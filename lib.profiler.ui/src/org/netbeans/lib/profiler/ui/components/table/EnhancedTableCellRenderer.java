@@ -44,7 +44,6 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.table.TableCellRenderer;
 
 
 /** An abstract superclass for table cell renderers to be used throughout the profiler.

@@ -41,7 +41,6 @@
 package org.netbeans.lib.profiler.ui.components.tree;
 
 import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.lib.profiler.ui.components.tree.TreeCellRendererPersistent;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
@@ -65,13 +64,14 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
     private transient Icon closedIcon = UIManager.getIcon("Tree.closedIcon"); // NOI18N
     private transient Icon leafIcon = UIManager.getIcon("Tree.leafIcon"); // NOI18N
     private transient Icon openIcon = UIManager.getIcon("Tree.openIcon"); // NOI18N
-    private BorderLayout borderLayout;
 
     // subcomponents
     private JLabel label1;
     private JLabel label2;
     private JLabel label3;
     private JTree tree;
+
+    private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -81,24 +81,18 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
      * UIManager.
      */
     public EnhancedTreeCellRenderer() {
+        super(null);
         setOpaque(false);
 
-        label1 = new JLabel();
-        label2 = new JLabel();
-        label3 = new JLabel();
+        label1 = new InternalLabel();
+        label2 = new InternalLabel();
+        label3 = new InternalLabel();
 
         label2.setFont(label1.getFont().deriveFont(Font.BOLD));
 
-        setLayout(borderLayout = new BorderLayout());
-
-        JPanel innerPanel = new JPanel();
-        innerPanel.setOpaque(false);
-        innerPanel.setLayout(new BorderLayout());
-
-        add(label1, BorderLayout.WEST);
-        add(innerPanel, BorderLayout.CENTER);
-        innerPanel.add(label2, BorderLayout.WEST);
-        innerPanel.add(label3, BorderLayout.CENTER);
+        add(label1);
+        add(label2);
+        add(label3);
 
         label1.setHorizontalAlignment(JLabel.LEFT);
 
@@ -114,6 +108,44 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    public void doLayout() {
+        Dimension size  = getSize();
+	Dimension size1 = label1.getPreferredSize();
+        Dimension size2 = label2.getPreferredSize();
+        Dimension size3 = label3.getPreferredSize();
+
+        size.height = Math.max(size.height, size1.height);
+        size.height = Math.max(size.height, size2.height);
+        size.height = Math.max(size.height, size3.height);
+
+        int x = 0;
+
+        if ("".equals(label1.getText())) size1.width += label1.getIconTextGap(); // NOI18N
+        label1.setBounds(x, 0, size1.width, size.height);
+        x += size1.width;
+
+        label2.setBounds(x, 0, size2.width, size.height);
+        x += size2.width;
+
+        label3.setBounds(x, 0, size3.width, size.height);
+    }
+
+    public Dimension getPreferredSize() {
+	Dimension size = label1.getPreferredSize();
+        if ("".equals(label1.getText())) size.width += label1.getIconTextGap(); // NOI18N
+        size.width += label2.getPreferredSize().width;
+        size.width += label3.getPreferredSize().width;
+        return size;
+    }
+
+    public Dimension getMaximumSize() {
+	return getPreferredSize();
+    }
+
+    public Dimension getMinimumSize() {
+	return getPreferredSize();
+    }
 
     /**
      * Subclassed to map <code>ColorUIResource</code>s to null. If
@@ -250,20 +282,6 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
     }
 
     /**
-     * Overrides <code>JComponent.getPreferredSize</code> to
-     * return slightly wider preferred size value.
-     */
-    public Dimension getPreferredSize() {
-        Dimension retDimension = super.getPreferredSize();
-
-        if (retDimension != null) {
-            retDimension = new Dimension(retDimension.width + 3, retDimension.height);
-        }
-
-        return retDimension;
-    }
-
-    /**
      * Sets the color the text is drawn with when the node isn't selected.
      */
     public void setTextNonSelectionColor(Color newColor) {
@@ -301,20 +319,13 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
      */
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row,
                                                   boolean hasFocus) {
-        String stringValue = tree.convertValueToText(value, sel, expanded, leaf, row, hasFocus);
+
+        String stringValue = value != null ? value.toString() : ""; // NOI18N
 
         this.tree = tree;
         this.hasFocus = hasFocus;
 
-        String firstLabel = getLabel1Text(value, stringValue);
-        label1.setText(firstLabel);
-
-        if ("".equals(firstLabel)) {
-            borderLayout.setHgap(label1.getIconTextGap()); // NOI18N
-        } else {
-            borderLayout.setHgap(0);
-        }
-
+        label1.setText(getLabel1Text(value, stringValue));
         label2.setText(getLabel2Text(value, stringValue));
         label3.setText(getLabel3Text(value, stringValue));
 
@@ -376,71 +387,7 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
-     */
-    public void firePropertyChange(String propertyName, byte oldValue, byte newValue) {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
-     */
-    public void firePropertyChange(String propertyName, char oldValue, char newValue) {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
-     */
-    public void firePropertyChange(String propertyName, short oldValue, short newValue) {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
-     */
-    public void firePropertyChange(String propertyName, int oldValue, int newValue) {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
-     */
-    public void firePropertyChange(String propertyName, long oldValue, long newValue) {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
-     */
-    public void firePropertyChange(String propertyName, float oldValue, float newValue) {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
-     */
-    public void firePropertyChange(String propertyName, double oldValue, double newValue) {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
-     */
-    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-    }
-
-    /**
-     * Paints the value.  The background is filled based on selected.
+     * Paints the value. The background is filled based on selected.
      */
     public void paint(Graphics g) {
         Color bColor;
@@ -470,6 +417,7 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
         }
 
         super.paint(g);
+
     }
 
     protected Icon getClosedIcon(Object value) {
@@ -511,15 +459,171 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
         return getOpenIcon();
     }
 
+    // --- Performance tweaks
+
+    // Overridden for performance reasons.
+    public Insets getInsets() { return ZERO_INSETS; }
+    
+    // Overridden for performance reasons.
+    public void validate() { if (!isValid()) doLayout(); }
+    
+    // Overridden for performance reasons.
+    public void revalidate() {}
+
+    // Overridden for performance reasons.
+    public void repaint(long tm, int x, int y, int width, int height) {}
+
+    // Overridden for performance reasons.
+    public void repaint(Rectangle r) {}
+
+    // Overridden for performance reasons.
+    public void repaint() {}
+
+    // Overridden for performance reasons.
+    public void firePropertyChange(String propertyName, byte oldValue, byte newValue) {}
+
+    // Overridden for performance reasons.
+    public void firePropertyChange(String propertyName, char oldValue, char newValue) {}
+
+    // Overridden for performance reasons.
+    public void firePropertyChange(String propertyName, short oldValue, short newValue) {}
+
+    // Overridden for performance reasons.
+    public void firePropertyChange(String propertyName, int oldValue, int newValue) {}
+
+    // Overridden for performance reasons.
+    public void firePropertyChange(String propertyName, long oldValue, long newValue) {}
+
+    // Overridden for performance reasons.
+    public void firePropertyChange(String propertyName, float oldValue, float newValue) {}
+
+    // Overridden for performance reasons.
+    public void firePropertyChange(String propertyName, double oldValue, double newValue) {}
+
+    // Overridden for performance reasons.
+    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
+
+    /// Overridden for performance reasons.
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
+
+    // ---
+
+
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Tweaked JLabel optimized for performance - use only as component renderer!
      */
-    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-        // Strings get interned...
-        if (propertyName == "text") { // NOI18N
-            super.firePropertyChange(propertyName, oldValue, newValue);
+    private static class InternalLabel extends JLabel {
+
+        private FontMetrics fontMetrics;
+        private String text;
+        private Color foreground;
+        private boolean enabled;
+
+
+        // Overridden for performance reasons.
+        public void setText(String text) {
+            this.text = text;
         }
+
+        // Overridden for performance reasons.
+        public String getText() {
+            return text;
+        }
+
+        // Overridden for performance reasons.
+        public void setForeground(Color foreground) {
+            this.foreground = foreground;
+        }
+
+        // Overridden for performance reasons.
+        public Color getForeground() {
+            return foreground;
+        }
+
+        // Overridden for performance reasons.
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        // Overridden for performance reasons.
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        // Overridden for performance reasons.
+        public FontMetrics getFontMetrics(Font font) {
+            if (fontMetrics == null) fontMetrics = super.getFontMetrics(font);
+            return fontMetrics;
+        }
+
+        // Overridden for performance reasons.
+        public void setFont(Font font) {
+            fontMetrics = null;
+            super.setFont(font);
+        }
+
+        // Overridden for performance reasons.
+        public void validate() {}
+
+        // Overridden for performance reasons.
+        public void revalidate() {}
+
+        // Overridden for performance reasons.
+        public void repaint(long tm, int x, int y, int width, int height) {}
+
+        // Overridden for performance reasons.
+        public void repaint(Rectangle r) {}
+
+        // Overridden for performance reasons.
+        public void repaint() {}
+
+        // Overridden for performance reasons.
+        public void setDisplayedMnemonic(int key) {}
+
+        // Overridden for performance reasons.
+        public void setDisplayedMnemonic(char aChar) {}
+
+        // Overridden for performance reasons.
+        public void setDisplayedMnemonicIndex(int index) {}
+
+        // Overridden for performance reasons.
+        public void firePropertyChange(String propertyName, byte oldValue, byte newValue) {}
+
+        // Overridden for performance reasons.
+        public void firePropertyChange(String propertyName, char oldValue, char newValue) {}
+
+        // Overridden for performance reasons.
+        public void firePropertyChange(String propertyName, short oldValue, short newValue) {}
+
+        // Overridden for performance reasons.
+        public void firePropertyChange(String propertyName, int oldValue, int newValue) {}
+
+        // Overridden for performance reasons.
+        public void firePropertyChange(String propertyName, long oldValue, long newValue) {}
+
+        // Overridden for performance reasons.
+        public void firePropertyChange(String propertyName, float oldValue, float newValue) {}
+
+        // Overridden for performance reasons.
+        public void firePropertyChange(String propertyName, double oldValue, double newValue) {}
+
+        // Overridden for performance reasons.
+        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
+
+        // Overridden for performance reasons.
+        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
+
+        // Overridden for performance reasons.
+        public void paint(Graphics g) {
+            Graphics componentGraphics = getComponentGraphics(g);
+            Graphics co = (componentGraphics == null) ? null :
+                          componentGraphics.create();
+            try {
+                paintComponent(co);
+            } finally {
+                co.dispose();
+            }
+        }
+
     }
 }
