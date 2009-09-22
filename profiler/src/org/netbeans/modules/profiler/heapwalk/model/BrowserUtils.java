@@ -45,7 +45,6 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
@@ -78,6 +77,7 @@ public class BrowserUtils {
     // -----
     // I18N String constants
     private static final String OUT_OF_MEMORY_MSG = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_OutOfMemoryMsg"); // NOI18N
+    private static final String TRUNCATED_STRING = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_TruncatedMsg"); // NOI18N
                                                                                                                             // -----
     public static ImageIcon ICON_INSTANCE = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/instance.png", false); // NOI18N
     public static ImageIcon ICON_PRIMITIVE = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/primitive.png", false); // NOI18N
@@ -88,6 +88,8 @@ public class BrowserUtils {
     public static ImageIcon ICON_GCROOT = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/gcRoot.png", false); // NOI18N
     private static RequestProcessor requestProcessor = new RequestProcessor("HeapWalker Processor", 3); // NOI18N
 
+    private static final int MAX_FULLNAME_LENGTH = 100;
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static String getArrayItemType(String arrayTypeName) {
@@ -97,11 +99,23 @@ public class BrowserUtils {
     }
 
     public static String getFullNodeName(HeapWalkerNode node) {
-        if (node.isRoot()) {
-            return getNodeName(node);
-        } else {
-            return getFullNodeName((HeapWalkerNode) node.getParent()) + "." + getNodeName(node); // NOI18N
+        StringBuilder sb = new StringBuilder();
+
+        while (!node.isRoot()) {
+            int length = sb.length();
+            if (length < MAX_FULLNAME_LENGTH) {
+                String nodeName = getNodeName(node);
+                sb.insert(0, "." + nodeName); // NOI18N
+                node = node.getParent();
+            } else {
+                sb.delete(0, TRUNCATED_STRING.length());
+                sb.insert(0, TRUNCATED_STRING);
+                break;
+            }
         }
+
+        sb.insert(0, getNodeName(node));
+        return sb.toString();
     }
 
     public static GroupingInfo getGroupingInfo(int itemsCount) {
