@@ -283,7 +283,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     protected void offsetChanged(long oldOffsetX, long oldOffsetY,
                                  long newOffsetX, long newOffsetY) {
-        // To be overriden by descendants
+        // To be overridden by descendants
     }
 
 
@@ -318,7 +318,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
 
     protected void scaleChanged(double oldScaleX, double oldScaleY,
                                 double newScaleX, double newScaleY) {
-        // To be overriden by descendants
+        // To be overridden by descendants
     }
 
 
@@ -429,7 +429,7 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
                                      long dataWidth, long dataHeight,
                                      long oldDataOffsetX, long oldDataOffsetY,
                                      long oldDataWidth, long oldDataHeight) {
-        // To be overriden by descendants
+        // To be overridden by descendants
     }
 
 

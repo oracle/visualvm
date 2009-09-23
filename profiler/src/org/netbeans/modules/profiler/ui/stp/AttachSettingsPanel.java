@@ -165,7 +165,7 @@ public class AttachSettingsPanel extends JPanel {
             }) {
                 public Dimension getPreferredSize() {
                     return new Dimension(super.getPreferredSize().width, PREFERRED_HINT_HEIGHT);
-                } // Needs to be overriden to prevent layout problems
+                } // Needs to be overridden to prevent layout problems
             };
         attachModeLabel.setLabelFor(attachModeHintLabel);
         constraints = new GridBagConstraints();
