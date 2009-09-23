@@ -46,7 +46,7 @@ import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
 import org.netbeans.modules.profiler.heapwalk.ui.FieldsBrowserControllerUI;
 import org.openide.util.NbBundle;
-import java.util.Comparator;
+//import java.util.Comparator;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JPanel;
@@ -71,37 +71,37 @@ public class FieldsBrowserController extends AbstractController {
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class FieldsComparator implements Comparator {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private boolean sortingOrder;
-        private int sortingColumn;
-
-        //~ Constructors ---------------------------------------------------------------------------------------------------------
-
-        public FieldsComparator(int sortingColumn, boolean sortingOrder) {
-            this.sortingColumn = sortingColumn;
-            this.sortingOrder = sortingOrder;
-        }
-
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public int compare(Object o1, Object o2) {
-            FieldValue field1 = sortingOrder ? (FieldValue) o1 : (FieldValue) o2;
-            FieldValue field2 = sortingOrder ? (FieldValue) o2 : (FieldValue) o1;
-
-            switch (sortingColumn) {
-                case 0: // Name
-                    return field1.getField().getName().compareTo(field2.getField().getName());
-                case 1: // Type
-                    return field1.getField().getType().getName().compareTo(field2.getField().getType().getName());
-                case 2: // Value
-                    return field1.getValue().compareTo(field2.getValue());
-                default:
-                    throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N
-            }
-        }
-    }
+//    private class FieldsComparator implements Comparator {
+//        //~ Instance fields ------------------------------------------------------------------------------------------------------
+//
+//        private boolean sortingOrder;
+//        private int sortingColumn;
+//
+//        //~ Constructors ---------------------------------------------------------------------------------------------------------
+//
+//        public FieldsComparator(int sortingColumn, boolean sortingOrder) {
+//            this.sortingColumn = sortingColumn;
+//            this.sortingOrder = sortingOrder;
+//        }
+//
+//        //~ Methods --------------------------------------------------------------------------------------------------------------
+//
+//        public int compare(Object o1, Object o2) {
+//            FieldValue field1 = sortingOrder ? (FieldValue) o1 : (FieldValue) o2;
+//            FieldValue field2 = sortingOrder ? (FieldValue) o2 : (FieldValue) o1;
+//
+//            switch (sortingColumn) {
+//                case 0: // Name
+//                    return field1.getField().getName().compareTo(field2.getField().getName());
+//                case 1: // Type
+//                    return field1.getField().getType().getName().compareTo(field2.getField().getType().getName());
+//                case 2: // Value
+//                    return field1.getValue().compareTo(field2.getValue());
+//                default:
+//                    throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N
+//            }
+//        }
+//    }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -275,21 +275,21 @@ public class FieldsBrowserController extends AbstractController {
     }
 
     private HeapWalkerNode getFields(final Instance instance) {
-        return HeapWalkerNodeFactory.createRootInstanceNode(instance, "this",
-                                                            new Runnable() { // NOI18N
-                public void run() {
-                    ((FieldsBrowserControllerUI) getPanel()).refreshView();
-                }
-            }, HeapWalkerNode.MODE_FIELDS, instancesControllerHandler.getHeapFragmentWalker().getHeapFragment());
+        return HeapWalkerNodeFactory.createRootInstanceNode(instance, "this", // NOI18N
+                                                            new Runnable() {
+            public void run() {
+                ((FieldsBrowserControllerUI) getPanel()).refreshView();
+            }
+        }, HeapWalkerNode.MODE_FIELDS, instancesControllerHandler.getHeapFragmentWalker().getHeapFragment());
     }
 
     private HeapWalkerNode getFields(final JavaClass javaClass) {
-        return HeapWalkerNodeFactory.createRootClassNode(javaClass, "class",
-                                                         new Runnable() { // NOI18N
-                public void run() {
-                    ((FieldsBrowserControllerUI) getPanel()).refreshView();
-                }
-            }, HeapWalkerNode.MODE_FIELDS, instancesControllerHandler.getHeapFragmentWalker().getHeapFragment());
+        return HeapWalkerNodeFactory.createRootClassNode(javaClass, "class", // NOI18N
+                                                         new Runnable() {
+            public void run() {
+                ((FieldsBrowserControllerUI) getPanel()).refreshView();
+            }
+        }, HeapWalkerNode.MODE_FIELDS, instancesControllerHandler.getHeapFragmentWalker().getHeapFragment());
     }
 
     private HeapWalkerNode getFilteredFields(HeapWalkerNode fields, String filterValue) {
@@ -310,7 +310,7 @@ public class FieldsBrowserController extends AbstractController {
         return filteredFields;
     }
 
-    private boolean matchesFilter(FieldValue field) {
-        return true;
-    }
+//    private boolean matchesFilter(FieldValue field) {
+//        return true;
+//    }
 }

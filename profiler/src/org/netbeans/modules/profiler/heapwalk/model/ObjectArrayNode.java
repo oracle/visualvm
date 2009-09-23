@@ -179,21 +179,7 @@ public class ObjectArrayNode extends ArrayNode {
                             }
                         }
                     } else if (getMode() == HeapWalkerNode.MODE_REFERENCES) {
-                        List fields = getReferences();
-
-                        if (fields.size() == 0) {
-                            // Instance has no fields
-                            children = new HeapWalkerNode[1];
-                            children[0] = HeapWalkerNodeFactory.createNoReferencesNode(ObjectArrayNode.this);
-                        } else {
-                            // Instance has at least one field
-                            children = new HeapWalkerNode[fields.size()];
-
-                            for (int i = 0; i < children.length; i++) {
-                                children[i] = HeapWalkerNodeFactory.createReferenceNode((Value) fields.get(i),
-                                                                                        ObjectArrayNode.this);
-                            }
-                        }
+                        children = HeapWalkerNodeFactory.createReferences(ObjectArrayNode.this);
                     }
 
                     return children;

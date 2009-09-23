@@ -45,7 +45,6 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
@@ -78,6 +77,7 @@ public class BrowserUtils {
     // -----
     // I18N String constants
     private static final String OUT_OF_MEMORY_MSG = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_OutOfMemoryMsg"); // NOI18N
+    private static final String TRUNCATED_STRING = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_TruncatedMsg"); // NOI18N
                                                                                                                             // -----
     public static ImageIcon ICON_INSTANCE = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/instance.png", false); // NOI18N
     public static ImageIcon ICON_PRIMITIVE = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/primitive.png", false); // NOI18N
@@ -88,6 +88,8 @@ public class BrowserUtils {
     public static ImageIcon ICON_GCROOT = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/gcRoot.png", false); // NOI18N
     private static RequestProcessor requestProcessor = new RequestProcessor("HeapWalker Processor", 3); // NOI18N
 
+    private static final int MAX_FULLNAME_LENGTH = 100;
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static String getArrayItemType(String arrayTypeName) {
@@ -97,11 +99,23 @@ public class BrowserUtils {
     }
 
     public static String getFullNodeName(HeapWalkerNode node) {
-        if (node.isRoot()) {
-            return getNodeName(node);
-        } else {
-            return getFullNodeName((HeapWalkerNode) node.getParent()) + "." + getNodeName(node); // NOI18N
+        StringBuilder sb = new StringBuilder();
+
+        while (!node.isRoot()) {
+            int length = sb.length();
+            if (length < MAX_FULLNAME_LENGTH) {
+                String nodeName = getNodeName(node);
+                sb.insert(0, "." + nodeName); // NOI18N
+                node = node.getParent();
+            } else {
+                sb.delete(0, TRUNCATED_STRING.length());
+                sb.insert(0, TRUNCATED_STRING);
+                break;
+            }
         }
+
+        sb.insert(0, getNodeName(node));
+        return sb.toString();
     }
 
     public static GroupingInfo getGroupingInfo(int itemsCount) {
@@ -147,43 +161,49 @@ public class BrowserUtils {
     }
 
     public static HeapWalkerNode computeChildrenToNearestGCRoot(InstanceNode instanceNode) {
-        Instance p = instanceNode.getInstance();
-        Instance next = p.getNearestGCRootPointer();
+        HeapWalkerNode node = instanceNode;
+        Instance instance = instanceNode.getInstance();
+        Instance nextInstance = instance.getNearestGCRootPointer();
+        HeapWalkerNode[] children = null;
 
-        while (!p.equals(next)) {
-            HeapWalkerNode[] children;
-
-            if (next == null) {
-                instanceNode = null;
-
+        while (!instance.equals(nextInstance)) {
+            if (nextInstance == null || node == null) {
+                node = null;
                 break;
             }
 
-            if (instanceNode.currentlyHasChildren()) {
-                children = instanceNode.getChildren();
-            } else {
-                children = instanceNode.getChildrenComputer().computeChildren();
-                instanceNode.setChildren(children);
-            }
-
-            instanceNode = null;
-
-            for (int i = 0; i < children.length; i++) {
-                InstanceNode inode = (InstanceNode) children[i];
-
-                if (inode.getInstance().equals(next)) {
-                    instanceNode = inode;
-
-                    break;
+            if (children == null) {
+                if (node instanceof InstanceNode && !((InstanceNode)node).currentlyHasChildren()) {
+                    InstanceNode inode = (InstanceNode)node;
+                    children = inode.getChildrenComputer().computeChildren();
+                    inode.setChildren(children);
+                } else {
+                    children = node.getChildren();
                 }
             }
 
-            //      System.out.println("    Next object "+next.getJavaClass().getName()+"#"+next.getInstanceNumber());
-            p = next;
-            next = next.getNearestGCRootPointer();
+            for (int i = 0; i < children.length; i++) {
+                HeapWalkerNode child = children[i];
+                if (child instanceof InstanceNode) {
+                    if (((InstanceNode)child).getInstance().equals(nextInstance)) {
+                        node = child;
+                        children = null;
+                        break;
+                    }
+                } else if (child instanceof InstancesContainerNode) {
+                    if (((InstancesContainerNode)child).getInstances().contains(nextInstance)) {
+                        node = child;
+                        children = null;
+                        break;
+                    }
+                }
+            }
+
+            instance = nextInstance;
+            nextInstance = nextInstance.getNearestGCRootPointer();
         }
 
-        return instanceNode;
+        return node;
     }
 
     public static ImageIcon createGCRootIcon(ImageIcon icon) {
@@ -200,36 +220,35 @@ public class BrowserUtils {
 
     public static HeapWalkerNode[] lazilyCreateChildren(final HeapWalkerNode parent, final ChildrenComputer childrenComputer) {
         SwingUtilities.invokeLater(new Runnable() { // allow repaint expanded node first
-                public void run() {
-                    performTask(new Runnable() { // compute progressChildren in separate thread, TODO: use RequestProcessor with single thread!
-                            public void run() {
-                                if (parent instanceof AbstractHeapWalkerNode) {
-                                    boolean oome = false;
-                                    HeapWalkerNode[] computedChildren;
+            public void run() {
+                performTask(new Runnable() { // compute progressChildren in separate thread, TODO: use RequestProcessor with single thread!
+                    public void run() {
+                        if (parent instanceof AbstractHeapWalkerNode) {
+                            boolean oome = false;
+                            HeapWalkerNode[] computedChildren;
 
-                                    try {
-                                        computedChildren = childrenComputer.computeChildren();
-                                        ((AbstractHeapWalkerNode) parent).changeChildren(computedChildren);
-                                    } catch (OutOfMemoryError e) {
-                                        oome = true;
-                                        computedChildren = new HeapWalkerNode[] { HeapWalkerNodeFactory.createOOMNode(parent) };
-                                        ((AbstractHeapWalkerNode) parent).changeChildren(computedChildren);
-                                    }
-
-                                    HeapWalkerNode root = getRoot(parent);
-
-                                    if (root instanceof RootNode) {
-                                        ((RootNode) root).refreshView();
-                                    }
-
-                                    if (oome) {
-                                        NetBeansProfiler.getDefaultNB().displayError(OUT_OF_MEMORY_MSG);
-                                    }
-                                }
+                            try {
+                                computedChildren = childrenComputer.computeChildren();
+                            } catch (OutOfMemoryError e) {
+                                oome = true;
+                                computedChildren = new HeapWalkerNode[] { HeapWalkerNodeFactory.createOOMNode(parent) };
                             }
-                        });
-                }
-            });
+
+                            final HeapWalkerNode[] computedChildrenF = computedChildren;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    ((AbstractHeapWalkerNode) parent).changeChildren(computedChildrenF);
+                                    HeapWalkerNode root = getRoot(parent);
+                                    if (root instanceof RootNode) ((RootNode)root).refreshView();
+                                }
+                            });
+
+                            if (oome) NetBeansProfiler.getDefaultNB().displayError(OUT_OF_MEMORY_MSG);
+                        }
+                    }
+                });
+            }
+        });
 
         return new HeapWalkerNode[] { HeapWalkerNodeFactory.createProgressNode(parent) };
     }
@@ -241,8 +260,9 @@ public class BrowserUtils {
     private static String getNodeName(HeapWalkerNode node) {
         String name = node.getName();
 
-        if (name.endsWith(")")) {
-            name = name.substring(0, name.indexOf("(")).trim(); // NOI18N // filters out additional information in name, i.e. GC root type
+        if (name.endsWith(")")) { // NOI18N
+            // filters out additional information in name, i.e. GC root type
+            name = name.substring(0, name.indexOf("(")).trim(); // NOI18N
         }
 
         return name;
