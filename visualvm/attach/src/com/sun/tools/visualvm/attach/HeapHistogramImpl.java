@@ -160,7 +160,7 @@ public class HeapHistogramImpl extends HeapHistogram {
         return totalPermGenBytes;
     }
     
-    public static class ClassInfoImpl {
+    public static class ClassInfoImpl extends ClassInfo {
         private long instances;
         private long bytes;
         private String name;
