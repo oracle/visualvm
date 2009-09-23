@@ -126,7 +126,7 @@ public class StackTraceSnapshotBuilder {
         }
     }
     
-    private static class SampledThreadInfo {
+    static class SampledThreadInfo {
         private StackTraceElement[] stackTrace;
         private Thread.State state;
         private java.lang.management.ThreadInfo threadInfo;
@@ -173,7 +173,7 @@ public class StackTraceSnapshotBuilder {
             return threadInfo.getStackTrace();
         }
 
-        private State getThreadState() {
+        State getThreadState() {
             if (state != null) {
                 return state;
             }
