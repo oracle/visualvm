@@ -602,7 +602,9 @@ class HprofHeap implements Heap {
                     if (entry.isTreeObj()) {
                         break;
                     }
-                    entry.setRetainedSize(entry.getRetainedSize()+size);
+                    int retainedSize = entry.getRetainedSize();
+                    if (retainedSize < 0) retainedSize = 0;
+                    entry.setRetainedSize(retainedSize+size);
                 }
             }
         }
