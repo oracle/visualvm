@@ -49,7 +49,6 @@ import javax.swing.ImageIcon;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.Value;
 
 
 /**
@@ -161,9 +160,8 @@ public class ObjectNode extends InstanceNode {
                 public HeapWalkerNode[] computeChildren() {
                     HeapWalkerNode[] children = null;
 
-                    ArrayList fieldValues = new ArrayList();
-
                     if (getMode() == HeapWalkerNode.MODE_FIELDS) {
+                        ArrayList fieldValues = new ArrayList();
                         fieldValues.addAll(getInstance().getFieldValues());
                         fieldValues.addAll(getInstance().getStaticFieldValues());
 
@@ -181,21 +179,7 @@ public class ObjectNode extends InstanceNode {
                             }
                         }
                     } else if (getMode() == HeapWalkerNode.MODE_REFERENCES) {
-                        fieldValues.addAll(getReferences());
-
-                        if (fieldValues.size() == 0) {
-                            // Instance has no fields
-                            children = new HeapWalkerNode[1];
-                            children[0] = HeapWalkerNodeFactory.createNoReferencesNode(ObjectNode.this);
-                        } else {
-                            // Instance has at least one field
-                            children = new HeapWalkerNode[fieldValues.size()];
-
-                            for (int i = 0; i < children.length; i++) {
-                                children[i] = HeapWalkerNodeFactory.createReferenceNode((Value) fieldValues.get(i),
-                                                                                        ObjectNode.this);
-                            }
-                        }
+                        children = HeapWalkerNodeFactory.createReferences(ObjectNode.this);
                     }
 
                     return children;

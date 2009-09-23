@@ -49,7 +49,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreePath;
 
 
 /**
