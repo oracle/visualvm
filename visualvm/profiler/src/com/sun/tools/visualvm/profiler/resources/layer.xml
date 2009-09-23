@@ -43,9 +43,13 @@
     
     <folder name="Menu">
         <folder name="Applications">
+            <file name="Applications-Separator-1500.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1500"/>
+            </file>
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
-                <attr name="position" intvalue="2300"/>
+                <attr name="position" intvalue="1510"/>
             </file>
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
@@ -59,7 +63,11 @@
             
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
-                <attr name="position" intvalue="1300"/>
+                <attr name="position" intvalue="1010"/>
+            </file>
+            <file name="ProfileApplicationAction-Separator-1020.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1020"/>
             </file>
             
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
