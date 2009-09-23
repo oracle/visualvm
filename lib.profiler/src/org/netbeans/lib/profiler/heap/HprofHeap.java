@@ -582,20 +582,24 @@ class HprofHeap implements Heap {
             long instanceId = dumpBuffer.getID(start + instanceIdOffset);
             LongMap.Entry instanceEntry = idToOffsetMap.get(instanceId);
             long idom = domTree.getIdomId(instanceId,instanceEntry);
-
-            if (!instanceEntry.isTreeObj() && (instanceEntry.getNearestGCRootPointer() != 0 || getGCRoot(new Long(instanceId)) != null)) {
+            boolean isTreeObj = instanceEntry.isTreeObj();
+            int instSize = 0;
+            
+            if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || getGCRoot(new Long(instanceId)) != null)) {
                 int origSize = instanceEntry.getRetainedSize();
-                instanceEntry.setRetainedSize(origSize + getInstanceByID(instanceId).getSize());
+                instSize = getInstanceByID(instanceId).getSize();
+                instanceEntry.setRetainedSize(origSize + instSize);
             }
             if (idom != 0) {
                 int size;
                 LongMap.Entry entry;
                 Object[] domPath = null;
                 
-                if (instanceEntry.isTreeObj()) {
+                if (isTreeObj) {
                     size = instanceEntry.getRetainedSize();
                 } else {
-                    size = getInstanceByID(instanceId).getSize();
+                    assert instSize != 0;
+                    size = instSize;
                 }
                 for (;idom!=0;idom=domTree.getIdomId(idom,entry)) {
                     entry = idToOffsetMap.get(idom);
