@@ -57,10 +57,8 @@ import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.heapwalk.ClassesListController;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Font;
@@ -174,25 +172,28 @@ public class ClassesListControllerUI extends JTitledPanel {
     private class ClassesListTableMouseListener extends MouseAdapter {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public void mouseClicked(MouseEvent e) {
-            int row = classesListTable.rowAtPoint(e.getPoint());
-
-            if (row != -1) {
-                if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
-                    showInstancesForClass((JavaClass) displayCache[row][4]);
-                } else if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                    tablePopup.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
+        private void updateSelection(int row) {
+            classesListTable.requestFocusInWindow();
+            if (row != -1) classesListTable.setRowSelectionInterval(row, row);
+            else classesListTable.clearSelection();
         }
 
-        public void mousePressed(MouseEvent e) {
-            int row = classesListTable.rowAtPoint(e.getPoint());
+        public void mousePressed(final MouseEvent e) {
+            final int row = classesListTable.rowAtPoint(e.getPoint());
+            updateSelection(row);
+            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+        }
 
-            if (row != -1) {
-                if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-                    classesListTable.setRowSelectionInterval(row, row);
-                }
+        public void mouseReleased(MouseEvent e) {
+            int row = classesListTable.rowAtPoint(e.getPoint());
+            updateSelection(row);
+            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+                int row = classesListTable.rowAtPoint(e.getPoint());
+                if (row != -1) showInstancesForClass((JavaClass) displayCache[row][4]);
             }
         }
     }

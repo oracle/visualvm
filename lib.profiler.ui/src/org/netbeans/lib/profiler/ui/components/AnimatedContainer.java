@@ -252,7 +252,7 @@ public class AnimatedContainer extends javax.swing.JPanel {
     }
 
     /**
-     * Overriden - we need to store reference to the content component
+     * Overridden - we need to store reference to the content component
      */
     public Component add(Component component) {
         content = (JComponent) component;

@@ -488,7 +488,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
             //System.err.println("CLazz: "+clazz.getName());
             for (int i = 0; i < nMethods; i++) {
-                // FIXME: issue 68840: An overriden method overriding with subclass of return type is instrumented twice
+                // FIXME: issue 68840: An overridden method overriding with subclass of return type is instrumented twice
                 // http://profiler.netbeans.org/issues/show_bug.cgi?id=68840
                 // a method whose return type is not exact match as the method which it implements/overrides would be listed
                 // and processed twice, leading to double instrumentation
