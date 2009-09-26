@@ -171,7 +171,7 @@ class LongBuffer {
         
         if (bufferSize < buffer.length) {
             for (int i=0;i<bufferSize;i++) {
-                reverted.buffer[i] = buffer[bufferSize - 1 - i];
+                reverted.writeLong(buffer[bufferSize - 1 - i]);
             }
         } else {
             writeStream.flush();
