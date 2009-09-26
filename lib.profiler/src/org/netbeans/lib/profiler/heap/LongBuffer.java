@@ -174,6 +174,7 @@ class LongBuffer {
                 reverted.buffer[i] = buffer[bufferSize - 1 - i];
             }
         } else {
+            writeStream.flush();
             RandomAccessFile raf = new RandomAccessFile(backingFile,"r");
             long offset = raf.length();
             while(offset > 0) {
