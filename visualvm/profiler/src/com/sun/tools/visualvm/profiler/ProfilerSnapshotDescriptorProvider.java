@@ -33,7 +33,7 @@ import com.sun.tools.visualvm.core.model.AbstractModelProvider;
  *
  * @author Tomas Hurka
  */
-public class ProfilerSnapshotDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+class ProfilerSnapshotDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
     public ProfilerSnapshotDescriptorProvider() {
     }

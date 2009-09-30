@@ -24,6 +24,8 @@
  */
 package com.sun.tools.visualvm.modules.sampler.cpu;
 
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;
@@ -62,6 +64,29 @@ public class SampledLivePanel extends LiveFlatProfileCollectorPanel {
         }
 
         return new String[] { className, null, null };
+    }
+
+    protected void obtainResults() {
+        super.obtainResults();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                resTableModel.
+                        setRealColumnVisibility(4, false);
+                resTable.createDefaultColumnsFromModel();
+                resTableModel.setTable(resTable);
+                setColumnsData();
+            }
+        });
+    }
+
+    private void setColumnsData() {
+        TableColumnModel colModel = resTable.getColumnModel();
+        for (int i = 0; i < resTableModel.getColumnCount(); i++) {
+            int index = resTableModel.getRealColumn(i);
+            if (index != 0)
+                colModel.getColumn(i).setPreferredWidth(columnWidths[index - 1]);
+            colModel.getColumn(i).setCellRenderer(columnRenderers[index]);
+        }
     }
 
 }

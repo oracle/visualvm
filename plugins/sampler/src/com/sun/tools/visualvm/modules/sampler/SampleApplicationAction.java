@@ -25,12 +25,8 @@
 package com.sun.tools.visualvm.modules.sampler;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import org.openide.util.NbBundle;
 
     
@@ -40,12 +36,6 @@ import org.openide.util.NbBundle;
  */
 class SampleApplicationAction extends SingleDataSourceAction<Application> {
     
-    private final PropertyChangeListener stateListener = new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
-            updateState(ActionUtils.getSelectedDataSources(Application.class));
-        }
-    };
-        
     private static SampleApplicationAction instance;
     
     public static synchronized SampleApplicationAction instance() {
@@ -55,17 +45,16 @@ class SampleApplicationAction extends SingleDataSourceAction<Application> {
     }
         
     protected void actionPerformed(Application application, ActionEvent actionEvent) {
-        SamplerSupport.getInstance().selectProfilerView(application);
+        SamplerSupport.getInstance().selectSamplerView(application);
     }
     
     protected boolean isEnabled(Application application) {
-        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
-        return SamplerSupport.getInstance().supportsProfiling(application);
+        return true;
     }
         
     private SampleApplicationAction() {
         super(Application.class);
-        putValue(NAME, NbBundle.getMessage(SampleApplicationAction.class, "MSG_Profile")); // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(SampleApplicationAction.class, "DESCR_Profile"));    // NOI18N
+        putValue(NAME, NbBundle.getMessage(SampleApplicationAction.class, "MSG_Sample")); // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(SampleApplicationAction.class, "DESCR_Sample"));    // NOI18N
     }
 }

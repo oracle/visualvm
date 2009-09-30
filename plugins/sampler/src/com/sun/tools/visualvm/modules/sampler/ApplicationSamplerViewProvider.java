@@ -37,7 +37,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 class ApplicationSamplerViewProvider extends DataSourceViewProvider<Application>{
     
     protected boolean supportsViewFor(Application application) {
-        return SamplerSupport.getInstance().supportsProfiling(application);
+        return true;
     }
 
     protected DataSourceView createView(Application application) {

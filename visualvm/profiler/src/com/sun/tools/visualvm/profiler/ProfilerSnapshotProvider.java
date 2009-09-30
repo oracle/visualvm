@@ -46,7 +46,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerSnapshotProvider {
+class ProfilerSnapshotProvider {
     
     public void createSnapshot(LoadedSnapshot loadedSnapshot, Application application, final boolean openView) {
         final ProfilerSnapshot snapshot = new ProfilerSnapshot(loadedSnapshot, application);

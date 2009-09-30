@@ -46,7 +46,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-public final class ProfilerSupport {
+final class ProfilerSupport {
     private static final boolean FORCE_PROFILING_SUPPORTED = Boolean.getBoolean("com.sun.tools.visualvm.profiler.SupportAllVMs");   // NOI18N
     private static final String HOTSPOT_VM_NAME_PREFIX = "Java HotSpot";    // NOI18N
     private static final String OPENJDK_VM_NAME_PREFIX = "OpenJDK ";    // NOI18N

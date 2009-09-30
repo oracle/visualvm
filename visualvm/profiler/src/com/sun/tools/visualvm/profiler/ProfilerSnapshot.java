@@ -36,7 +36,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class ProfilerSnapshot extends Snapshot {
+public class ProfilerSnapshot extends Snapshot {
     
     private LoadedSnapshot loadedSnapshot;
     

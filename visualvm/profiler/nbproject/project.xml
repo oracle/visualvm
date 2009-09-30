@@ -111,7 +111,10 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <friend-packages>
+                <friend>com.sun.tools.visualvm.modules.sampler</friend>
+                <package>com.sun.tools.visualvm.profiler</package>
+            </friend-packages>
         </data>
     </configuration>
 </project>

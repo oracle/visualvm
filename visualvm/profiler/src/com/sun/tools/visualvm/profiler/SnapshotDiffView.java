@@ -41,7 +41,6 @@ import org.netbeans.modules.profiler.SnapshotsDiffWindow;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  *

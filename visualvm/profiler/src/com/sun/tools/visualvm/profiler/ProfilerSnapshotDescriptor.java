@@ -31,13 +31,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.openide.util.ImageUtilities;
-import org.openide.util.Utilities;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
+class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
     private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotDescriptor.class.getName());
     
     private static final Image CPU_ICON = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png", true);    // NOI18N

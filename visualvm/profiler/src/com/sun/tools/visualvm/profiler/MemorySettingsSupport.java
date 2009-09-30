@@ -50,7 +50,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-public class MemorySettingsSupport {
+class MemorySettingsSupport {
     
     private static final String PROP_PREFIX = "ProfilerMemorySettings_"; // NOI18N
     
