@@ -55,7 +55,7 @@ public class AttachModelImpl extends AttachModel {
         try {
             return getVirtualMachine().getSystemProperties();
         } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"getSystemProperties",ex);
+            LOGGER.log(Level.INFO,"getSystemProperties",ex);    // NOI18N
         }
         return null;
     }
@@ -65,11 +65,11 @@ public class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().dumpHeap(fileName,LIVE_OBJECTS_OPTION);
             String out = readToEOF(in);
             if (out.length()>0) {
-                LOGGER.log(Level.INFO,"takeHeapDump",out);
+                LOGGER.log(Level.INFO,"takeHeapDump",out);  // NOI18N
             }
             return true;
         } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"takeHeapDump",ex);
+            LOGGER.log(Level.INFO,"takeHeapDump",ex);   // NOI18N
         }
         return false;
     }
@@ -79,7 +79,7 @@ public class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().remoteDataDump("-l");  // NOI18N
             return readToEOF(in);
         } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"takeThreadDump",ex);
+            LOGGER.log(Level.INFO,"takeThreadDump",ex);     // NOI18N
         }
         return null;
     }
@@ -89,7 +89,7 @@ public class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().printFlag(name);
             return readToEOF(in);
         } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"printFlag",ex);
+            LOGGER.log(Level.INFO,"printFlag",ex);  // NOI18N
         }
         return null;
     }
@@ -99,10 +99,10 @@ public class AttachModelImpl extends AttachModel {
             InputStream in = getVirtualMachine().setFlag(name,value);
             String out = readToEOF(in);
             if (out.length()>0) {
-                LOGGER.log(Level.INFO,"setFlag",out);
+                LOGGER.log(Level.INFO,"setFlag",out);   // NOI18N
             }
         } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"setFlag",ex);
+            LOGGER.log(Level.INFO,"setFlag",ex);    // NOI18N
         }
     }
 
@@ -113,7 +113,7 @@ public class AttachModelImpl extends AttachModel {
             in.close();
             return h;
         } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"takeHeapHistogram",ex);
+            LOGGER.log(Level.INFO,"takeHeapHistogram",ex);  // NOI18N
         }
         return null;
     }
