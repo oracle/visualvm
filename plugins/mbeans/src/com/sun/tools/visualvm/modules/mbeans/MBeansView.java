@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
@@ -67,8 +68,12 @@ class MBeansView extends DataSourceView {
         DataViewComponent dvc = null;
         JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
         if (jmx == null || jmx.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-            JTextArea textArea = new JTextArea("\n\n" + Resources.getText("LBL_ConnectionNotEstablished")); // NOI18N
+            JTextArea textArea = new JTextArea();
+            textArea.setBorder(BorderFactory.createEmptyBorder(25, 9, 9, 9));
             textArea.setEditable(false);
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+            textArea.setText(Resources.getText("LBL_ConnectionNotEstablished")); // NOI18N
             dvc = new DataViewComponent(
                 new DataViewComponent.MasterView(Resources.getText("LBL_MBeansBrowser"), null, textArea), // NOI18N
                 new DataViewComponent.MasterViewConfiguration(true));
