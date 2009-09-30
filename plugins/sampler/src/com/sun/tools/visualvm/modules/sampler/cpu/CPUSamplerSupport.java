@@ -107,7 +107,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         InstrumentationFilter filter = new InstrumentationFilter();
         SimpleFilter sf = (SimpleFilter)settings.getSelectedInstrumentationFilter();
         filter.setFilterStrings(sf.getFilterValue());
-        filter.setFilterType(sf.getFilterType());
+        filter.setFilterType(convertFilterType(sf.getFilterType()));
         builder = new StackTraceSnapshotBuilder(1, filter);
         snapshotDumper.builder = builder;
 
@@ -158,6 +158,19 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                 }
             }
         });
+    }
+
+    private int convertFilterType(int simpleFilterrType) {
+        if (simpleFilterrType == SimpleFilter.SIMPLE_FILTER_NONE) {
+            return InstrumentationFilter.INSTR_FILTER_NONE;
+        }
+        if (simpleFilterrType == SimpleFilter.SIMPLE_FILTER_EXCLUSIVE) {
+            return InstrumentationFilter.INSTR_FILTER_EXCLUSIVE;
+        }
+        if (simpleFilterrType == SimpleFilter.SIMPLE_FILTER_INCLUSIVE) {
+            return InstrumentationFilter.INSTR_FILTER_INCLUSIVE;
+        }
+        throw new IllegalArgumentException("type "+simpleFilterrType);
     }
 
 
