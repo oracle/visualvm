@@ -563,7 +563,7 @@ class SamplerImpl {
                 if (!JvmFactory.getJVMFor(application).isAttachable()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            memoryStatus = "Not available. Cannot connect to target application. Make sure the application is running on JDK 6 or JDK 7.";
+                            memoryStatus = "Not available. Cannot connect to target application. Make sure the application is running on a supported JDK 6 or JDK 7.";
                             refreshSummary();
                         }
                     });
@@ -681,7 +681,7 @@ class SamplerImpl {
     }
 
     private static void addCpuHeader(StringBuilder builder) {
-        builder.append("<b>CPU Sampling:</b><br>");
+        builder.append("<b>CPU sampling:</b><br>");
     }
 
     private static void addMemoryHeader(StringBuilder builder) {
