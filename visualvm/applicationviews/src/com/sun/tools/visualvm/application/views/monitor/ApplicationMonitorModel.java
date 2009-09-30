@@ -215,57 +215,57 @@ final class ApplicationMonitorModel {
         else initialize((Snapshot)source);
     }
 
-    public void registerCpuChartSupport(SimpleXYChartSupport cpuChartSupport) {
+    public void registerCpuChartSupport(final SimpleXYChartSupport cpuChartSupport) {
         this.cpuChartSupport = cpuChartSupport;
-        if (source instanceof Snapshot)
+        if (cpuChartSupport != null && source instanceof Snapshot)
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    loadChartSupport(ApplicationMonitorModel.this.cpuChartSupport,
-                            source.getStorage(), CPU_CHART_STORAGE);
+                    File file = new File(source.getStorage().getDirectory(), CPU_CHART_STORAGE);
+                    if (file.isFile()) loadChartSupport(cpuChartSupport, file);
                 }
             });
     }
 
-    public void registerHeapChartSupport(SimpleXYChartSupport heapChartSupport) {
+    public void registerHeapChartSupport(final SimpleXYChartSupport heapChartSupport) {
         this.heapChartSupport = heapChartSupport;
-        if (source instanceof Snapshot)
+        if (heapChartSupport != null && source instanceof Snapshot)
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    loadChartSupport(ApplicationMonitorModel.this.heapChartSupport,
-                            source.getStorage(), HEAP_CHART_STORAGE);
+                    File file = new File(source.getStorage().getDirectory(), HEAP_CHART_STORAGE);
+                    if (file.isFile()) loadChartSupport(heapChartSupport, file);
                 }
             });
     }
 
-    public void registerPermGenChartSupport(SimpleXYChartSupport permgenChartSupport) {
+    public void registerPermGenChartSupport(final SimpleXYChartSupport permgenChartSupport) {
         this.permGenChartSupport = permgenChartSupport;
-        if (source instanceof Snapshot)
+        if (permGenChartSupport != null && source instanceof Snapshot)
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    loadChartSupport(ApplicationMonitorModel.this.permGenChartSupport,
-                            source.getStorage(), PERMGEN_CHART_STORAGE);
+                    File file = new File(source.getStorage().getDirectory(), PERMGEN_CHART_STORAGE);
+                    if (file.isFile()) loadChartSupport(permGenChartSupport, file);
                 }
             });
     }
 
-    public void registerClassesChartSupport(SimpleXYChartSupport classesChartSupport) {
+    public void registerClassesChartSupport(final SimpleXYChartSupport classesChartSupport) {
         this.classesChartSupport = classesChartSupport;
-        if (source instanceof Snapshot)
+        if (classesChartSupport != null && source instanceof Snapshot)
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    loadChartSupport(ApplicationMonitorModel.this.classesChartSupport,
-                            source.getStorage(), CLASSES_CHART_STORAGE);
+                    File file = new File(source.getStorage().getDirectory(), CLASSES_CHART_STORAGE);
+                    if (file.isFile()) loadChartSupport(classesChartSupport, file);
                 }
             });
     }
 
-    public void registerThreadsChartSupport(SimpleXYChartSupport threadsChartSupport) {
+    public void registerThreadsChartSupport(final SimpleXYChartSupport threadsChartSupport) {
         this.threadsChartSupport = threadsChartSupport;
-        if (source instanceof Snapshot)
+        if (threadsChartSupport != null && source instanceof Snapshot)
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    loadChartSupport(ApplicationMonitorModel.this.threadsChartSupport,
-                            source.getStorage(), THREADS_CHART_STORAGE);
+                    File file = new File(source.getStorage().getDirectory(), THREADS_CHART_STORAGE);
+                    if (file.isFile()) loadChartSupport(threadsChartSupport, file);
                 }
             });
     }
@@ -324,22 +324,28 @@ final class ApplicationMonitorModel {
         setProperty(storage, PROP_PEAK_THREADS, Long.toString(peakThreads));
         setProperty(storage, PROP_STARTED_THREADS, Long.toString(startedThreads));
 
-        saveChartSupport(cpuChartSupport, storage, CPU_CHART_STORAGE);
-        saveChartSupport(heapChartSupport, storage, HEAP_CHART_STORAGE);
-        saveChartSupport(permGenChartSupport, storage, PERMGEN_CHART_STORAGE);
-        saveChartSupport(classesChartSupport, storage, CLASSES_CHART_STORAGE);
-        saveChartSupport(threadsChartSupport, storage, THREADS_CHART_STORAGE);
+        File dir = storage.getDirectory();
+
+        if (cpuMonitoringSupported || gcMonitoringSupported)
+            saveChartSupport(cpuChartSupport, new File(dir, CPU_CHART_STORAGE));
+        if (memoryMonitoringSupported)
+            saveChartSupport(heapChartSupport, new File(dir, HEAP_CHART_STORAGE));
+        if (memoryMonitoringSupported)
+            saveChartSupport(permGenChartSupport, new File(dir, PERMGEN_CHART_STORAGE));
+        if (classMonitoringSupported)
+            saveChartSupport(classesChartSupport, new File(dir, CLASSES_CHART_STORAGE));
+        if (threadsMonitoringSupported)
+            saveChartSupport(threadsChartSupport, new File(dir, THREADS_CHART_STORAGE));
         
     }
 
-    private static void saveChartSupport(SimpleXYChartSupport chartSupport, Storage storage, String filename) {
+    private static void saveChartSupport(SimpleXYChartSupport chartSupport, File file) {
         if (chartSupport == null) return;
 
-        File dir = storage.getDirectory();
         OutputStream os = null;
         
         try {
-            os = new FileOutputStream(new File(dir, filename));
+            os = new FileOutputStream(file);
             chartSupport.saveValues(os);
         } catch (Exception e) {
             // TODO: log it
@@ -352,14 +358,11 @@ final class ApplicationMonitorModel {
         }
     }
 
-    private static void loadChartSupport(SimpleXYChartSupport chartSupport, Storage storage, String filename) {
-        if (chartSupport == null) return;
-
-        File dir = storage.getDirectory();
+    private static void loadChartSupport(SimpleXYChartSupport chartSupport, File file) {
         InputStream is = null;
 
         try {
-            is = new FileInputStream(new File(dir, filename));
+            is = new FileInputStream(file);
             chartSupport.loadValues(is);
         } catch (Exception e) {
             // TODO: log it
