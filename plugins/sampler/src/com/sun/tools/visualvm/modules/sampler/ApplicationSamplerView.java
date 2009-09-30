@@ -68,10 +68,6 @@ class ApplicationSamplerView extends DataSourceView {
         application.addPropertyChangeListener(Stateful.PROPERTY_STATE, applicationListener);
     }
 
-    protected void added() {
-        sampler.added();
-    }
-
     protected void removed() {
         sampler.removed();
         cleanup();

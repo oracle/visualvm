@@ -52,6 +52,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.DataOutputStream;
@@ -127,6 +129,20 @@ class SamplerImpl {
     DataViewComponent.MasterView getMasterView() {
         initComponents();
         setState(State.INACTIVE);
+
+        final HierarchyListener hl = new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (view.isShowing()) {
+                        initializeCpuSampling();
+                        initializeMemorySampling();
+                        view.removeHierarchyListener(this);
+                    }
+                }
+            }
+        };
+        view.addHierarchyListener(hl);
+
         return new DataViewComponent.MasterView(NbBundle.getMessage(
                    ApplicationSamplerView.class, "LBL_Sampler"), null, view); // NOI18N
     }
@@ -145,11 +161,6 @@ class SamplerImpl {
         dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
     }
 
-
-    void added() {
-        initializeCpuSampling();
-        initializeMemorySampling();
-    }
 
     void removed() {
         terminate();
