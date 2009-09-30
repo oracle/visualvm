@@ -46,7 +46,7 @@ class JExtendedSplitPane extends JSplitPane {
         public void componentHidden(ComponentEvent e) {
             computeDividerLocationWhenHidden(e.getComponent());
 
-            if ((dividerLocation == 0) || (dividerLocation == 1)) {
+            if ((dividerLocation <= 0) || (dividerLocation >= 1)) {
                 dividerLocation = 0.5;
             }
 
