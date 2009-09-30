@@ -122,6 +122,7 @@ class JConsolePluginWrapper {
                 hintArea.setLineWrap(true);
                 hintArea.setWrapStyleWord(true);
                 hintArea.setDisabledTextColor(hintArea.getForeground());
+                hintArea.setOpaque(false);
                 hintArea.setText(NbBundle.getMessage(
                         JConsolePluginWrapper.class, "InstallPluginHint")); // NOI18N
                 c = new GridBagConstraints();
