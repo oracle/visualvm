@@ -113,7 +113,7 @@ public class AttachModelImpl extends AttachModel {
             in.close();
             return h;
         } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"setFlag",ex);
+            LOGGER.log(Level.INFO,"takeHeapHistogram",ex);
         }
         return null;
     }
