@@ -40,9 +40,9 @@ import sun.tools.attach.HotSpotVirtualMachine;
  * @author Tomas Hurka
  */
 public class AttachModelImpl extends AttachModel {
-    private static final String LIVE_OBJECTS_OPTION = "-live";  // NOI18N
-    private static final String ALL_OBJECTS_OPTION = "-all";    // NOI18N
-    private static final Logger LOGGER = Logger.getLogger(AttachModelImpl.class.getName());
+    static final String LIVE_OBJECTS_OPTION = "-live";  // NOI18N
+    static final String ALL_OBJECTS_OPTION = "-all";    // NOI18N
+    static final Logger LOGGER = Logger.getLogger(AttachModelImpl.class.getName());
 
     String pid;
     HotSpotVirtualMachine vm;
@@ -118,7 +118,7 @@ public class AttachModelImpl extends AttachModel {
         return null;
     }
     
-    private HotSpotVirtualMachine getVirtualMachine() throws IOException {
+    HotSpotVirtualMachine getVirtualMachine() throws IOException {
         if (vm == null) {
             try {
                 vm = (HotSpotVirtualMachine) VirtualMachine.attach(pid);

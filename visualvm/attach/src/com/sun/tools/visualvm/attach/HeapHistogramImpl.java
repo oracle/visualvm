@@ -72,16 +72,18 @@ public class HeapHistogramImpl extends HeapHistogram {
         permGenNames.put("<klassKlass>","Base Class Metadata");
         permGenNames.put("<arrayKlassKlass>","Base Array Class Metadata");
     }
-    private final Set<ClassInfo> classes;
-    private final Set<ClassInfo> permGenClasses;
-    private final Date time;
-    private final long totalBytes;
-    private final long totalInstances;
-    private long totalHeapBytes;
-    private long totalHeapInstances;
-    private long totalPermGenBytes;
-    private long totalPermgenInstances;
+    Set<ClassInfo> classes;
+    Set<ClassInfo> permGenClasses;
+    Date time;
+    long totalBytes;
+    long totalInstances;
+    long totalHeapBytes;
+    long totalHeapInstances;
+    long totalPermGenBytes;
+    long totalPermgenInstances;
     
+    HeapHistogramImpl() {
+    }
     
     HeapHistogramImpl(InputStream in) {
         Map<String,ClassInfoImpl> classesMap = new HashMap(1024);
@@ -114,7 +116,7 @@ public class HeapHistogramImpl extends HeapHistogram {
         permGenClasses = new HashSet(permGenMap.values());
     }
 
-    private void storeClassInfo(final ClassInfoImpl newClInfo, final Map<String, ClassInfoImpl> map) {
+    void storeClassInfo(final ClassInfoImpl newClInfo, final Map<String, ClassInfoImpl> map) {
         ClassInfoImpl oldClInfo = map.get(newClInfo.getName());
         if (oldClInfo == null) {
             map.put(newClInfo.getName(),newClInfo);
@@ -160,14 +162,13 @@ public class HeapHistogramImpl extends HeapHistogram {
         return totalPermGenBytes;
     }
     
-    public static class ClassInfoImpl extends ClassInfo {
-        private long instances;
-        private long bytes;
-        private String name;
-        private boolean permGen;
-
-
-        public ClassInfoImpl() {
+    static class ClassInfoImpl extends ClassInfo {
+        long instances;
+        long bytes;
+        String name;
+        boolean permGen;
+        
+        ClassInfoImpl() {
         }
         
         ClassInfoImpl(Scanner sc) {
@@ -210,7 +211,7 @@ public class HeapHistogramImpl extends HeapHistogram {
             return permGen;
         }
         
-        private String convertJVMName(String jvmName) {
+        String convertJVMName(String jvmName) {
             String name = null;
             int index = jvmName.lastIndexOf('[');
             
