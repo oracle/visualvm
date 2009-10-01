@@ -37,7 +37,6 @@ import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.URL;
 import java.rmi.ConnectException;
 import java.util.ArrayList;
