@@ -25,10 +25,6 @@
 
 package com.sun.tools.visualvm.application;
 
-import com.sun.tools.visualvm.application.ApplicationDescriptor;
-import java.awt.Image;
-import org.openide.util.ImageUtilities;
-
 /**
  *
  * @author Tomas Hurka
