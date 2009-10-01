@@ -26,6 +26,7 @@ package com.sun.tools.visualvm.modules.sampler.cpu;
 
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;
@@ -48,7 +49,9 @@ public class SampledLivePanel extends LiveFlatProfileCollectorPanel {
     }
     
     public FlatProfileProvider getFlatProfileProvider() {
-        CCTFlattener flattener = new CCTFlattener(snapshotBuilder.collectionTwoTimeStamps(),methodInfoMapper);
+        InstrumentationFilter filter = snapshotBuilder.getFilter();
+        boolean twoTimeStamps = snapshotBuilder.collectionTwoTimeStamps();
+        CCTFlattener flattener = new CCTFlattener(twoTimeStamps,methodInfoMapper,filter);
         RuntimeCPUCCTNode rootNode = (RuntimeCPUCCTNode) snapshotBuilder.getAppRootNode();
         return new FlatProfileBuilder(rootNode, flattener);
     }

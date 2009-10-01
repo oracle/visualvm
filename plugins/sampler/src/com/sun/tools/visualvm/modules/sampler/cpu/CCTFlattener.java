@@ -1,12 +1,13 @@
 package com.sun.tools.visualvm.modules.sampler.cpu;
 
 import java.util.Stack;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;
-import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTVisitorAdapter;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
 
 /**
  *
@@ -28,16 +29,17 @@ class CCTFlattener extends CPUCCTVisitorAdapter {
     private long[] timePM1;
     private int nMethods;
     private boolean collectingTwoTimeStamps;
-    private CCTResultsFilter currentFilter = null;
     private MethodInfoMapper methodInfoMapper;
+    private InstrumentationFilter filter;
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    CCTFlattener(boolean twoStamps, MethodInfoMapper mapper) {
+    CCTFlattener(boolean twoStamps, MethodInfoMapper mapper, InstrumentationFilter f) {
         parentStack = new Stack();
         nMethods = mapper.getMaxMethodId();
         methodInfoMapper = mapper;
         collectingTwoTimeStamps = twoStamps;
+        filter = f;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -115,22 +117,38 @@ class CCTFlattener extends CPUCCTVisitorAdapter {
     }
 
     public void visit(MethodCPUCCTNode node) {
-
         MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek();
+        boolean filteredOut = node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_YES; // filtered out by rootmethod/markermethod rules
 
-        timePM0[node.getMethodId()] += node.getNetTime0();
-
-        if (collectingTwoTimeStamps) {
-            timePM1[node.getMethodId()] += node.getNetTime1();
+        if (!filteredOut) {
+            String jvmClassName = methodInfoMapper.getInstrMethodClass(node.getMethodId()).replace('.', '/');
+            filteredOut = !filter.passesFilter(jvmClassName);
         }
+        if (filteredOut) {
+            if ((currentParent != null) && !currentParent.isRoot()) {
+                invDiff[currentParent.getMethodId()] += node.getNCalls();
 
-        invPM[node.getMethodId()] += node.getNCalls();
+                timePM0[currentParent.getMethodId()] += node.getNetTime0();
 
-        if ((currentParent != null) && !currentParent.isRoot()) {
-            nCalleeInvocations[currentParent.getMethodId()] += node.getNCalls();
+                if (collectingTwoTimeStamps) {
+                    timePM1[currentParent.getMethodId()] += node.getNetTime1();
+                }
+            }
+        } else {
+            timePM0[node.getMethodId()] += node.getNetTime0();
+
+            if (collectingTwoTimeStamps) {
+                timePM1[node.getMethodId()] += node.getNetTime1();
+            }
+
+            invPM[node.getMethodId()] += node.getNCalls();
+
+            if ((currentParent != null) && !currentParent.isRoot()) {
+                nCalleeInvocations[currentParent.getMethodId()] += node.getNCalls();
+            }
+
+            currentParent = node;
         }
-
-        currentParent = node;
 
         parentStack.push(currentParent);
     }
