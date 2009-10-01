@@ -199,7 +199,11 @@ public final class AboutAction extends AbstractAction {
             if (files.add (f)) {
                 // new file
                 sb.append (prefix);
-                sb.append(f.getAbsolutePath());
+                try {
+                    sb.append(f.getCanonicalPath());
+                } catch (IOException e) {
+                    sb.append(f.getAbsolutePath());
+                }
                 prefix = "\n";  // NOI18N
             }
         }
