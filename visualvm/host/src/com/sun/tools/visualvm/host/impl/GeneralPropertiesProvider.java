@@ -46,8 +46,8 @@ import org.openide.util.RequestProcessor;
 public class GeneralPropertiesProvider extends PropertiesProvider<Host> {
 
     public GeneralPropertiesProvider() {
-        super(NbBundle.getMessage(GeneralPropertiesProvider.class, "LBL_TargetProperties"), // NOI18N
-              NbBundle.getMessage(GeneralPropertiesProvider.class, "DESCR_TargetProperties"), // NOI18N
+        super(NbBundle.getMessage(GeneralPropertiesProvider.class, "LBL_HostProperties"), // NOI18N
+              NbBundle.getMessage(GeneralPropertiesProvider.class, "DESCR_HostProperties"), // NOI18N
               CATEGORY_GENERAL, 50);
     }
 
