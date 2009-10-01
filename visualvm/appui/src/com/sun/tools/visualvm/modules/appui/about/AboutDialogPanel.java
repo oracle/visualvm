@@ -35,7 +35,6 @@ import java.awt.event.HierarchyListener;
 import java.net.URL;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
