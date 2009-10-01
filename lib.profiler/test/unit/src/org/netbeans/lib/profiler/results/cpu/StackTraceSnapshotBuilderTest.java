@@ -180,7 +180,7 @@ public class StackTraceSnapshotBuilderTest {
 
         addStacktrace(stack0, 0);
         CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
-        assertFalse(snapshot.collectingTwoTimeStamps);
+        assertTrue(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
 
@@ -192,7 +192,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stack0, 500000);
 
         CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
-        assertFalse(snapshot.collectingTwoTimeStamps);
+        assertTrue(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
 
@@ -204,7 +204,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackMinus, 500000);
 
         CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
-        assertFalse(snapshot.collectingTwoTimeStamps);
+        assertTrue(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
 
@@ -216,7 +216,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackPlus, 500000);
 
         CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
-        assertFalse(snapshot.collectingTwoTimeStamps);
+        assertTrue(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
 
@@ -229,7 +229,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackMinus, 1000000);
 
         CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
-        assertFalse(snapshot.collectingTwoTimeStamps);
+        assertTrue(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
 
@@ -242,7 +242,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackPlus, 1000000);
 
         CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
-        assertFalse(snapshot.collectingTwoTimeStamps);
+        assertTrue(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
     }
 
@@ -254,7 +254,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackDup, 500000);
 
         CPUResultsSnapshot snapshot = instance.createSnapshot(System.currentTimeMillis());
-        assertFalse(snapshot.collectingTwoTimeStamps);
+        assertTrue(snapshot.collectingTwoTimeStamps);
         assertEquals(instance.methodInfos.size(), snapshot.nInstrMethods);
         CPUCCTContainer container = snapshot.getContainerForThread((int) stack0[0].getThreadId(), CPUResultsSnapshot.METHOD_LEVEL_VIEW);
         assertEquals(container.getThreadName(),thread0.getName());
@@ -305,12 +305,9 @@ public class StackTraceSnapshotBuilderTest {
         int tIdSize = instance.threadIds.size();
         long timestamp = instance.currentDumpTimeStamp;
 
-        try {
-            addStacktrace(stack0, stamp);
-            fail();
-        } catch (IllegalStateException ex) {
-            // ok
-        }
+        addStacktrace(stack0, stamp);
+        assertTrue(instance.stackTraceCount == 1);
+
     }
 
     @Test
