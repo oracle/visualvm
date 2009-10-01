@@ -35,9 +35,11 @@ import java.awt.event.HierarchyListener;
 import java.net.URL;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.Caret;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -108,7 +110,6 @@ public class AboutDialogPanel extends JPanel {
             }
         };
         licenseArea.setOpaque(true);
-        licenseArea.setBackground(new Color(255, 255, 255, 80));
         licenseArea.setForeground(Color.BLACK);
         licenseArea.setBorder(BorderFactory.createEmptyBorder(10, 22, 10, 22));
         licenseArea.setCaret(new NullCaret());
@@ -116,7 +117,25 @@ public class AboutDialogPanel extends JPanel {
         licenseArea.setFocusable(false);
 
         splashImageContainer.setLayout(new BorderLayout());
-        splashImageContainer.add(licenseArea, BorderLayout.SOUTH);
+
+        if (UIManager.getLookAndFeel().getID().equals("Nimbus")) { // NOI18N
+            // Nimbus LaF doesn't respect setOpaque(false), this is a workaround.
+            licenseArea.setBackground(new Color(0, 0, 0, 0));
+            JPanel transparentPanel = new JPanel(new BorderLayout()) {
+                public void paint(Graphics g) {
+                    g.setColor(getBackground());
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                    paintChildren(g);
+                }
+            };
+            transparentPanel.setOpaque(true);
+            transparentPanel.setBackground(new Color(255, 255, 255, 100));
+            transparentPanel.add(licenseArea, BorderLayout.CENTER);
+            splashImageContainer.add(transparentPanel, BorderLayout.SOUTH);
+        } else {
+            licenseArea.setBackground(new Color(255, 255, 255, 100));
+            splashImageContainer.add(licenseArea, BorderLayout.SOUTH);
+        }
 
         setLayout(new BorderLayout());
         add(splashImageContainer, BorderLayout.CENTER);
