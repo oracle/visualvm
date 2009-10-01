@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.application;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.properties.PropertiesSupport;
 import com.sun.tools.visualvm.host.Host;
 import java.lang.management.ManagementFactory;
 import org.openide.util.RequestProcessor;
@@ -41,9 +42,7 @@ final class ApplicationSupport {
     private static ApplicationSupport instance;
 
     public static synchronized ApplicationSupport getInstance() {
-        if (instance == null) {
-            instance = new ApplicationSupport();
-        }
+        if (instance == null) instance = new ApplicationSupport();
         return instance;
     }
     
@@ -69,10 +68,12 @@ final class ApplicationSupport {
         DataSourceDescriptorFactory descriptorFactory = DataSourceDescriptorFactory.getDefault();
         descriptorFactory.registerProvider(new ApplicationDescriptorProvider());
         descriptorFactory.registerProvider(new UserNameDescriptorProvider());
+        PropertiesSupport.sharedInstance().registerPropertiesProvider(
+                new GeneralPropertiesProvider(), CurrentApplication.class);
         initCurrentApplication();
     }
 
-    private class CurrentApplication extends Application {
+    class CurrentApplication extends Application {
 
         private int selfPid;
         // since getting JVM for the first time can take a long time

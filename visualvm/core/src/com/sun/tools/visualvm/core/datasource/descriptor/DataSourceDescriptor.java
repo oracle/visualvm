@@ -191,6 +191,17 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     public int getAutoExpansionPolicy() {
         return autoExpansionPolicy;
     }
+
+    /**
+     * Returns true if the General properties section should be available for
+     * the DataSource, false otherwise.
+     *
+     * @return true if the General properties section should be available for
+     * the DataSource, false otherwise
+     */
+    public boolean providesProperties() {
+        return false;
+    }
     
     /**
      * Add a PropertyChangeListener to the listener list.

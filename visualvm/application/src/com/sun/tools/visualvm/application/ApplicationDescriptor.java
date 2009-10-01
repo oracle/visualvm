@@ -84,6 +84,10 @@ import java.beans.PropertyChangeSupport;
         else return name;
     }
 
+    public boolean providesProperties() {
+        return true;
+    }
+
     private static String resolveName(Application application, ApplicationType type) {
         // Check for persisted displayname (currently only for JmxApplications)
         String persistedName = getPersistedName(application);

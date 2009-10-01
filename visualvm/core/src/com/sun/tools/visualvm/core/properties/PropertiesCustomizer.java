@@ -280,7 +280,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
                     separator.setFont(separatorFont);
                     separator.setToolTipText(provider.getPropertiesDescription());
                     constraints = createConstraints(currentRow++);
-                    constraints.insets = new Insets(10, 0, 0, 0);
+                    constraints.insets = new Insets(10, 0, 5, 0);
                     add(separator, constraints);
                 }
             }

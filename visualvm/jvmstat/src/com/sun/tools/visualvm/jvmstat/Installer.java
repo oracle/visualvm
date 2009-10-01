@@ -25,10 +25,8 @@
 
 package com.sun.tools.visualvm.jvmstat;
 
-import com.sun.tools.visualvm.core.properties.PropertiesSupport;
-import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.jvmstat.application.HostPropertiesProvider;
 import com.sun.tools.visualvm.jvmstat.application.JvmstatApplicationProvider;
+import com.sun.tools.visualvm.jvmstat.application.PropertiesImpl;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
 import org.openide.modules.ModuleInstall;
@@ -44,8 +42,7 @@ public class Installer extends ModuleInstall {
         JvmJvmstatModelFactory.getDefault().registerProvider(new JvmJvmstatModelProvider());
         JvmJvmstatModelFactory.getDefault().registerProvider(new JRockitJvmJvmstatModelProvider());
         JvmstatApplicationProvider.register();
-        PropertiesSupport.sharedInstance().registerPropertiesProvider(
-                new HostPropertiesProvider(), Host.class);
+        PropertiesImpl.initialize();
     }
     
 }

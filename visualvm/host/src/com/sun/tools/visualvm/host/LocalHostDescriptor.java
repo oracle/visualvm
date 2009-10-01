@@ -45,4 +45,8 @@ public class LocalHostDescriptor extends DataSourceDescriptor {
     public LocalHostDescriptor() {
         super(Host.LOCALHOST, NbBundle.getMessage(LocalHostDescriptor.class, "LBL_Local"), null, NODE_ICON, 0, EXPAND_ON_FIRST_CHILD);  // NOI18N
     }
+
+    public boolean providesProperties() {
+        return true;
+    }
 }

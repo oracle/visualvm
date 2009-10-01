@@ -549,9 +549,12 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             boolean persistent = provider.isPersistent(storage);
 
             connectionField.setText(connectionString);
+            connectionField.setCaretPosition(0);
             securityCheckbox.setSelected(username != null || password);
             usernameField.setText(username);
+            usernameField.setCaretPosition(0);
             passwordField.setText(password ? "----------" : ""); // NOI18N
+            passwordField.setCaretPosition(0);
             saveCheckbox.setSelected(persistent);
 
         }
@@ -580,8 +583,9 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             connectionField = new JTextField();
             connectionLabel.setLabelFor(connectionField);
             connectionField.setEditable(false);
-            connectionField.setPreferredSize(
-                    new Dimension(250, connectionField.getPreferredSize().height));
+            Dimension size = connectionField.getPreferredSize();
+            size.width = 1;
+            connectionField.setPreferredSize(size);
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
             constraints.gridy = 0;
@@ -625,8 +629,9 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             usernameField = new JTextField();
             usernameLabel.setLabelFor(usernameField);
             usernameField.setEditable(false);
-            usernameField.setPreferredSize(
-                    new Dimension(320, usernameField.getPreferredSize().height));
+            size = usernameField.getPreferredSize();
+            size.width = 1;
+            usernameField.setPreferredSize(size);
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
             constraints.gridy = 4;
@@ -654,8 +659,9 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             passwordLabel.setLabelFor(passwordField);
             passwordField.setEditable(false);
             passwordField.setFocusable(false);
-            passwordField.setPreferredSize(
-                    new Dimension(200, passwordField.getPreferredSize().height));
+            size = passwordField.getPreferredSize();
+            size.width = 1;
+            passwordField.setPreferredSize(size);
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
             constraints.gridy = 5;

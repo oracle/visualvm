@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.datasource.descriptor;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.model.ModelFactory;
 import com.sun.tools.visualvm.core.model.ModelProvider;
+import com.sun.tools.visualvm.core.properties.PropertiesSupport;
 
 /**
  * ModelFactory for DataSourceDescriptors.
@@ -50,6 +51,9 @@ public final class DataSourceDescriptorFactory extends ModelFactory<DataSourceDe
         if (dsDescFactory == null) {
             dsDescFactory = new DataSourceDescriptorFactory();
             dsDescFactory.registerProvider(dsDescFactory);
+            // Register General properties tab support
+            PropertiesSupport.sharedInstance().registerPropertiesProvider(
+                new GeneralPropertiesProvider(), DataSource.class);
         }
         return dsDescFactory;
     }

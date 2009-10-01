@@ -40,7 +40,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-public class HostPropertiesProvider extends PropertiesProvider<Host> {
+class HostPropertiesProvider extends PropertiesProvider<Host> {
 
     /**
      * Key for the "jstatd" properties category.
@@ -52,8 +52,9 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
 
 
     public HostPropertiesProvider() {
-        super("jstatd", NbBundle.getMessage(HostPropertiesProvider.class, // NOI18N
-                "MSG_JstatdDescr"), CATEGORY_JSTATD_CONNECTION, 0); // NOI18N
+        super(NbBundle.getMessage(HostPropertiesProvider.class, "CAP_JstatdProperties"), // NOI18N
+              NbBundle.getMessage(HostPropertiesProvider.class, "DESCR_JstatdProperties"), // NOI18N
+              CATEGORY_JSTATD_CONNECTION, 0); // NOI18N
     }
 
 
@@ -173,10 +174,6 @@ public class HostPropertiesProvider extends PropertiesProvider<Host> {
                 iterator.remove();
         }
         changed = cleanup(host, changed);
-
-//        System.err.println(">>> added:   " + added);
-//        System.err.println(">>> removed: " + removed);
-//        System.err.println(">>> changed: " + changed);
 
         if (!added.isEmpty() || !removed.isEmpty() || !changed.isEmpty())
             JvmstatApplicationProvider.sharedInstance().connectionsChanged(

@@ -43,8 +43,7 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
      * @param icon icon for the Snapshot.
      */
     public SnapshotDescriptor(X snapshot, Image icon) {
-        super(snapshot, resolveName(snapshot),
-              snapshot.getFile().getAbsolutePath(),
+        super(snapshot, resolveName(snapshot), null,
               icon, POSITION_AT_THE_END, EXPAND_NEVER);
     }
     
@@ -70,9 +69,13 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
     /**
      * Returns true if the snapshot can be renamed from UI, false otherwise.
      * 
-     * @return true if the snapshot can be renamed from UI, false otherwise.
+     * @return true if the snapshot can be renamed from UI, false otherwise
      */
     public boolean supportsRename() {
+        return true;
+    }
+
+    public boolean providesProperties() {
         return true;
     }
 

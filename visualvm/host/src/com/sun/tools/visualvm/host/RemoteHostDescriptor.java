@@ -58,4 +58,8 @@ public class RemoteHostDescriptor extends DataSourceDescriptor {
     public boolean supportsRename() {
         return true;
     }
+
+    public boolean providesProperties() {
+        return true;
+    }
 }

@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.properties.PropertiesSupport;
 import java.awt.Image;
 import java.io.File;
 import java.util.Date;
@@ -119,8 +120,8 @@ public final class SnapshotsSupport {
     
     
     private SnapshotsSupport() {
-//        DataSourceDescriptorFactory.getDefault().registerProvider(new SnapshotsContainerDescriptorProvider());
-//        new SnapshotsContainerProvider().initialize();
+        PropertiesSupport.sharedInstance().registerPropertiesProvider(
+                new GeneralPropertiesProvider(), Snapshot.class);
     }
 
 }
