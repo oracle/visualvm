@@ -27,18 +27,30 @@ package com.sun.tools.visualvm.jvmstat.application;
 
 import com.sun.tools.visualvm.core.properties.PropertiesSupport;
 import com.sun.tools.visualvm.host.Host;
+import sun.jvmstat.monitor.HostIdentifier;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public final class PropertiesImpl {
+    
+    private static final String LOCAL_JVMSTAT_URI = "local://localhost"; // NOI18N
+    
+
+    static boolean isLocalConnection(JvmstatApplication dataSource) {
+        HostIdentifier hi = dataSource.getHostIdentifier();
+        return LOCAL_JVMSTAT_URI.equals(hi.getURI().toString());
+    }
+
 
     public static void initialize() {
         PropertiesSupport.sharedInstance().registerPropertiesProvider(
                 new HostPropertiesProvider(), Host.class);
         PropertiesSupport.sharedInstance().registerPropertiesProvider(
                 new GeneralPropertiesProvider(), JvmstatApplication.class);
+        PropertiesSupport.sharedInstance().registerPropertiesProvider(
+                new JstatdPropertiesProvider(), JvmstatApplication.class);
     }
 
 }

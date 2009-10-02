@@ -69,7 +69,9 @@ class GeneralPropertiesProvider extends PropertiesProvider<JvmstatApplication> {
         textArea.setEditable(false);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
-        textArea.setText(NbBundle.getMessage(GeneralPropertiesProvider.class, "MSG_ConnectionProperties")); // NOI18N
+        textArea.setText(NbBundle.getMessage(GeneralPropertiesProvider.class,
+                PropertiesImpl.isLocalConnection(dataSource) ?
+                "MSG_ConnectionPropertiesDefault" : "MSG_ConnectionPropertiesCustom")); // NOI18N
         textArea.setMinimumSize(new Dimension(1, 1));
         panel.add(textArea, BorderLayout.CENTER);
         return panel;
