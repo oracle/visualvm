@@ -32,6 +32,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -620,7 +621,7 @@ class MemoryView extends JPanel {
 
         heapdumpButton = new JButton("Heap Dump") {
             protected void fireActionPerformed(ActionEvent event) {
-                heapDumper.takeHeapDump((event.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                heapDumper.takeHeapDump((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
         heapdumpButton.setToolTipText("Heap Dump");

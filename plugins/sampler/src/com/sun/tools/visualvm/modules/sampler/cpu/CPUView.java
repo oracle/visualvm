@@ -29,11 +29,11 @@ import com.sun.tools.visualvm.modules.sampler.AbstractSamplerSupport;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import java.awt.event.InputEvent;
 import java.text.NumberFormat;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -192,7 +192,7 @@ class CPUView extends JPanel {
 
         snapshotButton = new JButton("Snapshot") {
             protected void fireActionPerformed(ActionEvent event) {
-                snapshotDumper.takeSnapshot((event.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
         snapshotButton.setToolTipText("Snapshot");
@@ -216,7 +216,7 @@ class CPUView extends JPanel {
 
         threaddumpButton = new JButton("Thread Dump") {
             protected void fireActionPerformed(ActionEvent event) {
-                threadDumper.takeThreadDump((event.getModifiers() & InputEvent.CTRL_MASK) == 0);
+                threadDumper.takeThreadDump((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
         threaddumpButton.setToolTipText("Thread Dump");
