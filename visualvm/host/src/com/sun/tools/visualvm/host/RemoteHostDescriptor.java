@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.host;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  * DataSourceDescriptor for remote hosts.
@@ -43,7 +44,8 @@ public class RemoteHostDescriptor extends DataSourceDescriptor {
      * @param host Host for which to create the descriptor.
      */
     public RemoteHostDescriptor(Host host) {
-        super(host, resolveName(host), null, NODE_ICON, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+        super(host, resolveName(host), NbBundle.getMessage(RemoteHostDescriptor.class,
+              "DESCR_Remote"), NODE_ICON, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
     }
 
     private static String resolveName(Host host) {

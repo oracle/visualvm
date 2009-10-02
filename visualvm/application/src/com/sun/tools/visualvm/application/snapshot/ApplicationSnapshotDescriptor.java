@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  * DataSourceDescriptor for ApplicationSnapshot.
@@ -48,6 +49,10 @@ public class ApplicationSnapshotDescriptor extends SnapshotDescriptor<Applicatio
      */
     public ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {
         super(snapshot, resolveIcon(snapshot));
+    }
+
+    public String getDescription() {
+        return NbBundle.getMessage(ApplicationSnapshotDescriptor.class, "DESCR_ApplicationSnapshot"); // NOI18N
     }
 
     private static Image resolveIcon(ApplicationSnapshot snapshot) {

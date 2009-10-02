@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  * DataSourceDescriptor for ThreadDump.
@@ -48,5 +49,9 @@ public class ThreadDumpDescriptor extends SnapshotDescriptor<ThreadDump> {
     public ThreadDumpDescriptor(ThreadDump threadDump) {
         super(threadDump, ICON);
     }
+        
+    public String getDescription() {
+        return NbBundle.getMessage(ThreadDumpDescriptor.class, "DESCR_ThreadDump"); // NOI18N
+}
         
 }

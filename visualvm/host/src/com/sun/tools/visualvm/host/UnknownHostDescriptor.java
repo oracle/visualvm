@@ -43,6 +43,8 @@ public class UnknownHostDescriptor extends DataSourceDescriptor {
      * Creates new instance of UnknownHostDescriptor.
      */
     public UnknownHostDescriptor() {
-        super(Host.UNKNOWN_HOST, NbBundle.getMessage(UnknownHostDescriptor.class, "LBL_Unknown_Host"), null, NODE_ICON, POSITION_LAST, EXPAND_ON_FIRST_CHILD);  // NOI18N
+        super(Host.UNKNOWN_HOST, NbBundle.getMessage(UnknownHostDescriptor.class, "LBL_Unknown_Host"),
+              NbBundle.getMessage(UnknownHostDescriptor.class, "DESCR_Unknown"), NODE_ICON,
+              POSITION_LAST, EXPAND_ON_FIRST_CHILD);  // NOI18N
     }
 }
