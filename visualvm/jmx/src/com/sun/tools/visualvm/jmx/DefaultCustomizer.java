@@ -576,7 +576,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridwidth = 1;
             constraints.fill = GridBagConstraints.NONE;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(0, 0, 3, 0);
+            constraints.insets = new Insets(3, 0, 3, 0);
             add(connectionLabel, constraints);
 
             // connectionField
@@ -592,7 +592,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(0, 5, 3, 0);
+            constraints.insets = new Insets(3, 5, 3, 0);
             add(connectionField, constraints);
 
             // securityCheckbox
