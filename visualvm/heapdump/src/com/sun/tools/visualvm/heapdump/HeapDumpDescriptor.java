@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -48,5 +49,9 @@ public class HeapDumpDescriptor extends SnapshotDescriptor<HeapDump> {
      */
     public HeapDumpDescriptor(HeapDump heapDump) {
         super(heapDump, ICON);
+    }
+
+    public String getDescription() {
+        return NbBundle.getMessage(HeapDumpDescriptor.class, "DESCR_HeapDump"); // NOI18N
     }
 }

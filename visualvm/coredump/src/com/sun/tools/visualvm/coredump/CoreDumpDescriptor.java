@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.coredump;
 import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  * DataSourceDescriptor for CoreDump.
@@ -45,5 +46,9 @@ public class CoreDumpDescriptor extends SnapshotDescriptor<CoreDump> {
      */
     public CoreDumpDescriptor(CoreDump coreDump) {
         super(coreDump, ICON);
+    }
+
+    public String getDescription() {
+        return NbBundle.getMessage(CoreDumpDescriptor.class, "DESCR_CoreDump"); // NOI18N
     }
 }

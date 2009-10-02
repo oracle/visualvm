@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -47,7 +48,12 @@ class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
     public ProfilerSnapshotDescriptor(ProfilerSnapshot snapshot) {
         super(snapshot, resolveIcon(snapshot));
     }
-    
+
+
+    public String getDescription() {
+        return NbBundle.getMessage(ProfilerSnapshotDescriptor.class, "DESCR_ProfilerSnapshot"); // NOI18N
+    }
+
     
     private static Image resolveIcon(ProfilerSnapshot snapshot) {
         try {
