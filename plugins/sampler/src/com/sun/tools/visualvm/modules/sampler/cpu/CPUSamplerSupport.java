@@ -43,6 +43,7 @@ import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
 
