@@ -28,12 +28,14 @@ package com.sun.tools.visualvm.application.views.overview;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
@@ -131,16 +133,25 @@ class OverviewViewSupport {
     
     // --- Snapshots -----------------------------------------------------------
     
-    static class SnapshotsViewSupport extends JPanel implements DataChangeListener {
+    static class SnapshotsViewSupport extends JPanel implements DataChangeListener<Snapshot> {
         
         private DataSource dataSource;
         private HTMLTextArea area;
+        
+        private boolean standaloneAppSnapshot;
         
         
         public SnapshotsViewSupport(DataSource dataSource) {
             this.dataSource = dataSource;
             initComponents();
             dataSource.getRepository().addDataChangeListener(this, Snapshot.class);
+
+            standaloneAppSnapshot = dataSource.getOwner() == null &&
+                                    dataSource instanceof ApplicationSnapshot;
+            if (standaloneAppSnapshot) {
+                dataSource.setVisible(false);
+                DataSource.ROOT.getRepository().addDataSource(dataSource);
+            }
         }
         
         public DataViewComponent.DetailsView getDetailsView() {
@@ -158,14 +169,18 @@ class OverviewViewSupport {
             add(new ScrollableContainer(area), BorderLayout.CENTER);
         }
         
-                public void dataChanged(DataChangeEvent event) {
+        public void dataChanged(DataChangeEvent<Snapshot> event) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() { updateSavedData(); }
             });
+            if (standaloneAppSnapshot) for (Snapshot snapshot : event.getAdded())
+                    DataSourceWindowManager.sharedInstance().openDataSource(snapshot, false);
         }
             
         void removed() {
             dataSource.getRepository().removeDataChangeListener(this);
+            if (standaloneAppSnapshot)
+                DataSource.ROOT.getRepository().removeDataSource(dataSource);
         }
         
         private void updateSavedData() {
