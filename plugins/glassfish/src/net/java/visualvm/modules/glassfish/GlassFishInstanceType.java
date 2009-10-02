@@ -32,6 +32,7 @@ import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.logging.Logger;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 
 
@@ -43,7 +44,7 @@ public class GlassFishInstanceType extends GlassFishApplicationType {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     private final static Logger LOGGER = Logger.getLogger(GlassFishInstanceType.class.getName());
     
-    private final String description = "(domain = {0})";
+    private final String description = NbBundle.getMessage(GlassFishInstanceType.class, "DESCR_GlassFish"); // NOI18N
     private String domainName = "UNKNOWN";
     private final String typeName = "GlassFish/SJSAS";
     private Jvm gfJvm;
