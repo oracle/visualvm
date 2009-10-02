@@ -196,7 +196,7 @@ final class ApplicationOverviewModel {
         
         if (basicInfoSupported) {
             mainClass = jvm.getMainClass();
-            if (mainClass == null) mainClass = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
+            if (mainClass == null || "".equals(mainClass)) mainClass = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_unknown");  // NOI18N
 
             mainArgs = jvm.getMainArgs();
             if (mainArgs == null) mainArgs = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_none");   // NOI18N
