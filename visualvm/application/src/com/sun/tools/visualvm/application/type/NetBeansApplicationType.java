@@ -86,7 +86,7 @@ public class NetBeansApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "";
+        return NbBundle.getMessage(NetBeansApplicationType.class, "DESCR_NetBeansApplicationType");   // NOI18N
     }
     
     /**

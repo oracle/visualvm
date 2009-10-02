@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
+import org.openide.util.NbBundle;
 
 /**
  * This {@link ApplicationType} represents NetBeans 3.x application 
@@ -35,8 +36,10 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 public class NetBeans3xApplicationType extends MainClassApplicationType {
 
 
-  NetBeans3xApplicationType(Application app,Jvm jvm) {
-    super(app,"NetBeans 3.x","com/sun/tools/visualvm/application/resources/application.png");   // NOI18N
+  NetBeans3xApplicationType(Application app, Jvm jvm) {
+    super(app, "NetBeans 3.x", NbBundle.getMessage( // NOI18N
+                MainClassApplicationType.class, "DESCR_NetBeansApplicationType"), // NOI18N
+                "com/sun/tools/visualvm/application/resources/application.png"); // NOI18N
   }
 
 }

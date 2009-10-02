@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
+import org.openide.util.NbBundle;
 
 /**
  * This {@link ApplicationType} represents Apache Maven application.
@@ -34,7 +35,9 @@ import com.sun.tools.visualvm.application.Application;
 public class MavenApplicationType extends MainClassApplicationType {
     
     MavenApplicationType(Application app) {
-        super(app,"Apache Maven","com/sun/tools/visualvm/application/type/resources/Maven2Icon.png");   // NOI18N
+        super(app, "Apache Maven", NbBundle.getMessage( // NOI18N
+                MainClassApplicationType.class, "DESCR_JDeveloperApplicationType"), // NOI18N
+                "com/sun/tools/visualvm/application/type/resources/Maven2Icon.png"); // NOI18N
     }    
     
 }

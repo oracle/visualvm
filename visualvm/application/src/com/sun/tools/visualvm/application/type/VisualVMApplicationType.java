@@ -60,7 +60,7 @@ public class VisualVMApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "";
+        return NbBundle.getMessage(VisualVMApplicationType.class, "DESCR_VisualVMApplicationType");   // NOI18N
     }
     
     /**

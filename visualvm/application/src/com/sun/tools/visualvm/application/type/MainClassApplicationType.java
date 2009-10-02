@@ -38,10 +38,12 @@ import org.openide.util.NbBundle;
  */
 public class MainClassApplicationType extends ApplicationType  {
   String name;
+  String description;
   String iconPath;
 
-  MainClassApplicationType(Application app, String n,String path) {
+  MainClassApplicationType(Application app, String n, String d, String path) {
     name = n;
+    description = d;
     iconPath = path;
   }
 
@@ -63,7 +65,7 @@ public class MainClassApplicationType extends ApplicationType  {
    * {@inheritDoc}
    */
   public String getDescription() {
-    return "";
+    return description != null ? description : ""; // NOI18N
   }
 
   /**

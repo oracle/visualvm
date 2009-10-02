@@ -44,10 +44,10 @@ import java.beans.PropertyChangeSupport;
  * @author Tomas Hurka
  */
 public abstract class ApplicationType extends Model {
-    public static final String PROPERTY_NAME = "name";
-    public static final String PROPERTY_DESCRIPTION = "description";
-    public static final String PROPERTY_VERSION = "version";
-    public static final String PROPERTY_ICON = "icon";
+    public static final String PROPERTY_NAME = "name"; // NOI18N
+    public static final String PROPERTY_DESCRIPTION = "description"; // NOI18N
+    public static final String PROPERTY_VERSION = "version"; // NOI18N
+    public static final String PROPERTY_ICON = "icon"; // NOI18N
 
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 

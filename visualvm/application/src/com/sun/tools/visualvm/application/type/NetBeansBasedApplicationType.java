@@ -62,7 +62,7 @@ public class NetBeansBasedApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getName() {
-        return "NetBeans Platform application"; // NOI18N
+        return NbBundle.getMessage(NetBeansBasedApplicationType.class, "LBL_NbPlatformApplication"); // NOI18N
     }
     
     /**
@@ -76,7 +76,7 @@ public class NetBeansBasedApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "";
+        return NbBundle.getMessage(NetBeansBasedApplicationType.class, "DESCR_NetBeansBasedApplicationType"); // NOI18N
     }
     
     /**

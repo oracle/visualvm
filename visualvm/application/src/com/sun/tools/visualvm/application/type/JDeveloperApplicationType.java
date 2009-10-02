@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
+import org.openide.util.NbBundle;
 
 /**
  * This {@link ApplicationType} represents JDeveloper IDE application.
@@ -36,7 +36,9 @@ public class JDeveloperApplicationType extends MainClassApplicationType {
     private String version;
     
     JDeveloperApplicationType(Application app,String ver) {
-        super(app,"JDeveloper "+ver,"com/sun/tools/visualvm/application/type/resources/JDeveloper.png");   // NOI18N
+        super(app,"JDeveloper " + ver, NbBundle.getMessage( // NOI18N
+                MainClassApplicationType.class, "DESCR_JDeveloperApplicationType"), // NOI18N
+                "com/sun/tools/visualvm/application/type/resources/JDeveloper.png"); // NOI18N
         version = ver;
     }
     
