@@ -190,12 +190,13 @@ class CPUView extends JPanel {
 
         toolBar.addSeparator();
 
-        snapshotButton = new JButton("Snapshot") {
+        snapshotButton = new JButton("Snapshot", new ImageIcon(ImageUtilities.loadImage(
+                "com/sun/tools/visualvm/modules/sampler/resources/snapshot.png", true))) { // NOI18N)
             protected void fireActionPerformed(ActionEvent event) {
                 snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
-        snapshotButton.setToolTipText("Snapshot");
+        snapshotButton.setToolTipText("Take snapshot of collected results");
         snapshotButton.setOpaque(false);
         toolBar.add(snapshotButton);
 

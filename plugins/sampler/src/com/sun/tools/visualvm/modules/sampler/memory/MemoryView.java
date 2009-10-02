@@ -582,15 +582,18 @@ class MemoryView extends JPanel {
 
         toolBar.addSeparator();
 
-        snapshotButton = new JButton("Snapshot") {
+        snapshotButton = new JButton("Snapshot", new ImageIcon(ImageUtilities.loadImage(
+                "com/sun/tools/visualvm/modules/sampler/resources/snapshot.png", true))) {
             protected void fireActionPerformed(ActionEvent event) {
                 snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
-        snapshotButton.setToolTipText("Snapshot");
+        snapshotButton.setToolTipText("Take snapshot of collected results");
         snapshotButton.setOpaque(false);
         snapshotButton.setEnabled(snapshotDumper != null);
         toolBar.add(snapshotButton);
+
+        toolBar.addSeparator();
 
         deltaButton = new JToggleButton("Deltas") {
             protected void fireActionPerformed(ActionEvent event) {
@@ -645,6 +648,7 @@ class MemoryView extends JPanel {
 
         int maxHeight = pauseButton.getPreferredSize().height;
         maxHeight = Math.max(maxHeight, refreshButton.getPreferredSize().height);
+        maxHeight = Math.max(maxHeight, snapshotButton.getPreferredSize().height);
         maxHeight = Math.max(maxHeight, deltaButton.getPreferredSize().height);
         maxHeight = Math.max(maxHeight, gcButton.getPreferredSize().height);
         maxHeight = Math.max(maxHeight, heapdumpButton.getPreferredSize().height);
@@ -660,6 +664,12 @@ class MemoryView extends JPanel {
         refreshButton.setMinimumSize(size);
         refreshButton.setPreferredSize(size);
         refreshButton.setMaximumSize(size);
+
+        width = snapshotButton.getPreferredSize().width;
+        size = new Dimension(width + 5, maxHeight);
+        snapshotButton.setMinimumSize(size);
+        snapshotButton.setPreferredSize(size);
+        snapshotButton.setMaximumSize(size);
 
         width = deltaButton.getPreferredSize().width;
         size = new Dimension(width + 5, maxHeight);
