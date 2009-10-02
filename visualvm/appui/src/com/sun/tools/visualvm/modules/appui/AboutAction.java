@@ -124,6 +124,11 @@ public final class AboutAction extends AbstractAction {
             sb.append("<td valign=\"top\" nowrap>" + "<b>Java: </b>" + "</td>");
             sb.append("<td valign=\"top\" nowrap>" + getJavaInfo() + "</td>");
             sb.append("</tr>");
+
+            sb.append("<tr>");
+            sb.append("<td valign=\"top\" nowrap>" + "<b>Vendor: </b>" + "</td>");
+            sb.append("<td valign=\"top\" nowrap>" + getJavaVendor() + "</td>");
+            sb.append("</tr>");
             
             sb.append("<tr>");
             sb.append("<td valign=\"top\" nowrap>" + "<b>Environment: </b>" + "</td>");
@@ -165,6 +170,13 @@ public final class AboutAction extends AbstractAction {
         String vmVerison = systemProperties.getProperty("java.vm.version", ""); // NOI18N
         String vmInfo = systemProperties.getProperty("java.vm.info", "");   // NOI18N
         return javaVersion + "; " + vmName + " (" + vmVerison + ", " + vmInfo + ")";
+    }
+
+    private static String getJavaVendor() {
+        Properties systemProperties = System.getProperties();
+        String javaVendor = systemProperties.getProperty("java.vendor", "unknown");   // NOI18N
+        String javaVendorUrl = systemProperties.getProperty("java.vendor.url", null);  // NOI18N
+        return javaVendor + (javaVendorUrl == null ? "" : ", " + javaVendorUrl); // NOI18N
     }
     
     private static String getEnvironment() {
