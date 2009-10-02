@@ -35,6 +35,7 @@ import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.jmx.EnvironmentProvider;
+import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -128,7 +129,7 @@ class JmxModelImpl extends JmxModel {
                 // Create a ProxyClient from local pid
                 String connectorAddress = jvmstat.findByName("sun.management.JMXConnectorServer.address"); // NOI18N
                 String javaHome = jvmstat.findByName("java.property.java.home");    // NOI18N
-                LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), jvmstatModel.isAttachable(), connectorAddress, javaHome);
+                LocalVirtualMachine lvm = new LocalVirtualMachine(application.getPid(), AttachModelFactory.getAttachFor(application) != null, connectorAddress, javaHome);
                 if (!lvm.isManageable()) {
                     if (lvm.isAttachable()) {
                         proxyClient = new ProxyClient(this, lvm);
