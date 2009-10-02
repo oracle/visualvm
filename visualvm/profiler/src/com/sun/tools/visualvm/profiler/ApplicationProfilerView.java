@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -52,6 +53,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.TargetAppRunner;
@@ -204,6 +206,17 @@ class ApplicationProfilerView extends DataSourceView {
         
         private static JComponent getLiveResultsView() {
             JComponent view = LiveResultsWindow.getDefault();
+
+            Component[] components = view.getComponents();
+            if (components.length > 0 && components[0] instanceof JToolBar) {
+                JToolBar toolbar = (JToolBar)components[0];
+                components = toolbar.getComponents();
+                if (components.length > 5 && components[5] instanceof JButton) {
+                    JButton button = (JButton)components[5];
+                    button.setText(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Snapshot")); // NOI18N
+                }
+            }
+
             view.setPreferredSize(new Dimension(1, 1));
             return view;
         }
