@@ -40,7 +40,10 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -60,6 +63,8 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
     private String retainedSize;
     private HeapWalkerNode[] children;
     private int mode = HeapWalkerNode.MODE_FIELDS;
+
+    private Map<Object, Integer> indexes;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -81,9 +86,21 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
     public HeapWalkerNode[] getChildren() {
         if (children == null) {
             children = computeChildren();
+            indexes = null;
         }
 
         return children;
+    }
+
+    private Map<Object, Integer> getIndexes() {
+        if (indexes == null) {
+            HeapWalkerNode[] chldrn = getChildren();
+            indexes = new HashMap(chldrn.length * 4 / 3);
+            for (int i = 0; i < chldrn.length; i++)
+                indexes.put(chldrn[i], i);
+        }
+
+        return indexes;
     }
 
     public Icon getIcon() {
@@ -95,16 +112,18 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
     }
 
     public int getIndexOfChild(Object object) {
-        for (int i = 0; i < getChildren().length; i++) {
-            if (getChildren()[i] == object) {
-                return i;
-            }
-        }
-
-        return -1;
+//        for (int i = 0; i < getChildren().length; i++) {
+//            if (getChildren()[i] == object) {
+//                return i;
+//            }
+//        }
+//
+//        return -1;
+        Integer index = getIndexes().get(object);
+        return index != null ? index : -1;
     }
 
-    // Should be overriden for lazy populating children
+    // Should be overridden for lazy populating children
     public boolean isLeaf() {
         return getNChildren() == 0;
     }
@@ -200,13 +219,25 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
         changeChildren(children);
     }
 
-    // Should be overriden for lazy populating children
+    // Should be overridden for lazy populating children
     protected HeapWalkerNode[] computeChildren() {
         return new HeapWalkerNode[0];
     }
 
     // Used for updating lazily created children, shouldn't be used for any other purpose!
-    void changeChildren(HeapWalkerNode[] children) {
-        this.children = children;
+    void changeChildren(final HeapWalkerNode[] children) {
+        Runnable childrenChanger = new Runnable() {
+            public void run() {
+                AbstractHeapWalkerNode.this.children = children;
+                indexes = null;
+            }
+        };
+        if (!SwingUtilities.isEventDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(childrenChanger);
+            } catch (Exception ex) {}
+        } else {
+            childrenChanger.run();
+        }
     }
 }

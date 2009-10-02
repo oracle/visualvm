@@ -40,14 +40,19 @@
 
 package org.netbeans.lib.profiler.ui.components.treetable;
 
+import java.awt.event.MouseWheelEvent;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.components.JTreeTable;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.awt.event.MouseWheelListener;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.JTableHeader;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -87,24 +92,17 @@ public class JTreeTablePanel extends JPanel {
             }
         }
 
-        private int getEmptySpaceY() {
-            if (getView() == null) {
-                return 0;
-            }
-
-            return getView().getHeight();
-        }
-
         private void paintVerticalLines(Graphics g) {
-            int emptySpaceY = getEmptySpaceY();
-            Rectangle cellRect;
-
-            if (emptySpaceY > 0) {
+            Component view = getView();
+            int linesTop = view == null ? 0 : view.getHeight();
+            int linesBottom = getHeight() - 1;
+            if (linesTop > 0 && linesTop <= linesBottom) {
                 g.setColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
-
-                for (int i = 0; i < tableHeader.getColumnModel().getColumnCount(); i++) {
-                    cellRect = tableHeader.getHeaderRect(i);
-                    g.drawLine((cellRect.x + cellRect.width) - 1, emptySpaceY, (cellRect.x + cellRect.width) - 1, getHeight() - 1);
+                int columnCount = tableHeader.getColumnModel().getColumnCount();
+                for (int i = 0; i < columnCount; i++) {
+                    Rectangle cellRect = tableHeader.getHeaderRect(i);
+                    int cellX = cellRect.x + cellRect.width - 1;
+                    g.drawLine(cellX, linesTop, cellX, linesBottom);
                 }
             }
         }
@@ -117,8 +115,8 @@ public class JTreeTablePanel extends JPanel {
     protected JScrollBar scrollBar;
     protected JScrollPane treeTableScrollPane;
     protected JTreeTable treeTable;
-    private boolean columnMarginChanged = false;
-    private boolean internalScrollBarChange = false;
+
+    private int invisibleRowsCount = -1;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -131,6 +129,16 @@ public class JTreeTablePanel extends JPanel {
         hookHeaderColumnResize();
         hookScrollBarValueChange();
         hookTreeCollapsedExpanded();
+
+        addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (isShowing()) {
+                        updateScrollBar(true);
+                    }
+                }
+            }
+        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -143,65 +151,56 @@ public class JTreeTablePanel extends JPanel {
         return treeTableScrollPane;
     }
 
-    @Override
-    public void paint(java.awt.Graphics g) {
-        super.paint(g);
-        updateScrollBarMaximum();
-        updateScrollBarWidth();
-    }
-
     private void hookHeaderColumnResize() {
         treeTable.getTableHeader().getColumnModel().addColumnModelListener(new TableColumnModelListener() {
-                public void columnAdded(TableColumnModelEvent e) {
-                    treeTableViewport.repaint();
-                }
+            public void columnAdded(TableColumnModelEvent e) {
+                treeTableViewport.repaint();
+            }
 
-                public void columnMoved(TableColumnModelEvent e) {
-                    treeTableViewport.repaint();
-                }
+            public void columnMoved(TableColumnModelEvent e) {
+                treeTableViewport.repaint();
+            }
 
-                public void columnRemoved(TableColumnModelEvent e) {
-                    treeTableViewport.repaint();
-                }
+            public void columnRemoved(TableColumnModelEvent e) {
+                treeTableViewport.repaint();
+            }
 
-                public void columnMarginChanged(ChangeEvent e) {
-                    internalScrollBarChange = true;
-                    columnMarginChanged = true;
-                    updateScrollBarMaximum();
-                    treeTableViewport.repaint();
-                    updateScrollBarWidth();
-                    internalScrollBarChange = false;
-                }
+            public void columnMarginChanged(ChangeEvent e) {
+                treeTableViewport.repaint();
+                updateScrollBar(true);
+            }
 
-                public void columnSelectionChanged(ListSelectionEvent e) {
-                } // Ignored
-            });
+            public void columnSelectionChanged(ListSelectionEvent e) {}
+        });
     }
 
     private void hookScrollBarValueChange() {
         scrollBar.addAdjustmentListener(new AdjustmentListener() {
-                public void adjustmentValueChanged(AdjustmentEvent e) {
-                    if (!internalScrollBarChange) {
+            public void adjustmentValueChanged(final AdjustmentEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
                         treeTable.setTreeCellOffsetX(e.getValue());
+                        if (!e.getValueIsAdjusting()) updateScrollBar(false);
                     }
-                }
-            });
+                });
+            }
+        });
     }
 
     private void hookTreeCollapsedExpanded() {
         treeTable.getTree().addTreeExpansionListener(new TreeExpansionListener() {
-                public void treeCollapsed(TreeExpansionEvent event) {
-                    internalScrollBarChange = true;
-                    updateScrollBarMaximum();
-                    internalScrollBarChange = false;
-                }
-                ;
-                public void treeExpanded(TreeExpansionEvent event) {
-                    internalScrollBarChange = true;
-                    updateScrollBarMaximum();
-                    internalScrollBarChange = false;
-                }
-            });
+            public void treeCollapsed(TreeExpansionEvent event) {
+                updateSB();
+            }
+            public void treeExpanded(TreeExpansionEvent event) {
+                updateSB();
+            }
+            private void updateSB() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { updateScrollBar(false); }
+                });
+            }
+        });
     }
 
     private void initComponents() {
@@ -213,64 +212,133 @@ public class JTreeTablePanel extends JPanel {
         treeTableScrollPane.setViewport(treeTableViewport);
         treeTableScrollPane.addMouseWheelListener(treeTable);
         // Enable vertical scrollbar only if needed
-        treeTableScrollPane.getVerticalScrollBar().getModel().addChangeListener(new javax.swing.event.ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    if (treeTableScrollPane.getVerticalScrollBar().getModel().getExtent() == treeTableScrollPane.getVerticalScrollBar()
-                                                                                                                    .getModel()
-                                                                                                                    .getMaximum()) {
-                        treeTableScrollPane.getVerticalScrollBar().setEnabled(false);
-                    } else {
-                        treeTableScrollPane.getVerticalScrollBar().setEnabled(true);
-                    }
+        JScrollBar vScrollBar = treeTableScrollPane.getVerticalScrollBar();
+        vScrollBar.getModel().addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (treeTableScrollPane.getVerticalScrollBar().getModel().getExtent() == treeTableScrollPane.getVerticalScrollBar()
+                                                                                                                .getModel()
+                                                                                                                .getMaximum()) {
+                    treeTableScrollPane.getVerticalScrollBar().setEnabled(false);
+                } else {
+                    treeTableScrollPane.getVerticalScrollBar().setEnabled(true);
                 }
-            });
-
+            }
+        });
+        vScrollBar.addAdjustmentListener(new AdjustmentListener() {
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                if (!e.getValueIsAdjusting()) updateScrollBar(false);
+            }
+        });
         scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
         scrollBar.setUnitIncrement(10);
         scrollBarPanel = new JPanel(new BorderLayout());
         scrollBarPanel.add(scrollBar, BorderLayout.WEST);
         treeTable.setTreeCellOffsetX(0);
         scrollBarPanel.setVisible(false);
+        scrollBar.addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+                    int unitsToScroll = e.getUnitsToScroll();
+                    int direction = unitsToScroll < 0 ? -1 : 1;
+                    if (unitsToScroll != 0) {
+                        int increment = scrollBar.getUnitIncrement(direction);
+                        int oldValue = scrollBar.getValue();
+                        int newValue = oldValue + increment * unitsToScroll;
+                        newValue = Math.max(Math.min(newValue, scrollBar.getMaximum() -
+                                scrollBar.getVisibleAmount()), scrollBar.getMinimum());
+                        if (oldValue != newValue) scrollBar.setValue(newValue);
+                    }
+                }
+            }
+        });
 
         add(treeTableScrollPane, BorderLayout.CENTER);
         add(scrollBarPanel, BorderLayout.SOUTH);
     }
 
-    private void updateScrollBarMaximum() {
-        int treeWidth = treeTable.getTree().getPreferredSize().width + 3; // +3 means extra right margin
+    private void updateScrollBar(boolean updateWidth) {
+        if (!isShowing()) return;
+
+        boolean refreshScrollBar = false;
+
+        JTree tree = treeTable.getTree();
+        Point viewPos = treeTableViewport.getViewPosition();
+        int viewHeight = treeTableViewport.getHeight();
+        TreePath firstVisiblePath = tree.getClosestPathForLocation(viewPos.x, viewPos.y);
+        TreePath lastVisiblePath =  tree.getClosestPathForLocation(viewPos.x, viewPos.y + viewHeight - 1);
+        int firstVisibleRow = tree.getRowForPath(firstVisiblePath);
+        int lastVisibleRow = tree.getRowForPath(lastVisiblePath);
+
+        if (firstVisibleRow < 0) return;
+
+        Rectangle size = new Rectangle();
+        for (int row = firstVisibleRow; row <= lastVisibleRow; row++)
+            size.add(tree.getRowBounds(row));
+
+        int treeWidth = size.width + 3; // +3 means extra right margin
         int columnWidth = treeTable.getColumnModel().getColumn(0).getWidth();
+        int treeOffset = treeTable.getTreeCellOffsetX();
+        int maximum = Math.max(treeWidth - columnWidth, treeOffset);
 
-        if (columnMarginChanged && (treeTable.getTreeCellOffsetX() > 0)
-                && ((treeWidth - treeTable.getTreeCellOffsetX()) < columnWidth)) {
-            columnMarginChanged = false;
-
-            if ((treeWidth - columnWidth) >= 0) {
-                treeTable.setTreeCellOffsetX(treeWidth - columnWidth);
+        if (scrollBarPanel.isVisible() && maximum <= 0) {
+            int firstInvisibleRow = lastVisibleRow + 1;
+            int lastInvisibleRow = Math.min(lastVisibleRow + getInvisibleRowsCount(),
+                                            treeTable.getRowCount() - 1);
+            if (firstInvisibleRow <= lastInvisibleRow) {
+                size = new Rectangle();
+                for (int row = firstInvisibleRow; row <= lastInvisibleRow; row++)
+                    size.add(tree.getRowBounds(row));
+                size.width += 3;
+                int maximum2 = Math.max(size.width - columnWidth, treeOffset);
+                if (maximum2 > 0) {
+                    treeWidth = size.width;
+                    maximum = maximum2;
+                }
             }
         }
 
-        int scrollBarMaximum = treeWidth - columnWidth;
-
-        if (!isShowing()) {
-            return;
-        }
-
-        if (scrollBarMaximum <= 0) {
-            treeTable.setTreeCellOffsetX(0);
-            scrollBarPanel.setVisible(false);
+        if (maximum <= 0) {
+            if (scrollBarPanel.isVisible()) {
+                treeTable.setTreeCellOffsetX(0);
+                scrollBarPanel.setVisible(false);
+                refreshScrollBar = true;
+            }
         } else {
-            int value = treeTable.getTreeCellOffsetX();
+            int value = treeOffset;
             int extent = treeWidth;
-            scrollBarPanel.setVisible(true);
-            scrollBar.setValues(value, extent, 0, scrollBarMaximum + extent);
+            if (!scrollBarPanel.isVisible()) {
+                scrollBarPanel.setVisible(true);
+                refreshScrollBar = true;
+            }
+            scrollBar.setValues(value, extent, 0, maximum + extent);
+        }
+
+        if (updateWidth) {
+            Dimension dim = scrollBar.getPreferredSize();
+            dim.width = treeTable.getColumnModel().getColumn(0).getWidth();
+            scrollBar.setPreferredSize(dim);
+            scrollBar.setBlockIncrement((int)((float)scrollBar.getModel().getExtent() * 0.95f));
+            refreshScrollBar = true;
+        }
+
+        if (refreshScrollBar) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    scrollBar.invalidate();
+                    validate();
+                    repaint();
+                }
+            });
         }
     }
 
-    private void updateScrollBarWidth() {
-        scrollBar.setPreferredSize(new Dimension(treeTable.getTableHeader().getHeaderRect(0).width,
-                                                 scrollBar.getPreferredSize().height));
-        scrollBar.setBlockIncrement((int) (scrollBar.getModel().getExtent() * 0.95f));
-        scrollBar.invalidate();
-        JTreeTablePanel.this.revalidate();
+    private int getInvisibleRowsCount() {
+        if (invisibleRowsCount == -1)
+            invisibleRowsCount =
+                    (int)Math.ceil((float)scrollBar.getPreferredSize().height /
+                                   (float)treeTable.getRowHeight());
+
+        return invisibleRowsCount;
     }
+    
 }
