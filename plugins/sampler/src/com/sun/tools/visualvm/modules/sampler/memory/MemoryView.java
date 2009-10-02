@@ -534,6 +534,7 @@ class MemoryView extends JPanel {
         toolBar.setOpaque(false);
 
         refreshRateLabel = new JLabel("Refresh: ");
+        refreshRateLabel.setToolTipText("Live results refresh rate [ms]");
         toolBar.add(refreshRateLabel);
 
         Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
@@ -541,6 +542,7 @@ class MemoryView extends JPanel {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
+        refreshCombo.setToolTipText("Live results refresh rate [ms]");
         refreshCombo.setEditable(false);
         refreshCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -552,6 +554,7 @@ class MemoryView extends JPanel {
         toolBar.add(refreshCombo);
 
         refreshUnitsLabel = new JLabel(" ms.  ");
+        refreshUnitsLabel.setToolTipText("Live results refresh rate [ms]");
         toolBar.add(refreshUnitsLabel);
 
         pauseButton = new JToggleButton() {
@@ -563,7 +566,7 @@ class MemoryView extends JPanel {
         };
         pauseButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/modules/sampler/resources/pause.png", true))); // NOI18N
-        pauseButton.setToolTipText("Pause");
+        pauseButton.setToolTipText("Pause live results");
         pauseButton.setOpaque(false);
         toolBar.add(pauseButton);
 
@@ -575,7 +578,7 @@ class MemoryView extends JPanel {
         };
         refreshButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/modules/sampler/resources/update.png", true))); // NOI18N
-        refreshButton.setToolTipText("Update");
+        refreshButton.setToolTipText("Update live results now");
         refreshButton.setEnabled(pauseButton.isSelected());
         refreshButton.setOpaque(false);
         toolBar.add(refreshButton);
@@ -600,7 +603,7 @@ class MemoryView extends JPanel {
                 refresher.refresh();
             }
         };
-        deltaButton.setToolTipText("Deltas");
+        deltaButton.setToolTipText("Show delta values");
         deltaButton.setOpaque(false);
         toolBar.add(deltaButton);
 
@@ -631,7 +634,7 @@ class MemoryView extends JPanel {
                 });
             }
         };
-        gcButton.setToolTipText("Peform GC");
+        gcButton.setToolTipText("Peform garbage collection in target application");
         gcButton.setOpaque(false);
         gcButton.setEnabled(memoryBean != null);
         toolBar.add(gcButton);
@@ -641,7 +644,7 @@ class MemoryView extends JPanel {
                 heapDumper.takeHeapDump((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
-        heapdumpButton.setToolTipText("Heap Dump");
+        heapdumpButton.setToolTipText("Take heap dump");
         heapdumpButton.setOpaque(false);
         heapdumpButton.setEnabled(heapDumper != null);
         toolBar.add(heapdumpButton);
