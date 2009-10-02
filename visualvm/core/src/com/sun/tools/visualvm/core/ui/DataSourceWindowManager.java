@@ -80,14 +80,24 @@ public final class DataSourceWindowManager {
     }
     
     /**
-     * Opens the DataSource.
+     * Opens the DataSource and selects the view.
      * 
-     * @param dataSource DataSource to open.
+     * @param dataSource DataSource to open
      */
     public void openDataSource(final DataSource dataSource) {
+        openDataSource(dataSource, true);
+    }
+
+    /**
+     * Opens the DataSource and optionally selects the view.
+     *
+     * @param dataSource DataSource to open
+     * @param selectView true if the view should be selected, false otherwise
+     */
+    public void openDataSource(final DataSource dataSource, final boolean selectView) {
         processor.post(new Runnable() {
             public void run() {
-                openWindowAndSelectView(dataSource, null, true, true);
+                openWindowAndAddView(dataSource, null, selectView, selectView, selectView);
             }
         });
     }
@@ -138,13 +148,13 @@ public final class DataSourceWindowManager {
     public void selectView(final DataSourceView view) {
         processor.post(new Runnable() {
             public void run() {
-                openWindowAndSelectView(view.getDataSource(), view, true, true);
+                openWindowAndAddView(view.getDataSource(), view, true, true, true);
             }
         });
     }
     
     
-    private void openWindowAndSelectView(DataSource dataSource, DataSourceView viewToSelect, final boolean selectWindow, final boolean windowToFront) {
+    private void openWindowAndAddView(DataSource dataSource, DataSourceView view, final boolean selectView, final boolean selectWindow, final boolean windowToFront) {
         // Resolve viewmaster
         DataSource viewMaster = getViewMaster(dataSource);
 
@@ -175,17 +185,18 @@ public final class DataSourceWindowManager {
             if (dataSource != viewMaster) {
                 List<? extends DataSourceView> views = DataSourceViewsManager.sharedInstance().getViews(dataSource);
                 addViews(window, views);
-                if (viewToSelect == null && !views.isEmpty()) viewToSelect = views.get(0);
+                if (view == null && !views.isEmpty()) view = views.get(0);
             }
 
             // Open window
             final DataSourceWindow windowF = window;
-            final DataSourceView viewToSelectF = viewToSelect;
+            final DataSourceView viewToSelectF = selectView ? view : null;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if (viewToSelectF != null) {
-                        if (windowF.containsView(viewToSelectF)) windowF.selectView(viewToSelectF);
-                        else {
+                        if (windowF.containsView(viewToSelectF)) {
+                            windowF.selectView(viewToSelectF);
+                        } else {
                             if (LOGGER.isLoggable(Level.WARNING)) {
                                 LOGGER.warning("Tried to select not opened view " + viewToSelectF); // NOI18N
                             }
