@@ -76,6 +76,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
+import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.LoadedSnapshot;
@@ -89,6 +90,7 @@ import org.openide.util.RequestProcessor;
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 class SamplerImpl {
 
@@ -624,13 +626,54 @@ class SamplerImpl {
                 final HeapDumpSupport hds = HeapDumpSupport.getInstance();
                 final String noHeapDump = hds.supportsHeapDump(application) ? null : "heap dump not supported";
 
+                MemorySamplerSupport.SnapshotDumper snapshotDumper = new MemorySamplerSupport.SnapshotDumper() {
+                    public void takeSnapshot(final boolean openView) {
+                        final MemorySamplerSupport.SnapshotDumper dumper = this; 
+                        RequestProcessor.getDefault().post(new Runnable() {
+                            public void run() {
+                                LoadedSnapshot ls = null;
+                                DataOutputStream dos = null;
+                                try {
+                                    long time = System.currentTimeMillis();
+                                    AllocMemoryResultsSnapshot snapshot = dumper.createSnapshot(time);
+                                    if (snapshot == null) {
+                                        DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message("<html><b>No data to save</b><br><br>Make sure the application performs some code.</html>", NotifyDescriptor.WARNING_MESSAGE));
+                                    } else {
+                                        ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createMemoryPreset(), null);
+                                        File file = Utils.getUniqueFile(application.getStorage().getDirectory(),
+                                                                        Long.toString(time),
+                                                                        "." + ResultsManager.SNAPSHOT_EXTENSION);
+                                        dos = new DataOutputStream(new FileOutputStream(file));
+                                        ls.save(dos);
+                                        ls.setFile(file);
+                                        ls.setSaved(true);
+                                    }
+                                } catch (Throwable t) {
+                                    LOGGER.log(Level.WARNING, "Failed to save profiler snapshot for " + application, t); // NOI18N
+                                } finally {
+                                    try {
+                                        if (dos != null) dos.close();
+                                    } catch (IOException e) {
+                                        LOGGER.log(Level.WARNING, "Problem closing output stream for  " + dos, e); // NOI18N
+                                    }
+                                }
+                                if (ls != null) {
+                                    ProfilerSnapshot ps = new ProfilerSnapshot(ls, application);
+                                    application.getRepository().addDataSource(ps);
+                                    if (openView)
+                                        DataSourceWindowManager.sharedInstance().openDataSource(ps);
+                                }
+                            }
+                        });
+                    }
+                };
                 MemorySamplerSupport.HeapDumper heapDumper = noHeapDump != null ? null :
                     new MemorySamplerSupport.HeapDumper() {
                         public void takeHeapDump(boolean openView) {
                             hds.takeHeapDump(application, openView);
                         }
                     };
-                memorySampler = new MemorySamplerSupport(attachModel, memoryBean, heapDumper) {
+                memorySampler = new MemorySamplerSupport(attachModel, memoryBean, snapshotDumper, heapDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {

@@ -89,6 +89,7 @@ import org.openide.util.RequestProcessor;
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 class MemoryView extends JPanel {
 
@@ -102,17 +103,19 @@ class MemoryView extends JPanel {
     
     private final MemoryMXBean memoryBean;
     private final MemorySamplerSupport.HeapDumper heapDumper;
+    private final MemorySamplerSupport.SnapshotDumper snapshotDumper;
 
 
     MemoryView(AbstractSamplerSupport.Refresher refresher, int mode,
-               MemoryMXBean memoryBean, MemorySamplerSupport.HeapDumper heapDumper) {
+               MemoryMXBean memoryBean, MemorySamplerSupport.SnapshotDumper snapshotDumper,
+               MemorySamplerSupport.HeapDumper heapDumper) {
 
         this.refresher = refresher;
         this.mode = mode;
 
         this.memoryBean = memoryBean;
+        this.snapshotDumper = snapshotDumper;
         this.heapDumper = heapDumper;
-
         initColumnsData();
         initComponents();
 
@@ -186,6 +189,7 @@ class MemoryView extends JPanel {
         refreshUnitsLabel.setEnabled(false);
         pauseButton.setEnabled(false);
         refreshButton.setEnabled(false);
+        snapshotButton.setEnabled(false);
         deltaButton.setEnabled(false);
         gcButton.setEnabled(false);
         heapdumpButton.setEnabled(false);
@@ -578,6 +582,16 @@ class MemoryView extends JPanel {
 
         toolBar.addSeparator();
 
+        snapshotButton = new JButton("Snapshot") {
+            protected void fireActionPerformed(ActionEvent event) {
+                snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+            }
+        };
+        snapshotButton.setToolTipText("Snapshot");
+        snapshotButton.setOpaque(false);
+        snapshotButton.setEnabled(snapshotDumper != null);
+        toolBar.add(snapshotButton);
+
         deltaButton = new JToggleButton("Deltas") {
             protected void fireActionPerformed(ActionEvent event) {
                 refresher.refresh();
@@ -797,6 +811,7 @@ class MemoryView extends JPanel {
     private JLabel refreshRateLabel;
     private JLabel refreshUnitsLabel;
     private JComboBox refreshCombo;
+    private AbstractButton snapshotButton;
     private AbstractButton deltaButton;
     private AbstractButton pauseButton;
     private AbstractButton refreshButton;
