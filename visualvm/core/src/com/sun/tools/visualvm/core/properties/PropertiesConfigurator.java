@@ -54,9 +54,10 @@ class PropertiesConfigurator extends JPanel {
     private static Map<String, Dimension> SAVED_SIZES = new HashMap();
 
 
-    public static void editProperties(DataSource dataSource) {
+    public static void editProperties(DataSource dataSource, int propertiesCategory) {
         PropertiesCustomizer customizer =
                 PropertiesSupport.sharedInstance().getCustomizer(dataSource, null);
+        customizer.selectCategory(propertiesCategory);
         PropertiesConfigurator pc = new PropertiesConfigurator(customizer);
 
         final DialogDescriptor dd = new DialogDescriptor(pc, NbBundle.getMessage(

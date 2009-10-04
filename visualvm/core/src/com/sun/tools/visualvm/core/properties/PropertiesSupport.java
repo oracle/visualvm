@@ -39,9 +39,7 @@ import java.util.Set;
  * and unregisterPropertiesProvider methods.
  * 
  * DataSource providers displaying a dialog supporting user-customizable properties
- * should use getCustomizer(Class) method to get the properties UI. The loadProperties
- * and saveProperties methods should be used when persisting or restoring persistent
- * DataSources.
+ * should use getCustomizer(Class) method to get the properties UI.
  *
  * @since VisualVM 1.2
  * @author Jiri Sedlacek
@@ -102,6 +100,19 @@ public final class PropertiesSupport {
     }
 
     /**
+     * Returns true if there's at least one PropertiesProvider providing properties
+     * for the DataSource, false otherwise.
+     *
+     * @param <X> any DataSource type
+     * @param dataSource DataSource to be checked
+     * @return true if there's at least one PropertiesProvider providing properties for the DataSource, false otherwise
+     */
+    public <X extends DataSource> boolean hasProperties(X dataSource) {
+        if (dataSource == null) throw new IllegalArgumentException("DataSource cannot be null"); // NOI18N
+        return hasProperties(dataSource, (Class<X>)dataSource.getClass());
+    }
+
+    /**
      * Returns an UI component to display user-customizable properties for the
      * provided DataSource type. Use hasProperties(Class) method to check if there
      * are any customizable properties for the given DataSource type. For no
@@ -115,10 +126,26 @@ public final class PropertiesSupport {
         return getCustomizer(null, type);
     }
 
-
-    <X extends DataSource> boolean hasProperties(X dataSource) {
-        return hasProperties(dataSource, (Class<X>)dataSource.getClass());
+    /**
+     * Opens Properites window of the DataSource. The first category is selected.
+     *
+     * @param dataSource DataSource for which to open the Properties window
+     */
+    public void openProperties(DataSource dataSource) {
+        openProperties(dataSource, PropertiesProvider.CATEGORY_GENERAL);
     }
+
+    /**
+     * Opens Properites window of the DataSource and selects the provided category
+     * if available.
+     *
+     * @param dataSource DataSource for which to open the Properties window
+     */
+    public void openProperties(DataSource dataSource, int propertiesCategory) {
+        if (dataSource == null) throw new IllegalArgumentException("DataSource cannot be null"); // NOI18N
+        PropertiesConfigurator.editProperties(dataSource, propertiesCategory);
+    }
+
 
     <X extends DataSource> PropertiesCustomizer<X> getCustomizer(X dataSource, Class<X> type) {
         return new PropertiesCustomizer(dataSource, type);
