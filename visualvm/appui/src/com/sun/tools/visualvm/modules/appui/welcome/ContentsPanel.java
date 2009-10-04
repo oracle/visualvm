@@ -25,14 +25,16 @@
 
 package com.sun.tools.visualvm.modules.appui.welcome;
 
+import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.net.URL;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkEvent.EventType;
+import org.openide.awt.StatusDisplayer;
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 
 /**
  *
@@ -46,53 +48,53 @@ class ContentsPanel extends JPanel implements Constants {
     
     
     private void initComponents() {
-        setLayout(new GridLayout(4, 2, 0, 0));
-        
-        addLink( "Link1", true, false, false );
-        addLink( "Link2", false, false, true );
-        addLink( "Link3", true, false, false );
-        addLink( "Link4", false, false, true );
-        addLink( "Link5", true, false, false );
-        addLink( "Link6", false, false, true );
-        addLink( "Link7", true, true, false );
-        addLink( "Link8", false, true, true );
-        
-        setBackground(Utils.getColor(COLOR_CONTENT_BACKGROUND));
-    }
-    
-    private void addLink( String resourceKey, boolean includeSource, boolean drawBottom, boolean drawRight ) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque( false );
-        panel.add( new WebLink(resourceKey, includeSource), BorderLayout.CENTER );
-        panel.setBorder( new MyBorder(drawBottom, drawRight) );
-        add( panel );
-    }
-    
-    private static class MyBorder implements Border {
-        private static final Color COLOR = Utils.getColor(BORDER_COLOR);
-        private boolean drawBottom;
-        private boolean drawRight;
-        public MyBorder( boolean drawBottom, boolean drawRight ) {
-            this.drawBottom = drawBottom;
-            this.drawRight = drawRight;
-        }
-        
-        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            g.setColor(COLOR);
-            g.drawLine(x, y, x+width, y);
-            g.drawLine(x, y, x, y+height);
-            if( drawRight ) 
-                g.drawLine(x+width-1, y, x+width-1, y+height);
-            if( drawBottom )
-                g.drawLine(x, y+height-1, x+width, y+height-1);
-        }
+        HTMLTextArea welcomeArea = new HTMLTextArea(getText()) {
+            protected void showURL(URL url) {
+                if (DesktopUtils.isBrowseAvailable()) {
+                    try {
+                        DesktopUtils.browse(url.toURI());
+                    } catch (Exception e) {}
+                }
+            }
+            public void fireHyperlinkUpdate(HyperlinkEvent e) {
+                EventType type = e.getEventType();
 
-        public Insets getBorderInsets(Component c) {
-            return new Insets(8,8,8,8);
-        }
+                if (type == EventType.ENTERED)
+                    StatusDisplayer.getDefault().setStatusText(
+                            e.getURL().toExternalForm().replace("%20", " "));
+                else if (type == EventType.EXITED)
+                    StatusDisplayer.getDefault().setStatusText("");
 
-        public boolean isBorderOpaque() {
-            return false;
-        }
+                super.fireHyperlinkUpdate(e);
+            }
+        };
+        welcomeArea.setOpaque(true);
+        welcomeArea.setForeground(Color.BLACK);
+        welcomeArea.setBackground(Utils.getColor(COLOR_CONTENT_BACKGROUND));
+        welcomeArea.setBorder(BorderFactory.createEmptyBorder());
+
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createLineBorder(Utils.getColor(BORDER_COLOR)));
+        add(welcomeArea, BorderLayout.CENTER);
     }
+
+    private static String getText() {
+        Color background = Utils.getColor(COLOR_CONTENT_BACKGROUND);
+        String backgroundText = "rgb(" + background.getRed() + ","
+                                       + background.getGreen() + ","
+                                       + background.getBlue() + ")"; //NOI18N
+
+        StringBuilder b = new StringBuilder();
+
+        b.append("<div bgcolor='" + backgroundText + "' style='padding:10px;'>");
+
+        b.append("<div><b>VisualVM 1.2 Test Build </b>is a public development build for testing and evaluation purposes. See the <a href='https://visualvm.dev.java.net/relnotes12tb.html'>Release notes</a> for details.</div><br>");
+        b.append("<div>If you find a bug or have any feedback please let the developers know on a <a href='mailto:feedback@visualvm.dev.java.net?subject=VisualVM%201.2%20Test%20Build%20Feedback'>mailing list</a>. You may also file a <a href='https://visualvm.dev.java.net/issues/enter_bug.cgi?issue_type=DEFECT'>bug report</a>.</div><br>");
+        b.append("<div><nobr>VisualVM 1.2 will be released soon at <a href='https://visualvm.dev.java.net'>https://visualvm.dev.java.net</a>!</nobr></div>");
+
+        b.append("</div>");
+
+        return b.toString();
+    }
+
 }
