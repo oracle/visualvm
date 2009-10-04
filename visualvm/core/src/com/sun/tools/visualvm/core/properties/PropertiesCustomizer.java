@@ -38,7 +38,9 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -66,12 +68,17 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
                       public void stateChanged(ChangeEvent e) { update(); }
                   };
 
+    private JTabbedPane tabbedPane;
+    private final Map<Integer, Integer> categories;
+
 
     PropertiesCustomizer(X dataSource, Class<X> type) {
         this.dataSource = dataSource;
 
         groups = createGroups(PropertiesSupport.sharedInstance().getProviders(dataSource, type));
         panels = createPanels(groups, dataSource);
+
+        categories = new HashMap();
         
         initComponents();
         update();
@@ -145,6 +152,12 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
     }
 
 
+    void selectCategory(int category) {
+        Integer tabIndex = categories.get(category);
+        if (tabIndex != null) tabbedPane.setSelectedIndex(tabIndex);
+    }
+
+
     private void registerListeners() {
         for (PropertiesPanel panel : panels)
             panel.addChangeListener(listener);
@@ -165,7 +178,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
     }
 
     private void initComponents() {
-        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
         tabbedPane.setFocusable(false);
         for (int i = 0; i < panels.size(); i++) {
             PropertiesPanel panel = panels.get(i);
@@ -173,6 +186,7 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
             ScrollableContainer c = new ScrollableContainer(panel);
             c.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             c.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            categories.put(provider.getPropertiesCategory(), tabbedPane.getTabCount());
             tabbedPane.addTab(provider.getPropertiesName(), null, c,
                               provider.getPropertiesDescription());
         }

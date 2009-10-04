@@ -23,10 +23,12 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.core.properties;
+package com.sun.tools.visualvm.jvmstat.application;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.properties.PropertiesSupport;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
 import org.openide.util.NbBundle;
 
@@ -34,29 +36,32 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class EditPropertiesAction extends SingleDataSourceAction {
+class AddJstatdConnectionAction extends SingleDataSourceAction {
 
-    private static EditPropertiesAction instance;
+    private static AddJstatdConnectionAction instance;
 
-    public static synchronized EditPropertiesAction instance() {
-        if (instance == null) instance = new EditPropertiesAction();
+    public static synchronized AddJstatdConnectionAction instance() {
+        if (instance == null) instance = new AddJstatdConnectionAction();
         return instance;
     }
 
 
     protected void actionPerformed(DataSource dataSource, ActionEvent actionEvent) {
-        PropertiesSupport.sharedInstance().openProperties(dataSource);
+        PropertiesSupport.sharedInstance().openProperties(dataSource,
+                HostPropertiesProvider.CATEGORY_JSTATD_CONNECTION);
     }
 
     protected boolean isEnabled(DataSource dataSource) {
-        return PropertiesSupport.sharedInstance().hasProperties(dataSource);
+        return true;
     }
 
 
-    private EditPropertiesAction() {
-        super(DataSource.class);
-        putValue(NAME, NbBundle.getMessage(EditPropertiesAction.class, "ACT_Properties"));   // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(EditPropertiesAction.class, "DESCR_Properties"));   // NOI18N
+    private AddJstatdConnectionAction() {
+        super(Host.class);
+        putValue(NAME, NbBundle.getMessage(AddJstatdConnectionAction.class,
+                "ACT_AddJstatdConnection"));   // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(AddJstatdConnectionAction.class,
+                "DESCR_AddJstatdConnection"));   // NOI18N
     }
 
 }
