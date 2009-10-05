@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 
 /**
  * Factory which recognizes NetBeans IDE, NetBeans Platform based
- * application and VisualVM itself 
+ * application and VisualVM itself
  * @author Tomas Hurka
  */
 public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFactory {
@@ -60,18 +60,18 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
       }
       return false;
   }
-  
+
   protected Set<String> computeClusters(Jvm jvm) {
     String args = jvm.getJvmArgs();
     int clusterIndex = args.indexOf(NETBEANS_DIRS);
     String pathSeparator = jvm.getJavaHome().contains("\\")?";":":";    // NOI18N
     String separator = pathSeparator.equals(":")?"/":"\\";      // NOI18N
     Set<String> clusters = new HashSet();
-    
+
     if (clusterIndex > -1) {
       String clustersString=args.substring(clusterIndex);
       int endIndex = clustersString.indexOf(" -");  // NOI18N
-      Scanner clusterScanner;   
+      Scanner clusterScanner;
       if (endIndex > -1) {
         clustersString = clustersString.substring(0,endIndex);
       }
@@ -86,12 +86,12 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
     }
     return Collections.unmodifiableSet(clusters);
   }
-  
+
   protected String getBranding(Jvm jvm) {
     String args = jvm.getMainArgs();
     if (args != null) {
       int brandingOffset = args.indexOf(BRANDING_ID);
-      
+
       if (brandingOffset > -1) {
         Scanner sc = new Scanner(args.substring(brandingOffset));
         sc.next(); // skip --branding
@@ -105,14 +105,14 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
 
   /**
    * Detects NetBeans IDE, NetBeans Platform based
-   * application and VisualVM itself. It returns 
+   * application and VisualVM itself. It returns
    * {@link VisualVMApplicationType} for VisualVM,
    * {@link NetBeansApplicationType} for NetBeans 4.0 and newer and
    * {@link NetBeans3xApplicationType} for NetBeans 3.x
-   * 
+   *
    * @return {@link ApplicationType} subclass or <code>null</code> if
-   * this application is not NetBeans 
-   */ 
+   * this application is not NetBeans
+   */
   public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
     if (isNetBeans(jvm,mainClass)) {
       String branding = getBranding(jvm);
@@ -121,11 +121,14 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
       }
       Set<String> clusters = computeClusters(jvm);
       Iterator<String> clIt = clusters.iterator();
-      
+
       while(clIt.hasNext()) {
         String cluster = clIt.next();
         if (nbcluster_pattern.matcher(cluster).matches()) {
           return new NetBeansApplicationType(app,jvm,clusters);
+        }
+        if (VISUALVM_ID.equals(cluster)) {
+            return new VisualVMApplicationType(app);
         }
       }
       if (clusters.isEmpty() && branding == null) {
