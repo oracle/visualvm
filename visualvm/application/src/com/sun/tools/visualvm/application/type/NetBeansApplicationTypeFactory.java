@@ -127,6 +127,9 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
         if (nbcluster_pattern.matcher(cluster).matches()) {
           return new NetBeansApplicationType(app,jvm,clusters);
         }
+        if (VISUALVM_ID.equals(cluster)) {
+            return new VisualVMApplicationType(app);
+        }
       }
       if (clusters.isEmpty() && branding == null) {
         return new NetBeans3xApplicationType(app,jvm);
