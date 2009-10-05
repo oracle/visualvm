@@ -726,8 +726,6 @@ class SamplerImpl {
         addMemoryHeader(builder);
         builder.append(memoryStatus);
 
-        addReleaseNote(builder);
-
         int selStart = summaryArea.getSelectionStart();
         int selEnd = summaryArea.getSelectionEnd();
         summaryArea.setText(builder.toString());
@@ -740,15 +738,6 @@ class SamplerImpl {
 
     private static void addMemoryHeader(StringBuilder builder) {
         builder.append("<br><br><b>Memory sampling:</b><br>");
-    }
-
-    private static void addReleaseNote(StringBuilder builder) {
-        builder.append("<div style='margin-top: 30px; padding: 5px; background-color: #f5f5f5;'>");
-        builder.append("<b>Note: </b>Sampler is an experimental profiling plugin for VisualVM 1.2. Please give us your feedback on this plugin:<br><div style='margin-left: 12px;'>");
-        builder.append("- to send us any feedback use <a href='mailto:feedback@visualvm.dev.java.net'><nobr>feedback@visualvm.dev.java.net</nobr></a><br>");
-        builder.append("- to report a bug use <a href='https://visualvm.dev.java.net/issues/enter_bug.cgi?issue_type=DEFECT'><nobr>https://visualvm.dev.java.net/issues/enter_bug.cgi?issue_type=DEFECT</nobr></a><br>");
-        builder.append("- to request an enhancement use <a href='https://visualvm.dev.java.net/issues/enter_bug.cgi?issue_type=ENHANCEMENT'><nobr>https://visualvm.dev.java.net/issues/enter_bug.cgi?issue_type=ENHANCEMENT</nobr></a></div>");
-        builder.append("</div>");
     }
 
     private void initComponents() {
