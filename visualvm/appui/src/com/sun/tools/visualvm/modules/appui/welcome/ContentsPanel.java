@@ -88,8 +88,8 @@ class ContentsPanel extends JPanel implements Constants {
 
         b.append("<div bgcolor='" + backgroundText + "' style='padding:10px;'>");
 
-        b.append("<div><b>VisualVM 1.2 Test Build </b>is a public development build for testing and evaluation purposes. See the <a href='https://visualvm.dev.java.net/relnotes12tb.html'>Release notes</a> for details.</div><br>");
-        b.append("<div>If you find a bug or have any feedback please let the developers know on a <a href='mailto:feedback@visualvm.dev.java.net?subject=VisualVM%201.2%20Test%20Build%20Feedback'>mailing list</a>. You may also file a <a href='https://visualvm.dev.java.net/issues/enter_bug.cgi?issue_type=DEFECT'>bug report</a>.</div><br>");
+        b.append("<div><b>VisualVM 1.2 Test Build </b>is a public development build for testing<br>and evaluation purposes. See the <a href='https://visualvm.dev.java.net/relnotes12tb.html'>Release notes</a> for details.</div><br>");
+        b.append("<div>If you find a bug or have any feedback please let the developers<br>know on a <a href='mailto:feedback@visualvm.dev.java.net?subject=VisualVM%201.2%20Test%20Build%20Feedback'>mailing list</a>. You may also file a <a href='https://visualvm.dev.java.net/issues/enter_bug.cgi?issue_type=DEFECT'>bug report</a>.</div><br>");
         b.append("<div><nobr>VisualVM 1.2 will be released soon at <a href='https://visualvm.dev.java.net'>https://visualvm.dev.java.net</a>!</nobr></div>");
 
         b.append("</div>");
