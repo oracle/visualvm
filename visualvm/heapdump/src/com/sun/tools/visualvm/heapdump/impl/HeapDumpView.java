@@ -32,6 +32,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,6 +41,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.heapwalk.HeapWalker;
@@ -112,11 +114,20 @@ class HeapDumpView extends DataSourceView {
                 SwingUtilities.invokeLater(new Runnable() { public void run() {
                     contentsPanel.remove(progressLabel);
                     JComponent hwView = hw.getTopComponent();
+                    try {
+                        JComponent fragmentWalker = (JComponent)hwView.getComponent(0);
+                        fragmentWalker.setOpaque(false);
+                        JToolBar toolBar = (JToolBar)fragmentWalker.getComponent(0);
+                        JComponent controllerPanel = (JComponent)fragmentWalker.getComponent(1);
+                        toolBar.setOpaque(false);
+                        ((JComponent)toolBar.getComponent(0)).setOpaque(false);
+                        ((JComponent)toolBar.getComponent(1)).setOpaque(false);
+                        controllerPanel.setOpaque(false);
+                    } catch (Exception e) {}
                     hwView.setPreferredSize(new Dimension(1, 1));
                     contentsPanel.add(hwView, BorderLayout.CENTER);
                     contentsPanel.revalidate();
                     contentsPanel.repaint();
-//                    contentsPanel.doLayout();
                 } });
               } catch (FileNotFoundException ex) {
                 LOGGER.throwing(HeapDumpView.class.getName(), "loadHeap", ex);  // NOI18N
