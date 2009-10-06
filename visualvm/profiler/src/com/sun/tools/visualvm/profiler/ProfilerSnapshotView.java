@@ -30,11 +30,14 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
@@ -92,6 +95,12 @@ class ProfilerSnapshotView extends DataSourceView {
     
     protected DataViewComponent createComponent() {
         srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
+        try {
+            JComponent cpuResPanel = (JComponent)srw.getComponents()[0];
+            cpuResPanel.setOpaque(false);
+            JToolBar toolBar = (JToolBar)cpuResPanel.getComponents()[1];
+            toolBar.setOpaque(false);
+        } catch (Exception e) {}
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport().getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(true));
