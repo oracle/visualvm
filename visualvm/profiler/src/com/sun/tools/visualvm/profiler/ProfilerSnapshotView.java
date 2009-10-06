@@ -30,13 +30,14 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.modules.profiler.LoadedSnapshot;
@@ -95,12 +96,6 @@ class ProfilerSnapshotView extends DataSourceView {
     
     protected DataViewComponent createComponent() {
         srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
-        try {
-            JComponent cpuResPanel = (JComponent)srw.getComponents()[0];
-            cpuResPanel.setOpaque(false);
-            JToolBar toolBar = (JToolBar)cpuResPanel.getComponents()[1];
-            toolBar.setOpaque(false);
-        } catch (Exception e) {}
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport().getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(true));
@@ -114,6 +109,15 @@ class ProfilerSnapshotView extends DataSourceView {
     private class MasterViewSupport extends JPanel  {
         
         public DataViewComponent.MasterView getMasterView() {
+            try {
+                JComponent cpuResPanel = (JComponent)srw.getComponent(0);
+                cpuResPanel.setOpaque(false);
+                JToolBar toolBar = (JToolBar)cpuResPanel.getComponent(1);
+                toolBar.setOpaque(false);
+                JTabbedPane tabbedPane = (JTabbedPane)cpuResPanel.getComponent(0);
+                JComponent infoPanel = (JComponent)tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1);
+                infoPanel.setBorder(BorderFactory.createEmptyBorder());
+            } catch (Exception e) {}
             srw.setPreferredSize(new Dimension(1, 1));
             return new DataViewComponent.MasterView(NbBundle.getMessage(ProfilerSnapshotView.class, "DESCR_Profiler_Snapshot"), null, srw);   // NOI18N
         }
