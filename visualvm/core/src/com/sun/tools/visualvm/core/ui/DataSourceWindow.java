@@ -29,13 +29,16 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 
@@ -51,6 +54,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     private DataSource dataSource;
     private DataSourceDescriptor dataSourceDescriptor;
     private DataSourceWindowTabbedPane.ViewContainer singleViewContainer;
+    private JPanel multiViewContainer;
 
 
     // Doesn't need to be called from EDT
@@ -81,7 +85,8 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             doLayout();
         } else if (viewsCount == 1) {
             remove(singleViewContainer);
-            add(tabbedContainer, BorderLayout.CENTER);
+
+            add(multiViewContainer, BorderLayout.CENTER);
             tabbedContainer.addViewTab(dataSource, singleViewContainer.getView());
             tabbedContainer.addViewTab(dataSource, view);
             doLayout();
@@ -114,7 +119,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             
             if (viewsCount == 2) {
                 singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(dataSource), tabbedContainer.getViews().iterator().next());
-                remove(tabbedContainer);
+                remove(multiViewContainer);
                 tabbedContainer.removeTabAt(0);
                 add(singleViewContainer, BorderLayout.CENTER);
                 doLayout();
@@ -202,7 +207,16 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         // tabbedContainer
         tabbedContainer = new DataSourceWindowTabbedPane();
         tabbedContainer.addPropertyChangeListener(DataSourceWindowTabbedPane.PROP_CLOSE, this);
-        add(tabbedContainer, BorderLayout.CENTER);
+
+        // multiViewContainer
+        multiViewContainer = new JPanel(new BorderLayout());
+        if (UIUtils.isAquaLookAndFeel()) {
+            multiViewContainer.setOpaque(true);
+            multiViewContainer.setBackground(UIUtils.getProfilerResultsBackground());
+        }
+        multiViewContainer.add(tabbedContainer, BorderLayout.CENTER);
+
+        add(multiViewContainer, BorderLayout.CENTER);
     }
     
     private DataSourceWindowTabbedPane tabbedContainer;
