@@ -224,5 +224,9 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
             }
         });
     }
+
+    public String getConnectionId() {
+        return monitoredVm.getVmIdentifier().getURI().toString();
+    }
     
 }

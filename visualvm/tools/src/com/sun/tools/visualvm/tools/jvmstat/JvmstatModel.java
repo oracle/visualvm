@@ -83,6 +83,18 @@ public abstract class JvmstatModel extends Model {
      * @return a List of string values of the matching counters.
      */
     public abstract List<String> findByPattern(String pattern);
+    
+    /**
+     * Gets this connection's ID which identifies a target Java Virtual Machine.  For a
+     * given Java Virtual Machine, connection ID is unique id
+     * which does not change during the lifetime of the
+     * Java Virtual Machine.
+     *
+     * @return the unique ID of a target Java Virtual Machine.
+     * @since VisualVM 1.2
+     */
+    public abstract String getConnectionId();
+    
     /**
      * Find a list of the named counters exported via Jvmstat.
      * 

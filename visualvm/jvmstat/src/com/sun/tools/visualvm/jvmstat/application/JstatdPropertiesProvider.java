@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.jvmstat.application;
 
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.properties.PropertiesProvider;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -76,7 +77,7 @@ class JstatdPropertiesProvider extends PropertiesProvider<JvmstatApplication> {
         panel.add(connectionLabel, constraints);
 
         // connectionField
-        JTextField connectionField = new JTextField(dataSource.getHostIdentifier().getURI().toString());
+        JTextField connectionField = new JTextField(JvmstatModelFactory.getJvmstatFor(dataSource).getConnectionId());
         connectionLabel.setLabelFor(connectionField);
         connectionField.setCaretPosition(0);
         connectionField.setEditable(false);
