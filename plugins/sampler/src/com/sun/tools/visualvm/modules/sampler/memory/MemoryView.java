@@ -129,6 +129,10 @@ class MemoryView extends JPanel {
     }
 
 
+    void initSession() {
+        snapshotButton.setEnabled(false);
+    }
+
     void refresh(HeapHistogram histogram) {
         if (histogram == null || (pauseButton.isSelected() && !forceRefresh)) return;
         forceRefresh = false;
@@ -181,6 +185,8 @@ class MemoryView extends JPanel {
 
         updateData(false);
         refreshUI();
+
+        snapshotButton.setEnabled(snapshotDumper != null);
     }
 
     void terminate() {
@@ -189,7 +195,6 @@ class MemoryView extends JPanel {
         refreshUnitsLabel.setEnabled(false);
         pauseButton.setEnabled(false);
         refreshButton.setEnabled(false);
-        snapshotButton.setEnabled(false);
         deltaButton.setEnabled(false);
         gcButton.setEnabled(false);
         heapdumpButton.setEnabled(false);
@@ -593,7 +598,7 @@ class MemoryView extends JPanel {
         };
         snapshotButton.setToolTipText("Take snapshot of collected results");
         snapshotButton.setOpaque(false);
-        snapshotButton.setEnabled(snapshotDumper != null);
+        snapshotButton.setEnabled(false);
         toolBar.add(snapshotButton);
 
         toolBar.addSeparator();

@@ -91,6 +91,7 @@ class CPUView extends JPanel {
             remove(resultsPanel);
             resultsPanel = null;
         }
+        snapshotButton.setEnabled(false);
         add(noDataLabel, BorderLayout.CENTER);
         noDataLabel.invalidate();
         validate();
@@ -118,6 +119,8 @@ class CPUView extends JPanel {
         forceRefresh = false;
         resultsPanel.updateLiveResults();
 //        refreshUI();
+
+        snapshotButton.setEnabled(snapshotDumper != null);
     }
 
     void terminate() {
@@ -126,7 +129,6 @@ class CPUView extends JPanel {
         refreshUnitsLabel.setEnabled(false);
         pauseButton.setEnabled(false);
         refreshButton.setEnabled(false);
-//        snapshotButton.setEnabled(false);
         threaddumpButton.setEnabled(false);
     }
 
@@ -201,6 +203,7 @@ class CPUView extends JPanel {
         };
         snapshotButton.setToolTipText("Take snapshot of collected results");
         snapshotButton.setOpaque(false);
+        snapshotButton.setEnabled(false);
         toolBar.add(snapshotButton);
 
         JPanel toolbarSpacer = new JPanel(null) {

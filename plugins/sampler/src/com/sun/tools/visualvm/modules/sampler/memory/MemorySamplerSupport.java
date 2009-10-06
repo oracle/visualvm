@@ -82,6 +82,8 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
             initialize();
             detailsViews = createViews();
         }
+        heapView.initSession();
+        permgenView.initSession();
         return detailsViews;
     }
     
@@ -179,13 +181,14 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
                     try {
                         if (!timer.isRunning()) return;
                         final HeapHistogram heapHistogram = attachModel.takeHeapHistogram();
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                snapshotDumper.lastHistogram = heapHistogram;
-                                for (MemoryView view : views)
-                                    view.refresh(heapHistogram);
-                            }
-                        });
+                        if (heapHistogram != null)
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    snapshotDumper.lastHistogram = heapHistogram;
+                                    for (MemoryView view : views)
+                                        view.refresh(heapHistogram);
+                                }
+                            });
                     } catch (Exception e) {
                         terminate();
                     }
@@ -207,7 +210,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         
         public AllocMemoryResultsSnapshot createSnapshot(long time) {
             HeapHistogram histogram = lastHistogram;
-            
+
             if (histogram != null) {
                 ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
                 DataOutputStream dos = new DataOutputStream(output);
