@@ -49,6 +49,7 @@ class LoadSnapshotAction extends AbstractAction {
     private static final Image ICON =  ImageUtilities.loadImage(ICON_PATH);
     
     private String lastFile = null;
+    private String lastFilter = null;
     
     
     private static LoadSnapshotAction instance;
@@ -88,10 +89,15 @@ class LoadSnapshotAction extends AbstractAction {
             }            
         };
         chooser.setDialogTitle(NbBundle.getMessage(LoadSnapshotAction.class, "LBL_Load"));  // NOI18N
-        if (lastFile != null) chooser.setSelectedFile(new File(lastFile));
         chooser.setAcceptAllFileFilterUsed(false);
-        for (FileFilter fileFilter : fileFilters) chooser.addChoosableFileFilter(fileFilter);
-        chooser.setFileFilter(fileFilters.get(0));
+        int filterIndex = 0;
+        for (int i = 0; i < fileFilters.size(); i++) {
+            FileFilter fileFilter = fileFilters.get(i);
+            chooser.addChoosableFileFilter(fileFilter);
+            if (fileFilter.getDescription().equals(lastFilter)) filterIndex = i;
+        }
+        if (lastFile != null) chooser.setSelectedFile(new File(lastFile));
+        chooser.setFileFilter(fileFilters.get(filterIndex));
         if (chooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
             if (selectedFile == null || !selectedFile.exists()) {
@@ -100,6 +106,7 @@ class LoadSnapshotAction extends AbstractAction {
                 FileFilter fileFilter = chooser.getFileFilter();
                 if (fileFilter.accept(selectedFile)) {
                     lastFile = selectedFile.getAbsolutePath();
+                    lastFilter = fileFilter.getDescription();
                     categories.get(fileFilters.indexOf(fileFilter)).openSnapshot(selectedFile);
                 } else {
                     NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(LoadSnapshotAction.class, "MSG_Selected_file_does_not_match_snapshot_type"));  // NOI18N
