@@ -114,7 +114,7 @@ public class SimpleXYChartUtils {
 
         PERCENT_FORMATTER = NumberFormat.getPercentInstance();
         PERCENT_FORMATTER.setMinimumFractionDigits(1);
-        PERCENT_FORMATTER.setMaximumIntegerDigits(2);
+        PERCENT_FORMATTER.setMaximumIntegerDigits(3);
 
         DEFAULT_BUFFER_STEP = 50;
 
