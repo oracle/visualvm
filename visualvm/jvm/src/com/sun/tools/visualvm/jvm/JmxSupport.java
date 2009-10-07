@@ -82,6 +82,7 @@ public class JmxSupport implements DataRemovedListener {
     private boolean operatingSystemMXBeanInitialized;
     private Object operatingSystemMXBeanLock = new Object();
     private OperatingSystemMXBean operatingSystemMXBean;
+    private Boolean readOnlyConnection;
     private Timer timer;
     private MemoryPoolMXBean permGenPool;
     private Collection<GarbageCollectorMXBean> gcList;
@@ -131,6 +132,24 @@ public class JmxSupport implements DataRemovedListener {
         return mxbeans;
     }
 
+    synchronized boolean isReadOnlyConnection() {
+        if (readOnlyConnection == null) {
+            readOnlyConnection = Boolean.FALSE;
+            JvmMXBeans mxbeans = getJvmMXBeans();
+            if (mxbeans != null) {
+                ThreadMXBean threads = mxbeans.getThreadMXBean();
+                if (threads != null) {
+                    try {
+                        threads.getThreadInfo(0);
+                    } catch (SecurityException ex) {
+                        readOnlyConnection = Boolean.TRUE;
+                    }
+                }
+            }
+        }
+        return readOnlyConnection.booleanValue();
+    }
+    
     synchronized Collection<GarbageCollectorMXBean> getGarbageCollectorMXBeans() {
         if (gcList == null) {
             JvmMXBeans jmx = getJvmMXBeans();

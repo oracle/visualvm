@@ -210,7 +210,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             }
             if (args == null) {
                 HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
-                if (hsDiagnostic != null) {
+                if (hsDiagnostic != null && !jmxSupport.isReadOnlyConnection()) {
                     String value = hsDiagnostic.getVMOption(HEAP_DUMP_ON_OOME).getValue();
                     isDumpOnOOMEnabled = Boolean.valueOf(value);
                     return isDumpOnOOMEnabled.booleanValue();
