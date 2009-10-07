@@ -78,7 +78,10 @@ public final class SnapshotsSupport {
         chooser.setFileFilter(snapshot.getCategory().getFileFilter());
 //        chooser.setFileView(category.getFileView());
         if (chooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
-            final File copy = chooser.getSelectedFile();
+            String categorySuffix = snapshot.getCategory().getSuffix();
+            String filePath = chooser.getSelectedFile().getAbsolutePath();
+            if (!filePath.endsWith(categorySuffix)) filePath += categorySuffix;
+            final File copy = new File(filePath);
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     ProgressHandle pHandle = null;

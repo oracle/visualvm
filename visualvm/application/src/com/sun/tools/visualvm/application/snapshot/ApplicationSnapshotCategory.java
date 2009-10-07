@@ -37,7 +37,7 @@ class ApplicationSnapshotCategory extends SnapshotCategory<ApplicationSnapshot> 
     
     private static final String NAME = NbBundle.getMessage(ApplicationSnapshotCategory.class, "LBL_Application_Snapshots"); // NOI18N
     private static final String PREFIX = "application"; // NOI18N
-    private static final String SUFFIX = ".apps";   // NOI18N
+    static final String SUFFIX = ".apps";   // NOI18N
     
     public ApplicationSnapshotCategory() {
         super(NAME, ApplicationSnapshot.class, PREFIX, SUFFIX, POSITION_NONE);

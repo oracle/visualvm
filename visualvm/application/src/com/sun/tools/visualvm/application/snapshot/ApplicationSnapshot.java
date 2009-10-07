@@ -68,7 +68,7 @@ public final class ApplicationSnapshot extends Snapshot {
     public boolean supportsSaveAs() {
         return true;
     }
-    
+
     public void saveAs() {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle(NbBundle.getMessage(ApplicationSnapshot.class, "LBL_Save_Application_Snapshot_As")); // NOI18N
@@ -76,7 +76,10 @@ public final class ApplicationSnapshot extends Snapshot {
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.setFileFilter(getCategory().getFileFilter());
         if (chooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
-            final File file = chooser.getSelectedFile();
+            String categorySuffix = ApplicationSnapshotCategory.SUFFIX;
+            String filePath = chooser.getSelectedFile().getAbsolutePath();
+            if (!filePath.endsWith(categorySuffix)) filePath += categorySuffix;
+            final File file = new File(filePath);
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     ProgressHandle pHandle = null;
