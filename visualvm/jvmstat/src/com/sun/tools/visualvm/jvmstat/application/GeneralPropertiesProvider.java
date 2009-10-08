@@ -73,6 +73,7 @@ class GeneralPropertiesProvider extends PropertiesProvider<JvmstatApplication> {
                 PropertiesImpl.isLocalConnection(dataSource) ?
                 "MSG_ConnectionPropertiesDefault" : "MSG_ConnectionPropertiesCustom")); // NOI18N
         textArea.setMinimumSize(new Dimension(1, 1));
+        textArea.setCaretPosition(0);
         panel.add(textArea, BorderLayout.CENTER);
         return panel;
     }

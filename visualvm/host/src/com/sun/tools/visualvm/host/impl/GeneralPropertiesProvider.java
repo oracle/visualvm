@@ -96,6 +96,7 @@ public class GeneralPropertiesProvider extends PropertiesProvider<Host> {
         String dnsName = NbBundle.getMessage(GeneralPropertiesProvider.class, "LBL_DnsName"); // NOI18N
         String ipAddress = NbBundle.getMessage(GeneralPropertiesProvider.class, "LBL_IpAddress"); // NOI18N
         textArea.setText(dnsName + " " + hostname + "\n" + ipAddress + " " + ip); // NOI18N
+        textArea.setCaretPosition(0);
     }
 
 

@@ -98,7 +98,7 @@ class ConnectionsTable extends JTable {
             if (lastRow != -1) table.setRowHeight(lastRow, table.getRowHeight());
             if (row != -1) {
                 table.editCellAt(row, 0, null);
-                table.requestFocusInWindow();
+                if (table.isShowing()) table.requestFocusInWindow();
             } else {
                 table.doEditingStopped(null);
             }

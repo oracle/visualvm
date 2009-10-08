@@ -70,6 +70,7 @@ public class GeneralPropertiesProvider extends PropertiesProvider<JmxApplication
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setText(NbBundle.getMessage(GeneralPropertiesProvider.class, "MSG_ConnectionProperties")); // NOI18N
+        textArea.setCaretPosition(0);
         textArea.setMinimumSize(new Dimension(1, 1));
         panel.add(textArea, BorderLayout.CENTER);
         return panel;
