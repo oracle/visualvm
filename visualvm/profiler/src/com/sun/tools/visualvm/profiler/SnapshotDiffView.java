@@ -33,8 +33,11 @@ import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
+import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.modules.profiler.MemoryDiffPanel;
 import org.netbeans.modules.profiler.SnapshotsDiffWindow;
@@ -111,6 +114,37 @@ class SnapshotDiffView extends DataSourceView {
     private class MasterViewSupport extends JPanel  {
         
         public DataViewComponent.MasterView getMasterView() {
+            try {
+                JComponent memoryDiffPanel = (JComponent)sdw.getComponent(0);
+                memoryDiffPanel.setOpaque(false);
+                final JToolBar toolBar = (JToolBar)memoryDiffPanel.getComponent(1);
+                toolBar.setOpaque(false);
+                ((JComponent)toolBar.getComponent(0)).setOpaque(false);
+                ((JComponent)toolBar.getComponent(1)).setOpaque(false);
+                ((JComponent)toolBar.getComponent(3)).setOpaque(false);
+                ((JComponent)toolBar.getComponent(4)).setOpaque(false);
+                ((JComponent)toolBar.getComponent(5)).setOpaque(false);
+
+                JPanel toolbarSpacer = new JPanel(null) {
+                    public Dimension getPreferredSize() {
+                        if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
+                            int currentWidth = toolBar.getSize().width;
+                            int minimumWidth = toolBar.getMinimumSize().width;
+                            int extraWidth = currentWidth - minimumWidth;
+                            return new Dimension(Math.max(extraWidth, 0), 0);
+                        } else {
+                            return super.getPreferredSize();
+                        }
+                    }
+                };
+                toolbarSpacer.setOpaque(false);
+                Component descriptionLabel = toolBar.getComponent(7);
+                toolBar.remove(descriptionLabel);
+                toolBar.remove(6);
+                toolBar.add(toolbarSpacer);
+                toolBar.add(descriptionLabel);
+            } catch (Exception e) {}
+
             sdw.setPreferredSize(new Dimension(1, 1));
             SnapshotDiffContainer snapshotDiff = (SnapshotDiffContainer)getDataSource();
             String caption = NbBundle.getMessage(SnapshotDiffView.class, "DESCR_Snapshots_Comparison", // NOI18N
