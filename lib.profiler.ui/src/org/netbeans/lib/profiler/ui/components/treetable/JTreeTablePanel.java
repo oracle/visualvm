@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -92,24 +92,17 @@ public class JTreeTablePanel extends JPanel {
             }
         }
 
-        private int getEmptySpaceY() {
-            if (getView() == null) {
-                return 0;
-            }
-
-            return getView().getHeight();
-        }
-
         private void paintVerticalLines(Graphics g) {
-            int emptySpaceY = getEmptySpaceY();
-            Rectangle cellRect;
-
-            if (emptySpaceY > 0) {
+            Component view = getView();
+            int linesTop = view == null ? 0 : view.getHeight();
+            int linesBottom = getHeight() - 1;
+            if (linesTop > 0 && linesTop <= linesBottom) {
                 g.setColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
-
-                for (int i = 0; i < tableHeader.getColumnModel().getColumnCount(); i++) {
-                    cellRect = tableHeader.getHeaderRect(i);
-                    g.drawLine((cellRect.x + cellRect.width) - 1, emptySpaceY, (cellRect.x + cellRect.width) - 1, getHeight() - 1);
+                int columnCount = tableHeader.getColumnModel().getColumnCount();
+                for (int i = 0; i < columnCount; i++) {
+                    Rectangle cellRect = tableHeader.getHeaderRect(i);
+                    int cellX = cellRect.x + cellRect.width - 1;
+                    g.drawLine(cellX, linesTop, cellX, linesBottom);
                 }
             }
         }
@@ -122,6 +115,8 @@ public class JTreeTablePanel extends JPanel {
     protected JScrollBar scrollBar;
     protected JScrollPane treeTableScrollPane;
     protected JTreeTable treeTable;
+
+    private int invisibleRowsCount = -1;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -139,8 +134,7 @@ public class JTreeTablePanel extends JPanel {
             public void hierarchyChanged(HierarchyEvent e) {
                 if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                     if (isShowing()) {
-                        updateScrollBarMaximum();
-                        updateScrollBarWidth();
+                        updateScrollBar(true);
                     }
                 }
             }
@@ -172,9 +166,8 @@ public class JTreeTablePanel extends JPanel {
             }
 
             public void columnMarginChanged(ChangeEvent e) {
-                updateScrollBarMaximum();
                 treeTableViewport.repaint();
-                updateScrollBarWidth();
+                updateScrollBar(true);
             }
 
             public void columnSelectionChanged(ListSelectionEvent e) {}
@@ -187,8 +180,7 @@ public class JTreeTablePanel extends JPanel {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         treeTable.setTreeCellOffsetX(e.getValue());
-                        if (!e.getValueIsAdjusting())
-                            updateScrollBarMaximum();
+                        if (!e.getValueIsAdjusting()) updateScrollBar(false);
                     }
                 });
             }
@@ -198,16 +190,14 @@ public class JTreeTablePanel extends JPanel {
     private void hookTreeCollapsedExpanded() {
         treeTable.getTree().addTreeExpansionListener(new TreeExpansionListener() {
             public void treeCollapsed(TreeExpansionEvent event) {
-                updateScrollBar();
+                updateSB();
             }
             public void treeExpanded(TreeExpansionEvent event) {
-                updateScrollBar();
+                updateSB();
             }
-            private void updateScrollBar() {
+            private void updateSB() {
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        updateScrollBarMaximum();
-                    }
+                    public void run() { updateScrollBar(false); }
                 });
             }
         });
@@ -236,7 +226,7 @@ public class JTreeTablePanel extends JPanel {
         });
         vScrollBar.addAdjustmentListener(new AdjustmentListener() {
             public void adjustmentValueChanged(AdjustmentEvent e) {
-                if (!e.getValueIsAdjusting()) updateScrollBarMaximum();
+                if (!e.getValueIsAdjusting()) updateScrollBar(false);
             }
         });
         scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
@@ -266,8 +256,10 @@ public class JTreeTablePanel extends JPanel {
         add(scrollBarPanel, BorderLayout.SOUTH);
     }
 
-    private void updateScrollBarMaximum() {
+    private void updateScrollBar(boolean updateWidth) {
         if (!isShowing()) return;
+
+        boolean refreshScrollBar = false;
 
         JTree tree = treeTable.getTree();
         Point viewPos = treeTableViewport.getViewPosition();
@@ -286,39 +278,67 @@ public class JTreeTablePanel extends JPanel {
         int treeWidth = size.width + 3; // +3 means extra right margin
         int columnWidth = treeTable.getColumnModel().getColumn(0).getWidth();
         int treeOffset = treeTable.getTreeCellOffsetX();
-
         int maximum = Math.max(treeWidth - columnWidth, treeOffset);
+
+        if (scrollBarPanel.isVisible() && maximum <= 0) {
+            int firstInvisibleRow = lastVisibleRow + 1;
+            int lastInvisibleRow = Math.min(lastVisibleRow + getInvisibleRowsCount(),
+                                            treeTable.getRowCount() - 1);
+            if (firstInvisibleRow <= lastInvisibleRow) {
+                size = new Rectangle();
+                for (int row = firstInvisibleRow; row <= lastInvisibleRow; row++)
+                    size.add(tree.getRowBounds(row));
+                size.width += 3;
+                int maximum2 = Math.max(size.width - columnWidth, treeOffset);
+                if (maximum2 > 0) {
+                    treeWidth = size.width;
+                    maximum = maximum2;
+                }
+            }
+        }
 
         if (maximum <= 0) {
             if (scrollBarPanel.isVisible()) {
                 treeTable.setTreeCellOffsetX(0);
                 scrollBarPanel.setVisible(false);
-                refreshScrollBar();
+                refreshScrollBar = true;
             }
         } else {
             int value = treeOffset;
             int extent = treeWidth;
             if (!scrollBarPanel.isVisible()) {
                 scrollBarPanel.setVisible(true);
-                refreshScrollBar();
+                refreshScrollBar = true;
             }
             scrollBar.setValues(value, extent, 0, maximum + extent);
         }
+
+        if (updateWidth) {
+            Dimension dim = scrollBar.getPreferredSize();
+            dim.width = treeTable.getColumnModel().getColumn(0).getWidth();
+            scrollBar.setPreferredSize(dim);
+            scrollBar.setBlockIncrement((int)((float)scrollBar.getModel().getExtent() * 0.95f));
+            refreshScrollBar = true;
+        }
+
+        if (refreshScrollBar) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    scrollBar.invalidate();
+                    validate();
+                    repaint();
+                }
+            });
+        }
     }
 
-    private void updateScrollBarWidth() {
-//        if (isShowing() || !scrollBarPanel.isVisible()) return;
-        
-        Dimension dim = scrollBar.getPreferredSize();
-        dim.width = treeTable.getTableHeader().getHeaderRect(0).width;
-        scrollBar.setPreferredSize(dim);
-        scrollBar.setBlockIncrement((int)((float)scrollBar.getModel().getExtent() * 0.95f));
-        refreshScrollBar();
-    }
+    private int getInvisibleRowsCount() {
+        if (invisibleRowsCount == -1)
+            invisibleRowsCount =
+                    (int)Math.ceil((float)scrollBar.getPreferredSize().height /
+                                   (float)treeTable.getRowHeight());
 
-    private void refreshScrollBar() {
-        scrollBarPanel.invalidate();
-        doLayout();
-        repaint();
+        return invisibleRowsCount;
     }
+    
 }
