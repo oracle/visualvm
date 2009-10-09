@@ -474,8 +474,10 @@ public class CPUSettingsSupport {
         constraints.insets = new Insets(5, 10, 15, 5);
         panelImpl.add(sampleRateLabel, constraints);
 
-        Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
-        sampleRateCombo = new JComboBox(refreshRates) {
+        Integer[] samplingRates = application.isLocalApplication() ?
+            new Integer[] { 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 } :
+            new Integer[] {     50, 100, 200, 500, 1000, 2000, 5000, 10000 };
+        sampleRateCombo = new JComboBox(samplingRates) {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
