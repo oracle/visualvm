@@ -140,7 +140,7 @@ public class JmxSupport implements DataRemovedListener {
                 ThreadMXBean threads = mxbeans.getThreadMXBean();
                 if (threads != null) {
                     try {
-                        threads.getThreadInfo(0);
+                        threads.getThreadInfo(1);
                     } catch (SecurityException ex) {
                         readOnlyConnection = Boolean.TRUE;
                     }
