@@ -547,4 +547,8 @@ public class StackTraceSnapshotBuilder {
     public boolean collectionTwoTimeStamps() {
         return COLLECT_TWO_TIMESTAMPS;
     }
+    
+    public InstrumentationFilter getFilter() {
+        return filter;
+    }
 }
