@@ -46,6 +46,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.text.MessageFormat;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -210,10 +211,16 @@ class ApplicationProfilerView extends DataSourceView {
             Component[] components = view.getComponents();
             if (components.length > 0 && components[0] instanceof JToolBar) {
                 JToolBar toolbar = (JToolBar)components[0];
+                toolbar.setOpaque(false);
                 components = toolbar.getComponents();
-                if (components.length > 5 && components[5] instanceof JButton) {
-                    JButton button = (JButton)components[5];
-                    button.setText(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Snapshot")); // NOI18N
+                for (int i = 0; i < components.length; i++) {
+                    Component component = components[i];
+                    if (component instanceof AbstractButton) {
+                        ((AbstractButton)component).setOpaque(false);
+                        if (i == 5)
+                            ((AbstractButton)component).setText(NbBundle.getMessage(
+                                    ApplicationProfilerView.class, "LBL_Snapshot")); // NOI18N
+                    }
                 }
             }
 
