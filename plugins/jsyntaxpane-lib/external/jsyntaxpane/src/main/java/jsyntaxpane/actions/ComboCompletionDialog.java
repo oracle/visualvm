@@ -80,7 +80,7 @@ public class ComboCompletionDialog extends javax.swing.JDialog {
         Object selected = jLstItems.getSelectedValue();
         for (String s : items) {
             if (s.startsWith(prefix)) {
-                filtered.add(s);
+                filtered.add(trimPrefix(s));
             }
         }
         jLstItems.setListData(filtered);
@@ -89,6 +89,15 @@ public class ComboCompletionDialog extends javax.swing.JDialog {
         } else {
             jLstItems.setSelectedIndex(0);
         }
+    }
+
+    private String trimPrefix(String item) {
+        int idx1 = item.indexOf("[");
+        int idx2 = item.indexOf("]");
+        if (idx1 > -1 && idx2 > -1) {
+            return (idx1 > 0 ? item.substring(0, idx1 - 1) : "") + (idx2 < item.length() - 1 ? item.substring(idx2 + 1) : "");
+        }
+        return item;
     }
 
     /** This method is called from within the constructor to
@@ -182,7 +191,7 @@ public class ComboCompletionDialog extends javax.swing.JDialog {
      * @return the selected text, or empty string if nothing is selected
      */
     public String getResult() {
-        return result == null ? "" : result;
+        return result == null ? "" : trimPrefix(result);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

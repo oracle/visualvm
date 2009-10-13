@@ -105,6 +105,7 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
         String kitName = this.getClass().getSimpleName();
         Color caretColor = CONFIG.getPrefixColor(kitName, "CaretColor", Color.BLACK);
         editorPane.setCaretColor(caretColor);
+        addSyntaxActions(km_new, ""); // shared actions
         addSyntaxActions(km_new, kitName);
         editorPane.setKeymap(km_new);
         // install the components to the editor:
@@ -144,10 +145,11 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
         // look at all keys that either start with prefix.Action, or
         // that start with Action.
 
+        Pattern splitter = CONFIG.getValueSeparator(prefix);
         Configuration actionsConf = CONFIG.subConfig(prefix, "Action.");
 
         for (String actionName : actionsConf.stringPropertyNames()) {
-            String[] values = Configuration.COMMA_SEPARATOR.split(
+            String[] values = splitter.split(
                     actionsConf.getProperty(actionName));
             String actionClass = values[0];
             SyntaxAction action = editorActions.get(actionClass);
@@ -174,7 +176,7 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
     private SyntaxAction createAction(String actionClassName) {
         SyntaxAction action = null;
         try {
-            Class clazz = Class.forName(actionClassName);
+            Class clazz = JarServiceProvider.loadClass(actionClassName);
             action = (SyntaxAction) clazz.newInstance();
             editorActions.put(actionClassName, action);
         } catch (InstantiationException ex) {

@@ -14,6 +14,8 @@
 package jsyntaxpane.util;
 
 import java.awt.Color;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +29,7 @@ import java.util.regex.Pattern;
  * @author Ayman Al-Sairafi
  */
 public class Configuration extends Properties {
+    final private Map<String, Pattern> valueSeparatorMap = new HashMap<String, Pattern>();
 
     public Configuration(Properties defaults) {
         super(defaults);
@@ -92,7 +95,7 @@ public class Configuration extends Properties {
         if (v == null) {
             return EMPTY_LIST;
         }
-        return COMMA_SEPARATOR.split(v);
+        return getValueSeparator(prefix).split(v);
     }
 
     /**
@@ -141,8 +144,7 @@ public class Configuration extends Properties {
      */
     public Configuration subConfig(String prefix, String keyPrefix) {
         Configuration sub = new Configuration();
-        addToSubConf(sub, keyPrefix);
-        addToSubConf(sub, prefix + "." + keyPrefix);
+        addToSubConf(sub, prefix.length() > 0 ? prefix + "." + keyPrefix : keyPrefix);
         return sub;
     }
 
@@ -154,8 +156,19 @@ public class Configuration extends Properties {
             }
         }
     }
-    
+
+    public Pattern getValueSeparator(String prefix) {
+        synchronized(valueSeparatorMap) {
+            Pattern val = valueSeparatorMap.get(prefix);
+            if (val == null) {
+                val = Pattern.compile("\\s*" + getPrefixProperty(prefix, "ValueSeparator", COMMA_SEPARATOR) + "\\s*");
+                valueSeparatorMap.put(prefix, val);
+            }
+            return val;
+        }
+    }
+
     public static final String[] EMPTY_LIST = new String[0];
-    public static final Pattern COMMA_SEPARATOR = Pattern.compile("\\s*,\\s*");
+    public static final String COMMA_SEPARATOR = ",";
     private static final Logger LOG = Logger.getLogger(Configuration.class.getName());
 }

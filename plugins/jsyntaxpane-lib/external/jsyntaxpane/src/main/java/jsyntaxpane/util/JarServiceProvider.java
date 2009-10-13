@@ -36,11 +36,16 @@ public class JarServiceProvider {
 
     private static final Logger LOG = Logger.getLogger(JarServiceProvider.class.getName());
 
+    private static ClassLoader globalLoader = ClassLoader.getSystemClassLoader();
     /**
      * Prevent anyone from instantiating this class.  
      * Just use the static method
      */
     private JarServiceProvider() {
+    }
+
+    public static Class loadClass(String className) throws ClassNotFoundException {
+        return globalLoader.loadClass(className);
     }
 
     /**
@@ -51,11 +56,9 @@ public class JarServiceProvider {
      */
     public static List<Object> getServiceProviders(Class cls) throws IOException {
         ArrayList<Object> l = new ArrayList<Object>();
-        ClassLoader cl = JarServiceProvider.class.getClassLoader();
-        cl = cl == null ? ClassLoader.getSystemClassLoader() : cl;
-        if (cl != null) {
+        if (globalLoader != null) {
             String serviceFile = "META-INF/services/" + cls.getName();
-            Enumeration<URL> e = cl.getResources(serviceFile);
+            Enumeration<URL> e = globalLoader.getResources(serviceFile);
             while (e.hasMoreElements()) {
                 URL u = e.nextElement();
                 InputStream is = u.openStream();
@@ -74,7 +77,7 @@ public class JarServiceProvider {
                             continue;
                         }
                         try {
-                            Object obj = cl.loadClass(str).newInstance();
+                            Object obj = globalLoader.loadClass(str).newInstance();
                             l.add(obj);
                         } catch (Exception ex) {
                             LOG.warning("Could not load: " + str);
@@ -110,18 +113,28 @@ public class JarServiceProvider {
      * @return Property file read.
      */
     public static Properties readProperties(String name) {
-        ClassLoader cl = JarServiceProvider.class.getClassLoader();
-        cl = cl == null ? ClassLoader.getSystemClassLoader() : cl;
         Properties props = new Properties();
-        if (cl != null) {
+        if (globalLoader != null) {
             InputStream is = null;
             try {
                 String serviceFile = "META-INF/services/" +
                         name.toLowerCase() + ".properties";
-                URL loc = cl.getResource(serviceFile);
-                if (loc != null) {
-                    is = loc.openStream();
-                    props.load(is);
+                Enumeration<URL> locs = globalLoader.getResources(serviceFile);
+                while(locs.hasMoreElements()) {
+                    URL loc = locs.nextElement();
+                    if (loc != null) {
+                        try {
+                            is = loc.openStream();
+                            Properties p = new Properties();
+                            p.load(is);
+                            props.putAll(p);
+                        } finally {
+                            if (is != null) {
+                                is.close();
+                            }
+                        }
+
+                    }
                 }
             } catch (IOException ex) {
                 LOG.log(Level.SEVERE, null, ex);
@@ -155,5 +168,9 @@ public class JarServiceProvider {
             }
         }
         return map;
+    }
+
+    public static void setGlobalLoader(ClassLoader loader) {
+        globalLoader = loader;
     }
 }

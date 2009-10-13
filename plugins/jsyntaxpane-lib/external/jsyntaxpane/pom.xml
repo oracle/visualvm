@@ -4,7 +4,7 @@
   <groupId>jsyntaxpane</groupId>
   <artifactId>jsyntaxpane</artifactId>
   <packaging>jar</packaging>
-  <version>0.9.4-visualvm</version>
+  <version>0.9.4.1-visualvm</version>
   <name>jsyntaxpane</name>
   <description>A very simple to use and extend JEditorKit that supports few languages. The main goal is to make it easy to have nice looking Java Swing Editors with support for Syntax Highlighting.</description>
   <url>http://jsyntaxpane.googlecode.com/</url>
@@ -78,7 +78,7 @@
           </archive>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>de.jflex.maven.plugin</groupId>
         <artifactId>maven-jflex-plugin</artifactId>
@@ -95,4 +95,5 @@
   </build>
 
 </project>
+
 
