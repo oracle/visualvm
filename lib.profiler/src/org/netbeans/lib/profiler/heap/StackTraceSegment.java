@@ -96,12 +96,12 @@ class StackTraceSegment extends TagBounds {
         return dumpBuffer;
     }
 
-    private long readStackTraceTag(long[] offset) {
+    private int readStackTraceTag(long[] offset) {
         long start = offset[0];
 
         if (hprofHeap.readTag(offset) != HprofHeap.STACK_TRACE) {
             return 0;
         }
-        return getDumpBuffer().getID(start + stackTraceSerialNumberOffset);
+        return getDumpBuffer().getInt(start + stackTraceSerialNumberOffset);
     }
 }
