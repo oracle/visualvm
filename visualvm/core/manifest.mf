@@ -5,4 +5,5 @@ OpenIDE-Module: com.sun.tools.visualvm.core/0
 OpenIDE-Module-Layer: com/sun/tools/visualvm/core/layer.xml
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/core/Bundle.properties
 OpenIDE-Module-Install: com/sun/tools/visualvm/core/Install.class
+OpenIDE-Module-Specification-Version: 1.3
 

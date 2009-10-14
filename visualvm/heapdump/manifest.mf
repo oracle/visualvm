@@ -5,4 +5,5 @@ OpenIDE-Module: com.sun.tools.visualvm.heapdump/0
 OpenIDE-Module-Install: com/sun/tools/visualvm/heapdump/Installer.class
 OpenIDE-Module-Layer: com/sun/tools/visualvm/heapdump/resources/layer.xml
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/heapdump/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
 

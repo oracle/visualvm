@@ -4,4 +4,5 @@ AutoUpdate-Essential-Module: true
 OpenIDE-Module: com.sun.tools.visualvm.application.views/0
 OpenIDE-Module-Install: com/sun/tools/visualvm/application/views/Installer.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/application/views/resources/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
 

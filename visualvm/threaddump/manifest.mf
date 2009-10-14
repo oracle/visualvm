@@ -5,4 +5,5 @@ OpenIDE-Module: com.sun.tools.visualvm.threaddump/0
 OpenIDE-Module-Layer: com/sun/tools/visualvm/threaddump/resources/layer.xml
 OpenIDE-Module-Install: com/sun/tools/visualvm/threaddump/Installer.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/threaddump/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
 

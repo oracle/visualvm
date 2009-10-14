@@ -6,4 +6,5 @@ OpenIDE-Module-Layer: com/sun/tools/visualvm/jvmstat/resources/layer.xml
 OpenIDE-Module-Install: com/sun/tools/visualvm/jvmstat/Installer.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/jvmstat/Bundle.properties
 OpenIDE-Module-Provides: com.sun.tools.visualvm.jvmstat
+OpenIDE-Module-Specification-Version: 1.0
 

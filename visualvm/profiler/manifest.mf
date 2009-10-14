@@ -5,4 +5,5 @@ OpenIDE-Module: com.sun.tools.visualvm.profiler/0
 OpenIDE-Module-Layer: com/sun/tools/visualvm/profiler/resources/layer.xml
 OpenIDE-Module-Install: com/sun/tools/visualvm/profiler/Installer.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/profiler/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.1
 
