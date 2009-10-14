@@ -90,12 +90,12 @@ class LoadClassSegment extends TagBounds {
         return null;
     }
 
-    LoadClass getClassBySerialNumber(long classSerialNumber) {
+    LoadClass getClassBySerialNumber(int classSerialNumber) {
         long[] offset = new long[] { startOffset };
 
         while (offset[0] < endOffset) {
             long start = offset[0];
-            long serial = readLoadClassSerialNumber(offset);
+            int serial = readLoadClassSerialNumber(offset);
 
             if (serial == classSerialNumber) {
                 return new LoadClass(this, start);
@@ -126,7 +126,7 @@ class LoadClassSegment extends TagBounds {
         return dumpBuffer;
     }
 
-    private long readLoadClassSerialNumber(long[] offset) {
+    private int readLoadClassSerialNumber(long[] offset) {
         long start = offset[0];
 
         if (hprofHeap.readTag(offset) != HprofHeap.LOAD_CLASS) {
