@@ -352,7 +352,11 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
     }
 
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
-        ((DiffAllocResultsPanel) memoryPanel).exportData(exportedFileType, eDD, PANEL_TITLE);
+        if (memoryPanel instanceof DiffAllocResultsPanel) {
+            ((DiffAllocResultsPanel) memoryPanel).exportData(exportedFileType, eDD, PANEL_TITLE);
+        } else {
+            ((DiffLivenessResultsPanel) memoryPanel).exportData(exportedFileType, eDD, PANEL_TITLE);
+        }
     }
 
     public boolean hasLoadedSnapshot() {
