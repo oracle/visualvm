@@ -140,7 +140,14 @@ public final class Open extends OptionProcessor {
             if (!removed) {
                 container.removeDataChangeListener(this);
                 removed = true;
-                String msg = NbBundle.getMessage(Open.class,"MSG_NO_APP_PID",new Object[] {Integer.toString(pid)});    // NOI18N
+                String msg = "";
+                if (pid != null) {
+                    msg = NbBundle.getMessage(Open.class,"MSG_NO_APP_PID",new Object[] {Integer.toString(pid)});    // NOI18N
+                }
+                if (id != null) {
+                    msg = NbBundle.getMessage(Open.class,"MSG_NO_APP_ID");    // NOI18N
+                }
+                
                 NotifyDescriptor desc = new NotifyDescriptor.Message(msg,NotifyDescriptor.WARNING_MESSAGE);
                 DialogDisplayer.getDefault().notifyLater(desc);
             }
