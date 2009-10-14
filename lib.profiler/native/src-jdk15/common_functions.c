@@ -135,7 +135,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
 
         initializeJVMTI(jvm);
     
-        fprintf(stderr, "Profiler Agent: JNI OnLoad Initialized succesfully\n");
+        fprintf(stderr, "Profiler Agent: JNI OnLoad Initialized successfully\n");
     }
     return JNI_VERSION_1_2;
 }
@@ -168,7 +168,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
         }
     } // in case of calibration, the arguments are just empty, this is OK
 
-    fprintf(stderr, "Profiler Agent: Initialized succesfully\n");
+    fprintf(stderr, "Profiler Agent: Initialized successfully\n");
     return 0;
 }
 
