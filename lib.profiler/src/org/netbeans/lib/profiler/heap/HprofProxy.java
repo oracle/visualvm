@@ -90,10 +90,13 @@ class HprofProxy {
         assert stringInstance.getJavaClass().getName().equals(String.class.getName());
 
         PrimitiveArrayDump chars = (PrimitiveArrayDump) stringInstance.getValueOfField("value"); // NOI18N
-        Integer offset = (Integer) stringInstance.getValueOfField("offset"); // NOI18N
-        Integer len = (Integer) stringInstance.getValueOfField("count"); // NOI18N
-        char[] charArr = ((PrimitiveArrayDump) chars).getChars(offset.intValue(), len.intValue());
+        if (chars != null) {
+            Integer offset = (Integer) stringInstance.getValueOfField("offset"); // NOI18N
+            Integer len = (Integer) stringInstance.getValueOfField("count"); // NOI18N
+            char[] charArr = ((PrimitiveArrayDump) chars).getChars(offset.intValue(), len.intValue());
 
-        return new String(charArr).intern();
+            return new String(charArr).intern();
+        }
+        return "*null*"; // NOI18N
     }
 }
