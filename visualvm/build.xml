@@ -13,6 +13,7 @@
         <copy file="launcher/visualvm.exe" overwrite="true" todir="${build.launcher.dir}/bin/"/>
         <copy file="launcher/visualvm" overwrite="true" todir="${build.launcher.dir}/bin/"/>
         <copy file="launcher/visualvm.conf" overwrite="true" todir="${build.launcher.dir}/etc/"/>
+        <copy file="launcher/visualvm.icns" overwrite="true" todir="${build.launcher.dir}/etc/"/>
     </target>
     <target name="build-launchers" depends="build-launchers.shadow,-post-build-launchers"/>
     <target name="build-launchers.shadow" depends="-init">

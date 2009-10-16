@@ -86,9 +86,9 @@ case "`uname`" in
     Darwin*)
         eval exec sh '"$nbexec"' \
             --jdkhome '"$jdkhome"' \
-            -J-Dcom.apple.mrj.application.apple.menu.about.name='"$APPNAME"' \
-            -J-Xdock:name='"$APPNAME"' \
-            '"-J-Xdock:icon=$BASEDIR/../$APPNAME.icns"' \
+            -J-Dcom.apple.mrj.application.apple.menu.about.name='VisualVM' \
+            -J-Xdock:name='VisualVM' \
+            -J-Xdock:icon='"$BASEDIR/etc/$APPNAME.icns"' \
             --branding '"$APPNAME"' \
             --clusters '"$clusters"' \
             --userdir '"${userdir}"' \
