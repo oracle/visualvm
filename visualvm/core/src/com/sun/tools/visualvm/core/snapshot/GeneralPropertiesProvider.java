@@ -28,14 +28,14 @@ package com.sun.tools.visualvm.core.snapshot;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.properties.PropertiesProvider;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.plaf.TextUI;
+import javax.swing.plaf.basic.BasicTextFieldUI;
 import org.openide.util.NbBundle;
 
 /**
@@ -59,13 +59,11 @@ class GeneralPropertiesProvider extends PropertiesProvider<Snapshot> {
         l.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         panel.add(l, BorderLayout.WEST);
 
-        JTextField f = new JTextField();
+        JTextField f = new JTextField() {
+            public void setUI(TextUI ui) { super.setUI(new BasicTextFieldUI()); }
+        };
         f.setEditable(false);
         f.setOpaque(false);
-        // Nimbus LaF doesn't respect setOpaque(false), this is a workaround.
-        // May cause delays for remote X sessions due to color transparency.
-        if (UIManager.getLookAndFeel().getID().equals("Nimbus")) // NOI18N
-            f.setBackground(new Color(0, 0, 0, 0));
         f.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         Dimension size = f.getPreferredSize();
         size.width = 1;
