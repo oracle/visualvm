@@ -298,7 +298,8 @@ public final class AntActions {
                         throw new IllegalStateException();
                     }
 
-                    if (!org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project).isFileObjectSupported(project, fos[0])) {
+                    final ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+                    if (!ptp.isFileObjectSupported(project, fos[0]) && !ProjectUtilities.hasAction(project, "profile-single")) { //NOI18N
                         throw new IllegalStateException();
                     }
 
