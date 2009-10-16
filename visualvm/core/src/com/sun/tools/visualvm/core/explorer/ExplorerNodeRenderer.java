@@ -29,6 +29,7 @@ import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -42,6 +43,15 @@ class ExplorerNodeRenderer extends DefaultTreeCellRenderer {
         JLabel rl = (JLabel)renderer;
         rl.setText(dsn.getName());
         rl.setIcon(dsn.getIcon());
+
+        if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
+            if (renderer instanceof DefaultTreeCellRenderer) {
+                DefaultTreeCellRenderer dtcr = (DefaultTreeCellRenderer)renderer;
+                dtcr.setBackgroundSelectionColor(null);
+                dtcr.setBorderSelectionColor(null);
+            }
+        }
+
         return renderer;
     }
 
