@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -90,12 +90,12 @@ class LoadClassSegment extends TagBounds {
         return null;
     }
 
-    LoadClass getClassBySerialNumber(long classSerialNumber) {
+    LoadClass getClassBySerialNumber(int classSerialNumber) {
         long[] offset = new long[] { startOffset };
 
         while (offset[0] < endOffset) {
             long start = offset[0];
-            long serial = readLoadClassSerialNumber(offset);
+            int serial = readLoadClassSerialNumber(offset);
 
             if (serial == classSerialNumber) {
                 return new LoadClass(this, start);
@@ -126,7 +126,7 @@ class LoadClassSegment extends TagBounds {
         return dumpBuffer;
     }
 
-    private long readLoadClassSerialNumber(long[] offset) {
+    private int readLoadClassSerialNumber(long[] offset) {
         long start = offset[0];
 
         if (hprofHeap.readTag(offset) != HprofHeap.LOAD_CLASS) {

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -353,13 +353,19 @@ public class OverviewControllerUI extends JTitledPanel {
                         Integer priority = (Integer)threadInstance.getValueOfField("priority"); // NOI18N
                         Long threadId = (Long)threadInstance.getValueOfField("tid");    // NOI18N
                         Integer threadStatus = (Integer)threadInstance.getValueOfField("threadStatus"); // NOI18N
-                        State tState = sun.misc.VM.toThreadState(threadStatus.intValue());
                         StackTraceElement stack[] = threadRoot.getStackTrace();
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
                         // sw.append("&nbsp;&nbsp;<span style=\"color: #0033CC\">"); // NOI18N
                         sw.append("&nbsp;&nbsp;<b>");   // NOI18N
                         // -------------------------------------------------------------------
-                        sw.append("\""+threadName+"\""+(daemon.booleanValue() ? " daemon" : "")+" prio="+priority+" tid="+threadId+" "+tState);    // NOI18N
+                        sw.append("\""+threadName+"\""+(daemon.booleanValue() ? " daemon" : "")+" prio="+priority);   // NOI18N
+                        if (threadId != null) {
+                            sw.append(" tid="+threadId);    // NOI18N
+                        }
+                        if (threadStatus != null) {
+                            State tState = sun.misc.VM.toThreadState(threadStatus.intValue());
+                            sw.append(" "+tState);          // NOI18N
+                        }
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
                         // sw.append("</span><br>"); // NOI18N
                         sw.append("</b><br>");   // NOI18N

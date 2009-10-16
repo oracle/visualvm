@@ -50,6 +50,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Caret;
+import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
@@ -155,6 +156,12 @@ public class OQLEditor extends JPanel {
     }
 
     private void init() {
+        final DocumentListener listener = new DocumentListener() {
+            public void insertUpdate(DocumentEvent e)  { validateScript(); }
+            public void removeUpdate(DocumentEvent e)  { validateScript(); }
+            public void changedUpdate(DocumentEvent e) { validateScript(); }
+        };
+
         OQLEditorImpl impl = Lookup.getDefault().lookup(OQLEditorImpl.class);
         if (impl != null) {
             queryEditor = impl.getEditorPane();
@@ -167,25 +174,19 @@ public class OQLEditor extends JPanel {
                 }
             });
         } else {
-            queryEditor = new JEditorPane("text/x-oql", ""); // NOI18N
+            queryEditor = new JEditorPane("text/x-oql", "") { // NOI18N
+                public void setText(String text) {
+                    Document doc = getDocument();
+                    if (doc != null) doc.removeDocumentListener(listener);
+                    setDocument(getEditorKit().createDefaultDocument());
+                    doc = getDocument();
+                    if (doc != null) doc.addDocumentListener(listener);
+                    super.setText(text);
+                }
+            };
             queryEditor.setFont(new Font("Monospaced", Font.PLAIN, 12));
             lexervalid = true; // no lexer info available; assume the lexing info is valid
         }
-
-        queryEditor.getDocument().addDocumentListener(new DocumentListener() {
-
-            public void insertUpdate(DocumentEvent e) {
-                validateScript();
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                validateScript();
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-                validateScript();
-            }
-        });
 
         queryEditor.setOpaque(isOpaque());
         queryEditor.setBackground(getBackground());
