@@ -51,7 +51,7 @@ class ApplicationSamplerView extends DataSourceView {
 
     ApplicationSamplerView(Application application) {
         super(application, NbBundle.getMessage(ApplicationSamplerView.class, "LBL_Sampler"), // NOI18N
-              new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 45, false);
+              new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 35, false);
 
     }
 
