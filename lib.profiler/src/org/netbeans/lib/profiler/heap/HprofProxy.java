@@ -93,7 +93,7 @@ class HprofProxy {
         if (chars != null) {
             Integer offset = (Integer) stringInstance.getValueOfField("offset"); // NOI18N
             Integer len = (Integer) stringInstance.getValueOfField("count"); // NOI18N
-            char[] charArr = ((PrimitiveArrayDump) chars).getChars(offset.intValue(), len.intValue());
+            char[] charArr = chars.getChars(offset.intValue(), len.intValue());
 
             return new String(charArr).intern();
         }
