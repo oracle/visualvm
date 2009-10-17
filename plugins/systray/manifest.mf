@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: com.sun.tools.visualvm.modules.systray
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/systray/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.1
+OpenIDE-Module-Specification-Version: 1.2
 OpenIDE-Module-Install: com/sun/tools/visualvm/modules/systray/Install.class
