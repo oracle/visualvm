@@ -26,6 +26,8 @@
 package com.sun.tools.visualvm.core.explorer;
 
 import java.awt.BorderLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.ImageUtilities;
@@ -57,6 +59,11 @@ final class ExplorerTopComponent extends TopComponent {
 
         setFocusable(true);
         setRequestFocusEnabled(true);
+        addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                ExplorerComponent.instance().requestFocusInWindow();
+            }
+        });
     }
   
     private void initComponents() {

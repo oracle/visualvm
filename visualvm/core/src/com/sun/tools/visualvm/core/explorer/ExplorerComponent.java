@@ -79,6 +79,12 @@ class ExplorerComponent extends JPanel {
     public JTree getTree() {
         return explorerTree;
     }
+
+
+    public boolean requestFocusInWindow() {
+        if (explorerTree != null) return explorerTree.requestFocusInWindow();
+        else return super.requestFocusInWindow();
+    }
     
     
     private void initComponents() {
