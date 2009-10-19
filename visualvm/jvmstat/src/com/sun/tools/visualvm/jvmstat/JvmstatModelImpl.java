@@ -27,7 +27,6 @@ package com.sun.tools.visualvm.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
-import com.sun.tools.visualvm.jvmstat.application.JvmstatApplicationProvider;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
 import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
@@ -150,7 +149,7 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
     
     void initListeners() {
         try {
-            monitoredHost = JvmstatApplicationProvider.findMonitoredHost(application);
+            monitoredHost = MonitoredHost.getMonitoredHost(monitoredVm.getVmIdentifier());
             monitoredVm.addVmListener(this);
         } catch (MonitorException ex) {
             ErrorManager.getDefault().notify(ErrorManager.WARNING,ex);

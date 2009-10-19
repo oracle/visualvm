@@ -48,7 +48,7 @@ public class JvmstatModelProvider extends AbstractModelProvider<JvmstatModel, Ap
     static MonitoredVm getMonitoredVm(Application app) throws MonitorException {
         if (app.isRemoved() || app.getPid() == Application.UNKNOWN_PID) return null;
         
-        String vmId = "//" + app.getPid() + "?mode=r";  // NOI18N
+        String vmId = "//" + app.getPid();  // NOI18N
         try {
             MonitoredHost monitoredHost = JvmstatApplicationProvider.findMonitoredHost(app);
             if (monitoredHost != null) {
