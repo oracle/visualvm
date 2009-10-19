@@ -32,7 +32,6 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -124,7 +123,6 @@ class HeapDumpView extends DataSourceView {
                         ((JComponent)toolBar.getComponent(1)).setOpaque(false);
                         controllerPanel.setOpaque(false);
                     } catch (Exception e) {}
-                    hwView.setPreferredSize(new Dimension(1, 1));
                     contentsPanel.add(hwView, BorderLayout.CENTER);
                     contentsPanel.revalidate();
                     contentsPanel.repaint();
