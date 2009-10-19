@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.jvmstat.application;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -52,7 +53,6 @@ import javax.swing.Timer;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
@@ -265,11 +265,16 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             registerHostListener(host, hostId, hostListener);
         } catch (MonitorException e) {
             Throwable t = e.getCause();
-            if (!(t instanceof ConnectException)) {
-                Exceptions.printStackTrace(e);
-            }
             monitoredHost.setLastException(e);
-            rescheduleProcessNewHost(host,hostId);
+            if (!(t instanceof ConnectException)) {
+                DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
+                        NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jvmstat", // NOI18N
+                        DataSourceDescriptorFactory.getDescriptor(host).getName()),
+                        NotifyDescriptor.ERROR_MESSAGE));
+                LOGGER.log(Level.INFO, "Jvmstat connection to " + host + " failed.", t); // NOI18N
+            } else {
+                rescheduleProcessNewHost(host,hostId);
+            }
         }
     }
     
