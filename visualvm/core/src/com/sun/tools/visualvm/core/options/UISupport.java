@@ -66,4 +66,7 @@ public final class UISupport {
         return container;
     }
 
+
+    private UISupport() {}
+
 }
