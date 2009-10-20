@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2009 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,11 +25,11 @@
 
 #define COMPANY "Sun Microsystems, Inc."
 #define COMPONENT "VisualVM"
-#define VER "0.0.0.0"
-#define FVER 0,0,0,0
-#define BUILD_ID "0"
+#define VER "1.2.0.0"
+#define FVER 1,2,0,0
+#define BUILD_ID "20102009"
 #define INTERNAL_NAME "visualvm"
 #define COPYRIGHT "\xA9 2007-2009 Sun Microsystems, Inc."
 #define FNAME "visualvm.exe"
-#define NAME "VisualVM Dev. build"
+#define NAME "VisualVM Test Build"
 
