@@ -29,9 +29,10 @@
     <folder name="Actions">
         <file name="Edit_hidden"/>
         <folder name="Help">
-            <file name="com-sun-tools-visualvm-modules-appui-AboutAction.instance"/>
             <file name="master-help.xml_hidden"/>
-            <file name="org-netbeans-core-actions-AboutAction.instance_hidden"/>
+            <file name="org-netbeans-core-actions-AboutAction.instance">
+                <attr name="instanceClass" stringvalue="com.sun.tools.visualvm.modules.appui.AboutAction"/>
+           </file>
             <file name="org-netbeans-modules-javahelp-HelpAction.instance_hidden"/>
             <!--file name="Show Welcome.instance">
 	        <attr name="instanceClass" stringvalue="com.sun.tools.visualvm.modules.appui.welcome.ShowWelcomeAction"/>
@@ -102,8 +103,8 @@
             <file name="com-sun-tools-visualvm-modules-appui-welcome-ShowWelcomeAction.instance">
                 <attr name="position" intvalue="1100"/>
             </file>
-            <file name="com-sun-tools-visualvm-modules-appui-AboutAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Help/com-sun-tools-visualvm-modules-appui-AboutAction.instance"/>
+            <file name="com-sun-tools-visualvm-modules-appui-AboutAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.modules.appui.AboutAction.getMenuAction"/>
                 <attr name="position" intvalue="1200"/>
             </file>
             <file name="org-netbeans-modules-autoupdate-ui-actions-CheckForUpdatesAction.shadow_hidden"/>

@@ -44,6 +44,7 @@ import com.sun.tools.visualvm.modules.appui.about.AboutDialog;
 import java.util.logging.Logger;
 import org.openide.util.Enumerations;
 import org.openide.util.NbBundle;
+import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
 
 
@@ -63,6 +64,12 @@ public final class AboutAction extends AbstractAction {
         if (ad != null) ad.show();
     }
     
+    static AboutAction getMenuAction() {
+        if (Utilities.isMac()) {
+            return null;
+        }
+        return new AboutAction();
+    }
     
     private AboutDialog getAboutDialog() {
         if (aboutDialog == null) {

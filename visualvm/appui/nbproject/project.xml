@@ -50,6 +50,20 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.core</code-name-base>
+                    <run-dependency>
+                        <release-version>2</release-version>
+                        <specification-version>3.11.1.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.core.ui</code-name-base>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.10</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.core.windows</code-name-base>
                     <run-dependency>
                         <release-version>2</release-version>
