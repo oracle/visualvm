@@ -137,6 +137,7 @@
             <!--group title="VisualVM-Charts" packages="ccom.sun.tools.visualvm.charts*"/-->
             <fileset dir="charts/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/charts/swing/*.java"/>
                 <exclude name="com/sun/tools/visualvm/charts/xy/*.java"/>
             </fileset>
 
