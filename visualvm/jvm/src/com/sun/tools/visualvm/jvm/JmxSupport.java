@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -298,7 +299,7 @@ public class JmxSupport implements DataRemovedListener {
             }
             return sb.toString();
         } catch (Exception e) {
-            LOGGER.throwing(JmxSupport.class.getName(), "takeThreadDump", e); // NOI18N
+            LOGGER.log(Level.INFO,"takeThreadDump", e); // NOI18N
             return null;
         }
     }
