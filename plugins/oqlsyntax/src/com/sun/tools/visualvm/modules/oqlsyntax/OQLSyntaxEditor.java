@@ -39,7 +39,11 @@ public class OQLSyntaxEditor extends OQLEditorImpl {
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            System.out.println("fok");
+            if (e.getDocument().getLength() > 0) {
+                getValidationCallback(e.getDocument()).callback(true);
+            } else {
+                getValidationCallback(e.getDocument()).callback(false);
+            }
         }
     };
 
