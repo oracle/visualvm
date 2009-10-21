@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: org.nb.samplebundle
-OpenIDE-Module-Layer: org/nb/samplebundle/layer.xml
-OpenIDE-Module-Localizing-Bundle: org/nb/samplebundle/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-
