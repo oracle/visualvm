@@ -413,7 +413,7 @@ public class SimpleXYChartUtils {
             public String getRowValue(int index, long itemValue) {
                 double value = itemValue * chartFactor;
                 switch (chartType) {
-                    case TYPE_BYTES  : return formatBytes((int)value);
+                    case TYPE_BYTES  : return formatBytes((long)value);
                     case TYPE_PERCENT: return formatPercent(value);
                     default:           return formatDecimal(value);
                 }
