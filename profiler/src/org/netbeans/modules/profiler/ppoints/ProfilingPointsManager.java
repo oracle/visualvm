@@ -411,7 +411,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             // Bugfix #162132, the factory may already be unloaded
             if (factory != null) {
                 if (ppClass.isInstance(profilingPoint)) {
-                    if (projects.contains(profilingPoint.getProject())) {
+                    if (containsProject(projects, profilingPoint.getProject())) {
                         if (inclUnavailable || factory.isAvailable()) {
                             filteredProfilingPoints.add((T) profilingPoint);
                         }
@@ -786,6 +786,15 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                || propertyName.equals(ProfilingPoint.PROPERTY_PROJECT) || propertyName.equals(ProfilingPoint.PROPERTY_RESULTS);
     }
 
+    private static boolean containsProject(Collection<Project> c, Project p) {
+        for (Project in : c) {
+            if (in.getProjectDirectory().equals(p.getProjectDirectory())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private Set<Project> getOpenSubprojects(Project project) {
         Set<Project> subprojects = new HashSet();
         ProjectUtilities.fetchSubprojects(project, subprojects);
@@ -794,7 +803,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
         Set<Project> openSubprojects = new HashSet();
         for (Project openProject : openedProjects)
-            if (subprojects.contains(openProject))
+            if (containsProject(subprojects, openProject))
                 openSubprojects.add(openProject);
 
         return openSubprojects;
@@ -995,13 +1004,13 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         refreshOpenedProjects();
 
         for (Project project : lastOpenedProjects) {
-            if (!openedProjects.contains(project)) {
+            if (!containsProject(openedProjects, project)) {
                 projectClosed(project);
             }
         }
 
         for (Project openProject : openedProjects) {
-            if (!lastOpenedProjects.contains(openProject)) {
+            if (!containsProject(lastOpenedProjects, openProject)) {
                 projectOpened(openProject);
             }
         }
