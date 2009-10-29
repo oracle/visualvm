@@ -49,7 +49,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
@@ -221,30 +223,7 @@ public class StackTraceSnapshotBuilder {
             return 0;
         }
     };
-    final CPUCallGraphBuilder ccgb = new CPUCallGraphBuilder() {
-        
-        {
-            setFactory(new CPUCCTNodeFactory(COLLECT_TWO_TIMESTAMPS));
-            setFilter(InstrumentationFilter.getDefault());
-        }
-        
-        @Override
-        protected boolean isCollectingTwoTimeStamps() {
-            return COLLECT_TWO_TIMESTAMPS;
-        }
-        
-        @Override
-        protected boolean isReady() {
-            return true;
-        }
-        
-        @Override
-        protected long getDumpAbsTimeStamp() {
-            synchronized(stampLock) {
-                return currentDumpTimeStamp;
-            }
-        }
-    };
+    final CPUCallGraphBuilder ccgb;
     final Object lock = new Object();
     final Object stampLock = new Object();
     // @GuardedBy stampLock
@@ -262,7 +241,8 @@ public class StackTraceSnapshotBuilder {
     public StackTraceSnapshotBuilder(int batchSize, InstrumentationFilter f) {
         //        builderBatchSize = batchSize;
         filter = f;
-        ccgb.setMethodInfoMapper(mapper);
+        setDefaultTiming();
+        ccgb = new StackTraceCallGraphBuilder(mapper);
     }
     
     final public void setIgnoredThreads(Set<String> ignoredThreadNames) {
@@ -494,6 +474,17 @@ public class StackTraceSnapshotBuilder {
         return oldMethodInfo.equals(newMethodInfo);
     }
     
+    private void setDefaultTiming() {
+        // Ugly code to set default CPU calibration data
+        ProfilingSessionStatus pss = new ProfilingSessionStatus();
+        pss.timerCountsInSecond[0] = InstrTimingData.DEFAULT.timerCountsInSecond0;
+        pss.timerCountsInSecond[1] = InstrTimingData.DEFAULT.timerCountsInSecond1;
+        pss.currentInstrType = CommonConstants.INSTR_RECURSIVE_FULL;
+        pss.absoluteTimerOn = true;
+        pss.threadCPUTimerOn = true;
+        TimingAdjusterOld.getInstance(pss);        
+    }
+
     public final CPUResultsSnapshot createSnapshot(
             long since) throws CPUResultsSnapshot.NoDataAvailableException {
         if (stackTraceCount < 1) {
@@ -551,4 +542,32 @@ public class StackTraceSnapshotBuilder {
     public InstrumentationFilter getFilter() {
         return filter;
     }
+    
+    private class StackTraceCallGraphBuilder extends CPUCallGraphBuilder {
+
+        StackTraceCallGraphBuilder (MethodInfoMapper mapper) {
+            setFactory(new CPUCCTNodeFactory(COLLECT_TWO_TIMESTAMPS));
+            setFilter(InstrumentationFilter.getDefault());
+            setMethodInfoMapper(mapper);
+        }
+
+        @Override
+        protected boolean isCollectingTwoTimeStamps() {
+            return COLLECT_TWO_TIMESTAMPS;
+        }
+
+        @Override
+        protected boolean isReady() {
+            return true;
+        }
+
+        @Override
+        protected long getDumpAbsTimeStamp() {
+            synchronized (stampLock) {
+                return currentDumpTimeStamp;
+            }
+        }
+
+    }
+
 }
