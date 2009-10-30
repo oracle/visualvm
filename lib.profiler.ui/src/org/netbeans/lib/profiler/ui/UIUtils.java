@@ -503,7 +503,7 @@ public final class UIUtils {
                         }
                     });
             }
-        } catch (Exception e) {
+        } catch (Throwable t) {
             // Private API is used, just skip any incompatibility failure
         }
     }
