@@ -578,7 +578,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                 });
         } else if (evt.getSource() instanceof ProfilingPoint) {
             ProfilingPoint profilingPoint = (ProfilingPoint) evt.getSource();
-            storeProfilingPoints(new ProfilingPoint[] { profilingPoint });
+            if (!evt.getPropertyName().equals(ProfilingPoint.PROPERTY_RESULTS))
+                storeProfilingPoints(new ProfilingPoint[] { profilingPoint });
 
             if (isAnnotationChange(evt)) {
                 deannotate((CodeProfilingPoint.Annotation[]) evt.getOldValue());

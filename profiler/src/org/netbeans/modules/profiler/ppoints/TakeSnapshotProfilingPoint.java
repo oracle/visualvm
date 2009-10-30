@@ -160,13 +160,15 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
 
             StringBuilder dataAreaTextBuilder = new StringBuilder();
 
-            if (!hasResults()) {
-                dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
-            } else {
-                for (int i = 0; i < results.size(); i++) {
-                    dataAreaTextBuilder.append("&nbsp;&nbsp;");
-                    dataAreaTextBuilder.append(getDataResultItem(i));
-                    dataAreaTextBuilder.append("<br>"); // NOI18N
+            synchronized(resultsSync) {
+                if (!hasResults()) {
+                    dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
+                } else {
+                    for (int i = 0; i < results.size(); i++) {
+                        dataAreaTextBuilder.append("&nbsp;&nbsp;");
+                        dataAreaTextBuilder.append(getDataResultItem(i));
+                        dataAreaTextBuilder.append("<br>"); // NOI18N
+                    }
                 }
             }
 
@@ -180,22 +182,24 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
         }
 
         private String getDataResultItem(int index) {
-            Result result = results.get(index);
+            synchronized(resultsSync) {
+                Result result = results.get(index);
 
-            // TODO: enable once thread name by id is available
-            //String threadName = Utils.getThreadName(result.getThreadID());
-            //String threadClassName = Utils.getThreadClassName(result.getThreadID());
-            //String threadInformation = (threadName == null ? "&lt;unknown thread&gt;" : (threadClassName == null ? threadName : threadName + " (" + threadClassName + ")"));
-            String resultString = result.getResultString();
-            String snapshotInformation = resultString.startsWith(SNAPSHOT_LOCATION_URLMASK)
-                                         ? ("<a href='" + resultString + "'>" + OPEN_SNAPSHOT_STRING + "</a>") : resultString; // NOI18N
-                                                                                                                               //return "<b>" + (index + 1) + ".</b> hit at <b>" + Utils.formatProfilingPointTimeHiRes(result.getTimestamp()) + "</b> by " + threadInformation + ", " + snapshotInformation;
+                // TODO: enable once thread name by id is available
+                //String threadName = Utils.getThreadName(result.getThreadID());
+                //String threadClassName = Utils.getThreadClassName(result.getThreadID());
+                //String threadInformation = (threadName == null ? "&lt;unknown thread&gt;" : (threadClassName == null ? threadName : threadName + " (" + threadClassName + ")"));
+                String resultString = result.getResultString();
+                String snapshotInformation = resultString.startsWith(SNAPSHOT_LOCATION_URLMASK)
+                                             ? ("<a href='" + resultString + "'>" + OPEN_SNAPSHOT_STRING + "</a>") : resultString; // NOI18N
+                                                                                                                                   //return "<b>" + (index + 1) + ".</b> hit at <b>" + Utils.formatProfilingPointTimeHiRes(result.getTimestamp()) + "</b> by " + threadInformation + ", " + snapshotInformation;
 
-            return MessageFormat.format(HIT_STRING,
-                                        new Object[] {
-                                            (index + 1), Utils.formatProfilingPointTimeHiRes(result.getTimestamp()),
-                                            snapshotInformation
-                                        });
+                return MessageFormat.format(HIT_STRING,
+                                            new Object[] {
+                                                (index + 1), Utils.formatProfilingPointTimeHiRes(result.getTimestamp()),
+                                                snapshotInformation
+                                            });
+            }
         }
 
         private String getHeaderEnabled() {
@@ -203,7 +207,9 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
         }
 
         private String getHeaderHitsCount() {
-            return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            synchronized(resultsSync) {
+                return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            }
         }
 
         private String getHeaderLocation() {
@@ -417,6 +423,7 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
 
     private Annotation annotation;
     private List<Result> results = new ArrayList();
+    private final Object resultsSync = new Object();
     private String snapshotFile = System.getProperty("java.io.tmpdir"); // NOI18N
     private String snapshotTarget = TARGET_PROJECT_KEY;
     private String snapshotType = TYPE_PROFDATA_KEY;
@@ -500,7 +507,9 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
     }
 
     public boolean hasResults() {
-        return !results.isEmpty();
+        synchronized(resultsSync) {
+            return !results.isEmpty();
+        }
     }
 
     public void hideResults() {
@@ -538,21 +547,23 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
     }
 
     protected String getResultsText() {
-        if (hasResults()) {
-            int size = results.size();
+        synchronized(resultsSync) {
+            if (hasResults()) {
+                int size = results.size();
 
-            return (results.size() == 1)
-                   ? MessageFormat.format(ONE_HIT_STRING,
-                                          new Object[] {
-                                              Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
-                                          })
-                   : MessageFormat.format(N_HITS_STRING,
-                                          new Object[] {
-                                              results.size(),
-                                              Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
-                                          });
-        } else {
-            return NO_RESULTS_STRING;
+                return (results.size() == 1)
+                       ? MessageFormat.format(ONE_HIT_STRING,
+                                              new Object[] {
+                                                  Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
+                                              })
+                       : MessageFormat.format(N_HITS_STRING,
+                                              new Object[] {
+                                                  results.size(),
+                                                  Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
+                                              });
+            } else {
+                return NO_RESULTS_STRING;
+            }
         }
     }
 
@@ -630,16 +641,20 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
             snapshotFilename = takeSnapshotHit();
         }
 
-        results.add(new Result(hitEvent.getTimestamp(), hitEvent.getThreadId(), snapshotFilename));
+        synchronized(resultsSync) {
+            results.add(new Result(hitEvent.getTimestamp(), hitEvent.getThreadId(), snapshotFilename));
+        }
         getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
     }
 
     void reset() {
-        boolean change = hasResults();
-        results.clear();
+        synchronized(resultsSync) {
+            boolean change = hasResults();
+            results.clear();
 
-        if (change) {
-            getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            if (change) {
+                getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            }
         }
     }
 
