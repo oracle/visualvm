@@ -29,6 +29,7 @@ package com.sun.tools.visualvm.core.explorer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -54,6 +55,7 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -105,6 +107,7 @@ class ExplorerComponent extends JPanel {
                 setCellRenderer(new ExplorerNodeRenderer());
             }
         };
+        if (UIUtils.isAquaLookAndFeel()) explorerTree.setBackground(new Color(213, 221, 229));
         explorerTree.setRootVisible(false);
         explorerTree.setShowsRootHandles(true);
         explorerTree.setRowHeight(getTreeRowHeight());
