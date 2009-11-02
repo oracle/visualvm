@@ -48,14 +48,12 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
-import org.netbeans.lib.profiler.ui.UIUtils;
 
 @OptionsPanelController.SubRegistration(displayName="#ProfilerOptionsCategory_Title")
 public class ProfilerOptionsCategory extends OptionsPanelController {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
         private static ProfilerOptionsPanel settingsPanel = null;
-        private static JScrollPane optionsComponent = null;
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
@@ -68,24 +66,8 @@ public class ProfilerOptionsCategory extends OptionsPanelController {
         }
 
         public JComponent getComponent(Lookup lookup) {
-            if (settingsPanel == null) {
-                settingsPanel = new ProfilerOptionsPanel();
-                optionsComponent = new JScrollPane(settingsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                   JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                optionsComponent.setBorder(BorderFactory.createEmptyBorder());
-                optionsComponent.setViewportBorder(BorderFactory.createEmptyBorder());
-                if (UIUtils.isGTKLookAndFeel()) {
-                    // Must be transparent for GTK
-                    optionsComponent.getViewport().setOpaque(false);
-                    optionsComponent.setOpaque(false);
-                } else {
-                    // JTabbedPane (container) has other than Panel.background color on Metal, Windows, Aqua
-                    optionsComponent.getViewport().setBackground(settingsPanel.getBackground());
-                    optionsComponent.setBackground(settingsPanel.getBackground());
-                }
-            }
-
-            return optionsComponent;
+            if (settingsPanel == null) settingsPanel = new ProfilerOptionsPanel();
+            return settingsPanel;
         }
 
         public HelpCtx getHelpCtx() {
@@ -111,22 +93,6 @@ public class ProfilerOptionsCategory extends OptionsPanelController {
 
         public void update() {
             settingsPanel.init(ProfilerIDESettings.getInstance());
-
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        JScrollBar vScrollBar = optionsComponent.getVerticalScrollBar();
-
-                        if (vScrollBar != null) {
-                            vScrollBar.setValue(0);
-                        }
-
-                        JScrollBar hScrollBar = optionsComponent.getHorizontalScrollBar();
-
-                        if (hScrollBar != null) {
-                            hScrollBar.setValue(0);
-                        }
-                    }
-                });
         }
 
 }
