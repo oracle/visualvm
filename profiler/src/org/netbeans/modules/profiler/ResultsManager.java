@@ -170,6 +170,8 @@ public final class ResultsManager {
                                                                                      "ResultsManager_DirectoryDoesntExistCaption"); // NOI18N
     private static final String DIRECTORY_DOESNT_EXIST_MSG = NbBundle.getMessage(LoadedSnapshot.class,
                                                                                  "ResultsManager_DirectoryDoesntExistMsg"); // NOI18N
+    private static final String CANNOT_OPEN_SNAPSHOT_MSG = NbBundle.getMessage(LoadedSnapshot.class,
+                                                                                 "ResultsManager_CannotOpenSnapshotMsg"); // NOI18N
                                                                                                                             // -----
     public static final String SNAPSHOT_EXTENSION = "nps"; // NOI18N
     public static final String HEAPDUMP_EXTENSION = "hprof"; // NOI18N
@@ -595,7 +597,8 @@ public final class ResultsManager {
     }
 
     public void openSnapshot(final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        /*if (ls == null) NetBeansProfiler.getDefaultNB().displayError(CANNOT_OPEN_SNAPSHOT_MSG);
+        else*/ IDEUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
                 srw.open();

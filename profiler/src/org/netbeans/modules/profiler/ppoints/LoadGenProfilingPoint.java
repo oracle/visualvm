@@ -217,22 +217,24 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
 
             StringBuilder dataAreaTextBuilder = new StringBuilder();
 
-            if (results.size() == 0) {
-                dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
-            } else {
-                if (results.size() > 1) {
-                    Collections.sort(results,
-                                     new Comparator<LoadGenProfilingPoint.Result>() {
-                            public int compare(LoadGenProfilingPoint.Result o1, LoadGenProfilingPoint.Result o2) {
-                                return Long.valueOf(o1.getTimestamp()).compareTo(Long.valueOf(o2.getTimestamp()));
-                            }
-                        });
-                }
+            synchronized(resultsSync) {
+                if (results.size() == 0) {
+                    dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
+                } else {
+                    if (results.size() > 1) {
+                        Collections.sort(results,
+                                         new Comparator<LoadGenProfilingPoint.Result>() {
+                                public int compare(LoadGenProfilingPoint.Result o1, LoadGenProfilingPoint.Result o2) {
+                                    return Long.valueOf(o1.getTimestamp()).compareTo(Long.valueOf(o2.getTimestamp()));
+                                }
+                            });
+                    }
 
-                for (int i = 0; i < results.size(); i++) {
-                    dataAreaTextBuilder.append("&nbsp;&nbsp;"); // NOI18N
-                    dataAreaTextBuilder.append(getDataResultItem(i));
-                    dataAreaTextBuilder.append("<br>"); // NOI18N
+                    for (int i = 0; i < results.size(); i++) {
+                        dataAreaTextBuilder.append("&nbsp;&nbsp;"); // NOI18N
+                        dataAreaTextBuilder.append(getDataResultItem(i));
+                        dataAreaTextBuilder.append("<br>"); // NOI18N
+                    }
                 }
             }
 
@@ -246,29 +248,31 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
         }
 
         private String getDataResultItem(int index) {
-            Result result = results.get(index);
+            synchronized(resultsSync) {
+                Result result = results.get(index);
 
-            // TODO: enable once thread name by id is available
-            //String threadName = Utils.getThreadName(result.getThreadID());
-            //String threadClassName = Utils.getThreadClassName(result.getThreadID());
-            //String threadInformation = (threadName == null ? "&lt;unknown thread&gt;" : (threadClassName == null ? threadName : threadName + " (" + threadClassName + ")"));
-            String hitTime = Utils.formatProfilingPointTimeHiRes(result.getTimestamp());
+                // TODO: enable once thread name by id is available
+                //String threadName = Utils.getThreadName(result.getThreadID());
+                //String threadClassName = Utils.getThreadClassName(result.getThreadID());
+                //String threadInformation = (threadName == null ? "&lt;unknown thread&gt;" : (threadClassName == null ? threadName : threadName + " (" + threadClassName + ")"));
+                String hitTime = Utils.formatProfilingPointTimeHiRes(result.getTimestamp());
 
-            //      if (!LoadGenProfilingPoint.this.usesEndLocation()) {
-            //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b> by " + threadInformation;
-            if (result.isSuccess()) {
-                return MessageFormat.format(HIT_SUCCESS_STRING, new Object[] { (index + 1), hitTime });
-            } else {
-                return MessageFormat.format(HIT_FAILED_STRING, new Object[] { (index + 1), hitTime });
+                //      if (!LoadGenProfilingPoint.this.usesEndLocation()) {
+                //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b> by " + threadInformation;
+                if (result.isSuccess()) {
+                    return MessageFormat.format(HIT_SUCCESS_STRING, new Object[] { (index + 1), hitTime });
+                } else {
+                    return MessageFormat.format(HIT_FAILED_STRING, new Object[] { (index + 1), hitTime });
+                }
+
+                //      } else if (result.getEndTimestamp() == -1) {
+                //        //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration pending..., thread " + threadInformation;
+                //        return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration <b>" + (result.getDuration() / 1000d) + "s</b>(pending...)";
+                //      } else {
+                //        //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration <b>" + Utils.getDurationInMicroSec(result.getTimestamp(),result.getEndTimestamp()) + " &micro;s</b>, thread " + threadInformation;
+                //        return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration <b>" + (result.getDuration() / 1000d) + " s</b>";
+                //      }
             }
-
-            //      } else if (result.getEndTimestamp() == -1) {
-            //        //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration pending..., thread " + threadInformation;
-            //        return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration <b>" + (result.getDuration() / 1000d) + "s</b>(pending...)";
-            //      } else {
-            //        //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration <b>" + Utils.getDurationInMicroSec(result.getTimestamp(),result.getEndTimestamp()) + " &micro;s</b>, thread " + threadInformation;
-            //        return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration <b>" + (result.getDuration() / 1000d) + " s</b>";
-            //      }
         }
 
         private String getHeaderEnabled() {
@@ -287,7 +291,9 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
         }
 
         private String getHeaderHitsCount() {
-            return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            synchronized(resultsSync) {
+                return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            }
         }
 
         private String getHeaderName() {
@@ -414,6 +420,7 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
     private Annotation endAnnotation;
     private Annotation startAnnotation;
     private final List<Result> results = new ArrayList<LoadGenProfilingPoint.Result>();
+    private final Object resultsSync = new Object();
     private String scriptFileName;
     private WeakReference<Report> reportReference;
 
@@ -461,7 +468,9 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
     }
 
     public boolean hasResults() {
-        return !results.isEmpty();
+        synchronized(resultsSync) {
+            return !results.isEmpty();
+        }
     }
 
     public void hideResults() {
@@ -501,19 +510,21 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
     }
 
     protected String getResultsText() {
-        if (hasResults()) {
-            return (results.size() == 1)
-                   ? MessageFormat.format(ONE_HIT_STRING,
-                                          new Object[] {
-                                              Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
-                                          })
-                   : MessageFormat.format(N_HITS_STRING,
-                                          new Object[] {
-                                              results.size(),
-                                              Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
-                                          });
-        } else {
-            return NO_RESULTS_STRING;
+        synchronized(resultsSync) {
+            if (hasResults()) {
+                return (results.size() == 1)
+                       ? MessageFormat.format(ONE_HIT_STRING,
+                                              new Object[] {
+                                                  Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
+                                              })
+                       : MessageFormat.format(N_HITS_STRING,
+                                              new Object[] {
+                                                  results.size(),
+                                                  Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
+                                              });
+            } else {
+                return NO_RESULTS_STRING;
+            }
         }
     }
 
@@ -550,56 +561,59 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
 
     void hit(final HitEvent hitEvent, int index) {
         LoadGenPlugin lg = Lookup.getDefault().lookup(LoadGenPlugin.class);
+        synchronized(resultsSync) {
+            if (usesEndLocation() && (index == 1)) {
+                if (lg != null) {
+                    lg.stop(getScriptFileName());
 
-        if (usesEndLocation() && (index == 1)) {
-            if (lg != null) {
-                lg.stop(getScriptFileName());
+                    for (Result result : results) {
+                        if ((result.getEndTimestamp() == -1) && (result.getThreadID() == hitEvent.getThreadId())) {
+                            result.setEndTimestamp(hitEvent.getTimestamp());
 
-                for (Result result : results) {
-                    if ((result.getEndTimestamp() == -1) && (result.getThreadID() == hitEvent.getThreadId())) {
-                        result.setEndTimestamp(hitEvent.getTimestamp());
-
-                        break;
+                            break;
+                        }
                     }
                 }
-            }
-        } else {
-            if (lg != null) {
-                lg.start(getScriptFileName(),
-                         new LoadGenPlugin.Callback() {
-                        private long correlationId = hitEvent.getTimestamp();
+            } else {
+                if (lg != null) {
+                    lg.start(getScriptFileName(),
+                             new LoadGenPlugin.Callback() {
+                            private long correlationId = hitEvent.getTimestamp();
 
-                        public void afterStart(LoadGenPlugin.Result result) {
-                            Result rslt = new Result(hitEvent.getTimestamp(), hitEvent.getThreadId(),
-                                                     result == LoadGenPlugin.Result.SUCCESS);
-                            results.add(rslt);
-                            correlationId = hitEvent.getTimestamp();
-                            getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
-                        }
-
-                        public void afterStop(LoadGenPlugin.Result result) {
-                            for (Result rslt : results) {
-                                if (rslt.getTimestamp() == correlationId) {
-                                    rslt.setEndTimestamp(correlationId);
-                                    rslt.setStopTime();
-
-                                    break;
-                                }
+                            public void afterStart(LoadGenPlugin.Result result) {
+                                Result rslt = new Result(hitEvent.getTimestamp(), hitEvent.getThreadId(),
+                                                         result == LoadGenPlugin.Result.SUCCESS);
+                                results.add(rslt);
+                                correlationId = hitEvent.getTimestamp();
+                                getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
                             }
 
-                            getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
-                        }
-                    });
+                            public void afterStop(LoadGenPlugin.Result result) {
+                                for (Result rslt : results) {
+                                    if (rslt.getTimestamp() == correlationId) {
+                                        rslt.setEndTimestamp(correlationId);
+                                        rslt.setStopTime();
+
+                                        break;
+                                    }
+                                }
+
+                                getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+                            }
+                        });
+                }
             }
         }
     }
 
     void reset() {
-        boolean change = results.size() > 0;
-        results.clear();
+        synchronized(resultsSync) {
+            boolean change = results.size() > 0;
+            results.clear();
 
-        if (change) {
-            getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            if (change) {
+                getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            }
         }
     }
 
