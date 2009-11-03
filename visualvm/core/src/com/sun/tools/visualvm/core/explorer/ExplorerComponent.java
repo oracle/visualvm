@@ -32,12 +32,17 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -56,12 +61,16 @@ import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.openide.windows.WindowManager;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 class ExplorerComponent extends JPanel {
+
+    private static final Color MAC_TREE_BG_FOCUSED = new Color(214, 221, 229);
+    private static final Color MAC_TREE_BG_NOTFOCUSED = new Color(232, 232, 232);
     
     private static ExplorerComponent instance;
     
@@ -107,7 +116,6 @@ class ExplorerComponent extends JPanel {
                 setCellRenderer(new ExplorerNodeRenderer());
             }
         };
-        if (UIUtils.isAquaLookAndFeel()) explorerTree.setBackground(new Color(213, 221, 229));
         explorerTree.setRootVisible(false);
         explorerTree.setShowsRootHandles(true);
         explorerTree.setRowHeight(getTreeRowHeight());
@@ -115,6 +123,37 @@ class ExplorerComponent extends JPanel {
         explorerTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         explorerTree.addKeyListener(new ExplorerTreeKeyAdapter());
         explorerTree.addMouseListener(new ExplorerTreeMouseAdapter());
+
+        // Aqua LaF customizations
+        if (UIUtils.isAquaLookAndFeel()) {
+            final Window mainWindow = WindowManager.getDefault().getMainWindow();
+            final Window[] ownerWindow = new Window[1];
+            final WindowFocusListener focusListener = new WindowFocusListener() {
+                public void windowGainedFocus(WindowEvent e) { update(true, e); }
+                public void windowLostFocus(WindowEvent e)   { update(false, e); }
+                private void update(boolean hasFocus, WindowEvent e) {
+                    Window oppositeWindow = e.getOppositeWindow();
+                    boolean focus = hasFocus || oppositeWindow == mainWindow ||
+                                    oppositeWindow == ownerWindow[0];
+                    if (focus) explorerTree.setBackground(MAC_TREE_BG_FOCUSED);
+                    else explorerTree.setBackground(MAC_TREE_BG_NOTFOCUSED);
+                }
+            };
+            mainWindow.addWindowFocusListener(focusListener);
+            explorerTree.addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0) {
+                        Window newOwnerWindow = SwingUtilities.getWindowAncestor(explorerTree);
+                        if (ownerWindow[0] == newOwnerWindow) return;
+                        if (ownerWindow[0] != null && ownerWindow[0] != mainWindow)
+                            ownerWindow[0].removeWindowFocusListener(focusListener);
+                        ownerWindow[0] = newOwnerWindow;
+                        if (ownerWindow[0] != null && ownerWindow[0] != mainWindow)
+                            ownerWindow[0].addWindowFocusListener(focusListener);
+                    }
+                }
+            });
+        }
         
         // explorerTreeScrollPane
         JScrollPane explorerTreeScrollPane = new JScrollPane(explorerTree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);

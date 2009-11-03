@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.core.explorer;
 
-import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTree;
@@ -54,7 +53,7 @@ class ExplorerNodeRenderer extends DefaultTreeCellRenderer {
         } else if (UIUtils.isAquaLookAndFeel()) {
             if (!sel) {
                 rl.setOpaque(true);
-                rl.setBackground(new Color(213, 221, 229));
+                rl.setBackground(tree.getBackground());
             } else {
                 rl.setOpaque(false);
             }
