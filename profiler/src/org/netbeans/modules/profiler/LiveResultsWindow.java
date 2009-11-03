@@ -1203,33 +1203,39 @@ public final class LiveResultsWindow extends TopComponent
             return;
         }
 
-        // does the current display support the instrumentation in use?
-        boolean instrSupported = (currentDisplayComponent != null)
-                                 && ((currentDisplay != null)
-                                     ? currentDisplay.supports(runner.getProfilerClient().getCurrentInstrType()) : false);
+        int instrType = runner.getProfilerClient().getCurrentInstrType();
 
-        if (!instrSupported) {
-            if (currentDisplayComponent != null) {
-                remove(currentDisplayComponent);
+        if (instrType != CommonConstants.INSTR_NONE) {
+
+            // does the current display support the instrumentation in use?
+            boolean instrSupported = (currentDisplayComponent != null)
+                                     && ((currentDisplay != null)
+                                         ? currentDisplay.supports(instrType) : false);
+
+            if (!instrSupported) {
+                if (currentDisplayComponent != null) {
+                    remove(currentDisplayComponent);
+                }
+
+                if (currentDisplay != null) {
+                    currentDisplay.handleRemove();
+                }
+
+                currentDisplay = preparePanelForInstrType(instrType);
+                add(currentDisplayComponent, BorderLayout.CENTER);
+                revalidate();
+                repaint();
+                IDEUtils.runInEventDispatchThread(new Runnable() {
+                    public void run() {
+                        currentDisplayComponent.requestFocusInWindow(); // must be invoked lazily to override default focus behavior
+                    }
+                });
             }
 
             if (currentDisplay != null) {
-                currentDisplay.handleRemove();
+                currentDisplay.updateLiveResults();
             }
 
-            currentDisplay = preparePanelForInstrType(runner.getProfilerClient().getCurrentInstrType());
-            add(currentDisplayComponent, BorderLayout.CENTER);
-            revalidate();
-            repaint();
-            IDEUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    currentDisplayComponent.requestFocusInWindow(); // must be invoked lazily to override default focus behavior
-                }
-            });
-        }
-
-        if (currentDisplay != null) {
-            currentDisplay.updateLiveResults();
         }
 
         updateDrillDown();
