@@ -56,7 +56,6 @@ import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRender
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.heapwalk.ClassesListController;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
@@ -77,6 +76,7 @@ import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -94,6 +94,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -698,29 +701,9 @@ public class ClassesListControllerUI extends JTitledPanel {
         filterComponent.setFilterValues(filterValue, filterType);
         filterComponent.addFilterListener(new FilterComponent.FilterListener() {
                 public void filterChanged() {
-                    if ((classesCount > 10000)
-                            || (hasProjectContext && (filterComponent.getFilterType() == classesListController.FILTER_SUBCLASS))) {
-                        // For large dumps or resolving implementations of interface compute in SwingWorker
-                        new NBSwingWorker() {
-                                protected void doInBackground() {
-                                    contents.show(contentsPanel, NO_DATA);
-                                    filterValue = filterComponent.getFilterString();
-                                    filterType = filterComponent.getFilterType();
-                                    initData();
-                                    contents.show(contentsPanel, DATA);
-                                }
-
-                                protected void done() {
-                                    repaint();
-                                }
-                            }.execute();
-                    } else {
-                        // For simple filtering compute in AWT (do not show the progress message which would immediately dissapear)
-                        filterValue = filterComponent.getFilterString();
-                        filterType = filterComponent.getFilterType();
-                        initData();
-                        repaint();
-                    }
+                    filterValue = filterComponent.getFilterString();
+                    filterType = filterComponent.getFilterType();
+                    initData();
                 }
             });
 
@@ -748,6 +731,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         contentsPanel = new JPanel(contents);
         contentsPanel.add(tablePanel, DATA);
         contentsPanel.add(noDataPanel, NO_DATA);
+        contents.show(contentsPanel, NO_DATA);
 
         add(contentsPanel, BorderLayout.CENTER);
         add(filterComponent, BorderLayout.SOUTH);
@@ -762,41 +746,79 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     private void initData() {
-        saveSelection();
+        if (displayCache == null) displayCache = new Object[0][columnCount + 1];
 
-        long totalLiveInstances = classesListController.getClassesController().getHeapFragmentWalker().getTotalLiveInstances();
-        long totalLiveBytes = classesListController.getClassesController().getHeapFragmentWalker().getTotalLiveBytes();
+        IDEUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                final AtomicBoolean initInProgress = new AtomicBoolean(false);
+                
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (contents != null && initInProgress.get())
+                                    contents.show(contentsPanel, NO_DATA);
+                            }
+                        });
+                    }
+                }, 100);
 
-        if (classesCount == -1) {
-            classesCount = classesListController.getClassesController().getHeapFragmentWalker().getHeapFragment().getAllClasses()
-                                                .size();
-        }
+                saveSelection();
 
-        List classes = classesListController.getFilteredSortedClasses(FilterComponent.getFilterStrings(filterValue), filterType,
-                                                                      showZeroInstances, showZeroSize, sortingColumn, sortingOrder);
-        displayCache = new Object[classes.size()][columnCount + 1];
+                BrowserUtils.performTask(new Runnable() {
+                    public void run() {
+                        initInProgress.set(true);
 
-        for (int i = 0; i < classes.size(); i++) {
-            JavaClass jClass = (JavaClass) classes.get(i);
+                        long totalLiveInstances = classesListController.getClassesController().
+                                getHeapFragmentWalker().getTotalLiveInstances();
+                        long totalLiveBytes = classesListController.getClassesController().
+                                getHeapFragmentWalker().getTotalLiveBytes();
 
-            int instancesCount = jClass.getInstancesCount();
-            int instanceSize = jClass.getInstanceSize();
-            long allInstancesSize = jClass.getAllInstancesSize();
+                        if (classesCount == -1) classesCount = classesListController.
+                                getClassesController().getHeapFragmentWalker().
+                                getHeapFragment().getAllClasses().size();
 
-            displayCache[i][0] = jClass.getName();
-            displayCache[i][1] = new Double((double) instancesCount / (double) totalLiveInstances * 100);
-            displayCache[i][2] = Integer.toString(instancesCount) + " (" // NOI18N
-                                 + percentFormat.format((double) instancesCount / (double) totalLiveInstances) + ")"; // NOI18N
-            displayCache[i][3] = (allInstancesSize < 0) ? RESULT_NOT_AVAILABLE_STRING
-                                                    : (Long.toString(allInstancesSize) + " (" // NOI18N
-                                                    + percentFormat.format((double) allInstancesSize / (double) totalLiveBytes)
-                                                    + ")"); // NOI18N
-            displayCache[i][4] = jClass;
-        }
+                        List classes = classesListController.getFilteredSortedClasses(
+                                FilterComponent.getFilterStrings(filterValue), filterType,
+                                showZeroInstances, showZeroSize, sortingColumn, sortingOrder);
+                        final Object[][] displayCache2 = new Object[classes.size()][columnCount + 1];
 
-        classesListTableModel.fireTableDataChanged();
+                        for (int i = 0; i < classes.size(); i++) {
+                            JavaClass jClass = (JavaClass) classes.get(i);
 
-        restoreSelection();
+                            int instancesCount = jClass.getInstancesCount();
+                            int instanceSize = jClass.getInstanceSize();
+                            long allInstancesSize = jClass.getAllInstancesSize();
+
+                            displayCache2[i][0] = jClass.getName();
+                            displayCache2[i][1] = new Double((double) instancesCount /
+                                                 (double) totalLiveInstances * 100);
+                            displayCache2[i][2] = Integer.toString(instancesCount) + " (" // NOI18N
+                                                 + percentFormat.format((double) instancesCount /
+                                                 (double) totalLiveInstances) + ")"; // NOI18N
+                            displayCache2[i][3] = (allInstancesSize < 0) ? RESULT_NOT_AVAILABLE_STRING
+                                                  : (Long.toString(allInstancesSize) + " (" // NOI18N
+                                                  + percentFormat.format((double) allInstancesSize /
+                                                  (double) totalLiveBytes) + ")"); // NOI18N
+                            displayCache2[i][4] = jClass;
+                        }
+
+                        initInProgress.set(false);
+
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                displayCache = displayCache2;
+                                classesListTableModel.fireTableDataChanged();
+                                restoreSelection();
+                                if (contents != null) contents.show(contentsPanel, DATA);
+                            }
+                        });
+
+                    }
+                });
+
+            }
+        });
     }
 
     private void performDefaultAction() {
