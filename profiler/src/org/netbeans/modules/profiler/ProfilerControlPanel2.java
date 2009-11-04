@@ -87,6 +87,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -1822,13 +1823,27 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static synchronized ProfilerControlPanel2 getDefault() {
-        if (defaultInstance == null) {
-            IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        while (defaultInstance == null) {
+            Runnable resolver = new Runnable() {
                 public void run() {
                     defaultInstance = (ProfilerControlPanel2) WindowManager.getDefault().findTopComponent(ID);
                     if (defaultInstance == null) defaultInstance = new ProfilerControlPanel2();
                 }
-            });
+            };
+
+            if (SwingUtilities.isEventDispatchThread()) {
+                resolver.run();
+                break;
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(resolver);
+                } catch (InterruptedException e) {
+                    ProfilerLogger.info("InterruptedException in ProfilerControlPanel2.getDefault() [will retry]: " + e.getMessage()); // NOI18N
+                } catch (Throwable t) {
+                    ProfilerLogger.severe("Throwable in ProfilerControlPanel2.getDefault(): " + t.getMessage()); // NOI18N
+                    break;
+                }
+            }
         }
 
         return defaultInstance;
