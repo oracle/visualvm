@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 OpenIDE-Module: com.sun.tools.visualvm.charts/0
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/charts/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
+OpenIDE-Module-Specification-Version: 1.0.1
 

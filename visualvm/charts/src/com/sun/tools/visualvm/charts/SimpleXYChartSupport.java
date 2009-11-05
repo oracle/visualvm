@@ -187,7 +187,7 @@ public final class SimpleXYChartSupport {
      * @return formatted value in the same format as used in the chart
      */
     public String formatBytes(long value) {
-        return SimpleXYChartUtils.formatBytes((int)(value * chartFactor));
+        return SimpleXYChartUtils.formatBytes((long)(value * chartFactor));
     }
 
     /**
