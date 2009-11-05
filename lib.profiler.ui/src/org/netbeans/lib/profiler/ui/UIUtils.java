@@ -459,41 +459,52 @@ public final class UIUtils {
      * and fixes using custom border for JDK 1.5 & XP LaF
      */
     public static void fixButtonUI(AbstractButton button) {
-        // JButton
-        if (button.getUI() instanceof com.sun.java.swing.plaf.windows.WindowsButtonUI) {
-            button.setUI(new com.sun.java.swing.plaf.windows.WindowsButtonUI() {
-                    protected BasicButtonListener createButtonListener(AbstractButton b) {
-                        return new BasicButtonListener(b); // Fix for  Issue 71546
-                    }
+        try { // Fix for Issue 175755 - WindowsButtonUI is private API, incompatible changes may occur
+            final int dashedRectGapX_Local = ((Integer)UIManager.get("Button.dashedRectGapX")).intValue(); // NOI18N
+            final int dashedRectGapY_Local = ((Integer)UIManager.get("Button.dashedRectGapY")).intValue(); // NOI18N
+            final int dashedRectGapWidth_Local = ((Integer)UIManager.get("Button.dashedRectGapWidth")).intValue(); // NOI18N
+            final int dashedRectGapHeight_Local = ((Integer)UIManager.get("Button.dashedRectGapHeight")).intValue(); // NOI18N
 
-                    protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect, Rectangle textRect,
-                                              Rectangle iconRect) {
-                        int width = b.getWidth();
-                        int height = b.getHeight();
-                        g.setColor(getFocusColor());
-                        javax.swing.plaf.basic.BasicGraphicsUtils.drawDashedRect(g, dashedRectGapX, dashedRectGapY,
-                                                                                 width - dashedRectGapWidth,
-                                                                                 height - dashedRectGapHeight);
-                    }
-                });
-        }
-        // JToggleButton
-        else if (button.getUI() instanceof com.sun.java.swing.plaf.windows.WindowsToggleButtonUI) {
-            button.setUI(new com.sun.java.swing.plaf.windows.WindowsToggleButtonUI() {
-                    protected BasicButtonListener createButtonListener(AbstractButton b) {
-                        return new BasicButtonListener(b); // Fix for  Issue 71546
-                    }
+            // JButton
+            if (button.getUI() instanceof com.sun.java.swing.plaf.windows.WindowsButtonUI) {
+                button.setUI(new com.sun.java.swing.plaf.windows.WindowsButtonUI() {
+                        protected BasicButtonListener createButtonListener(AbstractButton b) {
+                            return new BasicButtonListener(b); // Fix for  Issue 71546
+                        }
 
-                    protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect, Rectangle textRect,
-                                              Rectangle iconRect) {
-                        int width = b.getWidth();
-                        int height = b.getHeight();
-                        g.setColor(getFocusColor());
-                        javax.swing.plaf.basic.BasicGraphicsUtils.drawDashedRect(g, dashedRectGapX, dashedRectGapY,
-                                                                                 width - dashedRectGapWidth,
-                                                                                 height - dashedRectGapHeight);
-                    }
-                });
+                        protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect, Rectangle textRect,
+                                                  Rectangle iconRect) {
+                            int width = b.getWidth();
+                            int height = b.getHeight();
+                            g.setColor(getFocusColor());
+                            javax.swing.plaf.basic.BasicGraphicsUtils.drawDashedRect(g, dashedRectGapX_Local,
+                                                                                     dashedRectGapY_Local,
+                                                                                     width - dashedRectGapWidth_Local,
+                                                                                     height - dashedRectGapHeight_Local);
+                        }
+                    });
+            }
+            // JToggleButton
+            else if (button.getUI() instanceof com.sun.java.swing.plaf.windows.WindowsToggleButtonUI) {
+                button.setUI(new com.sun.java.swing.plaf.windows.WindowsToggleButtonUI() {
+                        protected BasicButtonListener createButtonListener(AbstractButton b) {
+                            return new BasicButtonListener(b); // Fix for  Issue 71546
+                        }
+
+                        protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect, Rectangle textRect,
+                                                  Rectangle iconRect) {
+                            int width = b.getWidth();
+                            int height = b.getHeight();
+                            g.setColor(getFocusColor());
+                            javax.swing.plaf.basic.BasicGraphicsUtils.drawDashedRect(g, dashedRectGapX_Local,
+                                                                                     dashedRectGapY_Local,
+                                                                                     width - dashedRectGapWidth_Local,
+                                                                                     height - dashedRectGapHeight_Local);
+                        }
+                    });
+            }
+        } catch (Throwable t) {
+            // Private API is used, just skip any incompatibility failure
         }
     }
 
