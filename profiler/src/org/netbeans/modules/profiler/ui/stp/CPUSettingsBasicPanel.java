@@ -808,15 +808,15 @@ public class CPUSettingsBasicPanel extends DefaultSettingsPanel implements Actio
         }
 
         filterCombo.setSelectedIndex(itemToSelect);
-        selectedInstrumentationFilter = filterCombo.getSelectedItem(); // in case original selectedInstrFilter not found
 
         updateComboLinks();
     }
 
     private void updateComboLinks() {
         selectedInstrumentationFilter = filterCombo.getSelectedItem();
+        if (selectedInstrumentationFilter == null) selectedInstrumentationFilter = SimpleFilter.NO_FILTER;
 
-        if (selectedInstrumentationFilter.equals(quickFilter)) {
+        if (quickFilter.equals(selectedInstrumentationFilter)) {
             showFilterLink.setVisible(false);
             editFilterLink.setVisible(true);
         } else if ((preferredInstrFilters != null) && preferredInstrFilters.contains(selectedInstrumentationFilter)) {

@@ -267,7 +267,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private class SeparateCmdExecutionThread extends Thread {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private boolean stopped = false;
+        private volatile boolean stopped = false;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
