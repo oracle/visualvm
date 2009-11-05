@@ -1379,7 +1379,12 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public void openJavaSource(final Project project, final String className, final String methodName, final String methodSig) {
-        GoToSourceHelper.openSource(project, new JavaSourceLocation(className, methodName, methodSig));
+        // Bugfix #175844 doesn't need to be called in EDT any more, ElementOpen.open() is now thread-aware
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                GoToSourceHelper.openSource(project, new JavaSourceLocation(className, methodName, methodSig));
+            }
+        });
     }
 
     public boolean processesProfilingPoints() {
