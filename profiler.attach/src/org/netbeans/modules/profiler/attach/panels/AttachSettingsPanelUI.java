@@ -195,9 +195,10 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
-        comboGroups.getAccessibleContext().setAccessibleName("null");
-        comboGroups.getAccessibleContext().setAccessibleDescription("null");
-        comboTargets.getAccessibleContext().setAccessibleDescription("null");
+        comboGroups.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "AttachSettingsPanelUI.comboGroups.AccessibleContext.accessibleName")); // NOI18N
+        comboGroups.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "AttachSettingsPanelUI.comboGroups.AccessibleContext.accessibleDescription")); // NOI18N
+        comboTargets.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "AttachSettingsPanelUI.comboTargets.AccessibleContext.accessibleDescription")); // NOI18N
+
 
         panelDetails.setLayout(new javax.swing.BoxLayout(panelDetails, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -206,7 +207,7 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
         groupMethod.add(buttonLocal);
         buttonLocal.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(buttonLocal, bundle.getString("TargetSettingsWizardPanelUI_LocalRadioName")); // NOI18N
-        buttonLocal.setToolTipText("null");
+        buttonLocal.setToolTipText(bundle.getString("TargetSettingsWizardPanelUI_LocalRadioAccessDescr")); // NOI18N
         buttonLocal.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         buttonLocal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -216,7 +217,7 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
 
         groupMethod.add(buttonRemote);
         org.openide.awt.Mnemonics.setLocalizedText(buttonRemote, bundle.getString("TargetSettingsWizardPanelUI_RemoteRadioName")); // NOI18N
-        buttonRemote.setToolTipText("null");
+        buttonRemote.setToolTipText(bundle.getString("TargetSettingsWizardPanelUI_RemoteRadioAccessDescr")); // NOI18N
         buttonRemote.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         buttonRemote.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -269,7 +270,7 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
         groupInvocation.add(buttonDirect);
         buttonDirect.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(buttonDirect, bundle.getString("TargetSettingsWizardPanelUI_DirectRadioName")); // NOI18N
-        buttonDirect.setToolTipText("null");
+        buttonDirect.setToolTipText(bundle.getString("TargetSettingsWizardPanelUI_DirectRadioAccessDescr")); // NOI18N
         buttonDirect.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         buttonDirect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -279,7 +280,7 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
 
         groupInvocation.add(buttonDynamic16);
         org.openide.awt.Mnemonics.setLocalizedText(buttonDynamic16, org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "TargetSettingsWizardPanelUI_Dynamic16RadioName")); // NOI18N
-        buttonDynamic16.setToolTipText("null");
+        buttonDynamic16.setToolTipText(org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "AttachSettingsPanelUI.buttonDynamic16.toolTipText")); // NOI18N
         buttonDynamic16.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         buttonDynamic16.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -356,7 +357,7 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
                 .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE))
         );
 
-        hintPanel.getAccessibleContext().setAccessibleName("null");
+        hintPanel.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "AttachSettingsPanelUI.hintPanel.AccessibleContext.accessibleName")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonDynamic16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDynamic16ActionPerformed

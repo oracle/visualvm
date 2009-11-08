@@ -51,8 +51,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.*;
@@ -64,7 +62,7 @@ import javax.swing.*;
  * @author Ian Formanek
  * @author Jiri Sedlacek
  */
-public final class ProfilerOptionsPanel extends JPanel implements ActionListener, Scrollable {
+public final class ProfilerOptionsPanel extends JPanel implements ActionListener {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class CategorySeparator extends JPanel {
@@ -224,33 +222,6 @@ public final class ProfilerOptionsPanel extends JPanel implements ActionListener
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public Dimension getPreferredScrollableViewportSize() {
-        return null;
-    }
-
-    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-        // Scroll almost one screen
-        Container parent = getParent();
-
-        if ((parent == null) || !(parent instanceof JViewport)) {
-            return 50;
-        }
-
-        return (int) (((JViewport) parent).getHeight() * 0.95f);
-    }
-
-    public boolean getScrollableTracksViewportHeight() {
-        return false;
-    }
-
-    public boolean getScrollableTracksViewportWidth() {
-        return true;
-    }
-
-    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-        return 20;
-    }
 
     public JavaPlatform getSelectedJavaPlatform() {
         int selectedJavaPlatformIndex = javaPlatformCombo.getSelectedIndex();
@@ -873,7 +844,13 @@ public final class ProfilerOptionsPanel extends JPanel implements ActionListener
         JPanel resetConfirmationsPanel = new JPanel(new GridBagLayout());
 
         // resetConfirmationsArea
-        JTextArea resetConfirmationsArea = new JTextArea(RESET_HINT_TEXT);
+        JTextArea resetConfirmationsArea = new JTextArea(RESET_HINT_TEXT) {
+            public Dimension getPreferredSize() {
+                Dimension size = super.getPreferredSize();
+                size.width = 1;
+                return size;
+            }
+        };
         resetConfirmationsArea.setOpaque(false);
         resetConfirmationsArea.setWrapStyleWord(true);
         resetConfirmationsArea.setLineWrap(true);
@@ -887,7 +864,7 @@ public final class ProfilerOptionsPanel extends JPanel implements ActionListener
         gridBagConstraints.weighty = 1;
         gridBagConstraints.insets = new Insets(0, 0, 0, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         resetConfirmationsPanel.add(resetConfirmationsArea, gridBagConstraints);
 
         // resetConfirmationsButton

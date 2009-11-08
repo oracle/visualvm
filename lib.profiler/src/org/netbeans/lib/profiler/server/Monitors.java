@@ -107,8 +107,8 @@ public class Monitors implements CommonConstants {
     static class SurvGenAndThreadsMonitor extends Thread {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        public boolean started;
-        public boolean terminated;
+        public volatile boolean started;
+        public volatile boolean terminated;
         private LongList gcFinishs;
         private LongList gcStarts;
         private ThreadDataTable threadTable;

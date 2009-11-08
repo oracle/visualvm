@@ -368,7 +368,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     // Currently profiling, data are being collected
     public boolean isProfilingInProgress() {
-        return profilingInProgress;
+        synchronized (this) {
+            return profilingInProgress;
+        }
     }
 
     public ProfilingPointFactory[] getProfilingPointFactories() {
@@ -427,7 +429,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     // Profiling session started and not yet finished
     public boolean isProfilingSessionInProgress() {
-        return profilingSessionInProgress;
+        synchronized (this) {
+            return profilingSessionInProgress;
+        }
     }
 
     public List<ProfilingPoint> getSortedProfilingPoints(Project project, int sortBy, boolean sortOrder) {
@@ -524,36 +528,42 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
     }
 
-    public synchronized void profilingStateChanged(ProfilingStateEvent profilingStateEvent) {
-        boolean wasProfilingInProgress = profilingInProgress;
-        boolean wasProfilingSessionInProgres = profilingSessionInProgress;
+    public void profilingStateChanged(final ProfilingStateEvent profilingStateEvent) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                boolean wasProfilingInProgress = profilingInProgress;
+                boolean wasProfilingSessionInProgres = profilingSessionInProgress;
 
-        switch (profilingStateEvent.getNewState()) {
-            case Profiler.PROFILING_INACTIVE:
-            case Profiler.PROFILING_STOPPED:
-                profilingInProgress = false;
-                profilingSessionInProgress = false;
+                synchronized (ProfilingPointsManager.this) {
+                    switch (profilingStateEvent.getNewState()) {
+                        case Profiler.PROFILING_INACTIVE:
+                        case Profiler.PROFILING_STOPPED:
+                            profilingInProgress = false;
+                            profilingSessionInProgress = false;
 
-                break;
-            case Profiler.PROFILING_STARTED:
-            case Profiler.PROFILING_IN_TRANSITION:
-                profilingInProgress = false;
-                profilingSessionInProgress = true;
+                            break;
+                        case Profiler.PROFILING_STARTED:
+                        case Profiler.PROFILING_IN_TRANSITION:
+                            profilingInProgress = false;
+                            profilingSessionInProgress = true;
 
-                break;
-            default:
-                profilingInProgress = true;
-                profilingSessionInProgress = true;
-        }
-
-        if ((wasProfilingInProgress != profilingInProgress) || (wasProfilingSessionInProgres != profilingSessionInProgress)) {
-            GlobalProfilingPointsProcessor.getDefault().notifyProfilingStateChanged();
-            IDEUtils.runInEventDispatchThread(new Runnable() {
-                    public void run() {
-                        ProfilingPointsWindow.getDefault().notifyProfilingStateChanged(); // this needs to be called on EDT
+                            break;
+                        default:
+                            profilingInProgress = true;
+                            profilingSessionInProgress = true;
                     }
-                });
-        }
+                }
+
+                if ((wasProfilingInProgress != profilingInProgress) || (wasProfilingSessionInProgres != profilingSessionInProgress)) {
+                    GlobalProfilingPointsProcessor.getDefault().notifyProfilingStateChanged();
+                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                            public void run() {
+                                ProfilingPointsWindow.getDefault().notifyProfilingStateChanged(); // this needs to be called on EDT
+                            }
+                        });
+                }
+            }
+        });
     }
 
     public void propertyChange(PropertyChangeEvent evt) {

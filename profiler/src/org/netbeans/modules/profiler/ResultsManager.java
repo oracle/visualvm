@@ -597,8 +597,8 @@ public final class ResultsManager {
     }
 
     public void openSnapshot(final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
-        /*if (ls == null) NetBeansProfiler.getDefaultNB().displayError(CANNOT_OPEN_SNAPSHOT_MSG);
-        else*/ IDEUtils.runInEventDispatchThread(new Runnable() {
+        if (ls == null) NetBeansProfiler.getDefaultNB().displayError(CANNOT_OPEN_SNAPSHOT_MSG);
+        else IDEUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
                 srw.open();
