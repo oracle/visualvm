@@ -368,7 +368,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     // Currently profiling, data are being collected
     public boolean isProfilingInProgress() {
-        return profilingInProgress;
+        synchronized (this) {
+            return profilingInProgress;
+        }
     }
 
     public ProfilingPointFactory[] getProfilingPointFactories() {
@@ -411,7 +413,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             // Bugfix #162132, the factory may already be unloaded
             if (factory != null) {
                 if (ppClass.isInstance(profilingPoint)) {
-                    if (projects.contains(profilingPoint.getProject())) {
+                    if (containsProject(projects, profilingPoint.getProject())) {
                         if (inclUnavailable || factory.isAvailable()) {
                             filteredProfilingPoints.add((T) profilingPoint);
                         }
@@ -427,7 +429,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     // Profiling session started and not yet finished
     public boolean isProfilingSessionInProgress() {
-        return profilingSessionInProgress;
+        synchronized (this) {
+            return profilingSessionInProgress;
+        }
     }
 
     public List<ProfilingPoint> getSortedProfilingPoints(Project project, int sortBy, boolean sortOrder) {
@@ -524,36 +528,42 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
     }
 
-    public synchronized void profilingStateChanged(ProfilingStateEvent profilingStateEvent) {
-        boolean wasProfilingInProgress = profilingInProgress;
-        boolean wasProfilingSessionInProgres = profilingSessionInProgress;
+    public void profilingStateChanged(final ProfilingStateEvent profilingStateEvent) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                boolean wasProfilingInProgress = profilingInProgress;
+                boolean wasProfilingSessionInProgres = profilingSessionInProgress;
 
-        switch (profilingStateEvent.getNewState()) {
-            case Profiler.PROFILING_INACTIVE:
-            case Profiler.PROFILING_STOPPED:
-                profilingInProgress = false;
-                profilingSessionInProgress = false;
+                synchronized (ProfilingPointsManager.this) {
+                    switch (profilingStateEvent.getNewState()) {
+                        case Profiler.PROFILING_INACTIVE:
+                        case Profiler.PROFILING_STOPPED:
+                            profilingInProgress = false;
+                            profilingSessionInProgress = false;
 
-                break;
-            case Profiler.PROFILING_STARTED:
-            case Profiler.PROFILING_IN_TRANSITION:
-                profilingInProgress = false;
-                profilingSessionInProgress = true;
+                            break;
+                        case Profiler.PROFILING_STARTED:
+                        case Profiler.PROFILING_IN_TRANSITION:
+                            profilingInProgress = false;
+                            profilingSessionInProgress = true;
 
-                break;
-            default:
-                profilingInProgress = true;
-                profilingSessionInProgress = true;
-        }
-
-        if ((wasProfilingInProgress != profilingInProgress) || (wasProfilingSessionInProgres != profilingSessionInProgress)) {
-            GlobalProfilingPointsProcessor.getDefault().notifyProfilingStateChanged();
-            IDEUtils.runInEventDispatchThread(new Runnable() {
-                    public void run() {
-                        ProfilingPointsWindow.getDefault().notifyProfilingStateChanged(); // this needs to be called on EDT
+                            break;
+                        default:
+                            profilingInProgress = true;
+                            profilingSessionInProgress = true;
                     }
-                });
-        }
+                }
+
+                if ((wasProfilingInProgress != profilingInProgress) || (wasProfilingSessionInProgres != profilingSessionInProgress)) {
+                    GlobalProfilingPointsProcessor.getDefault().notifyProfilingStateChanged();
+                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                            public void run() {
+                                ProfilingPointsWindow.getDefault().notifyProfilingStateChanged(); // this needs to be called on EDT
+                            }
+                        });
+                }
+            }
+        });
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
@@ -578,7 +588,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                 });
         } else if (evt.getSource() instanceof ProfilingPoint) {
             ProfilingPoint profilingPoint = (ProfilingPoint) evt.getSource();
-            storeProfilingPoints(new ProfilingPoint[] { profilingPoint });
+            if (!evt.getPropertyName().equals(ProfilingPoint.PROPERTY_RESULTS))
+                storeProfilingPoints(new ProfilingPoint[] { profilingPoint });
 
             if (isAnnotationChange(evt)) {
                 deannotate((CodeProfilingPoint.Annotation[]) evt.getOldValue());
@@ -786,6 +797,15 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                || propertyName.equals(ProfilingPoint.PROPERTY_PROJECT) || propertyName.equals(ProfilingPoint.PROPERTY_RESULTS);
     }
 
+    private static boolean containsProject(Collection<Project> c, Project p) {
+        for (Project in : c) {
+            if (in.getProjectDirectory().equals(p.getProjectDirectory())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private Set<Project> getOpenSubprojects(Project project) {
         Set<Project> subprojects = new HashSet();
         ProjectUtilities.fetchSubprojects(project, subprojects);
@@ -794,7 +814,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
         Set<Project> openSubprojects = new HashSet();
         for (Project openProject : openedProjects)
-            if (subprojects.contains(openProject))
+            if (containsProject(subprojects, openProject))
                 openSubprojects.add(openProject);
 
         return openSubprojects;
@@ -995,13 +1015,13 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         refreshOpenedProjects();
 
         for (Project project : lastOpenedProjects) {
-            if (!openedProjects.contains(project)) {
+            if (!containsProject(openedProjects, project)) {
                 projectClosed(project);
             }
         }
 
         for (Project openProject : openedProjects) {
-            if (!lastOpenedProjects.contains(openProject)) {
+            if (!containsProject(lastOpenedProjects, openProject)) {
                 projectOpened(openProject);
             }
         }
