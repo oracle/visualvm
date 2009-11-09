@@ -25,11 +25,11 @@
 
 #define COMPANY "Sun Microsystems, Inc."
 #define COMPONENT "VisualVM"
-#define VER "1.2.0.0"
-#define FVER 1,2,0,0
-#define BUILD_ID "20102009"
+#define VER "1.2.1.0"
+#define FVER 1,2,1,0
+#define BUILD_ID "09112009"
 #define INTERNAL_NAME "visualvm"
 #define COPYRIGHT "\xA9 2007-2009 Sun Microsystems, Inc."
 #define FNAME "visualvm.exe"
-#define NAME "VisualVM Test Build"
+#define NAME "VisualVM"
 
