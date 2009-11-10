@@ -124,9 +124,9 @@ public class ManualIntegrationPanelUI extends javax.swing.JPanel implements List
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(label, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
-                    .add(comboJvms, 0, 472, Short.MAX_VALUE)
-                    .add(stepsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
+                    .add(label, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(comboJvms, 0, 476, Short.MAX_VALUE)
+                    .add(stepsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, generateRemotePack))
                 .addContainerGap())
         );
@@ -138,13 +138,13 @@ public class ManualIntegrationPanelUI extends javax.swing.JPanel implements List
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(comboJvms, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(stepsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+                .add(stepsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(generateRemotePack)
                 .addContainerGap())
         );
 
-        comboJvms.getAccessibleContext().setAccessibleDescription("null");
+        comboJvms.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(ManualIntegrationPanelUI.class, "ManualIntegrationPanelUI.comboJvms.AccessibleContext.accessibleDescription")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
 
 private void generateRemotePackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateRemotePackActionPerformed
