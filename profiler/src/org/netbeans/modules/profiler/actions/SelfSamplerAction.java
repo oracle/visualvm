@@ -53,8 +53,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,6 +62,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
@@ -91,8 +90,9 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
     private static final double MAX_STDDEVIATION = SAMPLER_RATE * 4;
     
     private final AtomicReference<Controller> RUNNING = new AtomicReference<Controller>();
-    private Boolean runMode;
-
+    private Boolean debugMode;
+    private String lastReason;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     private SelfSamplerAction() {
         putValue(Action.NAME, ACTION_NAME_START);
@@ -159,27 +159,52 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
         }
         return o;
     }
-
-    private synchronized boolean isRunMode() {
-        if (runMode == null) {
-            runMode = Boolean.TRUE;
-            String reason = null;
+    
+    private synchronized boolean isDebugged() {
+        if (debugMode == null) {
+            debugMode = Boolean.FALSE;
 
             // check if we are debugged
             RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
             List<String> args = runtime.getInputArguments();
             if (args.contains(DEBUG_ARG)) {
-                reason = "running in debug mode";   // NOI18N
-                runMode = Boolean.FALSE;
-            }
-            
-            if (!runMode.booleanValue()) {
-                LOGGER.log(Level.INFO,"Slowness detector disabled - "+ reason); // NOI18N
-            }
+                debugMode = Boolean.TRUE;
+            }            
         }
-        return runMode.booleanValue();
+        return debugMode.booleanValue();
     }
 
+    private boolean isRunMode() {
+        boolean runMode = true;
+        String reason = null;
+        
+        if (isDebugged()) {
+            reason = "running in debug mode";   // NOI18N
+            runMode = false;
+        }
+        if (runMode) {
+            // check if the profiling session is active
+            int profilingState = NetBeansProfiler.getDefaultNB().getProfilingState();
+            if (profilingState != NetBeansProfiler.PROFILING_STOPPED && profilingState != NetBeansProfiler.PROFILING_INACTIVE) {
+                reason = "active profiling session";   // NOI18N
+                runMode = false;
+            }
+        }
+        if (runMode) {
+            // check if netbeans is profiled
+            try {
+                Class.forName("org.netbeans.lib.profiler.server.ProfilerServer", false, ClassLoader.getSystemClassLoader()); // NO18N
+                reason = "running under profiler";   // NOI18N
+                runMode = false;
+            } catch (ClassNotFoundException ex) {
+            }
+        }
+        if (!runMode && reason != lastReason) {
+            LOGGER.log(Level.INFO,"Slowness detector disabled - " + reason); // NOI18N
+        }
+        lastReason = reason;
+        return runMode;
+    }
 
     private static final class Controller implements Runnable, ActionListener {
         private final String name;
