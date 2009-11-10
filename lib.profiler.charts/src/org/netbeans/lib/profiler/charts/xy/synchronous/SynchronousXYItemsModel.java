@@ -93,10 +93,15 @@ public class SynchronousXYItemsModel extends ItemsModel.Abstract {
                                  timeline.getTimestamp(valueIndex - 1);
         
         if (previousTimestamp != -1 && previousTimestamp >= timestamp)
-            throw new IllegalArgumentException(
-                           "ProfilerXYItemsModel: new timestamp " + timestamp + // NOI18N
-                           " not greater than previous " + previousTimestamp + // NOI18N
-                           ", skipping the values."); // NOI18N
+// See #168544
+//            throw new IllegalArgumentException(
+//                           "ProfilerXYItemsModel: new timestamp " + timestamp + // NOI18N
+//                           " not greater than previous " + previousTimestamp + // NOI18N
+//                           ", skipping the values."); // NOI18N
+            System.err.println("WARNING [" + SynchronousXYItemsModel.class.getName() + // NOI18N
+                               "]: ProfilerXYItemsModel: new timestamp " + // NOI18N
+                               timestamp + " not greater than previous " + // NOI18N
+                               previousTimestamp + ", skipping the values."); // NOI18N
     }
 
     public final void valuesReset() {
