@@ -798,9 +798,13 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     private static boolean containsProject(Collection<Project> c, Project p) {
-        for (Project in : c) {
-            if (in.getProjectDirectory().equals(p.getProjectDirectory())) {
-                return true;
+        if (p != null) {
+            FileObject projectDir = p.getProjectDirectory();
+            
+            for (Project in : c) {
+                if (in.getProjectDirectory().equals(projectDir)) {
+                    return true;
+                }
             }
         }
         return false;

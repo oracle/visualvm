@@ -105,6 +105,7 @@ public class StepsPanelComponent extends javax.swing.JPanel {
         add(label, java.awt.BorderLayout.NORTH);
 
         stepsScroller.setViewportView(areaSteps);
+        areaSteps.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(StepsPanelComponent.class, "StepsPanelComponent_areaSteps.accessibleName")); // NOI18N
 
         add(stepsScroller, java.awt.BorderLayout.CENTER);
 
