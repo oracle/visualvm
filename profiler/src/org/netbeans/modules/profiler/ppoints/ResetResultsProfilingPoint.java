@@ -134,13 +134,15 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
 
             StringBuilder dataAreaTextBuilder = new StringBuilder();
 
-            if (results.size() == 0) {
-                dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
-            } else {
-                for (int i = 0; i < results.size(); i++) {
-                    dataAreaTextBuilder.append("&nbsp;&nbsp;");
-                    dataAreaTextBuilder.append(getDataResultItem(i));
-                    dataAreaTextBuilder.append("<br>"); // NOI18N
+            synchronized(resultsSync) {
+                if (results.size() == 0) {
+                    dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
+                } else {
+                    for (int i = 0; i < results.size(); i++) {
+                        dataAreaTextBuilder.append("&nbsp;&nbsp;");
+                        dataAreaTextBuilder.append(getDataResultItem(i));
+                        dataAreaTextBuilder.append("<br>"); // NOI18N
+                    }
                 }
             }
 
@@ -154,15 +156,17 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
         }
 
         private String getDataResultItem(int index) {
-            Result result = results.get(index);
+            synchronized(resultsSync) {
+                Result result = results.get(index);
 
-            // TODO: enable once thread name by id is available
-            //String threadName = Utils.getThreadName(result.getThreadID());
-            //String threadClassName = Utils.getThreadClassName(result.getThreadID());
-            //String threadInformation = (threadName == null ? "&lt;unknown thread&gt;" : (threadClassName == null ? threadName : threadName + " (" + threadClassName + ")"));
-            //return "<b>" + (index + 1) + ".</b> hit at <b>" + Utils.formatProfilingPointTimeHiRes(result.getTimestamp()) + "</b> by " + threadInformation;
-            return MessageFormat.format(HIT_STRING,
-                                        new Object[] { (index + 1), Utils.formatProfilingPointTimeHiRes(result.getTimestamp()) });
+                // TODO: enable once thread name by id is available
+                //String threadName = Utils.getThreadName(result.getThreadID());
+                //String threadClassName = Utils.getThreadClassName(result.getThreadID());
+                //String threadInformation = (threadName == null ? "&lt;unknown thread&gt;" : (threadClassName == null ? threadName : threadName + " (" + threadClassName + ")"));
+                //return "<b>" + (index + 1) + ".</b> hit at <b>" + Utils.formatProfilingPointTimeHiRes(result.getTimestamp()) + "</b> by " + threadInformation;
+                return MessageFormat.format(HIT_STRING,
+                                            new Object[] { (index + 1), Utils.formatProfilingPointTimeHiRes(result.getTimestamp()) });
+            }
         }
 
         private String getHeaderEnabled() {
@@ -170,7 +174,9 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
         }
 
         private String getHeaderHitsCount() {
-            return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            synchronized(resultsSync) {
+                return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            }
         }
 
         private String getHeaderLocation() {
@@ -301,6 +307,7 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
 
     private Annotation annotation;
     private List<Result> results = new ArrayList();
+    private final Object resultsSync = new Object();
     private WeakReference<Report> reportReference;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -313,7 +320,9 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public boolean hasResults() {
-        return results.size() > 0;
+        synchronized(resultsSync) {
+            return results.size() > 0;
+        }
     }
 
     public void hideResults() {
@@ -351,19 +360,21 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
     }
 
     protected String getResultsText() {
-        if (hasResults()) {
-            return (results.size() == 1)
-                   ? MessageFormat.format(ONE_HIT_STRING,
-                                          new Object[] {
-                                              Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
-                                          })
-                   : MessageFormat.format(N_HITS_STRING,
-                                          new Object[] {
-                                              results.size(),
-                                              Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
-                                          });
-        } else {
-            return NO_RESULTS_STRING;
+        synchronized(resultsSync) {
+            if (hasResults()) {
+                return (results.size() == 1)
+                       ? MessageFormat.format(ONE_HIT_STRING,
+                                              new Object[] {
+                                                  Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
+                                              })
+                       : MessageFormat.format(N_HITS_STRING,
+                                              new Object[] {
+                                                  results.size(),
+                                                  Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
+                                              });
+            } else {
+                return NO_RESULTS_STRING;
+            }
         }
     }
 
@@ -382,17 +393,21 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
     }
 
     void hit(RuntimeProfilingPoint.HitEvent hitEvent, int index) {
-        results.add(new Result(hitEvent.getTimestamp(), hitEvent.getThreadId()));
+        synchronized(resultsSync) {
+            results.add(new Result(hitEvent.getTimestamp(), hitEvent.getThreadId()));
+        }
         //    ResultsManager.getDefault().reset();
         getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
     }
 
     void reset() {
-        boolean change = results.size() > 0;
-        results.clear();
+        synchronized(resultsSync) {
+            boolean change = results.size() > 0;
+            results.clear();
 
-        if (change) {
-            getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            if (change) {
+                getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            }
         }
     }
 

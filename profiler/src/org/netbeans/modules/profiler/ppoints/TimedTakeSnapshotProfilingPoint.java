@@ -144,13 +144,15 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
 
             StringBuilder dataAreaTextBuilder = new StringBuilder();
 
-            if (!hasResults()) {
-                dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
-            } else {
-                for (int i = 0; i < results.size(); i++) {
-                    dataAreaTextBuilder.append("&nbsp;&nbsp;");
-                    dataAreaTextBuilder.append(getDataResultItem(i));
-                    dataAreaTextBuilder.append("<br>"); // NOI18N
+            synchronized(resultsSync) {
+                if (!hasResults()) {
+                    dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
+                } else {
+                    for (int i = 0; i < results.size(); i++) {
+                        dataAreaTextBuilder.append("&nbsp;&nbsp;");
+                        dataAreaTextBuilder.append(getDataResultItem(i));
+                        dataAreaTextBuilder.append("<br>"); // NOI18N
+                    }
                 }
             }
 
@@ -164,16 +166,18 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
         }
 
         private String getDataResultItem(int index) {
-            Result result = results.get(index);
-            String resultString = result.getResultString();
-            String snapshotInformation = resultString.startsWith(SNAPSHOT_LOCATION_URLMASK)
-                                         ? ("<a href='" + resultString + "'>" + OPEN_SNAPSHOT_STRING + "</a>") : resultString; // NOI18N
+            synchronized(resultsSync) {
+                Result result = results.get(index);
+                String resultString = result.getResultString();
+                String snapshotInformation = resultString.startsWith(SNAPSHOT_LOCATION_URLMASK)
+                                             ? ("<a href='" + resultString + "'>" + OPEN_SNAPSHOT_STRING + "</a>") : resultString; // NOI18N
 
-            return MessageFormat.format(HIT_STRING,
-                                        new Object[] {
-                                            (index + 1), Utils.formatLocalProfilingPointTime(result.getTimestamp()),
-                                            snapshotInformation
-                                        });
+                return MessageFormat.format(HIT_STRING,
+                                            new Object[] {
+                                                (index + 1), Utils.formatLocalProfilingPointTime(result.getTimestamp()),
+                                                snapshotInformation
+                                            });
+            }
         }
 
         private String getHeaderEnabled() {
@@ -181,7 +185,9 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
         }
 
         private String getHeaderHitsCount() {
-            return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            synchronized(resultsSync) {
+                return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            }
         }
 
         private String getHeaderMode() {
@@ -372,6 +378,7 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private List<Result> results = new ArrayList();
+    private final Object resultsSync = new Object();
     private String snapshotFile = System.getProperty("java.io.tmpdir"); // NOI18N
     private String snapshotTarget = TARGET_PROJECT_KEY;
     private String snapshotType = TYPE_PROFDATA_KEY;
@@ -455,7 +462,9 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
     }
 
     public boolean hasResults() {
-        return !results.isEmpty();
+        synchronized(resultsSync) {
+            return !results.isEmpty();
+        }
     }
 
     public void hideResults() {
@@ -485,18 +494,20 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
     }
 
     protected String getResultsText() {
-        if (hasResults()) {
-            int size = results.size();
+        synchronized(resultsSync) {
+            if (hasResults()) {
+                int size = results.size();
 
-            return (size == 1)
-                   ? MessageFormat.format(ONE_HIT_STRING,
-                                          new Object[] { Utils.formatLocalProfilingPointTime(results.get(size - 1).getTimestamp()) })
-                   : MessageFormat.format(N_HITS_STRING,
-                                          new Object[] {
-                                              size, Utils.formatLocalProfilingPointTime(results.get(size - 1).getTimestamp())
-                                          });
-        } else {
-            return NO_RESULTS_STRING;
+                return (size == 1)
+                       ? MessageFormat.format(ONE_HIT_STRING,
+                                              new Object[] { Utils.formatLocalProfilingPointTime(results.get(size - 1).getTimestamp()) })
+                       : MessageFormat.format(N_HITS_STRING,
+                                              new Object[] {
+                                                  size, Utils.formatLocalProfilingPointTime(results.get(size - 1).getTimestamp())
+                                              });
+            } else {
+                return NO_RESULTS_STRING;
+            }
         }
     }
 
@@ -555,16 +566,20 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
             }
         }
 
-        results.add(new Result(currentTime, snapshotFilename));
+        synchronized(resultsSync) {
+            results.add(new Result(currentTime, snapshotFilename));
+        }
         getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
     }
 
     void reset() {
-        boolean change = hasResults();
-        results.clear();
+        synchronized(resultsSync) {
+            boolean change = hasResults();
+            results.clear();
 
-        if (change) {
-            getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            if (change) {
+                getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            }
         }
     }
 

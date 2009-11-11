@@ -93,23 +93,25 @@ public class GlobalProfilingPointsProcessor implements DataManagerListener {
     }
 
     void notifyProfilingStateChanged() {
-        boolean profilingInProgress = ProfilingPointsManager.getDefault().isProfilingInProgress();
-        boolean sessionInProgress = ProfilingPointsManager.getDefault().isProfilingSessionInProgress();
+        synchronized (this) {
+            boolean profilingInProgress = ProfilingPointsManager.getDefault().isProfilingInProgress();
+            boolean sessionInProgress = ProfilingPointsManager.getDefault().isProfilingSessionInProgress();
 
-        if (sessionInProgress && !profilingInProgress) { // transition between states
+            if (sessionInProgress && !profilingInProgress) { // transition between states
 
-            if (isRunning) {
-                stop(); // modify profiling
+                if (isRunning) {
+                    stop(); // modify profiling
+                }
+
+                init(); // TODO: unnecessarily called when finishing profiling session
+            } else if (profilingInProgress) { // profiling in progress
+
+                if (!isRunning) {
+                    start();
+                }
+            } else { // profiling inactive
+                stop();
             }
-
-            init(); // TODO: unnecessarily called when finishing profiling session
-        } else if (profilingInProgress) { // profiling in progress
-
-            if (!isRunning) {
-                start();
-            }
-        } else { // profiling inactive
-            stop();
         }
     }
 
