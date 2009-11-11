@@ -145,7 +145,6 @@ public final class ProfilerModule extends ModuleInstall {
                                      // to run correctly - it needs to know the saved JVM executable file/version to run.
 
         MiscUtils.deleteHeapTempFiles();
-        Profiler.getDefault();
     }
 
     /**
