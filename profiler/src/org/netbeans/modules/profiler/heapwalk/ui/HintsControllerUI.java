@@ -214,14 +214,14 @@ public class HintsControllerUI extends JTitledPanel {
         JScrollPane contentsPanelScrollPane = new JScrollPane(contentsPanel,
                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        contentsPanelScrollPane.setBorder(BorderFactory.createMatteBorder(10, 5, 5, 5,
-                                        UIUtils.getProfilerResultsBackground()));
+        contentsPanelScrollPane.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 1, 0, 0, getTitleBorderColor()),
+                BorderFactory.createMatteBorder(10, 4, 5, 5, UIUtils.getProfilerResultsBackground())));
         contentsPanelScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
         contentsPanelScrollPane.getVerticalScrollBar().setUnitIncrement(10);
         contentsPanelScrollPane.getHorizontalScrollBar().setUnitIncrement(10);
 
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, getTitleBorderColor()));
         add(contentsPanelScrollPane, BorderLayout.CENTER);
 
         // UI tweaks
