@@ -125,7 +125,7 @@ public class HintsControllerUI extends JTitledPanel {
         // hintsTextContainer
         hintsTextContainer = new JPanel(new GridBagLayout());
         hintsTextContainer.setOpaque(false);
-        hintsTextContainer.setBorder(BorderFactory.createMatteBorder(5, 5, 0, 5,
+        hintsTextContainer.setBorder(BorderFactory.createMatteBorder(0, 0, 10, 0,
                                         UIUtils.getProfilerResultsBackground()));
 
         // text
@@ -136,7 +136,7 @@ public class HintsControllerUI extends JTitledPanel {
         constraints.gridwidth = 1;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(4, 5, 0, 5);
+        constraints.insets = new Insets(0, 5, 0, 5);
         hintsTextContainer.add(textLabel1, constraints);
         
         // Spinner
@@ -151,7 +151,7 @@ public class HintsControllerUI extends JTitledPanel {
         constraints.weighty = 1;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(4, 0, 0, 0);
+        constraints.insets = new Insets(0, 0, 0, 0);
         hintsTextContainer.add(spinner, constraints);
         
         // text
@@ -162,7 +162,7 @@ public class HintsControllerUI extends JTitledPanel {
         constraints.gridwidth = 1;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(4, 5, 0, 5);
+        constraints.insets = new Insets(0, 5, 0, 5);
         hintsTextContainer.add(textLabel2, constraints);
 
         // findButton
@@ -180,7 +180,7 @@ public class HintsControllerUI extends JTitledPanel {
         constraints.gridwidth = 1;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(4, 5, 0, 5);
+        constraints.insets = new Insets(0, 5, 0, 0);
         hintsTextContainer.add(findButton, constraints);
         
         // Filler panel
@@ -204,27 +204,25 @@ public class HintsControllerUI extends JTitledPanel {
             }
         };
         
-        JScrollPane dataAreaScrollPane = new JScrollPane(dataArea,
-                                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        dataAreaScrollPane.setBorder(BorderFactory.createMatteBorder(10, 5, 5, 5,
-                                        UIUtils.getProfilerResultsBackground()));
-        dataAreaScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
-        dataAreaScrollPane.getVerticalScrollBar().setUnitIncrement(10);
-        dataAreaScrollPane.getHorizontalScrollBar().setUnitIncrement(10);
-
-
-
         JPanel contentsPanel = new JPanel();
-        contentsPanel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, getTitleBorderColor()));
         contentsPanel.setLayout(new BorderLayout());
         contentsPanel.setOpaque(true);
         contentsPanel.setBackground(dataArea.getBackground());
         contentsPanel.add(hintsTextContainer, BorderLayout.NORTH);
-        contentsPanel.add(dataAreaScrollPane, BorderLayout.CENTER);
+        contentsPanel.add(dataArea, BorderLayout.CENTER);
+
+        JScrollPane contentsPanelScrollPane = new JScrollPane(contentsPanel,
+                                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        contentsPanelScrollPane.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 1, 0, 0, getTitleBorderColor()),
+                BorderFactory.createMatteBorder(10, 4, 5, 5, UIUtils.getProfilerResultsBackground())));
+        contentsPanelScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
+        contentsPanelScrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        contentsPanelScrollPane.getHorizontalScrollBar().setUnitIncrement(10);
 
         setLayout(new BorderLayout());
-        add(contentsPanel, BorderLayout.CENTER);
+        add(contentsPanelScrollPane, BorderLayout.CENTER);
 
         // UI tweaks
         setBackground(dataArea.getBackground());
