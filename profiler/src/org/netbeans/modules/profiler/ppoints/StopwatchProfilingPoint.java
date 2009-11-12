@@ -166,13 +166,15 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
 
             StringBuilder dataAreaTextBuilder = new StringBuilder();
 
-            if (results.size() == 0) {
-                dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
-            } else {
-                for (int i = 0; i < results.size(); i++) {
-                    dataAreaTextBuilder.append("&nbsp;&nbsp;");
-                    dataAreaTextBuilder.append(getDataResultItem(i));
-                    dataAreaTextBuilder.append("<br>"); // NOI18N
+            synchronized(resultsSync) {
+                if (results.size() == 0) {
+                    dataAreaTextBuilder.append("&nbsp;&nbsp;&lt;" + NO_HITS_STRING + "&gt;"); // NOI18N
+                } else {
+                    for (int i = 0; i < results.size(); i++) {
+                        dataAreaTextBuilder.append("&nbsp;&nbsp;");
+                        dataAreaTextBuilder.append(getDataResultItem(i));
+                        dataAreaTextBuilder.append("<br>"); // NOI18N
+                    }
                 }
             }
 
@@ -186,28 +188,30 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
         }
 
         private String getDataResultItem(int index) {
-            Result result = results.get(index);
+            synchronized(resultsSync) {
+                Result result = results.get(index);
 
-            // TODO: enable once thread name by id is available
-            //String threadName = Utils.getThreadName(result.getThreadID());
-            //String threadClassName = Utils.getThreadClassName(result.getThreadID());
-            //String threadInformation = (threadName == null ? "&lt;unknown thread&gt;" : (threadClassName == null ? threadName : threadName + " (" + threadClassName + ")"));
-            String hitTime = Utils.formatProfilingPointTimeHiRes(result.getTimestamp());
+                // TODO: enable once thread name by id is available
+                //String threadName = Utils.getThreadName(result.getThreadID());
+                //String threadClassName = Utils.getThreadClassName(result.getThreadID());
+                //String threadInformation = (threadName == null ? "&lt;unknown thread&gt;" : (threadClassName == null ? threadName : threadName + " (" + threadClassName + ")"));
+                String hitTime = Utils.formatProfilingPointTimeHiRes(result.getTimestamp());
 
-            if (!StopwatchProfilingPoint.this.usesEndLocation()) {
-                //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b> by " + threadInformation;
-                return MessageFormat.format(HIT_STRING, new Object[] { (index + 1), hitTime });
-            } else if (result.getEndTimestamp() == -1) {
-                //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration pending..., thread " + threadInformation;
-                return MessageFormat.format(HIT_DURATION_PENDING_STRING, new Object[] { (index + 1), hitTime });
-            } else {
-                //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration <b>" + Utils.getDurationInMicroSec(result.getTimestamp(),result.getEndTimestamp()) + " &micro;s</b>, thread " + threadInformation;
-                return MessageFormat.format(HIT_DURATION_KNOWN_STRING,
-                                            new Object[] {
-                                                (index + 1), hitTime,
-                                                Utils.getDurationInMicroSec(result.getTimestamp(),
-                                                                            result.getEndTimestamp() - result.getTimeAdjustment())
-                                            });
+                if (!StopwatchProfilingPoint.this.usesEndLocation()) {
+                    //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b> by " + threadInformation;
+                    return MessageFormat.format(HIT_STRING, new Object[] { (index + 1), hitTime });
+                } else if (result.getEndTimestamp() == -1) {
+                    //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration pending..., thread " + threadInformation;
+                    return MessageFormat.format(HIT_DURATION_PENDING_STRING, new Object[] { (index + 1), hitTime });
+                } else {
+                    //return "<b>" + (index + 1) + ".</b> hit at <b>" + hitTime + "</b>, duration <b>" + Utils.getDurationInMicroSec(result.getTimestamp(),result.getEndTimestamp()) + " &micro;s</b>, thread " + threadInformation;
+                    return MessageFormat.format(HIT_DURATION_KNOWN_STRING,
+                                                new Object[] {
+                                                    (index + 1), hitTime,
+                                                    Utils.getDurationInMicroSec(result.getTimestamp(),
+                                                                                result.getEndTimestamp() - result.getTimeAdjustment())
+                                                });
+                }
             }
         }
 
@@ -227,7 +231,9 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
         }
 
         private String getHeaderHitsCount() {
-            return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            synchronized(resultsSync) {
+                return MessageFormat.format(HEADER_HITS_STRING, new Object[] { results.size() });
+            }
         }
 
         private String getHeaderMeasureLocation() {
@@ -407,6 +413,7 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
     private Annotation endAnnotation;
     private Annotation startAnnotation;
     private List<Result> results = new ArrayList();
+    private final Object resultsSync = new Object();
     private WeakReference<Report> reportReference;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -419,7 +426,9 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public boolean hasResults() {
-        return results.size() > 0;
+        synchronized(resultsSync) {
+            return results.size() > 0;
+        }
     }
 
     public void hideResults() {
@@ -459,19 +468,21 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
     }
 
     protected String getResultsText() {
-        if (hasResults()) {
-            return (results.size() == 1)
-                   ? MessageFormat.format(ONE_HIT_STRING,
-                                          new Object[] {
-                                              Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
-                                          })
-                   : MessageFormat.format(N_HITS_STRING,
-                                          new Object[] {
-                                              results.size(),
-                                              Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
-                                          });
-        } else {
-            return NO_RESULTS_STRING;
+        synchronized(resultsSync) {
+            if (hasResults()) {
+                return (results.size() == 1)
+                       ? MessageFormat.format(ONE_HIT_STRING,
+                                              new Object[] {
+                                                  Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
+                                              })
+                       : MessageFormat.format(N_HITS_STRING,
+                                              new Object[] {
+                                                  results.size(),
+                                                  Utils.formatProfilingPointTime(results.get(results.size() - 1).getTimestamp())
+                                              });
+            } else {
+                return NO_RESULTS_STRING;
+            }
         }
     }
 
@@ -485,11 +496,12 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
 
     protected void timeAdjust(final int threadId, final long timeDiff0, final long timeDiff1) {
         if (usesEndLocation()) { // we have start and stop StopwatchProfilingPoint
-
-            for (Result result : results) {
-                if ((result.getEndTimestamp() == -1) && (result.getThreadID() == threadId)) {
-                    //System.out.println("Time adjust thread "+threadId+" time "+Long.toHexString(timeDiff1)+ " diff "+Long.toHexString(timeDiff0));
-                    result.timeAdjust(timeDiff0);
+            synchronized(resultsSync) {
+                for (Result result : results) {
+                    if ((result.getEndTimestamp() == -1) && (result.getThreadID() == threadId)) {
+                        //System.out.println("Time adjust thread "+threadId+" time "+Long.toHexString(timeDiff1)+ " diff "+Long.toHexString(timeDiff0));
+                        result.timeAdjust(timeDiff0);
+                    }
                 }
             }
         }
@@ -516,33 +528,37 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
     }
 
     void hit(RuntimeProfilingPoint.HitEvent hitEvent, int index) {
-        if (!usesEndLocation() || (index == 0)) {
-            // TODO: should endpoint hit before startpoint hit be processed somehow?
-            results.add(new Result(hitEvent.getTimestamp(), hitEvent.getThreadId()));
+        synchronized(resultsSync) {
+            if (!usesEndLocation() || (index == 0)) {
+                // TODO: should endpoint hit before startpoint hit be processed somehow?
+                results.add(new Result(hitEvent.getTimestamp(), hitEvent.getThreadId()));
 
-            //System.out.println("Time start  thread "+hitEvent.getThreadId()+" time "+Long.toHexString(hitEvent.getTimestamp()));
-        } else {
-            for (Result result : results) {
-                if ((result.getEndTimestamp() == -1) && (result.getThreadID() == hitEvent.getThreadId())) {
-                    result.setEndTimestamp(hitEvent.getTimestamp());
+                //System.out.println("Time start  thread "+hitEvent.getThreadId()+" time "+Long.toHexString(hitEvent.getTimestamp()));
+            } else {
+                for (Result result : results) {
+                    if ((result.getEndTimestamp() == -1) && (result.getThreadID() == hitEvent.getThreadId())) {
+                        result.setEndTimestamp(hitEvent.getTimestamp());
 
-                    //System.out.println("Time end    thread "+hitEvent.getThreadId()+" time "+Long.toHexString(hitEvent.getTimestamp()));
-                    break;
+                        //System.out.println("Time end    thread "+hitEvent.getThreadId()+" time "+Long.toHexString(hitEvent.getTimestamp()));
+                        break;
+                    }
                 }
-            }
 
-            // TODO: endpoind hit without startpoint hit, what to do?
+                // TODO: endpoind hit without startpoint hit, what to do?
+            }
         }
 
         getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
     }
 
     void reset() {
-        boolean change = results.size() > 0;
-        results.clear();
+        synchronized(resultsSync) {
+            boolean change = results.size() > 0;
+            results.clear();
 
-        if (change) {
-            getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            if (change) {
+                getChangeSupport().firePropertyChange(PROPERTY_RESULTS, false, true);
+            }
         }
     }
 
