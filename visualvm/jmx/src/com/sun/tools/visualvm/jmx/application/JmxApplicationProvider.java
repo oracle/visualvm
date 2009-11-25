@@ -291,7 +291,7 @@ public class JmxApplicationProvider {
         // NOTE: this is not absolutely failsafe, if resolving the JMX application
         // took a long time and its host has been added by the user/plugin, it may
         // be removed by this call. Hopefully just a hypothetical case...
-        if (host != null && !hosts.contains(host))
+        if (host != null && !hosts.contains(host) && host.getOwner() != null)
             host.getOwner().getRepository().removeDataSource(host);
     }
 
