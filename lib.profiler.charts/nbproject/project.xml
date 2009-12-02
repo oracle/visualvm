@@ -48,6 +48,7 @@ made subject to such option by the copyright holder.
             <module-dependencies/>
             <friend-packages>
                 <friend>com.sun.tools.visualvm.charts</friend>
+                <friend>com.sun.tools.visualvm.modules.tracer</friend>
                 <friend>org.netbeans.lib.profiler.ui</friend>
                 <package>org.netbeans.lib.profiler.charts</package>
                 <package>org.netbeans.lib.profiler.charts.axis</package>

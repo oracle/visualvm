@@ -81,6 +81,7 @@ public final class ProfilerModule extends ModuleInstall {
      * @return <code>true</code> if it is ok to exit the IDE
      */
     public boolean closing() {
+        if (!NetBeansProfiler.isInitialized()) return true;
         final int state = Profiler.getDefault().getProfilingState();
         final int mode = Profiler.getDefault().getProfilingMode();
 
@@ -145,7 +146,6 @@ public final class ProfilerModule extends ModuleInstall {
                                      // to run correctly - it needs to know the saved JVM executable file/version to run.
 
         MiscUtils.deleteHeapTempFiles();
-        Profiler.getDefault();
     }
 
     /**

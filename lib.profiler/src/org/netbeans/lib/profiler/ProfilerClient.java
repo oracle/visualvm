@@ -105,7 +105,7 @@ public class ProfilerClient implements CommonConstants {
                     }
 
                     if (execInSeparateThreadCmd == null) {
-                        return; // It was a signal to this thread to terminate (currently not used, though)
+                        return; // It was a signal to this thread to terminate
                     }
 
                     Command cmd = execInSeparateThreadCmd;
@@ -193,29 +193,34 @@ public class ProfilerClient implements CommonConstants {
                     return;
                 }
             }
+            
+            startSeparateCmdExecThread();
+            try {
+                while (targetVMAlive) {
+                    try {
+                        Object o = wireIO.receiveCommandOrResponse();
 
-            while (targetVMAlive) {
-                try {
-                    Object o = wireIO.receiveCommandOrResponse();
-
-                    //System.out.println(">>> Got response or command from server " + o);
-                    if (o == null) {
-                        closeConnection();
-                    } else {
-                        if (o instanceof Command) {
-                            handleServerCommand((Command) o);
+                        //System.out.println(">>> Got response or command from server " + o);
+                        if (o == null) {
+                            closeConnection();
                         } else {
-                            setLastResponse((Response) o);
+                            if (o instanceof Command) {
+                                handleServerCommand((Command) o);
+                            } else {
+                                setLastResponse((Response) o);
+                            }
+                        }
+                    } catch (IOException ex) {
+                        if (targetVMAlive && !terminateOrDetachCommandIssued) { // It wasn't a normal connection shutdown
+                            MiscUtils.printErrorMessage("exception while trying to get response from the target JVM:\n" + ex); // NOI18N
+                            closeConnection();
+
+                            //            serverCommandHandler.handleServerCommand(null); // does not seem to do anything
                         }
                     }
-                } catch (IOException ex) {
-                    if (targetVMAlive && !terminateOrDetachCommandIssued) { // It wasn't a normal connection shutdown
-                        MiscUtils.printErrorMessage("exception while trying to get response from the target JVM:\n" + ex); // NOI18N
-                        closeConnection();
-
-                        //            serverCommandHandler.handleServerCommand(null); // does not seem to do anything
-                    }
                 }
+            } finally {
+                stopSeparateCmdExecThread();
             }
         }
 
@@ -398,9 +403,6 @@ public class ProfilerClient implements CommonConstants {
         appStatusHandler = ash;
         serverCommandHandler = sch;
         instrumentor = new Instrumentor(status, settings);
-        separateCmdExecThread = new SeparateCmdExecutionThread();
-        separateCmdExecThread.setDaemon(true);
-        separateCmdExecThread.start();
         EventBufferProcessor.initialize(this);
         EventBufferResultsProvider.getDefault().addDispatcher(ProfilingResultsDispatcher.getDefault());
     }
@@ -1702,6 +1704,20 @@ public class ProfilerClient implements CommonConstants {
                 MiscUtils.internalError("ProfilerClient.executeInSeparateThread()"); // NOI18N
             }
         }
+    }
+
+    private void startSeparateCmdExecThread() {
+        assert separateCmdExecThread == null;
+        SeparateCmdExecutionThread t = new SeparateCmdExecutionThread();
+        t.setDaemon(true);
+        t.start();
+        separateCmdExecThread = t;
+    }
+    
+    private void stopSeparateCmdExecThread() {
+        assert separateCmdExecThread != null;
+        executeInSeparateThread(null); // stop thread
+        separateCmdExecThread = null;
     }
 
     private boolean handleFakeClassLoad(RootClassLoadedCommand cmd) {
