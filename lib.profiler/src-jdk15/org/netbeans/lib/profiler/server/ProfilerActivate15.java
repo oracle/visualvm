@@ -128,7 +128,8 @@ public class ProfilerActivate15 {
             System.err.println("*** Profiler Engine: invalid port number specified to premain(): " + portStr); // NOI18N
             System.exit(-1);
         }
-
+        
+        ProfilerServer.loadNativeLibrary(fullJFluidPath, false);
         ProfilerServer.activate(fullJFluidPath, portNo, activateCode, timeOut);
     }
 }
