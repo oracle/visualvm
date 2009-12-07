@@ -59,6 +59,10 @@
 #define JF_SERVER_JAR_2  "/jfluid-server-15.jar"
 #endif
 
+// these constatns must match those defined in ProfilerServer
+#define ATTACH_DYNAMIC 0
+#define ATTACH_DIRECT 1
+
 static char *_jfluid_dir;
 static int _port_no;
 static int _time_out = 0;
@@ -149,5 +153,5 @@ jint setupAndCallProfilerRuntimeActivate(JNIEnv *env, jint activateCode) {
 
 /** If the VM was launched on its own, we arrange that this is called right after the VM is initialized */
 void JNICALL vm_init_hook(jvmtiEnv *jvmti_env, JNIEnv* jni_env, jthread thread) {
-    setupAndCallProfilerRuntimeActivate(jni_env, 1);
+    setupAndCallProfilerRuntimeActivate(jni_env, ATTACH_DIRECT);
 }
