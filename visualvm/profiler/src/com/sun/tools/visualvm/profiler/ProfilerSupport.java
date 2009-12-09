@@ -37,6 +37,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.host.Host;
 import java.io.File;
 import java.util.Properties;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
@@ -287,7 +288,7 @@ final class ProfilerSupport {
     
     
     private ProfilerSupport() {
-        isInitialized = NetBeansProfiler.isInitialized() && checkCurrentJDKCalibration();
+        isInitialized = Profiler.getDefault() != null && checkCurrentJDKCalibration();
         
         if (isInitialized) {
         
