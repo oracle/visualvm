@@ -37,11 +37,14 @@ import org.openide.windows.WindowManager;
  * @author Jiri Sedlacek
  */
 public class ProxySettingsHack {
+
+    private static Logger logger;
     
     public static void hackProxySettings() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {
-                Logger logger = Logger.getLogger(OptionsDisplayer.class.getName());
+                // Bugfix #344, logger must be referenced to prevent it from being GCed
+                logger = Logger.getLogger(OptionsDisplayer.class.getName());
                 logger.addHandler(new Handler() {
                     public void flush() {}
                     public void close() throws SecurityException {}
