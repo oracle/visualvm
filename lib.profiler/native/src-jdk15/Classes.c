@@ -262,7 +262,7 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_doRe
     jvmtiClassDefinition* classDefs;
   
     if (!nativeMethodBindDisabled) {
-        // First, disable the NativeMethodBind event, assume that Thread.sleep and Object.wwait have already been intercepted
+        // First, disable the NativeMethodBind event, assume that Thread.sleep and Object.wait have already been intercepted
         res = (*_jvmti)->SetEventNotificationMode(_jvmti, JVMTI_DISABLE, JVMTI_EVENT_NATIVE_METHOD_BIND, NULL);
         if (res != JVMTI_ERROR_NONE) {
             fprintf (stderr, "Profiler Agent: Error while turning NativeMethodBind off: %d\n",res);
