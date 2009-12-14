@@ -49,7 +49,7 @@ import org.openide.util.actions.SystemAction;
  */
 class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
     
-    private static final String NB_PROFILER_SNAPSHOTS_STORAGE = "config" + File.separator + "Services" + File.separator + "org-netbeans-modules-profiler";
+    private static final String NB_PROFILER_SNAPSHOTS_STORAGE = "config" + File.separator + "NBProfiler" + File.separator + "Config" + File.separator + "Settings";
     private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotAction.class.getName());
     
     private final TakeSnapshotAction originalAction = SystemAction.get(TakeSnapshotAction.class);
