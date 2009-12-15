@@ -76,8 +76,8 @@ readClusters() {
 
 clusters=`(cat "$BASEDIR/etc/$APPNAME".clusters; echo) | readClusters | tr '\012' ':'`
 
-if [ ! -z "$extraclusters" ] ; then
-    clusters="$clusters:$extraclusters"
+if [ ! -z "$extra_clusters" ] ; then
+    clusters="$clusters:$extra_clusters"
 fi
 
 nbexec=`echo "$BASEDIR"/platform*/lib/nbexec`
