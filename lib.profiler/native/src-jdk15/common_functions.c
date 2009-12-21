@@ -153,7 +153,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     }    
 
     /* If it looks like the VM was started not from the tool, but on its own, e.g. like
-    java -agentpath:/blahblah/profilerinterface:/foobar/profiler-ea-libs,5140
+    java -agentpath:/blahblah/profilerinterface=/foobar/profiler-ea-libs,5140
     do some sanity checks for options and then eable the VM init event, so that we can start
     our Java agent when the VM is initialized */
     if (options != NULL && strlen(options) > 0) { /* The spec says no options means options == "", but in reality it's NULL */
