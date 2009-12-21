@@ -353,7 +353,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         eDD.dumpData(result);
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</td>"); //NOI18N
-            result.append("<td align=\"right\">"+percentFormat.format(flatProfileContainer.getPercentAtRow(i))+((flatProfileContainer.getTimeInMcs0AtRow(i)%10==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%100==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%1000==0)?("    "):("  ")):(" ")):(""))+"</td>"); //NOI18N
+            result.append("<td align=\"right\">"+percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)+((flatProfileContainer.getTimeInMcs0AtRow(i)%10==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%100==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%1000==0)?("    "):("  ")):(" ")):(""))+"</td>"); //NOI18N
             result.append("<td align=right>"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>"); //NOI18N
             result.append("<td align=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>"); //NOI18N
             eDD.dumpData(result);
@@ -373,7 +373,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline); //NOI18N
-            result.append("    <TableColumn><![CDATA["+percentFormat.format(flatProfileContainer.getPercentAtRow(i))+"]]></TableColumn>"+newline); //NOI18N
+            result.append("    <TableColumn><![CDATA["+percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)+"]]></TableColumn>"+newline); //NOI18N
             result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline); //NOI18N
             result.append("    <TableColumn><![CDATA["+flatProfileContainer.getNInvocationsAtRow(i)+"]]></TableColumn>"+newline+"  </TableRow>"+newline); //NOI18N
             eDD.dumpData(result);
