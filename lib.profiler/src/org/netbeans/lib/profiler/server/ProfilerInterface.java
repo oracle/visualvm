@@ -66,9 +66,6 @@ import java.util.WeakHashMap;
  */
 public class ProfilerInterface implements CommonConstants {
 
-    private static final boolean INSTRUMENT_JFLUID_CLASSES =
-            Boolean.getBoolean("org.netbeans.lib.profiler.server.instrumentJFluidClasses"); // NOI18N
-
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class HFIRIThread extends Thread {
@@ -145,6 +142,7 @@ public class ProfilerInterface implements CommonConstants {
                     Class.forName("java.lang.reflect.InvocationTargetException"); // NOI18N
                     Class.forName("java.lang.InterruptedException");    // NOI18N
                     Class.forName("java.util.zip.Deflater");    // NOI18N compressed remote profiling
+                    Class.forName("java.lang.ClassFormatError"); // NOI18N class caching
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace(System.err);
                 }
@@ -257,6 +255,7 @@ public class ProfilerInterface implements CommonConstants {
 
     // TODO [release]: change value to FALSE to remove the print code below entirely by compiler
     private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.server.ProfilerInterface.classLoadHook") != null; // NOI18N
+    private static final boolean INSTRUMENT_JFLUID_CLASSES = Boolean.getBoolean("org.netbeans.lib.profiler.server.instrumentJFluidClasses"); // NOI18N
 
     // The lock used to serialize requests from server to client. May be used outside this class.
     public static TransactionalSupport serialClientOperationsLock = new TransactionalSupport();
@@ -696,24 +695,30 @@ public class ProfilerInterface implements CommonConstants {
     }
 
     private static void getLoadedClasses() {
-        Class[] nonSystemClasses;
-        int nonSystemIndex = 0;
+        if (loadedClassesArray == null) {
+            int nonSystemIndex = 0;
+            int MAX_CLASSES = 1000;
+            Class[] nonSystemClasses = new Class[MAX_CLASSES+1]; // classes loaded by classloaders other that bootstrap and system
 
-        loadedClassesArray = Classes.getAllLoadedClasses();
-        nonSystemClasses = new Class[loadedClassesArray.length]; // classes loaded by classloaders other that bootstrap and system
-        loadedClassesLoaders = new int[loadedClassesArray.length];
+            loadedClassesArray = Classes.getAllLoadedClasses();
+            loadedClassesLoaders = new int[loadedClassesArray.length];
+           
+            for (int i = 0; i < loadedClassesArray.length; i++) {
+                Class clazz = loadedClassesArray[i];
+                loadedClassesLoaders[i] = ClassLoaderManager.registerLoader(clazz);
 
-        for (int i = 0; i < loadedClassesArray.length; i++) {
-            Class clazz = loadedClassesArray[i];
-            loadedClassesLoaders[i] = ClassLoaderManager.registerLoader(clazz);
-
-            if (loadedClassesLoaders[i] > 0) { // bootstrap classloader has index -1 and system classloader has index 0
-                nonSystemClasses[nonSystemIndex++] = clazz;
+                if (loadedClassesLoaders[i] > 0) { // bootstrap classloader has index -1 and system classloader has index 0
+                    nonSystemClasses[nonSystemIndex++] = clazz;
+                }
+                if (nonSystemIndex == MAX_CLASSES) {
+                    cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+                    nonSystemIndex = 0;
+                }
             }
-        }
 
-        if (nonSystemIndex > 0) {
-            Classes.cacheLoadedClasses(nonSystemClasses, nonSystemIndex);
+            if (nonSystemIndex > 0) {
+                cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+            }
         }
     }
 
@@ -871,9 +876,19 @@ public class ProfilerInterface implements CommonConstants {
                         // Get cached class file bytes if they are available, i.e. if the class is loaded by a custom classloader
                         // If remote profiling is used, get these class file bytes from system classpath
                         // classLoaderId = 0 means that it is a system or bootstrap classloader
-                        byte[] classFileBytes = (classLoaderId > 0) ? Classes.getCachedClassFileBytes(clazz)
-                                                                    : (status.remoteProfiling
-                                                                       ? ClassBytesLoader.getClassFileBytes(className) : null);
+                        byte[] classFileBytes = null;
+                        if (classLoaderId > 0) {
+                            classFileBytes = Classes.getCachedClassFileBytes(clazz);
+                            if (classFileBytes == null) {
+                                if (DEBUG) {
+                                    System.err.println("Cannot get classbytes for "+clazz.getName()+" loader "+classLoaderId);
+                                }
+                                cacheLoadedClass(clazz);
+                                classFileBytes = getCachedClassFileBytes(clazz);
+                            }
+                        } else if (status.remoteProfiling) {
+                            classFileBytes = ClassBytesLoader.getClassFileBytes(className);
+                        }
 
                         // send request to tool to instrument the bytecode
                         ClassLoadedCommand cmd = new ClassLoadedCommand(className,
@@ -1068,7 +1083,7 @@ public class ProfilerInterface implements CommonConstants {
                         if (instrClassLoaders[i] == 0) {
                             b[k] = ClassBytesLoader.getClassFileBytes(instrClassNames[i]);
                         } else {
-                            b[k] = Classes.getCachedClassFileBytes(clazzes[k]);
+                            b[k] = getCachedClassFileBytes(clazzes[k]);
                         }
                     }
 
@@ -1216,6 +1231,30 @@ public class ProfilerInterface implements CommonConstants {
         System.err.println("*** probably it has been unloaded recently"); // NOI18N
     }
 
+    private static void reportCacheMiss(final byte[] bytes, final Class clazz) {
+        if (bytes == null) {
+            System.err.println(ENGINE_WARNING + "Failed to lookup cached class " + clazz.getName()); // NOI18N
+        }
+    }
+    
+    private static byte[] getCachedClassFileBytes(Class clazz) {
+        byte[] bytes = Classes.getCachedClassFileBytes(clazz);
+        reportCacheMiss(bytes, clazz);
+        return bytes;
+    }
+
+    private static void cacheLoadedClass(Class clazz) {
+        Class[] classes = new Class[2];
+        classes[0] = clazz;
+        cacheLoadedClasses(classes,1);
+    }
+    
+    private static void cacheLoadedClasses(Class[] nonSystemClasses, int nonSystemIndex) {
+        if (DEBUG) System.out.println("Caching "+nonSystemIndex+" classes");
+        nonSystemClasses[nonSystemIndex++] = ProfilerInterface.InitiateInstThread.class;
+        Classes.cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+    }
+
     private static void sendRootClassLoadedCommand(boolean doGetLoadedClasses) {
         if (doGetLoadedClasses) {
             getLoadedClasses(); // Otherwise we know loadedClassesArray has already been initialized
@@ -1239,7 +1278,7 @@ public class ProfilerInterface implements CommonConstants {
             loaders[idx] = loadedClassesLoaders[i];
 
             if (loaders[idx] > 0) {
-                cachedClassFileBytes[idx] = Classes.getCachedClassFileBytes(loadedClassesArray[i]);
+                cachedClassFileBytes[idx] = getCachedClassFileBytes(loadedClassesArray[i]);
             } else if (status.remoteProfiling) { // When we profile remotely, we need to send all available classes to the tool
                 cachedClassFileBytes[idx] = ClassBytesLoader.getClassFileBytes(loadedClassesArray[i].getName());
             }
