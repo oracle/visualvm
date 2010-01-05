@@ -34,8 +34,11 @@ import java.awt.Graphics2D;
 import java.awt.ImageCapabilities;
 import java.awt.Insets;
 import java.awt.image.VolatileImage;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JComponent.AccessibleJComponent;
 import javax.swing.border.BevelBorder;
 
 
@@ -311,6 +314,20 @@ public class LevelIndicator extends JComponent {
         repaint();
     }
 
+
+    /**
+     * Gets a dummy AccessibleContext associated with this LevelIndicator.
+     *
+     * @return a dummy AccessibleContext associated with this LevelIndicator
+     */
+    public AccessibleContext getAccessibleContext() {
+        if (accessibleContext == null) {
+            accessibleContext = new AccessibleLevelIndicator();
+        }
+        return accessibleContext;
+    }
+
+
     private Color getColorAt(VolatileImage img, int x, int y) {
         if ((x <= 0) || (y < 0) || (x > img.getWidth()) || (y > img.getHeight())) {
             return null;
@@ -375,5 +392,22 @@ public class LevelIndicator extends JComponent {
 
         gr.setPaint(peakColor);
         gr.fillRect(left, 0, right - left + 1, canvasDimension.height);
+    }
+
+
+    /**
+     * Dummy AccessibleContext implementation for the LevelIndicator.
+     */
+    private class AccessibleLevelIndicator extends AccessibleJComponent {
+
+        /**
+         * Get the role of this object.
+         *
+         * @return an instance of AccessibleRole describing the role of the
+         * object
+         */
+        public AccessibleRole getAccessibleRole() {
+            return AccessibleRole.SWING_COMPONENT;
+        }
     }
 }
