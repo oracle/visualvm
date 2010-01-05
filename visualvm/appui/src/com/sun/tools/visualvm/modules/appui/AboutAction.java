@@ -51,7 +51,7 @@ import org.openide.windows.WindowManager;
 public final class AboutAction extends AbstractAction {
     private final static Logger LOGGER = Logger.getLogger(AboutAction.class.getName());
     
-    private String versionString = "Dev"; // Use "Dev" for development builds   // NOI18N
+    private String versionString = "1.2.2"; // Use "Dev" for development builds   // NOI18N
 
 
     public AboutAction() {
