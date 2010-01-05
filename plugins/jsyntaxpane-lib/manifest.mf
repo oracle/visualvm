@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-AutoUpdate-Show-In-Client: false
-OpenIDE-Module: jsyntaxpane.lib/1
-OpenIDE-Module-Install: jsyntaxpane/lib/Installer.class
-OpenIDE-Module-Localizing-Bundle: jsyntaxpane/lib/Bundle.properties
-OpenIDE-Module-Provides: com.sun.tools.visualvm.editor.SyntaxSupport
-OpenIDE-Module-Specification-Version: 0.9.4.2
-

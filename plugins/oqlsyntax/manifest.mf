@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.modules.oqlsyntax/0
-OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/oqlsyntax/layer.xml
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/oqlsyntax/Bundle.properties
-OpenIDE-Module-Requires: com.sun.tools.visualvm.editor.SyntaxSupport
-OpenIDE-Module-Specification-Version: 1.0
-

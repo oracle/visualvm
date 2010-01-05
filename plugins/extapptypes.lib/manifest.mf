@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.modules.customtype.lib
-OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/customtype/lib/layer.xml
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/customtype/lib/Bundle.properties
-OpenIDE-Module-Requires: com.sun.tools.visualvm.modules.customtype
-OpenIDE-Module-Specification-Version: 1.0
-

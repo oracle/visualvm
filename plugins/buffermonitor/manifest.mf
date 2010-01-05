@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.modules.buffermonitor/0
-OpenIDE-Module-Install: com/sun/tools/visualvm/modules/buffermonitor/Installer.class
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/buffermonitor/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.4
-

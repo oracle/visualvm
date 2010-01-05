@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: org.nb.hostcompare
-OpenIDE-Module-Install: org/nb/hostcompare/Installer.class
-OpenIDE-Module-Localizing-Bundle: org/nb/hostcompare/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-

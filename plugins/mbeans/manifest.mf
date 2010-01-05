@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.modules.mbeans
-OpenIDE-Module-Install: com/sun/tools/visualvm/modules/mbeans/Install.class
-OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/mbeans/layer.xml
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/mbeans/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.3
-
