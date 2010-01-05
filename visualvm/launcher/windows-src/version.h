@@ -29,7 +29,7 @@
 #define FVER 1,2,2,0
 #define BUILD_ID "05012010"
 #define INTERNAL_NAME "visualvm"
-#define COPYRIGHT "\xA9 2007-2009 Sun Microsystems, Inc."
+#define COPYRIGHT "\xA9 2007-2010 Sun Microsystems, Inc."
 #define FNAME "visualvm.exe"
 #define NAME "VisualVM"
 
