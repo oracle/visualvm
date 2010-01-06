@@ -133,8 +133,16 @@ class MemoryView extends JPanel {
         snapshotButton.setEnabled(false);
     }
 
+    boolean isPaused() {
+        return pauseButton.isSelected() && !forceRefresh;
+    }
+
+    boolean isEmpty() {
+        return resTableModel.getRowCount() == 0;
+    }
+
     void refresh(HeapHistogram histogram) {
-        if (histogram == null || (pauseButton.isSelected() && !forceRefresh)) return;
+        if (histogram == null || isPaused()) return;
         forceRefresh = false;
 
         if (deltaButton.isSelected()) {
