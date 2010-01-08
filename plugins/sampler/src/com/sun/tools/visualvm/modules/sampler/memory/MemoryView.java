@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -100,7 +100,7 @@ class MemoryView extends JPanel {
 
     private final AbstractSamplerSupport.Refresher refresher;
     private boolean forceRefresh = false;
-    
+
     private final MemoryMXBean memoryBean;
     private final MemorySamplerSupport.HeapDumper heapDumper;
     private final MemorySamplerSupport.SnapshotDumper snapshotDumper;
@@ -133,8 +133,16 @@ class MemoryView extends JPanel {
         snapshotButton.setEnabled(false);
     }
 
+    boolean isPaused() {
+        return pauseButton.isSelected() && !forceRefresh;
+    }
+
+    boolean isEmpty() {
+        return resTableModel.getRowCount() == 0;
+    }
+
     void refresh(HeapHistogram histogram) {
-        if (histogram == null || (pauseButton.isSelected() && !forceRefresh)) return;
+        if (histogram == null || isPaused()) return;
         forceRefresh = false;
 
         if (deltaButton.isSelected()) {
@@ -162,7 +170,7 @@ class MemoryView extends JPanel {
 
             diffBarCellRenderer.setMaximum(maxAbsDiffBytes);
             diffBarCellRenderer.setMinimum(-maxAbsDiffBytes);
-            
+
         } else {
             if (baseClasses != null) {
                 baseClasses = null;
@@ -726,7 +734,7 @@ class MemoryView extends JPanel {
 
         resTablePanel = new JExtendedTablePanel(resTable);
         resultsPanel.add(resTablePanel, BorderLayout.CENTER);
-        
+
         resultsPanel.setBorder(resTablePanel.getBorder());
         resTablePanel.setBorder(BorderFactory.createEmptyBorder());
 
@@ -863,7 +871,7 @@ class MemoryView extends JPanel {
     private int[] columnWidths;
     private int minNamesColumnWidth; // minimal width of classnames columns
 
-    
+
     private static class ComboRenderer implements ListCellRenderer {
 
         private ListCellRenderer renderer;
