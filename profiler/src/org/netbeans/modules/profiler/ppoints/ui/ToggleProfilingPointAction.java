@@ -41,7 +41,6 @@
 package org.netbeans.modules.profiler.ppoints.ui;
 
 import org.netbeans.api.project.Project;
-import org.netbeans.editor.Registry;
 import org.netbeans.lib.profiler.ui.components.ThinBevelBorder;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.profiler.NetBeansProfiler;
@@ -85,6 +84,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import org.netbeans.api.editor.EditorRegistry;
 import org.openide.util.Utilities;
 
 
@@ -338,7 +338,7 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
         }
 
         // Get most active editor
-        JTextComponent editor = Registry.getMostActiveComponent();
+        JTextComponent editor = EditorRegistry.focusedComponent();
 
         if (editor == null) {
             return false;
