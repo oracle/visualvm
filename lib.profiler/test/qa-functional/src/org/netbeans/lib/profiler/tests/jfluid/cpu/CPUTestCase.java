@@ -446,7 +446,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());
             waitForStatus(STATUS_RESULTS_AVAILABLE | STATUS_APP_FINISHED);
-            assertTrue("ResultsAvailable was not called - issue 69084", isStatus(STATUS_RESULTS_AVAILABLE));
+            assertTrue("ResultsAvailable was not called - issue 69084", (isStatus(STATUS_RESULTS_AVAILABLE) || isStatus(STATUS_LIVERESULTS_AVAILABLE)));
 
             HashMap methods = new HashMap(128);
             long alltime = 0;
