@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.jvmstat.application;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.properties.PropertiesSupport;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.Host;
