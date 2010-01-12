@@ -36,7 +36,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class AddJstatdConnectionAction extends SingleDataSourceAction {
+class AddJstatdConnectionAction extends SingleDataSourceAction<Host> {
 
     private static AddJstatdConnectionAction instance;
 
@@ -46,12 +46,12 @@ class AddJstatdConnectionAction extends SingleDataSourceAction {
     }
 
 
-    protected void actionPerformed(DataSource dataSource, ActionEvent actionEvent) {
-        PropertiesSupport.sharedInstance().openProperties(dataSource,
+    protected void actionPerformed(Host host, ActionEvent actionEvent) {
+        PropertiesSupport.sharedInstance().openProperties(host,
                 HostPropertiesProvider.CATEGORY_JSTATD_CONNECTION);
     }
 
-    protected boolean isEnabled(DataSource dataSource) {
+    protected boolean isEnabled(Host host) {
         return true;
     }
 

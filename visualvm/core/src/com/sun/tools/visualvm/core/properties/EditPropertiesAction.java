@@ -34,7 +34,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class EditPropertiesAction extends SingleDataSourceAction {
+class EditPropertiesAction extends SingleDataSourceAction<DataSource> {
 
     private static EditPropertiesAction instance;
 
