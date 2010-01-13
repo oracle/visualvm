@@ -145,6 +145,9 @@ public class Scheduler implements PropertyChangeListener {
                                 Set<WeakReference<DefaultScheduledTask>> myReceivers = Collections.EMPTY_SET;
 
                                 synchronized (interval2recevier) {
+                                    if (!interval2recevier.containsKey(interval)) {
+                                        interval2recevier.put(interval, Collections.EMPTY_SET); // sanitize the dead interval
+                                    }
                                     myReceivers = new HashSet<WeakReference<DefaultScheduledTask>>(interval2recevier.get(interval));
                                     if (LOGGER.isLoggable(Level.FINEST)) {
                                         LOGGER.finest(((myReceivers != null) ? myReceivers.size() : "0") + " scheduled tasks for interval " + interval);    // NOI18N
