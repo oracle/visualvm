@@ -24,18 +24,8 @@
  */
 package com.sun.tools.visualvm.core.scheduler;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -44,16 +34,13 @@ import java.util.logging.Logger;
  * There is supposed to be only one instance of this class accesible vie <code>getSharedInstance()</code>
  * @author Jaroslav Bachorik
  */
-public class Scheduler implements PropertyChangeListener {
+public class Scheduler {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final Logger LOGGER = Logger.getLogger(Scheduler.class.getName());
     private static final Scheduler INSTANCE = new Scheduler();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-    private final Map<Quantum, Set<WeakReference<DefaultScheduledTask>>> interval2recevier = new HashMap<Quantum, Set<WeakReference<DefaultScheduledTask>>>();
-    private final ScheduledExecutorService schedulerService = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
-    private final ExecutorService intermediateTaskService = Executors.newCachedThreadPool();
-    private final ExecutorService dispatcher = Executors.newCachedThreadPool();
+    private final ExecutorService immediateTaskService = Executors.newCachedThreadPool();
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     private Scheduler() {
@@ -91,7 +78,7 @@ public class Scheduler implements PropertyChangeListener {
     public final ScheduledTask schedule(final SchedulerTask task, final Quantum interval, boolean immediate) {
         boolean suspended = interval.equals(Quantum.SUSPENDED);
         if (immediate && !suspended) {
-            intermediateTaskService.submit(new Runnable() {
+            immediateTaskService.submit(new Runnable() {
                 public void run() {
                     task.onSchedule(System.currentTimeMillis());
                 }
@@ -99,7 +86,6 @@ public class Scheduler implements PropertyChangeListener {
         }
 
         DefaultScheduledTask scheduled = new DefaultScheduledTask(interval, task);
-        add(scheduled, interval);
 
         return scheduled;
     }
@@ -110,173 +96,6 @@ public class Scheduler implements PropertyChangeListener {
      */
     public final void unschedule(final ScheduledTask task) {
         if (task == null) return;
-        remove((DefaultScheduledTask) task, task.getInterval());
         task.suspend();
-    }
-
-    /**
-     * @see PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     */
-    public void propertyChange(PropertyChangeEvent evt) {
-        DefaultScheduledTask task = (DefaultScheduledTask) evt.getSource();
-        reschedule(task, (Quantum) evt.getOldValue(), (Quantum) evt.getNewValue());
-    }
-
-    private void add(final DefaultScheduledTask task, final Quantum interval) {
-        if (task == null || interval == null) return;
-        
-        synchronized (interval2recevier) {
-            Set<WeakReference<DefaultScheduledTask>> receivers = interval2recevier.get(interval);
-
-            if (receivers == null) {
-                Set<WeakReference<DefaultScheduledTask>> newReceivers = new HashSet<WeakReference<DefaultScheduledTask>>();
-                newReceivers.add(new WeakReference<DefaultScheduledTask>(task));
-                interval2recevier.put(interval, newReceivers);
-                if (!interval.equals(Quantum.SUSPENDED)) {
-                    schedulerService.scheduleAtFixedRate(new Runnable() {
-
-                        public void run() {
-                            try {
-                                if (LOGGER.isLoggable(Level.FINEST)) {
-                                    LOGGER.finest("Notifying scheduled tasks at interval " + interval); // NOI18N
-                                }
-
-                                long timeStamp = System.currentTimeMillis();
-                                Set<WeakReference<DefaultScheduledTask>> myReceivers = Collections.EMPTY_SET;
-
-                                synchronized (interval2recevier) {
-                                    if (!interval2recevier.containsKey(interval)) {
-                                        interval2recevier.put(interval, Collections.EMPTY_SET); // sanitize the dead interval
-                                    }
-                                    myReceivers = new HashSet<WeakReference<DefaultScheduledTask>>(interval2recevier.get(interval));
-                                    if (LOGGER.isLoggable(Level.FINEST)) {
-                                        LOGGER.finest(((myReceivers != null) ? myReceivers.size() : "0") + " scheduled tasks for interval " + interval);    // NOI18N
-                                    }
-                                }
-
-                                int deadRefCounter = notifyReceivers(timeStamp, myReceivers);
-
-                                if (deadRefCounter > 0) {
-                                    Set<WeakReference<DefaultScheduledTask>> cleansed = cleanDeadRefs(myReceivers);
-
-                                    synchronized (interval2recevier) {
-                                        interval2recevier.remove(interval);
-                                        interval2recevier.put(interval, cleansed);
-                                    }
-                                }
-                                if (LOGGER.isLoggable(Level.FINEST)) {
-                                    LOGGER.finest("Finished");  // NOI18N
-                                }
-                            } catch (Exception e) {
-                                if (LOGGER.isLoggable(Level.WARNING)) {
-                                    LOGGER.log(Level.WARNING, "Exception in scheduler", e); // NOI18N
-                                }
-                            }
-                        }
-                    }, interval.interval, interval.interval, interval.unit);
-                }
-            } else {
-                receivers.add(new WeakReference<DefaultScheduledTask>(task));
-            }
-        }
-
-        task.addPropertyChangeListener(ScheduledTask.INTERVAL_PROPERTY, this);
-    }
-
-    private static Set<WeakReference<DefaultScheduledTask>> cleanDeadRefs(Set<WeakReference<DefaultScheduledTask>> tasks) {
-        Set<WeakReference<DefaultScheduledTask>> newSet = new HashSet<WeakReference<DefaultScheduledTask>>();
-
-        for (WeakReference<DefaultScheduledTask> task : tasks) {
-            if (task.get() != null) {
-                newSet.add(task);
-            }
-        }
-
-        return newSet;
-    }
-
-    private int notifyReceivers(final long timeStamp, Set<WeakReference<DefaultScheduledTask>> myReceivers) {
-        int deadRefCounter = 0;
-
-        for (WeakReference<DefaultScheduledTask> rcvRef : myReceivers) {
-            final DefaultScheduledTask rcv = rcvRef.get();
-
-            if (rcv == null) {
-                deadRefCounter++;
-
-                continue;
-            }
-            if (rcv.isSuspended()) {
-                continue;
-            }
-
-            dispatcher.submit(new Runnable() {
-                public void run() {
-                    rcv.onSchedule(timeStamp);
-                }
-            });
-        }
-
-        return deadRefCounter;
-    }
-
-    private void remove(final DefaultScheduledTask task, Quantum interval) {
-        task.removePropertyChangeListener(ScheduledTask.INTERVAL_PROPERTY, this);
-
-        synchronized (interval2recevier) {
-            Set<WeakReference<DefaultScheduledTask>> receivers = interval2recevier.get(interval);
-
-            if (receivers != null) {
-                int deadRefCounter = 0;
-
-                for (WeakReference<DefaultScheduledTask> rcvRef : receivers) {
-                    DefaultScheduledTask rcv = rcvRef.get();
-
-                    if (rcv == null) {
-                        deadRefCounter++;
-
-                        continue;
-                    }
-
-                    if (rcv.equals(task)) {
-                        boolean taskAlive = !rcv.isSuspended();
-                        if (taskAlive) {
-                            rcv.suspend();
-                        }
-                        receivers.remove(rcvRef);
-                        if (taskAlive) {
-                            rcv.resume();
-                        }
-                        break;
-                    }
-                }
-
-                if (deadRefCounter > 0) {
-                    receivers = cleanDeadRefs(receivers);
-                    interval2recevier.remove(interval);
-
-                    if (!receivers.isEmpty()) {
-                        interval2recevier.put(interval, receivers);
-                    }
-                } else {
-                    if (receivers.isEmpty()) {
-                        interval2recevier.remove(interval);
-                    }
-                }
-            }
-        }
-    }
-
-    private void reschedule(final DefaultScheduledTask task, Quantum oldInterval, Quantum newInterval) {
-        remove(task, oldInterval);
-        // when rescehduling from suspended state execute the task out of order
-        if (oldInterval.equals(Quantum.SUSPENDED)) {
-            intermediateTaskService.submit(new Runnable() {
-                public void run() {
-                    task.onSchedule(System.currentTimeMillis());
-                }
-            });
-        }
-        add(task, newInterval);
     }
 }

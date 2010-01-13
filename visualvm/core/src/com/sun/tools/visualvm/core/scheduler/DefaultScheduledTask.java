@@ -26,6 +26,9 @@ package com.sun.tools.visualvm.core.scheduler;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -35,6 +38,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Jaroslav Bachorik
  */
 class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
+    static private final Map<Quantum, WeakReference<SchedulingPipe>> pipeMap = new HashMap<Quantum, WeakReference<SchedulingPipe>>();
+
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -44,7 +49,9 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
     private Quantum interval;
     private SchedulerTask delegateTask;
     private Quantum suspendedFrom = Quantum.SUSPENDED;
-    
+
+    private SchedulingPipe pipe = null;
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public DefaultScheduledTask(Quantum interval, SchedulerTask task) {
@@ -63,6 +70,24 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
 
         try {
             oldInterval = this.interval;
+
+            synchronized(pipeMap) {
+                WeakReference<SchedulingPipe> oldPipeRef = pipeMap.get(oldInterval);
+                WeakReference<SchedulingPipe> newPipeRef = pipeMap.get(interval);
+
+                SchedulingPipe oldPipe = oldPipeRef != null ? oldPipeRef.get() : null;
+                SchedulingPipe newPipe = newPipeRef != null ? newPipeRef.get() : null;
+                if (oldPipe != null) {
+                    oldPipe.removeTask(this);
+                }
+                if (newPipe == null && interval != Quantum.SUSPENDED) {
+                    newPipe = new SchedulingPipe(interval);
+                    pipeMap.put(interval, new WeakReference<SchedulingPipe>(newPipe));
+                }
+                if (newPipe != null) {
+                    newPipe.addTask(this);
+                }
+            }
             this.interval = interval;
         } finally {
             intervalLock.writeLock().unlock();
@@ -147,5 +172,13 @@ class DefaultScheduledTask implements ScheduledTask, SchedulerTask {
      */
     public void onSchedule(long timeStamp) {
         delegateTask.onSchedule(timeStamp);
+    }
+
+    void setPipe(SchedulingPipe pipe) {
+        this.pipe = pipe;
+    }
+
+    SchedulingPipe getPipe() {
+        return pipe;
     }
 }
