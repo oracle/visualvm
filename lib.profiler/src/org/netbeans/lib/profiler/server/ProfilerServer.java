@@ -870,8 +870,6 @@ public class ProfilerServer extends Thread implements CommonConstants {
      * @see #ATTACH_DIRECT
      */
     private static void doActivate(int activateCode) {
-        loadNativeLibrary(_fullJFluidPath, false);
-
         ProfilerInterface.disableProfilerHooks(); // Just in case
         initInternals();
 

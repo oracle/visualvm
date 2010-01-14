@@ -45,7 +45,6 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.editor.Registry;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.ui.components.table.EnhancedTableCellRenderer;
@@ -87,6 +86,7 @@ import javax.swing.SwingConstants;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
+import org.netbeans.api.editor.EditorRegistry;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
@@ -891,10 +891,7 @@ public class Utils {
     }
 
     private static JavaEditorContext getMostActiveJavaEditorContext() {
-        Iterator componentIterator = Registry.getComponentIterator();
-
-        while (componentIterator.hasNext()) {
-            JTextComponent component = (JTextComponent) componentIterator.next();
+        for (JTextComponent component : EditorRegistry.componentList()) {
             Document document = component.getDocument();
             FileObject fileObject = NbEditorUtilities.getFileObject(document);
 
