@@ -35,6 +35,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -69,25 +70,46 @@ final class SchedulingPipe {
     void addTask(DefaultScheduledTask task) {
         try {
             tasksLock.writeLock().lock();
+            if (tasks.isEmpty()) {
+                startPipe();
+            }
             tasks.add(new WeakReference<DefaultScheduledTask>(task));
         } finally {
             tasksLock.writeLock().unlock();
         }
-        synchronized(pipeLock) {
+    }
+
+    private void startPipe() {
+        synchronized (pipeLock) {
             pipeFuture = schedulerService.scheduleAtFixedRate(new Runnable() {
+
                 public void run() {
                     try {
                         tasksLock.writeLock().lock();
                         final long timeStamp = System.currentTimeMillis();
-                        for(Iterator<WeakReference<DefaultScheduledTask>> iter = tasks.iterator();iter.hasNext();) {
+                        for (Iterator<WeakReference<DefaultScheduledTask>> iter = tasks.iterator(); iter.hasNext();) {
                             WeakReference<DefaultScheduledTask> ref = iter.next();
                             final DefaultScheduledTask t = ref.get();
-                            dispatcher.submit(new Runnable() {
-                                public void run() {
-                                    t.onSchedule(timeStamp);
-                                }
-                            });
-                            
+                            if (t != null) {
+                                dispatcher.submit(new Runnable() {
+
+                                    public void run() {
+                                        try {
+                                            t.onSchedule(timeStamp);
+                                        } catch (Throwable e) {
+                                            LOGGER.log(Level.SEVERE, null, e);
+                                        }
+                                    }
+                                });
+                            } else {
+                                iter.remove();
+                            }
+                        }
+                        if (tasks.isEmpty()) {
+                            synchronized (pipeLock) {
+                                pipeFuture.cancel(false);
+                                pipeFuture = null;
+                            }
                         }
                     } finally {
                         tasksLock.writeLock().unlock();
