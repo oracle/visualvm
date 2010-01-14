@@ -446,8 +446,8 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         File workdir = getWorkDir();
         diff = new File(getWorkDir(), getName() + ".diff");
         ref = new File(getWorkDir(), getName() + ".ref");
-        log("Test Source: http://toolscvs.sfbay.sun.com/cvsweb/profiler/libs/jfluid/test/functional/src/"
-            + getClass().getName().replace('.', '/') + ".java?cvsroot=/cvs/profiler");
+        log("Test Source: http://hg.netbeans.org/main-golden/file/tip/lib.profiler/test/qa-functional/src/"
+            + getClass().getName().replace('.', '/') + ".java");
 
         //check for running server
         try {
