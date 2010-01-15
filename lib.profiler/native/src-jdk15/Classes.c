@@ -111,17 +111,14 @@ JNIEXPORT jobjectArray JNICALL Java_org_netbeans_lib_profiler_server_system_Clas
     type = (*env)->FindClass(env, "java/lang/Class");
     assert(type != NULL);
     ret = (*env)->NewObjectArray(env, n_linked_classes, type, NULL);
-    if (ret == NULL) {
-        return NULL;
-    }
-  
-    j = 0;
-    for (i = 0; i < classCount; i++) {
-        if (class_status[i]) {
-            (*env)->SetObjectArrayElement(env, ret, j++, classes[i]);
+    if (ret != NULL) {  
+        j = 0;
+        for (i = 0; i < classCount; i++) {
+            if (class_status[i]) {
+                (*env)->SetObjectArrayElement(env, ret, j++, classes[i]);
+            }
         }
     }
-  
     free(class_status);
     res = (*_jvmti)->Deallocate(_jvmti, (unsigned char*) classes);
     assert(res == JVMTI_ERROR_NONE);
@@ -262,7 +259,7 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_doRe
     jvmtiClassDefinition* classDefs;
   
     if (!nativeMethodBindDisabled) {
-        // First, disable the NativeMethodBind event, assume that Thread.sleep and Object.wwait have already been intercepted
+        // First, disable the NativeMethodBind event, assume that Thread.sleep and Object.wait have already been intercepted
         res = (*_jvmti)->SetEventNotificationMode(_jvmti, JVMTI_DISABLE, JVMTI_EVENT_NATIVE_METHOD_BIND, NULL);
         if (res != JVMTI_ERROR_NONE) {
             fprintf (stderr, "Profiler Agent: Error while turning NativeMethodBind off: %d\n",res);
