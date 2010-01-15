@@ -104,6 +104,7 @@ class JExtendedSplitPane extends JSplitPane {
         Component divider = getDivider();
         if (isVisible() && divider.isVisible()) { // SplitPane fully visible
             super.setDividerLocation(requestedDividerLocation);
+            dividerLocation = requestedDividerLocation;
         } else if (isVisible()) { // Divider not visible, will be updated in updateVisibility()
             dividerLocation = requestedDividerLocation;
         } else if (!isVisible()) { // SplitPane not visible, dividerLocation will be set on first reasonable getSize()
@@ -149,6 +150,7 @@ class JExtendedSplitPane extends JSplitPane {
         super.reshape(x, y, width, height);
         if (width > 0 && height > 0 && requestedDividerLocation != -1) {
             super.setDividerLocation(requestedDividerLocation);
+            dividerLocation = requestedDividerLocation;
             // SplitPaneUI.paint() needs to be invoked here to set the
             // BasicSplitPaneUI.painted flag to enable resizing the divider
             // even if the component hasn't been shown yet.
