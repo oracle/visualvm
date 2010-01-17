@@ -90,6 +90,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     private String projectName;
     private String[][] rootMethods;
     private int status = 0;
+    private File workdir;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -443,11 +444,11 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         System.err.println("START TEST " + getClass().getName() + "." + getName());
 
         //System.setProperty("org.netbeans.lib.profiler.TargetAppRunner", "true");
-        File workdir = getWorkDir();
-        diff = new File(getWorkDir(), getName() + ".diff");
-        ref = new File(getWorkDir(), getName() + ".ref");
-        log("Test Source: http://toolscvs.sfbay.sun.com/cvsweb/profiler/libs/jfluid/test/functional/src/"
-            + getClass().getName().replace('.', '/') + ".java?cvsroot=/cvs/profiler");
+        workdir = getWorkDir();
+        diff = new File(workdir, getName() + ".diff");
+        ref = new File(workdir, getName() + ".ref");
+        log("Test Source: http://hg.netbeans.org/main-golden/file/tip/lib.profiler/test/qa-functional/src/"
+            + getClass().getName().replace('.', '/') + ".java");
 
         //check for running server
         try {
@@ -562,6 +563,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         settings.setSeparateConsole(true);
         settings.setInstrScheme(ProfilerEngineSettings.INSTRSCHEME_TOTAL);
         settings.setJVMArgs("");
+        settings.setWorkingDir(workdir.getAbsolutePath());
         //coverage
         //addJVMArgs(settings, "-Demma.coverage.out.file=/space/tmp/testrun/coverage.emma");
         setProjectName(projectName);
