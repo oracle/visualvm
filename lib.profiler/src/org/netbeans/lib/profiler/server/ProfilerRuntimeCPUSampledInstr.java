@@ -445,6 +445,7 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
         ProfilerRuntimeCPU.createNewDataStructures();
         st = new SamplingThread();
         st.setPriority(Thread.MAX_PRIORITY);
+        st.setDaemon(true);
         Threads.recordAdditionalProfilerOwnThread(st);
         st.start();
     }
