@@ -77,6 +77,13 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        SamplingThread() {
+            Threads.recordAdditionalProfilerOwnThread(this);
+            setPriority(Thread.MAX_PRIORITY);
+            setDaemon(true);
+            setName(PROFILER_SPECIAL_EXEC_THREAD_NAME + " 9"); // NOI18N
+        }
+
         public void run() {
             if (isSolaris) {
                 samplingInterval *= 1000000; // Convert into nanos - the Solaris hires timer resolution
@@ -444,9 +451,6 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
     protected static void createNewDataStructures() {
         ProfilerRuntimeCPU.createNewDataStructures();
         st = new SamplingThread();
-        st.setPriority(Thread.MAX_PRIORITY);
-        st.setDaemon(true);
-        Threads.recordAdditionalProfilerOwnThread(st);
         st.start();
     }
 
