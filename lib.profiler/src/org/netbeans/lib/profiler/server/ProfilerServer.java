@@ -380,7 +380,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static ShutdownWaitThread shutdownWaitThread;
     static Object execInSeparateThreadLock;
     static int execInSeparateThreadOpCode;
-    private static boolean preemptExit = true;
+    private static volatile boolean preemptExit = true;
     private static boolean shutdownOK = false;
     private static final Object shutdownLock = new Object();
     private static final Object resultsNotifiedLock = new Object();
