@@ -455,7 +455,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             java.net.Socket sock = new java.net.Socket("localhost", 5140);
             sock.getOutputStream().write(1);
             sock.close();
-            assertTrue("There is running another server on port 5140", false);
+            assertTrue("Another server is running on port 5140", false);
         } catch (Exception ex) {
         }
     }
@@ -497,7 +497,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         }
 
         if (!isStatus(STATUS_APP_FINISHED)) { //not handled shutdown
-            System.err.println("must be treminated target vm");
+            System.err.println("target vm must be terminated");
             runner.terminateTargetJVM();
         }
 
