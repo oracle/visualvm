@@ -72,7 +72,7 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private boolean terminated;
+        private volatile boolean terminated;
         private int count;
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
