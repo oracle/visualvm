@@ -331,6 +331,9 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
                 log("obtaining results " + String.valueOf(System.currentTimeMillis()));
                 assertTrue("Results do not exist - issue 65185.", runner.getProfilerClient().cpuResultsExist());
 
+                if (initDelay == 0) {
+                    Thread.sleep(200); // wait a while so that client can process all CPU results
+                }
                 CPUResultsSnapshot snapshot = runner.getProfilerClient().getCPUProfilingResultsSnapshot();
                 log("\nSnapshot:");
 
