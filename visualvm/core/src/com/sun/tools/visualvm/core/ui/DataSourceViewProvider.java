@@ -90,7 +90,7 @@ public abstract class DataSourceViewProvider<X extends DataSource> {
     
     /**
      * Returns DataSourceView for the DataSource. Tries to resolve already
-     * created plugin from cache, creates new DataSourceView instance using
+     * created view from cache, creates new DataSourceView instance using
      * the createView(DataSource) method if needed.
      * 
      * @param dataSource
