@@ -842,12 +842,13 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static void cleanupOnShutdown() {
         Monitors.shutdown();
         ProfilerInterface.disableProfilerHooks();
-        ProfilerRuntimeCPU.enableProfiling(false); // Bugfix for 65947: Profiler blocks a finishing profiled application
-                                                   // The following connectionOpen = false is done just to prevent error message from listenToClient(). When the connection
-                                                   // is closed either by the client or here by closeConnection(), whoever is faster, listenToClient() waiting for input in socket
-                                                   // will get IOException.
-                                                   // Be careful with this! sendResponseToClient() currently doesn't check connectionOpen value, but if it does, this should be changed.
+        ProfilerRuntimeCPU.enableProfiling(false); 
 
+        // Bugfix for 65947: Profiler blocks a finishing profiled application
+        // The following connectionOpen = false is done just to prevent error message from listenToClient(). When the connection
+        // is closed either by the client or here by closeConnection(), whoever is faster, listenToClient() waiting for input in socket
+        // will get IOException.
+        // Be careful with this! sendResponseToClient() currently doesn't check connectionOpen value, but if it does, this should be changed.
         connectionOpen = false;
         profilerServer.sendSimpleCmdToClient(Command.SHUTDOWN_COMPLETED);
         profilerServer.closeConnection();
