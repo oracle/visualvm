@@ -89,7 +89,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     private String mainClass;
     private String projectName;
     private String[][] rootMethods;
-    private int status = 0;
+    private volatile int status = 0;
     private File workdir;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -136,11 +136,11 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         notifyAll();
     }
 
-    public int getStatus() {
+    public synchronized int getStatus() {
         return status;
     }
 
-    public String getStatus(int status) {
+    public synchronized String getStatus(int status) {
         StringBuffer sb = new StringBuffer();
 
         if (status == STATUS_ERROR) {
@@ -178,7 +178,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         return sb.toString();
     }
 
-    public boolean isStatus(int status) {
+    public synchronized boolean isStatus(int status) {
         if (status == STATUS_ERROR) {
             return (getStatus() == status);
         }
