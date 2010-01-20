@@ -416,6 +416,7 @@ public class BasicTest extends CPUTestCase {
         settings.setInstrumentGetterSetterMethods(true);
         settings.setInstrumentEmptyMethods(true);
         settings.setInstrScheme(instrscheme);
+        addJVMArgs(settings,"-Xss1024k");
         startCPUTest(settings, new String[]{"simple.cpu.Methods2.method0()"}, new long[]{400L}, 40.0,
                 new String[]{"simple.cpu.Methods2.method1"}, ALL_INV_ERROR_METHOD);
     }
