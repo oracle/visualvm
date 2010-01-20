@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.modules.sampler.cpu.CPUSettingsSupport;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -432,6 +433,15 @@ class SamplerImpl {
     private void initializeCpuSampling() {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
+                if (application.getState() != Stateful.STATE_AVAILABLE) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            cpuStatus = "Not available.";
+                            refreshSummary();
+                        }
+                    });
+                    return;
+                }
                 JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
                 if (jmxModel == null) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -564,6 +574,15 @@ class SamplerImpl {
     private void initializeMemorySampling() {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
+                if (application.getState() != Stateful.STATE_AVAILABLE) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            memoryStatus = "Not available.";
+                            refreshSummary();
+                        }
+                    });
+                    return;
+                }
                 if (!application.isLocalApplication()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
