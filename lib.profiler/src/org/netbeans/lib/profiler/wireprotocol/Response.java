@@ -120,7 +120,7 @@ public class Response {
     public String toString() {
         String s = respTypeToString(type);
 
-        return s + (isOK() ? ("Ok, " + (yes() ? "yes" : "no")) : ("Error, " + errorMessage)); // NOI18N
+        return s + (isOK() ? (" Ok, " + (yes() ? "yes" : "no")) : (" Error, " + errorMessage)); // NOI18N
     }
 
     public boolean yes() {
