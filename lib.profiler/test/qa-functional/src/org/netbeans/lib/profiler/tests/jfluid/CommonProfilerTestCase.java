@@ -646,7 +646,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             profilingProcess = Runtime.getRuntime().exec(cmdArray, null, new File(settings.getWorkingDir()));
 
             if (profilingProcess != null) {
-                runner.initiateSession(0, false);
+                runner.initiateSession(1, false);
             } else {
                 throw new NullPointerException();
             }

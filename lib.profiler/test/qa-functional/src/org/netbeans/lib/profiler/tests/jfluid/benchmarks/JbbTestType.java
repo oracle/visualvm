@@ -196,7 +196,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
             Process p = startTargetVM(runner);
             assertNotNull("Target JVM is not started", p);
             time = System.currentTimeMillis();
-            runner.connectToStartedVMAndStartTA();
+            runner.attachToTargetVMOnStartup();
             //Thread.sleep(delay);//wait for init
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());

@@ -347,15 +347,12 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
 
         try {
             runner.readSavedCalibrationData();
+            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
 
             Process p = startTargetVM(runner);
             assertNotNull("Target JVM is not started", p);
             bindStreams(p);
-
-            runner.connectToStartedVMAndStartTA();
-            System.err.println(">>> runner.connectToStartedVMAndStartTA");
-
-            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
+            runner.attachToTargetVMOnStartup();
 
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());
