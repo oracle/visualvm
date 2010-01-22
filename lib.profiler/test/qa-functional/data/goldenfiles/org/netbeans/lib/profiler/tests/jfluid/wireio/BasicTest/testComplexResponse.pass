@@ -1,7 +1,7 @@
 Server start to listen on port 5140
  received object org.netbeans.lib.profiler.wireprotocol.CodeRegionCPUResultsResponse CodeRegionCPUResultsResponse, length: 3, CODE_REGION_CPU_RESULTS Ok, yes
- received object org.netbeans.lib.profiler.wireprotocol.ThreadLivenessStatusResponse ThreadLivenessStatusResponse, THREAD_LIVENESS_STATU SOk, yes
- received object org.netbeans.lib.profiler.wireprotocol.DumpResultsResponse DumpResultsResponse, timeStamp: 200508181215, DUMP_RESULT SOk, yes
+ received object org.netbeans.lib.profiler.wireprotocol.ThreadLivenessStatusResponse ThreadLivenessStatusResponse, THREAD_LIVENESS_STATUS Ok, yes
+ received object org.netbeans.lib.profiler.wireprotocol.DumpResultsResponse DumpResultsResponse, timeStamp: 200508181215, DUMP_RESULTS Ok, yes
  received object org.netbeans.lib.profiler.wireprotocol.InstrumentMethodGroupResponse InstrumentMethodGroupResponse 1 classes.
  received object org.netbeans.lib.profiler.wireprotocol.MethodNamesResponse METHOD_NAMES Ok, yes
  received object org.netbeans.lib.profiler.wireprotocol.DefiningLoaderResponse DefiningLoaderResponse, loaderId: 1, DEFINING_LOADER Ok, yes
