@@ -1,6 +1,6 @@
 
 SET BUILD_SRC_15=..\src-jdk15
-SET BUILD_JDK=C:\PROGRA~1\java\jdk1.6.0_03
+SET BUILD_JDK=C:\PROGRA~1\java\jdk1.6.0_16
 SET BUILD_OUTPUT=dist
 SET BUILD_DEPLOY=..\..\release\lib
 
