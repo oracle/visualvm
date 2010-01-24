@@ -273,7 +273,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         settings.setInstrumentEmptyMethods(false);
         settings.setInstrumentGetterSetterMethods(false);
         settings.setInstrumentMethodInvoke(true);
-        settings.setInstrumentSpawnedThreads(rootMethods != null);
+        settings.setInstrumentSpawnedThreads(rootMethods == null);
         settings.setExcludeWaitTime(true);
 
         //        addJVMArgs(settings, "-Dorg.netbeans.lib.profiler.wireprotocol.WireIO=true");
