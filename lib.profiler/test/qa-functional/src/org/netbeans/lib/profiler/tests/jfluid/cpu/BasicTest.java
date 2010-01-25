@@ -154,7 +154,7 @@ public class BasicTest extends CPUTestCase {
                 "testSettingsSampledProfilingServerLazy",
                 "testSettingsSampledProfilingServerTotal",
                 "testSettingsSampledProfilingTotal"
-                ).enableModules(".*").clusters(".*"));
+                ).enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

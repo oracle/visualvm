@@ -74,7 +74,7 @@ public class MeasureDiffsTest extends MeasureDiffsTestCase {
             "testSettingsInstrumentAllLazy",
             "testSettingsInstrumentAllLazyServer",
             "testSettingsInstrumentAllTotal",
-            "testSettingsInstrumentAllTotalServer").enableModules(".*").clusters(".*"));
+            "testSettingsInstrumentAllTotalServer").enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
