@@ -104,7 +104,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
         return null;
     }
 
-    protected void evalueateResults(int[] without, int[] with) {
+    protected void evalueateResults(int[] without, int[] with, int maxSlowdown) {
         double[] diffs = new double[with.length];
 
         for (int i = 0; i < diffs.length; i++) {
@@ -124,8 +124,8 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
             }
         }
 
-        log("\nMax multiple: " + String.valueOf(maxmult) + " %\n");
-        assertTrue("Difference multiple is greater than 5 - " + String.valueOf(maxmult), (maxmult <= 5));
+        log("\nMax multiple: " + String.valueOf(maxmult) + " Max allowed: "+maxSlowdown+"\n");
+        assertTrue("Difference multiple is greater than "+maxSlowdown+" - " + String.valueOf(maxmult), (maxmult <= maxSlowdown));
     }
 
     protected ProfilerEngineSettings initCpuTest(String projectName, String mainClass) {
@@ -144,7 +144,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
         return settings;
     }
 
-    protected void startBenchmarkTest(ProfilerEngineSettings settings, long checkDelay) {
+    protected void startBenchmarkTest(ProfilerEngineSettings settings, int maxSlowdown) {
         //without profiler
         log("without profiler");
         log("*******************************************************************************");
@@ -202,7 +202,8 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
             assertTrue("runner is not running", runner.targetAppIsRunning());
 
             ArrayList metods = new ArrayList();
-
+            long checkDelay = 1500;
+            
             while (!isStatus(STATUS_APP_FINISHED) && !isStatus(STATUS_ERROR)) {
                 time = System.currentTimeMillis();
                 Thread.sleep(checkDelay);
@@ -214,7 +215,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
             log("finish ****************************** " + getStatus());
 
             int[] res2 = checkResults(workdir);
-            evalueateResults(res1, res2);
+            evalueateResults(res1, res2, maxSlowdown);
         } catch (Exception ex) {
             log(ex);
             assertTrue("Exception thrown: " + ex.getMessage(), false);

@@ -80,7 +80,7 @@ public class JbbTest extends JbbTestType {
 
     public void testBasic() {
         ProfilerEngineSettings settings = initCpuTest("jbb", "spec.jbb.JBBmain");
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 20);
     }
 
     public void testDefaultEntire() {
@@ -92,7 +92,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 120);
     }
 
     public void testDefaultPart() {
@@ -104,7 +104,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(false);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 10);
     }
 
     public void testInstrumentEager() {
@@ -116,7 +116,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 120);
     }
 
     public void testInstrumentSampledLazy() {
@@ -129,7 +129,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 20);
     }
 
     public void testInstrumentSampledTotal() {
@@ -142,6 +142,6 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 20);
     }
 }
