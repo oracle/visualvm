@@ -215,7 +215,6 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
 
             int[] res2 = checkResults(workdir);
             evalueateResults(res1, res2);
-            Utils.removeFolder(new File(workdir, "results"));
         } catch (Exception ex) {
             log(ex);
             assertTrue("Exception thrown: " + ex.getMessage(), false);
