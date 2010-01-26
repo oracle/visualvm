@@ -385,8 +385,6 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
         ProfilingResultsDispatcher.getDefault().addListener(builder);
         builder.startup(runner.getProfilerClient());
 
-        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
-
         try {
             assertTrue("not read calibration data", runner.readSavedCalibrationData());
             runner.getProfilerClient().initiateMemoryProfInstrumentation(instrMode);

@@ -306,7 +306,6 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
         ProfilingResultsDispatcher.getDefault().addListener(builder);
 
         builder.startup(runner.getProfilerClient());
-        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
 
         try {
             runner.readSavedCalibrationData();

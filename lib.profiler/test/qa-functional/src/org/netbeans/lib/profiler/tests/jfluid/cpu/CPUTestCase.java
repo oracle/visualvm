@@ -330,8 +330,6 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         builder.addListener(flattener);
         flattener.setContext(runner.getProfilerClient(),null,null);
 
-        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
-
         builder.startup(runner.getProfilerClient());
 
         try {
@@ -425,8 +423,6 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         FlatProfileBuilder flattener = new FlatProfileBuilder();
         builder.addListener(flattener);
         flattener.setContext(runner.getProfilerClient(),null,null);
-
-        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
 
         builder.startup(runner.getProfilerClient());
 
