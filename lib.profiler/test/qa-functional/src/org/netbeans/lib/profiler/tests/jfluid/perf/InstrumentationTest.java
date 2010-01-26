@@ -99,7 +99,7 @@ public class InstrumentationTest extends CommonProfilerTestCase implements NbPer
             "testJaxbNoGettersEmpties",
             "testSimple",
             "testSimpleNoEmpties",
-            "testSimpleNoGetters").enableModules(".*").clusters(".*"));
+            "testSimpleNoGetters").enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
