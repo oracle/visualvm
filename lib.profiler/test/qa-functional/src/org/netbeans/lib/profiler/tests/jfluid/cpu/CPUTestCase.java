@@ -314,8 +314,6 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                                 String[] displayMethodsFilter, int errorMethod) {
         CPUCallGraphBuilder builder = new CPUCallGraphBuilder();
 
-        assertTrue(builder != null);
-
         //create runner
         TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
                                                      new TestProfilingPointsProcessor());
@@ -407,8 +405,6 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
      */
     protected void startCPUTest(ProfilerEngineSettings settings, String[] measuredMethodsFilter, long checkDelay, long maxDelay) {
         CPUCallGraphBuilder builder = new CPUCallGraphBuilder();
-
-        assertTrue(builder != null);
 
         //create runner
         TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),

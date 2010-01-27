@@ -287,8 +287,6 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
                                      String[] filterout) {
         CPUCallGraphBuilder builder = new CPUCallGraphBuilder();
 
-        assertTrue(builder != null);
-
         TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
                                                      new TestProfilingPointsProcessor());
         runner.addProfilingEventListener(Utils.createProfilingListener(this));

@@ -312,8 +312,6 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
         HashMap results = new HashMap(64);
         builder = new CPUCallGraphBuilder();
 
-        assertTrue(builder != null);
-
         //get results with alone run
         try {
             outFile = File.createTempFile("profiler", "test");
