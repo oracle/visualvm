@@ -411,7 +411,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     }
 
     protected void setTargetVM(ProfilerEngineSettings settings) {
-        String vers = System.getProperty("java.vm.version");
+        String vers = System.getProperty("java.version");
 
         if (vers.startsWith("1.5")) {
             if (vers.startsWith("1.5.0")
