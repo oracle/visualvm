@@ -51,16 +51,17 @@ public class ProfilerStableTestSuite {
     return NbModuleSuite.create(
       NbModuleSuite.emptyConfiguration()
         .addTest(org.netbeans.lib.profiler.tests.jfluid.BasicTest.class)
+        .addTest(org.netbeans.lib.profiler.tests.jfluid.perf.InstrumentationTest.class)
         .addTest(org.netbeans.lib.profiler.tests.jfluid.wireio.BasicTest.class)
         .addTest(org.netbeans.lib.profiler.tests.jfluid.monitor.BasicTest.class)
         .addTest(org.netbeans.lib.profiler.tests.jfluid.memory.BasicTest.class)
-	    .addTest(org.netbeans.lib.profiler.tests.jfluid.memory.MemorySnapshotTest.class)
-	    .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class, org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.tests)
+	.addTest(org.netbeans.lib.profiler.tests.jfluid.memory.MemorySnapshotTest.class)
+        .addTest(org.netbeans.lib.profiler.tests.jfluid.others.MeasureDiffsTest.class)
+        .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.CPUSnapshotTest.class)
+	.addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class, org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.tests)
         .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class, org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.tests2)
         .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.class, org.netbeans.lib.profiler.tests.jfluid.cpu.BasicTest.tests3)
-        .addTest(org.netbeans.lib.profiler.tests.jfluid.cpu.CPUSnapshotTest.class)
-	//.addTest(org.netbeans.lib.profiler.tests.jfluid.benchmarks.JbbTest.class)
-	//.addTest(org.netbeans.lib.profiler.tests.jfluid.others.MeasureDiffsTest.class)
+        .addTest(org.netbeans.lib.profiler.tests.jfluid.benchmarks.JbbTest.class)
     );
   }
 
