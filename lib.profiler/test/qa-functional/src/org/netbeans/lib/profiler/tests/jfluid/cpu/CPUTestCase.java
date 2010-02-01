@@ -110,6 +110,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         public void cctReset() {
             synchronized (resultsLock) {
                 hasResults = false;
+                log("cctReset "+System.currentTimeMillis());
                 resultsLock.notify();
             }
         }
@@ -118,6 +119,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
             synchronized (resultsLock) {
                 if (!hasResults) {
                     try {
+                        log("wait4results "+System.currentTimeMillis());
                         resultsLock.wait(timeout);
                     } catch (InterruptedException e) {
                     }
@@ -128,6 +130,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         }
 
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
+            log("cctEstablished "+emtpy+" "+System.currentTimeMillis());
             if (!emtpy) {
                 cctEstablished(appRootNode);
             }
