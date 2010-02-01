@@ -107,8 +107,6 @@ made subject to such option by the copyright holder.
 
     <target name="release" depends="projectized-common.release">
         <fixcrlf eol="crlf" srcdir="${cluster}/lib/deployed" includes="**/*.map"/>
-    </chmod>
-
     </target>
 
     <target name="netbeans-extra">
