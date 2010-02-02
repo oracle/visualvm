@@ -250,7 +250,7 @@ public class ProfilerClient implements CommonConstants {
                                     int instrType = getCurrentInstrType();
 
                                     if (currentInstrTypeIsRecursiveCPUProfiling() || currentInstrTypeIsMemoryProfiling()) {
-                                        forceObtainedResultsDump(false, 5);
+                                        forceObtainedResultsDump(false, 15);
                                     }
 
                                     // In case of memory profiling, fetch additional data from the VM - names for all jmethodIDs and
