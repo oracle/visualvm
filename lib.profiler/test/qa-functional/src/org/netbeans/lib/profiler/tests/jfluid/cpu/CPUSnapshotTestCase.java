@@ -287,8 +287,6 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
                                      String[] filterout) {
         CPUCallGraphBuilder builder = new CPUCallGraphBuilder();
 
-        assertTrue(builder != null);
-
         TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
                                                      new TestProfilingPointsProcessor());
         runner.addProfilingEventListener(Utils.createProfilingListener(this));
@@ -306,17 +304,15 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
         ProfilingResultsDispatcher.getDefault().addListener(builder);
 
         builder.startup(runner.getProfilerClient());
-        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
 
         try {
             runner.readSavedCalibrationData();
+            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
 
             Process p = startTargetVM(runner);
             assertNotNull("Target JVM is not started", p);
             bindStreams(p);
-            runner.connectToStartedVMAndStartTA();
-
-            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
+            runner.attachToTargetVMOnStartup();
 
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());
@@ -331,6 +327,9 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
                 log("obtaining results " + String.valueOf(System.currentTimeMillis()));
                 assertTrue("Results do not exist - issue 65185.", runner.getProfilerClient().cpuResultsExist());
 
+                if (initDelay == 0) {
+                    Thread.sleep(200); // wait a while so that client can process all CPU results
+                }
                 CPUResultsSnapshot snapshot = runner.getProfilerClient().getCPUProfilingResultsSnapshot();
                 log("\nSnapshot:");
 
