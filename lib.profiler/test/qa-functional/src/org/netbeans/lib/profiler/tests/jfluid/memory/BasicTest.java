@@ -74,7 +74,7 @@ public class BasicTest extends MemoryTestCase {
             "testSettingsLiveness",
             "testSettingsLivenessServer",
             "testSettingsLivenessStackTraces",
-            "testSettingsLivenessStackTracesServer").enableModules(".*").clusters(".*"));
+            "testSettingsLivenessStackTracesServer").enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
