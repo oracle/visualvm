@@ -70,11 +70,11 @@ public class MeasureDiffsTest extends MeasureDiffsTestCase {
         return NbModuleSuite.create(
             NbModuleSuite.createConfiguration(MeasureDiffsTest.class).addTest(
             "testSettingsInstrumentAllEager",
-//            "testSettingsInstrumentAllEagerServer",
-//            "testSettingsInstrumentAllLazy",
-//            "testSettingsInstrumentAllLazyServer",
-//            "testSettingsInstrumentAllTotal",
-            "testSettingsInstrumentAllTotalServer").enableModules(".*").clusters(".*"));
+            "testSettingsInstrumentAllEagerServer",
+            "testSettingsInstrumentAllLazy",
+            "testSettingsInstrumentAllLazyServer",
+            "testSettingsInstrumentAllTotal",
+            "testSettingsInstrumentAllTotalServer").enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

@@ -118,6 +118,7 @@ public class Utils {
 
                 public void attachedToTarget() {
                     test.log("app attached to target");
+                    test.setStatus(CommonProfilerTestCase.STATUS_RUNNING);
                 }
 
                 public void detachedFromTarget() {
