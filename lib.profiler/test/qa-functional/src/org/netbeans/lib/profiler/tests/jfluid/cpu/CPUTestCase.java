@@ -349,7 +349,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
 
             waitForStatus(STATUS_APP_FINISHED);
 
-            Thread.sleep(6000);
+            Thread.sleep(1000);
 
             if (runner.targetJVMIsAlive()) {
                 log("Get results: " + System.currentTimeMillis());
