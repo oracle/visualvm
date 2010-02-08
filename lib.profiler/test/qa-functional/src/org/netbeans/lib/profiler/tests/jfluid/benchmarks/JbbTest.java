@@ -116,7 +116,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 150);
+        startBenchmarkTest(settings, 160);
     }
 
     public void testInstrumentSampledLazy() {
@@ -129,7 +129,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 25);
+        startBenchmarkTest(settings, 30);
     }
 
     public void testInstrumentSampledTotal() {
