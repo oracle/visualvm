@@ -71,7 +71,7 @@ public class TimelineModel implements Timeline {
         TimelineXYItem[] itemsArr = new TimelineXYItem[addedItemsCount];
 
         for (int i = 0; i < addedItemsCount; i++) {
-            itemsArr[i] = new TimelineXYItem(itemNames[i], itemsCount + i) {
+            itemsArr[i] = new TimelineXYItem(itemNames[i], 0, itemsCount + i) {
                 public long getYValue(int valueIndex) {
                     return values[getIndex()][valueIndex];
                 }

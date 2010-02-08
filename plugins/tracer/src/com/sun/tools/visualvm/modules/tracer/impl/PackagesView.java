@@ -40,6 +40,7 @@ import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -71,7 +72,8 @@ class PackagesView {
             public void run() {
                 final List<TracerPackage> packages = model.getPackages();
                 final List<List<TracerProbeDescriptor>> descriptors = new ArrayList();
-                for (TracerPackage p : packages) descriptors.add(p.getProbeDescriptors());
+                for (TracerPackage p : packages)
+                    descriptors.add(Arrays.asList(p.getProbeDescriptors()));
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() { displayPackages(packages, descriptors, view); }
                 });

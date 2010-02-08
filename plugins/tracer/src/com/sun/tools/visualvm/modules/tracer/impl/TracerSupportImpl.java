@@ -61,6 +61,13 @@ public final class TracerSupportImpl {
     }
 
 
+    public synchronized boolean hasPackages(DataSource dataSource) {
+        for (TracerPackageProvider provider : providers)
+            if (provider.getScope().isInstance(dataSource))
+                return true;
+        return false;
+    }
+
     public synchronized List<TracerPackage> getPackages(DataSource dataSource) {
         List<TracerPackage> packages = new ArrayList();
         for (TracerPackageProvider provider : providers)

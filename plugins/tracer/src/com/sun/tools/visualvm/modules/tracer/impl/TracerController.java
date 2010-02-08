@@ -144,7 +144,10 @@ final class TracerController implements DataRemovedListener<DataSource>,
     void startSession() {
         if (!model.areProbesDefined()) return;
         setState(STATE_SESSION_STARTING);
-        if (doStartSession()) setState(STATE_SESSION_RUNNING);
+        if (doStartSession()) {
+            model.getTimelineSupport().resetValues();
+            setState(STATE_SESSION_RUNNING);
+        }
         else setState(STATE_SESSION_INACTIVE);
     }
 
@@ -368,8 +371,11 @@ final class TracerController implements DataRemovedListener<DataSource>,
                 values[currentIndex++] = itemValues[i];
         }
 
+        if (!running) return;
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                if (!running) return;
                 model.getTimelineSupport().addValues(timestamp, values);
             }
         });

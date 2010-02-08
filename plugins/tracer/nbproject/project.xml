@@ -42,8 +42,8 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.modules.tracer.btrace.demo</friend>
-                <friend>com.sun.tools.visualvm.modules.tracer.sample.monitor</friend>
+                <friend>com.sun.tools.visualvm.modules.tracer.javafx</friend>
+                <friend>com.sun.tools.visualvm.modules.tracer.monitor</friend>
                 <package>com.sun.tools.visualvm.modules.tracer</package>
             </friend-packages>
         </data>

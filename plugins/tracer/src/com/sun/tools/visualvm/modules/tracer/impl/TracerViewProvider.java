@@ -36,7 +36,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
 public class TracerViewProvider extends DataSourceViewProvider<DataSource> {
 
     protected boolean supportsViewFor(DataSource dataSource) {
-        return TracerSupportImpl.getInstance().getPackages(dataSource).size() > 0;
+        return TracerSupportImpl.getInstance().hasPackages(dataSource);
     }
 
     protected DataSourceView createView(DataSource dataSource) {

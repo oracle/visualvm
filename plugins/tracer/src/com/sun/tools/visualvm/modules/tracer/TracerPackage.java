@@ -93,15 +93,15 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
 
 
     /**
-     * Returns list of TracerProbeDescriptors to present the package probes in UI.
+     * Returns array of TracerProbeDescriptors to present the package probes in UI.
      * Should always return descriptors for all probes provided by the provider
      * for each DataSource. If a probe is not available for the DataSource its
      * descriptor should be disabled - TracerProbeDescriptor.isProbeAvailable()
      * returns false.
      *
-     * @return list of TracerProbeDescriptors to present the package probes in UI
+     * @return array of TracerProbeDescriptors to present the package probes in UI
      */
-    public abstract List<TracerProbeDescriptor> getProbeDescriptors();
+    public abstract TracerProbeDescriptor[] getProbeDescriptors();
 
     /**
      * Returns the probe to be used in Tracer session. The probe to return
@@ -130,8 +130,8 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
         private PackageStateHandler<X> stateHandler;
 
 
-        public StateAware(String name, String description, Icon icon,
-                            int preferredPosition) {
+        public StateAware(String name, String description,
+                          Icon icon, int preferredPosition) {
             super(name, description, icon, preferredPosition);
         }
 
