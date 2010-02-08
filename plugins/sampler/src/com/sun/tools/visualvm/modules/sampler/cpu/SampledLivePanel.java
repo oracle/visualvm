@@ -32,6 +32,7 @@ import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
+import org.netbeans.lib.profiler.ui.cpu.CPUResUserActionsHandler;
 import org.netbeans.lib.profiler.ui.cpu.LiveFlatProfileCollectorPanel;
 
 /**
@@ -43,7 +44,7 @@ public class SampledLivePanel extends LiveFlatProfileCollectorPanel {
     private StackTraceSnapshotBuilder snapshotBuilder;
     
     public SampledLivePanel(StackTraceSnapshotBuilder builder) {
-        super(null,null,null);
+        super(null,new DummyHandler(),null);
         methodInfoMapper = builder.getMapper();
         snapshotBuilder = builder;
     }
@@ -88,6 +89,26 @@ public class SampledLivePanel extends LiveFlatProfileCollectorPanel {
             if (index != 0)
                 colModel.getColumn(i).setPreferredWidth(columnWidths[index - 1]);
             colModel.getColumn(i).setCellRenderer(columnRenderers[index]);
+        }
+    }
+    
+    private static final class DummyHandler extends CPUResUserActionsHandler.Adapter {
+
+        public void addMethodToRoots(final String className, final String methodName, final String methodSig) {
+            throw new IllegalStateException("addMethodToRoots");    // NOI18N
+        }
+
+        public void showReverseCallGraph(final CPUResultsSnapshot snapshot, final int threadId, final int methodId, int view,
+                                         int sortingColumn, boolean sortingOrder) {
+            throw new IllegalStateException("showReverseCallGraph");    // NOI18N
+        }
+
+        public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
+            // no-op
+        }
+
+        public void viewChanged(int viewType) {
+            throw new IllegalStateException("viewChanged"); // NOI18N
         }
     }
 
