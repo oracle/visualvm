@@ -74,7 +74,7 @@ public class BasicTest extends CommonWireIOTestCase {
             "testComplexResponse",
             "testSimpleCommands",
             "testSimpleResponse",
-            "testUnknownSimpleCommand").enableModules(".*").clusters(".*"));
+            "testUnknownSimpleCommand").enableModules(".*").clusters(".*").gui(false));
     }
 
     protected void tearDown() throws Exception {
