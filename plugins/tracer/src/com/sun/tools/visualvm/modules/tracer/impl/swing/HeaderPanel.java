@@ -25,22 +25,27 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.swing;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.OverlayLayout;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public class HeaderPanel extends JPanel {
+
+    private JPanel clientContainer;
+    private Header header;
 
     public HeaderPanel() {
         initComponents();
@@ -51,11 +56,34 @@ public class HeaderPanel extends JPanel {
 
     protected void setupRenderer(Component renderer) {}
 
+    protected boolean isSelected() { return false; }
+
+    protected boolean processMouseEvents() { return false; }
+
+
+    public JPanel getClientContainer() {
+        if (clientContainer == null) {
+            clientContainer = new JPanel(null);
+            clientContainer.setOpaque(false);
+            add(clientContainer, 0);
+        }
+        return clientContainer;
+    }
+
+    public boolean isOptimizedDrawingEnabled() {
+        return clientContainer == null;
+    }
+    
+    protected void processMouseEvent(MouseEvent e) {
+        if (processMouseEvents()) header.processMouseEvent(e);
+        if (!e.isConsumed()) super.processMouseEvent(e);
+    }
 
     private void initComponents() {
         JTable impl = new JTable(new DefaultTableModel(new Object[] { "" }, 0)); // NOI18N
-
-        final JTableHeader header = impl.getTableHeader();
+        impl.setFocusable(false);
+        header = new Header(impl.getColumnModel());
+        impl.setTableHeader(header);
         header.setResizingAllowed(false);
         header.setReorderingAllowed(false);
 
@@ -66,7 +94,8 @@ public class HeaderPanel extends JPanel {
                     int row, int column) {
 
                 Component component = renderer.getTableCellRendererComponent(
-                        table, getRendererValue(), false, false, row, 1);
+                        table, getRendererValue(), isSelected(),
+                        isSelected(), row, processMouseEvents() ? 0 : 1);
 
                 setupRenderer(component);
 
@@ -86,8 +115,13 @@ public class HeaderPanel extends JPanel {
         scroll.setBorder(BorderFactory.createEmptyBorder());
         scroll.setViewportBorder(BorderFactory.createEmptyBorder());
 
-        setLayout(new BorderLayout());
-        add(scroll, BorderLayout.CENTER);
+        setLayout(new OverlayLayout(this));
+        add(scroll);
+    }
+
+    private static class Header extends JTableHeader {
+        Header(TableColumnModel model) { super(model); };
+        public void processMouseEvent(MouseEvent e) { super.processMouseEvent(e); }
     }
 
 }

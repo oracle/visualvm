@@ -44,10 +44,12 @@ public class ProbePresenter extends JLabel {
     private boolean isSelected = false;
 
     public ProbePresenter(TracerProbe p) {
-        super(p.getDescriptor().getProbeName(), p.getDescriptor().getProbeIcon(), JLabel.CENTER);
-//        System.err.println("Icon: " + p.getIcon());
-//        setHorizontalAlignment(JLabel.CENTER);
-        setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.LIGHT_GRAY));
+        super(p.getDescriptor().getProbeName(), p.getDescriptor().getProbeIcon(), JLabel.LEADING);
+        setIconTextGap(7);
+        setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 1, 1, 1, Color.LIGHT_GRAY),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                ));
     }
 
     

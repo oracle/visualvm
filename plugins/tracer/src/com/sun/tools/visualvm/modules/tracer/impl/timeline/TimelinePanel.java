@@ -27,12 +27,19 @@ package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
 import com.sun.tools.visualvm.modules.tracer.impl.probes.ProbePresenter;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderButton;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Point;
-import javax.swing.BorderFactory;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JViewport;
@@ -60,22 +67,25 @@ public class TimelinePanel extends JPanel {
 
         add(probesPanel, BorderLayout.WEST);
         add(chartPanel, BorderLayout.CENTER);
+
+        new RowMouseHandler(support.getChart(), probesPanel.getMouseTarget(), this).register();
     }
 
     private static class ProbesPanel extends JPanel {
+
+        private final JViewport viewport;
+        private final HeaderButton increaseB;
+        private final HeaderButton decreaseB;
+        private final HeaderButton resetB;
 
         public ProbesPanel(final TimelineSupport support) {
             final TimelineChart chart = support.getChart();
 
             final JPanel listPanel = new JPanel(new VerticalTimelineLayout(chart));
             listPanel.setOpaque(false);
-        //        listPanel.setOpaque(true);
-        //        listPanel.setBackground(new Color(245, 245, 245));
 
-            final JViewport viewport = new JViewport();
+            viewport = new JViewport();
             viewport.setOpaque(false);
-        //        viewport.setOpaque(true);
-        //        viewport.setBackground(new Color(245, 245, 245));
             viewport.setView(listPanel);
             viewport.setViewPosition(new Point(0, 0));
 
@@ -104,10 +114,35 @@ public class TimelinePanel extends JPanel {
                 }
             });
 
-            final JPanel bottomPanel = new JPanel(null);
-            bottomPanel.setBackground(Color.WHITE);
-            bottomPanel.setPreferredSize(new Dimension(1, new JScrollBar(JScrollBar.HORIZONTAL).getPreferredSize().height));
-            bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+            final JPanel bottomPanel = new JPanel(new GridLayout(1, 3));
+            bottomPanel.setPreferredSize(new Dimension(100, new JScrollBar(JScrollBar.HORIZONTAL).getPreferredSize().height));
+            bottomPanel.setOpaque(false);
+
+            increaseB = new HeaderButton("+") {
+                protected void performAction(ActionEvent e) {
+                    chart.increaseRowHeights((e.getModifiers() & Toolkit.
+                            getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+                }
+            };
+            increaseB.setToolTipText("Increase rows height");
+            bottomPanel.add(increaseB);
+
+            decreaseB = new HeaderButton("-") {
+                protected void performAction(ActionEvent e) {
+                    chart.decreaseRowHeights((e.getModifiers() & Toolkit.
+                            getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+                }
+            };
+            decreaseB.setToolTipText("Decrease rows height");
+            bottomPanel.add(decreaseB);
+
+            resetB = new HeaderButton("=") {
+                protected void performAction(ActionEvent e) {
+                    chart.resetRowHeights();
+                }
+            };
+            resetB.setToolTipText("Reset rows height");
+            bottomPanel.add(resetB);
 
             setOpaque(false);
             setLayout(new BorderLayout());
@@ -121,11 +156,23 @@ public class TimelinePanel extends JPanel {
             chart.addRowListener(new TimelineChart.RowListener() {
                 public void rowAdded(TimelineChart.Row row) {
                     listPanel.add(new ProbePresenter(support.getProbe(row)), row.getIndex());
+                    refreshButtons(true);
                 }
                 public void rowRemoved(TimelineChart.Row row) {
                     listPanel.remove(row.getIndex());
+                    refreshButtons(chart.hasRows());
                 }
             });
+
+            refreshButtons(chart.hasRows());
+        }
+
+        Component getMouseTarget() { return viewport; }
+
+        private void refreshButtons(boolean enabled) {
+            increaseB.setEnabled(enabled);
+            decreaseB.setEnabled(enabled);
+            resetB.setEnabled(enabled);
         }
 
     }
@@ -166,6 +213,86 @@ public class TimelinePanel extends JPanel {
             add(chart, BorderLayout.CENTER);
             add(vScrollBar, BorderLayout.EAST);
             add(hScrollBar, BorderLayout.SOUTH);
+        }
+
+    }
+
+
+    private static class RowMouseHandler extends MouseAdapter {
+
+        private static final int RESIZE_RANGE = 3;
+
+        private final TimelineChart chart;
+        private final Component mouseTarget;
+        private final Component repaintTarget;
+
+        private int baseY;
+        private int baseHeight;
+        private TimelineChart.Row draggingRow;
+
+
+        public RowMouseHandler(TimelineChart chart, Component mouseTarget,
+                               Component repaintTarget) {
+            this.chart = chart;
+            this.mouseTarget = mouseTarget;
+            this.repaintTarget = repaintTarget;
+        }
+
+
+        public void register() {
+            chart.addMouseListener(this);
+            chart.addMouseMotionListener(this);
+            mouseTarget.addMouseListener(this);
+            mouseTarget.addMouseMotionListener(this);
+        }
+
+
+        public void mousePressed(MouseEvent e) {
+            updateRowState(e, true);
+            updateCursor();
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            updateRowState(e, false);
+            updateCursor();
+        }
+
+        public void mouseMoved(MouseEvent e) {
+            updateRowState(e, false);
+            updateCursor();
+        }
+
+        public void mouseDragged(MouseEvent e){
+            if (draggingRow != null) {
+                boolean checkStep = (e.getModifiers() & Toolkit.getDefaultToolkit().
+                                     getMenuShortcutKeyMask()) == 0;
+                chart.setRowHeight(draggingRow.getIndex(), baseHeight + e.getY() - baseY, checkStep);
+            }
+        }
+
+
+        private void updateRowState(MouseEvent e, boolean updateSelection) {
+            baseY = e.getY();
+            draggingRow = chart.getNearestRow(baseY, RESIZE_RANGE, true);
+            if (draggingRow != null) {
+                baseHeight = draggingRow.getHeight();
+            } else if (updateSelection) {
+//                TimelineChart.Row row = chart.getRowAt(baseY);
+//                chart.setSelectedRow(row == null ? -1 : row.getIndex());
+//                repaintTarget.repaint();
+            }
+        }
+
+        private void updateCursor() {
+            if (draggingRow != null) {
+                Cursor resizeCursor = Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR);
+                chart.setCursor(resizeCursor);
+                mouseTarget.setCursor(resizeCursor);
+            } else {
+                Cursor defaultCursor = Cursor.getDefaultCursor();
+                chart.setCursor(defaultCursor);
+                mouseTarget.setCursor(defaultCursor);
+            }
         }
 
     }

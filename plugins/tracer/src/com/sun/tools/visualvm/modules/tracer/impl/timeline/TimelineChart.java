@@ -55,6 +55,8 @@ public class TimelineChart extends SynchronousXYChart {
     public static final int DEF_ROW_HEIGHT = 75;
     public static final int ROW_RESIZE_STEP = MIN_ROW_HEIGHT;
 
+    private int currentRowHeight = DEF_ROW_HEIGHT;
+
     private final List<Row> rows;
     private final Map<ChartItem, Row> itemsToRows;
 
@@ -88,7 +90,7 @@ public class TimelineChart extends SynchronousXYChart {
         int rowIndex = rows.size();
         row.setIndex(rowIndex);
         rows.add(row);
-        row.setHeight(DEF_ROW_HEIGHT, true);
+        row.setHeight(currentRowHeight, true);
         row.updateOffset();
 //        repaintRows(row.getIndex());
         updateChart();
@@ -100,7 +102,7 @@ public class TimelineChart extends SynchronousXYChart {
         Row row = new Row();
         row.setIndex(rowIndex);
         rows.add(rowIndex, row);
-        row.setHeight(DEF_ROW_HEIGHT, true);
+        row.setHeight(currentRowHeight, true);
         updateRowOffsets(rowIndex);
         updateRowIndexes(rowIndex + 1);
 //        repaintRows(rowIndex);
@@ -129,6 +131,10 @@ public class TimelineChart extends SynchronousXYChart {
 
 
     // --- Rows access ---------------------------------------------------------
+
+    public boolean hasRows() {
+        return !rows.isEmpty();
+    }
 
     public int getRowsCount() {
         return rows.size();
@@ -159,6 +165,32 @@ public class TimelineChart extends SynchronousXYChart {
         return rows.get(rowIndex).getHeight();
     }
 
+    public void increaseRowHeights(boolean step) {
+        if (rows.isEmpty()) return;
+        int incr = step ? ROW_RESIZE_STEP : 1;
+        for (Row row : rows) row.setHeight(row.getHeight() + incr, step);
+        updateRowOffsets(0);
+        updateChart(); // TODO: update only affected rows!
+        currentRowHeight += incr;
+    }
+
+    public void decreaseRowHeights(boolean step) {
+        if (rows.isEmpty()) return;
+        int decr = step ? ROW_RESIZE_STEP : 1;
+        for (Row row : rows) row.setHeight(row.getHeight() - decr, step);
+        updateRowOffsets(0);
+        updateChart(); // TODO: update only affected rows!
+        currentRowHeight = Math.max(currentRowHeight - decr, MIN_ROW_HEIGHT);
+    }
+
+    public void resetRowHeights() {
+        if (rows.isEmpty()) return;
+        for (Row row : rows) row.setHeight(DEF_ROW_HEIGHT, true);
+        updateRowOffsets(0);
+        updateChart(); // TODO: update only affected rows!
+        currentRowHeight = DEF_ROW_HEIGHT;
+    }
+
     public Row getRowAt(int ypos) {
         ypos += getOffsetY();
         for (Row row : rows) {
@@ -171,6 +203,8 @@ public class TimelineChart extends SynchronousXYChart {
     }
 
     public Row getNearestRow(int ypos, int range, boolean noFirst) {
+        if (rows.size() == 0) return null;
+        
         ypos += getOffsetY();
 
         if (noFirst) {
