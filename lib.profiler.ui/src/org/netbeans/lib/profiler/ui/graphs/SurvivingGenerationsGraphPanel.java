@@ -402,7 +402,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowValue(int index) {
-                SynchronousXYItem item = models.generationsItemsModel().getItem(index);
+                SynchronousXYItem item = models.generationsItemsModel().getItem(index+1);
                 switch (index) {
                     case 0:
                         return INT_FORMATTER.format(item.getMaxYValue());
