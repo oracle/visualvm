@@ -110,7 +110,7 @@ public class GoToJavaSourceProvider extends GoToSourceProvider {
                                     return;
                                 }
                                 if (methodName != null) {
-                                    ExecutableElement methodElement = SourceUtils.resolveMethodByName(parentClass, methodName, signature);
+                                    ExecutableElement methodElement = SourceUtils.resolveMethodByName(controller, parentClass, methodName, signature);
                                     if (methodElement != null && ElementOpen.open(controller.getClasspathInfo(), methodElement)) {
                                         result.set(true);
                                         return;
