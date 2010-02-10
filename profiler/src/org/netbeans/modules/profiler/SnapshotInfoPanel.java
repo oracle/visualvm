@@ -510,8 +510,8 @@ public class SnapshotInfoPanel extends JPanel {
             //          method.getClassName(), method.getMethodName(), method.getMethodSignature()
             //      ).getFormattedClassAndMethod();
             ret = MethodNameFormatterFactory.getDefault().getFormatter().formatMethodName(method).toFormatted();
-            ret = ret.replaceAll("<", "&lt;"); // NOI18N
-            ret = ret.replaceAll(">", "&gt;"); // NOI18N
+            ret = ret.replace("<", "&lt;"); // NOI18N
+            ret = ret.replace(">", "&gt;"); // NOI18N
         } else {
             ret = MessageFormat.format(LINES_DEF_STRING,
                                        new String[] {

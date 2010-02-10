@@ -101,7 +101,7 @@ public class LocationCustomizer extends ValidityAwarePanel implements ActionList
         //      getAccessibleContext().setAccessibleName(text);
         //    }
         public void setText(String value) {
-            super.setText("<html><center><nobr>" + value.replaceAll("\\n", "<br>") + "</nobr></center></html>"); // NOI18N
+            super.setText("<html><center><nobr>" + value.replace("\\n", "<br>") + "</nobr></center></html>"); // NOI18N
             getAccessibleContext().setAccessibleName(value);
         }
     }
