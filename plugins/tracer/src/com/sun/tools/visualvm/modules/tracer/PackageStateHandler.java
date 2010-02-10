@@ -41,6 +41,9 @@ public interface PackageStateHandler<X extends DataSource> {
     public void probeRemoved(TracerProbe<X> probe, X dataSource);
 
 
+    public TracerProgressObject sessionInitializing(Set<TracerProbe<X>> probes,
+            X dataSource);
+
     // Tracer session is starting
     // Setup probe, deploy, instrument...
     public void sessionStarting(Set<TracerProbe<X>> probes, X dataSource)
@@ -57,15 +60,14 @@ public interface PackageStateHandler<X extends DataSource> {
     public void sessionFinished(Set<TracerProbe<X>> probes, X dataSource);
 
 
-//    // Tracer UI is closed or target has finished
-//    public void sessionImpossible(Set<TracerProbe<X>> probes, X dataSource);
-
-
-    public class Adapter<X extends DataSource> implements PackageStateHandler<X> {
+    public abstract class Adapter<X extends DataSource> implements PackageStateHandler<X> {
 
         public void probeAdded(TracerProbe<X> probe, X dataSource) {}
 
         public void probeRemoved(TracerProbe<X> probe, X dataSource) {}
+
+        public TracerProgressObject sessionInitializing(Set<TracerProbe<X>> probes,
+                X dataSource) { return null; }
 
         public void sessionStarting(Set<TracerProbe<X>> probes, X dataSource)
                 throws SessionInitializationException {}
@@ -75,8 +77,6 @@ public interface PackageStateHandler<X extends DataSource> {
         public void sessionStopping(Set<TracerProbe<X>> probes, X dataSource) {}
 
         public void sessionFinished(Set<TracerProbe<X>> probes, X dataSource) {}
-
-//        public void sessionImpossible(Set<TracerProbe<X>> probes, X dataSource) {}
 
     }
 

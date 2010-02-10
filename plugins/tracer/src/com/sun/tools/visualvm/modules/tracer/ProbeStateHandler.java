@@ -40,6 +40,8 @@ public interface ProbeStateHandler<X extends DataSource> {
     public void probeRemoved(X dataSource);
 
 
+    public TracerProgressObject sessionInitializing(X dataSource);
+
     // Tracer session is starting
     // Setup probe, deploy, instrument...
     public void sessionStarting(X dataSource)
@@ -60,11 +62,13 @@ public interface ProbeStateHandler<X extends DataSource> {
 //    public void sessionImpossible(X dataSource);
 
 
-    public class Adapter<X extends DataSource> implements ProbeStateHandler<X> {
+    public abstract class Adapter<X extends DataSource> implements ProbeStateHandler<X> {
 
         public void probeAdded(X dataSource) {}
 
         public void probeRemoved(X dataSource) {}
+
+        public TracerProgressObject sessionInitializing(X dataSource) { return null; }
 
         public void sessionStarting(X dataSource)
                 throws SessionInitializationException {}
@@ -74,8 +78,6 @@ public interface ProbeStateHandler<X extends DataSource> {
         public void sessionStopping(X dataSource) {}
 
         public void sessionFinished(X dataSource) {}
-
-//        public void sessionImpossible(X dataSource) {}
 
     }
 

@@ -27,7 +27,6 @@ package com.sun.tools.visualvm.modules.tracer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
-import java.util.List;
 import java.util.Set;
 import javax.swing.Icon;
 
@@ -144,6 +143,10 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
                 public void probeRemoved(TracerProbe<X> probe, X dataSource) {
                     StateAware.this.probeRemoved(probe, dataSource);
                 }
+                public TracerProgressObject sessionInitializing(Set<TracerProbe<X>> probes,
+                    X dataSource) {
+                    return StateAware.this.sessionInitializing(probes, dataSource);
+                }
                 public void sessionStarting(Set<TracerProbe<X>> probes, X dataSource)
                         throws SessionInitializationException {
                     StateAware.this.sessionStarting(probes, dataSource);
@@ -157,9 +160,6 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
                 public void sessionFinished(Set<TracerProbe<X>> probes, X dataSource) {
                     StateAware.this.sessionFinished(probes, dataSource);
                 }
-//                public void sessionImpossible(Set<TracerProbe<X>> probes, X dataSource) {
-//                    StateAware.this.sessionImpossible(probes, dataSource);
-//                }
             };
             return stateHandler;
         }
@@ -171,6 +171,9 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
         // Probe removed from Probes graph
         protected void probeRemoved(TracerProbe<X> probe, X dataSource) {}
 
+
+        protected TracerProgressObject sessionInitializing(Set<TracerProbe<X>> probes,
+                X dataSource) { return null; }
 
         // Tracer session is starting
         // Setup probe, deploy, instrument...
@@ -186,10 +189,6 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
 
         // Tracer session is stopped
         protected void sessionFinished(Set<TracerProbe<X>> probes, X dataSource) {}
-
-
-//        // Tracer UI is closed or target has finished
-//        protected void sessionImpossible(Set<TracerProbe<X>> probes, X dataSource) {}
 
     }
 

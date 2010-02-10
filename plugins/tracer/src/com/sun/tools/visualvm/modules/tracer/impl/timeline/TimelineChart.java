@@ -344,6 +344,12 @@ public class TimelineChart extends SynchronousXYChart {
     }
 
 
+    void invalidateRepaint() {
+        invalidateImage();
+        repaintDirty();
+    }
+
+
     // --- Private implementation ----------------------------------------------
 
     private SynchronousXYItemsModel itemsModel() {

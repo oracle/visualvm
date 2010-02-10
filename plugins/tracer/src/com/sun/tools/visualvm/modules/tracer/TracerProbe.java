@@ -92,6 +92,9 @@ public abstract class TracerProbe<X extends DataSource> {
                 public void probeRemoved(X dataSource) {
                     StateAware.this.probeRemoved(dataSource);
                 }
+                public TracerProgressObject sessionInitializing(X dataSource) {
+                    return StateAware.this.sessionInitializing(dataSource);
+                }
                 public void sessionStarting(X dataSource)
                         throws SessionInitializationException {
                     StateAware.this.sessionStarting(dataSource);
@@ -105,9 +108,6 @@ public abstract class TracerProbe<X extends DataSource> {
                 public void sessionFinished(X dataSource) {
                     StateAware.this.sessionFinished(dataSource);
                 }
-//                public void sessionImpossible(X dataSource) {
-//                    StateAware.this.sessionImpossible(dataSource);
-//                }
             };
             return stateHandler;
         }
@@ -119,6 +119,8 @@ public abstract class TracerProbe<X extends DataSource> {
         // Probe removed from Probes graph
         protected void probeRemoved(X dataSource) {}
 
+
+        protected TracerProgressObject sessionInitializing(X dataSource) { return null; }
 
         // Tracer session is starting
         // Setup probe, deploy, instrument...
@@ -134,10 +136,6 @@ public abstract class TracerProbe<X extends DataSource> {
 
         // Tracer session is stopped
         protected void sessionFinished(X dataSource) {}
-
-
-//        // Tracer UI is closed or target has finished
-//        protected void sessionImpossible(X dataSource) {}
 
     }
 

@@ -38,7 +38,7 @@ import java.awt.Stroke;
 import java.util.Iterator;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import org.netbeans.lib.profiler.charts.ChartComponent;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.axis.AxisMark;
 import org.netbeans.lib.profiler.charts.axis.AxisMarksComputer;
@@ -57,7 +57,7 @@ public class TimelineAxis extends JPanel {
     private int preferredHeight;
 
 
-    public TimelineAxis(ChartComponent chart, AxisMarksComputer marksComputer,
+    public TimelineAxis(TimelineChart chart, AxisMarksComputer marksComputer,
                         AxisMarksPainter marksPainter) {
 
         painter = new HeaderPanel();
@@ -98,13 +98,16 @@ public class TimelineAxis extends JPanel {
         private final Paint meshPaint = Utils.checkedColor(new Color(180, 180, 180, 50));
         private final Stroke meshStroke = new BasicStroke(1);
 
+        private final TimelineChart chart;
         private final AxisMarksComputer marksComputer;
+        private boolean hadTicks = false;
 
 
-        public Axis(ChartComponent chart, AxisMarksComputer marksComputer,
+        public Axis(TimelineChart chart, AxisMarksComputer marksComputer,
                                           AxisMarksPainter marksPainter) {
             super(chart, marksComputer, marksPainter, SwingConstants.NORTH,
                   AxisComponent.MESH_FOREGROUND);
+            this.chart = chart;
             this.marksComputer = marksComputer;
         }
 
@@ -126,7 +129,11 @@ public class TimelineAxis extends JPanel {
             Iterator<AxisMark> marks = marksComputer.marksIterator(
                                                      chartMask.x, chartMask.x + chartMask.width);
 
+            boolean hasTicks = false;
+
             while (marks.hasNext()) {
+                hasTicks = true;
+
                 AxisMark mark = marks.next();
                 int x = mark.getPosition();
 
@@ -134,6 +141,12 @@ public class TimelineAxis extends JPanel {
                 g.setStroke(meshStroke);
                 g.drawLine(x, chartMask.y, x, chartMask.y + chartMask.height);
             }
+
+            if (!hadTicks && hasTicks)
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { chart.invalidateRepaint(); }
+                });
+            hadTicks = hasTicks;
         }
 
     }

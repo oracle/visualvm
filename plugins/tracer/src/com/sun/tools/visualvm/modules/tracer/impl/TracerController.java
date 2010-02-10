@@ -34,11 +34,13 @@ import com.sun.tools.visualvm.modules.tracer.ProbeStateHandler;
 import com.sun.tools.visualvm.modules.tracer.SessionInitializationException;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
+import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -73,6 +75,8 @@ final class TracerController implements DataRemovedListener<DataSource>,
 
     private final PropertyChangeSupport changeSupport;
     private int state;
+
+    private TracerProgressObject progress;
 
     private boolean running;
     private final Timer timer;
@@ -113,11 +117,6 @@ final class TracerController implements DataRemovedListener<DataSource>,
                 TracerController.this.state = state;
                 changeSupport.firePropertyChange(PROPERTY_STATE, oldState, state);
                 if (state == STATE_SESSION_RUNNING) startTimer();
-//                if (state == STATE_SESSION_IMPOSSIBLE) {
-//                    RequestProcessor.getDefault().post(new Runnable() {
-//                        public void run() { notifySessionImpossible(probesCache.entrySet()); }
-//                    });
-//                }
             }
         };
         if (SwingUtilities.isEventDispatchThread()) stateSetter.run();
@@ -126,6 +125,10 @@ final class TracerController implements DataRemovedListener<DataSource>,
 
     int getState() {
         return state;
+    }
+
+    TracerProgressObject getProgress() {
+        return progress;
     }
 
     void addListener(PropertyChangeListener listener) {
@@ -143,7 +146,6 @@ final class TracerController implements DataRemovedListener<DataSource>,
 
     void startSession() {
         if (!model.areProbesDefined()) return;
-        setState(STATE_SESSION_STARTING);
         if (doStartSession()) {
             model.getTimelineSupport().resetValues();
             setState(STATE_SESSION_RUNNING);
@@ -161,6 +163,8 @@ final class TracerController implements DataRemovedListener<DataSource>,
     private boolean doStartSession() {
         Set<Map.Entry<TracerPackage, Set<TracerProbe>>> toNotify =
                 model.getDefinedProbeSets();
+        notifySessionInitializing(toNotify);
+        setState(STATE_SESSION_STARTING);
         if (!notifySessionStarting(toNotify)) return false;
         notifySessionRunning(toNotify);
         return true;
@@ -171,6 +175,53 @@ final class TracerController implements DataRemovedListener<DataSource>,
                 model.getDefinedProbeSets();
         notifySessionStopping(toNotify);
         notifySessionFinished(toNotify);
+    }
+
+    private void notifySessionInitializing(Set<Map.Entry<TracerPackage, Set<TracerProbe>>> items) {
+        List<TracerProgressObject> progresses = new ArrayList();
+        int steps = 0;
+        Iterator<Map.Entry<TracerPackage, Set<TracerProbe>>> itemsI = items.iterator();
+        while (itemsI.hasNext()) {
+            Map.Entry<TracerPackage, Set<TracerProbe>> item = itemsI.next();
+            Set<TracerProbe> probes = item.getValue();
+
+            PackageStateHandler ph = item.getKey().getStateHandler();
+            if (ph != null) try {
+                TracerProgressObject c = ph.sessionInitializing(probes, dataSource);
+                if (c != null) {
+                    steps += c.getSteps();
+                    progresses.add(c);
+                }
+            } catch (Throwable t) {
+                LOGGER.log(Level.INFO, "Package exception in sessionInitializing", t); // NOI18N
+            }
+
+            Iterator<TracerProbe> probesI = probes.iterator();
+            while (probesI.hasNext()) {
+                TracerProbe probe = probesI.next();
+                ProbeStateHandler rh = probe.getStateHandler();
+                if (rh != null) try {
+                    TracerProgressObject c = rh.sessionInitializing(dataSource);
+                    if (c != null)  {
+                        steps += c.getSteps();
+                        progresses.add(c);
+                    }
+                } catch (Throwable t) {
+                    LOGGER.log(Level.INFO, "Probe exception in sessionInitializing", t); // NOI18N
+                }
+            }
+        }
+        if (steps == 0) {
+            progress = null;
+        } else {
+            progress = new TracerProgressObject(steps, "Starting session...");
+            TracerProgressObject.Listener l = new TracerProgressObject.Listener() {
+                public void progressChanged(int step, String text) {
+                    progress.addSteps(step, text);
+                }
+            };
+            for (TracerProgressObject o : progresses) o.addListener(l);
+        }
     }
 
     private boolean notifySessionStarting(Set<Map.Entry<TracerPackage, Set<TracerProbe>>> items) {
@@ -291,32 +342,6 @@ final class TracerController implements DataRemovedListener<DataSource>,
             }
         }
     }
-
-//    private void notifySessionImpossible(Set<Map.Entry<TracerPackage, Set<TracerProbe>>> items) {
-//        Iterator<Map.Entry<TracerPackage, Set<TracerProbe>>> itemsI = items.iterator();
-//        while (itemsI.hasNext()) {
-//            Map.Entry<TracerPackage, Set<TracerProbe>> item = itemsI.next();
-//            Set<TracerProbe> probes = item.getValue();
-//
-//            PackageStateHandler ph = item.getKey().getStateHandler();
-//            if (ph != null) try {
-//                ph.sessionImpossible(probes, dataSource);
-//            } catch (Throwable t) {
-//                LOGGER.log(Level.FINE, "Package exception in sessionImpossible", t); // NOI18N
-//            }
-//
-//            Iterator<TracerProbe> probesI = probes.iterator();
-//            while (probesI.hasNext()) {
-//                TracerProbe probe = probesI.next();
-//                ProbeStateHandler rh = probe.getStateHandler();
-//                if (rh != null) try {
-//                    rh.sessionImpossible(dataSource);
-//                } catch (Throwable t) {
-//                    LOGGER.log(Level.FINE, "Probe exception in sessionImpossible", t); // NOI18N
-//                }
-//            }
-//        }
-//    }
 
 
     // --- Session runtime -----------------------------------------------------

@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
+import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HorizontalLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -38,7 +39,9 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JToggleButton;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
@@ -125,6 +128,7 @@ class TracerView extends DataSourceView {
 
         private AbstractButton startButton;
         private AbstractButton stopButton;
+        private JPanel toolbar;
 
 
         public DataViewComponent.MasterView getView() {
@@ -142,6 +146,7 @@ class TracerView extends DataSourceView {
                     startButton.setSelected(false);
                     stopButton.setEnabled(true);
                     stopButton.requestFocusInWindow();
+                    toolbar.removeAll();
                     break;
                 case TracerController.STATE_SESSION_INACTIVE:
                     startButton.setEnabled(probesDefined);
@@ -160,6 +165,23 @@ class TracerView extends DataSourceView {
                     stopButton.setEnabled(false);
                     startButton.setFocusable(false);
                     startButton.setFocusable(true);
+                    TracerProgressObject progress = controller.getProgress();
+                    if (progress != null) {
+                        final JProgressBar p = new JProgressBar(0, progress.getSteps());
+                        final JLabel l = new JLabel(progress.getText());
+//                        p.setStringPainted(true);
+                        p.setValue(progress.getStep());
+//                        p.setString(progress.getText());
+                        progress.addListener(new TracerProgressObject.Listener() {
+                            public void progressChanged(int step, String text) {
+                                p.setValue(step);
+//                                p.setString(text);
+                                l.setText(text);
+                            }
+                        });
+                        toolbar.add(p);
+                        toolbar.add(l);
+                    }
                     break;
                 case TracerController.STATE_SESSION_STOPPING:
                     startButton.setEnabled(false);
@@ -215,6 +237,10 @@ class TracerView extends DataSourceView {
                 }
             };
             view.add(stopButton);
+
+            toolbar = new JPanel(new HorizontalLayout());
+            toolbar.setOpaque(false);
+            view.add(toolbar);
 
 //            SimpleSeparator s1 = new SimpleSeparator(SwingConstants.VERTICAL);
 //            s1.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
