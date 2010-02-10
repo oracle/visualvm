@@ -337,7 +337,13 @@ public class ThreadInfo {
                 Thread t = ti.thread;
 
                 if ((t != null) && !t.isAlive()) {
-                    ti.thread = null;
+                    if (ti.evBuf != null) {
+                        if (ti.evBufPos > 0) { // dump local event buffer
+                            ProfilerRuntimeCPU.copyLocalBuffer(ti);
+                        }
+                        ti.evBuf = null; // release results buffer
+                    }
+                    ti.thread = null; // release dead thread
                 }
             }
         }

@@ -77,7 +77,7 @@ public class MethodInvokedFirstTimeCommand extends Command {
 
     // for debugging
     public String toString() {
-        return super.toString() + ", methodId: " + methodId; // NOI18N
+        return super.toString() + ", methodId: " + ((int) methodId); // NOI18N
     }
 
     void readObject(ObjectInputStream in) throws IOException {

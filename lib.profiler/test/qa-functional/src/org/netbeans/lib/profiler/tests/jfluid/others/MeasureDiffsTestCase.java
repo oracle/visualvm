@@ -312,8 +312,6 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
         HashMap results = new HashMap(64);
         builder = new CPUCallGraphBuilder();
 
-        assertTrue(builder != null);
-
         //get results with alone run
         try {
             outFile = File.createTempFile("profiler", "test");
@@ -341,21 +339,16 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
         builder.addListener(flattener);
         flattener.setContext(runner.getProfilerClient(),null,null);
         
-        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
-
         builder.startup(runner.getProfilerClient());
 
         try {
             runner.readSavedCalibrationData();
+            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
 
             Process p = startTargetVM(runner);
             assertNotNull("Target JVM is not started", p);
             bindStreams(p);
-
-            runner.connectToStartedVMAndStartTA();
-            System.err.println(">>> runner.connectToStartedVMAndStartTA");
-
-            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
+            runner.attachToTargetVMOnStartup();
 
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());

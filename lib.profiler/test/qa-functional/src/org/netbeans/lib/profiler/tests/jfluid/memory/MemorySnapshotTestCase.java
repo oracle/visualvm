@@ -385,19 +385,15 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
         ProfilingResultsDispatcher.getDefault().addListener(builder);
         builder.startup(runner.getProfilerClient());
 
-        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
-
         try {
             assertTrue("not read calibration data", runner.readSavedCalibrationData());
+            runner.getProfilerClient().initiateMemoryProfInstrumentation(instrMode);
 
             Process p = startTargetVM(runner);
             assertNotNull("Target JVM is not started", p);
             bindStreams(p);
-
-            runner.connectToStartedVMAndStartTA();
+            runner.attachToTargetVMOnStartup();
             
-            runner.getProfilerClient().initiateMemoryProfInstrumentation(instrMode);
-
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());
 
@@ -406,7 +402,7 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             if (!isStatus(STATUS_APP_FINISHED)) {
                 waitForStatus(STATUS_APP_FINISHED);
             }
-            Thread.sleep(6000);
+            Thread.sleep(1000);
             checkMemoryResults(runner, classPrefixes, stacktraceClass);
             setStatus(STATUS_MEASURED);
         } catch (Exception ex) {
