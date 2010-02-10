@@ -402,7 +402,7 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             if (!isStatus(STATUS_APP_FINISHED)) {
                 waitForStatus(STATUS_APP_FINISHED);
             }
-            Thread.sleep(6000);
+            Thread.sleep(1000);
             checkMemoryResults(runner, classPrefixes, stacktraceClass);
             setStatus(STATUS_MEASURED);
         } catch (Exception ex) {
