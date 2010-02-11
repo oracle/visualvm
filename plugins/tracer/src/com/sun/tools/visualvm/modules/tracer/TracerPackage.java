@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -27,15 +27,16 @@ package com.sun.tools.visualvm.modules.tracer;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
-import java.util.Set;
 import javax.swing.Icon;
 
 /**
- * Set of TracerProbes distributed as a single package. The probes are typically
- * designed to monitor the same functional unit on the target - for example
- * disk I/O, network I/O, memory subsystem etc.
+ * TracerPackage is a container for a set of TracerProbes distributed as a single
+ * package (plugin). The probes in a package are typically designed to monitor
+ * the same functional unit on the target - for example disk I/O, network I/O,
+ * memory subsystem etc.
  *
  * @author Jiri Sedlacek
+ * @param <X> any DataSource type
  */
 public abstract class TracerPackage<X extends DataSource> implements Positionable {
 
@@ -124,12 +125,26 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
     public PackageStateHandler<X> getStateHandler() { return null; }
 
 
-    public static abstract class StateAware<X extends DataSource> extends TracerPackage<X> {
+    /**
+     * An abstract adapter class for receiving Tracer session state notifications.
+     * See PackageStateHandler for details.
+     *
+     * @param <X> any DataSource type
+     */
+    public static abstract class SessionAware<X extends DataSource> extends TracerPackage<X> {
 
         private PackageStateHandler<X> stateHandler;
 
 
-        public StateAware(String name, String description,
+        /**
+         * Creates new instance of TracerPackage.SessionAware.
+         *
+         * @param name name of the package
+         * @param description description of the package
+         * @param icon icon of the package
+         * @param preferredPosition preferred position of the package in UI
+         */
+        public SessionAware(String name, String description,
                           Icon icon, int preferredPosition) {
             super(name, description, icon, preferredPosition);
         }
@@ -138,57 +153,110 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
         public synchronized final PackageStateHandler<X> getStateHandler() {
             if (stateHandler == null) stateHandler = new PackageStateHandler<X>() {
                 public void probeAdded(TracerProbe<X> probe, X dataSource) {
-                    StateAware.this.probeAdded(probe, dataSource);
+                    SessionAware.this.probeAdded(probe, dataSource);
                 }
                 public void probeRemoved(TracerProbe<X> probe, X dataSource) {
-                    StateAware.this.probeRemoved(probe, dataSource);
+                    SessionAware.this.probeRemoved(probe, dataSource);
                 }
-                public TracerProgressObject sessionInitializing(Set<TracerProbe<X>> probes,
+                public TracerProgressObject sessionInitializing(TracerProbe<X>[] probes,
                     X dataSource) {
-                    return StateAware.this.sessionInitializing(probes, dataSource);
+                    return SessionAware.this.sessionInitializing(probes, dataSource);
                 }
-                public void sessionStarting(Set<TracerProbe<X>> probes, X dataSource)
+                public void sessionStarting(TracerProbe<X>[] probes, X dataSource)
                         throws SessionInitializationException {
-                    StateAware.this.sessionStarting(probes, dataSource);
+                    SessionAware.this.sessionStarting(probes, dataSource);
                 }
-                public void sessionRunning(Set<TracerProbe<X>> probes, X dataSource) {
-                    StateAware.this.sessionRunning(probes, dataSource);
+                public void sessionRunning(TracerProbe<X>[] probes, X dataSource) {
+                    SessionAware.this.sessionRunning(probes, dataSource);
                 }
-                public void sessionStopping(Set<TracerProbe<X>> probes, X dataSource) {
-                    StateAware.this.sessionStopping(probes, dataSource);
+                public void sessionStopping(TracerProbe<X>[] probes, X dataSource) {
+                    SessionAware.this.sessionStopping(probes, dataSource);
                 }
-                public void sessionFinished(Set<TracerProbe<X>> probes, X dataSource) {
-                    StateAware.this.sessionFinished(probes, dataSource);
+                public void sessionFinished(TracerProbe<X>[] probes, X dataSource) {
+                    SessionAware.this.sessionFinished(probes, dataSource);
                 }
             };
             return stateHandler;
         }
 
 
-        // Probe added to Probes graph
+        /**
+         * Invoked when a probe is added into the Timeline view.
+         *
+         * @param probe added probe
+         * @param dataSource monitored DataSource
+         */
         protected void probeAdded(TracerProbe<X> probe, X dataSource) {}
 
-        // Probe removed from Probes graph
+        /**
+         * Invoked when a probe is removed from the Timeline view.
+         *
+         * @param probe removed probe
+         * @param dataSource monitored DataSource
+         */
         protected void probeRemoved(TracerProbe<X> probe, X dataSource) {}
 
 
-        protected TracerProgressObject sessionInitializing(Set<TracerProbe<X>> probes,
+        /**
+         * Invoked when setting up a new Tracer session. This method allows a
+         * Package to notify the user about initialization progress. The actual
+         * initialization (and updating the TracerProgressObject) should be
+         * performed in the sessionStarting() method. Useful for example for
+         * messaging a delay during instrumention of classes in target application.
+         *
+         * @param probes probes defined for the Tracer session
+         * @param dataSource monitored DataSource
+         * @return TracerProgressObject to track initialization progress
+         */
+        protected TracerProgressObject sessionInitializing(TracerProbe<X>[] probes,
                 X dataSource) { return null; }
 
-        // Tracer session is starting
-        // Setup probe, deploy, instrument...
-        protected void sessionStarting(Set<TracerProbe<X>> probes, X dataSource)
+        /**
+         * Invoked when starting a new Tracer session. Any package/probes
+         * initialization should be performed in this method. If provided by the
+         * sessionInitializing method, a TracerProgressObject should be updated to
+         * reflect the initialization progress. This method may throw a
+         * SessionInitializationException in case of initialization failure. Any
+         * packages/probes initialized so far will be correctly finished, however the
+         * package throwing the SessionInitializationException is responsible for
+         * cleaning up any used resources and restoring its state without any
+         * following events.
+         *
+         * @param probes probes defined for the Tracer session
+         * @param dataSource monitored DataSource
+         * @throws SessionInitializationException in case of initialization failure
+         */
+        protected void sessionStarting(TracerProbe<X>[] probes, X dataSource)
                 throws SessionInitializationException {}
 
-        // Tracer session is running
-        protected void sessionRunning(Set<TracerProbe<X>> probes, X dataSource) {}
+        /**
+         * Invoked when all packages/probes have been started and the Tracer session
+         * is running and collecting data.
+         *
+         * @param probes probes defined for the Tracer session
+         * @param dataSource monitored DataSource
+         */
+        protected void sessionRunning(TracerProbe<X>[] probes, X dataSource) {}
 
-        // Tracer session is stopping
-        // Uninstrument, undeploy, disable...
-        protected void sessionStopping(Set<TracerProbe<X>> probes, X dataSource) {}
+        /**
+         * Invoked when stopping the Tracer session. Any package/probes cleanup
+         * should be performed in this method. Any long-running cleanup code should
+         * preferably be invoked in a separate worker thread to allow the Tracer
+         * session to finish as fast as possible. Be sure to check/wait for the
+         * cleanup thread when starting a new Tracer session in sessionStarting().
+         *
+         * @param probes probes defined for the Tracer session
+         * @param dataSource monitored DataSource
+         */
+        protected void sessionStopping(TracerProbe<X>[] probes, X dataSource) {}
 
-        // Tracer session is stopped
-        protected void sessionFinished(Set<TracerProbe<X>> probes, X dataSource) {}
+        /**
+         * Invoked when the Tracer session has finished.
+         *
+         * @param probes probes defined for the Tracer session
+         * @param dataSource monitored DataSource
+         */
+        protected void sessionFinished(TracerProbe<X>[] probes, X dataSource) {}
 
     }
 

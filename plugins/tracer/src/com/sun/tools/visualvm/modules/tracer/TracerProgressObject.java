@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -31,6 +31,8 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 
 /**
+ * TracerProgressObject describes progress of the TracerPackage/TracerProbe
+ * initialization when starting a Tracer session.
  *
  * @author Jiri Sedlacek
  */
@@ -43,6 +45,23 @@ public final class TracerProgressObject {
     private final Set<Listener> listeners;
 
 
+    /**
+     * Creates new instance of TracerProgressObject with a defined number of
+     * steps.
+     *
+     * @param steps number of steps to finish the initialization
+     */
+    public TracerProgressObject(int steps) {
+        this(steps, null);
+    }
+
+    /**
+     * Creates new instance of TracerProgressObject with a defined number of
+     * steps and text describing the initial state.
+     *
+     * @param steps number of steps to finish the initialization
+     * @param text text describing the initial state
+     */
     public TracerProgressObject(int steps, String text) {
         this.steps = steps;
         this.text = text;
@@ -51,33 +70,93 @@ public final class TracerProgressObject {
     }
 
 
+    /**
+     * Returns number of steps to finish the initialization.
+     *
+     * @return number of steps to finish the initialization
+     */
     public int getSteps() { return steps; }
 
+    /**
+     * Returns current step of the initialization progress.
+     *
+     * @return current step of the initialization progress
+     */
     public int getStep() { return step; }
 
+    /**
+     * Returns text describing the current state or null.
+     *
+     * @return text describing the current state or null
+     */
     public String getText() { return text; }
 
 
+    /**
+     * Adds a single step to the current initialization progress.
+     */
     public void addStep() { addSteps(1); }
 
+    /**
+     * Adds a single step to the current initialization progress and changes
+     * the text describing the current state.
+     *
+     * @param text text describing the current state
+     */
     public void addStep(String text)  { addSteps(1, text); }
 
+    /**
+     * Adds a number of steps to the current initialization progress.
+     *
+     * @param steps number of steps to be addded to the current initialization progress
+     */
     public void addSteps(int steps) { addSteps(steps, text); }
 
+    /**
+     * Adds a number of steps to the current initialization progress and changes
+     * the text describing the current state.
+     *
+     * @param steps number of steps to be addded to the current initialization progress
+     * @param text text describing the current state
+     */
     public void addSteps(int steps, String text) {
         this.step += steps;
         this.text = text;
         fireChange();
     }
 
+    /**
+     * Updates text describing the current state without adding any steps to the
+     * current initialization progress.
+     *
+     * @param text text describing the current state
+     */
     public void setText(String text) {
         this.text = text;
         fireChange();
     }
 
+    /**
+     * Adds all remaining steps to finish the initialization progress.
+     */
+    public void finish() {
+        this.step = steps;
+        fireChange();
+    }
 
+
+    /**
+     * Adds a listener to receive progress notifications.
+     *
+     * @param l listener to be added
+     */
     public void addListener(Listener l) { listeners.add(l); }
 
+    /**
+     * Removes a listener receiving progress notifications.
+     *
+     * @param l listener to be removed.
+     */
     public void removeListener(Listener l) { listeners.remove(l); }
 
     private void fireChange() {
@@ -94,8 +173,18 @@ public final class TracerProgressObject {
     }
 
 
+    /**
+     * Listener to receive notifications about the initialization progress.
+     */
     public static interface Listener {
 
+        /**
+         * Invoked when the progress and/or text describing the current state
+         * changes.
+         *
+         * @param step current step of the initialization progress
+         * @param text text describing the current state
+         */
         public void progressChanged(int step, String text);
 
     }

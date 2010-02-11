@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -46,7 +46,7 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
  *
  * @author Jiri Sedlacek
  */
-public class TimelineXYPainter extends SynchronousXYItemPainter {
+final class TimelineXYPainter extends SynchronousXYItemPainter {
 
     private static final int HOVER_RADIUS = 2; // Not used
 

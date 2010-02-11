@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -23,34 +23,8 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl;
-
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
-import org.openide.modules.ModuleInstall;
-
 /**
- *
- * @author Jiri Sedlacek
+ * Framework and graphical user interface for visual tracing of applications or
+ * other data sources using the Tracer probes.
  */
-public class Installer extends ModuleInstall {
-
-    private TracerViewProvider provider;
-
-
-    public void restored() {
-        provider = new TracerViewProvider();
-        DataSourceViewsManager.sharedInstance().addViewProvider(
-                provider, DataSource.class);
-    }
-
-    public void uninstalled() {
-        if (provider != null)
-            DataSourceViewsManager.sharedInstance().removeViewProvider(provider);
-    }
-
-    public boolean closing() {
-        return true;
-    }
-
-}
+package com.sun.tools.visualvm.modules.tracer;

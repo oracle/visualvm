@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -35,7 +35,21 @@ import java.awt.LayoutManager;
  *
  * @author Jiri Sedlacek
  */
-public class HorizontalLayout implements LayoutManager {
+public final class HorizontalLayout implements LayoutManager {
+
+    private final boolean proportionalHeight;
+    private final int hGap;
+
+
+    public HorizontalLayout(boolean proportionalHeight) {
+        this(proportionalHeight, 0);
+    }
+
+    public HorizontalLayout(boolean proportionalHeight, int hGap) {
+        this.proportionalHeight = proportionalHeight;
+        this.hGap = hGap;
+    }
+
 
     public void layoutContainer(final Container parent) {
         final Insets insets = parent.getInsets();
@@ -45,9 +59,16 @@ public class HorizontalLayout implements LayoutManager {
 
         for (Component comp : parent.getComponents()) {
             if (comp.isVisible()) {
-                final int width = comp.getPreferredSize().width;
-                comp.setBounds(posX, posY, width, height);
-                posX += width;
+                Dimension pref = comp.getPreferredSize();
+                if (proportionalHeight) {
+                    int h = Math.min(pref.height, height);
+                    int o = (height - h) / 2;
+                    comp.setBounds(posX, posY + o, pref.width, h);
+                } else {
+                    comp.setBounds(posX, posY, pref.width, height);
+                }
+                pref.width += hGap;
+                posX += pref.width;
             }
         }
     }

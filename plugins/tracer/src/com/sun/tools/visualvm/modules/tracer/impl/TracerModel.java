@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.modules.tracer.PackageStateHandler;
 import com.sun.tools.visualvm.modules.tracer.ProbeStateHandler;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
@@ -33,12 +34,15 @@ import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.RequestProcessor;
@@ -47,13 +51,13 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-public class TracerModel {
+final class TracerModel {
 
     private static final Logger LOGGER = Logger.getLogger(TracerController.class.getName());
 
     private final DataSource dataSource;
 
-    private final Map<TracerPackage, Set<TracerProbe>> probesCache = new HashMap();
+    private final Map<TracerPackage, List<TracerProbe>> probesCache = new HashMap();
 
     private final Set<Listener> listeners = new HashSet();
 
@@ -106,8 +110,15 @@ public class TracerModel {
         return probes;
     }
 
-    Set<Map.Entry<TracerPackage, Set<TracerProbe>>> getDefinedProbeSets() {
-        Set<Map.Entry<TracerPackage, Set<TracerProbe>>> probes = new HashSet();
+    Set<Map.Entry<TracerPackage, List<TracerProbe>>> getDefinedProbeSets() {
+        Comparator<Map.Entry<TracerPackage, List<TracerProbe>>> comp =
+                new Comparator<Map.Entry<TracerPackage, List<TracerProbe>>>() {
+            public int compare(Entry<TracerPackage, List<TracerProbe>> o1,
+                               Entry<TracerPackage, List<TracerProbe>> o2) {
+                return Positionable.COMPARATOR.compare(o1.getKey(), o2.getKey());
+            }
+        };
+        Set<Map.Entry<TracerPackage, List<TracerProbe>>> probes = new TreeSet(comp);
         synchronized(probesCache) { probes.addAll(probesCache.entrySet()); }
         return probes;
     }
@@ -119,9 +130,9 @@ public class TracerModel {
 
     private void addProbe(TracerPackage<DataSource> p, TracerProbe<DataSource> r) {
         synchronized(probesCache) {
-            Set<TracerProbe> probes = probesCache.get(p);
+            List<TracerProbe> probes = probesCache.get(p);
             if (probes == null) {
-                probes = new HashSet();
+                probes = new ArrayList();
                 probesCache.put(p, probes);
             }
             probes.add(r);
@@ -138,7 +149,7 @@ public class TracerModel {
         boolean probesDefined = true;
 
         synchronized(probesCache) {
-            Set<TracerProbe> probes = probesCache.get(p);
+            List<TracerProbe> probes = probesCache.get(p);
             Iterator<TracerProbe> probesI = probes.iterator();
             while (probesI.hasNext()) {
                 TracerProbe r = probesI.next();

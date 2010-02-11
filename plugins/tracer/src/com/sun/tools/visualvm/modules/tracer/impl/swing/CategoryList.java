@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -44,7 +44,7 @@ import sun.swing.plaf.synth.SynthIcon;
  *
  * @author Jiri Sedlacek
  */
-public class CategoryList extends JPanel {
+public final class CategoryList extends JPanel {
 
     private static final Icon expandedIcon;
     private static final Icon collapsedIcon;
@@ -134,13 +134,9 @@ public class CategoryList extends JPanel {
         }
 
         public void setEnabled(boolean enabled) {
-//            super.setEnabled(enabled);
             Component[] components = getComponents();
             for (Component c : components)
-                if (!(c instanceof JMenuBar)) {
-//                    System.err.println(">>> enabled " + enabled + " set for " + c);
-                    c.setEnabled(enabled);
-                }
+                if (!(c instanceof JMenuBar)) c.setEnabled(enabled);
         }
 
         private void updateState() {

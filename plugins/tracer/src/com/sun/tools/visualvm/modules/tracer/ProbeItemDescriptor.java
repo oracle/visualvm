@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -29,7 +29,8 @@ import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelinePaintersFacto
 import java.awt.Color;
 
 /**
- * This class describes TracerProbe appearance in the UI.
+ * This class describes TracerProbe items appearance in the UI.
+ * Work in progress, the API and implementation is subject to change.
  *
  * @author Jiri Sedlacek
  */
@@ -38,7 +39,8 @@ public abstract class ProbeItemDescriptor {
     private final String name;
     private final String description;
 
-    private final double factor;
+    private final double dataFactor;
+    private final double viewFactor;
     private final String units;
 
     private final int chartType;
@@ -46,12 +48,14 @@ public abstract class ProbeItemDescriptor {
     private final Object[] data;
 
 
-    private ProbeItemDescriptor(String name, String description, double factor,
+    private ProbeItemDescriptor(String name, String description,
+                                double dataFactor, double viewFactor,
                                 String units, int chartType,
                                 Color[] colors, Object[] data) {
         this.name = name;
         this.description = description;
-        this.factor = factor;
+        this.dataFactor = dataFactor;
+        this.viewFactor = viewFactor;
         this.units = units;
         this.chartType = chartType;
         this.colors = colors;
@@ -62,7 +66,9 @@ public abstract class ProbeItemDescriptor {
 
     public final String getDescription() { return description; }
 
-    public final double getFactor() { return factor; }
+    public final double getDataFactor() { return dataFactor; }
+
+    public final double getViewFactor() { return viewFactor; }
 
     public final String getUnits() { return units; }
 
@@ -88,7 +94,7 @@ public abstract class ProbeItemDescriptor {
         }
 
         public LineItem(String name, String description, String units, double factor, Color color, float width) {
-            super(name, description, factor, units, TimelinePaintersFactory.LINE_ITEM,
+            super(name, description, factor, factor, units, TimelinePaintersFactory.LINE_ITEM,
                   new Color[] { color }, new Object[] { Float.valueOf(width == -1f ? 2 : width) });
         }
 

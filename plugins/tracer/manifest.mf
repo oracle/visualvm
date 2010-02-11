@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 OpenIDE-Module: com.sun.tools.visualvm.modules.tracer
-OpenIDE-Module-Install: com/sun/tools/visualvm/modules/tracer/impl/Installer.class
+OpenIDE-Module-Install: com/sun/tools/visualvm/modules/tracer/impl/TracerViewProvider.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/tracer/impl/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -31,7 +31,7 @@ import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
 
 /**
- * This class describes TracerProbe appearance in the UI.
+ * TracerProbeDescriptor defines how a TracerProbe appears in the Tracer UI.
  *
  * @author Jiri Sedlacek
  */

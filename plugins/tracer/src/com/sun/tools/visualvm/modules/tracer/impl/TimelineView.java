@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -27,27 +27,31 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelinePanel;
-import javax.swing.JComponent;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class TimelineView {
+final class TimelineView {
 
     private final TracerModel model;
+    private TimelinePanel panel;
 
 
     public TimelineView(TracerModel model) {
         this.model = model;
     }
 
+    public void reset() {
+        if (panel != null) panel.reset();
+    }
+
 
     // --- UI implementation ---------------------------------------------------
 
     public DataViewComponent.DetailsView getView() {
-        JComponent view = new TimelinePanel(model.getTimelineSupport());
-        return new DataViewComponent.DetailsView("Timeline", null, 10, view, null);
+        panel = new TimelinePanel(model.getTimelineSupport());
+        return new DataViewComponent.DetailsView("Timeline", null, 10, panel, null);
     }
 
 }

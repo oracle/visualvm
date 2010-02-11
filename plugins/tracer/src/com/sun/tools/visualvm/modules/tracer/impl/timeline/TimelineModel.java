@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -35,7 +35,7 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
  *
  * @author Jiri Sedlacek
  */
-public class TimelineModel implements Timeline {
+final class TimelineModel implements Timeline {
 
     private static final int STORAGE_BUFFER_STEP = 50;
 

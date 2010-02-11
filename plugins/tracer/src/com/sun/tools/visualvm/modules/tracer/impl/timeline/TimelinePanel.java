@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -56,20 +56,29 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
  *
  * @author Jiri Sedlacek
  */
-public class TimelinePanel extends JPanel {
+public final class TimelinePanel extends JPanel {
+
+    private final ChartPanel chartPanel;
+
     
     public TimelinePanel(TimelineSupport support) {
         super(new BorderLayout());
         setOpaque(false);
 
         ProbesPanel probesPanel = new ProbesPanel(support);
-        ChartPanel chartPanel = new ChartPanel(support.getChart());
+        chartPanel = new ChartPanel(support.getChart());
 
         add(probesPanel, BorderLayout.WEST);
         add(chartPanel, BorderLayout.CENTER);
 
         new RowMouseHandler(support.getChart(), probesPanel.getMouseTarget(), this).register();
     }
+
+
+    public void reset() {
+        chartPanel.resetPanel();
+    }
+
 
     private static class ProbesPanel extends JPanel {
 
@@ -179,12 +188,12 @@ public class TimelinePanel extends JPanel {
 
     private static class ChartPanel extends JPanel {
 
-        public ChartPanel(TimelineChart chart) {
-            setLayout(new BorderLayout());
-            chart.setBackground(Color.WHITE);
+        private final TimelineChart chart;
 
-            chart.setScale(0.02d, 1);
-            chart.setOffset(0, 0);
+        public ChartPanel(TimelineChart chart) {
+            this.chart = chart;
+
+            chart.setBackground(Color.WHITE);
             chart.addPreDecorator(new RowPreDecorator(chart));
             chart.addPostDecorator(new RowPostDecorator(chart));
 
@@ -209,10 +218,18 @@ public class TimelinePanel extends JPanel {
             chart.attachHorizontalScrollBar(hScrollBar);
             chart.attachVerticalScrollBar(vScrollBar);
 
+            setLayout(new BorderLayout());
             add(axis, BorderLayout.NORTH);
             add(chart, BorderLayout.CENTER);
             add(vScrollBar, BorderLayout.EAST);
             add(hScrollBar, BorderLayout.SOUTH);
+
+            resetPanel();
+        }
+
+        private void resetPanel() {
+            chart.setScale(0.02d, 1);
+            chart.setOffset(0, 0);
         }
 
     }

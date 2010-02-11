@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -30,6 +30,8 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HorizontalLayout;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.SimpleSeparator;
+import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -43,6 +45,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 
@@ -50,13 +53,15 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class TracerView extends DataSourceView {
+final class TracerView extends DataSourceView {
 
     private static final String IMAGE_PATH =
             "com/sun/tools/visualvm/modules/tracer/impl/resources/tracer.png"; // NOI18N
 
     private final TracerModel model;
     private final TracerController controller;
+
+    private TimelineView timelineView;
 
     
     public TracerView(TracerModel model, TracerController controller) {
@@ -80,43 +85,9 @@ class TracerView extends DataSourceView {
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Probes", true), DataViewComponent.TOP_LEFT);
         dvc.addDetailsView(packagesView.getView(), DataViewComponent.TOP_LEFT);
 
-        TimelineView timelineView = new TimelineView(model);
+        timelineView = new TimelineView(model);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Timeline", true), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(timelineView.getView(), DataViewComponent.TOP_RIGHT);
-
-//
-//        packagesView = new PackagesViewSupport(getDataSource(), packages);
-//        timelineView = new TimelineViewSupport(getDataSource(), packages);
-//        settingsView = new SettingsViewSupport(getDataSource(), packages);
-//        detailsView = new DetailsViewSupport(getDataSource(), packages);
-//
-//        PackagesPanel.SelectionHandler handler1 = new PackagesPanel.SelectionHandler() {
-//            public void descriptorSelected(TracerPackage p, TracerProbeDescriptor d) {
-//                timelineView.addDescriptor(d, p);
-////                System.err.println(">>> Selected: " + d.getProbeName() + " in " + p.getName());
-//            }
-//
-//            public void descriptorUnselected(TracerPackage p, TracerProbeDescriptor d) {
-//                timelineView.removeDescriptor(d);
-////                System.err.println(">>> Unselected: " + d.getProbeName() + " in " + p.getName());
-//            }
-//        };
-//
-//        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Probes", true), DataViewComponent.TOP_LEFT);
-//        dvc.addDetailsView(packagesView.getDetailsView(handler1), DataViewComponent.TOP_LEFT);
-//
-//        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Timeline", true), DataViewComponent.TOP_RIGHT);
-//        dvc.addDetailsView(timelineView.getDetailsView(), DataViewComponent.TOP_RIGHT);
-//
-//        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Settings", true), DataViewComponent.BOTTOM_LEFT);
-//        dvc.addDetailsView(settingsView.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
-//        dvc.hideDetailsArea(DataViewComponent.BOTTOM_LEFT);
-//
-//        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", true), DataViewComponent.BOTTOM_RIGHT);
-//        dvc.addDetailsView(detailsView.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
-//        dvc.hideDetailsArea(DataViewComponent.BOTTOM_RIGHT);
-//
-//        packages = null;
 
         return dvc;
     }
@@ -126,8 +97,17 @@ class TracerView extends DataSourceView {
 
     private class MasterViewSupport {
 
+        private static final String START_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/start.png"; // NOI18N
+        private static final String STOP_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/stop.png"; // NOI18N
+        private static final String ERROR_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/error.png"; // NOI18N
+
         private AbstractButton startButton;
         private AbstractButton stopButton;
+
+        private SimpleSeparator toolbarSeparator;
         private JPanel toolbar;
 
 
@@ -146,7 +126,7 @@ class TracerView extends DataSourceView {
                     startButton.setSelected(false);
                     stopButton.setEnabled(true);
                     stopButton.requestFocusInWindow();
-                    toolbar.removeAll();
+                    clearToolbar();
                     break;
                 case TracerController.STATE_SESSION_INACTIVE:
                     startButton.setEnabled(probesDefined);
@@ -165,23 +145,8 @@ class TracerView extends DataSourceView {
                     stopButton.setEnabled(false);
                     startButton.setFocusable(false);
                     startButton.setFocusable(true);
-                    TracerProgressObject progress = controller.getProgress();
-                    if (progress != null) {
-                        final JProgressBar p = new JProgressBar(0, progress.getSteps());
-                        final JLabel l = new JLabel(progress.getText());
-//                        p.setStringPainted(true);
-                        p.setValue(progress.getStep());
-//                        p.setString(progress.getText());
-                        progress.addListener(new TracerProgressObject.Listener() {
-                            public void progressChanged(int step, String text) {
-                                p.setValue(step);
-//                                p.setString(text);
-                                l.setText(text);
-                            }
-                        });
-                        toolbar.add(p);
-                        toolbar.add(l);
-                    }
+                    addProgress();
+                    timelineView.reset();
                     break;
                 case TracerController.STATE_SESSION_STOPPING:
                     startButton.setEnabled(false);
@@ -189,6 +154,8 @@ class TracerView extends DataSourceView {
                     stopButton.setEnabled(false);
                     stopButton.setFocusable(false);
                     stopButton.setFocusable(true);
+                    String error = controller.getErrorMessage();
+                    if (error != null) addMessage(error);
                     break;
             }
         }
@@ -210,16 +177,50 @@ class TracerView extends DataSourceView {
             });
         }
 
+        private void addMessage(String text) {
+            toolbar.removeAll();
+            toolbar.setLayout(new HorizontalLayout(false));
+            toolbar.add(new JLabel(text, new ImageIcon(ImageUtilities.
+                                   loadImage(ERROR_IMAGE_PATH)), JLabel.CENTER));
+            toolbarSeparator.setVisible(true);
+        }
+
+        private void addProgress() {
+            TracerProgressObject progress = controller.getProgress();
+            if (progress != null) {
+                final JProgressBar p = new JProgressBar(0, progress.getSteps());
+                p.setPreferredSize(new Dimension(120, p.getPreferredSize().height + 2));
+                p.setBorder(BorderFactory.createEmptyBorder());
+                String text = progress.getText();
+                final JLabel l = new JLabel(text == null ? "" : text); // NOI18N
+                l.setBorder(BorderFactory.createEmptyBorder(0, 7, 0, 0));
+                p.setValue(progress.getStep());
+                progress.addListener(new TracerProgressObject.Listener() {
+                    public void progressChanged(int step, String text) {
+                        p.setValue(step);
+                        l.setText(text == null ? "" : text); // NOI18N
+                    }
+                });
+                toolbar.removeAll();
+                toolbar.setLayout(new HorizontalLayout(true));
+                toolbar.add(p);
+                toolbar.add(l);
+                toolbarSeparator.setVisible(true);
+            }
+        }
+
+        private void clearToolbar() {
+            toolbar.removeAll();
+            toolbarSeparator.setVisible(false);
+        }
+
         private JComponent createComponents() {
-            JPanel view = new JPanel(new HorizontalLayout());
-            view.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            JPanel view = new JPanel(new HorizontalLayout(false, 3));
+            view.setBorder(BorderFactory.createEmptyBorder(15, 8, 15, 8));
             view.setOpaque(false);
 
-//            setLayout(new HorizontalLayout());
-//            setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-//            setOpaque(false);
-
-            startButton = new JToggleButton("Start") {
+            startButton = new JToggleButton("Start", new ImageIcon(ImageUtilities.
+                                                     loadImage(START_IMAGE_PATH))) {
                 protected void fireActionPerformed(ActionEvent e) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() { controller.startSession(); }
@@ -228,7 +229,8 @@ class TracerView extends DataSourceView {
             };
             view.add(startButton);
 
-            stopButton = new JButton("Stop") {
+            stopButton = new JButton("Stop", new ImageIcon(ImageUtilities.
+                                             loadImage(STOP_IMAGE_PATH))) {
                 protected void fireActionPerformed(ActionEvent e) {
                     startButton.requestFocusInWindow();
                     RequestProcessor.getDefault().post(new Runnable() {
@@ -238,13 +240,14 @@ class TracerView extends DataSourceView {
             };
             view.add(stopButton);
 
-            toolbar = new JPanel(new HorizontalLayout());
+            toolbarSeparator = new SimpleSeparator(SwingConstants.VERTICAL);
+            toolbarSeparator.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+            toolbarSeparator.setVisible(false);
+            view.add(toolbarSeparator);
+
+            toolbar = new JPanel(null);
             toolbar.setOpaque(false);
             view.add(toolbar);
-
-//            SimpleSeparator s1 = new SimpleSeparator(SwingConstants.VERTICAL);
-//            s1.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-//            add(s1);
 //
 //            add(new JButton("Zoom In"));
 //            add(new JButton("Zoom Pad"));

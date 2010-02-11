@@ -42,7 +42,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +76,7 @@ final class TracerController implements DataRemovedListener<DataSource>,
     private int state;
 
     private TracerProgressObject progress;
+    private String error;
 
     private boolean running;
     private final Timer timer;
@@ -131,6 +131,10 @@ final class TracerController implements DataRemovedListener<DataSource>,
         return progress;
     }
 
+    String getErrorMessage() {
+        return error;
+    }
+
     void addListener(PropertyChangeListener listener) {
         if (changeSupport != null && state != STATE_SESSION_IMPOSSIBLE)
             changeSupport.addPropertyChangeListener(PROPERTY_STATE, listener);
@@ -146,10 +150,7 @@ final class TracerController implements DataRemovedListener<DataSource>,
 
     void startSession() {
         if (!model.areProbesDefined()) return;
-        if (doStartSession()) {
-            model.getTimelineSupport().resetValues();
-            setState(STATE_SESSION_RUNNING);
-        }
+        if (doStartSession()) setState(STATE_SESSION_RUNNING);
         else setState(STATE_SESSION_INACTIVE);
     }
 
@@ -161,7 +162,8 @@ final class TracerController implements DataRemovedListener<DataSource>,
     }
 
     private boolean doStartSession() {
-        Set<Map.Entry<TracerPackage, Set<TracerProbe>>> toNotify =
+        model.getTimelineSupport().resetValues();
+        Set<Map.Entry<TracerPackage, List<TracerProbe>>> toNotify =
                 model.getDefinedProbeSets();
         notifySessionInitializing(toNotify);
         setState(STATE_SESSION_STARTING);
@@ -171,23 +173,24 @@ final class TracerController implements DataRemovedListener<DataSource>,
     }
 
     private void doStopSession() {
-        Set<Map.Entry<TracerPackage, Set<TracerProbe>>> toNotify =
+        Set<Map.Entry<TracerPackage, List<TracerProbe>>> toNotify =
                 model.getDefinedProbeSets();
         notifySessionStopping(toNotify);
         notifySessionFinished(toNotify);
     }
 
-    private void notifySessionInitializing(Set<Map.Entry<TracerPackage, Set<TracerProbe>>> items) {
+    private void notifySessionInitializing(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
         List<TracerProgressObject> progresses = new ArrayList();
         int steps = 0;
-        Iterator<Map.Entry<TracerPackage, Set<TracerProbe>>> itemsI = items.iterator();
+        Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
         while (itemsI.hasNext()) {
-            Map.Entry<TracerPackage, Set<TracerProbe>> item = itemsI.next();
-            Set<TracerProbe> probes = item.getValue();
+            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+            List<TracerProbe> probes = item.getValue();
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
 
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {
-                TracerProgressObject c = ph.sessionInitializing(probes, dataSource);
+                TracerProgressObject c = ph.sessionInitializing(probesArr, dataSource);
                 if (c != null) {
                     steps += c.getSteps();
                     progresses.add(c);
@@ -222,36 +225,43 @@ final class TracerController implements DataRemovedListener<DataSource>,
             };
             for (TracerProgressObject o : progresses) o.addListener(l);
         }
+        error = null;
     }
 
-    private boolean notifySessionStarting(Set<Map.Entry<TracerPackage, Set<TracerProbe>>> items) {
-        Iterator<Map.Entry<TracerPackage, Set<TracerProbe>>> itemsI = items.iterator();
-        Map<TracerPackage, Set<TracerProbe>> notifiedItems = new HashMap();
+    private boolean notifySessionStarting(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
+        Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
+        Map<TracerPackage, List<TracerProbe>> notifiedItems = new HashMap();
+        String notifiedName = null;
         try {
             while (itemsI.hasNext()) {
-                Map.Entry<TracerPackage, Set<TracerProbe>> item = itemsI.next();
+                Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
                 TracerPackage pkg = item.getKey();
-                Set<TracerProbe> probes = item.getValue();
+                notifiedName = pkg.getName();
+                List<TracerProbe> probes = item.getValue();
+                TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
 
                 PackageStateHandler ph = pkg.getStateHandler();
-                if (ph != null) ph.sessionStarting(probes, dataSource);
-                Set<TracerProbe> notifiedSet = new HashSet();
-                notifiedItems.put(pkg, notifiedSet);
+                if (ph != null) ph.sessionStarting(probesArr, dataSource);
+                List<TracerProbe> notifiedList = new ArrayList();
+                notifiedItems.put(pkg, notifiedList);
 
                 Iterator<TracerProbe> probesI = probes.iterator();
                 while (probesI.hasNext()) {
                     TracerProbe probe = probesI.next();
+                    notifiedName = probe.getDescriptor().getProbeName();
                     ProbeStateHandler rh = probe.getStateHandler();
                     if (rh != null) rh.sessionStarting(dataSource);
-                    notifiedSet.add(probe);
+                    notifiedList.add(probe);
                 }
             }
             return true;
         } catch (SessionInitializationException sie) {
             // TODO: update UI
             LOGGER.log(Level.INFO, "Package or probe failed to start Tracer session", sie); // NOI18N
+            error = sie.getUserMessage();
+            if (error == null) error = notifiedName + " failed to start";
 
-            Set<Map.Entry<TracerPackage, Set<TracerProbe>>> notifiedItemsE =
+            Set<Map.Entry<TracerPackage, List<TracerProbe>>> notifiedItemsE =
                     notifiedItems.entrySet();
             notifySessionStopping(notifiedItemsE);
             setState(STATE_SESSION_STOPPING);
@@ -265,15 +275,16 @@ final class TracerController implements DataRemovedListener<DataSource>,
         }
     }
 
-    private void notifySessionRunning(Set<Map.Entry<TracerPackage, Set<TracerProbe>>> items) {
-        Iterator<Map.Entry<TracerPackage, Set<TracerProbe>>> itemsI = items.iterator();
+    private void notifySessionRunning(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
+        Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
         while (itemsI.hasNext()) {
-            Map.Entry<TracerPackage, Set<TracerProbe>> item = itemsI.next();
-            Set<TracerProbe> probes = item.getValue();
+            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+            List<TracerProbe> probes = item.getValue();
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
 
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {
-                ph.sessionRunning(probes, dataSource);
+                ph.sessionRunning(probesArr, dataSource);
             } catch (Throwable t) {
                 LOGGER.log(Level.INFO, "Package exception in sessionRunning", t); // NOI18N
             }
@@ -291,15 +302,16 @@ final class TracerController implements DataRemovedListener<DataSource>,
         }
     }
 
-    private void notifySessionStopping(Set<Map.Entry<TracerPackage, Set<TracerProbe>>> items) {
-        Iterator<Map.Entry<TracerPackage, Set<TracerProbe>>> itemsI = items.iterator();
+    private void notifySessionStopping(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
+        Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
         while (itemsI.hasNext()) {
-            Map.Entry<TracerPackage, Set<TracerProbe>> item = itemsI.next();
-            Set<TracerProbe> probes = item.getValue();
+            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+            List<TracerProbe> probes = item.getValue();
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
 
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {
-                ph.sessionStopping(probes, dataSource);
+                ph.sessionStopping(probesArr, dataSource);
             } catch (Throwable t) {
                 LOGGER.log(Level.INFO, "Package exception in sessionStopping", t); // NOI18N
             }
@@ -317,15 +329,16 @@ final class TracerController implements DataRemovedListener<DataSource>,
         }
     }
 
-    private void notifySessionFinished(Set<Map.Entry<TracerPackage, Set<TracerProbe>>> items) {
-        Iterator <Map.Entry<TracerPackage, Set<TracerProbe>>> itemsI = items.iterator();
+    private void notifySessionFinished(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
+        Iterator <Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
         while (itemsI.hasNext()) {
-            Map.Entry<TracerPackage, Set<TracerProbe>> item = itemsI.next();
-            Set<TracerProbe> probes = item.getValue();
+            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+            List<TracerProbe> probes = item.getValue();
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
 
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {
-                ph.sessionFinished(probes, dataSource);
+                ph.sessionFinished(probesArr, dataSource);
             } catch (Throwable t) {
                 LOGGER.log(Level.INFO, "Package exception in sessionFinished", t); // NOI18N
             }

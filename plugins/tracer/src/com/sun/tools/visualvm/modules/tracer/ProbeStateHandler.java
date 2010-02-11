@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -28,46 +28,106 @@ package com.sun.tools.visualvm.modules.tracer;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 
 /**
+ * ProbeStateHandler interface allows an implementing TracerProbe to be
+ * notified about Tracer session state. See TracerProbe.getStateHandler().
  *
  * @author Jiri Sedlacek
+ * @param <X> any DataSource type
  */
 public interface ProbeStateHandler<X extends DataSource> {
 
-    // Probe added to Probes graph
+    /**
+     * Invoked when the is added into the Timeline view.
+     *
+     * @param dataSource monitored DataSource
+     */
     public void probeAdded(X dataSource);
 
-    // Probe removed from Probes graph
+    /**
+     * Invoked when the probe is removed from the Timeline view.
+     *
+     * @param dataSource monitored DataSource
+     */
     public void probeRemoved(X dataSource);
 
 
+    /**
+     * Invoked when setting up a new Tracer session. This method allows a
+     * Probe to notify the user about initialization progress. The actual
+     * initialization (and updating the TracerProgressObject) should be
+     * performed in the sessionStarting() method. Useful for example for
+     * messaging a delay during instrumention of classes in target application.
+     *
+     * @param dataSource monitored DataSource
+     * @return TracerProgressObject to track initialization progress
+     */
     public TracerProgressObject sessionInitializing(X dataSource);
 
-    // Tracer session is starting
-    // Setup probe, deploy, instrument...
+    /**
+     * Invoked when starting a new Tracer session. Any probe initialization
+     * should be performed in this method. If provided by the
+     * sessionInitializing method, a TracerProgressObject should be updated to
+     * reflect the initialization progress. This method may throw a
+     * SessionInitializationException in case of initialization failure. Any
+     * packages/probes initialized so far will be correctly finished, however the
+     * probe throwing the SessionInitializationException is responsible for
+     * cleaning up any used resources and restoring its state without any
+     * following events.
+     *
+     * @param dataSource monitored DataSource
+     * @throws SessionInitializationException in case of initialization failure
+     */
     public void sessionStarting(X dataSource)
             throws SessionInitializationException;
 
-    // Tracer session is running
+    /**
+     * Invoked when all packages/probes have been started and the Tracer session
+     * is running and collecting data.
+     *
+     * @param dataSource monitored DataSource
+     */
     public void sessionRunning(X dataSource);
 
-    // Tracer session is stopping
-    // Uninstrument, undeploy, disable...
+    /**
+     * Invoked when stopping the Tracer session. Any probe cleanup should be
+     * performed in this method. Any long-running cleanup code should preferably
+     * be invoked in a separate worker thread to allow the Tracer session to
+     * finish as fast as possible. Be sure to check/wait for the cleanup thread
+     * when starting a new Tracer session in sessionStarting().
+     *
+     * @param dataSource monitored DataSource
+     */
     public void sessionStopping(X dataSource);
 
-    // Tracer session is stopped
+    /**
+     * Invoked when the Tracer session has finished.
+     *
+     * @param dataSource monitored DataSource
+     */
     public void sessionFinished(X dataSource);
 
 
-//    // Tracer UI is closed or target has finished
-//    public void sessionImpossible(X dataSource);
-
-
+    /**
+     * An abstract adapter class for receiving Tracer session state notifications.
+     *
+     * @param <X> any DataSource type
+     */
     public abstract class Adapter<X extends DataSource> implements ProbeStateHandler<X> {
 
         public void probeAdded(X dataSource) {}
 
         public void probeRemoved(X dataSource) {}
 
+        /**
+         * Invoked when setting up a new Tracer session. This method allows a
+         * Probe to notify the user about initialization progress. The actual
+         * initialization (and updating the TracerProgressObject) should be
+         * performed in the sessionStarting() method. Useful for example for
+         * messaging a delay during instrumention of classes in target application.
+         *
+         * @param dataSource monitored DataSource
+         * @return TracerProgressObject null in default implementation
+         */
         public TracerProgressObject sessionInitializing(X dataSource) { return null; }
 
         public void sessionStarting(X dataSource)

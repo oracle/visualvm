@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -28,21 +28,43 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
+import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import org.openide.modules.ModuleInstall;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class TracerViewProvider extends DataSourceViewProvider<DataSource> {
+final class TracerViewProvider extends ModuleInstall {
 
-    protected boolean supportsViewFor(DataSource dataSource) {
-        return TracerSupportImpl.getInstance().hasPackages(dataSource);
+    private Impl provider;
+
+
+    public synchronized void restored() {
+        if (provider == null) provider = new Impl();
+        DataSourceViewsManager.sharedInstance().addViewProvider(
+                provider, DataSource.class);
     }
 
-    protected DataSourceView createView(DataSource dataSource) {
-        TracerModel model = new TracerModel(dataSource);
-        TracerController controller = new TracerController(model);
-        return new TracerView(model, controller);
+    public synchronized void uninstalled() {
+        if (provider == null) return;
+        DataSourceViewsManager.sharedInstance().removeViewProvider(provider);
+        provider = null;
+    }
+
+
+    private static final class Impl extends DataSourceViewProvider<DataSource> {
+
+        protected boolean supportsViewFor(DataSource dataSource) {
+            return TracerSupportImpl.getInstance().hasPackages(dataSource);
+        }
+
+        protected DataSourceView createView(DataSource dataSource) {
+            TracerModel model = new TracerModel(dataSource);
+            TracerController controller = new TracerController(model);
+            return new TracerView(model, controller);
+        }
+
     }
 
 }
