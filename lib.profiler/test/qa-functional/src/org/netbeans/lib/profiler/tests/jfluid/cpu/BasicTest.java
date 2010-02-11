@@ -56,11 +56,11 @@ public class BasicTest extends CPUTestCase {
     private static final long MAX_DELAY = 25000L;
     
     public static final String[] tests = new String[]{
-        "testLiveResultsAll",
+        /*"testLiveResultsAll",
         "testLiveResultsBasic",
         "testLiveResultsWaitEager",
         "testLiveResultsWaitLazy",
-        //"testLiveResultsWaitSampled" // not stable
+        "testLiveResultsWaitSampled", // not stable */
         "testLiveResultsWaitServer",
         "testLiveResultsWaitTotal",
         "testMethodWithWaitEager",
@@ -74,7 +74,7 @@ public class BasicTest extends CPUTestCase {
         "testMethodWithWaitLazyServer",
         "testMethodWithWaitTotal",
         "testMethodWithWaitTotalServer",
-        //"testSettingsDefault", // not stable
+        "testSettingsDefault", // not stable
         "testSettingsInstrumenManyMethodsLazy",
         "testSettingsInstrumentAllEager",
         "testSettingsInstrumentAllEagerServer",
@@ -119,7 +119,7 @@ public class BasicTest extends CPUTestCase {
                 "testLiveResultsBasic",
                 "testLiveResultsWaitEager",
                 "testLiveResultsWaitLazy",
-                //"testLiveResultsWaitSampled"
+                "testLiveResultsWaitSampled",
                 "testLiveResultsWaitServer",
                 "testLiveResultsWaitTotal",
                 "testMethodWithWaitEager",
@@ -127,35 +127,34 @@ public class BasicTest extends CPUTestCase {
                 "testMethodWithWaitExcludeWEager",
                 "testMethodWithWaitExcludeWLazy",
                 "testMethodWithWaitExcludeWTotal",
-                "testMethodWithWaitLazy" //            /* --- in BasicTest2 --- */
-                //            "testMethodWithWaitLazyServer",
-                //            "testMethodWithWaitTotal",
-                //            "testMethodWithWaitTotalServer",
-                //            "testSettingsDefault",
-                //            "testSettingsInstrumenManyMethodsLazy",
-                //            "testSettingsInstrumentAllEager",
-                //            "testSettingsInstrumentAllEagerServer",
-                //            "testSettingsInstrumentAllLazy",
-                //            "testSettingsInstrumentAllLazyServer",
-                //            "testSettingsInstrumentAllTotal",
-                //            "testSettingsInstrumentAllTotalServer",
-                //            "testSettingsInstrumentExcludeJavas",
-                //            "testSettingsInstrumentExcludeJavasServer",
-                //            /* --- in BasicTest3 --- */
-                //            "testSettingsInstrumentManyMethodsTotal",
-                //            "testSettingsInstrumentNotSpawnedThreads",
-                //            "testSettingsInstrumentNotSpawnedThreadsServer",
-                //            "testSettingsInstrumentRootMethod",
-                //            "testSettingsInstrumentRootMethodServer",
-                //            "testSettingsLimitedThreads",
-                //            "testSettingsLimitedThreadsServer",
-                //            "testSettingsSampledProfilingEager",
-                //            "testSettingsSampledProfilingLazy",
-                //            "testSettingsSampledProfilingServerEager",
-                //            "testSettingsSampledProfilingServerLazy",
-                //            "testSettingsSampledProfilingServerTotal",
-                //            "testSettingsSampledProfilingTotal"
-                ).enableModules(".*").clusters(".*"));
+                "testMethodWithWaitLazy",
+                 "testMethodWithWaitLazyServer",
+                "testMethodWithWaitTotal",
+                "testMethodWithWaitTotalServer",
+                "testSettingsDefault",
+//                "testSettingsInstrumenManyMethodsLazy", JVM crash 
+                "testSettingsInstrumentAllEager",
+                "testSettingsInstrumentAllEagerServer",
+                "testSettingsInstrumentAllLazy",
+                "testSettingsInstrumentAllLazyServer",
+                "testSettingsInstrumentAllTotal",
+                "testSettingsInstrumentAllTotalServer",
+                "testSettingsInstrumentExcludeJavas",
+                "testSettingsInstrumentExcludeJavasServer",
+                "testSettingsInstrumentManyMethodsTotal",
+                "testSettingsInstrumentNotSpawnedThreads",
+                "testSettingsInstrumentNotSpawnedThreadsServer",
+                "testSettingsInstrumentRootMethod",
+                "testSettingsInstrumentRootMethodServer",
+                "testSettingsLimitedThreads",
+                "testSettingsLimitedThreadsServer",
+                "testSettingsSampledProfilingEager",
+                "testSettingsSampledProfilingLazy",
+                "testSettingsSampledProfilingServerEager",
+                "testSettingsSampledProfilingServerLazy",
+                "testSettingsSampledProfilingServerTotal",
+                "testSettingsSampledProfilingTotal"
+                ).enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

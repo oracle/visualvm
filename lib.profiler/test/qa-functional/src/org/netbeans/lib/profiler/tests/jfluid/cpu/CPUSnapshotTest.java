@@ -73,7 +73,7 @@ public class CPUSnapshotTest extends CPUSnapshotTestCase {
             "testThreads",
             "testThreadsServer",
             "testWaits",
-            "testWaitsServer").enableModules(".*").clusters(".*"));
+            "testWaitsServer").enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
