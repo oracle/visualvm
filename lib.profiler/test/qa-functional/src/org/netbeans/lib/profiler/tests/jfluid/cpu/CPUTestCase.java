@@ -110,6 +110,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         public void cctReset() {
             synchronized (resultsLock) {
                 hasResults = false;
+                log("cctReset "+System.currentTimeMillis());
                 resultsLock.notify();
             }
         }
@@ -118,6 +119,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
             synchronized (resultsLock) {
                 if (!hasResults) {
                     try {
+                        log("wait4results "+System.currentTimeMillis());
                         resultsLock.wait(timeout);
                     } catch (InterruptedException e) {
                     }
@@ -128,6 +130,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         }
 
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
+            log("cctEstablished "+emtpy+" "+System.currentTimeMillis());
             if (!emtpy) {
                 cctEstablished(appRootNode);
             }
@@ -273,7 +276,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         settings.setInstrumentEmptyMethods(false);
         settings.setInstrumentGetterSetterMethods(false);
         settings.setInstrumentMethodInvoke(true);
-        settings.setInstrumentSpawnedThreads(rootMethods != null);
+        settings.setInstrumentSpawnedThreads(rootMethods == null);
         settings.setExcludeWaitTime(true);
 
         //        addJVMArgs(settings, "-Dorg.netbeans.lib.profiler.wireprotocol.WireIO=true");
@@ -314,8 +317,6 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
                                 String[] displayMethodsFilter, int errorMethod) {
         CPUCallGraphBuilder builder = new CPUCallGraphBuilder();
 
-        assertTrue(builder != null);
-
         //create runner
         TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
                                                      new TestProfilingPointsProcessor());
@@ -330,19 +331,16 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         builder.addListener(flattener);
         flattener.setContext(runner.getProfilerClient(),null,null);
 
-        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
-
         builder.startup(runner.getProfilerClient());
 
         try {
             runner.readSavedCalibrationData();
+            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
 
             Process p = startTargetVM(runner);
             assertNotNull("Target JVM is not started", p);
             bindStreams(p);
-            runner.connectToStartedVMAndStartTA();
-
-            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
+            runner.attachToTargetVMOnStartup();
 
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());
@@ -351,7 +349,7 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
 
             waitForStatus(STATUS_APP_FINISHED);
 
-            Thread.sleep(6000);
+            Thread.sleep(1000);
 
             if (runner.targetJVMIsAlive()) {
                 log("Get results: " + System.currentTimeMillis());
@@ -411,8 +409,6 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
     protected void startCPUTest(ProfilerEngineSettings settings, String[] measuredMethodsFilter, long checkDelay, long maxDelay) {
         CPUCallGraphBuilder builder = new CPUCallGraphBuilder();
 
-        assertTrue(builder != null);
-
         //create runner
         TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this),
                                                      new TestProfilingPointsProcessor());
@@ -427,26 +423,22 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
         builder.addListener(flattener);
         flattener.setContext(runner.getProfilerClient(),null,null);
 
-        EventBufferResultsProvider.getDefault().startup(runner.getProfilerClient());
-
         builder.startup(runner.getProfilerClient());
 
         try {
             runner.readSavedCalibrationData();
 
-            //      runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
+            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
             Process p = startTargetVM(runner);
             assertNotNull("Target JVM is not started", p);
             bindStreams(p);
 
-            runner.connectToStartedVMAndStartTA();
-
-            runner.getProfilerClient().initiateRecursiveCPUProfInstrumentation(settings.getInstrumentationRootMethods());
+            runner.attachToTargetVMOnStartup();
 
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());
             waitForStatus(STATUS_RESULTS_AVAILABLE | STATUS_APP_FINISHED);
-            assertTrue("ResultsAvailable was not called - issue 69084", isStatus(STATUS_RESULTS_AVAILABLE));
+            assertTrue("ResultsAvailable was not called - issue 69084", (isStatus(STATUS_RESULTS_AVAILABLE) || isStatus(STATUS_LIVERESULTS_AVAILABLE)));
 
             HashMap methods = new HashMap(128);
             long alltime = 0;
