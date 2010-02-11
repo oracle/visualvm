@@ -50,15 +50,15 @@ abstract class TimelineXYItem extends SynchronousXYItem {
 
     // --- Constructor ---------------------------------------------------------
 
-    public TimelineXYItem(String name, int index) {
+    TimelineXYItem(String name, int index) {
         this(name, Long.MAX_VALUE, index);
     }
 
-    public TimelineXYItem(String name, long initialMinY, int index) {
+    TimelineXYItem(String name, long initialMinY, int index) {
         this(name, initialMinY, Long.MIN_VALUE, index);
     }
 
-    public TimelineXYItem(String name, long initialMinY, long initialMaxY, int index) {
+    TimelineXYItem(String name, long initialMinY, long initialMaxY, int index) {
         super(name, initialMinY, initialMaxY);
         this.initialMinY = initialMinY;
         this.initialMaxY = initialMaxY;

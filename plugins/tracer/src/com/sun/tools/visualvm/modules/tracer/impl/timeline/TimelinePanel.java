@@ -87,7 +87,7 @@ public final class TimelinePanel extends JPanel {
         private final HeaderButton decreaseB;
         private final HeaderButton resetB;
 
-        public ProbesPanel(final TimelineSupport support) {
+        ProbesPanel(final TimelineSupport support) {
             final TimelineChart chart = support.getChart();
 
             final JPanel listPanel = new JPanel(new VerticalTimelineLayout(chart));
@@ -190,7 +190,7 @@ public final class TimelinePanel extends JPanel {
 
         private final TimelineChart chart;
 
-        public ChartPanel(TimelineChart chart) {
+        ChartPanel(TimelineChart chart) {
             this.chart = chart;
 
             chart.setBackground(Color.WHITE);
@@ -248,7 +248,7 @@ public final class TimelinePanel extends JPanel {
         private TimelineChart.Row draggingRow;
 
 
-        public RowMouseHandler(TimelineChart chart, Component mouseTarget,
+        RowMouseHandler(TimelineChart chart, Component mouseTarget,
                                Component repaintTarget) {
             this.chart = chart;
             this.mouseTarget = mouseTarget;
@@ -256,7 +256,7 @@ public final class TimelinePanel extends JPanel {
         }
 
 
-        public void register() {
+        void register() {
             chart.addMouseListener(this);
             chart.addMouseMotionListener(this);
             mouseTarget.addMouseListener(this);

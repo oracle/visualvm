@@ -43,7 +43,7 @@ final class RowPostDecorator implements ChartDecorator {
     private final TimelineChart chart;
 
 
-    public RowPostDecorator(TimelineChart chart) {
+    RowPostDecorator(TimelineChart chart) {
         this.chart = chart;
     }
 

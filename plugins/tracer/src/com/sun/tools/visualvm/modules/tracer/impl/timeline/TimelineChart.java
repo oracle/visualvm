@@ -50,10 +50,10 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
  */
 final class TimelineChart extends SynchronousXYChart {
 
-    public static final int MIN_ROW_HEIGHT = 25;
-    public static final int MAX_ROW_HEIGHT = 500;
-    public static final int DEF_ROW_HEIGHT = 75;
-    public static final int ROW_RESIZE_STEP = MIN_ROW_HEIGHT;
+    static final int MIN_ROW_HEIGHT = 25;
+    static final int MAX_ROW_HEIGHT = 500;
+    static final int DEF_ROW_HEIGHT = 75;
+    static final int ROW_RESIZE_STEP = MIN_ROW_HEIGHT;
 
     private int currentRowHeight = DEF_ROW_HEIGHT;
 
@@ -67,7 +67,7 @@ final class TimelineChart extends SynchronousXYChart {
 
     // --- Constructors --------------------------------------------------------
 
-    public TimelineChart(SynchronousXYItemsModel itemsModel) {
+    TimelineChart(SynchronousXYItemsModel itemsModel) {
         super(itemsModel, new PaintersModel.Default());
 
         rows = new ArrayList();
@@ -85,7 +85,7 @@ final class TimelineChart extends SynchronousXYChart {
 
     // --- Rows management -----------------------------------------------------
 
-    public Row addRow() {
+    Row addRow() {
         Row row = new Row();
         int rowIndex = rows.size();
         row.setIndex(rowIndex);
@@ -98,7 +98,7 @@ final class TimelineChart extends SynchronousXYChart {
         return row;
     }
 
-    public Row addRow(int rowIndex) {
+    Row addRow(int rowIndex) {
         Row row = new Row();
         row.setIndex(rowIndex);
         rows.add(rowIndex, row);
@@ -111,12 +111,11 @@ final class TimelineChart extends SynchronousXYChart {
         return row;
     }
 
-    public Row removeRow(int rowIndex) {
+    Row removeRow(int rowIndex) {
         return removeRow(rows.get(rowIndex));
     }
 
-    public Row removeRow(Row row) {
-//        System.err.println(">>> Removing row, current bounds: " + dataBounds + ", current rows: " + rows.size());
+    Row removeRow(Row row) {
         row.clearItems();
         rows.remove(row);
         int rowIndex = row.getIndex();
@@ -125,47 +124,46 @@ final class TimelineChart extends SynchronousXYChart {
 //        repaintRows(row.getIndex());
         updateChart();
         notifyRowRemoved(row);
-//        System.err.println(">>> Removed row, current bounds: " + dataBounds + ", current rows: " + rows.size());
         return row;
     }
 
 
     // --- Rows access ---------------------------------------------------------
 
-    public boolean hasRows() {
+    boolean hasRows() {
         return !rows.isEmpty();
     }
 
-    public int getRowsCount() {
+    int getRowsCount() {
         return rows.size();
     }
 
-    public Row getRow(int rowIndex) {
+    Row getRow(int rowIndex) {
         return rows.get(rowIndex);
     }
 
-    public Row getRow(ChartItem item) {
+    Row getRow(ChartItem item) {
         return itemsToRows.get(item);
     }
 
 
     // --- Row appearance ------------------------------------------------------
 
-    public void setRowHeight(int rowIndex, int rowHeight) {
+    void setRowHeight(int rowIndex, int rowHeight) {
         setRowHeight(rowIndex, rowHeight, true);
     }
 
-    public void setRowHeight(int rowIndex, int rowHeight, boolean checkStep) {
+    void setRowHeight(int rowIndex, int rowHeight, boolean checkStep) {
         rows.get(rowIndex).setHeight(rowHeight, checkStep);
         updateRowOffsets(rowIndex + 1);
         updateChart(); // TODO: update only affected rows!
     }
 
-    public int getRowHeight(int rowIndex) {
+    int getRowHeight(int rowIndex) {
         return rows.get(rowIndex).getHeight();
     }
 
-    public void increaseRowHeights(boolean step) {
+    void increaseRowHeights(boolean step) {
         if (rows.isEmpty()) return;
         int incr = step ? ROW_RESIZE_STEP : 1;
         for (Row row : rows) row.setHeight(row.getHeight() + incr, step);
@@ -174,7 +172,7 @@ final class TimelineChart extends SynchronousXYChart {
         currentRowHeight += incr;
     }
 
-    public void decreaseRowHeights(boolean step) {
+    void decreaseRowHeights(boolean step) {
         if (rows.isEmpty()) return;
         int decr = step ? ROW_RESIZE_STEP : 1;
         for (Row row : rows) row.setHeight(row.getHeight() - decr, step);
@@ -183,7 +181,7 @@ final class TimelineChart extends SynchronousXYChart {
         currentRowHeight = Math.max(currentRowHeight - decr, MIN_ROW_HEIGHT);
     }
 
-    public void resetRowHeights() {
+    void resetRowHeights() {
         if (rows.isEmpty()) return;
         for (Row row : rows) row.setHeight(DEF_ROW_HEIGHT, true);
         updateRowOffsets(0);
@@ -191,7 +189,7 @@ final class TimelineChart extends SynchronousXYChart {
         currentRowHeight = DEF_ROW_HEIGHT;
     }
 
-    public Row getRowAt(int ypos) {
+    Row getRowAt(int ypos) {
         ypos += getOffsetY();
         for (Row row : rows) {
             int pos = row.getOffset();
@@ -202,7 +200,7 @@ final class TimelineChart extends SynchronousXYChart {
         return null;
     }
 
-    public Row getNearestRow(int ypos, int range, boolean noFirst) {
+    Row getNearestRow(int ypos, int range, boolean noFirst) {
         if (rows.size() == 0) return null;
         
         ypos += getOffsetY();
@@ -234,11 +232,11 @@ final class TimelineChart extends SynchronousXYChart {
 
     // --- Row events ----------------------------------------------------------
 
-    public void addRowListener(RowListener listener) {
+    void addRowListener(RowListener listener) {
         rowListeners.add(listener);
     }
 
-    public void removeRowListener(RowListener listener) {
+    void removeRowListener(RowListener listener) {
         rowListeners.remove(listener);
     }
 
@@ -264,17 +262,17 @@ final class TimelineChart extends SynchronousXYChart {
 
     // --- Selection support ---------------------------------------------------
 
-    public void setSelectedRow(int rowIndex) {
+    void setSelectedRow(int rowIndex) {
         if (selectedRow == rowIndex) return;
         selectedRow = rowIndex;
         repaintRows();
     }
 
-    public int getSelectedRow() {
+    int getSelectedRow() {
         return selectedRow;
     }
 
-    public void clearSelection() {
+    void clearSelection() {
         setSelectedRow(-1);
     }
 
@@ -378,9 +376,6 @@ final class TimelineChart extends SynchronousXYChart {
                     invalidateImage(new Rectangle(0, Utils.checkedInt(rowContext.
                                    getViewportOffsetY()), getWidth(), rowContext.
                                    getViewportHeight()));
-                    System.err.println(">>> Invalidating: " + new Rectangle(0, Utils.checkedInt(rowContext.
-                                   getViewportOffsetY()), getWidth(), rowContext.
-                                   getViewportHeight()));
                 }
                 repaintDirty();
 //            }
@@ -395,7 +390,7 @@ final class TimelineChart extends SynchronousXYChart {
 
     // --- Row definition ------------------------------------------------------
 
-    public class Row {
+    class Row {
 
         private int rowIndex;
         private int rowOffset;
@@ -414,7 +409,7 @@ final class TimelineChart extends SynchronousXYChart {
 
         // --- Row telemetry ---------------------------------------------------
 
-        public int getIndex() {
+        int getIndex() {
             return rowIndex;
         }
 
@@ -427,7 +422,7 @@ final class TimelineChart extends SynchronousXYChart {
             }
         }
 
-        public int getOffset() {
+        int getOffset() {
             return rowOffset;
         }
 
@@ -438,14 +433,14 @@ final class TimelineChart extends SynchronousXYChart {
             rowHeight = height;
         }
 
-        public int getHeight() {
+        int getHeight() {
             return rowHeight;
         }
 
 
         // --- Items management ------------------------------------------------
 
-        public void addItems(SynchronousXYItemsModel addedItems, PaintersModel addedPainters) {
+        void addItems(SynchronousXYItemsModel addedItems, PaintersModel addedPainters) {
             int itemsCount = addedItems.getItemsCount();
 
             SynchronousXYItem[] addedItemsArr = new SynchronousXYItem[itemsCount];
@@ -459,12 +454,12 @@ final class TimelineChart extends SynchronousXYChart {
             addItems(addedItemsArr, addedPaintersArr);
         }
 
-        public void addItems(SynchronousXYItem[] addedItems, ItemPainter[] addedPainters) {
+        void addItems(SynchronousXYItem[] addedItems, ItemPainter[] addedPainters) {
             for (SynchronousXYItem item : addedItems) items.add(item);
             addItemsImpl(addedItems, addedPainters, this);
         }
 
-        public void removeItems(SynchronousXYItemsModel removedItems) {
+        void removeItems(SynchronousXYItemsModel removedItems) {
             int itemsCount = removedItems.getItemsCount();
 
             SynchronousXYItem[] removedItemsArr = new SynchronousXYItem[itemsCount];
@@ -474,7 +469,7 @@ final class TimelineChart extends SynchronousXYChart {
             removeItems(removedItemsArr);
         }
 
-        public void removeItems(SynchronousXYItem[] removedItems) {
+        void removeItems(SynchronousXYItem[] removedItems) {
             removeItemsImpl(removedItems);
             for (SynchronousXYItem item : removedItems) items.remove(item);
         }
@@ -482,33 +477,33 @@ final class TimelineChart extends SynchronousXYChart {
 
         // --- Items access ----------------------------------------------------
 
-        public int getItemsCount() {
+        int getItemsCount() {
             return items.size();
         }
 
-        public ChartItem getItem(int itemIndex) {
+        ChartItem getItem(int itemIndex) {
             return items.get(itemIndex);
         }
 
-        public SynchronousXYItem[] getItems() {
+        SynchronousXYItem[] getItems() {
             return items.toArray(new SynchronousXYItem[items.size()]);
         }
 
 
         // --- Row context -----------------------------------------------------
 
-        public ChartContext getContext() {
+        ChartContext getContext() {
             return context;
         }
 
 
         // --- Internal interface ----------------------------------------------
 
-        void setIndex(int rowIndex) {
+        private void setIndex(int rowIndex) {
             this.rowIndex = rowIndex;
         }
 
-        void clearItems() {
+        private void clearItems() {
             if (items.size() == 0) return;
             removeItemsImpl(getItems());
         }

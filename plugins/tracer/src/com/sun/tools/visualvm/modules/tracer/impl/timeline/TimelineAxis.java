@@ -57,7 +57,7 @@ final class TimelineAxis extends JPanel {
     private int preferredHeight;
 
 
-    public TimelineAxis(TimelineChart chart, AxisMarksComputer marksComputer,
+    TimelineAxis(TimelineChart chart, AxisMarksComputer marksComputer,
                         AxisMarksPainter marksPainter) {
 
         painter = new HeaderPanel();
@@ -103,7 +103,7 @@ final class TimelineAxis extends JPanel {
         private boolean hadTicks = false;
 
 
-        public Axis(TimelineChart chart, AxisMarksComputer marksComputer,
+        Axis(TimelineChart chart, AxisMarksComputer marksComputer,
                                           AxisMarksPainter marksPainter) {
             super(chart, marksComputer, marksPainter, SwingConstants.NORTH,
                   AxisComponent.MESH_FOREGROUND);

@@ -68,7 +68,6 @@ public final class TracerSupport {
     }
 
 
-    private TracerSupport() {
-    }
+    private TracerSupport() {}
     
 }

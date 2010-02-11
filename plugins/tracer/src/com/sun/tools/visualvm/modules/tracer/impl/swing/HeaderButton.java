@@ -82,21 +82,19 @@ public class HeaderButton extends HeaderPanel {
         super.setEnabled(enabled);
     }
 
-    protected boolean processMouseEvents() {
-        return true;
-    }
+    protected boolean processMouseEvents() { return true; }
 
     protected void performAction(ActionEvent e) {}
     
-    public void setUI(ButtonUI ui) {
-        if (ui == UI) super.setUI(ui);
-    }
+    public void setUI(ButtonUI ui) { if (ui == UI) super.setUI(ui); }
 
 
     private static class HeaderButtonUI extends BasicButtonUI {
 
         private static final Color FOCUS_COLOR = Color.BLACK;
-        private static final Stroke FOCUS_STROKE = new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 0, new float[] {0, 2}, 0);
+        private static final Stroke FOCUS_STROKE =
+                new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL,
+                                0, new float[] {0, 2}, 0);
 
         protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect, Rectangle textRect, Rectangle iconRect) {
             Graphics2D g2 = (Graphics2D)g;
@@ -109,6 +107,7 @@ public class HeaderButton extends HeaderPanel {
             g.setColor(new Color(100, 100, 100, 70));
             g.fillRect(0, 0, b.getWidth(), b.getHeight());
         }
+
     }
 
 }

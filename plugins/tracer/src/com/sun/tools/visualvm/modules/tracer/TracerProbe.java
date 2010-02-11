@@ -100,7 +100,8 @@ public abstract class TracerProbe<X extends DataSource> {
      * You may use StateAware subclass instead of implementing this method to
      * obtain the notifications.
      *
-     * @return ProbeStateHandler instance which obtains status notifications
+     * @return ProbeStateHandler instance which obtains status notifications,
+     * default implementation returns null
      */
     public ProbeStateHandler<X> getStateHandler() { return null; }
 
@@ -127,6 +128,12 @@ public abstract class TracerProbe<X extends DataSource> {
         }
 
 
+        /**
+         * Returns a predefined ProbeStateHandler which obtains notifications
+         * about the Tracer session state.
+         *
+         * @return predefined ProbeStateHandler which obtains status notifications
+         */
         public synchronized final ProbeStateHandler<X> getStateHandler() {
             if (stateHandler == null) stateHandler = new ProbeStateHandler<X>() {
                 public void probeAdded(X dataSource) {

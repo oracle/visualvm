@@ -59,7 +59,7 @@ final class PackagesView {
     private final TracerController controller;
 
 
-    public PackagesView(TracerModel model, TracerController controller) {
+    PackagesView(TracerModel model, TracerController controller) {
         this.model = model;
         this.controller = controller;
     }
@@ -84,7 +84,7 @@ final class PackagesView {
 
     // --- UI implementation ---------------------------------------------------
 
-    public DataViewComponent.DetailsView getView() {
+    DataViewComponent.DetailsView getView() {
         JComponent view = createComponents();
         initListeners(view);
         refreshState(view);

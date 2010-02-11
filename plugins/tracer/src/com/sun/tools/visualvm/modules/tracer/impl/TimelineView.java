@@ -38,18 +38,18 @@ final class TimelineView {
     private TimelinePanel panel;
 
 
-    public TimelineView(TracerModel model) {
+    TimelineView(TracerModel model) {
         this.model = model;
     }
 
-    public void reset() {
+    void reset() {
         if (panel != null) panel.reset();
     }
 
 
     // --- UI implementation ---------------------------------------------------
 
-    public DataViewComponent.DetailsView getView() {
+    DataViewComponent.DetailsView getView() {
         panel = new TimelinePanel(model.getTimelineSupport());
         return new DataViewComponent.DetailsView("Timeline", null, 10, panel, null);
     }

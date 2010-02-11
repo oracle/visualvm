@@ -49,15 +49,15 @@ final class TimelineColorFactory {
     };
     
 
-    /**
-     * Returns number of colors predefined for VisualVM charts.
-     * Always contains at least 4 colors.
-     *
-     * @return number of colors predefined for VisualVM charts
-     */
-    private static int getPredefinedColorsCount() {
-        return PREDEFINED_COLORS.length;
-    }
+//    /**
+//     * Returns number of colors predefined for VisualVM charts.
+//     * Always contains at least 4 colors.
+//     *
+//     * @return number of colors predefined for VisualVM charts
+//     */
+//    private static int getPredefinedColorsCount() {
+//        return PREDEFINED_COLORS.length;
+//    }
 
     /**
      * Returns a color predefined for VisualVM charts.
@@ -69,7 +69,7 @@ final class TimelineColorFactory {
         return PREDEFINED_COLORS[index];
     }
 
-    public static Color getColor(int index) {
+    static Color getColor(int index) {
         Color color;
 
         if (index >= PREDEFINED_COLORS.length) {
@@ -84,15 +84,15 @@ final class TimelineColorFactory {
     }
 
 
-    /**
-     * Returns number of color pairs predefined for VisualVM charts gradients.
-     * Always contains at least 4 color pairs.
-     *
-     * @return number of color pairs predefined for VisualVM charts gradients
-     */
-    private static int getPredefinedGradientsCount() {
-        return PREDEFINED_GRADIENTS.length;
-    }
+//    /**
+//     * Returns number of color pairs predefined for VisualVM charts gradients.
+//     * Always contains at least 4 color pairs.
+//     *
+//     * @return number of color pairs predefined for VisualVM charts gradients
+//     */
+//    private static int getPredefinedGradientsCount() {
+//        return PREDEFINED_GRADIENTS.length;
+//    }
 
     /**
      * Returns a color pair predefined for VisualVM charts gradients.
@@ -104,7 +104,7 @@ final class TimelineColorFactory {
         return PREDEFINED_GRADIENTS[index];
     }
 
-    public static Color[] getGradient(int index) {
+    static Color[] getGradient(int index) {
         Color[] colors = null;
 
         if (index >= PREDEFINED_GRADIENTS.length) {

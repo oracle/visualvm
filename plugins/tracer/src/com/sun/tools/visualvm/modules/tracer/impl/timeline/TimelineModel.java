@@ -50,7 +50,7 @@ final class TimelineModel implements Timeline {
     private final List<TimelineXYItem> items = new ArrayList();
 
 
-    public TimelineModel() {
+    TimelineModel() {
         this(STORAGE_BUFFER_STEP);
     }
     
@@ -60,12 +60,12 @@ final class TimelineModel implements Timeline {
     }
 
 
-    public int getItemsCount() {
+    int getItemsCount() {
         return items.size();
     }
 
 
-    public TimelineXYItem[] createItems(String[] itemNames) {
+    TimelineXYItem[] createItems(String[] itemNames) {
         int itemsCount = values == null ? 0 : values.length;
         int addedItemsCount = itemNames.length;
         TimelineXYItem[] itemsArr = new TimelineXYItem[addedItemsCount];
@@ -84,7 +84,7 @@ final class TimelineModel implements Timeline {
         return itemsArr;
     }
 
-    public void removeItems(SynchronousXYItem[] removed) {
+    void removeItems(SynchronousXYItem[] removed) {
         removeItemsImpl(removed.length);
 
         int firstRemovedIndex = ((TimelineXYItem)removed[0]).getIndex();
@@ -95,7 +95,7 @@ final class TimelineModel implements Timeline {
     }
 
 
-    public void addValues(long timestamp, long[] newValues) {
+    void addValues(long timestamp, long[] newValues) {
         updateStorage();
 
         timestamps[valuesCount] = timestamp;
@@ -106,7 +106,7 @@ final class TimelineModel implements Timeline {
     }
     
 
-    public void reset() {
+    void reset() {
         valuesCount = 0;
 
         timestamps = null;

@@ -43,7 +43,7 @@ final class RowPreDecorator implements ChartDecorator {
     private final TimelineChart chart;
 
 
-    public RowPreDecorator(TimelineChart chart) {
+    RowPreDecorator(TimelineChart chart) {
         this.chart = chart;
     }
 
@@ -59,7 +59,6 @@ final class RowPreDecorator implements ChartDecorator {
             g.setColor(Color.WHITE);
             g.fill(rowBounds);
             g.setColor(BORDER_COLOR);
-//            g.drawLine(0, rowBounds.y, chart.getWidth(), rowBounds.y);
             g.drawLine(0, rowBounds.y + rowBounds.height + 1,
                        chart.getWidth(), rowBounds.y + rowBounds.height + 1);
         }

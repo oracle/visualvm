@@ -43,7 +43,7 @@ final class VerticalTimelineLayout implements LayoutManager2 {
 
     // --- Constructor ---------------------------------------------------------
 
-    public VerticalTimelineLayout(TimelineChart chart) {
+    VerticalTimelineLayout(TimelineChart chart) {
         this.chart = chart;
     }
 
@@ -84,24 +84,16 @@ final class VerticalTimelineLayout implements LayoutManager2 {
 
     // --- Implicit implementation ---------------------------------------------
 
-    public void addLayoutComponent(Component comp, Object constraints) {
-    }
+    public void addLayoutComponent(Component comp, Object constraints) {}
 
-    public void addLayoutComponent(String name, Component comp) {
-    }
+    public void addLayoutComponent(String name, Component comp) {}
 
-    public void removeLayoutComponent(Component comp) {
-    }
+    public void removeLayoutComponent(Component comp) {}
 
-    public float getLayoutAlignmentX(Container target) {
-        return 0.5f;
-    }
+    public float getLayoutAlignmentX(Container target) { return 0.5f; }
 
-    public float getLayoutAlignmentY(Container target) {
-        return 0.5f;
-    }
+    public float getLayoutAlignmentY(Container target) { return 0.5f; }
 
-    public void invalidateLayout(Container target) {
-    }
+    public void invalidateLayout(Container target) {}
 
 }

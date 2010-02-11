@@ -56,7 +56,7 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
 
     // --- Constructor ---------------------------------------------------------
 
-    public static TimelineXYPainter absolutePainter(float lineWidth,
+    static TimelineXYPainter absolutePainter(float lineWidth,
                                                        Color lineColor,
                                                        Color fillColor1,
                                                        Color fillColor2) {
@@ -65,7 +65,7 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
                                          TYPE_ABSOLUTE, 0);
     }
 
-    public static TimelineXYPainter relativePainter(float lineWidth,
+    static TimelineXYPainter relativePainter(float lineWidth,
                                                        Color lineColor,
                                                        Color fillColor1,
                                                        Color fillColor2,
@@ -76,7 +76,7 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
     }
 
 
-    public TimelineXYPainter(float lineWidth, Color lineColor, Color fillColor1,
+    TimelineXYPainter(float lineWidth, Color lineColor, Color fillColor1,
                      Color fillColor2, int type, int maxValueOffset) {
 
         super(lineWidth, lineColor, fillColor1, type, maxValueOffset);
@@ -87,11 +87,11 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
 
     // --- Public interface ----------------------------------------------------
 
-    public void setPainting(boolean painting) {
+    void setPainting(boolean painting) {
         this.painting = painting;
     }
 
-    public boolean isPainting() {
+    boolean isPainting() {
         return painting;
     }
 

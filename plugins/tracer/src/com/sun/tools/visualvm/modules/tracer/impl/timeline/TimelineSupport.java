@@ -60,10 +60,6 @@ public final class TimelineSupport {
 
     // --- Chart access --------------------------------------------------------
 
-//    public JComponent getChartComponent() {
-//        return chart;
-//    }
-
     TimelineChart getChart() {
         return chart;
     }
@@ -112,20 +108,23 @@ public final class TimelineSupport {
         });
     }
 
-    public TimelineChart.Row getRow(TracerProbe probe) {
-        return rows.get(probes.indexOf(probe));
-    }
-
-    public TracerProbe getProbe(TimelineChart.Row row) {
-        return probes.get(rows.indexOf(row));
-    }
-
     public List<TracerProbe> getProbes() {
         return probes;
     }
 
     public int getItemsCount() {
         return model.getItemsCount();
+    }
+
+
+    // --- Rows <-> Probes mapping ---------------------------------------------
+
+    TimelineChart.Row getRow(TracerProbe probe) {
+        return rows.get(probes.indexOf(probe));
+    }
+
+    TracerProbe getProbe(TimelineChart.Row row) {
+        return probes.get(rows.indexOf(row));
     }
 
 

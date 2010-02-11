@@ -64,7 +64,7 @@ final class TracerView extends DataSourceView {
     private TimelineView timelineView;
 
     
-    public TracerView(TracerModel model, TracerController controller) {
+    TracerView(TracerModel model, TracerController controller) {
         super(model.getDataSource(), "Tracer", new ImageIcon(
               ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 100, false);
         this.model = model;
@@ -111,7 +111,7 @@ final class TracerView extends DataSourceView {
         private JPanel toolbar;
 
 
-        public DataViewComponent.MasterView getView() {
+        DataViewComponent.MasterView getView() {
             JComponent view = createComponents();
             initListeners();
             refreshState(model.areProbesDefined());

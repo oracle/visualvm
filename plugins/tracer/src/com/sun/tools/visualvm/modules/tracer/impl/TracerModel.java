@@ -66,7 +66,7 @@ final class TracerModel {
 
     // --- Constructor ---------------------------------------------------------
 
-    public TracerModel(DataSource dataSource) {
+    TracerModel(DataSource dataSource) {
         this.dataSource = dataSource;
         
         timelineSupport = new TimelineSupport();
@@ -75,7 +75,7 @@ final class TracerModel {
 
     // --- DataSource ----------------------------------------------------------
 
-    public DataSource getDataSource() {
+    DataSource getDataSource() {
         return dataSource;
     }
 
@@ -89,14 +89,14 @@ final class TracerModel {
 
     // --- Probes --------------------------------------------------------------
 
-    public void addDescriptor(final TracerPackage<DataSource> p,
+    void addDescriptor(final TracerPackage<DataSource> p,
                               final TracerProbeDescriptor d) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() { addProbe(p, p.getProbe(d)); }
         });
     }
 
-    public void removeDescriptor(final TracerPackage<DataSource> p,
+    void removeDescriptor(final TracerPackage<DataSource> p,
                                  final TracerProbeDescriptor d) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() { removeProbe(p, d); }
@@ -123,7 +123,7 @@ final class TracerModel {
         return probes;
     }
 
-    public boolean areProbesDefined() {
+    boolean areProbesDefined() {
         synchronized(probesCache) { return !probesCache.isEmpty(); }
     }
 
@@ -227,7 +227,7 @@ final class TracerModel {
             listener.probeRemoved(probe, probesDefined);
     }
 
-    public static interface Listener {
+    static interface Listener {
 
         public void probeAdded(TracerProbe probe);
 
@@ -238,7 +238,7 @@ final class TracerModel {
 
     // --- Timeline ------------------------------------------------------------
 
-    public TimelineSupport getTimelineSupport() {
+    TimelineSupport getTimelineSupport() {
         return timelineSupport;
     }
 

@@ -71,7 +71,10 @@ public final class ProbePresenter extends JLabel {
         Point start = new Point(0, 1);
         Point end = new Point(0, getHeight() - 2);
         float[] fractions = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
-        Color[] colors = new Color[] { new Color(250, 250, 250, 110), new Color(205, 205, 220, 30), new Color(180, 180, 195, 30), new Color(200, 200, 210, 110) };
+        Color[] colors = new Color[] { new Color(250, 250, 250, 110),
+                                       new Color(205, 205, 220, 30),
+                                       new Color(180, 180, 195, 30),
+                                       new Color(200, 200, 210, 110) };
 
         Rectangle rowBounds = new Rectangle(0, 1, getWidth(), getHeight() - 2);
         g2.setPaint(new LinearGradientPaint(start, end, fractions, colors));

@@ -120,7 +120,8 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
      * TracerPackage. Default implementation returns null. You may use StateAware
      * subclass instead of implementing this method to obtain the notifications.
      *
-     * @return PackageStateHandler instance which obtains status notifications
+     * @return PackageStateHandler instance which obtains status notifications,
+     * default implementation returns null
      */
     public PackageStateHandler<X> getStateHandler() { return null; }
 
@@ -150,6 +151,13 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
         }
 
 
+        /**
+         * Returns a predefined PackageStateHandler which obtains notifications
+         * about the Tracer session state in context of TracerProbes provided by this
+         * TracerPackage.
+         *
+         * @return predefined PackageStateHandler which obtains status notifications
+         */
         public synchronized final PackageStateHandler<X> getStateHandler() {
             if (stateHandler == null) stateHandler = new PackageStateHandler<X>() {
                 public void probeAdded(TracerProbe<X> probe, X dataSource) {
