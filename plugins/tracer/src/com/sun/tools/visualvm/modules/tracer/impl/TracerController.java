@@ -219,8 +219,8 @@ final class TracerController implements DataRemovedListener<DataSource>,
         } else {
             progress = new TracerProgressObject(steps, "Starting session...");
             TracerProgressObject.Listener l = new TracerProgressObject.Listener() {
-                public void progressChanged(int step, String text) {
-                    progress.addSteps(step, text);
+                public void progressChanged(int addedSteps, int currentStep, String text) {
+                    progress.addSteps(addedSteps, text);
                 }
             };
             for (TracerProgressObject o : progresses) o.addListener(l);

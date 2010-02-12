@@ -547,7 +547,7 @@ final class TimelineChart extends SynchronousXYChart {
                 LongRect itemBounds = painter.getItemBounds(item);
                 if (LongRect.isClear(bounds)) {
                     LongRect.set(bounds, itemBounds);
-                } else if (LongRect.isEmpty(bounds)) { // Zero height (constant value)
+                } else if (LongRect.isEmpty(itemBounds)) { // Zero height (constant value)
                     LongRect.add(bounds, itemBounds.x, itemBounds.height);
                 } else {
                     LongRect.add(bounds, itemBounds);

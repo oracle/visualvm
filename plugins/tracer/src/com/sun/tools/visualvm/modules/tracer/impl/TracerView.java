@@ -34,6 +34,7 @@ import com.sun.tools.visualvm.modules.tracer.impl.swing.SimpleSeparator;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.AbstractButton;
@@ -46,6 +47,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 
@@ -54,6 +56,9 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 final class TracerView extends DataSourceView {
+
+    private static final int INDETERMINATE_PROGRESS_THRESHOLD =
+                Integer.getInteger("visualvm.tracer.indeterminateProgressThreshold", 2500); // NOI18N
 
     private static final String IMAGE_PATH =
             "com/sun/tools/visualvm/modules/tracer/impl/resources/tracer.png"; // NOI18N
@@ -194,11 +199,21 @@ final class TracerView extends DataSourceView {
                 String text = progress.getText();
                 final JLabel l = new JLabel(text == null ? "" : text); // NOI18N
                 l.setBorder(BorderFactory.createEmptyBorder(0, 7, 0, 0));
-                p.setValue(progress.getStep());
+                p.setValue(progress.getCurrentStep());
+                final Timer t = new Timer(INDETERMINATE_PROGRESS_THRESHOLD, null);
+                t.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        p.setIndeterminate(true);
+                        t.stop();
+                    }
+                });
                 progress.addListener(new TracerProgressObject.Listener() {
-                    public void progressChanged(int step, String text) {
-                        p.setValue(step);
+                    public void progressChanged(int addedSteps, int currentStep, String text) {
+                        t.stop();
+                        p.setIndeterminate(false);
+                        p.setValue(currentStep);
                         l.setText(text == null ? "" : text); // NOI18N
+                        t.start();
                     }
                 });
                 JLabel s = new JLabel("Starting:");

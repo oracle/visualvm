@@ -40,7 +40,8 @@ public final class TracerProgressObject {
 
     private final int steps;
     private String text;
-    private int step;
+    private int currentStep;
+    private int lastStep;
 
     private final Set<Listener> listeners;
 
@@ -68,7 +69,8 @@ public final class TracerProgressObject {
 
         this.steps = steps;
         this.text = text;
-        step = 0;
+        currentStep = 0;
+        lastStep = 0;
         listeners = Collections.synchronizedSet(new HashSet());
     }
 
@@ -85,7 +87,7 @@ public final class TracerProgressObject {
      *
      * @return current step of the initialization progress
      */
-    public int getStep() { return step; }
+    public int getCurrentStep() { return currentStep; }
 
     /**
      * Returns text describing the current state or null.
@@ -125,11 +127,11 @@ public final class TracerProgressObject {
     public void addSteps(int steps, String text) {
         if (steps < 0)
             throw new IllegalArgumentException("steps value must be >= 0: " + steps); // NOI18N
-        if (this.step + steps > this.steps)
+        if (this.currentStep + steps > this.steps)
             throw new IllegalArgumentException("Total steps exceeded: " + // NOI18N
-                                               (this.step + steps) + ">" + this.steps); // NOI18N
+                                               (this.currentStep + steps) + ">" + this.steps); // NOI18N
 
-        this.step += steps;
+        this.currentStep += steps;
         this.text = text;
         fireChange();
     }
@@ -149,7 +151,7 @@ public final class TracerProgressObject {
      * Adds all remaining steps to finish the initialization progress.
      */
     public void finish() {
-        this.step = steps;
+        this.currentStep = steps;
         fireChange();
     }
 
@@ -170,15 +172,17 @@ public final class TracerProgressObject {
 
     private void fireChange() {
         final Set<Listener> toNotify = new HashSet();
-        final int s = step;
-        final String t = text;
+        final int currentStepF = currentStep;
+        final int addedStepsF = currentStep - lastStep;
+        final String textF = text;
         synchronized (listeners) { toNotify.addAll(listeners); }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 for (Listener listener : listeners)
-                    listener.progressChanged(s, t);
+                    listener.progressChanged(addedStepsF, currentStepF, textF);
             }
         });
+        lastStep = currentStep;
     }
 
 
@@ -191,10 +195,11 @@ public final class TracerProgressObject {
          * Invoked when the progress and/or text describing the current state
          * changes.
          *
-         * @param step current step of the initialization progress
+         * @param addedSteps new steps added by the change
+         * @param currentStep current step of the initialization progress
          * @param text text describing the current state
          */
-        public void progressChanged(int step, String text);
+        public void progressChanged(int addedSteps, int currentStep, String text);
 
     }
 
