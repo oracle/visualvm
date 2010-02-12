@@ -81,7 +81,7 @@ public class EventBufferResultsProvider implements ProfilingResultsProvider {
 
     public void dataReady(int buffsize, int instrumentationType) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("Profiling data ready"); // NOI18N
+            LOGGER.finest("Profiling data ready "+buffsize); // NOI18N
         }
 
         byte[] data = new byte[buffsize];
