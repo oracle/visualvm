@@ -78,7 +78,7 @@ public class MethodCPUCCTNode extends TimedCPUCCTNode {
         private MethodCPUCCTNode doLocate(int methodId, RuntimeCPUCCTNode.Children nodes) {
             cctNodeCandidate = null;
             locatedMethodId = methodId;
-            nodes.accept(Locator.this);
+            nodes.accept(this);
 
             return cctNodeCandidate;
         }
