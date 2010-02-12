@@ -73,27 +73,27 @@ public class VMUtils {
 
     public static String typeToVMSignature(final String type) {
         //    System.err.println("sig for: "+type);
-        String ret = type.replaceAll("\\.", "/"); // NOI18N
+        String ret = type.replace('.', '/'); // NOI18N
 
         // 1. replace primitive types or surround class name
         if (ret.startsWith(BOOLEAN_STRING)) {
-            ret = ret.replaceAll(BOOLEAN_STRING, BOOLEAN_CODE);
+            ret = ret.replace(BOOLEAN_STRING, BOOLEAN_CODE);
         } else if (ret.startsWith(CHAR_STRING)) {
-            ret = ret.replaceAll(CHAR_STRING, CHAR_CODE);
+            ret = ret.replace(CHAR_STRING, CHAR_CODE);
         } else if (ret.startsWith(BYTE_STRING)) {
-            ret = ret.replaceAll(BYTE_STRING, BYTE_CODE);
+            ret = ret.replace(BYTE_STRING, BYTE_CODE);
         } else if (ret.startsWith(SHORT_STRING)) {
-            ret = ret.replaceAll(SHORT_STRING, SHORT_CODE);
+            ret = ret.replace(SHORT_STRING, SHORT_CODE);
         } else if (ret.startsWith(INT_STRING)) {
-            ret = ret.replaceAll(INT_STRING, INT_CODE);
+            ret = ret.replace(INT_STRING, INT_CODE);
         } else if (ret.startsWith(LONG_STRING)) {
-            ret = ret.replaceAll(LONG_STRING, LONG_CODE);
+            ret = ret.replace(LONG_STRING, LONG_CODE);
         } else if (ret.startsWith(FLOAT_STRING)) {
-            ret = ret.replaceAll(FLOAT_STRING, FLOAT_CODE);
+            ret = ret.replace(FLOAT_STRING, FLOAT_CODE);
         } else if (ret.startsWith(DOUBLE_STRING)) {
-            ret = ret.replaceAll(DOUBLE_STRING, DOUBLE_CODE);
+            ret = ret.replace(DOUBLE_STRING, DOUBLE_CODE);
         } else if (ret.startsWith(VOID_STRING)) {
-            ret = ret.replaceAll(VOID_STRING, VOID_CODE);
+            ret = ret.replace(VOID_STRING, VOID_CODE);
         } else {
             // if the remainder is a class, surround it with "L...;"
             final int arIdx = ret.indexOf('['); // NOI18N
