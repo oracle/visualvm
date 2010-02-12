@@ -155,7 +155,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result = new StringBuffer();
             result.append(quote+flatProfileContainer.getMethodNameAtRow(i)+quote+separator);
             result.append(quote+flatProfileContainer.getPercentAtRow(i)+quote+separator);
-            result.append(quote+((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms"+quote+separator);
+            result.append(quote+((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+quote+separator);
             result.append(quote+flatProfileContainer.getNInvocationsAtRow(i)+quote+newLine);
             eDD.dumpData(result);
         }

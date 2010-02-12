@@ -550,7 +550,7 @@ public final class IDEUtils {
     }
 
     private static String forwardSlashes(String text) {
-        return text.replaceAll("\\\\", "/"); // NOI18N
+        return text.replace('\\', '/'); // NOI18N
     }
 
     private static boolean matchesMask(final ProfilingSettings settings, final int mask) {
