@@ -344,8 +344,8 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
         }
 
         String className = getClassName(classId);
-        className = className.replaceAll("\\[", ""); // NOI18N
-        className = className.replaceAll("/", "."); // NOI18N
+        className = className.replace("[", ""); // NOI18N
+        className = className.replace("/", "."); // NOI18N
 
         actionsHandler.showSourceForMethod(className, null, null);
     }

@@ -100,7 +100,7 @@ public class HyperlinkLabel extends HTMLLabel {
     public void setText(String value) {
         Font font = getFont();
         value = value.replaceAll("\\n\\r|\\r\\n|\\n|\\r", "<br>"); //NOI18N
-        value = value.replaceAll("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
+        value = value.replace("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
         super.setText("<html><body style=\"font-size: " + font.getSize() + "pt; font-family: " + font.getName() + ";\">" + value
                       + "</body></html>"); //NOI18N
     }
