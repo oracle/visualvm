@@ -201,8 +201,11 @@ final class TracerView extends DataSourceView {
                         l.setText(text == null ? "" : text); // NOI18N
                     }
                 });
+                JLabel s = new JLabel("Starting:");
+                s.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 4));
                 toolbar.removeAll();
                 toolbar.setLayout(new HorizontalLayout(true));
+                toolbar.add(s);
                 toolbar.add(p);
                 toolbar.add(l);
                 toolbarSeparator.setVisible(true);

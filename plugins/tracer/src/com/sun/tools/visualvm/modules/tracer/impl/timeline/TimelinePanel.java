@@ -195,6 +195,7 @@ public final class TimelinePanel extends JPanel {
 
             chart.setBackground(Color.WHITE);
             chart.addPreDecorator(new RowPreDecorator(chart));
+//            chart.addPreDecorator(new RowPostDecorator(chart));
             chart.addPostDecorator(new RowPostDecorator(chart));
 
             TimeMarksPainter marksPainter = new TimeMarksPainter() {

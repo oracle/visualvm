@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
+import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.lib.profiler.charts.Timeline;
@@ -65,17 +66,24 @@ final class TimelineModel implements Timeline {
     }
 
 
-    TimelineXYItem[] createItems(String[] itemNames) {
+    TimelineXYItem[] createItems(ProbeItemDescriptor[] itemDescriptors) {
         int itemsCount = values == null ? 0 : values.length;
-        int addedItemsCount = itemNames.length;
+        int addedItemsCount = itemDescriptors.length;
         TimelineXYItem[] itemsArr = new TimelineXYItem[addedItemsCount];
 
         for (int i = 0; i < addedItemsCount; i++) {
-            itemsArr[i] = new TimelineXYItem(itemNames[i], 0, itemsCount + i) {
-                public long getYValue(int valueIndex) {
-                    return values[getIndex()][valueIndex];
-                }
-            };
+            if (itemDescriptors[i] instanceof ProbeItemDescriptor.ValueItem) {
+                ProbeItemDescriptor.ValueItem d =
+                        (ProbeItemDescriptor.ValueItem)itemDescriptors[i];
+                itemsArr[i] = new TimelineXYItem(d.getName(), d.getMinValue(),
+                                                 d.getMaxValue(), itemsCount + i) {
+                    public long getYValue(int valueIndex) {
+                        return values[getIndex()][valueIndex];
+                    }
+                };
+            } else {
+                // Reserved for non-value items
+            }
             items.add(itemsArr[i]);
         }
 

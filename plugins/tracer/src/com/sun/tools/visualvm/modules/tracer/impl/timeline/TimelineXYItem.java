@@ -45,20 +45,20 @@ abstract class TimelineXYItem extends SynchronousXYItem {
     private long minY;
     private long maxY;
 
-    private int index;
+    private int itemIndex;
 
 
     // --- Constructor ---------------------------------------------------------
 
-    TimelineXYItem(String name, int index) {
-        this(name, Long.MAX_VALUE, index);
+    TimelineXYItem(String name, int itemIndex) {
+        this(name, Long.MAX_VALUE, itemIndex);
     }
 
-    TimelineXYItem(String name, long initialMinY, int index) {
-        this(name, initialMinY, Long.MIN_VALUE, index);
+    TimelineXYItem(String name, long initialMinY, int itemIndex) {
+        this(name, initialMinY, Long.MIN_VALUE, itemIndex);
     }
 
-    TimelineXYItem(String name, long initialMinY, long initialMaxY, int index) {
+    TimelineXYItem(String name, long initialMinY, long initialMaxY, int itemIndex) {
         super(name, initialMinY, initialMaxY);
         this.initialMinY = initialMinY;
         this.initialMaxY = initialMaxY;
@@ -66,15 +66,15 @@ abstract class TimelineXYItem extends SynchronousXYItem {
         maxY = Long.MIN_VALUE;
         bounds = new LongRect();
         lastIndex = -1;
-        setIndex(index);
+        setIndex(itemIndex);
     }
 
 
     // --- Internal interface --------------------------------------------------
 
-    final void setIndex(int itemIndex) { this.index = itemIndex; }
+    final void setIndex(int itemIndex) { this.itemIndex = itemIndex; }
 
-    final int getIndex() { return index; }
+    final int getIndex() { return itemIndex; }
 
 
     // --- Item telemetry ------------------------------------------------------

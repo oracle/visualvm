@@ -57,27 +57,27 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
     // --- Constructor ---------------------------------------------------------
 
     static TimelineXYPainter absolutePainter(float lineWidth,
-                                                       Color lineColor,
-                                                       Color fillColor1,
-                                                       Color fillColor2) {
+                                             Color lineColor,
+                                             Color fillColor1,
+                                             Color fillColor2) {
 
         return new TimelineXYPainter(lineWidth, lineColor, fillColor1, fillColor2,
                                          TYPE_ABSOLUTE, 0);
     }
 
     static TimelineXYPainter relativePainter(float lineWidth,
-                                                       Color lineColor,
-                                                       Color fillColor1,
-                                                       Color fillColor2,
-                                                       int maxOffset) {
+                                             Color lineColor,
+                                             Color fillColor1,
+                                             Color fillColor2,
+                                             int maxOffset) {
 
         return new TimelineXYPainter(lineWidth, lineColor, fillColor1, fillColor2,
-                                         TYPE_RELATIVE, maxOffset);
+                                     TYPE_RELATIVE, maxOffset);
     }
 
 
     TimelineXYPainter(float lineWidth, Color lineColor, Color fillColor1,
-                     Color fillColor2, int type, int maxValueOffset) {
+                      Color fillColor2, int type, int maxValueOffset) {
 
         super(lineWidth, lineColor, fillColor1, type, maxValueOffset);
         this.fillColor2 = Utils.checkedColor(fillColor2);
@@ -283,15 +283,11 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
         }
 
         if (type == TYPE_RELATIVE) {
-
             return getViewBoundsRelative(dataBounds, item, context);
-
         } else {
-
             LongRect viewBounds = context.getViewRect(dataBounds);
             LongRect.addBorder(viewBounds, HOVER_RADIUS);
             return viewBounds;
-
         }
     }
 

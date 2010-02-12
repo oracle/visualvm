@@ -63,6 +63,9 @@ public final class TracerProgressObject {
      * @param text text describing the initial state
      */
     public TracerProgressObject(int steps, String text) {
+        if (steps < 1)
+            throw new IllegalArgumentException("steps value must be >= 1: " + steps); // NOI18N
+
         this.steps = steps;
         this.text = text;
         step = 0;
@@ -120,6 +123,12 @@ public final class TracerProgressObject {
      * @param text text describing the current state
      */
     public void addSteps(int steps, String text) {
+        if (steps < 0)
+            throw new IllegalArgumentException("steps value must be >= 0: " + steps); // NOI18N
+        if (this.step + steps > this.steps)
+            throw new IllegalArgumentException("Total steps exceeded: " + // NOI18N
+                                               (this.step + steps) + ">" + this.steps); // NOI18N
+
         this.step += steps;
         this.text = text;
         fireChange();

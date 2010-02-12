@@ -544,15 +544,20 @@ final class TimelineChart extends SynchronousXYChart {
             for (int i = 0; i < itemsCount; i++) {
                 ChartItem item = row.getItem(i);
                 ItemPainter painter = painters.getPainter(item);
-                if (LongRect.isClear(bounds))
-                    LongRect.set(bounds, painter.getItemBounds(item));
-                else
-                    LongRect.add(bounds, painter.getItemBounds(item));
+                LongRect itemBounds = painter.getItemBounds(item);
+                if (LongRect.isClear(bounds)) {
+                    LongRect.set(bounds, itemBounds);
+                } else if (LongRect.isEmpty(bounds)) { // Zero height (constant value)
+                    LongRect.add(bounds, itemBounds.x, itemBounds.height);
+                } else {
+                    LongRect.add(bounds, itemBounds);
+                }
             }
 
             double oldScaleY = scaleY;
             scaleY = (double)(row.getHeight() - marginTop - marginBottom) /
-                     (double)bounds.height;
+                     (double)(bounds.height == 0 ? 1 : bounds.height);
+
             if (scaleY != oldScaleY) invalidateImage(Utils.checkedRectangle(
                                                      getViewRect(bounds)));
         }

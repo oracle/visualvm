@@ -76,18 +76,12 @@ public final class TimelineSupport {
                 rows.add(row);
 
                 ProbeItemDescriptor[] itemDescriptors = probe.getItemDescriptors();
-                String[] itemNames = new String[itemDescriptors.length];
-                for (int i = 0; i < itemDescriptors.length; i++)
-                    itemNames[i] = itemDescriptors[i].getName();
-
-
-                TimelineXYItem[] items = model.createItems(itemNames);
+                TimelineXYItem[] items = model.createItems(itemDescriptors);
                 XYItemPainter[] painters  = new XYItemPainter[items.length];
-
-                // TODO: use TimelinePaintersFactory to respect ProbeItemDescriptors!
                 for (int i = 0; i < painters.length; i++)
-                    painters[i] = TimelineXYPainter.absolutePainter(2, TimelineColorFactory.
-                                                                    getColor(i), null, null);
+                    painters[i] = TimelinePaintersFactory.createPainter(
+                            itemDescriptors[i], i);
+                
                 row.addItems(items, painters);
             }
         });

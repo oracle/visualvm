@@ -25,14 +25,71 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
+import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
+import java.awt.Color;
+
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class TimelinePaintersFactory {
+final class TimelinePaintersFactory {
 
-    public static final int LINE_ITEM = 1;
-    public static final int FILL_ITEM = 2;
-    public static final int LINE_FILL_ITEM = 3;
+    static TimelineXYPainter createPainter(ProbeItemDescriptor descriptor,
+                                           int itemIndex) {
+
+        // --- ValueItem -------------------------------------------------------
+        if (descriptor instanceof ProbeItemDescriptor.ValueItem)
+            return createValuePainter((ProbeItemDescriptor.ValueItem)descriptor,
+                                      itemIndex);
+
+        return null;
+    }
+
+    private static TimelineXYPainter createValuePainter(
+            ProbeItemDescriptor.ValueItem descriptor, int itemIndex) {
+
+        // --- XYItem ----------------------------------------------------------
+        if (descriptor instanceof ProbeItemDescriptor.XYItem)
+            return createXYPainter((ProbeItemDescriptor.XYItem)descriptor,
+                                   itemIndex);
+        
+//        // --- BarItem ---------------------------------------------------------
+//        if (descriptor instanceof ProbeItemDescriptor.BarItem)
+//            return createXYPainter((ProbeItemDescriptor.BarItem)descriptor,
+//                                   itemIndex);
+
+        return null;
+    }
+
+    private static TimelineXYPainter createXYPainter(
+            ProbeItemDescriptor.XYItem descriptor, int itemIndex) {
+
+        float lineWidth = descriptor.getLineWidth();
+        if (lineWidth == ProbeItemDescriptor.XYItem.DEFAULT_LINE_WIDTH)
+            lineWidth = 2f;
+
+        Color lineColor = descriptor.getLineColor();
+        if (lineColor == ProbeItemDescriptor.DEFAULT_COLOR)
+            lineColor = TimelineColorFactory.getColor(itemIndex);
+
+        Color fillColor1 = descriptor.getFillColor1();
+        if (fillColor1 == ProbeItemDescriptor.DEFAULT_COLOR) {
+            if (descriptor instanceof ProbeItemDescriptor.FillItem)
+                fillColor1 = TimelineColorFactory.getColor(itemIndex);
+            else
+                fillColor1 = TimelineColorFactory.getGradient(itemIndex)[0];
+        }
+
+        Color fillColor2 = descriptor.getFillColor2();
+        if (fillColor2 == ProbeItemDescriptor.DEFAULT_COLOR) {
+            if (descriptor instanceof ProbeItemDescriptor.FillItem)
+                fillColor2 = null;
+            else
+                fillColor2 = TimelineColorFactory.getGradient(itemIndex)[1];
+        }
+
+        return TimelineXYPainter.absolutePainter(lineWidth, lineColor,
+                                                 fillColor1, fillColor2);
+    }
 
 }
