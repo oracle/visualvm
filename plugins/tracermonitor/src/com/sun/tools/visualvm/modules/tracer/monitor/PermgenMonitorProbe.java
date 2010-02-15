@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -63,8 +63,8 @@ class PermgenMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            new ProbeItemDescriptor.LineItem("Size"),
-            new ProbeItemDescriptor.LineItem("Used")
+            new ProbeItemDescriptor.LineFillItem("Size", "Monitors current PermGen size", 0, 10 * 1024 * 1024, "B"),
+            new ProbeItemDescriptor.LineFillItem("Used", "Monitors currently PermGen heap", 0, 10 * 1024 * 1024, "B")
         };
     }
 

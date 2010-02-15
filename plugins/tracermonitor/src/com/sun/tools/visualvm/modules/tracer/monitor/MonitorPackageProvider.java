@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -40,14 +40,15 @@ class MonitorPackageProvider extends ModuleInstall {
     private Impl provider;
 
 
-    public void restored() {
+    public synchronized void restored() {
         if (provider == null) provider = new Impl();
         TracerSupport.getInstance().registerPackageProvider(provider);
     }
 
-    public void uninstalled() {
+    public synchronized void uninstalled() {
         if (provider == null) return;
         TracerSupport.getInstance().unregisterPackageProvider(provider);
+        provider = null;
     }
 
 

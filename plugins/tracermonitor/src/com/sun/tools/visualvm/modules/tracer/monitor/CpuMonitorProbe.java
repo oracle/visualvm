@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -123,8 +123,8 @@ class CpuMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            new ProbeItemDescriptor.LineItem("CPU usage"),
-            new ProbeItemDescriptor.LineItem("GC activity")
+            new ProbeItemDescriptor.LineItem("CPU usage", "Monitors relative CPU usage (%)", 0, 1000, "%"),
+            new ProbeItemDescriptor.LineItem("GC activity", "Monitors relative GC activity (%)", 0, 1000, "%")
         };
     }
 

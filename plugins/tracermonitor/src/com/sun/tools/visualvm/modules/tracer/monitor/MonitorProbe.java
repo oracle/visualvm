@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -24,17 +24,22 @@
  */
 package com.sun.tools.visualvm.modules.tracer.monitor;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-abstract class MonitorProbe extends TracerProbe {
+abstract class MonitorProbe extends TracerProbe<Application> {
+
+    private static final Logger LOGGER = Logger.getLogger(MonitorProbe.class.getName());
 
     private final MonitoredDataResolver resolver;
 
@@ -53,9 +58,9 @@ abstract class MonitorProbe extends TracerProbe {
     public synchronized final long[] getItemValues(long timestamp) {
         try {
             MonitoredData data = resolver.getMonitoredData(timestamp);
-            return getValues(data);
+            if (data != null) return getValues(data);
         } catch (Throwable t) {
-            System.err.println(">>> Failed to read Monitor data: " + t);
+            LOGGER.log(Level.INFO, "Failed to read Monitor data", t); // NOI18N
         }
 
         long[] values = new long[valuesCount];

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -67,8 +67,8 @@ class ClassesMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            new ProbeItemDescriptor.LineItem("Total loaded"),
-            new ProbeItemDescriptor.LineItem("Shared loaded")
+            new ProbeItemDescriptor.LineItem("Total loaded", "Monitors number of all Classes currently loaded by the JVM", 0, 100, null),
+            new ProbeItemDescriptor.LineItem("Shared loaded", "Monitors number of shared Classes currently loaded by the JVM", 0, 100, null)
         };
     }
 
