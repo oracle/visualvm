@@ -46,6 +46,7 @@ import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
+import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
@@ -198,6 +199,11 @@ public final class TimelinePanel extends JPanel {
 //            chart.addPreDecorator(new RowPostDecorator(chart));
             chart.addPostDecorator(new RowPostDecorator(chart));
 
+            TimelineSelectionOverlay selectionOverlay = new TimelineSelectionOverlay();
+            chart.addOverlayComponent(selectionOverlay);
+            selectionOverlay.registerChart(chart);
+            enableSelection(chart);
+
             TimeMarksPainter marksPainter = new TimeMarksPainter() {
                 public Dimension getPreferredSize() {
                     Dimension size = super.getPreferredSize();
@@ -236,6 +242,17 @@ public final class TimelinePanel extends JPanel {
     }
 
 
+    private static void enableSelection(TimelineChart chart) {
+        chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
+        chart.getSelectionModel().setMoveMode(ChartSelectionModel.SELECTION_LINE_V);
+    }
+
+    private static void disableSelection(TimelineChart chart) {
+        chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
+        chart.getSelectionModel().setMoveMode(ChartSelectionModel.SELECTION_NONE);
+    }
+
+
     private static class RowMouseHandler extends MouseAdapter {
 
         private static final int RESIZE_RANGE = 3;
@@ -267,10 +284,12 @@ public final class TimelinePanel extends JPanel {
 
         public void mousePressed(MouseEvent e) {
             updateRowState(e, true);
+            if (draggingRow != null) disableSelection(chart);
             updateCursor();
         }
 
         public void mouseReleased(MouseEvent e) {
+            if (draggingRow != null) enableSelection(chart);
             updateRowState(e, false);
             updateCursor();
         }

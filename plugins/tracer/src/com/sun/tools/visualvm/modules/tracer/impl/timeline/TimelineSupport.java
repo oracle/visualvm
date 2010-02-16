@@ -44,6 +44,8 @@ public final class TimelineSupport {
     private final TimelineModel model;
     private final SynchronousXYItemsModel itemsModel;
 
+    private TimelineTooltipOverlay tooltips;
+
     private final List<TracerProbe> probes = new ArrayList();
     private final List<TimelineChart.Row> rows = new ArrayList();
 
@@ -55,6 +57,8 @@ public final class TimelineSupport {
         model = new TimelineModel();
         itemsModel = new SynchronousXYItemsModel(model);
         chart = new TimelineChart(itemsModel);
+        tooltips = new TimelineTooltipOverlay(chart);
+        chart.addOverlayComponent(tooltips);
     }
 
 
@@ -83,6 +87,8 @@ public final class TimelineSupport {
                             itemDescriptors[i], i);
                 
                 row.addItems(items, painters);
+
+                setupTooltips();
             }
         });
     }
@@ -98,6 +104,8 @@ public final class TimelineSupport {
 
                 rows.remove(row);
                 probes.remove(probe);
+
+                setupTooltips();
             }
         });
     }
@@ -108,6 +116,41 @@ public final class TimelineSupport {
 
     public int getItemsCount() {
         return model.getItemsCount();
+    }
+
+
+    // --- Tooltips support ----------------------------------------------------
+
+    private void setupTooltips() {
+        TimelineTooltipPainter[] ttPainters = new TimelineTooltipPainter[chart.getRowsCount()];
+        for (int i = 0; i < ttPainters.length; i++) {
+            final TimelineChart.Row row = chart.getRow(i);
+            final TracerProbe probe = getProbe(row);
+            ttPainters[i] = new TimelineTooltipPainter(new TimelineTooltipModel() {
+
+                public int getRowsCount() {
+                    return row.getItemsCount();
+                }
+
+                public String getRowName(int index) {
+                    return ((TimelineXYItem)row.getItem(index)).getName();
+                }
+
+                public String getRowValue(int index, long itemValue) {
+                    return Long.toString(itemValue);
+                }
+
+                public String getRowUnits(int index) {
+                    ProbeItemDescriptor d = probe.getItemDescriptors()[index];
+                    if (d instanceof ProbeItemDescriptor.ValueItem)
+                        return ((ProbeItemDescriptor.ValueItem)d).getUnitsString();
+                    else
+                        return null; // NOI18N
+                }
+
+            });
+        }
+        tooltips.setupPainters(ttPainters);
     }
 
 
