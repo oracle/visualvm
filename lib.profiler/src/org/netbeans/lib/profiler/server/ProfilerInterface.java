@@ -1270,8 +1270,7 @@ public class ProfilerInterface implements CommonConstants {
             String name = loadedClassesArray[i].getName();
 
             if (name.startsWith("[") || internalClassName(name)) { // NOI18N
-
-                continue; // NOI18N
+                continue;
             }
 
             loadedClassNames[idx] = name;
