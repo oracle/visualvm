@@ -72,7 +72,7 @@ public class MemorySnapshotTest extends MemorySnapshotTestCase {
             "testSettingsLiveness",
             "testSettingsLivenessServer",
             "testSettingsLivenessStackTraces",
-            "testSettingsLivenessStackTracesServer").enableModules(".*").clusters(".*"));
+            "testSettingsLivenessStackTracesServer").enableModules(".*").clusters(".*").gui(false));
     }
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 

@@ -70,7 +70,7 @@ public class BasicTest extends MonitorTestCase {
             "testBasicMemory",
             "testCascadeThreads",
             "testCascadeThreadsCPU",
-            "testCascadeThreadsMemory").enableModules(".*").clusters(".*"));
+            "testCascadeThreadsMemory").enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
