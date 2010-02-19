@@ -28,7 +28,6 @@ package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
-import java.awt.Point;
 import java.awt.Rectangle;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartDecorator;
@@ -39,6 +38,13 @@ import org.netbeans.lib.profiler.charts.swing.Utils;
  * @author Jiri Sedlacek
  */
 final class RowGradientDecorator implements ChartDecorator {
+
+    private static final Color SELECTED_FILTER = new Color(0, 0, 200, 50);
+    private static final float[] FRACTIONS = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
+    private static final Color[] COLORS = new Color[] { new Color(250, 250, 250, 110),
+                                                        new Color(205, 205, 220, 30),
+                                                        new Color(180, 180, 195, 30),
+                                                        new Color(200, 200, 210, 110) };
 
     private final TimelineChart chart;
 
@@ -54,19 +60,15 @@ final class RowGradientDecorator implements ChartDecorator {
             TimelineChart.Row row = chart.getRow(i);
             ChartContext rowContext = row.getContext();
 
-            Point start = new Point(0, Utils.checkedInt(rowContext.getViewportOffsetY()) + 1);
-            Point end = new Point(0, Utils.checkedInt(rowContext.getViewportOffsetY()) + rowContext.getViewportHeight() - 2);
-            float[] fractions = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
-            Color[] colors = new Color[] { new Color(250, 250, 250, 110), new Color(205, 205, 220, 30), new Color(180, 180, 195, 30), new Color(200, 200, 210, 110) };
-            
-            Rectangle rowBounds = new Rectangle(0, Utils.checkedInt(rowContext.getViewportOffsetY()) + 1,
-                                                chart.getWidth(), rowContext.getViewportHeight() - 2);
-            g.setPaint(new LinearGradientPaint(start, end, fractions, colors));
-            g.fill(rowBounds);
+            int y = Utils.checkedInt(rowContext.getViewportOffsetY());
+            int h = Utils.checkedInt(rowContext.getViewportHeight() - 1);
+
+            g.setPaint(new LinearGradientPaint(0, y, 0, y + h, FRACTIONS, COLORS));
+            g.fillRect(0, y, chart.getWidth(), h);
 
             if (chart.getSelectedRow() == i) {
-                g.setPaint(new Color(0, 0, 200, 50));
-                g.fill(rowBounds);
+                g.setColor(SELECTED_FILTER);
+                g.fillRect(0, y, chart.getWidth(), h);
             }
         }
     }

@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -97,7 +98,7 @@ final class TimelineChart extends SynchronousXYChart {
         row.updateOffset();
 //        repaintRows(row.getIndex());
         updateChart();
-        notifyRowAdded(row);
+        notifyRowsAdded(Collections.singletonList(row));
         return row;
     }
 
@@ -110,7 +111,7 @@ final class TimelineChart extends SynchronousXYChart {
         updateRowIndexes(rowIndex + 1);
 //        repaintRows(rowIndex);
         updateChart();
-        notifyRowAdded(row);
+        notifyRowsAdded(Collections.singletonList(row));
         return row;
     }
 
@@ -126,7 +127,7 @@ final class TimelineChart extends SynchronousXYChart {
         updateRowOffsets(rowIndex);
 //        repaintRows(row.getIndex());
         updateChart();
-        notifyRowRemoved(row);
+        notifyRowsRemoved(Collections.singletonList(row));
         return row;
     }
 
@@ -157,8 +158,10 @@ final class TimelineChart extends SynchronousXYChart {
     }
 
     void setRowHeight(int rowIndex, int rowHeight, boolean checkStep) {
-        rows.get(rowIndex).setHeight(rowHeight, checkStep);
+        Row row = rows.get(rowIndex);
+        boolean changed = row.setHeight(rowHeight, checkStep);
         updateRowOffsets(rowIndex + 1);
+        if (changed) notifyRowsResized(Collections.singletonList(row));
         updateChart(); // TODO: update only affected rows!
     }
 
@@ -169,8 +172,12 @@ final class TimelineChart extends SynchronousXYChart {
     void increaseRowHeights(boolean step) {
         if (rows.isEmpty()) return;
         int incr = step ? ROW_RESIZE_STEP : 1;
-        for (Row row : rows) row.setHeight(row.getHeight() + incr, step);
+        List<Row> resized = new ArrayList(rows.size());
+        for (Row row : rows)
+            if (row.setHeight(row.getHeight() + incr, step))
+                resized.add(row);
         updateRowOffsets(0);
+        if (!resized.isEmpty()) notifyRowsResized(resized);
         updateChart(); // TODO: update only affected rows!
         currentRowHeight += incr;
     }
@@ -178,16 +185,24 @@ final class TimelineChart extends SynchronousXYChart {
     void decreaseRowHeights(boolean step) {
         if (rows.isEmpty()) return;
         int decr = step ? ROW_RESIZE_STEP : 1;
-        for (Row row : rows) row.setHeight(row.getHeight() - decr, step);
+        List<Row> resized = new ArrayList(rows.size());
+        for (Row row : rows)
+            if (row.setHeight(row.getHeight() - decr, step))
+                resized.add(row);
         updateRowOffsets(0);
+        if (!resized.isEmpty()) notifyRowsResized(resized);
         updateChart(); // TODO: update only affected rows!
         currentRowHeight = Math.max(currentRowHeight - decr, MIN_ROW_HEIGHT);
     }
 
     void resetRowHeights() {
         if (rows.isEmpty()) return;
-        for (Row row : rows) row.setHeight(DEF_ROW_HEIGHT, true);
+        List<Row> resized = new ArrayList(rows.size());
+        for (Row row : rows)
+            if (row.setHeight(DEF_ROW_HEIGHT, true))
+                resized.add(row);
         updateRowOffsets(0);
+        if (!resized.isEmpty()) notifyRowsResized(new ArrayList(rows));
         updateChart(); // TODO: update only affected rows!
         currentRowHeight = DEF_ROW_HEIGHT;
     }
@@ -244,20 +259,29 @@ final class TimelineChart extends SynchronousXYChart {
     }
 
 
-    private void notifyRowAdded(final Row row) {
+    private void notifyRowsAdded(final List<Row> rows) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 for (RowListener listener : rowListeners)
-                    listener.rowAdded(row);
+                    listener.rowsAdded(rows);
             }
         });
     }
 
-    private void notifyRowRemoved(final Row row) {
+    private void notifyRowsRemoved(final List<Row> rows) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 for (RowListener listener : rowListeners)
-                    listener.rowRemoved(row);
+                    listener.rowsRemoved(rows);
+            }
+        });
+    }
+
+    private void notifyRowsResized(final List<Row> rows) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (RowListener listener : rowListeners)
+                    listener.rowsResized(rows);
             }
         });
     }
@@ -429,11 +453,13 @@ final class TimelineChart extends SynchronousXYChart {
             return rowOffset;
         }
 
-        private void setHeight(int height, boolean checkStep) {
+        private boolean setHeight(int height, boolean checkStep) {
             height = Math.max(MIN_ROW_HEIGHT, height);
             height = Math.min(MAX_ROW_HEIGHT, height);
             if (checkStep) height = height / ROW_RESIZE_STEP * ROW_RESIZE_STEP;
+            boolean changed = rowHeight != height;
             rowHeight = height;
+            return changed;
         }
 
         int getHeight() {
@@ -618,9 +644,11 @@ final class TimelineChart extends SynchronousXYChart {
 
     public static interface RowListener {
 
-        public void rowAdded(Row row);
+        public void rowsAdded(List<Row> rows);
 
-        public void rowRemoved(Row row);
+        public void rowsRemoved(List<Row> rows);
+
+        public void rowsResized(List<Row> rows);
 
     }
 

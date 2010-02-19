@@ -30,8 +30,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
-import java.awt.Point;
-import java.awt.Rectangle;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
@@ -40,6 +38,13 @@ import javax.swing.JLabel;
  * @author Jiri Sedlacek
  */
 public final class ProbePresenter extends JLabel {
+
+    private static final Color SELECTED_FILTER = new Color(0, 0, 200, 50);
+    private static final float[] FRACTIONS = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
+    private static final Color[] COLORS = new Color[] { new Color(250, 250, 250, 110),
+                                                        new Color(205, 205, 220, 30),
+                                                        new Color(180, 180, 195, 30),
+                                                        new Color(200, 200, 210, 110) };
     
     private boolean isSelected = false;
 
@@ -65,25 +70,20 @@ public final class ProbePresenter extends JLabel {
 
 
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+//        super.paintComponent(g);
+        
+        int y = getHeight() - 1;
 
-        Graphics2D g2 = (Graphics2D)g;
-        Point start = new Point(0, 1);
-        Point end = new Point(0, getHeight() - 2);
-        float[] fractions = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
-        Color[] colors = new Color[] { new Color(250, 250, 250, 110),
-                                       new Color(205, 205, 220, 30),
-                                       new Color(180, 180, 195, 30),
-                                       new Color(200, 200, 210, 110) };
-
-        Rectangle rowBounds = new Rectangle(0, 1, getWidth(), getHeight() - 2);
-        g2.setPaint(new LinearGradientPaint(start, end, fractions, colors));
-        g2.fill(rowBounds);
+        ((Graphics2D)g).setPaint(
+                new LinearGradientPaint(0, 0, 0, y, FRACTIONS, COLORS));
+        g.fillRect(0, 0, getWidth(), y);
 
         if (isSelected) {
-            g2.setPaint(new Color(0, 0, 200, 50));
-            g2.fill(rowBounds);
+            g.setColor(SELECTED_FILTER);
+            g.fillRect(0, 0, getWidth(), y);
         }
+
+        super.paintComponent(g);
     }
 
 }

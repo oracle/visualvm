@@ -40,6 +40,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JViewport;
@@ -83,6 +84,7 @@ public final class TimelinePanel extends JPanel {
 
     private static class ProbesPanel extends JPanel {
 
+        private final JPanel listPanel;
         private final JViewport viewport;
         private final HeaderButton increaseB;
         private final HeaderButton decreaseB;
@@ -91,7 +93,13 @@ public final class TimelinePanel extends JPanel {
         ProbesPanel(final TimelineSupport support) {
             final TimelineChart chart = support.getChart();
 
-            final JPanel listPanel = new JPanel(new VerticalTimelineLayout(chart));
+            listPanel = new JPanel(new VerticalTimelineLayout(chart)) {
+                public Dimension getPreferredSize() {
+                    Dimension d = super.getPreferredSize();
+                    d.height = Utils.checkedInt(chart.getChartContext().getViewHeight());
+                    return d;
+                }
+            };
             listPanel.setOpaque(false);
 
             viewport = new JViewport();
@@ -105,20 +113,11 @@ public final class TimelinePanel extends JPanel {
                             long lastOffsetX, final long lastOffsetY,
                             double lastScaleX, double lastScaleY) {
 
-                    final int chartOffsetY = Utils.checkedInt(chart.getOffsetY());
-                    final int chartHeight = Utils.checkedInt(chart.getChartContext().getViewHeight());
-
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            Dimension size = listPanel.getSize();
-                            if (size.height != chartHeight) {
-                                size.height = chartHeight;
-                                listPanel.setSize(size);
-                            }
-
-                            if (lastOffsetY != offsetY) {
-                                viewport.setViewPosition(new Point(0, chartOffsetY));
-                            }
+                            if (lastOffsetY != offsetY)
+                                viewport.setViewPosition(new Point(0, Utils.
+                                                         checkedInt(offsetY)));
                         }
                     });
                 }
@@ -164,17 +163,30 @@ public final class TimelinePanel extends JPanel {
             setBackground(new Color(247, 247, 247));
 
             chart.addRowListener(new TimelineChart.RowListener() {
-                public void rowAdded(TimelineChart.Row row) {
-                    listPanel.add(new ProbePresenter(support.getProbe(row)), row.getIndex());
+                public void rowsAdded(List<TimelineChart.Row> rows) {
+                    for (TimelineChart.Row row : rows)
+                        listPanel.add(new ProbePresenter(support.getProbe(row)),
+                                                         row.getIndex());
+                    syncListPanel();
                     refreshButtons(true);
                 }
-                public void rowRemoved(TimelineChart.Row row) {
-                    listPanel.remove(row.getIndex());
+                public void rowsRemoved(List<TimelineChart.Row> rows) {
+                    for (TimelineChart.Row row : rows)
+                        listPanel.remove(row.getIndex());
+                    syncListPanel();
                     refreshButtons(chart.hasRows());
+                }
+                public void rowsResized(List<TimelineChart.Row> rows) {
+                    syncListPanel();
                 }
             });
 
             refreshButtons(chart.hasRows());
+        }
+
+        private void syncListPanel() {
+            listPanel.doLayout();
+            listPanel.repaint();
         }
 
         Component getMouseTarget() { return viewport; }
