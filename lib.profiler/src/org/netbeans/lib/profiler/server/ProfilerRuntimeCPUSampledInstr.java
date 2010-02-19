@@ -72,10 +72,17 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private boolean terminated;
+        private volatile boolean terminated;
         private int count;
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        SamplingThread() {
+            Threads.recordAdditionalProfilerOwnThread(this);
+            setPriority(Thread.MAX_PRIORITY);
+            setDaemon(true);
+            setName(PROFILER_SPECIAL_EXEC_THREAD_NAME + " 9"); // NOI18N
+        }
 
         public void run() {
             if (isSolaris) {
@@ -444,8 +451,6 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
     protected static void createNewDataStructures() {
         ProfilerRuntimeCPU.createNewDataStructures();
         st = new SamplingThread();
-        st.setPriority(Thread.MAX_PRIORITY);
-        Threads.recordAdditionalProfilerOwnThread(st);
         st.start();
     }
 
