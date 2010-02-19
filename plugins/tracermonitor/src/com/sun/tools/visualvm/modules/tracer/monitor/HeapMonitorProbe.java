@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.tracer.monitor;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
+import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import javax.swing.Icon;
@@ -63,8 +64,12 @@ class HeapMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            new ProbeItemDescriptor.LineFillItem("Size", "Monitors current Heap size", 0, 10 * 1024 * 1024, "B"),
-            new ProbeItemDescriptor.LineFillItem("Used", "Monitors currently used Heap", 0, 10 * 1024 * 1024, "B")
+            ProbeItemDescriptor.lineFillItem("Size",
+                    "Monitors current Heap size", ItemValueFormatter.DEFAULT_BYTES,
+                    0, 10 * 1024 * 1024),
+            ProbeItemDescriptor.lineFillItem("Used",
+                    "Monitors currently used Heap", ItemValueFormatter.DEFAULT_BYTES,
+                    0, 10 * 1024 * 1024)
         };
     }
 

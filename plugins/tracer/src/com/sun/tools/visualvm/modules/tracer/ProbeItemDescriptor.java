@@ -25,208 +25,180 @@
 
 package com.sun.tools.visualvm.modules.tracer;
 
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.FillItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.LineFillItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.LineItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
 
 /**
  * ProbeItemDescriptor describes TracerProbe items appearance in the UI.
- * Use the predefined subclasses to create instances of ProbeItemDescriptor.
+ * Use the predefined static methods to create instances of ProbeItemDescriptor.
  *
  * @author Jiri Sedlacek
  */
 public abstract class ProbeItemDescriptor {
 
+    // --- Public predefined constants -----------------------------------------
+
+    public static final long MIN_VALUE_UNDEFINED = Long.MAX_VALUE;
+    public static final long MAX_VALUE_UNDEFINED = Long.MIN_VALUE;
+
     public static final Color DEFAULT_COLOR = new Color(0, 0, 0); // use == to identify this instance!
+
+    public static final float DEFAULT_LINE_WIDTH = -1.0F;
+
+
+    // --- Private instance variables ------------------------------------------
 
     private final String name;
     private final String description;
 
 
-    private ProbeItemDescriptor(String name, String description) {
+    // --- Protected constructor -----------------------------------------------
+
+    protected ProbeItemDescriptor(String name, String description) {
+        if (name == null)
+            throw new IllegalArgumentException("name cannot be null"); // NOI18N
+
+        // Custom ProbeItemDescriptor subclasses are currently not supported.
+        // May be supported in future versions together with custom Painters.
+        if (!(this instanceof ValueItemDescriptor))
+            throw new UnsupportedOperationException("Custom descriptor not supported. Use the predefined descriptors."); // NOI18N
+
         this.name = name;
         this.description = description;
     }
 
+
+    // --- Common implementation -----------------------------------------------
 
     public final String getName() { return name; }
 
     public final String getDescription() { return description; }
 
 
-    public static abstract class ValueItem extends ProbeItemDescriptor {
+    // === Public factory methods ==============================================
 
-        public static final long MIN_VALUE_UNDEFINED = Long.MAX_VALUE;
-        public static final long MAX_VALUE_UNDEFINED = Long.MIN_VALUE;
+    // --- LineItem ------------------------------------------------------------
 
-        private final long minValue;
-        private final long maxValue;
-        private final double dataFactor;
-        private final double viewFactor;
-        private final String unitsString;
+    public static ProbeItemDescriptor lineItem(String name, String description) {
+        return new LineItemDescriptor(name, description);
+    }
+    
+    public static ProbeItemDescriptor lineItem(String name, String description,
+                                               ItemValueFormatter formatter) {
 
+        return new LineItemDescriptor(name, description, formatter);
+    }
 
-        private ValueItem(String name, String description, long minValue,
-                          long maxValue, double dataFactor, double viewFactor,
-                          String unitsString) {
-            super(name, description);
-            this.minValue = minValue;
-            this.maxValue = maxValue;
-            this.dataFactor = dataFactor;
-            this.viewFactor = viewFactor;
-            this.unitsString = unitsString;
-        }
+    public static ProbeItemDescriptor lineItem(String name, String description,
+                                               ItemValueFormatter formatter,
+                                               long minValue, long maxValue) {
 
+        return new LineItemDescriptor(name, description, formatter, minValue,
+                                      maxValue);
+    }
 
-        public final long getMinValue() { return minValue; }
+    public static ProbeItemDescriptor lineItem(String name, String description,
+                                               ItemValueFormatter formatter,
+                                               double dataFactor, long minValue,
+                                               long maxValue) {
 
-        public final long getMaxValue() { return maxValue; }
+        return new LineItemDescriptor(name, description, formatter, dataFactor,
+                                      minValue, maxValue);
+    }
 
-        public final double getDataFactor() { return dataFactor; }
+    public static ProbeItemDescriptor lineItem(String name, String description,
+                                               ItemValueFormatter formatter,
+                                               double dataFactor, long minValue,
+                                               long maxValue, float lineWidth,
+                                               Color lineColor) {
 
-        public final double getViewFactor() { return viewFactor; }
-
-        public final String getUnitsString() { return unitsString; }
-
+        return new LineItemDescriptor(name, description, formatter, dataFactor,
+                                      minValue, maxValue, lineWidth, lineColor);
     }
 
 
-    public static abstract class XYItem extends ValueItem {
+    // --- FillItem ------------------------------------------------------------
 
-        public static final float DEFAULT_LINE_WIDTH = -1f;
+    public static ProbeItemDescriptor fillItem(String name, String description) {
+        return new FillItemDescriptor(name, description);
+    }
 
-        private final float lineWidth;
-        private final Color lineColor;
-        private final Color fillColor1;
-        private final Color fillColor2;
+    public static ProbeItemDescriptor fillItem(String name, String description,
+                                               ItemValueFormatter formatter) {
 
+        return new FillItemDescriptor(name, description, formatter);
+    }
 
-        private XYItem(String name, String description, long minValue,
-                       long maxValue, double dataFactor, double viewFactor,
-                       String unitsString, float lineWidth, Color lineColor,
-                       Color fillColor1, Color fillColor2) {
+    public static ProbeItemDescriptor fillItem(String name, String description,
+                                               ItemValueFormatter formatter,
+                                               long minValue, long maxValue) {
 
-            super(name, description, minValue, maxValue, dataFactor, viewFactor,
-                  unitsString);
-            this.lineWidth = lineWidth;
-            this.lineColor = lineColor;
-            this.fillColor1 = fillColor1;
-            this.fillColor2 = fillColor2;
-        }
+        return new FillItemDescriptor(name, description, formatter, minValue,
+                                      maxValue);
+    }
 
+    public static ProbeItemDescriptor fillItem(String name, String description,
+                                               ItemValueFormatter formatter,
+                                               double dataFactor, long minValue,
+                                               long maxValue) {
 
-        public final float getLineWidth() { return lineWidth; }
+        return new FillItemDescriptor(name, description, formatter, dataFactor,
+                                      minValue, maxValue);
+    }
 
-        public final Color getLineColor() { return lineColor; }
+    public static ProbeItemDescriptor fillItem(String name, String description,
+                                               ItemValueFormatter formatter,
+                                               double dataFactor, long minValue,
+                                               long maxValue, Color fillColor1,
+                                               Color fillColor2) {
 
-        public final Color getFillColor1() { return fillColor1; }
-
-        public final Color getFillColor2() { return fillColor2; }
-
+        return new FillItemDescriptor(name, description, formatter, dataFactor,
+                                      minValue, maxValue, fillColor1, fillColor2);
     }
 
 
-    public static final class LineItem extends XYItem {
+    // --- LineFillItem --------------------------------------------------------
 
-        public LineItem(String name, String description) {
-            this(name, description, null);
-        }
-
-        public LineItem(String name, String description, String unitsString) {
-            this(name, description, MIN_VALUE_UNDEFINED, MAX_VALUE_UNDEFINED,
-                 unitsString);
-        }
-        
-        public LineItem(String name, String description, long minValue,
-                        long maxValue, String unitsString) {
-            this(name, description, minValue, maxValue, 1d, 1d, unitsString);
-        }
-
-        public LineItem(String name, String description, long minValue,
-                        long maxValue, double dataFactor, double viewFactor,
-                        String unitsString) {
-            this(name, description, minValue, maxValue, dataFactor, viewFactor,
-                 unitsString, DEFAULT_LINE_WIDTH, DEFAULT_COLOR);
-        }
-
-        public LineItem(String name, String description, long minValue,
-                        long maxValue, double dataFactor, double viewFactor,
-                        String unitsString, float lineWidth, Color lineColor) {
-            super(name, description, minValue, maxValue, dataFactor, viewFactor,
-                  unitsString, lineWidth, lineColor, null, null);
-        }
-
+    public static ProbeItemDescriptor lineFillItem(String name, String description) {
+        return new LineFillItemDescriptor(name, description);
     }
 
+    public static ProbeItemDescriptor lineFillItem(String name, String description,
+                                                   ItemValueFormatter formatter) {
 
-    public static final class FillItem extends XYItem {
-
-        public FillItem(String name, String description) {
-            this(name, description, null);
-        }
-
-        public FillItem(String name, String description, String unitsString) {
-            this(name, description, MIN_VALUE_UNDEFINED, MAX_VALUE_UNDEFINED,
-                 unitsString);
-        }
-
-        public FillItem(String name, String description, long minValue,
-                        long maxValue, String unitsString) {
-            this(name, description, minValue, maxValue, 1d, 1d, unitsString);
-        }
-
-        public FillItem(String name, String description, long minValue,
-                        long maxValue, double dataFactor, double viewFactor,
-                        String unitsString) {
-            this(name, description, minValue, maxValue, dataFactor, viewFactor,
-                 unitsString, DEFAULT_COLOR, DEFAULT_COLOR);
-        }
-
-        public FillItem(String name, String description, long minValue,
-                        long maxValue, double dataFactor, double viewFactor,
-                        String unitsString, Color fillColor1, Color fillColor2) {
-            super(name, description, minValue, maxValue, dataFactor, viewFactor,
-                  unitsString, 0f, null, fillColor1, fillColor2);
-        }
-
+        return new LineFillItemDescriptor(name, description, formatter);
     }
 
+    public static ProbeItemDescriptor lineFillItem(String name, String description,
+                                                   ItemValueFormatter formatter,
+                                                   long minValue, long maxValue) {
 
-    public static final class LineFillItem extends XYItem {
-
-        public LineFillItem(String name, String description) {
-            this(name, description, null);
-        }
-
-        public LineFillItem(String name, String description, String unitsString) {
-            this(name, description, MIN_VALUE_UNDEFINED, MAX_VALUE_UNDEFINED,
-                 unitsString);
-        }
-
-        public LineFillItem(String name, String description, long minValue,
-                            long maxValue, String unitsString) {
-            this(name, description, minValue, maxValue, 1d, 1d, unitsString);
-        }
-
-        public LineFillItem(String name, String description, long minValue,
-                            long maxValue, double dataFactor, double viewFactor,
-                            String unitsString) {
-            this(name, description, minValue, maxValue, dataFactor, viewFactor,
-                 unitsString, DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR,
-                 DEFAULT_COLOR);
-        }
-
-        public LineFillItem(String name, String description, long minValue,
-                            long maxValue, double dataFactor, double viewFactor,
-                            String unitsString, float lineWidth, Color lineColor,
-                            Color fillColor1, Color fillColor2) {
-            super(name, description, minValue, maxValue, dataFactor, viewFactor,
-                  unitsString, lineWidth, lineColor, fillColor1, fillColor2);
-        }
-
+        return new LineFillItemDescriptor(name, description, formatter, minValue,
+                                          maxValue);
     }
 
+    public static ProbeItemDescriptor lineFillItem(String name, String description,
+                                                   ItemValueFormatter formatter,
+                                                   double dataFactor, long minValue,
+                                                   long maxValue) {
 
-//    public abstract class BarItem extends ValueItem {
-//
-//    }
+        return new LineFillItemDescriptor(name, description, formatter, dataFactor,
+                                          minValue, maxValue);
+    }
+
+    public static ProbeItemDescriptor lineFillItem(String name, String description,
+                                                   ItemValueFormatter formatter,
+                                                   double dataFactor, long minValue,
+                                                   long maxValue, float lineWidth,
+                                                   Color lineColor, Color fillColor1,
+                                                   Color fillColor2) {
+
+        return new LineFillItemDescriptor(name, description, formatter, dataFactor,
+                                          minValue, maxValue, lineWidth, lineColor,
+                                          fillColor1, fillColor2);
+    }
 
 }

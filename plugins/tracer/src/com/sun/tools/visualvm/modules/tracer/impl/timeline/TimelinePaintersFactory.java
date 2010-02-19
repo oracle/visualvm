@@ -26,6 +26,9 @@
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.FillItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.XYItemDescriptor;
 import java.awt.Color;
 
 /**
@@ -38,19 +41,18 @@ final class TimelinePaintersFactory {
                                            int itemIndex) {
 
         // --- ValueItem -------------------------------------------------------
-        if (descriptor instanceof ProbeItemDescriptor.ValueItem)
-            return createValuePainter((ProbeItemDescriptor.ValueItem)descriptor,
-                                      itemIndex);
+        if (descriptor instanceof ValueItemDescriptor)
+            return createValuePainter((ValueItemDescriptor)descriptor, itemIndex);
 
         return null;
     }
 
     private static TimelineXYPainter createValuePainter(
-            ProbeItemDescriptor.ValueItem descriptor, int itemIndex) {
+            ValueItemDescriptor descriptor, int itemIndex) {
 
         // --- XYItem ----------------------------------------------------------
-        if (descriptor instanceof ProbeItemDescriptor.XYItem)
-            return createXYPainter((ProbeItemDescriptor.XYItem)descriptor,
+        if (descriptor instanceof XYItemDescriptor)
+            return createXYPainter((XYItemDescriptor)descriptor,
                                    itemIndex);
         
 //        // --- BarItem ---------------------------------------------------------
@@ -62,10 +64,10 @@ final class TimelinePaintersFactory {
     }
 
     private static TimelineXYPainter createXYPainter(
-            ProbeItemDescriptor.XYItem descriptor, int itemIndex) {
+            XYItemDescriptor descriptor, int itemIndex) {
 
         float lineWidth = descriptor.getLineWidth();
-        if (lineWidth == ProbeItemDescriptor.XYItem.DEFAULT_LINE_WIDTH)
+        if (lineWidth == ProbeItemDescriptor.DEFAULT_LINE_WIDTH)
             lineWidth = 2f;
 
         Color lineColor = descriptor.getLineColor();
@@ -74,7 +76,7 @@ final class TimelinePaintersFactory {
 
         Color fillColor1 = descriptor.getFillColor1();
         if (fillColor1 == ProbeItemDescriptor.DEFAULT_COLOR) {
-            if (descriptor instanceof ProbeItemDescriptor.FillItem)
+            if (descriptor instanceof FillItemDescriptor)
                 fillColor1 = TimelineColorFactory.getColor(itemIndex);
             else
                 fillColor1 = TimelineColorFactory.getGradient(itemIndex)[0];
@@ -82,7 +84,7 @@ final class TimelinePaintersFactory {
 
         Color fillColor2 = descriptor.getFillColor2();
         if (fillColor2 == ProbeItemDescriptor.DEFAULT_COLOR) {
-            if (descriptor instanceof ProbeItemDescriptor.FillItem)
+            if (descriptor instanceof FillItemDescriptor)
                 fillColor2 = null;
             else
                 fillColor2 = TimelineColorFactory.getGradient(itemIndex)[1];

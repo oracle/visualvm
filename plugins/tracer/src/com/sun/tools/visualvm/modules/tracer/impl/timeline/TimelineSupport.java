@@ -25,11 +25,14 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
+import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 
@@ -44,7 +47,8 @@ public final class TimelineSupport {
     private final TimelineModel model;
     private final SynchronousXYItemsModel itemsModel;
 
-    private TimelineTooltipOverlay tooltips;
+    private final TimelineTooltipOverlay tooltips;
+    private final TimelineUnitsOverlay units;
 
     private final List<TracerProbe> probes = new ArrayList();
     private final List<TimelineChart.Row> rows = new ArrayList();
@@ -59,6 +63,8 @@ public final class TimelineSupport {
         chart = new TimelineChart(itemsModel);
         tooltips = new TimelineTooltipOverlay(chart);
         chart.addOverlayComponent(tooltips);
+        units = new TimelineUnitsOverlay(chart);
+        chart.addOverlayComponent(units);
     }
 
 
@@ -88,7 +94,7 @@ public final class TimelineSupport {
                 
                 row.addItems(items, painters);
 
-                setupTooltips();
+                setupOverlays();
             }
         });
     }
@@ -105,7 +111,7 @@ public final class TimelineSupport {
                 rows.remove(row);
                 probes.remove(probe);
 
-                setupTooltips();
+                setupOverlays();
             }
         });
     }
@@ -121,12 +127,14 @@ public final class TimelineSupport {
 
     // --- Tooltips support ----------------------------------------------------
 
-    private void setupTooltips() {
-        TimelineTooltipPainter[] ttPainters = new TimelineTooltipPainter[chart.getRowsCount()];
+    private void setupOverlays() {
+        int rowsCount = chart.getRowsCount();
+
+        TimelineTooltipPainter[] ttPainters = new TimelineTooltipPainter[rowsCount];
         for (int i = 0; i < ttPainters.length; i++) {
             final TimelineChart.Row row = chart.getRow(i);
             final TracerProbe probe = getProbe(row);
-            ttPainters[i] = new TimelineTooltipPainter(new TimelineTooltipModel() {
+            ttPainters[i] = new TimelineTooltipPainter(new TimelineTooltipPainter.Model() {
 
                 public int getRowsCount() {
                     return row.getItemsCount();
@@ -137,20 +145,44 @@ public final class TimelineSupport {
                 }
 
                 public String getRowValue(int index, long itemValue) {
-                    return Long.toString(itemValue);
+                    ProbeItemDescriptor d = probe.getItemDescriptors()[index];
+                    return ((ValueItemDescriptor)d).getValueString(
+                            itemValue, ItemValueFormatter.FORMAT_TOOLTIP);
                 }
 
                 public String getRowUnits(int index) {
                     ProbeItemDescriptor d = probe.getItemDescriptors()[index];
-                    if (d instanceof ProbeItemDescriptor.ValueItem)
-                        return ((ProbeItemDescriptor.ValueItem)d).getUnitsString();
-                    else
-                        return null; // NOI18N
+                    return ((ValueItemDescriptor)d).getUnitsString(
+                             ItemValueFormatter.FORMAT_TOOLTIP);
                 }
 
             });
         }
         tooltips.setupPainters(ttPainters);
+
+        units.setupModel(new TimelineUnitsOverlay.Model() {
+
+            public String getMinUnits(TimelineChart.Row row) {
+                ChartContext context = row.getContext();
+                TracerProbe probe = getProbe(row);
+                ValueItemDescriptor descriptor = (ValueItemDescriptor)probe.getItemDescriptors()[0];
+                String valueString = descriptor.getValueString(context.getDataOffsetY(),
+                        ItemValueFormatter.FORMAT_UNITS);
+                String unitsString = descriptor.getUnitsString(ItemValueFormatter.FORMAT_UNITS);
+                return unitsString == null ? valueString : valueString + " " + unitsString;
+            }
+
+            public String getMaxUnits(TimelineChart.Row row) {
+                ChartContext context = row.getContext();
+                TracerProbe probe = getProbe(row);
+                ValueItemDescriptor descriptor = (ValueItemDescriptor)probe.getItemDescriptors()[0];
+                String valueString = descriptor.getValueString(context.getDataOffsetY() +
+                        context.getDataHeight(), ItemValueFormatter.FORMAT_UNITS);
+                String unitsString = descriptor.getUnitsString(ItemValueFormatter.FORMAT_UNITS);
+                return unitsString == null ? valueString : valueString + " " + unitsString;
+            }
+            
+        });
     }
 
 

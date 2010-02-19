@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.tracer.monitor;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
+import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import javax.swing.Icon;
@@ -67,8 +68,12 @@ class ClassesMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            new ProbeItemDescriptor.LineItem("Total loaded", "Monitors number of all Classes currently loaded by the JVM", 0, 100, null),
-            new ProbeItemDescriptor.LineItem("Shared loaded", "Monitors number of shared Classes currently loaded by the JVM", 0, 100, null)
+            ProbeItemDescriptor.lineItem("Total loaded",
+                    "Monitors number of all Classes currently loaded by the JVM",
+                    ItemValueFormatter.DEFAULT_DECIMAL, 0, 100),
+            ProbeItemDescriptor.lineItem("Shared loaded",
+                    "Monitors number of shared Classes currently loaded by the JVM",
+                    ItemValueFormatter.DEFAULT_DECIMAL, 0, 100)
         };
     }
 

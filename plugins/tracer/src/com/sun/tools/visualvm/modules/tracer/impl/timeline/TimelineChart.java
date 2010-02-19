@@ -55,6 +55,9 @@ final class TimelineChart extends SynchronousXYChart {
     static final int DEF_ROW_HEIGHT = 75;
     static final int ROW_RESIZE_STEP = MIN_ROW_HEIGHT;
 
+    private static final int ROW_MARGIN_TOP = 3;
+    private static final int ROW_MARGIN_BOTTOM = 3;
+
     private int currentRowHeight = DEF_ROW_HEIGHT;
 
     private final List<Row> rows;
@@ -528,8 +531,8 @@ final class TimelineChart extends SynchronousXYChart {
             super(TimelineChart.this);
             this.row = row;
 
-            marginTop = 3;
-            marginBottom = 3;
+            marginTop = ROW_MARGIN_TOP;
+            marginBottom = ROW_MARGIN_BOTTOM;
 
             bounds = new LongRect();
         }
@@ -602,10 +605,10 @@ final class TimelineChart extends SynchronousXYChart {
 
         private double getDataY(double viewY, boolean reverse) {
             if ((isBottomBased() && !reverse) || (!isBottomBased() && reverse)) {
-                return bounds.y - (viewY + getViewInsets().bottom -
+                return bounds.y - (viewY + getViewInsets().bottom - marginBottom -
                        getOffsetY() - getHeight()) / scaleY;
             } else {
-                return (viewY + getOffsetY() - getViewInsets().top) /
+                return (viewY + getOffsetY() - getViewInsets().top - marginTop) /
                        scaleY + bounds.y;
             }
         }

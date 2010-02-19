@@ -52,12 +52,12 @@ final class TimelineTooltipPainter extends JPanel {
     private JLabel[] valuePainters;
     private JLabel[] unitsPainters;
 
-    private TimelineTooltipModel model;
+    private Model model;
 
     private boolean initialized;
 
 
-    TimelineTooltipPainter(TimelineTooltipModel model) {
+    TimelineTooltipPainter(Model model) {
 
         this.model = model;
         initialized = false;
@@ -157,6 +157,16 @@ final class TimelineTooltipPainter extends JPanel {
 
     private static Font smallerFont(Font font) {
         return new Font(font.getName(), font.getStyle(), font.getSize() - 2);
+    }
+
+
+    static interface Model {
+
+        public int    getRowsCount      ();
+        public String getRowName        (int index);
+        public String getRowValue       (int index, long itemValue);
+        public String getRowUnits       (int index);
+
     }
 
 }

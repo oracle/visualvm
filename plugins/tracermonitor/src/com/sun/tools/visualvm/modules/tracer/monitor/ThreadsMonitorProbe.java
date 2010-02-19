@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.tracer.monitor;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
+import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import javax.swing.Icon;
@@ -63,8 +64,12 @@ class ThreadsMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            new ProbeItemDescriptor.LineItem("Live", "Monitors total number of live Threads in the JVM", 0, 3, null),
-            new ProbeItemDescriptor.LineItem("Daemon", "Monitors number of live daemon Threads in the JVM", 0, 3, null)
+            ProbeItemDescriptor.lineItem("Live",
+                    "Monitors total number of live Threads in the JVM",
+                    ItemValueFormatter.DEFAULT_DECIMAL, 0, 3),
+            ProbeItemDescriptor.lineItem("Daemon",
+                    "Monitors number of live daemon Threads in the JVM",
+                    ItemValueFormatter.DEFAULT_DECIMAL, 0, 3)
         };
     }
 

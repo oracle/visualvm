@@ -195,9 +195,11 @@ public final class TimelinePanel extends JPanel {
             this.chart = chart;
 
             chart.setBackground(Color.WHITE);
-            chart.addPreDecorator(new RowPreDecorator(chart));
+            chart.addPreDecorator(new RowBoundsDecorator(chart));
 //            chart.addPreDecorator(new RowPostDecorator(chart));
-            chart.addPostDecorator(new RowPostDecorator(chart));
+            chart.addPostDecorator(new RowGradientDecorator(chart));
+            
+//            chart.addOverlayComponent(new RowUnitsOverlay(chart));
 
             TimelineSelectionOverlay selectionOverlay = new TimelineSelectionOverlay();
             chart.addOverlayComponent(selectionOverlay);
@@ -212,7 +214,7 @@ public final class TimelinePanel extends JPanel {
                 }
             };
             Font font = marksPainter.getFont();
-            marksPainter.setFont(font.deriveFont(Font.PLAIN, font.getSize2D() - 1));
+            marksPainter.setFont(font.deriveFont(Font.PLAIN, font.getSize() - 2));
 
             Timeline timeline = ((SynchronousXYItemsModel)chart.getItemsModel()).getTimeline();
             TimelineMarksComputer marksComputer = new TimelineMarksComputer(timeline,

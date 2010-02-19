@@ -27,6 +27,8 @@ package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.Point;
 import java.awt.Rectangle;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartDecorator;
@@ -36,14 +38,12 @@ import org.netbeans.lib.profiler.charts.swing.Utils;
  *
  * @author Jiri Sedlacek
  */
-final class RowPreDecorator implements ChartDecorator {
-
-    private static final Color BORDER_COLOR = Color.LIGHT_GRAY;
+final class RowGradientDecorator implements ChartDecorator {
 
     private final TimelineChart chart;
 
 
-    RowPreDecorator(TimelineChart chart) {
+    RowGradientDecorator(TimelineChart chart) {
         this.chart = chart;
     }
 
@@ -54,13 +54,20 @@ final class RowPreDecorator implements ChartDecorator {
             TimelineChart.Row row = chart.getRow(i);
             ChartContext rowContext = row.getContext();
 
-            Rectangle rowBounds = new Rectangle(0, Utils.checkedInt(rowContext.getViewportOffsetY()),
+            Point start = new Point(0, Utils.checkedInt(rowContext.getViewportOffsetY()) + 1);
+            Point end = new Point(0, Utils.checkedInt(rowContext.getViewportOffsetY()) + rowContext.getViewportHeight() - 2);
+            float[] fractions = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
+            Color[] colors = new Color[] { new Color(250, 250, 250, 110), new Color(205, 205, 220, 30), new Color(180, 180, 195, 30), new Color(200, 200, 210, 110) };
+            
+            Rectangle rowBounds = new Rectangle(0, Utils.checkedInt(rowContext.getViewportOffsetY()) + 1,
                                                 chart.getWidth(), rowContext.getViewportHeight() - 2);
-            g.setColor(Color.WHITE);
+            g.setPaint(new LinearGradientPaint(start, end, fractions, colors));
             g.fill(rowBounds);
-            g.setColor(BORDER_COLOR);
-            g.drawLine(0, rowBounds.y + rowBounds.height + 1,
-                       chart.getWidth(), rowBounds.y + rowBounds.height + 1);
+
+            if (chart.getSelectedRow() == i) {
+                g.setPaint(new Color(0, 0, 200, 50));
+                g.fill(rowBounds);
+            }
         }
     }
 

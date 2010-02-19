@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.modules.tracer.monitor;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
+import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -123,8 +124,10 @@ class CpuMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            new ProbeItemDescriptor.LineItem("CPU usage", "Monitors relative CPU usage (%)", 0, 1000, "%"),
-            new ProbeItemDescriptor.LineItem("GC activity", "Monitors relative GC activity (%)", 0, 1000, "%")
+            ProbeItemDescriptor.lineItem("CPU usage", "Monitors relative CPU usage (%)",
+                    ItemValueFormatter.DEFAULT_PERCENT, 0, 1000),
+            ProbeItemDescriptor.lineItem("GC activity", "Monitors relative GC activity (%)",
+                    ItemValueFormatter.DEFAULT_PERCENT, 0, 1000)
         };
     }
 
