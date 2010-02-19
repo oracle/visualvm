@@ -363,7 +363,7 @@ public class ProfilerClient implements CommonConstants {
     private ObjectOutputStream socketOut;
     private ProfilerEngineSettings settings;
     private ProfilingSessionStatus status;
-    private Response lastResponse;
+    private volatile Response lastResponse;
     private SeparateCmdExecutionThread separateCmdExecThread;
     private ServerListener serverListener;
 
