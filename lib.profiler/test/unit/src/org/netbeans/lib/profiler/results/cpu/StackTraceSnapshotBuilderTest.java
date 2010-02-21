@@ -782,20 +782,24 @@ public class StackTraceSnapshotBuilderTest {
     }
 
     private java.lang.management.ThreadInfo createThreadInfo(Thread t, StackTraceElement[] stack) {
-        Constructor tinfoConstructor = java.lang.management.ThreadInfo.class.getDeclaredConstructors()[0];
-        tinfoConstructor.setAccessible(true);
         try {
+            Constructor tinfoConstructor = java.lang.management.ThreadInfo.class.getDeclaredConstructor(
+                    Thread.class,Integer.TYPE,Object.class,Thread.class,Long.TYPE,Long.TYPE,
+                    Long.TYPE,Long.TYPE,StackTraceElement[].class);
+            tinfoConstructor.setAccessible(true);
             ThreadInfo tinfo =  (ThreadInfo) tinfoConstructor.newInstance(t,0,null,null,0,0,0,0,stack);
             setState(tinfo,State.RUNNABLE);
             return tinfo;
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
         return null;
     }

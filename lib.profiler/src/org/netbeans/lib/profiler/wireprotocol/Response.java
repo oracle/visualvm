@@ -120,7 +120,7 @@ public class Response {
     public String toString() {
         String s = respTypeToString(type);
 
-        return s + (isOK() ? ("Ok, " + (yes() ? "yes" : "no")) : ("Error, " + errorMessage)); // NOI18N
+        return s + (isOK() ? (" Ok, " + (yes() ? "yes" : "no")) : (" Error, " + errorMessage)); // NOI18N
     }
 
     public boolean yes() {
@@ -146,9 +146,9 @@ public class Response {
         if (type != NO_TYPE) {
             switch (type) {
                 case CODE_REGION_CPU_RESULTS:
-                    return "CODE_REGION_CPU_RESULTS "; // NOI18N
+                    return "CODE_REGION_CPU_RESULTS"; // NOI18N
                 case INSTRUMENT_METHOD_GROUP:
-                    return "INSTRUMENT_METHOD_GROUP "; // NOI18N
+                    return "INSTRUMENT_METHOD_GROUP"; // NOI18N
                 case INTERNAL_STATS:
                     return "INTERNAL_STATS"; // NOI18N
                 case VM_PROPERTIES:
