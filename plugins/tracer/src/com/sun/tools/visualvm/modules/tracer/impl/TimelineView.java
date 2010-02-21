@@ -27,6 +27,8 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelinePanel;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
 
 /**
  *
@@ -44,6 +46,36 @@ final class TimelineView {
 
     void reset() {
         if (panel != null) panel.reset();
+    }
+
+    Action zoomInAction() {
+        if (panel != null) return panel.zoomInAction();
+        return null;
+    }
+
+    Action zoomOutAction() {
+        if (panel != null) return panel.zoomOutAction();
+        return null;
+    }
+
+    Action toggleViewAction() {
+        if (panel != null) return panel.toggleViewAction();
+        return null;
+    }
+
+    AbstractButton mouseZoom() {
+        if (panel != null) return panel.mouseZoom();
+        return null;
+    }
+
+    AbstractButton mouseHScroll() {
+        if (panel != null) return panel.mouseHScroll();
+        return null;
+    }
+
+    AbstractButton mouseVScroll() {
+        if (panel != null) return panel.mouseVScroll();
+        return null;
     }
 
 

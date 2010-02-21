@@ -80,7 +80,7 @@ final class TimelineChart extends SynchronousXYChart {
         setBottomBased(false);
 
         setZoomMode(ZOOM_X);
-        setMouseZoomingEnabled(true);
+        setMouseZoomingEnabled(false);
         setMousePanningEnabled(false);
 
         setAccelerationPriority(1f);
@@ -301,6 +301,17 @@ final class TimelineChart extends SynchronousXYChart {
 
     void clearSelection() {
         setSelectedRow(-1);
+    }
+
+
+    // --- Internal API to access protected methods ----------------------------
+
+    long maxOffsetX() {
+        return super.getMaxOffsetX();
+    }
+
+    double viewWidth(double d) {
+        return super.getViewWidth(d);
     }
 
 

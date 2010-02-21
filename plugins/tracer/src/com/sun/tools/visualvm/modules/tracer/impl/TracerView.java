@@ -32,13 +32,17 @@ import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HorizontalLayout;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.SimpleSeparator;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -46,6 +50,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import org.openide.util.ImageUtilities;
@@ -109,6 +114,8 @@ final class TracerView extends DataSourceView {
         private static final String ERROR_IMAGE_PATH =
             "com/sun/tools/visualvm/modules/tracer/impl/resources/error.png"; // NOI18N
 
+        private int commonControlHeight;
+
         private AbstractButton startButton;
         private AbstractButton stopButton;
 
@@ -131,7 +138,8 @@ final class TracerView extends DataSourceView {
                     startButton.setSelected(false);
                     stopButton.setEnabled(true);
                     stopButton.requestFocusInWindow();
-                    clearToolbar();
+//                    clearToolbar();
+                    addChartControls();
                     break;
                 case TracerController.STATE_SESSION_INACTIVE:
                     startButton.setEnabled(probesDefined);
@@ -227,6 +235,76 @@ final class TracerView extends DataSourceView {
             }
         }
 
+        private void addChartControls() {
+            JToolBar tb = new JToolBar();
+            tb.setBorder(BorderFactory.createEmptyBorder());
+            tb.setBorderPainted(false);
+            tb.setFloatable(false);
+            tb.setRollover(true);
+            tb.setOpaque(false);
+
+            Dimension size = new Dimension(commonControlHeight, commonControlHeight);
+
+            JComponent c1 = tb.add(timelineView.zoomInAction());
+            c1.setOpaque(false);
+            c1.setMinimumSize(size);
+            c1.setPreferredSize(size);
+            c1.setMaximumSize(size);
+
+            JComponent c2 = tb.add(timelineView.zoomOutAction());
+            c2.setOpaque(false);
+            c2.setMinimumSize(size);
+            c2.setPreferredSize(size);
+            c2.setMaximumSize(size);
+
+            JComponent c3 = tb.add(timelineView.toggleViewAction());
+            c3.setOpaque(false);
+            c3.setMinimumSize(size);
+            c3.setPreferredSize(size);
+            c3.setMaximumSize(size);
+
+            JPanel sp1 = new JPanel(null) {
+                public Dimension getPreferredSize() {
+                    Dimension d = super.getPreferredSize();
+                    d.width = 14;
+                    return d;
+                }
+            };
+            sp1.setOpaque(false);
+            tb.add(sp1);
+
+            ButtonGroup bg = new ButtonGroup();
+
+            AbstractButton b1 = timelineView.mouseZoom();
+            bg.add(b1);
+            tb.add(b1);
+            b1.setOpaque(false);
+            b1.setMinimumSize(size);
+            b1.setPreferredSize(size);
+            b1.setMaximumSize(size);
+
+            AbstractButton b2 = timelineView.mouseHScroll();
+            bg.add(b2);
+            tb.add(b2);
+            b2.setOpaque(false);
+            b2.setMinimumSize(size);
+            b2.setPreferredSize(size);
+            b2.setMaximumSize(size);
+
+            AbstractButton b3 = timelineView.mouseVScroll();
+            bg.add(b3);
+            tb.add(b3);
+            b3.setOpaque(false);
+            b3.setMinimumSize(size);
+            b3.setPreferredSize(size);
+            b3.setMaximumSize(size);
+
+            toolbar.removeAll();
+            toolbar.setLayout(new HorizontalLayout(false));
+            toolbar.add(tb);
+            toolbarSeparator.setVisible(true);
+        }
+
         private void clearToolbar() {
             toolbar.removeAll();
             toolbarSeparator.setVisible(false);
@@ -245,6 +323,10 @@ final class TracerView extends DataSourceView {
                     });
                 }
             };
+            Insets i = startButton.getMargin();
+            i.left = Math.min(i.left, 10);
+            i.right = i.left;
+            startButton.setMargin(i);
             view.add(startButton);
 
             stopButton = new JButton("Stop", new ImageIcon(ImageUtilities.
@@ -256,6 +338,7 @@ final class TracerView extends DataSourceView {
                     });
                 }
             };
+            stopButton.setMargin(i);
             view.add(stopButton);
 
             toolbarSeparator = new SimpleSeparator(SwingConstants.VERTICAL);
@@ -278,6 +361,28 @@ final class TracerView extends DataSourceView {
 //            add(new JToggleButton("Sel None"));
 //            add(new JToggleButton("Sel Line"));
 //            add(new JToggleButton("Sel Rect"));
+
+            Dimension size1 = startButton.getPreferredSize();
+            commonControlHeight = size1.height;
+
+            Dimension size2 = stopButton.getPreferredSize();
+            commonControlHeight = Math.max(commonControlHeight, size2.height);
+
+            Action tmpAction = new AbstractAction(null, startButton.getIcon()) {
+                public void actionPerformed(ActionEvent e) {}
+            };
+            commonControlHeight = Math.max(commonControlHeight, new JToolBar().
+                                           add(tmpAction).getPreferredSize().height);
+
+            size1.height = commonControlHeight;
+            startButton.setMinimumSize(size1);
+            startButton.setPreferredSize(size1);
+            startButton.setMaximumSize(size1);
+
+            size2.height = commonControlHeight;
+            stopButton.setMinimumSize(size2);
+            stopButton.setPreferredSize(size2);
+            stopButton.setMaximumSize(size2);
 
             return view;
         }
