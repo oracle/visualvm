@@ -88,6 +88,14 @@ class SecurityOptionsPanel extends JPanel {
         return dataValid;
     }
 
+    boolean shouldRestart() {
+        return restartCheckBox.isSelected();
+    }
+
+    void resetRestart() {
+        restartCheckBox.setSelected(false);
+    }
+
 
     String getKeyStore() {
         if (!keyStoreLocCheckBox.isSelected()) return null;
@@ -409,6 +417,11 @@ class SecurityOptionsPanel extends JPanel {
             public Dimension getMinimumSize() { return getPreferredSize(); }
         };
         keyStoreTypeLabel.setLabelFor(keyStoreTypeCombo);
+        keyStoreTypeCombo.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                update();
+            }
+        });
         keyStoreTypeCombo.setToolTipText(NbBundle.getMessage(SecurityOptionsPanel.class,
                 "MSG_ValueOf", SecurityModel.KEYSTORE_TYPE)); // NOI18N
         keyStoreTypeCombo.setEditable(true);
@@ -810,6 +823,7 @@ class SecurityOptionsPanel extends JPanel {
 
         // hintPanel
         hintPanel = new JPanel(new GridBagLayout());
+        hintPanel.setVisible(false);
 
         // hintLabel
         JLabel hintLabel = new JLabel();
@@ -817,7 +831,7 @@ class SecurityOptionsPanel extends JPanel {
                 SecurityOptionsPanel.class, "MSG_RestartVisualVM")); // NOI18N
         hintLabel.setIcon(ImageUtilities.loadImageIcon(
                 "com/sun/tools/visualvm/modules/security/resources/infoIcon.png", false)); // NOI18N)
-        hintLabel.setForeground(UIManager.getColor("Label.disabledForeground")); // NOI18N)
+        hintLabel.setIconTextGap(10);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -826,6 +840,18 @@ class SecurityOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(0, 0, 0, 0);
         hintPanel.add(hintLabel, c);
+
+        // restartCheckBox
+        restartCheckBox = new JCheckBox();
+        Mnemonics.setLocalizedText(restartCheckBox, NbBundle.getMessage(
+                            SecurityOptionsPanel.class, "CHK_RestartVisualVM")); // NOI18N
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(0, 20, 0, 0);
+        hintPanel.add(restartCheckBox, c);
 
         // --- Filler ---
         JPanel fillerPanel = new JPanel(null);
@@ -838,33 +864,6 @@ class SecurityOptionsPanel extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
         add(fillerPanel, c);
-
-        // Requires org.openide.util >= 7.25
-//        // restartButton
-//        JButton restartButton = new JButton();
-//        Mnemonics.setLocalizedText(restartButton, "<html><a href='#'>" + NbBundle.getMessage(
-//                SecurityOptionsPanel.class, "BTN_RestartVisualVM") + "</a></html>"); // NOI18N
-//        restartButton.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1) );
-//        restartButton.setMargin(new Insets(0, 0, 0, 0));
-//        restartButton.setBorderPainted(false);
-//        restartButton.setRolloverEnabled(true);
-//        restartButton.setContentAreaFilled(false);
-//        restartButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                LifecycleManager lcm = LifecycleManager.getDefault();
-//                lcm.markForRestart();
-//                lcm.exit();
-//
-//            }
-//        });
-//        c = new GridBagConstraints();
-//        c.gridx = 1;
-//        c.gridy = 0;
-//        c.weightx = 1;
-//        c.fill = GridBagConstraints.NONE;
-//        c.anchor = GridBagConstraints.WEST;
-//        c.insets = new Insets(0, 5, 0, 0);
-//        hintPanel.add(restartButton, c);
 
         c = new GridBagConstraints();
         c.gridy = 13;
@@ -901,5 +900,6 @@ class SecurityOptionsPanel extends JPanel {
     private JButton loadFromFileButton;
     private JButton saveToFileButton;
     private JPanel hintPanel;
+    private JCheckBox restartCheckBox;
 
 }
