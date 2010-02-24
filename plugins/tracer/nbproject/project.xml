@@ -44,6 +44,7 @@
             <friend-packages>
                 <friend>com.sun.tools.visualvm.modules.tracer.javafx</friend>
                 <friend>com.sun.tools.visualvm.modules.tracer.monitor</friend>
+                <friend>net.java.btrace.visualvm.tracer</friend>
                 <package>com.sun.tools.visualvm.modules.tracer</package>
             </friend-packages>
         </data>
