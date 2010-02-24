@@ -191,6 +191,7 @@ public final class CachedMBeanServerConnectionFactory {
         private Map<ObjectName, NameValueMap> cachedValues = newMap();
         private Map<ObjectName, Set<String>> cachedNames = newMap();
         private List<MBeanCacheListener> listenerList = new CopyOnWriteArrayList<MBeanCacheListener>();
+        private volatile boolean flushRunning;
 
         @SuppressWarnings("serial")
         private static final class NameValueMap
@@ -212,11 +213,14 @@ public final class CachedMBeanServerConnectionFactory {
         }
 
         void intervalElapsed() {
+            if (flushRunning) return;
+            flushRunning = true;
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     flush();
                     connectionPinger();
                     notifyListeners();
+                    flushRunning = false;
                 }
             });
         }
