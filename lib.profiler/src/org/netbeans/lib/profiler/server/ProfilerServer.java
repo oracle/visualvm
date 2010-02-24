@@ -852,6 +852,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         connectionOpen = false;
         profilerServer.sendSimpleCmdToClient(Command.SHUTDOWN_COMPLETED);
         profilerServer.closeConnection();
+        profilerServer.stopSeparateCmdExecutionThread();
     }
 
     private static void delay(int ms) {
