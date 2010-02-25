@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 import com.sun.tools.visualvm.modules.tracer.impl.probes.ProbePresenter;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderButton;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.ScrollBar;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -69,7 +70,8 @@ class ProbesPanel extends JPanel {
         listPanel.setOpaque(false);
 
         viewport = new JViewport();
-        viewport.setOpaque(false);
+        viewport.setOpaque(true);
+        viewport.setBackground(new Color(247, 247, 247));
         viewport.setView(listPanel);
         viewport.setViewPosition(new Point(0, 0));
         chart.addConfigurationListener(new ChartConfigurationListener.Adapter() {
@@ -87,7 +89,7 @@ class ProbesPanel extends JPanel {
             }
         });
         final JPanel bottomPanel = new JPanel(new GridLayout(1, 3));
-        bottomPanel.setPreferredSize(new Dimension(100, new JScrollBar(JScrollBar.
+        bottomPanel.setPreferredSize(new Dimension(100, new ScrollBar(JScrollBar.
                                      HORIZONTAL).getPreferredSize().height));
         bottomPanel.setOpaque(false);
 
@@ -122,8 +124,6 @@ class ProbesPanel extends JPanel {
         add(new HeaderLabel("Probes"), BorderLayout.NORTH);
         add(viewport, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
-        setOpaque(true);
-        setBackground(new Color(247, 247, 247));
 
         chart.addRowListener(new TimelineChart.RowListener() {
             public void rowsAdded(List<TimelineChart.Row> rows) {

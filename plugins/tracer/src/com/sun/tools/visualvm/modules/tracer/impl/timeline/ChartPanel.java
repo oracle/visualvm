@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.ScrollBar;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -122,9 +123,9 @@ class ChartPanel extends JPanel {
         TimelineMarksComputer marksComputer = new TimelineMarksComputer(timeline,
                 chart.getChartContext(), SwingConstants.HORIZONTAL);
         TimelineAxis axis = new TimelineAxis(chart, marksComputer, marksPainter);
-
-        hScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
-        vScrollBar = new JScrollBar(JScrollBar.VERTICAL);
+        
+        hScrollBar = new ScrollBar(JScrollBar.HORIZONTAL);
+        vScrollBar = new ScrollBar(JScrollBar.VERTICAL);
         chart.attachHorizontalScrollBar(hScrollBar);
         chart.attachVerticalScrollBar(vScrollBar);
         
@@ -133,7 +134,8 @@ class ChartPanel extends JPanel {
         mouseZoomImpl();
 
         chart.addConfigurationListener(new VisibleBoundsListener());
-        
+
+        setOpaque(false);
         setLayout(new BorderLayout());
         add(axis, BorderLayout.NORTH);
         add(chart, BorderLayout.CENTER);
