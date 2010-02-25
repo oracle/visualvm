@@ -64,33 +64,30 @@ public class StackTraceSnapshotBuilder {
     private static final StackTraceElement[] NO_STACK_TRACE = new StackTraceElement[0];
     private static final boolean COLLECT_TWO_TIMESTAMPS = true;
     private static final List<MethodInfo> knownBLockingMethods = Arrays.asList(new MethodInfo[] {
-        new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native]",null),
-        new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]",null),
-        new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit[native]",null),
-        new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents[native]",null),
-        new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native]",null),
-        new MethodInfo("java.lang.Object", "wait[native]",null),
-        new MethodInfo("java.lang.Thread", "sleep[native]",null),
+        new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native]"),
+        new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]"),
+        new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit[native]"),
+        new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents[native]"),
+        new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native]"),
+        new MethodInfo("java.lang.Object", "wait[native]"),
+        new MethodInfo("java.lang.Thread", "sleep[native]"),
     });
 
     private InstrumentationFilter filter;
     
     static class MethodInfo {
         
-        final public String className;
-        final public String methodName;
-        final public String signature;
+        final String className;
+        final String methodName;
         
-        public MethodInfo(String className, String methodName, String signature) {
+        MethodInfo(String className, String methodName) {
             this.className = className;
             this.methodName = methodName;
-            this.signature = signature;
         }
         
-        public MethodInfo(StackTraceElement element) {
+        MethodInfo(StackTraceElement element) {
             className = element.getClassName();
             methodName = element.getMethodName() + (element.isNativeMethod() ? "[native]" : ""); // NOI18N
-            signature = element.getFileName() + ":" + element.getLineNumber(); // NOI18N
         }
         
         @Override
@@ -105,10 +102,10 @@ public class StackTraceSnapshotBuilder {
                 return false;
             }
             final MethodInfo other = (MethodInfo) obj;
-            if ((this.className == null) ? (other.className != null) : !this.className.equals(other.className)) {
+            if ((className == null) ? (other.className != null) : !className.equals(other.className)) {
                 return false;
             }
-            if ((this.methodName == null) ? (other.methodName != null) : !this.methodName.equals(other.methodName)) {
+            if ((methodName == null) ? (other.methodName != null) : !methodName.equals(other.methodName)) {
                 return false;
             }
             return true;
@@ -124,7 +121,7 @@ public class StackTraceSnapshotBuilder {
         
         @Override
         public String toString() {
-            return className + "." + methodName + "(" + signature + ")";
+            return className + "." + methodName + "()";
         }
     }
     
@@ -210,7 +207,7 @@ public class StackTraceSnapshotBuilder {
         
         @Override
         public String getInstrMethodSignature(int methodId) {
-            return methodInfos.get(methodId).signature;
+            return "";
         }
         
         @Override
@@ -505,7 +502,7 @@ public class StackTraceSnapshotBuilder {
             for (MethodInfo mi : methodInfos) {
                 instrMethodClasses[counter] = mi.className;
                 instrMethodNames[counter] = mi.methodName;
-                instrMethodSigs[counter] = mi.signature;
+                instrMethodSigs[counter] = "";
                 counter++;
             }
             addStacktrace(new java.lang.management.ThreadInfo[0], currentDumpTimeStamp+1);
