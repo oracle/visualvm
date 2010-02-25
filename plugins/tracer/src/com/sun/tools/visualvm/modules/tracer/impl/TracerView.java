@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl;
 
+import com.sun.tools.visualvm.modules.tracer.impl.swing.TransparentToolBar;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
@@ -236,32 +237,27 @@ final class TracerView extends DataSourceView {
         }
 
         private void addChartControls() {
-            JToolBar tb = new JToolBar();
-            tb.setBorder(BorderFactory.createEmptyBorder());
-            tb.setBorderPainted(false);
-            tb.setFloatable(false);
-            tb.setRollover(true);
-            tb.setOpaque(false);
+            TransparentToolBar tb = new TransparentToolBar();
 
             Dimension size = new Dimension(commonControlHeight, commonControlHeight);
 
-            JComponent c1 = tb.add(timelineView.zoomInAction());
-            c1.setOpaque(false);
+            JButton c1 = new JButton(timelineView.zoomInAction());
             c1.setMinimumSize(size);
             c1.setPreferredSize(size);
             c1.setMaximumSize(size);
+            tb.addItem(c1);
 
-            JComponent c2 = tb.add(timelineView.zoomOutAction());
-            c2.setOpaque(false);
+            JButton c2 = new JButton(timelineView.zoomOutAction());
             c2.setMinimumSize(size);
             c2.setPreferredSize(size);
             c2.setMaximumSize(size);
+            tb.addItem(c2);
 
-            JComponent c3 = tb.add(timelineView.toggleViewAction());
-            c3.setOpaque(false);
+            JButton c3 = new JButton(timelineView.toggleViewAction());
             c3.setMinimumSize(size);
             c3.setPreferredSize(size);
             c3.setMaximumSize(size);
+            tb.addItem(c3);
 
             JPanel sp1 = new JPanel(null) {
                 public Dimension getPreferredSize() {
@@ -270,34 +266,30 @@ final class TracerView extends DataSourceView {
                     return d;
                 }
             };
-            sp1.setOpaque(false);
-            tb.add(sp1);
+            tb.addItem(sp1);
 
             ButtonGroup bg = new ButtonGroup();
 
             AbstractButton b1 = timelineView.mouseZoom();
             bg.add(b1);
-            tb.add(b1);
-            b1.setOpaque(false);
             b1.setMinimumSize(size);
             b1.setPreferredSize(size);
             b1.setMaximumSize(size);
+            tb.addItem(b1);
 
             AbstractButton b2 = timelineView.mouseHScroll();
             bg.add(b2);
-            tb.add(b2);
-            b2.setOpaque(false);
             b2.setMinimumSize(size);
             b2.setPreferredSize(size);
             b2.setMaximumSize(size);
+            tb.addItem(b2);
 
             AbstractButton b3 = timelineView.mouseVScroll();
             bg.add(b3);
-            tb.add(b3);
-            b3.setOpaque(false);
             b3.setMinimumSize(size);
             b3.setPreferredSize(size);
             b3.setMaximumSize(size);
+            tb.addItem(b3);
 
             toolbar.removeAll();
             toolbar.setLayout(new HorizontalLayout(false));
