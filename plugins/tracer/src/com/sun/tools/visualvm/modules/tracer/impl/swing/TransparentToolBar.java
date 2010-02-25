@@ -38,6 +38,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
@@ -90,6 +91,10 @@ public final class TransparentToolBar extends JPanel {
 
     public void addItem(JComponent c) {
         c.setOpaque(false);
+
+        if (c instanceof JButton)
+            ((JButton)c).setDefaultCapable(false);
+
         if (toolbar != null) {
             toolbar.add(c);
         } else {

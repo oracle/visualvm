@@ -330,6 +330,7 @@ final class TracerView extends DataSourceView {
                     });
                 }
             };
+            ((JButton)stopButton).setDefaultCapable(false);
             stopButton.setMargin(i);
             view.add(stopButton);
 
