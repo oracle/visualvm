@@ -582,6 +582,7 @@ class ApplicationProfilerView extends DataSourceView {
                 public void actionPerformed(ActionEvent e) { handleStopProfiling(); }
               });
               stopButton.setEnabled(false);
+              stopButton.setDefaultCapable(false); // Button size
               constraints = new GridBagConstraints();
               constraints.gridx = 4;
               constraints.gridy = 2;
