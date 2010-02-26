@@ -37,6 +37,20 @@ import java.awt.LayoutManager;
  */
 public final class VerticalLayout implements LayoutManager {
 
+    private final boolean proportionalWidth;
+    private final int vGap;
+
+
+    public VerticalLayout(boolean proportionalWidth) {
+        this(proportionalWidth, 0);
+    }
+
+    public VerticalLayout(boolean proportionalWidth, int vGap) {
+        this.proportionalWidth = proportionalWidth;
+        this.vGap = vGap;
+    }
+
+
     public void layoutContainer(final Container parent) {
         final Insets insets = parent.getInsets();
         final int posX = insets.left;
@@ -45,29 +59,38 @@ public final class VerticalLayout implements LayoutManager {
 
         for (Component comp : parent.getComponents()) {
             if (comp.isVisible()) {
-                final int height = comp.getPreferredSize().height;
-                comp.setBounds(posX, posY, width, height);
-                posY += height;
+                Dimension pref = comp.getPreferredSize();
+                if (proportionalWidth) {
+                    int w = Math.min(pref.width, width);
+                    int o = (width - w) / 2;
+                    comp.setBounds(posX, posY + o, w, pref.height);
+                } else {
+                    comp.setBounds(posX, posY, width, pref.height);
+                }
+                pref.height += vGap;
+                posY += pref.height;
             }
         }
     }
 
     public Dimension minimumLayoutSize(final Container parent) {
-        final Insets insets = parent.getInsets();
-        final Dimension d = new Dimension(insets.left + insets.right,
-                                          insets.top + insets.bottom);
-        int maxWidth = 0;
+//        final Insets insets = parent.getInsets();
+//        final Dimension d = new Dimension(insets.left + insets.right,
+//                                          insets.top + insets.bottom);
+//        int maxWidth = 0;
+//
+//        for (Component comp : parent.getComponents()) {
+//            if (comp.isVisible()) {
+//                maxWidth = Math.max(maxWidth, comp.getMinimumSize().width);
+//                d.height += comp.getPreferredSize().height;
+//            }
+//        }
+//
+//        d.width += maxWidth;
+//
+//        return d;
 
-        for (Component comp : parent.getComponents()) {
-            if (comp.isVisible()) {
-                maxWidth = Math.max(maxWidth, comp.getMinimumSize().width);
-                d.height += comp.getPreferredSize().height;
-            }
-        }
-
-        d.width += maxWidth;
-
-        return d;
+        return preferredLayoutSize(parent);
     }
 
     public Dimension preferredLayoutSize(final Container parent) {
@@ -75,12 +98,15 @@ public final class VerticalLayout implements LayoutManager {
         final Dimension d = new Dimension(insets.left + insets.right,
                                           insets.top + insets.bottom);
         int maxWidth = 0;
+        boolean first = false;
 
         for (Component comp : parent.getComponents()) {
             if (comp.isVisible()) {
                 final Dimension size = comp.getPreferredSize();
                 maxWidth = Math.max(maxWidth, size.width);
                 d.height += size.height;
+                if (first) first = false;
+                else d.height += vGap;
             }
         }
 

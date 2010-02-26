@@ -74,21 +74,23 @@ public final class HorizontalLayout implements LayoutManager {
     }
 
     public Dimension minimumLayoutSize(final Container parent) {
-        final Insets insets = parent.getInsets();
-        final Dimension d = new Dimension(insets.left + insets.right,
-                                          insets.top + insets.bottom);
-        int maxHeight = 0;
-
-        for (Component comp : parent.getComponents()) {
-            if (comp.isVisible()) {
-                maxHeight = Math.max(maxHeight, comp.getMinimumSize().height);
-                d.width += comp.getPreferredSize().width;
-            }
-        }
-
-        d.height += maxHeight;
-
-        return d;
+//        final Insets insets = parent.getInsets();
+//        final Dimension d = new Dimension(insets.left + insets.right,
+//                                          insets.top + insets.bottom);
+//        int maxHeight = 0;
+//
+//        for (Component comp : parent.getComponents()) {
+//            if (comp.isVisible()) {
+//                maxHeight = Math.max(maxHeight, comp.getMinimumSize().height);
+//                d.width += comp.getPreferredSize().width;
+//            }
+//        }
+//
+//        d.height += maxHeight;
+//
+//        return d;
+        
+        return preferredLayoutSize(parent);
     }
 
     public Dimension preferredLayoutSize(final Container parent) {
@@ -96,12 +98,15 @@ public final class HorizontalLayout implements LayoutManager {
         final Dimension d = new Dimension(insets.left + insets.right,
                                           insets.top + insets.bottom);
         int maxHeight = 0;
+        boolean first = false;
 
         for (Component comp : parent.getComponents()) {
             if (comp.isVisible()) {
                 final Dimension size = comp.getPreferredSize();
                 maxHeight = Math.max(maxHeight, size.height);
                 d.width += size.width;
+                if (first) first = false;
+                else d.width += hGap;
             }
         }
 

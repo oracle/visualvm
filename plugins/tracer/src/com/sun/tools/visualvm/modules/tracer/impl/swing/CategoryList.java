@@ -63,7 +63,7 @@ public final class CategoryList extends JPanel {
                     boolean[] initialStates, Component[][] items) {
 
         setOpaque(false);
-        setLayout(new VerticalLayout());
+        setLayout(new VerticalLayout(false));
 
         int captionsCount = categories.length;
         for (int i = 0; i < captionsCount; i++)
@@ -121,7 +121,7 @@ public final class CategoryList extends JPanel {
                 }
             };
             itemsContainer.setOpaque(false);
-            itemsContainer.setLayout(new VerticalLayout());
+            itemsContainer.setLayout(new VerticalLayout(false));
 
             for (int i = 0; i < items.length; i++)
                 itemsContainer.add(items[i]);

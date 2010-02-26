@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -214,17 +215,27 @@ final class TracerModel {
         synchronized(listeners) { listeners.remove(listener); }
     }
 
-    private void fireProbeAdded(TracerProbe probe) {
-        Set<Listener> toNotify = new HashSet();
+    private void fireProbeAdded(final TracerProbe probe) {
+        final Set<Listener> toNotify = new HashSet();
         synchronized(listeners) { toNotify.addAll(listeners); }
-        for (Listener listener : toNotify) listener.probeAdded(probe);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (Listener listener : toNotify)
+                    listener.probeAdded(probe);
+            }
+        });
+        
     }
 
-    private void fireProbeRemoved(TracerProbe probe, boolean probesDefined) {
-        Set<Listener> toNotify = new HashSet();
+    private void fireProbeRemoved(final TracerProbe probe, final boolean probesDefined) {
+        final Set<Listener> toNotify = new HashSet();
         synchronized(listeners) { toNotify.addAll(listeners); }
-        for (Listener listener : toNotify)
-            listener.probeRemoved(probe, probesDefined);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (Listener listener : toNotify)
+                    listener.probeRemoved(probe, probesDefined);
+            }
+        });
     }
 
     static interface Listener {

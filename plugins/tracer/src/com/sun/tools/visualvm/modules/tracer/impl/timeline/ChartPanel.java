@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
+import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.ScrollBar;
 import java.awt.BorderLayout;
@@ -130,8 +131,6 @@ class ChartPanel extends JPanel {
         chart.attachVerticalScrollBar(vScrollBar);
         
         defaultWheelHandler = chart.getMouseWheelListeners()[0];
-//        chart.removeMouseWheelListener(defaultWheelHandler);
-        mouseZoomImpl();
 
         chart.addConfigurationListener(new VisibleBoundsListener());
 
@@ -164,7 +163,11 @@ class ChartPanel extends JPanel {
     }
 
     Action toggleViewAction() {
-        if (toggleViewAction == null) toggleViewAction = new ToggleViewAction();
+        if (toggleViewAction == null) {
+            toggleViewAction = new ToggleViewAction();
+            if (TracerOptions.getInstance().getZoomMode().equals(TracerOptions.
+                    SCALE_TO_FIT)) toggleViewAction.actionPerformed(null);
+        }
         return toggleViewAction;
     }
 
@@ -174,22 +177,40 @@ class ChartPanel extends JPanel {
             mouseZoom = new OneWayToggleButton(ZMWHEEL_ICON, "Mouse wheel zooms") {
                 protected void performAction() { mouseZoomImpl(); }
             };
-            mouseZoom.setSelected(true);
+            if (TracerOptions.getInstance().getMouseWheelAction().equals(
+                    TracerOptions.MOUSE_WHEEL_ZOOMS)) {
+                mouseZoom.setSelected(true);
+                mouseZoomImpl();
+            }
         }
         return mouseZoom;
     }
 
     AbstractButton mouseHScroll() {
-        if (mouseHScroll == null) mouseHScroll = new OneWayToggleButton(HMWHEEL_ICON, "Mouse wheel scrolls horizontally") {
-            protected void performAction() { mouseHScrollImpl(); }
-        };
+        if (mouseHScroll == null) {
+            mouseHScroll = new OneWayToggleButton(HMWHEEL_ICON, "Mouse wheel scrolls horizontally") {
+                protected void performAction() { mouseHScrollImpl(); }
+            };
+            if (TracerOptions.getInstance().getMouseWheelAction().equals(
+                    TracerOptions.MOUSE_WHEEL_HSCROLLS)) {
+                mouseHScroll.setSelected(true);
+                mouseHScrollImpl();
+            }
+        }
         return mouseHScroll;
     }
 
     AbstractButton mouseVScroll() {
-        if (mouseVScroll == null) mouseVScroll = new OneWayToggleButton(VMWHEEL_ICON, "Mouse wheel scrolls vertically") {
-            protected void performAction() { mouseVScrollImpl(); }
-        };
+        if (mouseVScroll == null) {
+            mouseVScroll = new OneWayToggleButton(VMWHEEL_ICON, "Mouse wheel scrolls vertically") {
+                protected void performAction() { mouseVScrollImpl(); }
+            };
+            if (TracerOptions.getInstance().getMouseWheelAction().equals(
+                    TracerOptions.MOUSE_WHEEL_VSCROLLS)) {
+                mouseVScroll.setSelected(true);
+                mouseVScrollImpl();
+            }
+        }
         return mouseVScroll;
     }
 

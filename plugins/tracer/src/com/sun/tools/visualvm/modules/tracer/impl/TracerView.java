@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
+import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HorizontalLayout;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.SimpleSeparator;
 import java.awt.Dimension;
@@ -72,6 +73,7 @@ final class TracerView extends DataSourceView {
     private final TracerModel model;
     private final TracerController controller;
 
+    private DataViewComponent dvc;
     private TimelineView timelineView;
 
     
@@ -87,18 +89,24 @@ final class TracerView extends DataSourceView {
 
     protected DataViewComponent createComponent() {
         MasterViewSupport masterView = new MasterViewSupport();
-        DataViewComponent dvc = new DataViewComponent(masterView.getView(),
+        dvc = new DataViewComponent(masterView.getView(),
                 new DataViewComponent.MasterViewConfiguration(false));
 
         dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.33, 0, 0.33, 0, 0.5, 0.5));
 
+        String initiallyOpened = TracerOptions.getInstance().getInitiallyOpened();
+
         PackagesView packagesView = new PackagesView(model, controller);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Probes", true), DataViewComponent.TOP_LEFT);
         dvc.addDetailsView(packagesView.getView(), DataViewComponent.TOP_LEFT);
+        if (!initiallyOpened.contains(TracerOptions.VIEW_PROBES))
+            dvc.hideDetailsArea(DataViewComponent.TOP_LEFT);
 
         timelineView = new TimelineView(model);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Timeline", true), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(timelineView.getView(), DataViewComponent.TOP_RIGHT);
+        if (!initiallyOpened.contains(TracerOptions.VIEW_TIMELINE))
+            dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
 
         return dvc;
     }
@@ -140,6 +148,7 @@ final class TracerView extends DataSourceView {
                     stopButton.setEnabled(true);
                     stopButton.requestFocusInWindow();
 //                    clearToolbar();
+                    updateViewsOnSessionStart();
                     addChartControls();
                     break;
                 case TracerController.STATE_SESSION_INACTIVE:
@@ -184,11 +193,43 @@ final class TracerView extends DataSourceView {
             model.addListener(new TracerModel.Listener() {
                 public void probeAdded(TracerProbe probe) {
                     refreshState(true);
+                    updateViewsOnProbesChange();
                 }
                 public void probeRemoved(TracerProbe probe, boolean probesDefined) {
                     refreshState(probesDefined);
+                    updateViewsOnProbesChange();
                 }
             });
+        }
+
+        private void updateViewsOnSessionStart() {
+            String onSessionStart = TracerOptions.getInstance().getOnSessionStart();
+            if (!onSessionStart.equals(TracerOptions.VIEWS_UNCHANGED)) {
+                // Probes
+                setProbesVisible(onSessionStart.contains(TracerOptions.VIEW_PROBES));
+                // Timeline
+                setTimelineVisible(onSessionStart.contains(TracerOptions.VIEW_TIMELINE));
+            }
+        }
+
+        private void updateViewsOnProbesChange() {
+            String onSessionStart = TracerOptions.getInstance().getOnProbeAdded();
+            if (!onSessionStart.equals(TracerOptions.VIEWS_UNCHANGED)) {
+                // Probes
+                setProbesVisible(onSessionStart.contains(TracerOptions.VIEW_PROBES));
+                // Timeline
+                setTimelineVisible(onSessionStart.contains(TracerOptions.VIEW_TIMELINE));
+            }
+        }
+
+        private void setProbesVisible(boolean visible) {
+            if (visible) dvc.showDetailsArea(DataViewComponent.TOP_LEFT);
+            else dvc.hideDetailsArea(DataViewComponent.TOP_LEFT);
+        }
+
+        private void setTimelineVisible(boolean visible) {
+            if (visible) dvc.showDetailsArea(DataViewComponent.TOP_RIGHT);
+            else dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
         }
 
         private void addMessage(String text) {
