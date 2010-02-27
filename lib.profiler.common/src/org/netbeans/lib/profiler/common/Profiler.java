@@ -40,6 +40,7 @@
 
 package org.netbeans.lib.profiler.common;
 
+import java.awt.EventQueue;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -53,11 +54,10 @@ import org.netbeans.lib.profiler.instrumentation.BadLocationException;
 import org.netbeans.lib.profiler.instrumentation.InstrumentationException;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import sun.misc.Service;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Vector;
-import javax.swing.*;
+import org.openide.util.Lookup;
 
 
 /** An abstract superclass representing the entire Profiler.  The Profiler class should add a "state" on top of the
@@ -117,21 +117,13 @@ public abstract class Profiler {
 
     public static synchronized Profiler getDefault() {
         if (defaultProfiler == null) {
-            final Iterator it = Service.providers(Profiler.class);
-
-            if (it.hasNext()) {
-                defaultProfiler = (Profiler) it.next();
-
-                if ((defaultProfiler != null) && DEBUG) {
-                    System.err.println("Default Profiler succesfully installed: " + defaultProfiler); // NOI18N
-                }
-            }
-
+            defaultProfiler = (Profiler) Lookup.getDefault().lookup(Profiler.class);
             if (defaultProfiler == null) {
                 throw new InternalError("Should never happen"); // NOI18N
+            } else if (DEBUG) {
+                System.err.println("Default Profiler succesfully installed: " + defaultProfiler); // NOI18N
             }
         }
-
         return defaultProfiler;
     }
 
@@ -354,10 +346,10 @@ public abstract class Profiler {
             }
         };
 
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             r.run();
         } else {
-            SwingUtilities.invokeLater(r);
+            EventQueue.invokeLater(r);
         }
     }
 
@@ -388,10 +380,10 @@ public abstract class Profiler {
             }
         };
 
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             r.run();
         } else {
-            SwingUtilities.invokeLater(r);
+            EventQueue.invokeLater(r);
         }
     }
 
@@ -415,10 +407,10 @@ public abstract class Profiler {
             }
         };
 
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             r.run();
         } else {
-            SwingUtilities.invokeLater(r);
+            EventQueue.invokeLater(r);
         }
     }
 }
