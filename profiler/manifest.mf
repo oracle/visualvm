@@ -4,4 +4,5 @@ OpenIDE-Module-Layer: org/netbeans/modules/profiler/mf-layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/Bundle.properties
 OpenIDE-Module-Install: org/netbeans/modules/profiler/ProfilerModule.class
 OpenIDE-Module-Specification-Version: 1.16
-OpenIDE-Module-Provides: org.netbeans.modules.profiler
+OpenIDE-Module-Provides: org.netbeans.modules.profiler, org.netbeans.lib.profiler.common.Profiler
+
