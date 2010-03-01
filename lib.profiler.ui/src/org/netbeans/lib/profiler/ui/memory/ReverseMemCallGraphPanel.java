@@ -267,7 +267,7 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
     }
     
     private void showSourceForClass(String className) {
-        className = className.replaceAll("\\[]", ""); // NOI18N
+        className = className.replace("[]", ""); // NOI18N
         actionsHandler.showSourceForMethod(className, null, null);
     }
 
