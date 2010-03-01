@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.Timer;
+import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
@@ -163,9 +164,11 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
     @SuppressWarnings("element-type-mismatch")
     private void updateTooltip(TimelineChart chart) {
         if (mousePosition == null) return;
+        ChartSelectionModel selectionModel = chart.getSelectionModel();
+        if (selectionModel == null) return;
 
         List<ItemSelection> highlightedItems =
-                chart.getSelectionModel().getHighlightedItems();
+                selectionModel.getHighlightedItems();
 
         XYItemSelection selection = highlightedItems.isEmpty() ? null :
                                     (XYItemSelection)highlightedItems.get(0);

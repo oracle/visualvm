@@ -125,12 +125,12 @@ public final class TimelinePanel extends JPanel {
 
         public void mousePressed(MouseEvent e) {
             updateRowState(e, true);
-            if (draggingRow != null) ChartPanel.disableSelection(chart);
+            if (draggingRow != null) chart.updateSelection(false, this);
             updateCursor();
         }
 
         public void mouseReleased(MouseEvent e) {
-            if (draggingRow != null) ChartPanel.enableSelection(chart);
+            if (draggingRow != null) chart.updateSelection(true, this);
             updateRowState(e, false);
             updateCursor();
         }

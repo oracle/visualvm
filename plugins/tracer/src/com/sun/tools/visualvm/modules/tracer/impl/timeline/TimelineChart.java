@@ -37,6 +37,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.ChartItemChange;
+import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.ItemPainter;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.swing.LongRect;
@@ -65,6 +66,9 @@ final class TimelineChart extends SynchronousXYChart {
     private final Map<ChartItem, Row> itemsToRows;
 
     private int selectedRow = -1;
+    private Set selectionBlockers = new HashSet();
+    private int lastHoverMode;
+    private int lastMoveMode;
 
     private final Set<RowListener> rowListeners = new HashSet();
 
@@ -301,6 +305,26 @@ final class TimelineChart extends SynchronousXYChart {
 
     void clearSelection() {
         setSelectedRow(-1);
+    }
+
+    void updateSelection(boolean enable, Object source) {
+        int blockersSize = selectionBlockers.size();
+        if (enable) selectionBlockers.remove(source);
+        else selectionBlockers.add(source);
+        if (selectionBlockers.size() == blockersSize) return;
+
+        ChartSelectionModel selectionModel = getSelectionModel();
+        if (selectionModel == null) return;
+
+        if (selectionBlockers.isEmpty()) {
+            selectionModel.setHoverMode(lastHoverMode);
+            selectionModel.setMoveMode(lastMoveMode);
+        } else {
+            lastHoverMode = selectionModel.getHoverMode();
+            lastMoveMode = selectionModel.getMoveMode();
+            selectionModel.setHoverMode(ChartSelectionModel.HOVER_NONE);
+            selectionModel.setMoveMode(ChartSelectionModel.SELECTION_NONE);
+        }
     }
 
 

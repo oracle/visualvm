@@ -33,6 +33,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -109,7 +111,12 @@ class ChartPanel extends JPanel {
         TimelineSelectionOverlay selectionOverlay = new TimelineSelectionOverlay();
         chart.addOverlayComponent(selectionOverlay);
         selectionOverlay.registerChart(chart);
-        enableSelection(chart);
+//        enableSelection(chart);
+        ChartSelectionModel selectionModel = chart.getSelectionModel();
+        if (selectionModel != null) {
+            selectionModel.setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
+            selectionModel.setMoveMode(ChartSelectionModel.SELECTION_LINE_V);
+        }
 
         TimeMarksPainter marksPainter = new TimeMarksPainter() {
             public Dimension getPreferredSize() {
@@ -126,8 +133,25 @@ class ChartPanel extends JPanel {
         TimelineAxis axis = new TimelineAxis(chart, marksComputer, marksPainter);
         
         hScrollBar = new ScrollBar(JScrollBar.HORIZONTAL);
-        vScrollBar = new ScrollBar(JScrollBar.VERTICAL);
+        hScrollBar.addAdjustmentListener(new AdjustmentListener() {
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                if (hScrollBar.getValueIsAdjusting())
+                    ChartPanel.this.chart.updateSelection(false, hScrollBar);
+                else
+                    ChartPanel.this.chart.updateSelection(true, hScrollBar);
+            }
+        });
         chart.attachHorizontalScrollBar(hScrollBar);
+
+        vScrollBar = new ScrollBar(JScrollBar.VERTICAL);
+        vScrollBar.addAdjustmentListener(new AdjustmentListener() {
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                if (vScrollBar.getValueIsAdjusting())
+                    ChartPanel.this.chart.updateSelection(false, vScrollBar);
+                else
+                    ChartPanel.this.chart.updateSelection(true, vScrollBar);
+            }
+        });
         chart.attachVerticalScrollBar(vScrollBar);
         
         defaultWheelHandler = chart.getMouseWheelListeners()[0];
@@ -212,17 +236,6 @@ class ChartPanel extends JPanel {
             }
         }
         return mouseVScroll;
-    }
-
-
-    static void enableSelection(TimelineChart chart) {
-        chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
-        chart.getSelectionModel().setMoveMode(ChartSelectionModel.SELECTION_LINE_V);
-    }
-
-    static void disableSelection(TimelineChart chart) {
-        chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
-        chart.getSelectionModel().setMoveMode(ChartSelectionModel.SELECTION_NONE);
     }
 
 
