@@ -404,7 +404,7 @@ public class OverviewControllerUI extends JTitledPanel {
     }
     
     private void refreshSummary() {
-        if (!showSysprops) {
+        if (!showSysprops && !showThreads) {
             dataArea.setText(IN_PROGRESS_MSG);
         }
         
