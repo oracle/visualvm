@@ -252,7 +252,7 @@ public class SelfSamplerAction extends AbstractAction implements AWTEventListene
             timer.scheduleAtFixedRate(new TimerTask() {
                 public void run() {
                     try {
-                        ThreadInfo[] infos = threadBean.getThreadInfo(threadBean.getAllThreadIds(),Integer.MAX_VALUE);
+                        ThreadInfo[] infos = threadBean.dumpAllThreads(false,false);
                         long timestamp = System.nanoTime();
                         b.addStacktrace(infos, timestamp);
                         updateStats(timestamp);
