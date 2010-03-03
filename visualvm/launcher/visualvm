@@ -34,8 +34,8 @@ args=""
 case "`uname`" in
     Darwin*)
         userdir="${default_mac_userdir}"
-        if [ \! -n "$jdkhome" -a -d /System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home ] ; then
-           jdkhome=/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home
+        if [ \! -n "$jdkhome" ] ; then
+           jdkhome=`/usr/libexec/java_home --version 1.6+`
         fi
         ;;
     *)
