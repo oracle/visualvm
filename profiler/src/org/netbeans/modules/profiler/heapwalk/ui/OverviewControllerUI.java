@@ -521,8 +521,10 @@ public class OverviewControllerUI extends JTitledPanel {
                 String urls = url.toString();
                 if (urls.equals(SHOW_SYSPROPS_URL)) {
                     showSysprops = true;
+                    refreshSummary();
                 } else if (urls.equals(SHOW_THREADS_URL)) {
                     showThreads = true;
+                    refreshSummary();
                 } else if (urls.startsWith(OPEN_THREADS_URL)) {
                     urls = urls.substring(OPEN_THREADS_URL.length());
                     String parts[] = urls.split("\\|"); // NOI18N
@@ -565,7 +567,6 @@ public class OverviewControllerUI extends JTitledPanel {
                         NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
                     }
                 } 
-                refreshSummary();
             }
         };
         dataArea.setSelectionColor(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
