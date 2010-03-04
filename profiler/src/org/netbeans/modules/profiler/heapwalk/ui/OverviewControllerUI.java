@@ -42,20 +42,26 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
+import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.JTitledPanel;
+import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.heapwalk.AnalysisController;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.netbeans.modules.profiler.heapwalk.OverviewController;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.io.File;
 import java.io.StringWriter;
 import java.lang.Thread.State;
@@ -74,7 +80,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
@@ -97,6 +102,8 @@ public class OverviewControllerUI extends JTitledPanel {
     private static final String SHOW_SYSPROPS_URL = "file:/sysprops"; // NOI18N
     private static final String SHOW_THREADS_URL = "file:/threads"; // NOI18N
     private static final String OPEN_THREADS_URL = "file:/stackframe/";     // NOI18N
+    private static final String CLASS_URL_PREFIX = "file://class/"; // NOI18N
+    private static final String INSTANCE_URL_PREFIX = "file://instance/";   // NOI18N
     private static ImageIcon ICON_INFO = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false); // NOI18N
     
     
@@ -145,6 +152,10 @@ public class OverviewControllerUI extends JTitledPanel {
             "OverviewControllerUI_ThreadsString"); // NOI18N
     private static final String SHOW_THREADS_LINK_STRING = NbBundle.getMessage(OverviewControllerUI.class,
             "OverviewControllerUI_ShowThreadsLinkString"); // NOI18N
+    private static final String CANNOT_RESOLVE_CLASS_MSG = NbBundle.getMessage(AnalysisController.class,
+            "AnalysisController_CannotResolveClassMsg"); // NOI18N
+    private static final String CANNOT_RESOLVE_INSTANCE_MSG = NbBundle.getMessage(AnalysisController.class,
+            "AnalysisController_CannotResolveInstanceMsg"); // NOI18N
     // -----
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -157,6 +168,8 @@ public class OverviewControllerUI extends JTitledPanel {
     private HeapFragmentWalker heapFragmentWalker;
     
     // --- Private implementation ------------------------------------------------
+    private JavaClass java_lang_Class;
+    private Instance instanceToSelect;
     private boolean systemPropertiesComputed = false;
     private boolean showSysprops = false;
     private boolean showThreads = false;
@@ -168,7 +181,7 @@ public class OverviewControllerUI extends JTitledPanel {
     public OverviewControllerUI(OverviewController overviewController) {
         super(VIEW_TITLE,ICON_INFO,true);
         heapFragmentWalker = overviewController.getSummaryController().getHeapFragmentWalker();
-        
+        java_lang_Class = heapFragmentWalker.getHeapFragment().getJavaClassByName(Class.class.getName());
         initComponents();
         refreshSummary();
     }
@@ -176,6 +189,29 @@ public class OverviewControllerUI extends JTitledPanel {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     // --- Public interface ------------------------------------------------------
+
+    public void showInThreads(Instance instance) {
+        if (!showThreads) {
+            showThreads = true;
+            instanceToSelect = instance;
+            refreshSummary();
+            return;
+        }
+        String referenceId = String.valueOf(instance.getInstanceId());
+        
+        dataArea.scrollToReference(referenceId);
+        Document d = dataArea.getDocument();
+        HTMLDocument doc = (HTMLDocument) d;
+        HTMLDocument.Iterator iter = doc.getIterator(HTML.Tag.A);
+        for (; iter.isValid(); iter.next()) {
+            AttributeSet a = iter.getAttributes();
+            String nm = (String) a.getAttribute(HTML.Attribute.NAME);
+            if ((nm != null) && nm.equals(referenceId)) {
+                dataArea.select(iter.getStartOffset(),iter.getEndOffset());
+                dataArea.requestFocusInWindow();
+            }
+        }
+    }
     
     private Properties getSystemProperties() {
         if (!systemPropertiesComputed) {
@@ -333,6 +369,7 @@ public class OverviewControllerUI extends JTitledPanel {
             StringWriter sw = new StringWriter();
             Heap h = heapFragmentWalker.getHeapFragment();
             Collection<GCRoot> roots = h.getGCRoots();
+            Map<ThreadObjectGCRoot,Map<Integer,List<JavaFrameGCRoot>>> javaFrameMap = computeJavaFrameMap(roots);
             // Use this to enable VisualVM color scheme for threads dumps:
             // sw.append("<pre style='color: #cc3300;'>"); // NOI18N
             sw.append("<pre>"); // NOI18N
@@ -354,6 +391,7 @@ public class OverviewControllerUI extends JTitledPanel {
                         Long threadId = (Long)threadInstance.getValueOfField("tid");    // NOI18N
                         Integer threadStatus = (Integer)threadInstance.getValueOfField("threadStatus"); // NOI18N
                         StackTraceElement stack[] = threadRoot.getStackTrace();
+                        Map<Integer,List<JavaFrameGCRoot>> localsMap = javaFrameMap.get(threadRoot);
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
                         // sw.append("&nbsp;&nbsp;<span style=\"color: #0033CC\">"); // NOI18N
                         sw.append("&nbsp;&nbsp;<b>");   // NOI18N
@@ -389,6 +427,16 @@ public class OverviewControllerUI extends JTitledPanel {
                                     stackElHref = stackElement.toString();
                                 }
                                 sw.append("\tat "+stackElHref+"<br>");  // NOI18N
+                                if (localsMap != null) {
+                                    List<JavaFrameGCRoot> locals = localsMap.get(Integer.valueOf(i));
+                                    
+                                    if (locals != null) {
+                                        for (JavaFrameGCRoot localVar : locals) {
+                                            Instance localInstance = localVar.getInstance();
+                                            sw.append("\t   Local Variable: "+printInstance(localInstance)+"<br>"); // NOI18N
+                                        }
+                                    }
+                                }
                             }
                         }
                     } else {
@@ -404,7 +452,7 @@ public class OverviewControllerUI extends JTitledPanel {
     }
     
     private void refreshSummary() {
-        if (!showSysprops) {
+        if (!showSysprops && !showThreads) {
             dataArea.setText(IN_PROGRESS_MSG);
         }
         
@@ -422,7 +470,12 @@ public class OverviewControllerUI extends JTitledPanel {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         dataArea.setText(dataAreaText);
-                        dataArea.setCaretPosition(0);
+                        if (instanceToSelect != null) {
+                            showInThreads(instanceToSelect);
+                            instanceToSelect = null;
+                        } else {
+                            dataArea.setCaretPosition(0);
+                        }
                     }
                 });
             }
@@ -478,11 +531,44 @@ public class OverviewControllerUI extends JTitledPanel {
                     int linenumber = Integer.parseInt(parts[2]);
                     GoToSourceHelper.openSource(heapFragmentWalker.getHeapDumpProject(),
                             new JavaSourceLocation(className, method, linenumber));
-                }
+                } else if (urls.startsWith(INSTANCE_URL_PREFIX)) {
+                    urls = urls.substring(INSTANCE_URL_PREFIX.length());
+
+                    String[] id = urls.split("/"); // NOI18N
+                    JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByName(id[0]);
+
+                    if (c != null) {
+                        List<Instance> instances = c.getInstances();
+                        Instance i = null;
+                        int instanceNumber = Integer.parseInt(id[1]);
+                        if (instanceNumber <= instances.size()) i = instances.get(instanceNumber - 1);
+
+                        if (i != null) {
+                            heapFragmentWalker.getClassesController().showInstance(i);
+                        } else {
+                            NetBeansProfiler.getDefaultNB()
+                                    .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
+                                    new Object[] { id[1], c.getName() }));
+                        }
+                    } else {
+                        NetBeansProfiler.getDefaultNB()
+                                .displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+                    }
+                } else if (urls.startsWith(CLASS_URL_PREFIX)) {
+                    urls = urls.substring(CLASS_URL_PREFIX.length());
+
+                    JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByName(urls);
+
+                    if (c != null) {
+                        heapFragmentWalker.getClassesController().showClass(c);
+                    } else {
+                        NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
+                    }
+                } 
                 refreshSummary();
             }
         };
-
+        dataArea.setSelectionColor(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
         JScrollPane dataAreaScrollPane = new JScrollPane(dataArea,
                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -505,4 +591,43 @@ public class OverviewControllerUI extends JTitledPanel {
         // UI tweaks
         setBackground(dataArea.getBackground());
     }
+
+    private Map<ThreadObjectGCRoot,Map<Integer,List<JavaFrameGCRoot>>> computeJavaFrameMap(Collection<GCRoot> roots) {
+        Map<ThreadObjectGCRoot,Map<Integer,List<JavaFrameGCRoot>>> javaFrameMap = new HashMap();
+        
+        for (GCRoot root : roots) {
+            if (GCRoot.JAVA_FRAME.equals(root.getKind())) {
+                JavaFrameGCRoot frameGCroot = (JavaFrameGCRoot) root;
+                ThreadObjectGCRoot threadObj = frameGCroot.getThreadGCRoot();
+                Integer frameNo = Integer.valueOf(frameGCroot.getFrameNumber());
+                Map<Integer,List<JavaFrameGCRoot>> stackMap = javaFrameMap.get(threadObj);
+                List<JavaFrameGCRoot> locals;
+                
+                if (stackMap == null) {
+                    stackMap = new HashMap();
+                    javaFrameMap.put(threadObj,stackMap);
+                }
+                locals = stackMap.get(frameNo);
+                if (locals == null) {
+                    locals = new ArrayList(2);
+                    stackMap.put(frameNo,locals);
+                }
+                locals.add(frameGCroot);
+            }
+        }
+        return javaFrameMap;
+    }
+
+    private String printInstance(Instance in) {
+        String className;
+        
+        if (in.getJavaClass().equals(java_lang_Class)) {
+            JavaClass javaClass = heapFragmentWalker.getHeapFragment().getJavaClassByID(in.getInstanceId());
+            className = javaClass.getName();
+            return "<a href='"+ CLASS_URL_PREFIX + className + "' name='" + javaClass.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
+        }
+        className = in.getJavaClass().getName();
+        return "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "' name='" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
+    }
+
 }
