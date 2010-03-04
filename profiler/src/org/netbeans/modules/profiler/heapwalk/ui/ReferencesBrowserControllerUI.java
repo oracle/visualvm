@@ -41,6 +41,9 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 
+import org.netbeans.lib.profiler.heap.GCRoot;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -88,7 +91,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -240,6 +242,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                                                                             "ReferencesBrowserControllerUI_ShowGcRootItemText"); // NOI18N
     private static final String GO_TO_SOURCE_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                              "ReferencesBrowserControllerUI_GoToSourceItemText"); // NOI18N
+    private static final String SHOW_IN_THREADS_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
+                                                                             "ReferencesBrowserControllerUI_ShowInThreadsItemText"); // NOI18N
     private static final String SHOW_HIDE_COLUMNS_STRING = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                                "ReferencesBrowserControllerUI_ShowHideColumnsString"); // NOI18N
     private static final String FIELD_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
@@ -285,6 +289,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private JMenuItem showInstanceItem;
     private JMenuItem showLoopOriginItem;
     private JMenuItem showSourceItem;
+    private JMenuItem showInThreadsItem;
     private JPanel dataPanel;
     private JPanel noDataPanel;
     private JPopupMenu cornerPopup;
@@ -625,10 +630,26 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                     }
                 }
             });
+            
+        showInThreadsItem = new JMenuItem(SHOW_IN_THREADS_ITEM_TEXT);
+        showInThreadsItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    int row = fieldsListTable.getSelectedRow();
 
+                    if (row != -1) {
+                        HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
+                        if (node instanceof HeapWalkerInstanceNode) {
+                            Instance instance = ((HeapWalkerInstanceNode)node).getInstance();
+                            referencesBrowserController.showInThreads(instance);
+                        }
+                    }
+                }
+            });
+            
         popup.add(showInstanceItem);
 //        popup.add(showClassItem);
         popup.add(showGcRootItem);
+        popup.add(showInThreadsItem);
         popup.addSeparator();
         popup.add(showLoopOriginItem);
         popup.add(showSourceItem);
@@ -852,7 +873,22 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         showGcRootItem.setEnabled(node instanceof HeapWalkerInstanceNode && (!node.currentlyHasChildren() ||
                 (node.getNChildren() != 1 || !HeapWalkerNodeFactory.isMessageNode(node.getChild(0))))); // #124306
         showSourceItem.setEnabled(node instanceof HeapWalkerInstanceNode);
-
+        showInThreadsItem.setEnabled(false);
+        if (node instanceof HeapWalkerInstanceNode) {
+            Instance rootInstance = ((HeapWalkerInstanceNode)node).getInstance();
+            Heap heap = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapFragment();
+            GCRoot gcRoot = heap.getGCRoot(rootInstance);
+            
+            if (gcRoot != null && GCRoot.JAVA_FRAME.equals(gcRoot.getKind())) {
+                // make sure that thread information is available
+                JavaFrameGCRoot frameVar = (JavaFrameGCRoot) gcRoot;
+                
+                if (frameVar.getFrameNumber() != -1) {
+                    showInThreadsItem.setEnabled(true);
+                }
+            }
+        }
+        
         if ((x == -1) || (y == -1)) {
             Rectangle rowBounds = fieldsListTable.getCellRect(row, 0, true);
 
