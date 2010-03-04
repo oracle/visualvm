@@ -46,7 +46,6 @@ import java.util.Map;
 /**
  *
  * @author Tomas Hurka
- * @author Toms Hurka
  */
 class StackTraceSegment extends TagBounds {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
