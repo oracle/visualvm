@@ -33,6 +33,8 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,7 +47,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.openide.util.NbBundle;
@@ -149,12 +150,17 @@ public final class AcceptLicense {
         //Center on screen
         d.setLocationRelativeTo(null);
         // Bugfix #361, do everything to make the JDialog the topmost window after showing it
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                d.requestFocus();
-                d.setAlwaysOnTop(true);
-                d.toFront();
-                d.setAlwaysOnTop(false);
+        d.addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (d.isShowing()) {
+                        d.removeHierarchyListener(this);
+                        d.requestFocus();
+                        d.setAlwaysOnTop(true);
+                        d.toFront();
+                        d.setAlwaysOnTop(false);
+                    }
+                }
             }
         });
         d.setVisible(true);
