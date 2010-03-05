@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
+import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalk.ui.OverviewControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
@@ -76,6 +77,10 @@ public class OverviewController extends AbstractController {
     // --- Protected implementation ----------------------------------------------
     protected JPanel createControllerUI() {
         return new OverviewControllerUI(this);
+    }
+
+    void showInThreads(Instance instance) {
+        ((OverviewControllerUI) getPanel()).showInThreads(instance);
     }
 
 }
