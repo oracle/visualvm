@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -29,9 +29,14 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +45,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.openide.util.NbBundle;
@@ -61,9 +67,10 @@ public final class AcceptLicense {
     private static JDialog d;
     private static String command;
     
-    /** If License was not accepted during installation user must accept it here. 
+    /**
+     * If License was not accepted during installation user must accept it here.
      */
-    public static void showLicensePanel () throws Exception {
+    public static void showLicensePanel() throws Exception {
         setDefaultLookAndFeel();
         URL url = AcceptLicense.class.getResource("LICENSE.txt"); // NOI18N
         LicensePanel licensePanel = new LicensePanel(url);
@@ -72,10 +79,10 @@ public final class AcceptLicense {
         String noLabel = bundle.getString("MSG_LicenseNoButton"); // NOI18N
         JButton yesButton = new JButton();
         JButton noButton = new JButton();
-        setLocalizedText(yesButton,yesLabel);
-        setLocalizedText(noButton,noLabel);
+        setLocalizedText(yesButton, yesLabel);
+        setLocalizedText(noButton, noLabel);
         ActionListener listener = new ActionListener () {
-            public void actionPerformed (ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 command = e.getActionCommand();
                 d.setVisible(false);
                 d = null;
@@ -99,25 +106,57 @@ public final class AcceptLicense {
         int maxHeight = Math.max(yesPF.height, noPF.height);
         yesButton.setPreferredSize(new Dimension(maxWidth, maxHeight));
         noButton.setPreferredSize(new Dimension(maxWidth, maxHeight));
-        
-        d = new JDialog((Frame) null,bundle.getString("MSG_LicenseDlgTitle"),true); // NOI18N
+
+        // Bugfix #361, set the JDialog to appear in the Taskbar on Windows
+        // Actually this doesn't seem to work on Windows at all, the dialog is not displayed
+//        d = new JDialog(null, bundle.getString("MSG_LicenseDlgTitle"), // NOI18N
+//                        JDialog.ModalityType.APPLICATION_MODAL);
+        d = new JDialog((Frame)null, bundle.getString("MSG_LicenseDlgTitle"), // NOI18N
+                        true);
+
+        // Bugfix #361, JDialog should use the VisualVM icon for better identification
+        // Only works on JDK 6 but the AcceptLicense may run on JDK 5, reflection required
+        try {
+            Method m = d.getClass().getMethod("setIconImages", List.class); // NOI18N
+
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            List<Image> icons = new ArrayList();
+            icons.add(toolkit.createImage(AcceptLicense.class.getResource(
+                    "/com/sun/tools/visualvm/modules/startup/resources/icon16.png"))); // NOI18N
+            icons.add(toolkit.createImage(AcceptLicense.class.getResource(
+                    "/com/sun/tools/visualvm/modules/startup/resources/icon24.png"))); // NOI18N
+            icons.add(toolkit.createImage(AcceptLicense.class.getResource(
+                    "/com/sun/tools/visualvm/modules/startup/resources/icon32.png"))); // NOI18N
+            icons.add(toolkit.createImage(AcceptLicense.class.getResource(
+                    "/com/sun/tools/visualvm/modules/startup/resources/icon48.png"))); // NOI18N
+            
+            m.invoke(d, icons);
+        } catch (Throwable t) {}
         
         d.getAccessibleContext().setAccessibleName(bundle.getString("ACSN_LicenseDlg")); // NOI18N
         d.getAccessibleContext().setAccessibleDescription(bundle.getString("ACSD_LicenseDlg")); // NOI18N
         
-        d.getContentPane().add(licensePanel,BorderLayout.CENTER);
+        d.getContentPane().add(licensePanel, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(17,12,11,11));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(17, 12, 11, 11));
         buttonPanel.add(yesButton);
         buttonPanel.add(noButton);
-        d.getContentPane().add(buttonPanel,BorderLayout.SOUTH);
-        d.setSize(new Dimension(600,600));
+        d.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+        d.setSize(new Dimension(600, 600));
         d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        d.setModal(true);
         d.setResizable(true);
         //Center on screen
         d.setLocationRelativeTo(null);
+        // Bugfix #361, do everything to make the JDialog the topmost window after showing it
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                d.requestFocus();
+                d.setAlwaysOnTop(true);
+                d.toFront();
+                d.setAlwaysOnTop(false);
+            }
+        });
         d.setVisible(true);
         
         if (YES_AC.equals(command)) {
@@ -182,7 +221,7 @@ public final class AcceptLicense {
      * @param text text to search
      * @return the position of mnemonic ampersand in text, or -1 if there is none
      */
-    public static int findMnemonicAmpersand(String text) {
+    private static int findMnemonicAmpersand(String text) {
         int i = -1;
 
         do {
@@ -211,7 +250,7 @@ public final class AcceptLicense {
     /**
      * Tries to set default L&F according to platform.
      */
-    public static void setDefaultLookAndFeel () {
+    private static void setDefaultLookAndFeel() {
         String lafClassName = "<System LaF>"; // NOI18N
         try {
             lafClassName = UIManager.getSystemLookAndFeelClassName();
