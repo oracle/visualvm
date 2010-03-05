@@ -444,6 +444,7 @@ public class OverviewController extends AbstractController {
                             for(int i = 0; i < stack.length; i++) {
                                 String stackElHref;
                                 StackTraceElement stackElement = stack[i];
+                                String stackElementText = htmlize(stackElement.toString());
                                 
                                 if (heapFragmentWalker.getHeapDumpProject() != null) {
                                     String className = stackElement.getClassName();
@@ -453,10 +454,10 @@ public class OverviewController extends AbstractController {
                                     
                                     // --- Use this to enable VisualVM color scheme for threads dumps: ---
                                     // stackElHref = "&nbsp;&nbsp;<a style=\"color: #CC3300;\" href=\""+stackUrl+"\">"+stackElement+"</a>"; // NOI18N
-                                    stackElHref = "<a href=\""+stackUrl+"\">"+stackElement+"</a>";    // NOI18N
+                                    stackElHref = "<a href=\""+stackUrl+"\">"+stackElementText+"</a>";    // NOI18N
                                     // -------------------------------------------------------------------
                                 } else {
-                                    stackElHref = stackElement.toString();
+                                    stackElHref = stackElementText;
                                 }
                                 sb.append("\tat "+stackElHref+"<br>");  // NOI18N
                                 if (localsMap != null) {
@@ -521,5 +522,8 @@ public class OverviewController extends AbstractController {
         className = in.getJavaClass().getName();
         return "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "' name='" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
     }
-    
+
+    private static String htmlize(String value) {
+            return value.replace(">", "&gt;").replace("<", "&lt;");     // NOI18N
+    }
 }
