@@ -219,12 +219,12 @@ public class HintsController extends AbstractController {
     
     private String printInstance(Instance in) {
         String className = in.getJavaClass().getName();
-        return "<a href='file://instance/" + className + "/" + in.getInstanceNumber() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
+        return "<a href='" + INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
     }
     
     private String printClass(JavaClass jcls) {
         String className = jcls.getName();
-        return "<a href='file://class/" + className + "'>class " + className + "</a>"; // NOI18N
+        return "<a href='" + CLASS_URL_PREFIX + className + "'>class " + className + "</a>"; // NOI18N
     }
     
     
