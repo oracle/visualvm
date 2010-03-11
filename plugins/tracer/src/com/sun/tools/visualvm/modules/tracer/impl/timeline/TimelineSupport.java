@@ -28,11 +28,15 @@ package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
+import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineChart.Row;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartContext;
+import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 
@@ -63,8 +67,13 @@ public final class TimelineSupport {
         chart = new TimelineChart(itemsModel);
         tooltips = new TimelineTooltipOverlay(chart);
         chart.addOverlayComponent(tooltips);
-        units = new TimelineUnitsOverlay(chart);
-        chart.addOverlayComponent(units);
+
+        if (TracerOptions.getInstance().isShowValuesEnabled()) {
+            units = new TimelineUnitsOverlay(chart);
+            chart.addOverlayComponent(units);
+        } else {
+            units = null;
+        }
     }
 
 
@@ -128,7 +137,7 @@ public final class TimelineSupport {
     // --- Tooltips support ----------------------------------------------------
 
     private void setupOverlays() {
-        int rowsCount = chart.getRowsCount();
+        final int rowsCount = chart.getRowsCount();
 
         TimelineTooltipPainter[] ttPainters = new TimelineTooltipPainter[rowsCount];
         for (int i = 0; i < ttPainters.length; i++) {
@@ -160,26 +169,121 @@ public final class TimelineSupport {
         }
         tooltips.setupPainters(ttPainters);
 
-        units.setupModel(new TimelineUnitsOverlay.Model() {
+        if (units != null) units.setupModel(new TimelineUnitsOverlay.Model() {
 
-            public String getMinUnits(TimelineChart.Row row) {
-                ChartContext context = row.getContext();
-                TracerProbe probe = getProbe(row);
-                ValueItemDescriptor descriptor = (ValueItemDescriptor)probe.getItemDescriptors()[0];
-                String valueString = descriptor.getValueString(context.getDataOffsetY(),
-                        ItemValueFormatter.FORMAT_UNITS);
-                String unitsString = descriptor.getUnitsString(ItemValueFormatter.FORMAT_UNITS);
-                return unitsString == null ? valueString : valueString + " " + unitsString;
+            private Color[][] rowColors;
+            private String[][] rowMinValues;
+            private String[][] rowMaxValues;
+
+            public void prefetch() {
+                rowColors = new Color[rowsCount][];
+                rowMinValues = new String[rowsCount][];
+                rowMaxValues = new String[rowsCount][];
+
+                PaintersModel paintersModel = chart.getPaintersModel();
+                for (int rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
+                    
+                    Row row = chart.getRow(rowIndex);
+                    TracerProbe probe = getProbe(row);
+                    int rowItemsCount = row.getItemsCount();
+
+                    ChartContext rowContext = row.getContext();
+                    long commonMinY = rowContext.getDataOffsetY();
+                    long commonMaxY = commonMinY + rowContext.getDataHeight();
+
+                    List<Color> visibleRowItemColors = new ArrayList(rowItemsCount);
+                    List<String> visibleRowItemMinValues = new ArrayList(rowItemsCount);
+                    List<String> visibleRowItemMaxValues = new ArrayList(rowItemsCount);
+                    
+                    boolean sameFactorUnits = true;
+                    double lastDataFactor = -1;
+                    String lastUnitsString = "lastUnitsString"; // NOI18N
+
+                    for (int itemIndex = 0; itemIndex < rowItemsCount; itemIndex++) {
+                        TimelineXYItem item = (TimelineXYItem)row.getItem(itemIndex);
+                        TimelineXYPainter painter =
+                                (TimelineXYPainter)paintersModel.getPainter(item);
+
+                        if (painter.isPainting()) {
+                            visibleRowItemColors.add(itemColor(painter));
+
+                            ValueItemDescriptor descriptor = (ValueItemDescriptor)
+                                    probe.getItemDescriptors()[itemIndex];
+
+                            double dataFactor = descriptor.getDataFactor();
+                            String unitsString = descriptor.getUnitsString(
+                                    ItemValueFormatter.FORMAT_UNITS);
+                            
+                            if (sameFactorUnits) {
+                                if (lastDataFactor == -1)
+                                    lastDataFactor = dataFactor;
+                                else if (lastDataFactor != dataFactor)
+                                    sameFactorUnits = false;
+                                lastDataFactor = dataFactor;
+                                
+                                if ("lastUnitsString".equals(lastUnitsString)) // NOI18N
+                                    lastUnitsString = unitsString;
+                                else if (!equals(lastUnitsString, unitsString))
+                                    sameFactorUnits = false;
+                                lastUnitsString = unitsString;
+                            }
+
+                            String minValueString = descriptor.getValueString(
+                                    (long)(commonMinY / painter.dataFactor),
+                                    ItemValueFormatter.FORMAT_UNITS);
+                            visibleRowItemMinValues.add(unitsString == null ?
+                                minValueString : minValueString + " " + unitsString);
+                            
+                            String maxValueString = descriptor.getValueString(
+                                    (long)(commonMaxY / painter.dataFactor),
+                                    ItemValueFormatter.FORMAT_UNITS);
+                            visibleRowItemMaxValues.add(unitsString == null ?
+                                maxValueString : maxValueString + " " + unitsString);
+                        }
+                    }
+
+                    if (sameFactorUnits) {
+                        rowColors[rowIndex] = new Color[] { null };
+                        rowMinValues[rowIndex] =
+                                new String[] { visibleRowItemMinValues.get(0) };
+                        rowMaxValues[rowIndex] =
+                                new String[] { visibleRowItemMaxValues.get(0) };
+                    } else {
+                        rowColors[rowIndex] = visibleRowItemColors.toArray(
+                                new Color[visibleRowItemColors.size()]);
+                        rowMinValues[rowIndex] = visibleRowItemMinValues.toArray(
+                                new String[visibleRowItemMinValues.size()]);
+                        rowMaxValues[rowIndex] = visibleRowItemMaxValues.toArray(
+                                new String[visibleRowItemMaxValues.size()]);
+                    }
+                }
             }
 
-            public String getMaxUnits(TimelineChart.Row row) {
-                ChartContext context = row.getContext();
-                TracerProbe probe = getProbe(row);
-                ValueItemDescriptor descriptor = (ValueItemDescriptor)probe.getItemDescriptors()[0];
-                String valueString = descriptor.getValueString(context.getDataOffsetY() +
-                        context.getDataHeight(), ItemValueFormatter.FORMAT_UNITS);
-                String unitsString = descriptor.getUnitsString(ItemValueFormatter.FORMAT_UNITS);
-                return unitsString == null ? valueString : valueString + " " + unitsString;
+            public Color[] getColors(Row row) {
+                return rowColors[row.getIndex()];
+            }
+
+            public String[] getMinUnits(TimelineChart.Row row) {
+                return rowMinValues[row.getIndex()];
+            }
+
+            public String[] getMaxUnits(TimelineChart.Row row) {
+                return rowMaxValues[row.getIndex()];
+            }
+
+            private Color itemColor(TimelineXYPainter painter) {
+                Color color = painter.lineColor;
+                if (color == null) color = painter.fillColor;
+                return color;
+            }
+
+            private boolean equals(String s1, String s2) {
+                if (s1 == null) {
+                    if (s2 == null) return true;
+                    else return false;
+                } else {
+                    return s1.equals(s2);
+                }
             }
             
         });

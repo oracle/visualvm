@@ -196,7 +196,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
     }
 
     private void setPosition(List<ItemSelection> selectedItems, PaintersModel paintersModel,
-                             ChartContext chartContext, TimelineTooltipPainter tooltipPainter,  int index) {
+                             ChartContext chartContext, TimelineTooltipPainter tooltipPainter, int index) {
         LongRect bounds = null;
 
         for (ItemSelection selection : selectedItems) {
@@ -212,6 +212,8 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
         Point p = new Point();
 
         p.x = bounds.x + bounds.width + TOOLTIP_OFFSET;
+        if (p.x > chartContext.getViewportWidth() - tooltipPainter.getWidth() - TOOLTIP_MARGIN)
+            p.x = bounds.x - tooltipPainter.getWidth() - TOOLTIP_OFFSET;
 
         int rowY = Utils.checkedInt(chartContext.getViewportOffsetY());
         int rowHeight = chartContext.getViewportHeight();

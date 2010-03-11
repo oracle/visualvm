@@ -33,21 +33,19 @@ import javax.swing.JLabel;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartOverlay;
 import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class TimelineUnitsOverlay extends ChartOverlay {
+final class TimelineLegendOverlay extends ChartOverlay {
 
     private final TimelineChart chart;
     private final JLabel painter;
 
-    private Model model;
 
-
-    TimelineUnitsOverlay(TimelineChart chart) {
+    TimelineLegendOverlay(TimelineChart chart) {
         this.chart = chart;
 
         painter = new JLabel();
@@ -59,57 +57,35 @@ final class TimelineUnitsOverlay extends ChartOverlay {
     }
 
 
-    void setupModel(Model model) {
-        this.model = model;
-    }
-
-
-    private boolean hasValues() {
-        return ((SynchronousXYItemsModel)chart.getItemsModel()).getTimeline().
-                getTimestampsCount() > 0;
-    }
-
     private void setupPainter(String text, Color color) {
         painter.setText(text);
-        painter.setIcon(color == null ? null : ColorIcon.fromColor(color));
+        painter.setIcon(ColorIcon.fromColor(color));
         painter.setSize(painter.getPreferredSize());
     }
 
 
     public void paint(Graphics g) {
-        if (model == null || !hasValues()) return;
-
-        model.prefetch();
         int rowsCount = chart.getRowsCount();
-        
-        for (int rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-            TimelineChart.Row row = chart.getRow(rowIndex);
+        for (int i = 0; i < rowsCount; i++) {
+            TimelineChart.Row row = chart.getRow(i);
             ChartContext rowContext = row.getContext();
-            
-//            int x = Utils.checkedInt(rowContext.getViewportOffsetX());
-            int y = Utils.checkedInt(rowContext.getViewportOffsetY());
-            int w = Utils.checkedInt(rowContext.getViewportWidth());
-            int h = Utils.checkedInt(rowContext.getViewportHeight());
+            SynchronousXYItem[] rowItems = row.getItems();
 
-            Color[] colors = model.getColors(row);
-            
-            int xx = w - 2;
-            int yy = y;
-            for (int itemIndex = colors.length - 1; itemIndex >= 0; itemIndex--) {
-                setupPainter(model.getMaxUnits(row)[itemIndex], colors[itemIndex]);
-                xx -= painter.getWidth();
-                paint(g, xx, yy);
-                xx -= 10;
-            }
+            int x = 3;
+            int y = -1;
 
-            xx = w - 2;
-            yy = -1;
-            for (int itemIndex = colors.length - 1; itemIndex >= 0; itemIndex--) {
-                setupPainter(model.getMinUnits(row)[itemIndex], colors[itemIndex]);
-                xx -= painter.getWidth();
-                if (yy == -1) yy = y + h - painter.getHeight() - 1;
-                paint(g, xx, yy);
-                xx -= 10;
+            for (SynchronousXYItem rowItem : rowItems) {
+                TimelineXYPainter itemPainter =
+                        (TimelineXYPainter)chart.getPaintersModel().getPainter(rowItem);
+                if (itemPainter.isPainting()) {
+                    setupPainter(rowItem.getName(), itemColor(itemPainter));
+                    if (y == -1)
+                        y = Utils.checkedInt(rowContext.getViewportOffsetY()) +
+                            Utils.checkedInt(rowContext.getViewportHeight()) -
+                            painter.getHeight() - 1;
+                    paint(g, x, y);
+                    x += painter.getWidth() + 10;
+                }
             }
         }
     }
@@ -120,20 +96,16 @@ final class TimelineUnitsOverlay extends ChartOverlay {
         painter.paint(g);
         g.translate(0, -1);
         painter.setForeground(LegendFont.FOREGROUND_COLOR);
-        if (painter.getIcon() != null)
-            painter.setIcon(ColorIcon.BOTTOM_SHADOW);
+        painter.setIcon(ColorIcon.BOTTOM_SHADOW);
         painter.paint(g);
         g.translate(-x, -y);
     }
 
 
-    static interface Model {
-
-        public void prefetch();
-        public Color[]  getColors(TimelineChart.Row row);
-        public String[] getMinUnits(TimelineChart.Row row);
-        public String[] getMaxUnits(TimelineChart.Row row);
-
+    private static Color itemColor(TimelineXYPainter painter) {
+        Color color = painter.lineColor;
+        if (color == null) color = painter.fillColor;
+        return color;
     }
 
 }

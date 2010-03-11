@@ -73,14 +73,13 @@ public final class TransparentToolBar extends JPanel {
             add(toolbar, BorderLayout.CENTER);
         }
         addHierarchyListener(new HierarchyListener() {
-
             public void hierarchyChanged(HierarchyEvent e) {
                 if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                     if (isShowing()) {
                         removeHierarchyListener(this);
                         for (Component c : getComponents()) {
                             if (c instanceof AbstractButton) {
-                                listener.refresh((AbstractButton) c);
+                                listener.refresh((AbstractButton)c);
                             }
                         }
                     }

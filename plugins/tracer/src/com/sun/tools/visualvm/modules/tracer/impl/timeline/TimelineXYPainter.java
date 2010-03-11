@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,62 +25,64 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
+import java.awt.BasicStroke;
 import org.netbeans.lib.profiler.charts.ItemSelection;
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.util.List;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
+import org.netbeans.lib.profiler.charts.ChartItemChange;
 import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
+import org.netbeans.lib.profiler.charts.xy.XYItemChange;
+import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChartContext;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class TimelineXYPainter extends SynchronousXYItemPainter {
+public class TimelineXYPainter extends XYItemPainter.Abstract {
 
     private static final int HOVER_RADIUS = 2; // Not used
 
     private final Color fillColor2;
     private boolean painting;
 
+    protected final int lineWidth;
+    protected final Color lineColor;
+    protected final Color fillColor;
+
+    protected final Stroke lineStroke;
+
+    protected final double dataFactor;
+
 
     // --- Constructor ---------------------------------------------------------
 
-    static TimelineXYPainter absolutePainter(float lineWidth,
-                                             Color lineColor,
-                                             Color fillColor1,
-                                             Color fillColor2) {
+    public TimelineXYPainter(float lineWidth, Color lineColor, Color fillColor,
+                             Color fillColor2, double dataFactor) {
 
-        return new TimelineXYPainter(lineWidth, lineColor, fillColor1, fillColor2,
-                                         TYPE_ABSOLUTE, 0);
-    }
+        if (lineColor == null && fillColor == null)
+            throw new IllegalArgumentException("No parameters defined"); // NOI18N
 
-    static TimelineXYPainter relativePainter(float lineWidth,
-                                             Color lineColor,
-                                             Color fillColor1,
-                                             Color fillColor2,
-                                             int maxOffset) {
+        this.lineWidth = (int)Math.ceil(lineWidth);
+        this.lineColor = Utils.checkedColor(lineColor);
+        this.fillColor = Utils.checkedColor(fillColor);
+        this.fillColor2 = Utils.forceSpeed() ? null : Utils.checkedColor(fillColor2);
 
-        return new TimelineXYPainter(lineWidth, lineColor, fillColor1, fillColor2,
-                                     TYPE_RELATIVE, maxOffset);
-    }
+        this.lineStroke = new BasicStroke(lineWidth, BasicStroke.CAP_ROUND,
+                                          BasicStroke.JOIN_ROUND);
 
+        this.dataFactor = dataFactor;
 
-    TimelineXYPainter(float lineWidth, Color lineColor, Color fillColor1,
-                      Color fillColor2, int type, int maxValueOffset) {
-
-        super(lineWidth, lineColor, fillColor1, type, maxValueOffset);
-        this.fillColor2 = Utils.checkedColor(fillColor2);
         painting = true;
     }
 
@@ -97,6 +99,35 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
 
 
     // --- ItemPainter implementation ------------------------------------------
+
+    public LongRect getItemBounds(ChartItem item) {
+        XYItem xyItem = (XYItem)item;
+        return getDataBounds(xyItem.getBounds());
+    }
+
+    public LongRect getItemBounds(ChartItem item, ChartContext context) {
+        XYItem xyItem = (XYItem)item;
+        return getViewBounds(xyItem.getBounds(), context);
+    }
+
+
+    public boolean isBoundsChange(ChartItemChange itemChange) {
+        XYItemChange change = (XYItemChange)itemChange;
+        return !LongRect.equals(change.getOldValuesBounds(),
+                                change.getNewValuesBounds());
+    }
+
+    public boolean isAppearanceChange(ChartItemChange itemChange) {
+        XYItemChange change = (XYItemChange)itemChange;
+        LongRect dirtyBounds = change.getDirtyValuesBounds();
+        return dirtyBounds.width != 0 || dirtyBounds.height != 0;
+    }
+
+    public LongRect getDirtyBounds(ChartItemChange itemChange, ChartContext context) {
+        XYItemChange change = (XYItemChange)itemChange;
+        return getViewBounds(change.getDirtyValuesBounds(), context);
+    }
+
 
     public boolean supportsHovering(ChartItem item) {
         return true;
@@ -134,15 +165,94 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
                                            ItemSelection.DISTANCE_UNKNOWN);
     }
 
-    protected void paint(XYItem item, List<ItemSelection> highlighted,
-                       List<ItemSelection> selected, Graphics2D g,
-                       Rectangle dirtyArea, SynchronousXYChartContext context) {
+    public void paintItem(ChartItem item, List<ItemSelection> highlighted,
+                          List<ItemSelection> selected, Graphics2D g,
+                          Rectangle dirtyArea, ChartContext context) {
 
-        if (!isPainting()) return;
+        paint((XYItem)item, highlighted, selected, g, dirtyArea,
+              (SynchronousXYChartContext)context);
+    }
+
+
+    // --- XYItemPainter implementation ----------------------------------------
+
+    public double getItemView(double dataY, XYItem item, ChartContext context) {
+        return context.getViewY(dataY * dataFactor);
+    }
+
+    public double getItemValue(double viewY, XYItem item, ChartContext context) {
+        return context.getDataY(viewY / dataFactor);
+    }
+
+    public double getItemValueScale(XYItem item, ChartContext context) {
+        double scale = context.getViewHeight(dataFactor);
+        if (scale <= 0) scale = -1;
+        return scale;
+    }
+
+
+    // --- Private implementation ----------------------------------------------
+
+    private LongRect getDataBounds(LongRect itemBounds) {
+        LongRect bounds = new LongRect(itemBounds);
+        bounds.y *= dataFactor;
+        bounds.height *= dataFactor;
+
+        if (fillColor != null) {
+            bounds.height += bounds.y;
+            bounds.y = 0;
+        }
+
+        return bounds;
+    }
+
+    private LongRect getViewBounds(LongRect itemBounds, ChartContext context) {
+        LongRect dataBounds = getDataBounds(itemBounds);
+
+        LongRect viewBounds = context.getViewRect(dataBounds);
+        LongRect.addBorder(viewBounds, lineWidth);
+
+        return viewBounds;
+    }
+
+    private LongRect getViewBounds(XYItem item, int[] valuesIndexes, ChartContext context) {
+
+        LongRect dataBounds = new LongRect();
+
+        if (valuesIndexes == null) {
+            LongRect.set(dataBounds, item.getBounds());
+            dataBounds.y *= dataFactor;
+            dataBounds.height *= dataFactor;
+        } else {
+            boolean firstPoint = true;
+            for (int valueIndex : valuesIndexes) {
+                if (valueIndex == -1) continue;
+                long xValue = item.getXValue(valueIndex);
+                long yValue = (long)(item.getYValue(valueIndex) * dataFactor);
+                if (firstPoint) {
+                    LongRect.set(dataBounds, xValue, yValue, 0, 0);
+                    firstPoint = false;
+                } else {
+                    LongRect.add(dataBounds, xValue, yValue);
+                }
+            }
+        }
+
+        LongRect viewBounds = context.getViewRect(dataBounds);
+        LongRect.addBorder(viewBounds, HOVER_RADIUS);
+        return viewBounds;
+    }
+
+
+    protected void paint(XYItem item, List<ItemSelection> highlighted,
+                         List<ItemSelection> selected, Graphics2D g,
+                         Rectangle dirtyArea, SynchronousXYChartContext context) {
+
+        if (!painting) return;
         if (item.getValuesCount() < 2) return;
         if (context.getViewWidth() == 0 || context.getViewHeight() == 0) return;
 
-        int[][] points = createPoints(item, dirtyArea, context, type, maxValueOffset);
+        int[][] points = createPoints(item, dirtyArea, context, dataFactor);
         if (points == null) return;
 
         int[] xPoints  = points[0];
@@ -163,11 +273,7 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
             polygon.ypoints[npoints - 2] = zeroY;
             polygon.xpoints[npoints - 1] = xPoints[0];
             polygon.ypoints[npoints - 1] = zeroY;
-            
-            if (fillColor2 == null || Utils.forceSpeed()) g.setPaint(fillColor);
-            else g.setPaint(new GradientPaint(0, context.getViewportOffsetY(),
-                           fillColor, 0, context.getViewportOffsetY() +
-                           context.getViewportHeight(), fillColor2));
+            g.setPaint(fillColor);
             g.fill(polygon);
         }
 
@@ -180,8 +286,8 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
     }
 
     private static int[][] createPoints(XYItem item, Rectangle dirtyArea,
-                                 SynchronousXYChartContext context,
-                                 int type, int maxValueOffset) {
+                                        SynchronousXYChartContext context,
+                                        double dataFactor) {
 
         int valuesCount = item.getValuesCount();
         int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
@@ -198,7 +304,7 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
         if (lastIndex == -1) lastIndex = valuesCount - 1;
         if (lastFirst != -1 && lastIndex < valuesCount - 1) lastIndex += 1;
 
-        int itemsStep = (int)(valuesCount / context.getViewWidth());
+        int itemsStep = (int)Math.ceil(valuesCount / context.getViewWidth());
         if (itemsStep == 0) itemsStep = 1;
 
         int visibleCount = lastIndex - firstIndex + 1;
@@ -216,9 +322,6 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
         int[] yPoints = new int[visibleCount + 2];
 
 
-        double itemValueFactor = type == TYPE_RELATIVE ? getItemValueFactor(context,
-                                 maxValueOffset, item.getBounds().height) : 0;
-
         for (int i = 0; i < visibleCount; i++) {
             int dataIndex = i == visibleCount - 1 ? lastIndex :
                                  firstIndex + i * itemsStep;
@@ -226,86 +329,16 @@ final class TimelineXYPainter extends SynchronousXYItemPainter {
                          context.getViewX(item.getXValue(dataIndex))));
             yPoints[i] = Utils.checkedInt(Math.ceil(
                          getYValue(item, dataIndex,
-                         type, context, itemValueFactor)));
+                         context, dataFactor)));
         }
 
         return new int[][] { xPoints, yPoints };
     }
 
-    private LongRect getViewBoundsRelative(LongRect dataBounds, XYItem item,
-                                           ChartContext context) {
-        LongRect itemBounds = item.getBounds();
-
-        double itemValueFactor = getItemValueFactor(context, maxValueOffset,
-                                                    itemBounds.height);
-
-        // TODO: fix the math!!!
-        double value1 = context.getDataOffsetY() + itemValueFactor *
-                      (double)(dataBounds.y - itemBounds.y);
-        double value2 = context.getDataOffsetY() + itemValueFactor *
-                      (double)(dataBounds.y + dataBounds.height - itemBounds.y);
-
-        long viewX = (long)Math.ceil(context.getViewX(dataBounds.x));
-        long viewWidth = (long)Math.ceil(context.getViewWidth(dataBounds.width));
-        if (context.isRightBased()) viewX -= viewWidth;
-
-        long viewY1 = (long)Math.ceil(context.getViewY(value1));
-        long viewY2 = (long)Math.ceil(context.getViewY(value2));
-        long viewHeight = context.isBottomBased() ? viewY1 - viewY2 :
-                                                    viewY2 - viewY1;
-        if (!context.isBottomBased()) viewY2 -= viewHeight;
-
-        LongRect viewBounds =  new LongRect(viewX, viewY2, viewWidth, viewHeight);
-        LongRect.addBorder(viewBounds, HOVER_RADIUS);
-
-        return viewBounds;
-    }
-
-    private LongRect getViewBounds(XYItem item, int[] valuesIndexes, ChartContext context) {
-
-        LongRect dataBounds = new LongRect();
-
-        if (valuesIndexes == null) {
-            LongRect.set(dataBounds, item.getBounds());
-        } else {
-            boolean firstPoint = true;
-            for (int valueIndex : valuesIndexes) {
-                if (valueIndex == -1) continue;
-                long xValue = item.getXValue(valueIndex);
-                long yValue = item.getYValue(valueIndex);
-                if (firstPoint) {
-                    LongRect.set(dataBounds, xValue, yValue, 0, 0);
-                    firstPoint = false;
-                } else {
-                    LongRect.add(dataBounds, xValue, yValue);
-                }
-            }
-        }
-
-        if (type == TYPE_RELATIVE) {
-            return getViewBoundsRelative(dataBounds, item, context);
-        } else {
-            LongRect viewBounds = context.getViewRect(dataBounds);
-            LongRect.addBorder(viewBounds, HOVER_RADIUS);
-            return viewBounds;
-        }
-    }
-
-    private static double getItemValueFactor(ChartContext context,
-                                             double maxValueOffset,
-                                             double itemHeight) {
-        return ((double)context.getDataHeight() -
-               context.getDataHeight(maxValueOffset)) / itemHeight;
-    }
-
     private static double getYValue(XYItem item, int valueIndex,
-                                  int type, ChartContext context, double itemValueFactor) {
-        if (type == TYPE_ABSOLUTE) {
-            return context.getViewY(item.getYValue(valueIndex));
-        } else {
-            return context.getViewY(context.getDataOffsetY() + (itemValueFactor *
-                        (item.getYValue(valueIndex) - item.getBounds().y)));
-        }
+                                    ChartContext context, double dataFactor) {
+
+        return context.getViewY(item.getYValue(valueIndex) * dataFactor);
     }
 
 }

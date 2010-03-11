@@ -28,13 +28,13 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.modules.tracer.PackageStateHandler;
 import com.sun.tools.visualvm.modules.tracer.ProbeStateHandler;
 import com.sun.tools.visualvm.modules.tracer.SessionInitializationException;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
+import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -147,6 +147,14 @@ final class TracerController implements DataRemovedListener<DataSource>,
 
 
     // --- Session control -----------------------------------------------------
+
+    void setRefreshRate(int refreshRate) {
+        if (timer != null) timer.setDelay(refreshRate);
+    }
+
+    int getRefreshRate() {
+        return timer != null ? timer.getDelay() : -1;
+    }
 
     void startSession() {
         if (!model.areProbesDefined()) return;
@@ -360,7 +368,7 @@ final class TracerController implements DataRemovedListener<DataSource>,
     // --- Session runtime -----------------------------------------------------
 
     private Timer createTimer() {
-        int rate = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
+        int rate = TracerOptions.getInstance().getRefreshRate();
         Timer t = new Timer(rate, new ActionListener() {
             public void actionPerformed(ActionEvent e) { fetchData(); }
         });

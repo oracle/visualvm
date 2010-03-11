@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl;
 
+import com.sun.tools.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.TransparentToolBar;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -40,6 +41,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -47,6 +50,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -88,7 +92,10 @@ final class TracerView extends DataSourceView {
     // --- DataSourceView implementation ---------------------------------------
 
     protected DataViewComponent createComponent() {
+        PackagesView packagesView = new PackagesView(model, controller);
+        timelineView = new TimelineView(model);
         MasterViewSupport masterView = new MasterViewSupport();
+        
         dvc = new DataViewComponent(masterView.getView(),
                 new DataViewComponent.MasterViewConfiguration(false));
 
@@ -96,13 +103,12 @@ final class TracerView extends DataSourceView {
 
         String initiallyOpened = TracerOptions.getInstance().getInitiallyOpened();
 
-        PackagesView packagesView = new PackagesView(model, controller);
+        
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Probes", true), DataViewComponent.TOP_LEFT);
         dvc.addDetailsView(packagesView.getView(), DataViewComponent.TOP_LEFT);
         if (!initiallyOpened.contains(TracerOptions.VIEW_PROBES))
             dvc.hideDetailsArea(DataViewComponent.TOP_LEFT);
 
-        timelineView = new TimelineView(model);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Timeline", true), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(timelineView.getView(), DataViewComponent.TOP_RIGHT);
         if (!initiallyOpened.contains(TracerOptions.VIEW_TIMELINE))
@@ -149,7 +155,7 @@ final class TracerView extends DataSourceView {
                     stopButton.requestFocusInWindow();
 //                    clearToolbar();
                     updateViewsOnSessionStart();
-                    addChartControls();
+//                    addChartControls();
                     break;
                 case TracerController.STATE_SESSION_INACTIVE:
                     startButton.setEnabled(probesDefined);
@@ -199,6 +205,11 @@ final class TracerView extends DataSourceView {
                     refreshState(probesDefined);
                     updateViewsOnProbesChange();
                 }
+            });
+
+            timelineView.registerViewListener(new TimelineView.ViewListener() {
+                public void viewShown() { addChartControls(); }
+                public void viewHidden() { clearToolbar(); }
             });
         }
 
@@ -344,7 +355,9 @@ final class TracerView extends DataSourceView {
         }
 
         private JComponent createComponents() {
-            JPanel view = new JPanel(new HorizontalLayout(false, 3));
+            Set<SimpleSeparator> separators = new HashSet();
+
+            JPanel view = new JPanel(new HorizontalLayout(true, 3));
             view.setBorder(BorderFactory.createEmptyBorder(15, 8, 15, 8));
             view.setOpaque(false);
 
@@ -356,6 +369,7 @@ final class TracerView extends DataSourceView {
                     });
                 }
             };
+            startButton.setToolTipText("Starts new Tracer session");
             Insets i = startButton.getMargin();
             i.left = Math.min(i.left, 10);
             i.right = i.left;
@@ -371,13 +385,48 @@ final class TracerView extends DataSourceView {
                     });
                 }
             };
+            stopButton.setToolTipText("Stops current Tracer session");
             ((JButton)stopButton).setDefaultCapable(false);
             stopButton.setMargin(i);
             view.add(stopButton);
 
+            if (TracerOptions.getInstance().isRefreshCustomizable()) {
+
+                SimpleSeparator refreshSeparator = new SimpleSeparator(SwingConstants.VERTICAL);
+                refreshSeparator.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+                separators.add(refreshSeparator);
+                view.add(refreshSeparator);
+
+                JLabel refreshRateLabel = new JLabel("Refresh:");
+                refreshRateLabel.setToolTipText("Tracer refresh rate");
+                view.add(refreshRateLabel);
+
+                Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
+                final JComboBox refreshCombo = new JComboBox(refreshRates) {
+                    public Dimension getMinimumSize() { return getPreferredSize(); }
+                    public Dimension getMaximumSize() { return getPreferredSize(); }
+                };
+                refreshCombo.setToolTipText("Tracer refresh rate");
+                refreshCombo.setEditable(false);
+                refreshCombo.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        controller.setRefreshRate((Integer)refreshCombo.getSelectedItem());
+                    }
+                });
+                refreshCombo.setSelectedItem(Integer.valueOf(controller.getRefreshRate()));
+                refreshCombo.setRenderer(new CustomComboRenderer.Number(refreshCombo, null, false));
+                view.add(refreshCombo);
+
+                JLabel refreshUnitsLabel = new JLabel("ms");
+                refreshUnitsLabel.setToolTipText("Tracer refresh rate");
+                view.add(refreshUnitsLabel);
+
+            }
+
             toolbarSeparator = new SimpleSeparator(SwingConstants.VERTICAL);
             toolbarSeparator.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
             toolbarSeparator.setVisible(false);
+            separators.add(toolbarSeparator);
             view.add(toolbarSeparator);
 
             toolbar = new JPanel(null);
@@ -417,6 +466,12 @@ final class TracerView extends DataSourceView {
             stopButton.setMinimumSize(size2);
             stopButton.setPreferredSize(size2);
             stopButton.setMaximumSize(size2);
+
+            for (SimpleSeparator separator : separators) {
+                Dimension dim = separator.getPreferredSize();
+                dim.height = commonControlHeight;
+                separator.setPreferredSize(dim);
+            }
 
             return view;
         }

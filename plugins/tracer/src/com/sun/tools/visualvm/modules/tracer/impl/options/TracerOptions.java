@@ -25,7 +25,9 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.options;
 
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import java.util.prefs.Preferences;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.openide.util.NbPreferences;
 
 /**
@@ -33,6 +35,13 @@ import org.openide.util.NbPreferences;
  * @author Jiri Sedlacek
  */
 public final class TracerOptions {
+
+    private static final String PROP_REFRESH_RATE = "TracerOptions.refreshRate"; // NOI18N
+    private static final String PROP_REFRESH_CUSTOMIZABLE = "TracerOptions.refreshCustomizable"; // NOI18N
+
+    private static final String PROP_SHOW_VALUES = "TracerOptions.showValues"; // NOI18N
+    private static final String PROP_SHOW_LEGEND = "TracerOptions.showLegend"; // NOI18N
+    private static final String PROP_ROWS_DECORATION = "TracerOptions.rowsDecoration"; // NOI18N
 
     private static final String PROP_INITIALLY_OPEN = "TracerOptions.initiallyOpen"; // NOI18N
     private static final String PROP_PROBE_ADDED = "TracerOptions.probeAdded"; // NOI18N
@@ -56,9 +65,9 @@ public final class TracerOptions {
     private static final String KEY_MOUSE_WHEEL_ZOOMS = "KEY_mouseWheelZooms"; // NOI18N
     private static final String KEY_MOUSE_WHEEL_HSCROLLS = "KEY_mouseWheelHScrolls"; // NOI18N
     private static final String KEY_MOUSE_WHEEL_VSCROLLS = "KEY_mouseWheelVScrolls"; // NOI18N
-    public static final String MOUSE_WHEEL_ZOOMS = "zooms";
-    public static final String MOUSE_WHEEL_HSCROLLS = "scrolls horizontally";
-    public static final String MOUSE_WHEEL_VSCROLLS = "scrolls vertically";
+    public static final String MOUSE_WHEEL_ZOOMS = "zoom";
+    public static final String MOUSE_WHEEL_HSCROLLS = "horizontal scroll";
+    public static final String MOUSE_WHEEL_VSCROLLS = "vertical scroll";
 
 
     private static TracerOptions INSTANCE;
@@ -71,6 +80,52 @@ public final class TracerOptions {
         return INSTANCE;
     }
 
+
+    void setRefresh(int refreshRate) {
+        prefs.putInt(PROP_REFRESH_RATE, refreshRate);
+    }
+
+    int getRefresh() {
+        return prefs.getInt(PROP_REFRESH_RATE, -1);
+    }
+
+    public int getRefreshRate() {
+        int refresh = getRefresh();
+        return refresh != -1 ? refresh :
+               GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
+    }
+
+    void setRefreshCustomizable(boolean customizable) {
+        prefs.putBoolean(PROP_REFRESH_CUSTOMIZABLE, customizable);
+    }
+
+    public boolean isRefreshCustomizable() {
+        return prefs.getBoolean(PROP_REFRESH_CUSTOMIZABLE, false);
+    }
+
+    void setShowValuesEnabled(boolean showValuesEnabled) {
+        prefs.putBoolean(PROP_SHOW_VALUES, showValuesEnabled);
+    }
+
+    public boolean isShowValuesEnabled() {
+        return prefs.getBoolean(PROP_SHOW_VALUES, true);
+    }
+
+    void setShowLegendEnabled(boolean showLegendEnabled) {
+        prefs.putBoolean(PROP_SHOW_LEGEND, showLegendEnabled);
+    }
+
+    public boolean isShowLegendEnabled() {
+        return prefs.getBoolean(PROP_SHOW_LEGEND, true); // Default 'false' might be better
+    }
+
+    void setRowsDecorationEnabled(boolean rowsDecorationEnabled) {
+        prefs.putBoolean(PROP_ROWS_DECORATION, rowsDecorationEnabled);
+    }
+
+    public boolean isRowsDecorationEnabled() {
+        return prefs.getBoolean(PROP_ROWS_DECORATION, !Utils.forceSpeed());
+    }
 
     void setInitiallyOpened(String opened) {
         prefs.put(PROP_INITIALLY_OPEN, opened);

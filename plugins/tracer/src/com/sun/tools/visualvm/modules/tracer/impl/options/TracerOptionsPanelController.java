@@ -49,6 +49,13 @@ final class TracerOptionsPanelController extends OptionsPanelController {
     public void update() {
         TracerOptionsPanel p = getPanel();
 
+        p.setRefresh(options.getRefresh());
+        p.setRefreshCustomizable(options.isRefreshCustomizable());
+
+        p.setShowValuesEnabled(options.isShowValuesEnabled());
+        p.setShowLegendEnabled(options.isShowLegendEnabled());
+        p.setRowsDecorationEnabled(options.isRowsDecorationEnabled());
+
         p.setInitiallyOpened(options.getInitiallyOpened());
         p.setOnProbeAdded(options.getOnProbeAdded());
         p.setOnSessionStart(options.getOnSessionStart());
@@ -61,6 +68,13 @@ final class TracerOptionsPanelController extends OptionsPanelController {
 
     public void applyChanges() {
         TracerOptionsPanel p = getPanel();
+
+        options.setRefresh(p.getRefresh());
+        options.setRefreshCustomizable(p.isRefreshCustomizable());
+
+        options.setShowValuesEnabled(p.isShowValuesEnabled());
+        options.setShowLegendEnabled(p.isShowLegendEnabled());
+        options.setRowsDecorationEnabled(p.isRowsDecorationEnabled());
 
         options.setInitiallyOpened(p.getInitiallyOpened());
         options.setOnProbeAddded(p.getOnProbeAdded());

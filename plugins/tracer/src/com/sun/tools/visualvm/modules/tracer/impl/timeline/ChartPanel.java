@@ -105,7 +105,8 @@ class ChartPanel extends JPanel {
         chart.setBackground(Color.WHITE);
         chart.addPreDecorator(new RowBoundsDecorator(chart));
         //            chart.addPreDecorator(new RowPostDecorator(chart));
-        chart.addPostDecorator(new RowGradientDecorator(chart));
+        if (TracerOptions.getInstance().isRowsDecorationEnabled())
+            chart.addPostDecorator(new RowGradientDecorator(chart));
         //            chart.addOverlayComponent(new RowUnitsOverlay(chart));
 
         TimelineSelectionOverlay selectionOverlay = new TimelineSelectionOverlay();
@@ -117,6 +118,9 @@ class ChartPanel extends JPanel {
             selectionModel.setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
             selectionModel.setMoveMode(ChartSelectionModel.SELECTION_LINE_V);
         }
+
+        if (TracerOptions.getInstance().isShowLegendEnabled())
+            chart.addOverlayComponent(new TimelineLegendOverlay(chart));
 
         TimeMarksPainter marksPainter = new TimeMarksPainter() {
             public Dimension getPreferredSize() {

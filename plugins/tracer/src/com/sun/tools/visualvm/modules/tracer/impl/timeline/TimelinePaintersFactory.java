@@ -66,6 +66,8 @@ final class TimelinePaintersFactory {
     private static TimelineXYPainter createXYPainter(
             XYItemDescriptor descriptor, int itemIndex) {
 
+        double dataFactor = descriptor.getDataFactor();
+
         float lineWidth = descriptor.getLineWidth();
         if (lineWidth == ProbeItemDescriptor.DEFAULT_LINE_WIDTH)
             lineWidth = 2f;
@@ -90,8 +92,7 @@ final class TimelinePaintersFactory {
                 fillColor2 = TimelineColorFactory.getGradient(itemIndex)[1];
         }
 
-        return TimelineXYPainter.absolutePainter(lineWidth, lineColor,
-                                                 fillColor1, fillColor2);
+        return new TimelineXYPainter(lineWidth, lineColor, fillColor1, fillColor2, dataFactor);
     }
 
 }

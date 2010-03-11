@@ -44,6 +44,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 
 /**
@@ -166,11 +167,14 @@ final class TimelineSelectionOverlay extends ChartOverlay {
         selectedValues.clear();
         for (ItemSelection sel : selectedItems) {
             XYItemSelection xySel = (XYItemSelection)sel;
-            ChartContext context = chart.getChartContext(xySel.getItem());
-            long xValue = xySel.getItem().getXValue(xySel.getValueIndex());
-            long yValue = xySel.getItem().getYValue(xySel.getValueIndex());
+            XYItem item = xySel.getItem();
+            TimelineXYPainter painter = (TimelineXYPainter)chart.getPaintersModel().getPainter(item);
+            ChartContext context = chart.getChartContext(item);
+            long xValue = item.getXValue(xySel.getValueIndex());
+            long yValue = item.getYValue(xySel.getValueIndex());
+//            long yValue = painter.getItemView(item.getYValue(xySel.getValueIndex()), item, context);
             selectedValues.add(new Point(Utils.checkedInt(Math.ceil(context.getViewX(xValue))),
-                                         Utils.checkedInt(Math.ceil(context.getViewY(yValue)))));
+                                         Utils.checkedInt(Math.ceil(painter.getItemView(yValue, item, context)))));
         }
     }
 

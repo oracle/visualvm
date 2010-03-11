@@ -27,8 +27,11 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelinePanel;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.JComponent;
 
 /**
  *
@@ -39,10 +42,17 @@ final class TimelineView {
     private final TracerModel model;
     private TimelinePanel panel;
 
+    private ViewListener viewListener;
+
+
+    // --- Constructor ---------------------------------------------------------
 
     TimelineView(TracerModel model) {
         this.model = model;
     }
+
+
+    // --- Internal interface --------------------------------------------------
 
     void reset() {
         if (panel != null) panel.reset();
@@ -79,11 +89,52 @@ final class TimelineView {
     }
 
 
+    void registerViewListener(ViewListener viewListener) {
+        if (panel != null) {
+            registerListener(panel, viewListener);
+        } else {
+            this.viewListener = viewListener;
+        }
+
+    }
+
+
     // --- UI implementation ---------------------------------------------------
 
     DataViewComponent.DetailsView getView() {
         panel = new TimelinePanel(model.getTimelineSupport());
+
+        if (viewListener != null) {
+            registerListener(panel, viewListener);
+            viewListener = null;
+        }
+
         return new DataViewComponent.DetailsView("Timeline", null, 10, panel, null);
+    }
+
+
+    // --- Private implementation ----------------------------------------------
+
+    private static void registerListener(final JComponent c, final ViewListener l) {
+        c.addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (c.isShowing()) l.viewShown();
+                    else l.viewHidden();
+                }
+            }
+        });
+    }
+
+    
+    // --- View visibility listener --------------------------------------------
+
+    static interface ViewListener {
+
+        public void viewShown();
+
+        public void viewHidden();
+
     }
 
 }
