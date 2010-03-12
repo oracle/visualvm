@@ -266,6 +266,12 @@ public class ReferencesBrowserController extends AbstractController {
         }
     }
 
+    public void showInThreads(Instance instance) {
+        HeapFragmentWalker heapFragmentWalker = referencesControllerHandler.getHeapFragmentWalker();
+        heapFragmentWalker.switchToSummaryView();
+        heapFragmentWalker.getSummaryController().getOverViewController().showInThreads(instance);
+    }
+
     // --- Private implementation ------------------------------------------------
     public void update() {
         ((ReferencesBrowserControllerUI) getPanel()).update();
