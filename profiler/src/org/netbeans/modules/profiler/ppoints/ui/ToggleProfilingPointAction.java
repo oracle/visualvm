@@ -338,7 +338,7 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
         }
 
         // Get most active editor
-        JTextComponent editor = EditorRegistry.focusedComponent();
+        JTextComponent editor = EditorRegistry.lastFocusedComponent();
 
         if (editor == null) {
             return false;
