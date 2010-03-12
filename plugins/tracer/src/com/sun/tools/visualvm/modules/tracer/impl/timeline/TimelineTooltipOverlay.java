@@ -43,6 +43,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.swing.LongRect;
@@ -64,7 +65,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
     private Timer timer;
     private int currentStep;
-    private Point mousePosition;
+//    private Point mousePosition;
     private Point[] targetPositions;
 
 
@@ -79,6 +80,10 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
         setLayout(null);
 
+        final Runnable tooltipUpdater = new Runnable() {
+            public void run() { updateTooltip(chart); }
+        };
+
         chart.getSelectionModel().addSelectionListener(new ChartSelectionListener() {
 
             public void selectionModeChanged(int newMode, int oldMode) {}
@@ -87,7 +92,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
             public void highlightedItemsChanged(List<ItemSelection> currentItems,
                 List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-                updateTooltip(chart);
+                SwingUtilities.invokeLater(tooltipUpdater);
             }
 
             public void selectedItemsChanged(List<ItemSelection> currentItems,
@@ -102,16 +107,9 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
                                     long lastOffsetX, long lastOffsetY,
                                     double lastScaleX, double lastScaleY,
                                     int shiftX, int shiftY) {
-                updateTooltip(chart);
+                SwingUtilities.invokeLater(tooltipUpdater);
             }
 
-        });
-
-        chart.addMouseMotionListener(new MouseMotionAdapter() {
-            public void mouseMoved(MouseEvent e) {
-                mousePosition = e.getPoint();
-                updateTooltip(chart);
-            }
         });
     }
 
@@ -163,7 +161,6 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
     @SuppressWarnings("element-type-mismatch")
     private void updateTooltip(TimelineChart chart) {
-        if (mousePosition == null) return;
         ChartSelectionModel selectionModel = chart.getSelectionModel();
         if (selectionModel == null) return;
 

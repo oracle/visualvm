@@ -54,13 +54,12 @@ final class RowBoundsDecorator implements ChartDecorator {
             TimelineChart.Row row = chart.getRow(i);
             ChartContext rowContext = row.getContext();
 
-            Rectangle rowBounds = new Rectangle(0, Utils.checkedInt(rowContext.getViewportOffsetY()),
-                                                chart.getWidth(), rowContext.getViewportHeight() - 2);
-            g.setColor(Color.WHITE);
-            g.fill(rowBounds);
+            int y = Utils.checkedInt(rowContext.getViewportOffsetY()) +
+                    rowContext.getViewportHeight() - 1;
+            int w = chart.getWidth();
+
             g.setColor(BORDER_COLOR);
-            g.drawLine(0, rowBounds.y + rowBounds.height + 1,
-                       chart.getWidth(), rowBounds.y + rowBounds.height + 1);
+            g.drawLine(0, y, w, y);
         }
     }
 

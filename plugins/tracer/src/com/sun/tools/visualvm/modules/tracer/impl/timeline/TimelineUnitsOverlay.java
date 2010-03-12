@@ -26,10 +26,11 @@
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import com.sun.tools.visualvm.modules.tracer.impl.swing.ColorIcon;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.LabelRenderer;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.LegendFont;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
-import javax.swing.JLabel;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartOverlay;
 import org.netbeans.lib.profiler.charts.swing.Utils;
@@ -42,7 +43,7 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 final class TimelineUnitsOverlay extends ChartOverlay {
 
     private final TimelineChart chart;
-    private final JLabel painter;
+    private final LabelRenderer painter;
 
     private Model model;
 
@@ -50,7 +51,7 @@ final class TimelineUnitsOverlay extends ChartOverlay {
     TimelineUnitsOverlay(TimelineChart chart) {
         this.chart = chart;
 
-        painter = new JLabel();
+        painter = new LabelRenderer();
         painter.setFont(new LegendFont());
 
         int size = painter.getFont().getSize() - 3;
@@ -72,32 +73,30 @@ final class TimelineUnitsOverlay extends ChartOverlay {
     private void setupPainter(String text, Color color) {
         painter.setText(text);
         painter.setIcon(color == null ? null : ColorIcon.fromColor(color));
-        painter.setSize(painter.getPreferredSize());
     }
 
 
     public void paint(Graphics g) {
         if (model == null || !hasValues()) return;
 
+        int w = getWidth();
         model.prefetch();
         int rowsCount = chart.getRowsCount();
-        
+
         for (int rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
             TimelineChart.Row row = chart.getRow(rowIndex);
             ChartContext rowContext = row.getContext();
-            
-//            int x = Utils.checkedInt(rowContext.getViewportOffsetX());
+
             int y = Utils.checkedInt(rowContext.getViewportOffsetY());
-            int w = Utils.checkedInt(rowContext.getViewportWidth());
-            int h = Utils.checkedInt(rowContext.getViewportHeight());
+            int h = rowContext.getViewportHeight();
 
             Color[] colors = model.getColors(row);
-            
+
             int xx = w - 2;
             int yy = y;
             for (int itemIndex = colors.length - 1; itemIndex >= 0; itemIndex--) {
                 setupPainter(model.getMaxUnits(row)[itemIndex], colors[itemIndex]);
-                xx -= painter.getWidth();
+                xx -= painter.getPreferredSize().width;
                 paint(g, xx, yy);
                 xx -= 10;
             }
@@ -106,8 +105,9 @@ final class TimelineUnitsOverlay extends ChartOverlay {
             yy = -1;
             for (int itemIndex = colors.length - 1; itemIndex >= 0; itemIndex--) {
                 setupPainter(model.getMinUnits(row)[itemIndex], colors[itemIndex]);
-                xx -= painter.getWidth();
-                if (yy == -1) yy = y + h - painter.getHeight() - 1;
+                Dimension pd = painter.getPreferredSize();
+                xx -= pd.width;
+                if (yy == -1) yy = y + h - pd.height - 1;
                 paint(g, xx, yy);
                 xx -= 10;
             }
@@ -115,17 +115,28 @@ final class TimelineUnitsOverlay extends ChartOverlay {
     }
 
     private void paint(Graphics g, int x, int y) {
-        g.translate(x, y + 1);
+        painter.setLocation(x, y + 1);
         painter.setForeground(LegendFont.BACKGROUND_COLOR);
         painter.paint(g);
-        g.translate(0, -1);
+
+        painter.setLocation(x, y);
         painter.setForeground(LegendFont.FOREGROUND_COLOR);
         if (painter.getIcon() != null)
             painter.setIcon(ColorIcon.BOTTOM_SHADOW);
         painter.paint(g);
-        g.translate(-x, -y);
+
+        painter.resetLocation();
     }
 
+
+    // --- Peformance tweaks ---------------------------------------------------
+
+    public void invalidate() {}
+
+    public void update(Graphics g) {}
+
+
+    // --- Model definition ----------------------------------------------------
 
     static interface Model {
 

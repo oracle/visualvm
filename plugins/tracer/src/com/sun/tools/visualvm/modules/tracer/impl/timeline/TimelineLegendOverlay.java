@@ -26,10 +26,11 @@
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import com.sun.tools.visualvm.modules.tracer.impl.swing.ColorIcon;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.LabelRenderer;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.LegendFont;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
-import javax.swing.JLabel;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartOverlay;
 import org.netbeans.lib.profiler.charts.swing.Utils;
@@ -42,13 +43,13 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
 final class TimelineLegendOverlay extends ChartOverlay {
 
     private final TimelineChart chart;
-    private final JLabel painter;
+    private final LabelRenderer painter;
 
 
     TimelineLegendOverlay(TimelineChart chart) {
         this.chart = chart;
 
-        painter = new JLabel();
+        painter = new LabelRenderer();
         painter.setFont(new LegendFont());
 
         int size = painter.getFont().getSize() - 3;
@@ -60,7 +61,6 @@ final class TimelineLegendOverlay extends ChartOverlay {
     private void setupPainter(String text, Color color) {
         painter.setText(text);
         painter.setIcon(ColorIcon.fromColor(color));
-        painter.setSize(painter.getPreferredSize());
     }
 
 
@@ -79,26 +79,28 @@ final class TimelineLegendOverlay extends ChartOverlay {
                         (TimelineXYPainter)chart.getPaintersModel().getPainter(rowItem);
                 if (itemPainter.isPainting()) {
                     setupPainter(rowItem.getName(), itemColor(itemPainter));
+                    Dimension pd = painter.getPreferredSize();
                     if (y == -1)
                         y = Utils.checkedInt(rowContext.getViewportOffsetY()) +
-                            Utils.checkedInt(rowContext.getViewportHeight()) -
-                            painter.getHeight() - 1;
+                            rowContext.getViewportHeight() - pd.height - 1;
                     paint(g, x, y);
-                    x += painter.getWidth() + 10;
+                    x += pd.width + 10;
                 }
             }
         }
     }
 
     private void paint(Graphics g, int x, int y) {
-        g.translate(x, y + 1);
+        painter.setLocation(x, y + 1);
         painter.setForeground(LegendFont.BACKGROUND_COLOR);
         painter.paint(g);
-        g.translate(0, -1);
+
+        painter.setLocation(x, y);
         painter.setForeground(LegendFont.FOREGROUND_COLOR);
         painter.setIcon(ColorIcon.BOTTOM_SHADOW);
         painter.paint(g);
-        g.translate(-x, -y);
+        
+        painter.resetLocation();
     }
 
 
@@ -107,5 +109,11 @@ final class TimelineLegendOverlay extends ChartOverlay {
         if (color == null) color = painter.fillColor;
         return color;
     }
+
+    // --- Peformance tweaks ---------------------------------------------------
+
+    public void invalidate() {}
+
+    public void update(Graphics g) {}
 
 }
