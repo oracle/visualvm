@@ -29,7 +29,6 @@ import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.sampler.AbstractSamplerSupport;
 import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
