@@ -47,7 +47,7 @@ import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
  */
 public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
 
-    private final ThreadMXBean threadBean;
+    private final ThreadInfoProvider threadInfoProvider;
     private final SnapshotDumper snapshotDumper;
     private final ThreadDumper threadDumper;
 
@@ -67,8 +67,8 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     private DataViewComponent.DetailsView[] detailsViews;
 
 
-    public CPUSamplerSupport(ThreadMXBean threadBean, SnapshotDumper snapshotDumper, ThreadDumper threadDumper) {
-        this.threadBean = threadBean;
+    public CPUSamplerSupport(ThreadInfoProvider tip, SnapshotDumper snapshotDumper, ThreadDumper threadDumper) {
+        threadInfoProvider = tip;
         this.snapshotDumper = snapshotDumper;
         this.threadDumper = threadDumper;
 
@@ -189,7 +189,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             synchronized (updateLock) {
                 sampleRunning = true;
                 try {
-                    ThreadInfo[] infos = threadBean.getThreadInfo(threadBean.getAllThreadIds(), Integer.MAX_VALUE);
+                    ThreadInfo[] infos = threadInfoProvider.dumpAllThreads();
                     long timestamp = System.nanoTime();
                     String samplingThreadName = findSamplingThread(infos);
                     if (samplingThreadName != null) {

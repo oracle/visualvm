@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.sampler;
 
+import com.sun.tools.visualvm.modules.sampler.cpu.ThreadInfoProvider;
 import com.sun.tools.visualvm.modules.sampler.memory.MemorySettingsSupport;
 import com.sun.tools.visualvm.modules.sampler.cpu.CPUSettingsSupport;
 import com.sun.tools.visualvm.application.Application;
@@ -62,7 +63,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.MemoryMXBean;
-import java.lang.management.ThreadMXBean;
 import java.net.URL;
 import java.util.Timer;
 import java.util.logging.Level;
@@ -433,75 +433,16 @@ class SamplerImpl {
     private void initializeCpuSampling() {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                if (application.getState() != Stateful.STATE_AVAILABLE) {
+                ThreadInfoProvider ti = new ThreadInfoProvider(application);
+                final String status = ti.getStatus();
+
+                if (status != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            cpuStatus = "Not available.";
+                            cpuStatus = status;
                             refreshSummary();
                         }
                     });
-                    return;
-                }
-                JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
-                if (jmxModel == null) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            cpuStatus = "Not available. Cannot initialize JMX connection to target application. Use 'Add JMX Connection' action to attach to the application.";
-                            refreshSummary();
-                        }
-                    });
-                    return;
-                }
-                if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            cpuStatus = "Not available. Failed to create JMX connection to target application. Use 'Add JMX Connection' action to attach to the application.";
-                            refreshSummary();
-                        }
-                    });
-                    return;
-                }
-                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-                if (mxbeans == null) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            cpuStatus = "Not available. Cannot access threads in target application. Check the logfile for details (use Help | About | Logfile).";
-                            refreshSummary();
-                        }
-                    });
-                    LOGGER.log(Level.WARNING, "JvmMXBeansFactory.getJvmMXBeans(jmxModel) returns null for " + application); // NOI18N
-                    return;
-                }
-                ThreadMXBean threadBean = mxbeans.getThreadMXBean();
-                if (threadBean == null) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            cpuStatus = "Not available. Cannot access threads in target application. Check the logfile for details (use Help | About | Logfile).";
-                            refreshSummary();
-                        }
-                    });
-                    LOGGER.log(Level.WARNING, "mxbeans.getThreadMXBean() returns null for " + application); // NOI18N
-                    return;
-                }
-                try {
-                    threadBean.getThreadInfo(threadBean.getAllThreadIds(),Integer.MAX_VALUE);
-                } catch (SecurityException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            cpuStatus = "Not available. Failed to access threads in target application. Check the logfile for details (use Help | About | Logfile).";
-                            refreshSummary();
-                        }
-                    });
-                    LOGGER.log(Level.WARNING, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
-                    return;
-                } catch (Throwable t) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            cpuStatus = "Not available. Failed to access threads in target application. Check the logfile for details (use Help | About | Logfile).";
-                            refreshSummary();
-                        }
-                    });
-                    LOGGER.log(Level.WARNING, "threadBean.getThreadInfo(ids, maxDepth) throws Throwable for " + application, t); // NOI18N
                     return;
                 }
 
@@ -554,7 +495,7 @@ class SamplerImpl {
                             tds.takeThreadDump(application, openView);
                         }
                     };
-                cpuSampler = new CPUSamplerSupport(threadBean, snapshotDumper, threadDumper) {
+                cpuSampler = new CPUSamplerSupport(ti, snapshotDumper, threadDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {
