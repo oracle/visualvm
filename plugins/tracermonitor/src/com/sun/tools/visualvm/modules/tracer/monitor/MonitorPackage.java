@@ -116,8 +116,10 @@ class MonitorPackage extends TracerPackage<Application> implements MonitorProbe.
 
     public MonitoredData getMonitoredData(long timestamp) {
         // TODO: validity may be extended to some timeslot (~100ms)
-        if (lastTimestamp != timestamp)
+        if (lastTimestamp != timestamp) {
             lastMonitoredData = jvm.getMonitoredData();
+            lastTimestamp = timestamp;
+        }
         return lastMonitoredData;
     }
 
