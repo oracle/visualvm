@@ -146,7 +146,8 @@ public final class DetailsPanel extends JPanel {
         public void valueChanged(ListSelectionEvent e) {
 //            if (e.getValueIsAdjusting()) return;
             int selectedRow = table.getSelectionModel().getMinSelectionIndex();
-            int selectedIndex = table.convertRowIndexToModel(selectedRow);
+            int selectedIndex = selectedRow == -1 ? -1 :
+                                table.convertRowIndexToModel(selectedRow);
             support.setSelectedTimestamps(selectedIndex != -1 ? new int[] { selectedIndex } :
                                           TimelineSupport.EMPTY_TIMESTAMPS);
         }
