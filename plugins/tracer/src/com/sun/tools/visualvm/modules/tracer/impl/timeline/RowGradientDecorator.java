@@ -39,7 +39,7 @@ import org.netbeans.lib.profiler.charts.swing.Utils;
  */
 final class RowGradientDecorator implements ChartDecorator {
 
-    private static final Color SELECTED_FILTER = new Color(0, 0, 200, 50);
+    private static final Color SELECTED_FILTER = new Color(0, 0, 200, 25);
     private static final float[] FRACTIONS = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
     private static final Color[] COLORS = new Color[] { new Color(250, 250, 250, 110),
                                                         new Color(205, 205, 220, 30),
@@ -66,7 +66,7 @@ final class RowGradientDecorator implements ChartDecorator {
             g.setPaint(new LinearGradientPaint(0, y, 0, y + h, FRACTIONS, COLORS));
             g.fillRect(0, y, chart.getWidth(), h);
 
-            if (chart.getSelectedRow() == i) {
+            if (chart.isRowSelected(row)) {
                 g.setColor(SELECTED_FILTER);
                 g.fillRect(0, y, chart.getWidth(), h);
             }

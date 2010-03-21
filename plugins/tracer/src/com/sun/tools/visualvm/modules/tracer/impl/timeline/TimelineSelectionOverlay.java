@@ -180,6 +180,14 @@ final class TimelineSelectionOverlay extends ChartOverlay {
 
 
     private class ConfigurationListener extends ChartConfigurationListener.Adapter {
+        private final Runnable selectionUpdater = new Runnable() {
+            public void run() {
+                Set<Point> oldSelectedValues = new HashSet(selectedValues);
+                updateSelectedValues(selectedValues, chart.getSelectionModel().
+                        getHighlightedItems(), chart);
+                vLineBoundsChanged(oldSelectedValues, selectedValues);
+            }
+        };
         public void contentsUpdated(long offsetX, long offsetY,
                                     double scaleX, double scaleY,
                                     long lastOffsetX, long lastOffsetY,
@@ -187,14 +195,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
                                     int shiftX, int shiftY) {
             if (selectedValues.isEmpty()) return;
             if (scaleX != lastScaleX || scaleY != lastScaleY || shiftX != 0)
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        Set<Point> oldSelectedValues = new HashSet(selectedValues);
-                        updateSelectedValues(selectedValues, chart.getSelectionModel().
-                                getHighlightedItems(), chart);
-                        vLineBoundsChanged(oldSelectedValues, selectedValues);
-                    }
-                });
+                SwingUtilities.invokeLater(selectionUpdater);
         }
     }
 

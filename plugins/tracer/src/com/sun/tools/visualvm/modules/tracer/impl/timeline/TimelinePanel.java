@@ -26,14 +26,16 @@
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -51,13 +53,13 @@ public final class TimelinePanel extends JPanel {
         setOpaque(false);
 
         ProbesPanel probesPanel = new ProbesPanel(support);
-        chartPanel = new ChartPanel(support.getChart());
+        chartPanel = new ChartPanel(support.getChart(), support);
 
         add(probesPanel, BorderLayout.WEST);
         add(chartPanel, BorderLayout.CENTER);
 
-        new RowMouseHandler(support.getChart(), probesPanel.getMouseTarget(),
-                            this).register();
+        new ProbesWheelHandler(chartPanel, probesPanel).register();
+        new RowMouseHandler(support, probesPanel).register();
     }
 
 
@@ -94,37 +96,56 @@ public final class TimelinePanel extends JPanel {
 
     // --- Private implementation ----------------------------------------------
 
+    private static class ProbesWheelHandler implements MouseWheelListener {
+
+        private final ChartPanel chartPanel;
+        private final ProbesPanel probesPanel;
+
+        ProbesWheelHandler(ChartPanel chartPanel, ProbesPanel probesPanel) {
+            this.chartPanel = chartPanel;
+            this.probesPanel = probesPanel;
+        }
+
+        void register() {
+            probesPanel.addMouseWheelListener(this);
+        }
+
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            chartPanel.vScroll(e);
+        }
+
+    }
+
     private static class RowMouseHandler extends MouseAdapter {
 
         private static final int RESIZE_RANGE = 3;
 
+        private final TimelineSupport support;
         private final TimelineChart chart;
-        private final Component mouseTarget;
-        private final Component repaintTarget;
+        private final ProbesPanel probesPanel;
 
         private int baseY;
         private int baseHeight;
         private TimelineChart.Row draggingRow;
 
 
-        RowMouseHandler(TimelineChart chart, Component mouseTarget,
-                               Component repaintTarget) {
-            this.chart = chart;
-            this.mouseTarget = mouseTarget;
-            this.repaintTarget = repaintTarget;
+        RowMouseHandler(TimelineSupport support, ProbesPanel probesPanel) {
+            this.support = support;
+            this.chart = support.getChart();
+            this.probesPanel = probesPanel;
         }
 
 
         void register() {
             chart.addMouseListener(this);
             chart.addMouseMotionListener(this);
-            mouseTarget.addMouseListener(this);
-            mouseTarget.addMouseMotionListener(this);
+            probesPanel.getMouseTarget().addMouseListener(this);
+            probesPanel.getMouseTarget().addMouseMotionListener(this);
         }
 
 
         public void mousePressed(MouseEvent e) {
-            updateRowState(e, true);
+            updateRowState(e, SwingUtilities.isLeftMouseButton(e));
             if (draggingRow != null) chart.updateSelection(false, this);
             updateCursor();
         }
@@ -155,21 +176,30 @@ public final class TimelinePanel extends JPanel {
             if (draggingRow != null) {
                 baseHeight = draggingRow.getHeight();
             } else if (updateSelection) {
-//                TimelineChart.Row row = chart.getRowAt(baseY);
-//                chart.setSelectedRow(row == null ? -1 : row.getIndex());
-//                repaintTarget.repaint();
+                TimelineChart.Row row = chart.getRowAt(baseY);
+                if ((e.getModifiers() & Toolkit.getDefaultToolkit().
+                        getMenuShortcutKeyMask()) == 0) {
+                    if (chart.setSelectedRow(row)) updateSelection();
+                } else {
+                    if (row != null && chart.toggleRowSelection(row)) updateSelection();
+                }
             }
+        }
+
+        private void updateSelection() {
+            probesPanel.updateSelection();
+            support.rowSelectionChanged();
         }
 
         private void updateCursor() {
             if (draggingRow != null) {
                 Cursor resizeCursor = Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR);
                 chart.setCursor(resizeCursor);
-                mouseTarget.setCursor(resizeCursor);
+                probesPanel.setCursor(resizeCursor);
             } else {
                 Cursor defaultCursor = Cursor.getDefaultCursor();
                 chart.setCursor(defaultCursor);
-                mouseTarget.setCursor(defaultCursor);
+                probesPanel.setCursor(defaultCursor);
             }
         }
 

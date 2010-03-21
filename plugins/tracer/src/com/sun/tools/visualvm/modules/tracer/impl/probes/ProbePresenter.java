@@ -39,12 +39,14 @@ import javax.swing.JLabel;
  */
 public final class ProbePresenter extends JLabel {
 
-    private static final Color SELECTED_FILTER = new Color(0, 0, 200, 50);
+    private static final Color SELECTED_FILTER = new Color(0, 0, 200, 40);
     private static final float[] FRACTIONS = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
     private static final Color[] COLORS = new Color[] { new Color(250, 250, 250, 110),
                                                         new Color(205, 205, 220, 30),
                                                         new Color(180, 180, 195, 30),
                                                         new Color(200, 200, 210, 110) };
+
+    private LinearGradientPaint gradientPaint;
     
     private boolean isSelected = false;
 
@@ -69,13 +71,16 @@ public final class ProbePresenter extends JLabel {
     }
 
 
+    public void reshape(int x, int y, int w, int h) {
+        gradientPaint = new LinearGradientPaint(0, 0, 0, h - 1, FRACTIONS, COLORS);
+        super.reshape(x, y, w, h);
+    }
+
+
     protected void paintComponent(Graphics g) {
-//        super.paintComponent(g);
-        
         int y = getHeight() - 1;
 
-        ((Graphics2D)g).setPaint(
-                new LinearGradientPaint(0, 0, 0, y, FRACTIONS, COLORS));
+        ((Graphics2D)g).setPaint(gradientPaint);
         g.fillRect(0, 0, getWidth(), y);
 
         if (isSelected) {

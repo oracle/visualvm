@@ -29,15 +29,26 @@ import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
+import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsPanel;
+import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsTableModel;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineChart.Row;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 import org.netbeans.lib.profiler.charts.ChartContext;
+import org.netbeans.lib.profiler.charts.ChartSelectionModel;
+import org.netbeans.lib.profiler.charts.ItemSelection;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
+import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 
 /**
@@ -46,6 +57,8 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
  * @author Jiri Sedlacek
  */
 public final class TimelineSupport {
+
+    public static final int[] EMPTY_TIMESTAMPS = new int[0];
 
     private final TimelineChart chart;
     private final TimelineModel model;
@@ -56,6 +69,9 @@ public final class TimelineSupport {
 
     private final List<TracerProbe> probes = new ArrayList();
     private final List<TimelineChart.Row> rows = new ArrayList();
+
+    private int[] selectedTimestamps = new int[0];
+    private final Set<SelectionListener> selectionListeners = new HashSet();
 
 
     // --- Constructor ---------------------------------------------------------
@@ -81,6 +97,10 @@ public final class TimelineSupport {
 
     TimelineChart getChart() {
         return chart;
+    }
+
+    public ChartSelectionModel getChartSelectionModel() {
+        return chart.getSelectionModel();
     }
 
 
@@ -323,8 +343,10 @@ public final class TimelineSupport {
     public void addValues(final long timestamp, final long[] newValues) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                int newRow = detailsModel == null ? -1 : detailsModel.getRowCount();
                 model.addValues(timestamp, newValues);
                 itemsModel.valuesAdded();
+                if (newRow != -1) detailsModel.fireTableRowsInserted(newRow, newRow);
             }
         });
     }
@@ -332,10 +354,134 @@ public final class TimelineSupport {
     public void resetValues() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                int lastRow = detailsModel == null ? -1 : detailsModel.getRowCount() - 1;
                 model.reset();
                 itemsModel.valuesReset();
+                if (lastRow != -1) detailsModel.fireTableRowsDeleted(0, lastRow);
             }
         });
+    }
+
+    // --- Row selection management --------------------------------------------
+
+    private AbstractTableModel detailsModel;
+
+    void rowSelectionChanged() {
+        notifySelectionChanged();
+    }
+
+    public TableModel getDetailsModel() {
+        if (chart.isRowSelection()) detailsModel = createSelectionModel();
+        else detailsModel = null;
+        return detailsModel;
+    }
+
+    private AbstractTableModel createSelectionModel() {
+        final List<SynchronousXYItem> selectedItems = getSelectedItems();
+        final List<ValueItemDescriptor> selectedDescriptors = getSelectedDescriptors();
+        int selectedItemsCount = selectedItems.size();
+        
+        final int columnCount = selectedItemsCount + 1;
+        final SynchronousXYItem[] selectedItemsArr =
+                selectedItems.toArray(new SynchronousXYItem[selectedItemsCount]);
+        final String[] columnNames = new String[columnCount];
+        columnNames[0] = "Time";
+        for (int i = 1; i < columnCount; i++) {
+            String itemName = selectedItemsArr[i - 1].getName();
+            String unitsString = selectedDescriptors.get(i - 1).
+                                 getUnitsString(ItemValueFormatter.FORMAT_DETAILS);
+            String unitsExt = unitsString == null ? "" : " [" + unitsString + "]";
+            columnNames[i] = itemName + unitsExt;
+        }
+
+        return new DetailsTableModel() {
+
+            public int getRowCount() {
+                return model.getTimestampsCount();
+            }
+
+            public int getColumnCount() {
+                return columnCount;
+            }
+
+            public String getColumnName(int columnIndex) {
+                return columnNames[columnIndex];
+            }
+
+            public Class getColumnClass(int columnIndex) {
+                if (columnIndex == 0) return DetailsPanel.class;
+                return Long.class;
+            }
+
+            public ValueItemDescriptor getDescriptor(int columnIndex) {
+                if (columnIndex == 0) return null;
+                return selectedDescriptors.get(columnIndex - 1);
+            }
+
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                if (columnIndex == 0) return model.getTimestamp(rowIndex);
+                return selectedItemsArr[columnIndex - 1].getYValue(rowIndex);
+            }
+
+        };
+    }
+
+
+    // --- Time selection management -------------------------------------------
+
+    public void setSelectedTimestamps(int[] selectedIndexes) {
+        selectedTimestamps = selectedIndexes;
+        List<SynchronousXYItem> selectedItems = getSelectedItems();
+        List<ItemSelection> selections = new ArrayList(selectedItems.size());
+        for (int selectedIndex : selectedIndexes)
+            for (SynchronousXYItem selectedItem : selectedItems)
+                selections.add(new XYItemSelection.Default(selectedItem,
+                               selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
+        chart.getSelectionModel().setSelectedItems(selections);
+    }
+
+    public int[] getSelectedTimestamps() {
+        return selectedTimestamps;
+    }
+
+
+    private List<SynchronousXYItem> getSelectedItems() {
+        List<TimelineChart.Row> selectedRows = chart.getSelectedRows();
+        List<SynchronousXYItem> selectedItems = new ArrayList();
+        for (TimelineChart.Row selectedRow : selectedRows)
+            selectedItems.addAll(Arrays.asList(selectedRow.getItems()));
+        return selectedItems;
+    }
+
+    private List<ValueItemDescriptor> getSelectedDescriptors() {
+        List<TimelineChart.Row> selectedRows = chart.getSelectedRows();
+        List selectedDescriptors = new ArrayList();
+        for (TimelineChart.Row selectedRow : selectedRows)
+            selectedDescriptors.addAll(Arrays.asList(getProbe(selectedRow).getItemDescriptors()));
+        return selectedDescriptors;
+    }
+
+
+    // --- General selection support -------------------------------------------
+
+    public void addSelectionListener(SelectionListener listener) {
+        selectionListeners.add(listener);
+    }
+
+    public void removeSelectionListener(SelectionListener listener) {
+        selectionListeners.remove(listener);
+    }
+
+    private void notifySelectionChanged() {
+        for (SelectionListener selectionListener: selectionListeners)
+            selectionListener.selectionChanged();
+    }
+
+
+    public static interface SelectionListener {
+
+        void selectionChanged();
+
     }
 
 }

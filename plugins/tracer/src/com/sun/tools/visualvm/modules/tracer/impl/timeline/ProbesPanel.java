@@ -34,6 +34,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -49,9 +50,9 @@ import org.netbeans.lib.profiler.charts.swing.Utils;
  *
  * @author Jiri Sedlacek
  */
-class ProbesPanel extends JPanel {
+final class ProbesPanel extends JPanel {
 
-    private final JPanel listPanel;
+    private final ListPanel listPanel;
     private final JViewport viewport;
     private final HeaderButton increaseB;
     private final HeaderButton decreaseB;
@@ -60,32 +61,34 @@ class ProbesPanel extends JPanel {
     ProbesPanel(final TimelineSupport support) {
         final TimelineChart chart = support.getChart();
 
-        listPanel = new JPanel(new VerticalTimelineLayout(chart)) {
+        listPanel = new ListPanel(new VerticalTimelineLayout(chart)) {
             public Dimension getPreferredSize() {
                 Dimension d = super.getPreferredSize();
                 d.height = Utils.checkedInt(chart.getChartContext().getViewHeight());
                 return d;
             }
+            protected void updateSelection() {
+                int count = getComponentCount();
+                for (int i = 0; i < count; i++)
+                    ((ProbePresenter)getComponent(i)).setSelected(
+                            chart.isRowSelected(chart.getRow(i)));
+            }
         };
-        listPanel.setOpaque(false);
 
         viewport = new JViewport();
         viewport.setOpaque(true);
         viewport.setBackground(new Color(247, 247, 247));
         viewport.setView(listPanel);
         viewport.setViewPosition(new Point(0, 0));
+        final ViewportUpdater updater = new ViewportUpdater(viewport);
         chart.addConfigurationListener(new ChartConfigurationListener.Adapter() {
             public void contentsWillBeUpdated(long offsetX, final long offsetY,
                                               double scaleX, double scaleY,
                                               long lastOffsetX, final long lastOffsetY,
                                               double lastScaleX, double lastScaleY) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        if (lastOffsetY != offsetY)
-                            viewport.setViewPosition(new Point(0, Utils.
-                                                     checkedInt(offsetY)));
-                    }
-                });
+                if (lastOffsetY != offsetY)
+                    SwingUtilities.invokeLater(updater.forPoint(new Point(
+                            0, Utils.checkedInt(offsetY))));
             }
         });
         final JPanel bottomPanel = new JPanel(new GridLayout(1, 3));
@@ -130,37 +133,71 @@ class ProbesPanel extends JPanel {
                 for (TimelineChart.Row row : rows)
                     listPanel.add(new ProbePresenter(support.getProbe(row)),
                                   row.getIndex());
-                syncListPanel();
+                listPanel.sync();
                 refreshButtons(true);
             }
 
             public void rowsRemoved(List<TimelineChart.Row> rows) {
                 for (TimelineChart.Row row : rows)
                     listPanel.remove(row.getIndex());
-                syncListPanel();
+                listPanel.sync();
                 refreshButtons(chart.hasRows());
             }
 
             public void rowsResized(List<TimelineChart.Row> rows) {
-                syncListPanel();
+                listPanel.sync();
             }
         });
 
         refreshButtons(chart.hasRows());
     }
 
-    private void syncListPanel() {
-        listPanel.doLayout();
-        listPanel.repaint();
-    }
 
     Component getMouseTarget() {
         return viewport;
     }
+
+    void updateSelection() {
+        listPanel.updateSelection();
+    }
+
 
     private void refreshButtons(boolean enabled) {
         increaseB.setEnabled(enabled);
         decreaseB.setEnabled(enabled);
         resetB.setEnabled(enabled);
     }
+
+
+    private static class ViewportUpdater implements Runnable {
+
+        private final JViewport viewport;
+        private Point point;
+
+        ViewportUpdater(JViewport viewport) { this.viewport = viewport; }
+
+        Runnable forPoint(Point point) { this.point = point; return this; }
+
+        public void run() { viewport.setViewPosition(point); }
+
+    }
+
+
+    private static class ListPanel extends JPanel {
+
+        ListPanel(LayoutManager layout) {
+            super(layout);
+            setOpaque(false);
+        }
+
+        protected void updateSelection() {
+        }
+
+        private void sync() {
+            doLayout();
+            repaint();
+        }
+
+    }
+
 }

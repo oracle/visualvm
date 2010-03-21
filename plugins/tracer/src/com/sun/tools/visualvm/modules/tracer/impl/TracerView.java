@@ -94,6 +94,7 @@ final class TracerView extends DataSourceView {
     protected DataViewComponent createComponent() {
         PackagesView packagesView = new PackagesView(model, controller);
         timelineView = new TimelineView(model);
+        DetailsView detailsView = new DetailsView(model);
         MasterViewSupport masterView = new MasterViewSupport();
         
         dvc = new DataViewComponent(masterView.getView(),
@@ -113,6 +114,11 @@ final class TracerView extends DataSourceView {
         dvc.addDetailsView(timelineView.getView(), DataViewComponent.TOP_RIGHT);
         if (!initiallyOpened.contains(TracerOptions.VIEW_TIMELINE))
             dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
+
+        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration("Details", true), DataViewComponent.BOTTOM_RIGHT);
+        dvc.addDetailsView(detailsView.getView(), DataViewComponent.BOTTOM_RIGHT);
+        if (!initiallyOpened.contains(TracerOptions.VIEW_DETAILS))
+            dvc.hideDetailsArea(DataViewComponent.BOTTOM_RIGHT);
 
         return dvc;
     }
@@ -220,6 +226,8 @@ final class TracerView extends DataSourceView {
                 setProbesVisible(onSessionStart.contains(TracerOptions.VIEW_PROBES));
                 // Timeline
                 setTimelineVisible(onSessionStart.contains(TracerOptions.VIEW_TIMELINE));
+                // Details
+                setDetailsVisible(onSessionStart.contains(TracerOptions.VIEW_DETAILS));
             }
         }
 
@@ -241,6 +249,11 @@ final class TracerView extends DataSourceView {
         private void setTimelineVisible(boolean visible) {
             if (visible) dvc.showDetailsArea(DataViewComponent.TOP_RIGHT);
             else dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
+        }
+
+        private void setDetailsVisible(boolean visible) {
+            if (visible) dvc.showDetailsArea(DataViewComponent.BOTTOM_RIGHT);
+            else dvc.hideDetailsArea(DataViewComponent.BOTTOM_RIGHT);
         }
 
         private void addMessage(String text) {

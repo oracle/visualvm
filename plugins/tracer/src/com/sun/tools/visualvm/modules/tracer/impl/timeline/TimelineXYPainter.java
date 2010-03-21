@@ -49,7 +49,7 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
  *
  * @author Jiri Sedlacek
  */
-public class TimelineXYPainter extends XYItemPainter.Abstract {
+final class TimelineXYPainter extends XYItemPainter.Abstract {
 
     private static final int HOVER_RADIUS = 2; // Not used
 

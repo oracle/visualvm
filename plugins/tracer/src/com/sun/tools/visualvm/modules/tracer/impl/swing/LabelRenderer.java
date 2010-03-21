@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl.swing;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -33,14 +34,21 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.plaf.LabelUI;
+import javax.swing.plaf.basic.BasicLabelUI;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class LabelRenderer extends JLabel {
+public class LabelRenderer extends JLabel {
 
-    private final Insets insets;
+    private static final LabelUI UI = new BasicLabelUI();
+
+    private int x;
+    private int y;
+    private Insets insets;
+    private Dimension preferredSize;
 
     private FontMetrics fontMetrics;
     private String text;
@@ -52,8 +60,6 @@ public final class LabelRenderer extends JLabel {
     // --- Constructor ---------------------------------------------------------
 
     public LabelRenderer() {
-        insets = new Insets(0, 0, 0, 0);
-
         setHorizontalAlignment(LEFT);
         setVerticalAlignment(TOP);
         setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -66,19 +72,51 @@ public final class LabelRenderer extends JLabel {
     // --- Implementation ------------------------------------------------------
 
     public Insets getInsets() {
+        if (insets == null) insets = new Insets(0, 0, 0, 0);
         return insets;
     }
 
     public Insets getInsets(Insets insets) {
-        return this.insets;
+        return getInsets();
     }
 
     public void setLocation(int x, int y) {
-        insets.set(y, x, insets.bottom, insets.right);
+        this.x = x;
+        this.y = y;
     }
 
-    public void resetLocation() {
-        insets.set(0, 0, insets.bottom, insets.right);
+    public Dimension getPreferredSize() {
+        if (preferredSize == null) preferredSize = new Dimension();
+        return preferredSize;
+    }
+
+    public void setUI(LabelUI ui) {
+        super.setUI(UI);
+    }
+
+    private void updatePreferredSize() {
+        if (ui == null || fontMetrics == null) return;
+        Dimension dim = getPreferredSize();
+        dim.width = ui.getPreferredSize(this).width;
+        dim.height = fontMetrics.getAscent() + fontMetrics.getDescent();
+    }
+
+    protected void prePaint(Graphics g) {}
+    protected void postPaint(Graphics g) {}
+
+    public void paint(Graphics g) {
+        Graphics cg = getComponentGraphics(g);
+        boolean translate = x < 0 || y < 0;
+        
+        if (translate) cg.translate(x, y);
+        else insets.set(y, x, 0, 0);
+
+        prePaint(g);
+        ui.update(cg, this);
+        postPaint(g);
+        
+        if (!translate) insets.set(0, 0, 0, 0);
+        else cg.translate(-x, -y);
     }
 
 
@@ -87,6 +125,7 @@ public final class LabelRenderer extends JLabel {
     // Overridden for performance reasons.
     public void setText(String text) {
         this.text = text;
+        updatePreferredSize();
     }
 
     // Overridden for performance reasons.
@@ -97,6 +136,7 @@ public final class LabelRenderer extends JLabel {
     // Overridden for performance reasons.
     public void setIcon(Icon icon) {
         this.icon = icon;
+        updatePreferredSize();
     }
 
     // Overridden for performance reasons.
@@ -131,14 +171,14 @@ public final class LabelRenderer extends JLabel {
 
     // Overridden for performance reasons.
     public FontMetrics getFontMetrics(Font font) {
-        if (fontMetrics == null) fontMetrics = super.getFontMetrics(font);
         return fontMetrics;
     }
 
     // Overridden for performance reasons.
     public void setFont(Font font) {
-        fontMetrics = null;
         super.setFont(font);
+        fontMetrics = super.getFontMetrics(font);
+        updatePreferredSize();
     }
 
     // Overridden for performance reasons.
@@ -191,17 +231,5 @@ public final class LabelRenderer extends JLabel {
 
     // Overridden for performance reasons.
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
-
-    // Overridden for performance reasons.
-    public void paint(Graphics g) {
-        Graphics componentGraphics = getComponentGraphics(g);
-        Graphics co = (componentGraphics == null) ? null :
-                      componentGraphics.create();
-        try {
-            paintComponent(co);
-        } finally {
-            co.dispose();
-        }
-    }
 
 }

@@ -36,7 +36,6 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractButton;
@@ -125,6 +124,8 @@ final class TracerOptionsPanel extends JPanel {
                 opened.contains(TracerOptions.VIEW_PROBES));
         initialTimelineCheckBox.setSelected(
                 opened.contains(TracerOptions.VIEW_TIMELINE));
+        initialDetailsCheckBox.setSelected(
+                opened.contains(TracerOptions.VIEW_DETAILS));
         internalChange = false;
     }
 
@@ -134,6 +135,8 @@ final class TracerOptionsPanel extends JPanel {
                initialProbesCheckBox.isSelected());
         result = append(result, TracerOptions.VIEW_TIMELINE,
                initialTimelineCheckBox.isSelected());
+        result = append(result, TracerOptions.VIEW_DETAILS,
+               initialDetailsCheckBox.isSelected());
         return result;
     }
 
@@ -142,12 +145,15 @@ final class TracerOptionsPanel extends JPanel {
         if (TracerOptions.VIEWS_UNCHANGED.equals(opened)) {
             onProbeAddedProbesCheckBox.setSelected(false);
             onProbeAddedTimelineCheckBox.setSelected(false);
+            onProbeAddedDetailsCheckBox.setSelected(false);
             onProbeAddedNothingCheckBox.setSelected(true);
         } else {
             onProbeAddedProbesCheckBox.setSelected(
                     opened.contains(TracerOptions.VIEW_PROBES));
             onProbeAddedTimelineCheckBox.setSelected(
                     opened.contains(TracerOptions.VIEW_TIMELINE));
+            onProbeAddedDetailsCheckBox.setSelected(
+                    opened.contains(TracerOptions.VIEW_DETAILS));
             onProbeAddedNothingCheckBox.setSelected(false);
         }
         internalChange = false;
@@ -159,6 +165,8 @@ final class TracerOptionsPanel extends JPanel {
                onProbeAddedProbesCheckBox.isSelected());
         result = append(result, TracerOptions.VIEW_TIMELINE,
                onProbeAddedTimelineCheckBox.isSelected());
+        result = append(result, TracerOptions.VIEW_DETAILS,
+               onProbeAddedDetailsCheckBox.isSelected());
         return result;
     }
 
@@ -167,12 +175,15 @@ final class TracerOptionsPanel extends JPanel {
         if (TracerOptions.VIEWS_UNCHANGED.equals(opened)) {
             onStartProbesCheckBox.setSelected(false);
             onStartTimelineCheckBox.setSelected(false);
+            onStartDetailsCheckBox.setSelected(false);
             onStartNothingCheckBox.setSelected(true);
         } else {
             onStartProbesCheckBox.setSelected(
                     opened.contains(TracerOptions.VIEW_PROBES));
             onStartTimelineCheckBox.setSelected(
                     opened.contains(TracerOptions.VIEW_TIMELINE));
+            onStartDetailsCheckBox.setSelected(
+                    opened.contains(TracerOptions.VIEW_DETAILS));
             onStartNothingCheckBox.setSelected(false);
         }
         internalChange = false;
@@ -184,6 +195,8 @@ final class TracerOptionsPanel extends JPanel {
                onStartProbesCheckBox.isSelected());
         result = append(result, TracerOptions.VIEW_TIMELINE,
                onStartTimelineCheckBox.isSelected());
+        result = append(result, TracerOptions.VIEW_DETAILS,
+               onStartDetailsCheckBox.isSelected());
         return result;
     }
 
@@ -249,6 +262,8 @@ final class TracerOptionsPanel extends JPanel {
                     !selected.contains(initialProbesCheckBox));
             initialTimelineCheckBox.setEnabled(selected.size() > 1 ||
                     !selected.contains(initialTimelineCheckBox));
+            initialDetailsCheckBox.setEnabled(selected.size() > 1 ||
+                    !selected.contains(initialDetailsCheckBox));
         }
 
         // --- onProbeAdded ----------------------------------------------------
@@ -257,6 +272,8 @@ final class TracerOptionsPanel extends JPanel {
             onProbeAddedProbesCheckBox.setEnabled(false);
             onProbeAddedTimelineCheckBox.setSelected(false);
             onProbeAddedTimelineCheckBox.setEnabled(false);
+            onProbeAddedDetailsCheckBox.setSelected(false);
+            onProbeAddedDetailsCheckBox.setEnabled(false);
         } else {
             selected = getSelected(onProbeAddedPanel);
 
@@ -273,6 +290,8 @@ final class TracerOptionsPanel extends JPanel {
                         !selected.contains(onProbeAddedProbesCheckBox));
                 onProbeAddedTimelineCheckBox.setEnabled(selected.size() > 1 ||
                         !selected.contains(onProbeAddedTimelineCheckBox));
+                onProbeAddedDetailsCheckBox.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onProbeAddedDetailsCheckBox));
             }
         }
 
@@ -282,6 +301,8 @@ final class TracerOptionsPanel extends JPanel {
             onStartProbesCheckBox.setEnabled(false);
             onStartTimelineCheckBox.setSelected(false);
             onStartTimelineCheckBox.setEnabled(false);
+            onStartDetailsCheckBox.setSelected(false);
+            onStartDetailsCheckBox.setEnabled(false);
         } else {
             selected = getSelected(onStartOpenedPanel);
 
@@ -298,6 +319,8 @@ final class TracerOptionsPanel extends JPanel {
                         !selected.contains(onStartProbesCheckBox));
                 onStartTimelineCheckBox.setEnabled(selected.size() > 1 ||
                         !selected.contains(onStartTimelineCheckBox));
+                onStartDetailsCheckBox.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onStartDetailsCheckBox));
             }
         }
 
@@ -645,10 +668,13 @@ final class TracerOptionsPanel extends JPanel {
 //        JCheckBox initialSettingsCheckBox = new JCheckBox("Settings");
 //        initiallyOpenedPanel.add(initialSettingsCheckBox);
 //        initialSettingsCheckBox.setEnabled(false);
-//        // initialDetailsCheckBox
-//        JCheckBox initialDetailsCheckBox = new JCheckBox("Details");
-//        initiallyOpenedPanel.add(initialDetailsCheckBox);
-//        initialDetailsCheckBox.setEnabled(false);
+        // initialDetailsCheckBox
+        initialDetailsCheckBox = new JCheckBox("Details") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        initiallyOpenedPanel.add(initialDetailsCheckBox);
         viewsBehaviorPanel.add(initiallyOpenedPanel);
 
         // onProbeAddedPanel
@@ -673,10 +699,13 @@ final class TracerOptionsPanel extends JPanel {
 //        JCheckBox onProbeAddedSettingsCheckBox = new JCheckBox("Settings");
 //        onProbeAddedPanel.add(onProbeAddedSettingsCheckBox);
 //        onProbeAddedSettingsCheckBox.setEnabled(false);
-//        // initialDetailsCheckBox
-//        JCheckBox onProbeAddedDetailsCheckBox = new JCheckBox("Details");
-//        onProbeAddedPanel.add(onProbeAddedDetailsCheckBox);
-//        onProbeAddedDetailsCheckBox.setEnabled(false);
+        // initialDetailsCheckBox
+        onProbeAddedDetailsCheckBox = new JCheckBox("Details") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onProbeAddedPanel.add(onProbeAddedDetailsCheckBox);
         // onStartNothingCheckBox
         onProbeAddedNothingCheckBox = new JCheckBox("No change") {
             protected void fireActionPerformed(ActionEvent e) {
@@ -708,10 +737,13 @@ final class TracerOptionsPanel extends JPanel {
 //        JCheckBox onStartSettingsCheckBox = new JCheckBox("Settings");
 //        onStartOpenedPanel.add(onStartSettingsCheckBox);
 //        onStartSettingsCheckBox.setEnabled(false);
-//        // initialDetailsCheckBox
-//        JCheckBox onStartDetailsCheckBox = new JCheckBox("Details");
-//        onStartOpenedPanel.add(onStartDetailsCheckBox);
-//        onStartDetailsCheckBox.setEnabled(false);
+        // initialDetailsCheckBox
+        onStartDetailsCheckBox = new JCheckBox("Details") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onStartOpenedPanel.add(onStartDetailsCheckBox);
         // onStartNothingCheckBox
         onStartNothingCheckBox = new JCheckBox("No change") {
             protected void fireActionPerformed(ActionEvent e) {
@@ -745,13 +777,16 @@ final class TracerOptionsPanel extends JPanel {
     private JPanel initiallyOpenedPanel;
     private JCheckBox initialProbesCheckBox;
     private JCheckBox initialTimelineCheckBox;
+    private JCheckBox initialDetailsCheckBox;
     private JPanel onProbeAddedPanel;
     private JCheckBox onProbeAddedProbesCheckBox;
     private JCheckBox onProbeAddedTimelineCheckBox;
+    private JCheckBox onProbeAddedDetailsCheckBox;
     private JCheckBox onProbeAddedNothingCheckBox;
     private JPanel onStartOpenedPanel;
     private JCheckBox onStartProbesCheckBox;
     private JCheckBox onStartTimelineCheckBox;
+    private JCheckBox onStartDetailsCheckBox;
     private JCheckBox onStartNothingCheckBox;
 
     private JComboBox zoomModeCombo;

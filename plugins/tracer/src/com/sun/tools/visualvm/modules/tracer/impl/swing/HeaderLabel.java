@@ -26,17 +26,18 @@
 package com.sun.tools.visualvm.modules.tracer.impl.swing;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class HeaderLabel extends HeaderPanel {
+public final class HeaderLabel extends HeaderPanel {
 
-    public static final int DEFAULT_HEIGHT =
-            new HeaderLabel("X").getPreferredSize().height; // NOI18N
+    public static final int DEFAULT_HEIGHT = computeHeight();
 
 
     private String text;
@@ -81,6 +82,24 @@ public class HeaderLabel extends HeaderPanel {
             JLabel label = (JLabel)renderer;
             label.setHorizontalAlignment(hAlign);
         }
+    }
+
+
+    public Dimension getPreferredSize() {
+        Dimension dim = getPreferredSizeSuper();
+        dim.height = DEFAULT_HEIGHT;
+        return dim;
+    }
+
+    private Dimension getPreferredSizeSuper() {
+        return super.getPreferredSize();
+    }
+
+
+    private static int computeHeight() {
+        int height = new HeaderLabel("X").getPreferredSizeSuper().height; // NOI18N
+        if (UIManager.getLookAndFeel().getID().equals("Metal")) height += 4; // NOI18N
+        return height;
     }
 
 }

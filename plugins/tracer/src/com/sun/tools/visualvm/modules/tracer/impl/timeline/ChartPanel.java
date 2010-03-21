@@ -26,12 +26,9 @@
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.ScrollBar;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
@@ -48,13 +45,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.Timeline;
-import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
-import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.openide.util.ImageUtilities;
 
@@ -62,7 +56,7 @@ import org.openide.util.ImageUtilities;
  *
  * @author Jiri Sedlacek
  */
-class ChartPanel extends JPanel {
+final class ChartPanel extends JPanel {
 
     private static final String ZOOM_IN_STRING = "Zoom in"; //"Zoom In (Mouse Wheel)";
     private static final String ZOOM_OUT_STRING = "Zoom out"; //"Zoom Out (Mouse Wheel)";
@@ -99,7 +93,7 @@ class ChartPanel extends JPanel {
     private AbstractButton mouseVScroll;
 
 
-    ChartPanel(TimelineChart chart) {
+    ChartPanel(TimelineChart chart, TimelineSupport support) {
         this.chart = chart;
 
         chart.setBackground(Color.WHITE);
@@ -121,20 +115,8 @@ class ChartPanel extends JPanel {
 
         if (TracerOptions.getInstance().isShowLegendEnabled())
             chart.addOverlayComponent(new TimelineLegendOverlay(chart));
-
-        TimeMarksPainter marksPainter = new TimeMarksPainter() {
-            public Dimension getPreferredSize() {
-                Dimension size = super.getPreferredSize();
-                size.height = HeaderLabel.DEFAULT_HEIGHT;
-                return size;
-            }
-        };
-        Font font = marksPainter.getFont();
-        marksPainter.setFont(font.deriveFont(Font.PLAIN, font.getSize() - 2));
-        Timeline timeline = ((SynchronousXYItemsModel) chart.getItemsModel()).getTimeline();
-        TimelineMarksComputer marksComputer = new TimelineMarksComputer(timeline,
-                chart.getChartContext(), SwingConstants.HORIZONTAL);
-        TimelineAxis axis = new TimelineAxis(chart, marksComputer, marksPainter);
+        
+        TimelineAxis axis = new TimelineAxis(chart, support);
         
         hScrollBar = new ScrollBar(JScrollBar.HORIZONTAL);
         hScrollBar.addAdjustmentListener(new AdjustmentListener() {
@@ -245,6 +227,10 @@ class ChartPanel extends JPanel {
 
     // --- Mouse wheel handling ------------------------------------------------
 
+    void vScroll(MouseWheelEvent e) {
+        scroll(vScrollBar, e);
+    }
+
     private void mouseZoomImpl() {
         clearWheelHandlers();
         chart.setMouseZoomingEnabled(true);
@@ -272,21 +258,24 @@ class ChartPanel extends JPanel {
     private void setWheelScrollHandler(final JScrollBar scrollBar) {
         chart.addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
-                // Change the ScrollBar value
-                if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-                    int unitsToScroll = e.getUnitsToScroll();
-                    int direction = unitsToScroll < 0 ? -1 : 1;
-                    if (unitsToScroll != 0) {
-                        int increment = scrollBar.getUnitIncrement(direction);
-                        int oldValue = scrollBar.getValue();
-                        int newValue = oldValue + increment * unitsToScroll;
-                        newValue = Math.max(Math.min(newValue, scrollBar.getMaximum() -
-                                scrollBar.getVisibleAmount()), scrollBar.getMinimum());
-                        if (oldValue != newValue) scrollBar.setValue(newValue);
-                    }
-                }
+                scroll(scrollBar, e);
             }
         });
+    }
+
+    private static void scroll(JScrollBar scrollBar, MouseWheelEvent e) {
+        if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+            int unitsToScroll = e.getUnitsToScroll();
+            int direction = unitsToScroll < 0 ? -1 : 1;
+            if (unitsToScroll != 0) {
+                int increment = scrollBar.getUnitIncrement(direction);
+                int oldValue = scrollBar.getValue();
+                int newValue = oldValue + increment * unitsToScroll;
+                newValue = Math.max(Math.min(newValue, scrollBar.getMaximum() -
+                        scrollBar.getVisibleAmount()), scrollBar.getMinimum());
+                if (oldValue != newValue) scrollBar.setValue(newValue);
+            }
+        }
     }
 
 

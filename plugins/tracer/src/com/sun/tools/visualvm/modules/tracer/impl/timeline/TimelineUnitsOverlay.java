@@ -124,8 +124,6 @@ final class TimelineUnitsOverlay extends ChartOverlay {
         if (painter.getIcon() != null)
             painter.setIcon(ColorIcon.BOTTOM_SHADOW);
         painter.paint(g);
-
-        painter.resetLocation();
     }
 
 

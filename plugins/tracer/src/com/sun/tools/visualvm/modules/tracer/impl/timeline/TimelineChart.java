@@ -28,11 +28,13 @@ package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
@@ -65,8 +67,8 @@ final class TimelineChart extends SynchronousXYChart {
     private final List<Row> rows;
     private final Map<ChartItem, Row> itemsToRows;
 
-    private int selectedRow = -1;
-    private Set selectionBlockers = new HashSet();
+    private final Set selectedRows = new TreeSet(new RowComparator());
+    private final Set selectionBlockers = new HashSet();
     private int lastHoverMode;
     private int lastMoveMode;
 
@@ -293,19 +295,54 @@ final class TimelineChart extends SynchronousXYChart {
 
     // --- Selection support ---------------------------------------------------
 
-    void setSelectedRow(int rowIndex) {
-        if (selectedRow == rowIndex) return;
-        selectedRow = rowIndex;
+    boolean selectRow(Row row) {
+        if (!selectedRows.add(row)) return false;
         repaintRows();
+        return true;
     }
 
-    int getSelectedRow() {
-        return selectedRow;
+    boolean unselectRow(Row row) {
+        if (!selectedRows.remove(row)) return false;
+        repaintRows();
+        return true;
     }
 
-    void clearSelection() {
-        setSelectedRow(-1);
+    boolean setSelectedRow(Row row) {
+        if (row == null) {
+            return clearRowsSelection();
+        } else {
+            if (selectedRows.size() == 1 && selectedRows.contains(row)) return false;
+            selectedRows.clear();
+            selectedRows.add(row);
+            repaintRows();
+            return true;
+        }
     }
+
+    boolean toggleRowSelection(Row row) {
+        if (selectedRows.contains(row)) return unselectRow(row);
+        else return selectRow(row);
+    }
+
+    boolean clearRowsSelection() {
+        if (selectedRows.isEmpty()) return false;
+        selectedRows.clear();
+        repaintRows();
+        return true;
+    }
+
+    boolean isRowSelected(Row row) {
+        return selectedRows.contains(row);
+    }
+
+    boolean isRowSelection() {
+        return !selectedRows.isEmpty();
+    }
+
+    List<Row> getSelectedRows() {
+        return new ArrayList(selectedRows);
+    }
+    
 
     void updateSelection(boolean enable, Object source) {
         int blockersSize = selectionBlockers.size();
@@ -672,6 +709,17 @@ final class TimelineChart extends SynchronousXYChart {
                 return (viewY + getOffsetY() - getViewInsets().top - marginTop) /
                        scaleY + bounds.y;
             }
+        }
+
+    }
+
+
+    private static class RowComparator implements Comparator<Row> {
+
+        public int compare(Row r1, Row r2) {
+            int r1i = r1.getIndex();
+            int r2i = r2.getIndex();
+            return (r1i < r2i ? -1 : (r1i == r2i ? 0 : 1));
         }
 
     }

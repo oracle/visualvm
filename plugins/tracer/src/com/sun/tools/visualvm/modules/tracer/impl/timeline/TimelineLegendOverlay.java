@@ -99,8 +99,6 @@ final class TimelineLegendOverlay extends ChartOverlay {
         painter.setForeground(LegendFont.FOREGROUND_COLOR);
         painter.setIcon(ColorIcon.BOTTOM_SHADOW);
         painter.paint(g);
-        
-        painter.resetLocation();
     }
 
 

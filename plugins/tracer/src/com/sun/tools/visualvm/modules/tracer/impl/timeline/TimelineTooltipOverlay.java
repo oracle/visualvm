@@ -38,12 +38,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.swing.LongRect;
@@ -80,10 +77,6 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
         setLayout(null);
 
-        final Runnable tooltipUpdater = new Runnable() {
-            public void run() { updateTooltip(chart); }
-        };
-
         chart.getSelectionModel().addSelectionListener(new ChartSelectionListener() {
 
             public void selectionModeChanged(int newMode, int oldMode) {}
@@ -92,7 +85,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
             public void highlightedItemsChanged(List<ItemSelection> currentItems,
                 List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-                SwingUtilities.invokeLater(tooltipUpdater);
+                updateTooltip(chart);
             }
 
             public void selectedItemsChanged(List<ItemSelection> currentItems,
@@ -107,7 +100,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
                                     long lastOffsetX, long lastOffsetY,
                                     double lastScaleX, double lastScaleY,
                                     int shiftX, int shiftY) {
-                SwingUtilities.invokeLater(tooltipUpdater);
+                updateTooltip(chart);
             }
 
         });
@@ -167,14 +160,16 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
         List<ItemSelection> highlightedItems =
                 selectionModel.getHighlightedItems();
 
-        XYItemSelection selection = highlightedItems.isEmpty() ? null :
-                                    (XYItemSelection)highlightedItems.get(0);
+        boolean noSelection = highlightedItems.isEmpty();
+        if (!noSelection) {
+            XYItemSelection sel = (XYItemSelection)highlightedItems.get(0);
+            noSelection = sel.getItem().getValuesCount() <= sel.getValueIndex();
+        }
 
         int rowsCount = chart.getRowsCount();
         for (int i = 0; i < rowsCount; i++) {
             TimelineTooltipPainter tooltipPainter = tooltipPainters[i];
-            if (selection == null ||
-                selection.getItem().getValuesCount() <= selection.getValueIndex()) {
+            if (noSelection) {
                 setPosition(null, tooltipPainter, i);
             } else {
                 TimelineChart.Row row = chart.getRow(i);

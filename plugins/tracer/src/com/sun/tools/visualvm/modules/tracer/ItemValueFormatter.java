@@ -91,6 +91,7 @@ public abstract class ItemValueFormatter {
         public String formatValue(long value, int format) {
             switch (format) {
                 case FORMAT_TOOLTIP:
+                case FORMAT_DETAILS:
                     return FORMAT.format(value);
                 case FORMAT_UNITS:
                     String est = value == 0 ? "" : "~";
@@ -103,6 +104,7 @@ public abstract class ItemValueFormatter {
         public String getUnits(int format) {
             switch (format) {
                 case FORMAT_TOOLTIP:
+                case FORMAT_DETAILS:
                     return "B";
                 case FORMAT_UNITS:
                     return "MB";
@@ -116,12 +118,16 @@ public abstract class ItemValueFormatter {
 
     public static final class Percent extends ItemValueFormatter {
 
-        private static final NumberFormat FORMAT;
+        private static final NumberFormat PERCENT_FORMAT;
+        private static final NumberFormat NUMBER_FORMAT;
 
         static {
-            FORMAT = NumberFormat.getPercentInstance();
-            FORMAT.setMinimumFractionDigits(1);
-            FORMAT.setMaximumIntegerDigits(3);
+            PERCENT_FORMAT = NumberFormat.getPercentInstance();
+            PERCENT_FORMAT.setMinimumFractionDigits(1);
+            PERCENT_FORMAT.setMaximumIntegerDigits(3);
+            NUMBER_FORMAT = NumberFormat.getInstance();
+            NUMBER_FORMAT.setMinimumFractionDigits(1);
+            NUMBER_FORMAT.setMaximumIntegerDigits(3);
         }
         
         private double factor;
@@ -137,10 +143,26 @@ public abstract class ItemValueFormatter {
 
 
         public String formatValue(long value, int format) {
-            return FORMAT.format(value / factor);
+            switch (format) {
+                case FORMAT_TOOLTIP:
+                case FORMAT_UNITS:
+                    return PERCENT_FORMAT.format(value / factor);
+                case FORMAT_DETAILS:
+                    return NUMBER_FORMAT.format(value * 100 / factor);
+                default:
+                    return null;
+            }
         }
         public String getUnits(int format) {
-            return null; // '%' provided by NumberFormat.getPercentInstance()
+            switch (format) {
+                case FORMAT_TOOLTIP:
+                case FORMAT_UNITS:
+                    return null; // '%' provided by NumberFormat.getPercentInstance()
+                case FORMAT_DETAILS:
+                    return "%"; // '%' is part of column header
+                default:
+                    return null;
+            }
         }
 
     }
