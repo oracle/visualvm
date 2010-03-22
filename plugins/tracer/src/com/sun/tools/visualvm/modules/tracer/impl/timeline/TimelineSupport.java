@@ -385,7 +385,7 @@ public final class TimelineSupport {
         final SynchronousXYItem[] selectedItemsArr =
                 selectedItems.toArray(new SynchronousXYItem[selectedItemsCount]);
         final String[] columnNames = new String[columnCount];
-        columnNames[0] = "Time";
+        columnNames[0] = "Time [ms]";
         for (int i = 1; i < columnCount; i++) {
             String itemName = selectedItemsArr[i - 1].getName();
             String unitsString = selectedDescriptors.get(i - 1).
