@@ -57,6 +57,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
@@ -207,12 +208,17 @@ class SaveViewAction extends AbstractAction {
                         pHandle.start();
                         
                         BufferedImage img = (bImage == null) ? viewProvider.getViewImage(visibleArea) : bImage;
-                        if (img != null) ImageIO.write(img, "png", file); //NOI18N
-                    } catch (IOException ex) {
-                        //ex.printStackTrace();
+                        FileImageOutputStream stream = new FileImageOutputStream( file );
+                        if (img != null) ImageIO.write(img, "png", stream); //NOI18N
                     } catch (OutOfMemoryError e) {
                         NetBeansProfiler.getDefaultNB().displayError(OOME_SAVING_MSG);
-                    } finally {
+                    } catch (IOException ex) {
+                        NetBeansProfiler.getDefaultNB().displayError(
+                                NbBundle.getMessage(SaveViewAction.class,
+                                "ExportAction_FileWriteErrorMsg", //NOI18N
+                                file.getAbsolutePath()));
+                    }
+                    finally {
                         if (bImage != null) {
                             bImage.flush();
                         }
