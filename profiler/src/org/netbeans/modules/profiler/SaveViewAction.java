@@ -208,8 +208,11 @@ class SaveViewAction extends AbstractAction {
                         pHandle.start();
                         
                         BufferedImage img = (bImage == null) ? viewProvider.getViewImage(visibleArea) : bImage;
-                        FileImageOutputStream stream = new FileImageOutputStream( file );
-                        if (img != null) ImageIO.write(img, "png", stream); //NOI18N
+                        if (img != null) {
+                            FileImageOutputStream stream = new FileImageOutputStream( file );
+                            ImageIO.write(img, "png", stream); //NOI18N
+                            stream.close();
+                        }
                     } catch (OutOfMemoryError e) {
                         NetBeansProfiler.getDefaultNB().displayError(OOME_SAVING_MSG);
                     } catch (IOException ex) {
