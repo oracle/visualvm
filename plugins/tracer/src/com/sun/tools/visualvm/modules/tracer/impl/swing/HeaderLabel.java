@@ -98,7 +98,9 @@ public final class HeaderLabel extends HeaderPanel {
 
     private static int computeHeight() {
         int height = new HeaderLabel("X").getPreferredSizeSuper().height; // NOI18N
-        if (UIManager.getLookAndFeel().getID().equals("Metal")) height += 4; // NOI18N
+        String lafID = UIManager.getLookAndFeel().getID();
+        if ("Metal".equals(lafID)) height += 4; // NOI18N
+        else if ("Aqua".equals(lafID)) height += 6; // NOI18N
         return height;
     }
 
