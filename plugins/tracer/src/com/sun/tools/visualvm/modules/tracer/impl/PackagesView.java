@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 
 import com.sun.tools.visualvm.modules.tracer.impl.probes.ProbeDescriptorComponent;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
@@ -41,6 +42,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -74,6 +76,7 @@ final class PackagesView {
                 final List<List<TracerProbeDescriptor>> descriptors = new ArrayList();
                 for (TracerPackage p : packages)
                     descriptors.add(Arrays.asList(p.getProbeDescriptors()));
+                Collections.sort(descriptors, Positionable.COMPARATOR);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() { displayPackages(packages, descriptors, view); }
                 });
