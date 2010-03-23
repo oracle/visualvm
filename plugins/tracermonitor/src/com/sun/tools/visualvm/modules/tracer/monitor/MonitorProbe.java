@@ -29,7 +29,6 @@ import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
