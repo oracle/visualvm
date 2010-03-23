@@ -55,10 +55,10 @@ public abstract class TracerPackageProvider<X extends DataSource> {
     
 
     /**
-     * Returns TracerPackage for the provided DataSource.
+     * Returns TracerPackages for the provided DataSource.
      *
-     * @return TracerPackage for the provided DataSource
+     * @return TracerPackages for the provided DataSource
      */
-    public abstract TracerPackage<X> getPackage(X dataSource);
+    public abstract TracerPackage<X>[] getPackages(X dataSource);
 
 }

@@ -56,8 +56,8 @@ class MonitorPackageProvider extends ModuleInstall {
 
         Impl() { super(Application.class); }
 
-        public TracerPackage<Application> getPackage(Application application) {
-            return new MonitorPackage(application);
+        public TracerPackage<Application>[] getPackages(Application application) {
+            return new MonitorPackage[] { new MonitorPackage(application) };
         }
 
     }

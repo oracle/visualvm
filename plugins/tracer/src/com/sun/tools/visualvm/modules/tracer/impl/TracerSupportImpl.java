@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
 import com.sun.tools.visualvm.modules.tracer.TracerPackageProvider;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -72,7 +73,7 @@ public final class TracerSupportImpl {
         List<TracerPackage> packages = new ArrayList();
         for (TracerPackageProvider provider : providers)
             if (provider.getScope().isInstance(dataSource))
-                packages.add(provider.getPackage(dataSource));
+                packages.addAll(Arrays.asList(provider.getPackages(dataSource)));
         Collections.sort(packages, Positionable.COMPARATOR);
         return packages;
     }
