@@ -74,9 +74,12 @@ final class PackagesView {
             public void run() {
                 final List<TracerPackage> packages = model.getPackages();
                 final List<List<TracerProbeDescriptor>> descriptors = new ArrayList();
-                for (TracerPackage p : packages)
-                    descriptors.add(Arrays.asList(p.getProbeDescriptors()));
-                Collections.sort(descriptors, Positionable.COMPARATOR);
+                for (TracerPackage p : packages) {
+                    TracerProbeDescriptor[] da = p.getProbeDescriptors();
+                    Arrays.sort(da, Positionable.COMPARATOR);
+                    List<TracerProbeDescriptor> dl = Arrays.asList(da);
+                    descriptors.add(dl);
+                }
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() { displayPackages(packages, descriptors, view); }
                 });
