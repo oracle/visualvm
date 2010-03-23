@@ -62,10 +62,11 @@ public interface PackageStateHandler<X extends DataSource> {
      *
      * @param probes probes defined for the Tracer session
      * @param dataSource monitored DataSource
+     * @param refresh session refresh rate
      * @return TracerProgressObject to track initialization progress
      */
     public TracerProgressObject sessionInitializing(TracerProbe<X>[] probes,
-            X dataSource);
+            X dataSource, int refresh);
 
     /**
      * Invoked when starting a new Tracer session. Any package/probes
@@ -114,6 +115,15 @@ public interface PackageStateHandler<X extends DataSource> {
      */
     public void sessionFinished(TracerProbe<X>[] probes, X dataSource);
 
+    /**
+     * Invoked when refresh rate of the Tracer session has been changed.
+     *
+     * @param probes probes defined for the Tracer session
+     * @param dataSource monitored DataSource
+     * @param refresh session refresh rate
+     */
+    public void refreshRateChanged(TracerProbe<X>[] probes, X dataSource, int refresh);
+
 
     /**
      * An abstract adapter class for receiving Tracer session state notifications.
@@ -135,10 +145,11 @@ public interface PackageStateHandler<X extends DataSource> {
          *
          * @param probes probes defined for the Tracer session
          * @param dataSource monitored DataSource
+         * @param refresh session refresh rate
          * @return TracerProgressObject null in default implementation
          */
         public TracerProgressObject sessionInitializing(TracerProbe<X>[] probes,
-                X dataSource) { return null; }
+                X dataSource, int refresh) { return null; }
 
         public void sessionStarting(TracerProbe<X>[] probes, X dataSource)
                 throws SessionInitializationException {}
@@ -148,6 +159,9 @@ public interface PackageStateHandler<X extends DataSource> {
         public void sessionStopping(TracerProbe<X>[] probes, X dataSource) {}
 
         public void sessionFinished(TracerProbe<X>[] probes, X dataSource) {}
+
+        public void refreshRateChanged(TracerProbe<X>[] probes, X dataSource,
+                int refresh) {}
 
     }
 

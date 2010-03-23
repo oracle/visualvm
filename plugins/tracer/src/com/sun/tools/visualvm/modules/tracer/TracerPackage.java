@@ -167,8 +167,8 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
                     SessionAware.this.probeRemoved(probe, dataSource);
                 }
                 public TracerProgressObject sessionInitializing(TracerProbe<X>[] probes,
-                    X dataSource) {
-                    return SessionAware.this.sessionInitializing(probes, dataSource);
+                    X dataSource, int refresh) {
+                    return SessionAware.this.sessionInitializing(probes, dataSource, refresh);
                 }
                 public void sessionStarting(TracerProbe<X>[] probes, X dataSource)
                         throws SessionInitializationException {
@@ -182,6 +182,10 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
                 }
                 public void sessionFinished(TracerProbe<X>[] probes, X dataSource) {
                     SessionAware.this.sessionFinished(probes, dataSource);
+                }
+                public void refreshRateChanged(TracerProbe<X>[] probes, X dataSource,
+                        int refresh) {
+                    SessionAware.this.refreshRateChanged(probes, dataSource, refresh);
                 }
             };
             return stateHandler;
@@ -214,10 +218,11 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
          *
          * @param probes probes defined for the Tracer session
          * @param dataSource monitored DataSource
+         * @param refresh session refresh rate
          * @return TracerProgressObject to track initialization progress
          */
         protected TracerProgressObject sessionInitializing(TracerProbe<X>[] probes,
-                X dataSource) { return null; }
+                X dataSource, int refresh) { return null; }
 
         /**
          * Invoked when starting a new Tracer session. Any package/probes
@@ -265,6 +270,16 @@ public abstract class TracerPackage<X extends DataSource> implements Positionabl
          * @param dataSource monitored DataSource
          */
         protected void sessionFinished(TracerProbe<X>[] probes, X dataSource) {}
+
+        /**
+         * Invoked when refresh rate of the Tracer session has been changed.
+         *
+         * @param probes probes defined for the Tracer session
+         * @param dataSource monitored DataSource
+         * @param refresh session refresh rate
+         */
+        protected void refreshRateChanged(TracerProbe<X>[] probes, X dataSource,
+                int refresh) {}
 
     }
 

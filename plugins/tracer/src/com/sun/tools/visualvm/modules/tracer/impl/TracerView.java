@@ -58,6 +58,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
@@ -423,7 +424,12 @@ final class TracerView extends DataSourceView {
                 refreshCombo.setEditable(false);
                 refreshCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        controller.setRefreshRate((Integer)refreshCombo.getSelectedItem());
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                controller.setRefreshRate(
+                                        (Integer)refreshCombo.getSelectedItem());
+                            }
+                        });
                     }
                 });
                 refreshCombo.setSelectedItem(Integer.valueOf(controller.getRefreshRate()));

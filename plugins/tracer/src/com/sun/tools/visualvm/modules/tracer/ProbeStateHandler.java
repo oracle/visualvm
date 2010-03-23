@@ -59,9 +59,10 @@ public interface ProbeStateHandler<X extends DataSource> {
      * messaging a delay during instrumention of classes in target application.
      *
      * @param dataSource monitored DataSource
+     * @param refresh session refresh rate
      * @return TracerProgressObject to track initialization progress
      */
-    public TracerProgressObject sessionInitializing(X dataSource);
+    public TracerProgressObject sessionInitializing(X dataSource, int refresh);
 
     /**
      * Invoked when starting a new Tracer session. Any probe initialization
@@ -106,6 +107,14 @@ public interface ProbeStateHandler<X extends DataSource> {
      */
     public void sessionFinished(X dataSource);
 
+    /**
+     * Invoked when refresh rate of the Tracer session has been changed.
+     *
+     * @param dataSource monitored DataSource
+     * @param refresh session refresh rate
+     */
+    public void refreshRateChanged(X dataSource, int refresh);
+
 
     /**
      * An abstract adapter class for receiving Tracer session state notifications.
@@ -126,9 +135,12 @@ public interface ProbeStateHandler<X extends DataSource> {
          * messaging a delay during instrumention of classes in target application.
          *
          * @param dataSource monitored DataSource
+         * @param refresh session refresh rate
          * @return TracerProgressObject null in default implementation
          */
-        public TracerProgressObject sessionInitializing(X dataSource) { return null; }
+        public TracerProgressObject sessionInitializing(X dataSource, int refresh) {
+            return null;
+        }
 
         public void sessionStarting(X dataSource)
                 throws SessionInitializationException {}
@@ -138,6 +150,8 @@ public interface ProbeStateHandler<X extends DataSource> {
         public void sessionStopping(X dataSource) {}
 
         public void sessionFinished(X dataSource) {}
+
+        public void refreshRateChanged(X dataSource, int refresh) {}
 
     }
 

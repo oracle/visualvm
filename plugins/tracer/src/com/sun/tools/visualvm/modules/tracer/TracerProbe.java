@@ -142,8 +142,8 @@ public abstract class TracerProbe<X extends DataSource> {
                 public void probeRemoved(X dataSource) {
                     SessionAware.this.probeRemoved(dataSource);
                 }
-                public TracerProgressObject sessionInitializing(X dataSource) {
-                    return SessionAware.this.sessionInitializing(dataSource);
+                public TracerProgressObject sessionInitializing(X dataSource, int refresh) {
+                    return SessionAware.this.sessionInitializing(dataSource, refresh);
                 }
                 public void sessionStarting(X dataSource)
                         throws SessionInitializationException {
@@ -157,6 +157,9 @@ public abstract class TracerProbe<X extends DataSource> {
                 }
                 public void sessionFinished(X dataSource) {
                     SessionAware.this.sessionFinished(dataSource);
+                }
+                public void refreshRateChanged(X dataSource, int refresh) {
+                    SessionAware.this.refreshRateChanged(dataSource, refresh);
                 }
             };
             return stateHandler;
@@ -186,9 +189,12 @@ public abstract class TracerProbe<X extends DataSource> {
          * messaging a delay during instrumention of classes in target application.
          *
          * @param dataSource monitored DataSource
+         * @param refresh session refresh rate
          * @return TracerProgressObject to track initialization progress
          */
-        protected TracerProgressObject sessionInitializing(X dataSource) { return null; }
+        protected TracerProgressObject sessionInitializing(X dataSource, int refresh) {
+            return null;
+        }
 
         /**
          * Invoked when starting a new Tracer session. Any probe initialization
@@ -232,6 +238,14 @@ public abstract class TracerProbe<X extends DataSource> {
          * @param dataSource monitored DataSource
          */
         protected void sessionFinished(X dataSource) {}
+
+        /**
+         * Invoked when refresh rate of the Tracer session has been changed.
+         *
+         * @param dataSource monitored DataSource
+         * @param refresh session refresh rate
+         */
+        protected void refreshRateChanged(X dataSource, int refresh) {}
 
     }
 

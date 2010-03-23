@@ -149,7 +149,12 @@ final class TracerController implements DataRemovedListener<DataSource>,
     // --- Session control -----------------------------------------------------
 
     void setRefreshRate(int refreshRate) {
-        if (timer != null) timer.setDelay(refreshRate);
+        if (timer != null && getRefreshRate() != refreshRate) {
+            Set<Map.Entry<TracerPackage, List<TracerProbe>>> toNotify =
+                model.getDefinedProbeSets();
+            notifyRefreshRateChanged(toNotify);
+            timer.setDelay(refreshRate);
+        }
     }
 
     int getRefreshRate() {
@@ -196,9 +201,11 @@ final class TracerController implements DataRemovedListener<DataSource>,
             List<TracerProbe> probes = item.getValue();
             TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
 
+            int refresh = getRefreshRate();
+
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {
-                TracerProgressObject c = ph.sessionInitializing(probesArr, dataSource);
+                TracerProgressObject c = ph.sessionInitializing(probesArr, dataSource, refresh);
                 if (c != null) {
                     steps += c.getSteps();
                     progresses.add(c);
@@ -212,7 +219,7 @@ final class TracerController implements DataRemovedListener<DataSource>,
                 TracerProbe probe = probesI.next();
                 ProbeStateHandler rh = probe.getStateHandler();
                 if (rh != null) try {
-                    TracerProgressObject c = rh.sessionInitializing(dataSource);
+                    TracerProgressObject c = rh.sessionInitializing(dataSource, refresh);
                     if (c != null)  {
                         steps += c.getSteps();
                         progresses.add(c);
@@ -359,6 +366,35 @@ final class TracerController implements DataRemovedListener<DataSource>,
                     rh.sessionFinished(dataSource);
                 } catch (Throwable t) {
                     LOGGER.log(Level.INFO, "Probe exception in sessionFinished", t); // NOI18N
+                }
+            }
+        }
+    }
+
+    private void notifyRefreshRateChanged(Set<Map.Entry<TracerPackage, List<TracerProbe>>> items) {
+        Iterator<Map.Entry<TracerPackage, List<TracerProbe>>> itemsI = items.iterator();
+        while (itemsI.hasNext()) {
+            Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
+            List<TracerProbe> probes = item.getValue();
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
+
+            int refresh = getRefreshRate();
+
+            PackageStateHandler ph = item.getKey().getStateHandler();
+            if (ph != null) try {
+                ph.refreshRateChanged(probesArr, dataSource, refresh);
+            } catch (Throwable t) {
+                LOGGER.log(Level.INFO, "Package exception in refreshRateChanged", t); // NOI18N
+            }
+
+            Iterator<TracerProbe> probesI = probes.iterator();
+            while (probesI.hasNext()) {
+                TracerProbe probe = probesI.next();
+                ProbeStateHandler rh = probe.getStateHandler();
+                if (rh != null) try {
+                    rh.refreshRateChanged(dataSource, refresh);
+                } catch (Throwable t) {
+                    LOGGER.log(Level.INFO, "Probe exception in refreshRateChanged", t); // NOI18N
                 }
             }
         }
