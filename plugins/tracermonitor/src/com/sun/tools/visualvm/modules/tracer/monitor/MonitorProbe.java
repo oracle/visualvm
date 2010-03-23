@@ -63,9 +63,7 @@ abstract class MonitorProbe extends TracerProbe<Application> {
             LOGGER.log(Level.INFO, "Failed to read Monitor data", t); // NOI18N
         }
 
-        long[] values = new long[valuesCount];
-        Arrays.fill(values, 0);
-        return values;
+        return new long[valuesCount];
     }
 
     abstract long[] getValues(MonitoredData data);
