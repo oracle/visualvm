@@ -172,7 +172,7 @@ final class TracerModel {
         fireProbeRemoved(probe, probesDefined);
     }
 
-    private void notifyProbeAdded(TracerPackage p, TracerProbe r) {
+    private void notifyProbeAdded(TracerPackage p, TracerProbe<DataSource> r) {
         PackageStateHandler ph = p.getStateHandler();
         if (ph != null) try {
             ph.probeAdded(r, dataSource);
@@ -188,7 +188,7 @@ final class TracerModel {
         }
     }
 
-    private void notifyProbeRemoved(TracerPackage p, TracerProbe r) {
+    private void notifyProbeRemoved(TracerPackage p, TracerProbe<DataSource> r) {
         PackageStateHandler ph = p.getStateHandler();
         if (ph != null) try {
             ph.probeRemoved(r, dataSource);
