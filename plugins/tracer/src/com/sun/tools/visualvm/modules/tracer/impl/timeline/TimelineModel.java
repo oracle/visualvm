@@ -41,8 +41,6 @@ final class TimelineModel implements Timeline {
 
     private static final int STORAGE_BUFFER_STEP = 50;
 
-    public static final long NO_VALUE = Long.MIN_VALUE - 1;
-
     private int bufferStep;
 
     private int valuesCount;

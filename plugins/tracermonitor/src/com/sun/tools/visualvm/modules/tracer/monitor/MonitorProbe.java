@@ -29,16 +29,13 @@ import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Arrays;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 abstract class MonitorProbe extends TracerProbe<Application> {
-
-    private static final Logger LOGGER = Logger.getLogger(MonitorProbe.class.getName());
 
     private final MonitoredDataResolver resolver;
 
@@ -55,14 +52,12 @@ abstract class MonitorProbe extends TracerProbe<Application> {
 
 
     public synchronized final long[] getItemValues(long timestamp) {
-        try {
-            MonitoredData data = resolver.getMonitoredData(timestamp);
-            if (data != null) return getValues(data);
-        } catch (Throwable t) {
-            LOGGER.log(Level.INFO, "Failed to read Monitor data", t); // NOI18N
-        }
-
-        return new long[valuesCount];
+        MonitoredData data = resolver.getMonitoredData(timestamp);
+        if (data != null) return getValues(data);
+        
+        long[] noData = new long[valuesCount];
+        Arrays.fill(noData, ProbeItemDescriptor.VALUE_UNDEFINED);
+        return noData;
     }
 
     abstract long[] getValues(MonitoredData data);

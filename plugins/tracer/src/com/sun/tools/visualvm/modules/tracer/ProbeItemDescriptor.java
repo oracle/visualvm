@@ -43,6 +43,7 @@ public abstract class ProbeItemDescriptor {
 
     public static final long MIN_VALUE_UNDEFINED = Long.MAX_VALUE;
     public static final long MAX_VALUE_UNDEFINED = Long.MIN_VALUE;
+    public static final long VALUE_UNDEFINED = Long.MIN_VALUE - 1;
 
     public static final Color DEFAULT_COLOR = new Color(0, 0, 0); // use == to identify this instance!
 

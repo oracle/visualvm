@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.modules.tracer.PackageStateHandler;
+import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.ProbeStateHandler;
 import com.sun.tools.visualvm.modules.tracer.SessionInitializationException;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
@@ -41,6 +42,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -448,7 +450,14 @@ final class TracerController implements DataRemovedListener<DataSource>,
         final long timestamp = System.currentTimeMillis();
 
         for (TracerProbe probe : probes) {
-            long[] itemValues = probe.getItemValues(timestamp);
+            long[] itemValues;
+            try {
+                itemValues = probe.getItemValues(timestamp);
+            } catch (Throwable t) {
+                itemValues = new long[probe.getItemsCount()];
+                Arrays.fill(itemValues, ProbeItemDescriptor.VALUE_UNDEFINED);
+                LOGGER.log(Level.INFO, "Probe exception in getItemValues", t); // NOI18N
+            }
             for (int i = 0; i < itemValues.length; i++)
                 values[currentIndex++] = itemValues[i];
         }
