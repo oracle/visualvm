@@ -178,8 +178,8 @@ public final class DetailsPanel extends JPanel {
             });
         }
 
-        public void paint(Graphics g) {
-            super.paint(g);
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
             paintVerticalLines(g);
         }
 

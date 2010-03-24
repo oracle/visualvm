@@ -44,10 +44,11 @@ import javax.swing.plaf.basic.BasicLabelUI;
 public class LabelRenderer extends JLabel {
 
     private static final LabelUI UI = new BasicLabelUI();
+    private static final int DIRTY = Integer.MIN_VALUE;
 
     private int x;
     private int y;
-    private Insets insets;
+    private Insets insets = new Insets(0, 0, 0, 0);
     private Dimension preferredSize;
 
     private FontMetrics fontMetrics;
@@ -72,12 +73,11 @@ public class LabelRenderer extends JLabel {
     // --- Implementation ------------------------------------------------------
 
     public Insets getInsets() {
-        if (insets == null) insets = new Insets(0, 0, 0, 0);
         return insets;
     }
 
     public Insets getInsets(Insets insets) {
-        return getInsets();
+        return this.insets;
     }
 
     public void setLocation(int x, int y) {
@@ -86,7 +86,10 @@ public class LabelRenderer extends JLabel {
     }
 
     public Dimension getPreferredSize() {
-        if (preferredSize == null) preferredSize = new Dimension();
+        if (preferredSize == null) preferredSize = new Dimension(DIRTY, DIRTY);
+        boolean dirtyWidth = preferredSize.width == DIRTY;
+        boolean dirtyHeight = preferredSize.height == DIRTY;
+        if (dirtyWidth || dirtyHeight) updatePreferredSize(dirtyWidth, dirtyHeight);
         return preferredSize;
     }
 
@@ -94,11 +97,23 @@ public class LabelRenderer extends JLabel {
         super.setUI(UI);
     }
 
-    private void updatePreferredSize() {
-        if (ui == null || fontMetrics == null) return;
-        Dimension dim = getPreferredSize();
-        dim.width = ui.getPreferredSize(this).width;
-        dim.height = fontMetrics.getAscent() + fontMetrics.getDescent();
+    private void updatePreferredSize(boolean width, boolean height) {
+        if (width) preferredSize.width = getPreferredWidth();
+        if (height) preferredSize.height = fontMetrics.getAscent() +
+                                           fontMetrics.getDescent();
+    }
+
+    private void resetPreferredSize(boolean width, boolean height) {
+        if (preferredSize == null) return;
+        if (width) preferredSize.width = DIRTY;
+        if (height) preferredSize.height = DIRTY;
+    }
+
+    private int getPreferredWidth() {
+        int iconWidth = icon == null ? 0 : icon.getIconWidth();
+        int textWidth = text == null || text.isEmpty() ? 0 : fontMetrics.stringWidth(text);
+        int iconGap = iconWidth == 0 || textWidth == 0 ? 0 : getIconTextGap();
+        return iconWidth + iconGap + textWidth;
     }
 
     protected void prePaint(Graphics g) {}
@@ -112,7 +127,7 @@ public class LabelRenderer extends JLabel {
         else insets.set(y, x, 0, 0);
 
         prePaint(g);
-        ui.update(cg, this);
+        ui.paint(cg, this);
         postPaint(g);
         
         if (!translate) insets.set(0, 0, 0, 0);
@@ -125,7 +140,7 @@ public class LabelRenderer extends JLabel {
     // Overridden for performance reasons.
     public void setText(String text) {
         this.text = text;
-        updatePreferredSize();
+        resetPreferredSize(true, false);
     }
 
     // Overridden for performance reasons.
@@ -135,8 +150,10 @@ public class LabelRenderer extends JLabel {
 
     // Overridden for performance reasons.
     public void setIcon(Icon icon) {
+        int oldIconWidth = this.icon == null ? -1 : this.icon.getIconWidth();
+        int newIconWidth = icon == null ? -1 : icon.getIconWidth();
         this.icon = icon;
-        updatePreferredSize();
+        if (oldIconWidth != newIconWidth) resetPreferredSize(true, false);
     }
 
     // Overridden for performance reasons.
@@ -178,7 +195,7 @@ public class LabelRenderer extends JLabel {
     public void setFont(Font font) {
         super.setFont(font);
         fontMetrics = super.getFontMetrics(font);
-        updatePreferredSize();
+        resetPreferredSize(true, true);
     }
 
     // Overridden for performance reasons.
