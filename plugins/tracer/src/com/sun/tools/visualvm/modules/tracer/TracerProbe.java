@@ -36,35 +36,20 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
  */
 public abstract class TracerProbe<X extends DataSource> {
 
-    private final TracerProbeDescriptor descriptor;
     private final ProbeItemDescriptor[] itemDescriptors;
 
 
     /**
      * Creates new instance of TracerProbe.
      *
-     * @param descriptor descriptor of UI appearance of the probe
      * @param itemDescriptors descriptors of UI appearance of items provided by the probe
      */
-    public TracerProbe(TracerProbeDescriptor descriptor,
-                       ProbeItemDescriptor[] itemDescriptors) {
-
-        if (descriptor == null)
-            throw new IllegalArgumentException("Invalid TracerProbeDescriptor"); // NOI18N
+    public TracerProbe(ProbeItemDescriptor[] itemDescriptors) {
         if (itemDescriptors == null || itemDescriptors.length == 0)
             throw new IllegalArgumentException("Invalid ProbeItemDescriptors"); // NOI18N
-
-        this.descriptor = descriptor;
         this.itemDescriptors = itemDescriptors;
     }
 
-
-    /**
-     * Returns descriptor of UI appearance of the probe.
-     *
-     * @return descriptor of UI appearance of the probedescriptor of UI appearance of the probe
-     */
-    public final TracerProbeDescriptor getDescriptor() { return descriptor; }
 
     /**
      * Returns descriptors of UI appearance of items provided by the probe.
@@ -122,9 +107,8 @@ public abstract class TracerProbe<X extends DataSource> {
          * @param descriptor descriptor of UI appearance of the probe
          * @param itemDescriptors descriptors of UI appearance of items provided by the probe
          */
-        public SessionAware(TracerProbeDescriptor descriptor,
-                          ProbeItemDescriptor[] itemDescriptors) {
-            super(descriptor, itemDescriptors);
+        public SessionAware(ProbeItemDescriptor[] itemDescriptors) {
+            super(itemDescriptors);
         }
 
 

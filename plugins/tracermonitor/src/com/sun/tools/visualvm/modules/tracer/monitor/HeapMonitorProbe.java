@@ -43,8 +43,8 @@ class HeapMonitorProbe extends MonitorProbe {
     private static final int POSITION = 20;
 
 
-    HeapMonitorProbe(TracerProbeDescriptor descriptor, MonitoredDataResolver resolver) {
-        super(descriptor, 2, createItemDescriptors(), resolver);
+    HeapMonitorProbe(MonitoredDataResolver resolver) {
+        super(2, createItemDescriptors(), resolver);
     }
 
 

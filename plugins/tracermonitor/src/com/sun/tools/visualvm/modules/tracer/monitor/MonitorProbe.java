@@ -28,7 +28,6 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import java.util.Arrays;
 
 /**
@@ -42,10 +41,9 @@ abstract class MonitorProbe extends TracerProbe<Application> {
     private final int valuesCount;
 
 
-    MonitorProbe(TracerProbeDescriptor descriptor, int valuesCount,
-                ProbeItemDescriptor[] itemDescriptors,
-                MonitoredDataResolver resolver) {
-        super(descriptor, itemDescriptors);
+    MonitorProbe(int valuesCount, ProbeItemDescriptor[] itemDescriptors,
+                 MonitoredDataResolver resolver) {
+        super(itemDescriptors);
         this.valuesCount = valuesCount;
         this.resolver = resolver;
     }

@@ -43,8 +43,8 @@ class ThreadsMonitorProbe extends MonitorProbe {
     private static final int POSITION = 50;
 
 
-    ThreadsMonitorProbe(TracerProbeDescriptor descriptor, MonitoredDataResolver resolver) {
-        super(descriptor, 2, createItemDescriptors(), resolver);
+    ThreadsMonitorProbe(MonitoredDataResolver resolver) {
+        super(2, createItemDescriptors(), resolver);
     }
 
 

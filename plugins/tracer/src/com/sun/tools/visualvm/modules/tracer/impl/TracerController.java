@@ -265,7 +265,7 @@ final class TracerController implements DataRemovedListener<DataSource>,
                 Iterator<TracerProbe> probesI = probes.iterator();
                 while (probesI.hasNext()) {
                     TracerProbe probe = probesI.next();
-                    notifiedName = probe.getDescriptor().getProbeName();
+                    notifiedName = model.getDescriptor(probe).getProbeName();
                     ProbeStateHandler rh = probe.getStateHandler();
                     if (rh != null) rh.sessionStarting(dataSource);
                     notifiedList.add(probe);

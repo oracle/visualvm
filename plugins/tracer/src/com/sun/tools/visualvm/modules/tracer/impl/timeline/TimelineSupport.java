@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
+import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
 import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsPanel;
 import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsTableModel;
@@ -69,6 +70,7 @@ public final class TimelineSupport {
 
     private final List<TracerProbe> probes = new ArrayList();
     private final List<TimelineChart.Row> rows = new ArrayList();
+    private final DescriptorResolver descriptorResolver;
 
     private int[] selectedTimestamps = new int[0];
     private final Set<SelectionListener> selectionListeners = new HashSet();
@@ -76,7 +78,9 @@ public final class TimelineSupport {
 
     // --- Constructor ---------------------------------------------------------
 
-    public TimelineSupport() {
+    public TimelineSupport(DescriptorResolver descriptorResolver) {
+        this.descriptorResolver = descriptorResolver;
+        
         // TODO: must be called in EDT!
         model = new TimelineModel();
         itemsModel = new SynchronousXYItemsModel(model);
@@ -338,6 +342,13 @@ public final class TimelineSupport {
     }
 
 
+    // --- Probe -> Descriptor mapping -----------------------------------------
+
+    TracerProbeDescriptor getDescriptor(TracerProbe p) {
+        return descriptorResolver.getDescriptor(p);
+    }
+
+
     // --- Values management ---------------------------------------------------
 
     public void addValues(final long timestamp, final long[] newValues) {
@@ -480,7 +491,13 @@ public final class TimelineSupport {
 
     public static interface SelectionListener {
 
-        void selectionChanged();
+        public void selectionChanged();
+
+    }
+
+    public static interface DescriptorResolver {
+
+        public TracerProbeDescriptor getDescriptor(TracerProbe p);
 
     }
 

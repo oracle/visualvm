@@ -59,6 +59,7 @@ final class TracerModel {
     private final DataSource dataSource;
 
     private final Map<TracerPackage, List<TracerProbe>> probesCache = new HashMap();
+    private final Map<TracerProbe, TracerProbeDescriptor> descriptorsCache = new HashMap();
 
     private final Set<Listener> listeners = new HashSet();
 
@@ -69,8 +70,11 @@ final class TracerModel {
 
     TracerModel(DataSource dataSource) {
         this.dataSource = dataSource;
-        
-        timelineSupport = new TimelineSupport();
+        timelineSupport = new TimelineSupport(new TimelineSupport.DescriptorResolver() {
+            public TracerProbeDescriptor getDescriptor(TracerProbe p) {
+                return TracerModel.this.getDescriptor(p);
+            }
+        });
     }
 
 
@@ -91,17 +95,23 @@ final class TracerModel {
     // --- Probes --------------------------------------------------------------
 
     void addDescriptor(final TracerPackage<DataSource> p,
-                              final TracerProbeDescriptor d) {
+                       final TracerProbeDescriptor d) {
         RequestProcessor.getDefault().post(new Runnable() {
-            public void run() { addProbe(p, p.getProbe(d)); }
+            public void run() { addProbe(p, d); }
         });
     }
 
     void removeDescriptor(final TracerPackage<DataSource> p,
-                                 final TracerProbeDescriptor d) {
+                          final TracerProbeDescriptor d) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() { removeProbe(p, d); }
         });
+    }
+
+    TracerProbeDescriptor getDescriptor(TracerProbe p) {
+        synchronized(descriptorsCache) {
+            return descriptorsCache.get(p);
+        }
     }
 
     // Must be called in EDT
@@ -129,7 +139,11 @@ final class TracerModel {
     }
 
 
-    private void addProbe(TracerPackage<DataSource> p, TracerProbe<DataSource> r) {
+    private void addProbe(TracerPackage<DataSource> p, TracerProbeDescriptor d) {
+        TracerProbe<DataSource> r = p.getProbe(d);
+        synchronized(descriptorsCache) {
+            descriptorsCache.put(r, d);
+        }
         synchronized(probesCache) {
             List<TracerProbe> probes = probesCache.get(p);
             if (probes == null) {
@@ -149,17 +163,21 @@ final class TracerModel {
         TracerProbe probe = null;
         boolean probesDefined = true;
 
-        synchronized(probesCache) {
-            List<TracerProbe> probes = probesCache.get(p);
-            Iterator<TracerProbe> probesI = probes.iterator();
-            while (probesI.hasNext()) {
-                TracerProbe r = probesI.next();
-                if (r.getDescriptor().equals(d)) {
-                    probesI.remove();
-                    probe = r;
+        synchronized(descriptorsCache) {
+            Iterator<Map.Entry<TracerProbe, TracerProbeDescriptor>> iter =
+                    descriptorsCache.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<TracerProbe, TracerProbeDescriptor> entry = iter.next();
+                if (entry.getValue() == d) {
+                    probe = entry.getKey();
                     break;
                 }
             }
+            descriptorsCache.remove(probe);
+        }
+        synchronized(probesCache) {
+            List<TracerProbe> probes = probesCache.get(p);
+            probes.remove(probe);
             if (probes.isEmpty()) {
                 probesCache.remove(p);
                 probesDefined = !probesCache.isEmpty();

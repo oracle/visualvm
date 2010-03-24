@@ -43,8 +43,8 @@ class ClassesMonitorProbe extends MonitorProbe {
     private static final int POSITION = 40;
 
 
-    ClassesMonitorProbe(TracerProbeDescriptor descriptor, MonitoredDataResolver resolver) {
-        super(descriptor, 2, createItemDescriptors(), resolver);
+    ClassesMonitorProbe(MonitoredDataResolver resolver) {
+        super(2, createItemDescriptors(), resolver);
     }
 
 

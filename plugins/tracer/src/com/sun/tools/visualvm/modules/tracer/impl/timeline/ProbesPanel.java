@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
+import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.impl.probes.ProbePresenter;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderButton;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
@@ -130,9 +131,11 @@ final class ProbesPanel extends JPanel {
 
         chart.addRowListener(new TimelineChart.RowListener() {
             public void rowsAdded(List<TimelineChart.Row> rows) {
-                for (TimelineChart.Row row : rows)
-                    listPanel.add(new ProbePresenter(support.getProbe(row)),
-                                  row.getIndex());
+                for (TimelineChart.Row row : rows) {
+                    TracerProbe probe = support.getProbe(row);
+                    listPanel.add(new ProbePresenter(probe, support.
+                                  getDescriptor(probe)), row.getIndex());
+                }
                 listPanel.sync();
                 refreshButtons(true);
             }

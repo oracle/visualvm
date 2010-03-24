@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl.probes;
 
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
+import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -50,8 +51,8 @@ public final class ProbePresenter extends JLabel {
     
     private boolean isSelected = false;
 
-    public ProbePresenter(TracerProbe p) {
-        super(p.getDescriptor().getProbeName(), p.getDescriptor().getProbeIcon(), JLabel.LEADING);
+    public ProbePresenter(TracerProbe p, TracerProbeDescriptor d) {
+        super(d.getProbeName(), d.getProbeIcon(), JLabel.LEADING);
         setIconTextGap(7);
         setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 1, 1, 1, Color.LIGHT_GRAY),

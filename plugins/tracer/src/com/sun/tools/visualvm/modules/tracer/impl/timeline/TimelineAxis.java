@@ -120,7 +120,7 @@ final class TimelineAxis extends JPanel {
 
             public void selectedItemsChanged(List<ItemSelection> currentItems,
               List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-
+                
                 marks.refresh();
                 marks.repaint();
             }
@@ -188,6 +188,7 @@ final class TimelineAxis extends JPanel {
         private final TimelineSupport support;
 
         private final EnhancedLabelRenderer timeRenderer;
+        private final int timeRendererHeight;
         private final Format timeFormat;
 
         private final List<Integer> selections = new ArrayList();
@@ -204,6 +205,7 @@ final class TimelineAxis extends JPanel {
             timeRenderer.setBackground(Color.WHITE);
             timeRenderer.setMargin(new Insets(1, 2, 1, 2));
             timeRenderer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            timeRendererHeight = timeRenderer.getPreferredSize().height;
             timeFormat = new SimpleDateFormat(TimeAxisUtils.getFormatString(1, 1, 1));
 
             setOpaque(false);
@@ -215,11 +217,14 @@ final class TimelineAxis extends JPanel {
 
         void refresh() {
             int[] selectedIndexes = support.getSelectedTimestamps();
+            if (selectedIndexes.length == 0 && selections.isEmpty()) return;
+
             SynchronousXYItemsModel model = (SynchronousXYItemsModel)chart.getItemsModel();
             Timeline timeline = model.getTimeline();
             ChartContext context = chart.getChartContext();
             selections.clear();
             times.clear();
+
             for (int selectedIndex : selectedIndexes) {
                 long time = timeline.getTimestamp(selectedIndex);
                 int x = Utils.checkedInt(context.getViewX(time));
@@ -232,11 +237,13 @@ final class TimelineAxis extends JPanel {
 
 
         public void paint(Graphics g) {
-            if (selections == null) return;
+            if (selections == null || selections.isEmpty()) return;
+
             int h = getHeight();
             int my = h - 5 - MARK_HEIGHT;
-            int py = (h - timeRenderer.getPreferredSize().height) / 2;
+            int py = (h - timeRendererHeight) / 2;
             int selectionsCount = selections.size();
+            
             for (int i = 0; i < selectionsCount; i++)
                 paintMark(g, selections.get(i), my, py, times.get(i));
         }
@@ -309,20 +316,7 @@ final class TimelineAxis extends JPanel {
 
             marksComputer.refresh();
 
-            paintAxis(g, clip, chartBounds);
-        }
-
-        protected void paintHorizontalBasis(Graphics g, Rectangle clip,
-                                                        Rectangle chartMask) {}
-
-        protected int getAxisBasisExtent() {
-            return 3;
-        }
-
-        protected void paintHorizontalTick(Graphics g, AxisMark mark, int x,
-                                       Rectangle clip, Rectangle chartMask) {
-            g.setColor(getForeground());
-            g.drawLine(x, 1, x, 1 + getAxisBasisExtent());
+            paintHorizontalAxis(g, clip, chartBounds);
         }
 
         protected void paintHorizontalMesh(Graphics2D g, Rectangle clip, Rectangle chartMask) {
@@ -347,8 +341,6 @@ final class TimelineAxis extends JPanel {
         }
 
         protected void paintHorizontalAxis(Graphics g, Rectangle clip, Rectangle chartMask) {
-            paintHorizontalBasis(g, clip, chartMask);
-
             int viewStart = SwingUtilities.convertPoint(this, chartMask.x, 0, chart).x - 1; // -1: extra 1px for axis
             int viewEnd = viewStart + chartMask.width + 2; // +2 extra 1px + 1px for axis
 
@@ -373,11 +365,10 @@ final class TimelineAxis extends JPanel {
                 if (x + markOffsetX < clip.x ||
                     x - markOffsetX >= clip.x + clip.width) continue;
 
-                paintHorizontalTick(g, mark, x, clip, chartMask);
+                g.setColor(getForeground());
+                g.drawLine(x, 1, x, 3);
                 
                 int markOffsetY = (getHeight() - painterSize.height) / 2 + LAF_OFFSET;
-
-                g.setColor(getForeground());
                 painter.setLocation(x - markOffsetX, markOffsetY);
                 painter.paint(g);
             }

@@ -58,9 +58,9 @@ class CpuMonitorProbe extends MonitorProbe {
     private long prevProcessGcTime = -1;
 
 
-    CpuMonitorProbe(TracerProbeDescriptor descriptor, MonitoredDataResolver resolver,
-                    Application application, Jvm jvm) {
-        super(descriptor, 2, createItemDescriptors(), resolver);
+    CpuMonitorProbe(MonitoredDataResolver resolver, Application application,
+                    Jvm jvm) {
+        super(2, createItemDescriptors(), resolver);
         cpuSupported = jvm.isCpuMonitoringSupported();
         gcSupported = jvm.isCollectionTimeSupported();
         int pCount = 1;

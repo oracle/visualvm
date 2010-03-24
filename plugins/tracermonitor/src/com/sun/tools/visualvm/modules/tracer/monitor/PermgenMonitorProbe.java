@@ -43,8 +43,8 @@ class PermgenMonitorProbe extends MonitorProbe {
     private static final int POSITION = 30;
 
 
-    PermgenMonitorProbe(TracerProbeDescriptor descriptor, MonitoredDataResolver resolver) {
-        super(descriptor, 2, createItemDescriptors(), resolver);
+    PermgenMonitorProbe(MonitoredDataResolver resolver) {
+        super(2, createItemDescriptors(), resolver);
     }
 
 

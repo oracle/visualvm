@@ -90,24 +90,23 @@ class MonitorPackage extends TracerPackage<Application> implements MonitorProbe.
     public TracerProbe<Application> getProbe(TracerProbeDescriptor descriptor) {
         if (descriptor == cpuProbeDescriptor) {
             if (cpuProbe == null)
-                cpuProbe = new CpuMonitorProbe(cpuProbeDescriptor, this,
-                                               application, jvm);
+                cpuProbe = new CpuMonitorProbe(this, application, jvm);
             return cpuProbe;
         } else if (descriptor == heapProbeDescriptor) {
             if (heapProbe == null)
-                heapProbe = new HeapMonitorProbe(heapProbeDescriptor, this);
+                heapProbe = new HeapMonitorProbe(this);
             return heapProbe;
         } else if (descriptor == permgenProbeDescriptor) {
             if (permgenProbe == null)
-                permgenProbe = new PermgenMonitorProbe(permgenProbeDescriptor, this);
+                permgenProbe = new PermgenMonitorProbe(this);
             return permgenProbe;
         } else if (descriptor == classesProbeDescriptor) {
             if (classesProbe == null)
-                classesProbe = new ClassesMonitorProbe(classesProbeDescriptor, this);
+                classesProbe = new ClassesMonitorProbe(this);
             return classesProbe;
         } else if (descriptor == threadsProbeDescriptor) {
             if (threadsProbe == null)
-                threadsProbe = new ThreadsMonitorProbe(threadsProbeDescriptor, this);
+                threadsProbe = new ThreadsMonitorProbe(this);
             return threadsProbe;
         } else {
             return null;
