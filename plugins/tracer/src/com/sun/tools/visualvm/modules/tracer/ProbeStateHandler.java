@@ -59,7 +59,7 @@ public interface ProbeStateHandler<X extends DataSource> {
      * messaging a delay during instrumention of classes in target application.
      *
      * @param dataSource monitored DataSource
-     * @param refresh session refresh rate
+     * @param refresh session refresh rate in miliseconds
      * @return TracerProgressObject to track initialization progress
      */
     public TracerProgressObject sessionInitializing(X dataSource, int refresh);
@@ -111,7 +111,7 @@ public interface ProbeStateHandler<X extends DataSource> {
      * Invoked when refresh rate of the Tracer session has been changed.
      *
      * @param dataSource monitored DataSource
-     * @param refresh session refresh rate
+     * @param refresh session refresh rate in miliseconds
      */
     public void refreshRateChanged(X dataSource, int refresh);
 
@@ -135,7 +135,7 @@ public interface ProbeStateHandler<X extends DataSource> {
          * messaging a delay during instrumention of classes in target application.
          *
          * @param dataSource monitored DataSource
-         * @param refresh session refresh rate
+         * @param refresh session refresh rate in miliseconds
          * @return TracerProgressObject null in default implementation
          */
         public TracerProgressObject sessionInitializing(X dataSource, int refresh) {
