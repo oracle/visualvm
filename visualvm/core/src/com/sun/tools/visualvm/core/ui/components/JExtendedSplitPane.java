@@ -26,9 +26,8 @@
 package com.sun.tools.visualvm.core.ui.components;
 
 import java.awt.Component;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import javax.swing.JSplitPane;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
@@ -38,36 +37,14 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
  * @author Jiri Sedlacek
  */
 class JExtendedSplitPane extends JSplitPane {
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class SplitPaneComponentListener extends ComponentAdapter {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public void componentHidden(ComponentEvent e) {
-            computeDividerLocationWhenHidden(e.getComponent());
-
-            if ((dividerLocation <= 0) || (dividerLocation >= 1)) {
-                dividerLocation = 0.5;
-            }
-
-            updateVisibility();
-        }
-
-        public void componentShown(ComponentEvent e) {
-            updateVisibility();
-        }
-    }
-
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    transient private ComponentListener splitPaneComponentListener = new SplitPaneComponentListener();
+    private HierarchyListener leftComponentListener;
+    private HierarchyListener rightComponentListener;
     
     private double dividerLocation;
     private int customDividerSize;
     private double requestedDividerLocation = -1;
 
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
     
     public JExtendedSplitPane(int newOrientation, Component newLeftComponent, Component newRightComponent) {
         this(newOrientation, false, newLeftComponent, newRightComponent);
@@ -76,30 +53,22 @@ class JExtendedSplitPane extends JSplitPane {
     public JExtendedSplitPane(int newOrientation, boolean newContinuousLayout, Component newLeftComponent,
                               Component newRightComponent) {
         super(newOrientation, newContinuousLayout, newLeftComponent, newRightComponent);
-        registerListeners(newLeftComponent);
-        registerListeners(newRightComponent);
+
         updateVisibility();
 
-        if (!newLeftComponent.isVisible()) {
+        if (!newLeftComponent.isVisible())
             computeDividerLocationWhenInitiallyHidden(newLeftComponent);
-        }
 
-        if (!newRightComponent.isVisible()) {
+        if (!newRightComponent.isVisible())
             computeDividerLocationWhenInitiallyHidden(newRightComponent);
-        }
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public void setBottomComponent(Component comp) {
-        setRightComponent(comp);
-    }
 
     public void setDividerSize(int newSize) {
         super.setDividerSize(newSize);
         customDividerSize = newSize;
     }
-    
+
     public void setDividerLocation(double requestedDividerLocation) {
         Component divider = getDivider();
         if (isVisible() && divider.isVisible()) { // SplitPane fully visible
@@ -112,39 +81,39 @@ class JExtendedSplitPane extends JSplitPane {
         }
     }
 
-    public void setLeftComponent(Component comp) { // Actually setTopComponent is implemented as setLeftComponent
 
-        if (getLeftComponent() != null) {
-            unregisterListeners(getLeftComponent());
+    public void setLeftComponent(Component newLeftComponent) {
+        if (leftComponent != null) {
+            leftComponent.removeHierarchyListener(leftComponentListener);
+            leftComponentListener = null;
         }
 
-        super.setLeftComponent(comp);
+        super.setLeftComponent(newLeftComponent);
 
         if (getLeftComponent() != null) {
-            registerListeners(getLeftComponent());
+            leftComponentListener = new VisibilityListener(newLeftComponent);
+            newLeftComponent.addHierarchyListener(leftComponentListener);
         }
 
         updateVisibility();
     }
 
-    public void setRightComponent(Component comp) { // Actually setBottomComponent is implemented as setRightComponent
-
-        if (getRightComponent() != null) {
-            unregisterListeners(getRightComponent());
+    public void setRightComponent(Component newRightComponent) {
+        if (rightComponent != null) {
+            rightComponent.removeHierarchyListener(rightComponentListener);
+            rightComponentListener = null;
         }
 
-        super.setRightComponent(comp);
+        super.setRightComponent(newRightComponent);
 
         if (getRightComponent() != null) {
-            registerListeners(getRightComponent());
+            rightComponentListener = new VisibilityListener(newRightComponent);
+            newRightComponent.addHierarchyListener(rightComponentListener);
         }
 
         updateVisibility();
     }
-
-    public void setTopComponent(Component comp) {
-        setLeftComponent(comp);
-    }
+    
 
     public void reshape(int x, int y, int width, int height) {
         super.reshape(x, y, width, height);
@@ -159,121 +128,109 @@ class JExtendedSplitPane extends JSplitPane {
         }
     }
 
+    
     private Component getDivider() {
-        if (getUI() == null) {
-            return null;
-        }
-
-        return ((BasicSplitPaneUI) getUI()).getDivider();
-    }
-
-    private Component getFirstComponent() {
-        if (getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
-            return getLeftComponent();
-        } else {
-            return getTopComponent();
-        }
-    }
-
-    private Component getSecondComponent() {
-        if (getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
-            return getRightComponent();
-        } else {
-            return getBottomComponent();
-        }
+        if (ui == null) return null;
+        return ((BasicSplitPaneUI)ui).getDivider();
     }
 
     private void computeDividerLocationWhenHidden(Component hiddenComponent) {
-        if (getTopComponent().isVisible() || getBottomComponent().isVisible()) {
-            if (getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
-                if (hiddenComponent == getFirstComponent()) {
-                    dividerLocation = hiddenComponent.getSize().width / (getSize().getWidth() - customDividerSize);
-                } else {
-                    dividerLocation = (getSize().getWidth() - customDividerSize - hiddenComponent.getSize().width) / (getSize()
-                                                                                                                    .getWidth()
-                                                                                                               - customDividerSize);
-                }
-            } else {
-                if (hiddenComponent == getFirstComponent()) {
-                    dividerLocation = hiddenComponent.getSize().height / (getSize().getHeight() - customDividerSize);
-                } else {
-                    dividerLocation = (getSize().getHeight() - customDividerSize - hiddenComponent.getSize().height) / (getSize()
-                                                                                                                      .getHeight()
-                                                                                                                 - customDividerSize);
-                }
-            }
+        if (leftComponent.isVisible() || rightComponent.isVisible()) {
+            boolean horiz = getOrientation() == JSplitPane.HORIZONTAL_SPLIT;
+            double size  = horiz ? getSize().getWidth() :
+                                   getSize().getHeight();
+            double csize = horiz ? hiddenComponent.getSize().getWidth() :
+                                   hiddenComponent.getSize().getHeight();
+            computeDividerLocation(hiddenComponent, size, csize);
         }
     }
 
     private void computeDividerLocationWhenInitiallyHidden(Component hiddenComponent) {
-        if (getTopComponent().isVisible() || getBottomComponent().isVisible()) {
-            if (getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
-                if (hiddenComponent == getFirstComponent()) {
-                    dividerLocation = hiddenComponent.getPreferredSize().width / (getPreferredSize().getWidth() - customDividerSize);
-                } else {
-                    dividerLocation = (getPreferredSize().getWidth() - customDividerSize - hiddenComponent.getPreferredSize().width) / (getPreferredSize()
-                                                                                                                                      .getWidth()
-                                                                                                                                 - customDividerSize);
-                }
-            } else {
-                if (hiddenComponent == getFirstComponent()) {
-                    dividerLocation = hiddenComponent.getPreferredSize().height / (getPreferredSize().getHeight() - customDividerSize);
-                } else {
-                    dividerLocation = (getPreferredSize().getHeight() - customDividerSize - hiddenComponent.getPreferredSize().height) / (getPreferredSize()
-                                                                                                                                        .getHeight()
-                                                                                                                                   - customDividerSize);
-                }
-            }
+        if (leftComponent.isVisible() || rightComponent.isVisible()) {
+            boolean horiz = getOrientation() == JSplitPane.HORIZONTAL_SPLIT;
+            double size  = horiz ? getPreferredSize().getWidth() :
+                                   getPreferredSize().getHeight();
+            double csize = horiz ? hiddenComponent.getPreferredSize().getWidth() :
+                                   hiddenComponent.getPreferredSize().getHeight();
+            computeDividerLocation(hiddenComponent, size, csize);
         }
     }
 
-    private void registerListeners(Component component) {
-        if (splitPaneComponentListener != null) {
-            component.addComponentListener(splitPaneComponentListener);
-        }
-    }
-
-    private void unregisterListeners(Component component) {
-        if (splitPaneComponentListener != null) {
-            component.removeComponentListener(splitPaneComponentListener);
+    private void computeDividerLocation(Component hiddenComponent, double size, double csize) {
+        if (hiddenComponent == leftComponent) {
+            dividerLocation = csize / (size - customDividerSize);
+        } else {
+            dividerLocation = (size - customDividerSize - csize) / (size - customDividerSize);
         }
     }
 
     private void updateVisibility() {
-        Component firstComponent = getFirstComponent();
-        Component secondComponent = getSecondComponent();
-        Component divider = getDivider();
+        Component divider = getDivider(); // null UI, not yet set
+        if (divider == null) return;
 
-        if ((firstComponent == null) || (secondComponent == null) || (divider == null)) {
-            return;
-        }
+        if (leftComponent == null || rightComponent == null) return;
 
-        if (firstComponent.isVisible() && secondComponent.isVisible()) {
+        boolean leftVisible = leftComponent.isVisible();
+        boolean rightVisible = rightComponent.isVisible();
+
+        if (leftVisible && rightVisible) {
             if (!divider.isVisible()) {
                 JExtendedSplitPane.super.setDividerSize(customDividerSize);
                 divider.setVisible(true);
                 setDividerLocation(dividerLocation);
             }
-
-            if (!isVisible()) {
-                setVisible(true);
-            }
-        } else if (!firstComponent.isVisible() && !secondComponent.isVisible()) {
-            if (isVisible()) {
-                setVisible(false);
-            }
+            if (!isVisible()) setVisible(true);
+        } else if (!leftVisible && !rightVisible) {
+            if (isVisible()) setVisible(false);
         } else {
             if (divider.isVisible()) {
                 JExtendedSplitPane.super.setDividerSize(0);
                 divider.setVisible(false);
                 setDividerLocation(0);
             }
-
-            if (!isVisible()) {
-                setVisible(true);
-            }
+            if (!isVisible()) setVisible(true);
         }
 
         if (getParent() != null) getParent().doLayout();
     }
+
+
+    private class VisibilityListener implements HierarchyListener {
+
+        private boolean wasVisible;
+        private final Component c;
+
+        VisibilityListener(Component c) {
+            this.c = c;
+            wasVisible = c.isVisible();
+        }
+
+        public void hierarchyChanged(HierarchyEvent e) {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                boolean visible = c.isVisible();
+                if (wasVisible == visible) return;
+
+                wasVisible = visible;
+
+                if (visible) componentShown();
+                else componentHidden(c);
+            }
+        }
+
+        private void componentHidden(Component c) {
+            computeDividerLocationWhenHidden(c);
+
+            // Make sure the component is visible when shown
+            if ((dividerLocation <= 0) || (dividerLocation >= 1))
+                dividerLocation = 0.5;
+
+            updateVisibility();
+        }
+
+        private void componentShown() {
+            updateVisibility();
+        }
+
+    }
+
 }
