@@ -201,7 +201,7 @@ public class LoadedSnapshot {
      *
      * @param dis Stream to read from, typically data from file.
      * @return The loaded snapshot or null if failed to load (has already been reported to the user)
-     * @throws IOException If unexpected error occured while loading (should be reported to the user)
+     * @throws IOException If unexpected error occurred while loading (should be reported to the user)
      */
     public static LoadedSnapshot loadSnapshot(DataInputStream dis)
                                        throws IOException {
