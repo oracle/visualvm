@@ -159,16 +159,13 @@ public abstract class ResultsPanel extends JPanel {
         jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         // Enable vertical scrollbar only if needed
-        jScrollPane.getVerticalScrollBar().getModel().addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    if (jScrollPane.getVerticalScrollBar().getModel().getExtent() == jScrollPane.getVerticalScrollBar().getModel()
-                                                                                                    .getMaximum()) {
-                        jScrollPane.getVerticalScrollBar().setEnabled(false);
-                    } else {
-                        jScrollPane.getVerticalScrollBar().setEnabled(true);
-                    }
-                }
-            });
+        final JScrollBar vScrollbar = jScrollPane.getVerticalScrollBar();
+        vScrollbar.getModel().addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                vScrollbar.setEnabled(ResultsPanel.this.isEnabled() &&
+                vScrollbar.getVisibleAmount() < vScrollbar.getMaximum());
+            }
+        });
 
         return jScrollPane;
     }
