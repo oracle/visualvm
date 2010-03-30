@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelinePanel;
+import java.awt.Component;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import javax.swing.AbstractButton;
@@ -116,13 +117,9 @@ final class TimelineView {
     // --- Private implementation ----------------------------------------------
 
     private static void registerListener(final JComponent c, final ViewListener l) {
-        c.addHierarchyListener(new HierarchyListener() {
-            public void hierarchyChanged(HierarchyEvent e) {
-                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                    if (c.isShowing()) l.viewShown();
-                    else l.viewHidden();
-                }
-            }
+        c.addHierarchyListener(new VisibilityListener(c) {
+            void shown() { l.viewShown(); }
+            void hidden() { l.viewHidden(); }
         });
     }
 
@@ -134,6 +131,34 @@ final class TimelineView {
         public void viewShown();
 
         public void viewHidden();
+
+    }
+
+
+    private static abstract class VisibilityListener implements HierarchyListener {
+
+        private boolean wasVisible;
+        private final Component c;
+
+        VisibilityListener(Component c) {
+            this.c = c;
+            wasVisible = c.isVisible();
+        }
+
+        public void hierarchyChanged(HierarchyEvent e) {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                boolean visible = c.isShowing();
+                if (wasVisible == visible) return;
+
+                wasVisible = visible;
+                
+                if (visible) shown();
+                else hidden();
+            }
+        }
+
+        abstract void shown();
+        abstract void hidden();
 
     }
 

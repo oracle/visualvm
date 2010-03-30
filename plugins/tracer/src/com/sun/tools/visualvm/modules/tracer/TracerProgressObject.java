@@ -127,11 +127,11 @@ public final class TracerProgressObject {
     public void addSteps(int steps, String text) {
         if (steps < 0)
             throw new IllegalArgumentException("steps value must be >= 0: " + steps); // NOI18N
-        if (this.currentStep + steps > this.steps)
+        if (currentStep + steps > this.steps)
             throw new IllegalArgumentException("Total steps exceeded: " + // NOI18N
-                                               (this.currentStep + steps) + ">" + this.steps); // NOI18N
+                                               (currentStep + steps) + ">" + this.steps); // NOI18N
 
-        this.currentStep += steps;
+        currentStep += steps;
         this.text = text;
         fireChange();
     }
@@ -151,8 +151,17 @@ public final class TracerProgressObject {
      * Adds all remaining steps to finish the initialization progress.
      */
     public void finish() {
-        this.currentStep = steps;
+        currentStep = steps;
         fireChange();
+    }
+
+    /**
+     * Returns true for a finished TracerProgressObject, false otherwise.
+     *
+     * @return true for a finished TracerProgressObject, false otherwise.
+     */
+    public boolean isFinished() {
+        return currentStep == steps;
     }
 
 

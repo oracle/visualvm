@@ -309,19 +309,14 @@ final class TimelineAxis extends JPanel {
             Rectangle clip = g.getClipBounds();
             if (clip == null) clip = new Rectangle(0, 0, getWidth(), getHeight());
 
-            Rectangle chartBounds = SwingUtilities.convertRectangle(chart.getParent(),
-                                                            chart.getBounds(), this);
-            chartBounds.y = clip.y;
-            chartBounds.height = clip.height;
-
             marksComputer.refresh();
 
-            paintHorizontalAxis(g, clip, chartBounds);
+            paintHorizontalAxis(g, clip);
         }
 
         protected void paintHorizontalMesh(Graphics2D g, Rectangle clip, Rectangle chartMask) {
-            Iterator<AxisMark> marks = marksComputer.marksIterator(
-                                                     chartMask.x, chartMask.x + chartMask.width);
+            Iterator<AxisMark> marks =
+                    marksComputer.marksIterator(chartMask.x, chartMask.x + chartMask.width);
 
             boolean hasTicks = false;
 
@@ -340,9 +335,9 @@ final class TimelineAxis extends JPanel {
             hadTicks = hasTicks;
         }
 
-        protected void paintHorizontalAxis(Graphics g, Rectangle clip, Rectangle chartMask) {
-            int viewStart = SwingUtilities.convertPoint(this, chartMask.x, 0, chart).x - 1; // -1: extra 1px for axis
-            int viewEnd = viewStart + chartMask.width + 2; // +2 extra 1px + 1px for axis
+        protected void paintHorizontalAxis(Graphics g, Rectangle clip) {
+            int viewStart = -1; // -1: extra 1px for axis
+            int viewEnd = viewStart + chart.getWidth() + 2; // +2 extra 1px + 1px for axis
 
             Iterator<AxisMark> marks = marksComputer.marksIterator(viewStart, viewEnd);
 
@@ -352,10 +347,10 @@ final class TimelineAxis extends JPanel {
             while (marks.hasNext()) {
                 AxisMark mark = marks.next();
 
-                int x = SwingUtilities.convertPoint(chart, mark.getPosition(), 0, this).x;
+                int x = mark.getPosition() - 1;
 
-                if (x < chartMask.x - lZeroOffset ||
-                    x >= chartMask.x + chartMask.width + rZeroOffset) continue;
+                if (x < -1 - lZeroOffset ||
+                    x >= -1 + chart.getWidth() + rZeroOffset) continue;
 
                 TimelineMarksPainter painter =
                         (TimelineMarksPainter)marksPainter.getPainter(mark);

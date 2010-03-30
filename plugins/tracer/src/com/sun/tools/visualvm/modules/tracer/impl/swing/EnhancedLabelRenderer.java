@@ -83,28 +83,26 @@ public final class EnhancedLabelRenderer extends LabelRenderer {
     }
 
 
-    protected void prePaint(Graphics g) {
+    protected void prePaint(Graphics g, int x, int y) {
         if (background != null) {
             g.setColor(background);
-            Insets insets = getInsets();
             EnhancedInsets margin = getMarginInsets();
             Dimension size = getPreferredSize();
-            g.fillRect(insets.left - margin.left,
-                       insets.top - margin.top,
+            g.fillRect(x - margin.left,
+                       y - margin.top,
                        size.width + margin.width(),
                        size.height + margin.height());
         }
     }
 
-    protected void postPaint(Graphics g) {
+    protected void postPaint(Graphics g, int x, int y) {
         if (border != null) {
-            Insets insets = getInsets();
             EnhancedInsets bi = getBorderInsets();
             EnhancedInsets margin = getMarginInsets();
             Dimension size = getPreferredSize();
             border.paintBorder(this, g,
-                               insets.left - margin.left - bi.left,
-                               insets.top - margin.top - bi.top,
+                               x - margin.left - bi.left,
+                               y - margin.top - bi.top,
                                size.width + margin.width() + bi.width(),
                                size.height + margin.height() + bi.height());
         }

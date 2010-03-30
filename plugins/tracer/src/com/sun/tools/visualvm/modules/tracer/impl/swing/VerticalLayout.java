@@ -98,18 +98,18 @@ public final class VerticalLayout implements LayoutManager {
         final Dimension d = new Dimension(insets.left + insets.right,
                                           insets.top + insets.bottom);
         int maxWidth = 0;
-        boolean first = false;
+        int visibleCount = 0;
 
         for (Component comp : parent.getComponents()) {
             if (comp.isVisible()) {
                 final Dimension size = comp.getPreferredSize();
                 maxWidth = Math.max(maxWidth, size.width);
                 d.height += size.height;
-                if (first) first = false;
-                else d.height += vGap;
+                visibleCount++;
             }
         }
 
+        d.height += (visibleCount - 1) * vGap;
         d.width += maxWidth;
 
         return d;

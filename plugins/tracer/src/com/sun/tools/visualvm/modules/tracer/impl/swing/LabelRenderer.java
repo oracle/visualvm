@@ -43,7 +43,7 @@ import javax.swing.plaf.basic.BasicLabelUI;
  */
 public class LabelRenderer extends JLabel {
 
-    private static final LabelUI UI = new BasicLabelUI();
+    private static final LabelRendererUI UI = new LabelRendererUI();
     private static final int DIRTY = Integer.MIN_VALUE;
 
     private int x;
@@ -57,6 +57,12 @@ public class LabelRenderer extends JLabel {
     private Color foreground;
     private boolean enabled;
 
+    private int iconWidth;
+    private int iconHeight;
+    private int iconTextGap;
+    private int textWidth;
+    private int fontAscent;
+
 
     // --- Constructor ---------------------------------------------------------
 
@@ -67,6 +73,8 @@ public class LabelRenderer extends JLabel {
 
         setOpaque(false);
         setEnabled(true);
+
+        iconTextGap = super.getIconTextGap();
     }
 
 
@@ -87,20 +95,23 @@ public class LabelRenderer extends JLabel {
 
     public Dimension getPreferredSize() {
         if (preferredSize == null) preferredSize = new Dimension(DIRTY, DIRTY);
-        boolean dirtyWidth = preferredSize.width == DIRTY;
-        boolean dirtyHeight = preferredSize.height == DIRTY;
-        if (dirtyWidth || dirtyHeight) updatePreferredSize(dirtyWidth, dirtyHeight);
+
+        if (preferredSize.width == DIRTY) {
+            textWidth = text == null || text.isEmpty() ? 0 : fontMetrics.stringWidth(text);
+            preferredSize.width = iconWidth + textWidth;
+            if (iconWidth > 0 && textWidth > 0) preferredSize.width += iconTextGap;
+        }
+
+        if (preferredSize.height == DIRTY) {
+            fontAscent = fontMetrics.getAscent();
+            preferredSize.height = fontAscent + fontMetrics.getDescent();
+        }
+
         return preferredSize;
     }
 
     public void setUI(LabelUI ui) {
         super.setUI(UI);
-    }
-
-    private void updatePreferredSize(boolean width, boolean height) {
-        if (width) preferredSize.width = getPreferredWidth();
-        if (height) preferredSize.height = fontMetrics.getAscent() +
-                                           fontMetrics.getDescent();
     }
 
     private void resetPreferredSize(boolean width, boolean height) {
@@ -109,29 +120,24 @@ public class LabelRenderer extends JLabel {
         if (height) preferredSize.height = DIRTY;
     }
 
-    private int getPreferredWidth() {
-        int iconWidth = icon == null ? 0 : icon.getIconWidth();
-        int textWidth = text == null || text.isEmpty() ? 0 : fontMetrics.stringWidth(text);
-        int iconGap = iconWidth == 0 || textWidth == 0 ? 0 : getIconTextGap();
-        return iconWidth + iconGap + textWidth;
-    }
-
-    protected void prePaint(Graphics g) {}
-    protected void postPaint(Graphics g) {}
+    protected void prePaint(Graphics g, int x, int y) {}
+    protected void postPaint(Graphics g, int x, int y) {}
 
     public void paint(Graphics g) {
         Graphics cg = getComponentGraphics(g);
-        boolean translate = x < 0 || y < 0;
-        
-        if (translate) cg.translate(x, y);
-        else insets.set(y, x, 0, 0);
 
-        prePaint(g);
-        ui.paint(cg, this);
-        postPaint(g);
-        
-        if (!translate) insets.set(0, 0, 0, 0);
-        else cg.translate(-x, -y);
+        prePaint(cg, x, y);
+
+        int xx = x;
+        if (iconWidth > 0) {
+            int yy = (preferredSize.height - iconHeight) / 2;
+            icon.paintIcon(this, cg, xx, y + yy);
+            xx += iconWidth + iconTextGap;
+        }
+        if (textWidth > 0)
+            UI.paintEnabledText(this, cg, text, xx, y + fontAscent);
+
+        postPaint(cg, x, y);
     }
 
 
@@ -150,10 +156,11 @@ public class LabelRenderer extends JLabel {
 
     // Overridden for performance reasons.
     public void setIcon(Icon icon) {
-        int oldIconWidth = this.icon == null ? -1 : this.icon.getIconWidth();
-        int newIconWidth = icon == null ? -1 : icon.getIconWidth();
+        int oldIconWidth = iconWidth;
+        iconWidth = icon == null ? 0 : icon.getIconWidth();
+        iconHeight = icon == null ? 0 : icon.getIconHeight();
         this.icon = icon;
-        if (oldIconWidth != newIconWidth) resetPreferredSize(true, false);
+        if (oldIconWidth != iconWidth) resetPreferredSize(true, false);
     }
 
     // Overridden for performance reasons.
@@ -196,6 +203,18 @@ public class LabelRenderer extends JLabel {
         super.setFont(font);
         fontMetrics = super.getFontMetrics(font);
         resetPreferredSize(true, true);
+    }
+
+    // Overridden for performance reasons.
+    public int getIconTextGap() {
+        return iconTextGap;
+    }
+
+
+    // Overridden for performance reasons.
+    public void setIconTextGap(int iconTextGap) {
+        this.iconTextGap = iconTextGap;
+        resetPreferredSize(true, false);
     }
 
     // Overridden for performance reasons.
@@ -248,5 +267,12 @@ public class LabelRenderer extends JLabel {
 
     // Overridden for performance reasons.
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
+
+
+    private static class LabelRendererUI extends BasicLabelUI {
+        protected void paintEnabledText(JLabel l, Graphics g, String s, int textX, int textY) {
+            super.paintEnabledText(l, g, s, textX, textY);
+        }
+    }
 
 }

@@ -67,7 +67,7 @@ public final class HorizontalLayout implements LayoutManager {
                 } else {
                     comp.setBounds(posX, posY, pref.width, height);
                 }
-                pref.width += hGap;
+                posX += hGap;
                 posX += pref.width;
             }
         }
@@ -98,18 +98,18 @@ public final class HorizontalLayout implements LayoutManager {
         final Dimension d = new Dimension(insets.left + insets.right,
                                           insets.top + insets.bottom);
         int maxHeight = 0;
-        boolean first = false;
+        int visibleCount = 0;
 
         for (Component comp : parent.getComponents()) {
             if (comp.isVisible()) {
                 final Dimension size = comp.getPreferredSize();
                 maxHeight = Math.max(maxHeight, size.height);
                 d.width += size.width;
-                if (first) first = false;
-                else d.width += hGap;
+                visibleCount++;
             }
         }
 
+        d.width += (visibleCount - 1) * hGap;
         d.height += maxHeight;
 
         return d;

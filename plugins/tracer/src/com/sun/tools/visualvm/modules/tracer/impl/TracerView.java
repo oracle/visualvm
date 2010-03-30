@@ -34,6 +34,8 @@ import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
 import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HorizontalLayout;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.SimpleSeparator;
+import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
@@ -41,8 +43,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashSet;
-import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -136,13 +136,20 @@ final class TracerView extends DataSourceView {
         private static final String ERROR_IMAGE_PATH =
             "com/sun/tools/visualvm/modules/tracer/impl/resources/error.png"; // NOI18N
 
+        private static final String SYSTEM_TOOLBAR = "systemToolbar"; // NOI18N
+        private static final String CLIENT_TOOLBAR = "clientToolbar"; // NOI18N
+
         private int commonControlHeight;
 
         private AbstractButton startButton;
         private AbstractButton stopButton;
 
-        private SimpleSeparator toolbarSeparator;
+        private CardLayout toolbarLayout;
         private JPanel toolbar;
+        private JPanel systemToolbar;
+        private JPanel clientToolbar;
+
+        private TransparentToolBar timelineToolbar;
 
 
         DataViewComponent.MasterView getView() {
@@ -160,9 +167,8 @@ final class TracerView extends DataSourceView {
                     startButton.setSelected(false);
                     stopButton.setEnabled(true);
                     stopButton.requestFocusInWindow();
-//                    clearToolbar();
+                    resetSystemToolbar();
                     updateViewsOnSessionStart();
-//                    addChartControls();
                     break;
                 case TracerController.STATE_SESSION_INACTIVE:
                     startButton.setEnabled(probesDefined);
@@ -181,7 +187,7 @@ final class TracerView extends DataSourceView {
                     stopButton.setEnabled(false);
                     startButton.setFocusable(false);
                     startButton.setFocusable(true);
-                    addProgress();
+                    showProgress();
                     timelineView.reset();
                     break;
                 case TracerController.STATE_SESSION_STOPPING:
@@ -191,7 +197,7 @@ final class TracerView extends DataSourceView {
                     stopButton.setFocusable(false);
                     stopButton.setFocusable(true);
                     String error = controller.getErrorMessage();
-                    if (error != null) addMessage(error);
+                    if (error != null) showMessage(error);
                     break;
             }
         }
@@ -215,21 +221,25 @@ final class TracerView extends DataSourceView {
             });
 
             timelineView.registerViewListener(new TimelineView.ViewListener() {
-                public void viewShown() { addChartControls(); }
-                public void viewHidden() { clearToolbar(); }
+                public void viewShown()  { showTimelineToolbar(); }
+                public void viewHidden() { hideTimelineToolbar(); }
             });
         }
 
         private void updateViewsOnSessionStart() {
-            String onSessionStart = TracerOptions.getInstance().getOnSessionStart();
-            if (!onSessionStart.equals(TracerOptions.VIEWS_UNCHANGED)) {
-                // Probes
-                setProbesVisible(onSessionStart.contains(TracerOptions.VIEW_PROBES));
-                // Timeline
-                setTimelineVisible(onSessionStart.contains(TracerOptions.VIEW_TIMELINE));
-                // Details
-                setDetailsVisible(onSessionStart.contains(TracerOptions.VIEW_DETAILS));
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    String onSessionStart = TracerOptions.getInstance().getOnSessionStart();
+                    if (!onSessionStart.equals(TracerOptions.VIEWS_UNCHANGED)) {
+                        // Probes
+                        setProbesVisible(onSessionStart.contains(TracerOptions.VIEW_PROBES));
+                        // Timeline
+                        setTimelineVisible(onSessionStart.contains(TracerOptions.VIEW_TIMELINE));
+                        // Details
+                        setDetailsVisible(onSessionStart.contains(TracerOptions.VIEW_DETAILS));
+                    }
+                }
+            });
         }
 
         private void updateViewsOnProbesChange() {
@@ -257,16 +267,13 @@ final class TracerView extends DataSourceView {
             else dvc.hideDetailsArea(DataViewComponent.BOTTOM_RIGHT);
         }
 
-        private void addMessage(String text) {
-            toolbar.removeAll();
-            toolbar.setLayout(new HorizontalLayout(false));
-            toolbar.add(new JLabel(text, new ImageIcon(ImageUtilities.
-                                   loadImage(ERROR_IMAGE_PATH)), JLabel.CENTER));
-            toolbarSeparator.setVisible(true);
+        private void showMessage(String text) {
+            setSystemToolbarItem(new JLabel(text, new ImageIcon(ImageUtilities.
+                                 loadImage(ERROR_IMAGE_PATH)), JLabel.CENTER));
         }
 
-        private void addProgress() {
-            TracerProgressObject progress = controller.getProgress();
+        private void showProgress() {
+            final TracerProgressObject progress = controller.getProgress();
             if (progress != null) {
                 final JProgressBar p = new JProgressBar(0, progress.getSteps());
                 p.setPreferredSize(new Dimension(120, p.getPreferredSize().height + 2));
@@ -288,90 +295,139 @@ final class TracerView extends DataSourceView {
                         p.setIndeterminate(false);
                         p.setValue(currentStep);
                         l.setText(text == null ? "" : text); // NOI18N
-                        t.start();
+                        if (!progress.isFinished()) t.start();
                     }
                 });
                 JLabel s = new JLabel("Starting:");
                 s.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 4));
-                toolbar.removeAll();
-                toolbar.setLayout(new HorizontalLayout(true));
-                toolbar.add(s);
-                toolbar.add(p);
-                toolbar.add(l);
-                toolbarSeparator.setVisible(true);
+                JPanel container = new JPanel(new HorizontalLayout(true));
+                container.setOpaque(false);
+                container.add(s);
+                container.add(p);
+                container.add(l);
+                setSystemToolbarItem(container);
             }
         }
 
-        private void addChartControls() {
-            TransparentToolBar tb = new TransparentToolBar();
-
-            Dimension size = new Dimension(commonControlHeight, commonControlHeight);
-
-            JButton c1 = new JButton(timelineView.zoomInAction());
-            c1.setMinimumSize(size);
-            c1.setPreferredSize(size);
-            c1.setMaximumSize(size);
-            tb.addItem(c1);
-
-            JButton c2 = new JButton(timelineView.zoomOutAction());
-            c2.setMinimumSize(size);
-            c2.setPreferredSize(size);
-            c2.setMaximumSize(size);
-            tb.addItem(c2);
-
-            JButton c3 = new JButton(timelineView.toggleViewAction());
-            c3.setMinimumSize(size);
-            c3.setPreferredSize(size);
-            c3.setMaximumSize(size);
-            tb.addItem(c3);
-
-            JPanel sp1 = new JPanel(null) {
-                public Dimension getPreferredSize() {
-                    Dimension d = super.getPreferredSize();
-                    d.width = 14;
-                    return d;
-                }
-            };
-            tb.addItem(sp1);
-
-            ButtonGroup bg = new ButtonGroup();
-
-            AbstractButton b1 = timelineView.mouseZoom();
-            bg.add(b1);
-            b1.setMinimumSize(size);
-            b1.setPreferredSize(size);
-            b1.setMaximumSize(size);
-            tb.addItem(b1);
-
-            AbstractButton b2 = timelineView.mouseHScroll();
-            bg.add(b2);
-            b2.setMinimumSize(size);
-            b2.setPreferredSize(size);
-            b2.setMaximumSize(size);
-            tb.addItem(b2);
-
-            AbstractButton b3 = timelineView.mouseVScroll();
-            bg.add(b3);
-            b3.setMinimumSize(size);
-            b3.setPreferredSize(size);
-            b3.setMaximumSize(size);
-            tb.addItem(b3);
-
-            toolbar.removeAll();
-            toolbar.setLayout(new HorizontalLayout(false));
-            toolbar.add(tb);
-            toolbarSeparator.setVisible(true);
+        private void setSystemToolbarItem(Component c) {
+            clearSystemToolbar();
+            systemToolbar.add(c);
+            systemToolbar.revalidate();
+            systemToolbar.repaint();
+            toolbarLayout.show(toolbar, SYSTEM_TOOLBAR);
         }
 
-        private void clearToolbar() {
-            toolbar.removeAll();
-            toolbarSeparator.setVisible(false);
+        private void resetSystemToolbar() {
+            toolbarLayout.show(toolbar, CLIENT_TOOLBAR);
+            clearSystemToolbar();
+        }
+
+        private void clearSystemToolbar() {
+            while (systemToolbar.getComponentCount() > 1)
+                systemToolbar.remove(systemToolbar.getComponentCount() - 1);
+            systemToolbar.revalidate();
+            systemToolbar.repaint();
+        }
+
+
+        private void showTimelineToolbar() {
+            if (timelineToolbar == null) {
+                timelineToolbar = new TransparentToolBar();
+
+                Dimension size = new Dimension(commonControlHeight, commonControlHeight);
+
+                JButton c1 = new JButton(timelineView.zoomInAction());
+                c1.setMinimumSize(size);
+                c1.setPreferredSize(size);
+                c1.setMaximumSize(size);
+                timelineToolbar.addItem(c1);
+
+                JButton c2 = new JButton(timelineView.zoomOutAction());
+                c2.setMinimumSize(size);
+                c2.setPreferredSize(size);
+                c2.setMaximumSize(size);
+                timelineToolbar.addItem(c2);
+
+                JButton c3 = new JButton(timelineView.toggleViewAction());
+                c3.setMinimumSize(size);
+                c3.setPreferredSize(size);
+                c3.setMaximumSize(size);
+                timelineToolbar.addItem(c3);
+
+                JPanel sp1 = new JPanel(null) {
+                    public Dimension getPreferredSize() {
+                        Dimension d = super.getPreferredSize();
+                        d.width = 14;
+                        return d;
+                    }
+                };
+                timelineToolbar.addItem(sp1);
+
+                ButtonGroup bg = new ButtonGroup();
+
+                AbstractButton b1 = timelineView.mouseZoom();
+                bg.add(b1);
+                b1.setMinimumSize(size);
+                b1.setPreferredSize(size);
+                b1.setMaximumSize(size);
+                timelineToolbar.addItem(b1);
+
+                AbstractButton b2 = timelineView.mouseHScroll();
+                bg.add(b2);
+                b2.setMinimumSize(size);
+                b2.setPreferredSize(size);
+                b2.setMaximumSize(size);
+                timelineToolbar.addItem(b2);
+
+                AbstractButton b3 = timelineView.mouseVScroll();
+                bg.add(b3);
+                b3.setMinimumSize(size);
+                b3.setPreferredSize(size);
+                b3.setMaximumSize(size);
+                timelineToolbar.addItem(b3);
+            }
+
+            addClientToobarItem(timelineToolbar);
+        }
+
+        private void hideTimelineToolbar() {
+            if (timelineToolbar != null)
+                removeClientToolbarItem(timelineToolbar);
+        }
+
+        private void addClientToobarItem(Component c) {
+            clientToolbar.add(createToolbarSeparator()); // separator
+            clientToolbar.add(c);
+            clientToolbar.revalidate();
+            clientToolbar.repaint();
+        }
+
+        private void removeClientToolbarItem(Component c) {
+            int index = -1;
+            for (int i = 0; i < clientToolbar.getComponentCount(); i++)
+                if (clientToolbar.getComponent(i) == c) {
+                    index = i;
+                    break;
+                }
+            if (index != -1) {
+                clientToolbar.remove(index);
+                clientToolbar.remove(index - 1); // separator
+                clientToolbar.revalidate();
+                clientToolbar.repaint();
+            }
+        }
+
+        private SimpleSeparator createToolbarSeparator() {
+            SimpleSeparator separator = new SimpleSeparator(SwingConstants.VERTICAL);
+            separator.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+            Dimension dim = separator.getPreferredSize();
+            dim.height = commonControlHeight;
+            separator.setPreferredSize(dim);
+            return separator;
         }
 
         private JComponent createComponents() {
-            Set<SimpleSeparator> separators = new HashSet();
-
-            JPanel view = new JPanel(new HorizontalLayout(true, 3));
+            JPanel view = new JPanel(new HorizontalLayout(true));
             view.setBorder(BorderFactory.createEmptyBorder(15, 8, 15, 8));
             view.setOpaque(false);
 
@@ -390,6 +446,11 @@ final class TracerView extends DataSourceView {
             startButton.setMargin(i);
             view.add(startButton);
 
+            JPanel buttonGap = new JPanel(null);
+            buttonGap.setOpaque(false);
+            buttonGap.setPreferredSize(new Dimension(6, 1));
+            view.add(buttonGap);
+
             stopButton = new JButton("Stop", new ImageIcon(ImageUtilities.
                                              loadImage(STOP_IMAGE_PATH))) {
                 protected void fireActionPerformed(ActionEvent e) {
@@ -403,66 +464,6 @@ final class TracerView extends DataSourceView {
             ((JButton)stopButton).setDefaultCapable(false);
             stopButton.setMargin(i);
             view.add(stopButton);
-
-            if (TracerOptions.getInstance().isRefreshCustomizable()) {
-
-                SimpleSeparator refreshSeparator = new SimpleSeparator(SwingConstants.VERTICAL);
-                refreshSeparator.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-                separators.add(refreshSeparator);
-                view.add(refreshSeparator);
-
-                JLabel refreshRateLabel = new JLabel("Refresh:");
-                refreshRateLabel.setToolTipText("Tracer refresh rate");
-                view.add(refreshRateLabel);
-
-                Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
-                final JComboBox refreshCombo = new JComboBox(refreshRates) {
-                    public Dimension getMinimumSize() { return getPreferredSize(); }
-                    public Dimension getMaximumSize() { return getPreferredSize(); }
-                };
-                refreshCombo.setToolTipText("Tracer refresh rate");
-                refreshCombo.setEditable(false);
-                refreshCombo.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                controller.setRefreshRate(
-                                        (Integer)refreshCombo.getSelectedItem());
-                            }
-                        });
-                    }
-                });
-                refreshCombo.setSelectedItem(Integer.valueOf(controller.getRefreshRate()));
-                refreshCombo.setRenderer(new CustomComboRenderer.Number(refreshCombo, null, false));
-                view.add(refreshCombo);
-
-                JLabel refreshUnitsLabel = new JLabel("ms");
-                refreshUnitsLabel.setToolTipText("Tracer refresh rate");
-                view.add(refreshUnitsLabel);
-
-            }
-
-            toolbarSeparator = new SimpleSeparator(SwingConstants.VERTICAL);
-            toolbarSeparator.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-            toolbarSeparator.setVisible(false);
-            separators.add(toolbarSeparator);
-            view.add(toolbarSeparator);
-
-            toolbar = new JPanel(null);
-            toolbar.setOpaque(false);
-            view.add(toolbar);
-//
-//            add(new JButton("Zoom In"));
-//            add(new JButton("Zoom Pad"));
-//            add(new JButton("Zoom Out"));
-//
-//            SimpleSeparator s2 = new SimpleSeparator(SwingConstants.VERTICAL);
-//            s2.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-//            add(s2);
-//
-//            add(new JToggleButton("Sel None"));
-//            add(new JToggleButton("Sel Line"));
-//            add(new JToggleButton("Sel Rect"));
 
             Dimension size1 = startButton.getPreferredSize();
             commonControlHeight = size1.height;
@@ -486,11 +487,69 @@ final class TracerView extends DataSourceView {
             stopButton.setPreferredSize(size2);
             stopButton.setMaximumSize(size2);
 
-            for (SimpleSeparator separator : separators) {
-                Dimension dim = separator.getPreferredSize();
-                dim.height = commonControlHeight;
-                separator.setPreferredSize(dim);
+            toolbarLayout = new CardLayout(0, 0);
+            toolbar = new JPanel(toolbarLayout);
+            toolbar.setOpaque(false);
+
+            systemToolbar = new JPanel(new HorizontalLayout(false));
+            systemToolbar.setOpaque(false);
+            systemToolbar.add(createToolbarSeparator());
+            toolbar.add(systemToolbar, SYSTEM_TOOLBAR);
+
+            clientToolbar = new JPanel(new HorizontalLayout(false));
+            clientToolbar.setOpaque(false);
+            toolbar.add(clientToolbar, CLIENT_TOOLBAR);
+
+            toolbarLayout.show(toolbar, CLIENT_TOOLBAR);
+            view.add(toolbar);
+
+            if (TracerOptions.getInstance().isRefreshCustomizable()) {
+                JPanel refreshRateContainer = new JPanel(new HorizontalLayout(true, 4));
+                refreshRateContainer.setOpaque(false);
+
+                JLabel refreshRateLabel = new JLabel("Refresh:");
+                refreshRateLabel.setToolTipText("Tracer refresh rate");
+                refreshRateContainer.add(refreshRateLabel);
+
+                Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
+                final JComboBox refreshCombo = new JComboBox(refreshRates) {
+                    public Dimension getMinimumSize() { return getPreferredSize(); }
+                    public Dimension getMaximumSize() { return getPreferredSize(); }
+                };
+                refreshCombo.setToolTipText("Tracer refresh rate");
+                refreshCombo.setEditable(false);
+                refreshCombo.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                controller.setRefreshRate(
+                                        (Integer)refreshCombo.getSelectedItem());
+                            }
+                        });
+                    }
+                });
+                refreshCombo.setSelectedItem(Integer.valueOf(controller.getRefreshRate()));
+                refreshCombo.setRenderer(new CustomComboRenderer.Number(refreshCombo, null, false));
+                refreshRateContainer.add(refreshCombo);
+
+                JLabel refreshUnitsLabel = new JLabel("ms");
+                refreshUnitsLabel.setToolTipText("Tracer refresh rate");
+                refreshRateContainer.add(refreshUnitsLabel);
+
+                addClientToobarItem(refreshRateContainer);
             }
+//
+//            add(new JButton("Zoom In"));
+//            add(new JButton("Zoom Pad"));
+//            add(new JButton("Zoom Out"));
+//
+//            SimpleSeparator s2 = new SimpleSeparator(SwingConstants.VERTICAL);
+//            s2.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+//            add(s2);
+//
+//            add(new JToggleButton("Sel None"));
+//            add(new JToggleButton("Sel Line"));
+//            add(new JToggleButton("Sel Rect"));
 
             return view;
         }
