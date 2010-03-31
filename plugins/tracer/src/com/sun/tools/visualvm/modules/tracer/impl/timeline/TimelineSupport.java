@@ -449,6 +449,11 @@ public final class TimelineSupport {
                 selections.add(new XYItemSelection.Default(selectedItem,
                                selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
         chart.getSelectionModel().setSelectedItems(selections);
+
+        int selectedSize = selectedIndexes.length;
+        if (selectedSize > 0)
+            chart.scrollRangeToVisible(selectedIndexes[0],
+                                       selectedIndexes[selectedSize - 1]);
     }
 
     public int[] getSelectedTimestamps() {

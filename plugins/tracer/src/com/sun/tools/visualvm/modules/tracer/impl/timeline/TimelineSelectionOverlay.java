@@ -59,11 +59,15 @@ final class TimelineSelectionOverlay extends ChartOverlay {
 
     private ConfigurationListener configurationListener;
     private SelectionListener selectionListener;
+    private final Set<Point> highlightedValues;
     private final Set<Point> selectedValues;
 
-    private Paint markPaint;
-    private Paint oddPerfPaint;
-    private Paint evenPerfPaint;
+    private Paint hMarkPaint;
+    private Paint hOddPerfPaint;
+    private Paint hEvenPerfPaint;
+    private Paint sMarkPaint;
+    private Paint sOddPerfPaint;
+    private Paint sEvenPerfPaint;
 
     private Stroke markStroke;
     private Stroke oddPerfStroke;
@@ -73,6 +77,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     TimelineSelectionOverlay() {
         configurationListener = new ConfigurationListener();
         selectionListener = new SelectionListener();
+        highlightedValues = new HashSet();
         selectedValues = new HashSet();
         initDefaultValues();
     }
@@ -97,19 +102,25 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     private void registerListener() {
         if (chart == null) return;
         chart.addConfigurationListener(configurationListener);
+        chart.addRowListener(configurationListener);
         chart.getSelectionModel().addSelectionListener(selectionListener);
     }
 
     private void unregisterListener() {
         if (chart == null) return;
         chart.removeConfigurationListener(configurationListener);
+        chart.removeRowListener(configurationListener);
         chart.getSelectionModel().removeSelectionListener(selectionListener);
     }
 
     private void initDefaultValues() {
-        markPaint = new Color(80, 80, 80);
-        oddPerfPaint = Color.BLACK;
-        evenPerfPaint = Color.WHITE;
+        hMarkPaint = new Color(80, 80, 80);
+        hOddPerfPaint = Color.BLACK;
+        hEvenPerfPaint = Color.WHITE;
+
+        sMarkPaint = new Color(40, 40, 120);
+        sOddPerfPaint = new Color(120, 120, 120);
+        sEvenPerfPaint = Color.WHITE;
 
         markStroke = new BasicStroke(2.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
         oddPerfStroke = new BasicStroke(1f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 0, new float[] { 1.0f, 3.0f }, 0);
@@ -120,11 +131,11 @@ final class TimelineSelectionOverlay extends ChartOverlay {
 
 
     public void paint(Graphics g) {
-        if (selectedValues.isEmpty()) return;
+        if (highlightedValues.isEmpty() && selectedValues.isEmpty()) return;
 
         Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHints(chart.getRenderingHints());
-
+        
         Iterator<Point> it = selectedValues.iterator();
         boolean linePainted = false;
 
@@ -132,14 +143,38 @@ final class TimelineSelectionOverlay extends ChartOverlay {
             Point p = it.next();
 
             if (!linePainted) {
-                g2.setPaint(evenPerfPaint);
+                g2.setPaint(sEvenPerfPaint);
                 g2.setStroke(evenPerfStroke);
                 g2.drawLine(p.x, 0, p.x, getHeight());
-                g2.setPaint(oddPerfPaint);
+                g2.setPaint(sOddPerfPaint);
                 g2.setStroke(oddPerfStroke);
                 g2.drawLine(p.x, 0, p.x, getHeight());
 
-                g2.setPaint(markPaint);
+                g2.setPaint(sMarkPaint);
+                g2.setStroke(markStroke);
+
+                linePainted = true;
+            }
+
+            g2.fillOval(p.x - selectionExtent + 1, p.y - selectionExtent + 1,
+                        selectionExtent * 2 - 1, selectionExtent * 2 - 1);
+        }
+
+        it = highlightedValues.iterator();
+        linePainted = false;
+
+        while (it.hasNext()) {
+            Point p = it.next();
+
+            if (!linePainted) {
+                g2.setPaint(hEvenPerfPaint);
+                g2.setStroke(evenPerfStroke);
+                g2.drawLine(p.x, 0, p.x, getHeight());
+                g2.setPaint(hOddPerfPaint);
+                g2.setStroke(oddPerfStroke);
+                g2.drawLine(p.x, 0, p.x, getHeight());
+
+                g2.setPaint(hMarkPaint);
                 g2.setStroke(markStroke);
 
                 linePainted = true;
@@ -161,10 +196,10 @@ final class TimelineSelectionOverlay extends ChartOverlay {
                                              selectionExtent * 2, getHeight());
     }
 
-    private static void updateSelectedValues(Set<Point> selectedValues,
-                                             List<ItemSelection> selectedItems,
-                                             TimelineChart chart) {
-        selectedValues.clear();
+    private static void updateValues(Set<Point> values,
+                                     List<ItemSelection> selectedItems,
+                                     TimelineChart chart) {
+        values.clear();
         for (ItemSelection sel : selectedItems) {
             XYItemSelection xySel = (XYItemSelection)sel;
             XYItem item = xySel.getItem();
@@ -173,19 +208,24 @@ final class TimelineSelectionOverlay extends ChartOverlay {
             long xValue = item.getXValue(xySel.getValueIndex());
             long yValue = item.getYValue(xySel.getValueIndex());
 //            long yValue = painter.getItemView(item.getYValue(xySel.getValueIndex()), item, context);
-            selectedValues.add(new Point(Utils.checkedInt(Math.ceil(context.getViewX(xValue))),
-                                         Utils.checkedInt(Math.ceil(painter.getItemView(yValue, item, context)))));
+            values.add(new Point(Utils.checkedInt(Math.ceil(context.getViewX(xValue))),
+                                 Utils.checkedInt(Math.ceil(painter.getItemView(yValue, item, context)))));
         }
     }
 
 
-    private class ConfigurationListener extends ChartConfigurationListener.Adapter {
+    private class ConfigurationListener extends ChartConfigurationListener.Adapter
+                                        implements TimelineChart.RowListener {
         private final Runnable selectionUpdater = new Runnable() {
             public void run() {
-                Set<Point> oldSelectedValues = new HashSet(selectedValues);
-                updateSelectedValues(selectedValues, chart.getSelectionModel().
-                        getHighlightedItems(), chart);
-                vLineBoundsChanged(oldSelectedValues, selectedValues);
+                Set<Point> oldValues = new HashSet(selectedValues);
+                updateValues(selectedValues, chart.getSelectionModel().
+                             getSelectedItems(), chart);
+                vLineBoundsChanged(oldValues, selectedValues);
+                oldValues = new HashSet(highlightedValues);
+                updateValues(highlightedValues, chart.getSelectionModel().
+                             getHighlightedItems(), chart);
+                vLineBoundsChanged(oldValues, highlightedValues);
             }
         };
         public void contentsUpdated(long offsetX, long offsetY,
@@ -193,26 +233,42 @@ final class TimelineSelectionOverlay extends ChartOverlay {
                                     long lastOffsetX, long lastOffsetY,
                                     double lastScaleX, double lastScaleY,
                                     int shiftX, int shiftY) {
-            if (selectedValues.isEmpty()) return;
-            if (scaleX != lastScaleX || scaleY != lastScaleY || shiftX != 0)
+            if (highlightedValues.isEmpty() && selectedValues.isEmpty()) return;
+            if (scaleX != lastScaleX || scaleY != lastScaleY || shiftX != 0 || shiftY != 0)
                 SwingUtilities.invokeLater(selectionUpdater);
         }
+        public void rowsAdded(List<TimelineChart.Row> rows) { selectionUpdater.run(); };
+
+        public void rowsRemoved(List<TimelineChart.Row> rows) { selectionUpdater.run(); };
+
+        public void rowsResized(List<TimelineChart.Row> rows) { selectionUpdater.run(); };
     }
 
     private class SelectionListener implements ChartSelectionListener {
+
+        private final Runnable selectionUpdater = new Runnable() {
+            public void run() {
+                Set<Point> oldSelectedValues = new HashSet(selectedValues);
+                updateValues(selectedValues, chart.getSelectionModel().
+                             getSelectedItems(), chart);
+                vLineBoundsChanged(oldSelectedValues, selectedValues);
+            }
+        };
 
         public void selectionModeChanged(int newMode, int oldMode) {}
 
         public void selectionBoundsChanged(Rectangle newBounds, Rectangle oldBounds) {}
 
         public void selectedItemsChanged(List<ItemSelection> currentItems,
-              List<ItemSelection> addedItems, List<ItemSelection> removedItems) {}
+              List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
+            SwingUtilities.invokeLater(selectionUpdater);
+        }
 
         public void highlightedItemsChanged(List<ItemSelection> currentItems,
               List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-            Set<Point> oldSelectedValues = new HashSet(selectedValues);
-            updateSelectedValues(selectedValues, currentItems, chart);
-            vLineBoundsChanged(oldSelectedValues, selectedValues);
+            Set<Point> oldHighlightedValues = new HashSet(highlightedValues);
+            updateValues(highlightedValues, currentItems, chart);
+            vLineBoundsChanged(oldHighlightedValues, highlightedValues);
         }
 
     }

@@ -42,6 +42,7 @@ import org.netbeans.lib.profiler.charts.ChartItemChange;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.ItemPainter;
 import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
@@ -362,6 +363,43 @@ final class TimelineChart extends SynchronousXYChart {
             selectionModel.setHoverMode(ChartSelectionModel.HOVER_NONE);
             selectionModel.setMoveMode(ChartSelectionModel.SELECTION_NONE);
         }
+    }
+
+
+    // --- Scrolling support ---------------------------------------------------
+
+    private static final int SCROLL_MARGIN_LEFT = 10;
+    private static final int SCROLL_MARGIN_RIGHT = 50;
+    
+    /**
+     * Scrolls to timestamps. Rect.x is first timestamp index,
+     * Rect.x + Rect.width is last timestamp index.
+     *
+     * @param contentRect
+     */
+    public void scrollRectToVisible(Rectangle contentRect) {
+        scrollRangeToVisible(contentRect.x, contentRect.x + contentRect.width);
+    }
+
+    public void scrollRangeToVisible(int startIndex, int endIndex) {
+        SynchronousXYItemsModel itemsModel = (SynchronousXYItemsModel)getItemsModel();
+        Timeline timeline = itemsModel.getTimeline();
+        long dataX = timeline.getTimestamp(startIndex);
+        long newOffsetX = (long)getViewWidth(dataX - getDataOffsetX());
+
+        long offsetX = getOffsetX();
+
+        boolean onLeft = newOffsetX < offsetX + SCROLL_MARGIN_LEFT;
+        boolean onRight = !onLeft && newOffsetX > offsetX + getWidth() - SCROLL_MARGIN_RIGHT;
+
+        if (!onLeft && !onRight) return;
+        if (onLeft) {
+            setOffset(newOffsetX - SCROLL_MARGIN_LEFT, getOffsetY());
+        } else {
+            setOffset(newOffsetX - getWidth() + SCROLL_MARGIN_RIGHT, getOffsetY());
+        }
+
+        repaintDirtyAccel();
     }
 
 
