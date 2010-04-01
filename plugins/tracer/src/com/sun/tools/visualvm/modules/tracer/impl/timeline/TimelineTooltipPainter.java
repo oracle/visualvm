@@ -25,8 +25,8 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
+import com.sun.tools.visualvm.modules.tracer.impl.swing.LegendFont;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -45,65 +45,74 @@ import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
  */
 final class TimelineTooltipPainter extends JPanel {
 
-    private static Color BACKGROUND_COLOR = Utils.forceSpeed() ?
+    private static Color SELECTION_FOREGROUND = Color.BLACK;
+    private static Color SELECTION_BACKGROUND = Utils.forceSpeed() ?
+                                            new Color(255, 255, 255) :
+                                            new Color(255, 255, 255, 170);
+    private static Color HOVER_FOREGROUND = Color.WHITE;
+    private static Color HOVER_BACKGROUND = Utils.forceSpeed() ?
                                             new Color(80, 80, 80) :
                                             new Color(0, 0, 0, 170);
 
     private JLabel[] valuePainters;
     private JLabel[] unitsPainters;
 
-    private Model model;
-
+    private final boolean selection;
+    private final Color foreground;
+    private final Color background;
     private boolean initialized;
 
 
-    TimelineTooltipPainter(Model model) {
+    TimelineTooltipPainter(boolean selection) {
+        this.selection = selection;
 
-        this.model = model;
+        foreground = selection ? SELECTION_FOREGROUND : HOVER_FOREGROUND;
+        background = selection ? SELECTION_BACKGROUND : HOVER_BACKGROUND;
+
         initialized = false;
-
     }
 
 
-    void update(List<ItemSelection> selectedItems) {
-        if (!initialized) initComponents();
+    void update(Model rowModel, List<ItemSelection> selectedItems) {
+        if (!initialized) initComponents(rowModel);
         
-        int rowsCount = model.getRowsCount();
-        if (selectedItems.size() != rowsCount)
-            throw new IllegalStateException("Rows and selected items don't match"); // NOI18N
-
+        int rowsCount = rowModel.getRowsCount();
         for (int i = 0; i < rowsCount; i++) {
             XYItemSelection sel = (XYItemSelection)selectedItems.get(i);
             long itemValue = sel.getItem().getYValue(sel.getValueIndex());
-            valuePainters[i].setText(model.getRowValue(i, itemValue));
-            unitsPainters[i].setText(model.getRowUnits(i));
+            valuePainters[i].setText(rowModel.getRowValue(i, itemValue));
+            unitsPainters[i].setText(rowModel.getRowUnits(i));
         }
     }
 
 
     protected void paintComponent(Graphics g) {
-        g.setColor(BACKGROUND_COLOR);
+        g.setColor(background);
         g.fillRect(0, 0, getWidth(), getHeight());
         super.paintComponent(g);
+        if (selection) {
+            g.setColor(foreground);
+            g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+        }
     }
 
 
-    private void initComponents() {
+    private void initComponents(Model rowModel) {
         setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         setLayout(new GridBagLayout());
         GridBagConstraints constraints;
 
-        int count = model.getRowsCount();
+        int count = rowModel.getRowsCount();
         valuePainters = new JLabel[count];
         unitsPainters = new JLabel[count];
         for (int i = 0; i < count; i++) {
 
             JLabel itemLabel = new JLabel();
-            itemLabel.setText(model.getRowName(i));
-            itemLabel.setFont(smallerFont(itemLabel.getFont()));
-            itemLabel.setForeground(Color.WHITE);
+            itemLabel.setText(rowModel.getRowName(i));
+            itemLabel.setFont(new LegendFont());
+            itemLabel.setForeground(foreground);
             itemLabel.setOpaque(false);
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
@@ -115,8 +124,8 @@ final class TimelineTooltipPainter extends JPanel {
 
             JLabel valueLabel = new JLabel();
             valuePainters[i] = valueLabel;
-            valueLabel.setFont(smallerFont(valueLabel.getFont()));
-            valueLabel.setForeground(Color.WHITE);
+            valueLabel.setFont(new LegendFont());
+            valueLabel.setForeground(foreground);
             valueLabel.setOpaque(false);
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
@@ -128,8 +137,8 @@ final class TimelineTooltipPainter extends JPanel {
 
             JLabel unitsLabel = new JLabel();
             unitsPainters[i] = unitsLabel;
-            unitsLabel.setFont(smallerFont(unitsLabel.getFont()));
-            unitsLabel.setForeground(Color.WHITE);
+            unitsLabel.setFont(new LegendFont());
+            unitsLabel.setForeground(foreground);
             unitsLabel.setOpaque(false);
             constraints = new GridBagConstraints();
             constraints.gridx = 2;
@@ -153,10 +162,6 @@ final class TimelineTooltipPainter extends JPanel {
         }
 
         initialized = true;
-    }
-
-    private static Font smallerFont(Font font) {
-        return new Font(font.getName(), font.getStyle(), font.getSize() - 2);
     }
 
 

@@ -62,12 +62,13 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     private final Set<Point> highlightedValues;
     private final Set<Point> selectedValues;
 
-    private Paint hMarkPaint;
-    private Paint hOddPerfPaint;
-    private Paint hEvenPerfPaint;
     private Paint sMarkPaint;
     private Paint sOddPerfPaint;
     private Paint sEvenPerfPaint;
+
+    private Paint hMarkPaint;
+    private Paint hOddPerfPaint;
+    private Paint hEvenPerfPaint;
 
     private Stroke markStroke;
     private Stroke oddPerfStroke;
@@ -114,13 +115,13 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     }
 
     private void initDefaultValues() {
+        sMarkPaint = new Color(120, 120, 120);
+        sOddPerfPaint = new Color(120, 120, 120);
+        sEvenPerfPaint = Color.WHITE;
+
         hMarkPaint = new Color(80, 80, 80);
         hOddPerfPaint = Color.BLACK;
         hEvenPerfPaint = Color.WHITE;
-
-        sMarkPaint = new Color(40, 40, 120);
-        sOddPerfPaint = new Color(120, 120, 120);
-        sEvenPerfPaint = Color.WHITE;
 
         markStroke = new BasicStroke(2.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
         oddPerfStroke = new BasicStroke(1f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 0, new float[] { 1.0f, 3.0f }, 0);
@@ -234,7 +235,8 @@ final class TimelineSelectionOverlay extends ChartOverlay {
                                     double lastScaleX, double lastScaleY,
                                     int shiftX, int shiftY) {
             if (highlightedValues.isEmpty() && selectedValues.isEmpty()) return;
-            if (scaleX != lastScaleX || scaleY != lastScaleY || shiftX != 0 || shiftY != 0)
+            if (lastOffsetX != offsetX || lastOffsetY != offsetY ||
+                scaleX != lastScaleX || scaleY != lastScaleY)
                 SwingUtilities.invokeLater(selectionUpdater);
         }
         public void rowsAdded(List<TimelineChart.Row> rows) { selectionUpdater.run(); };

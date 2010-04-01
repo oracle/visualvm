@@ -87,7 +87,7 @@ final class TimelineAxis extends JPanel {
         Timeline timeline = ((SynchronousXYItemsModel)chart.getItemsModel()).getTimeline();
         axis = new Axis(chart, new MarksComputer(timeline, chart.getChartContext()));
 
-        marks = new MarksComponent(chart, support);
+        marks = new MarksComponent(support);
 
         preferredHeight = HeaderLabel.DEFAULT_HEIGHT;
 
@@ -184,7 +184,6 @@ final class TimelineAxis extends JPanel {
         private static final int MARK_EXTENT = MARK.getWidth(null) / 2;
         private static final int MARK_HEIGHT = MARK.getHeight(null);
 
-        private final TimelineChart chart;
         private final TimelineSupport support;
 
         private final EnhancedLabelRenderer timeRenderer;
@@ -196,8 +195,7 @@ final class TimelineAxis extends JPanel {
         private final int markExtent = 2;
 
 
-        MarksComponent(TimelineChart chart, TimelineSupport support) {
-            this.chart = chart;
+        MarksComponent(TimelineSupport support) {
             this.support = support;
 
             timeRenderer = new EnhancedLabelRenderer();
@@ -219,6 +217,7 @@ final class TimelineAxis extends JPanel {
             int[] selectedIndexes = support.getSelectedTimestamps();
             if (selectedIndexes.length == 0 && selections.isEmpty()) return;
 
+            TimelineChart chart = support.getChart();
             SynchronousXYItemsModel model = (SynchronousXYItemsModel)chart.getItemsModel();
             Timeline timeline = model.getTimeline();
             ChartContext context = chart.getChartContext();
@@ -251,7 +250,7 @@ final class TimelineAxis extends JPanel {
         private void paintMark(Graphics g, int x, int my, int py, long time) {
             g.drawImage(MARK, x - MARK_EXTENT + 1, my, null);
             timeRenderer.setText(timeFormat.format(time));
-            timeRenderer.setLocation(x + MARK_EXTENT * 2 + 1, py);
+            timeRenderer.setLocation(x + MARK_EXTENT + TimelineTooltipOverlay.TOOLTIP_OFFSET + 1, py);
             timeRenderer.paint(g);
         }
 

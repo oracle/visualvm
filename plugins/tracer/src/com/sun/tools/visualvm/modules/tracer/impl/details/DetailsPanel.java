@@ -73,14 +73,20 @@ public final class DetailsPanel extends JPanel {
 
     public void setTableModel(TableModel model) {
         if (model == null) {
+            table.clearSelection();
             table.setModel(new DefaultTableModel());
             removeAll();
             add(noDataContainer, BorderLayout.CENTER);
         } else {
+            int selectedRow = getSelectedRow();
             table.setModel(model);
+            if (selectedRow != -1)
+                table.getSelectionModel().setSelectionInterval(selectedRow,
+                                                               selectedRow);
             removeAll();
             add(dataContainer, BorderLayout.CENTER);
         }
+        
         validate();
         repaint();
     }
@@ -88,6 +94,11 @@ public final class DetailsPanel extends JPanel {
 
     private void initListeners() {
         table.getSelectionModel().addListSelectionListener(new TableListener());
+    }
+
+    private int getSelectedRow() {
+        int selectedRow = table.getSelectedRow();
+        return selectedRow == -1 ? -1 : table.convertRowIndexToModel(selectedRow);
     }
 
     private boolean isTrackingEnd() {
@@ -145,10 +156,8 @@ public final class DetailsPanel extends JPanel {
     private class TableListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
 //            if (e.getValueIsAdjusting()) return;
-            int selectedRow = table.getSelectionModel().getMinSelectionIndex();
-            int selectedIndex = selectedRow == -1 ? -1 :
-                                table.convertRowIndexToModel(selectedRow);
-            support.setSelectedTimestamps(selectedIndex != -1 ? new int[] { selectedIndex } :
+            int selectedRow = getSelectedRow();
+            support.setSelectedTimestamps(selectedRow != -1 ? new int[] { selectedRow } :
                                           TimelineSupport.EMPTY_TIMESTAMPS);
         }
     }

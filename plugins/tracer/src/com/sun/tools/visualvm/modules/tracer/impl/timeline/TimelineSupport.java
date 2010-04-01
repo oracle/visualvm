@@ -47,6 +47,7 @@ import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.ItemSelection;
 import org.netbeans.lib.profiler.charts.PaintersModel;
+import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
@@ -85,7 +86,7 @@ public final class TimelineSupport {
         model = new TimelineModel();
         itemsModel = new SynchronousXYItemsModel(model);
         chart = new TimelineChart(itemsModel);
-        tooltips = new TimelineTooltipOverlay(chart);
+        tooltips = new TimelineTooltipOverlay(this);
         chart.addOverlayComponent(tooltips);
 
         if (TracerOptions.getInstance().isShowValuesEnabled()) {
@@ -163,9 +164,10 @@ public final class TimelineSupport {
     private void setupOverlays() {
         final int rowsCount = chart.getRowsCount();
 
-        TimelineTooltipPainter[] ttPainters = new TimelineTooltipPainter[rowsCount];
+//        TimelineTooltipPainter[] ttPainters = new TimelineTooltipPainter[rowsCount];
+        TimelineTooltipPainter.Model[] rowModels = new TimelineTooltipPainter.Model[rowsCount];
         
-        for (int rowIndex = 0; rowIndex < ttPainters.length; rowIndex++) {
+        for (int rowIndex = 0; rowIndex < rowModels.length; rowIndex++) {
             final TimelineChart.Row row = chart.getRow(rowIndex);
             final TracerProbe probe = getProbe(row);
 
@@ -179,7 +181,7 @@ public final class TimelineSupport {
                 unitsStrings[itemIndex] = viDescriptors[itemIndex].getUnitsString(ItemValueFormatter.FORMAT_TOOLTIP);
             }
 
-            ttPainters[rowIndex] = new TimelineTooltipPainter(new TimelineTooltipPainter.Model() {
+            rowModels[rowIndex] = new TimelineTooltipPainter.Model() {
 
                 public int getRowsCount() {
                     return itemsCount;
@@ -198,9 +200,9 @@ public final class TimelineSupport {
                     return unitsStrings[index];
                 }
 
-            });
+            };
         }
-        tooltips.setupPainters(ttPainters);
+        tooltips.setupModel(rowModels);
 
         if (units != null) units.setupModel(new TimelineUnitsOverlay.Model() {
 
@@ -440,6 +442,10 @@ public final class TimelineSupport {
 
     // --- Time selection management -------------------------------------------
 
+    private static final int SCROLL_MARGIN_LEFT = 10;
+    private static final int SCROLL_MARGIN_RIGHT = 50;
+
+
     public void setSelectedTimestamps(int[] selectedIndexes) {
         selectedTimestamps = selectedIndexes;
         List<SynchronousXYItem> selectedItems = getSelectedItems();
@@ -448,16 +454,46 @@ public final class TimelineSupport {
             for (SynchronousXYItem selectedItem : selectedItems)
                 selections.add(new XYItemSelection.Default(selectedItem,
                                selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
-        chart.getSelectionModel().setSelectedItems(selections);
+
+        ChartSelectionModel selectionModel = chart.getSelectionModel();
+        List<ItemSelection> oldSelection = selectionModel.getSelectedItems();
+        selectionModel.setSelectedItems(selections);
 
         int selectedSize = selectedIndexes.length;
-        if (selectedSize > 0)
-            chart.scrollRangeToVisible(selectedIndexes[0],
-                                       selectedIndexes[selectedSize - 1]);
+        if (selectedSize > 0) {
+            int oldIndex = oldSelection.isEmpty() ? -1 :
+                           ((XYItemSelection)oldSelection.get(0)).getValueIndex();
+            scrollChartToSelection(oldIndex, selectedIndexes[0]);
+        }
     }
 
     public int[] getSelectedTimestamps() {
         return selectedTimestamps;
+    }
+
+
+    private void scrollChartToSelection(int oldIndex, int newIndex) {
+        Timeline timeline = itemsModel.getTimeline();
+        ChartContext context = chart.getChartContext();
+        long dataOffsetX = context.getDataOffsetX();
+        long newDataX = timeline.getTimestamp(newIndex);
+        long newOffsetX = (long)context.getViewWidth(newDataX - dataOffsetX);
+
+        long offsetX = chart.getOffsetX();
+        long viewWidth = context.getViewportWidth();
+        if (newOffsetX >= offsetX + SCROLL_MARGIN_LEFT &&
+            newOffsetX <= offsetX + viewWidth - SCROLL_MARGIN_RIGHT) return;
+
+        long oldDataX = oldIndex == -1 ? -1 : timeline.getTimestamp(oldIndex);
+        long oldOffsetX = oldIndex == -1 ? -1 : (long)context.getViewWidth(oldDataX - dataOffsetX);
+
+        if (oldOffsetX > newOffsetX) {
+            chart.setOffset(newOffsetX - SCROLL_MARGIN_LEFT, chart.getOffsetY());
+        } else {
+            chart.setOffset(newOffsetX - context.getViewportWidth() + SCROLL_MARGIN_RIGHT, chart.getOffsetY());
+        }
+
+        chart.repaintDirtyAccel();
     }
 
 
