@@ -73,7 +73,7 @@ public final class TimelineSupport {
     private final List<TimelineChart.Row> rows = new ArrayList();
     private final DescriptorResolver descriptorResolver;
 
-    private int[] selectedTimestamps = new int[0];
+    private final Set<Integer> selectedTimestamps = new HashSet();
     private final Set<SelectionListener> selectionListeners = new HashSet();
 
 
@@ -370,6 +370,7 @@ public final class TimelineSupport {
                 int lastRow = detailsModel == null ? -1 : detailsModel.getRowCount() - 1;
                 model.reset();
                 itemsModel.valuesReset();
+                resetSelectedTimestamps();
                 if (lastRow != -1) detailsModel.fireTableRowsDeleted(0, lastRow);
             }
         });
@@ -380,12 +381,13 @@ public final class TimelineSupport {
     private AbstractTableModel detailsModel;
 
     void rowSelectionChanged() {
-        notifySelectionChanged();
+        updateSelectedItems();
+        notifyRowSelectionChanged();
     }
 
     public TableModel getDetailsModel() {
-        if (chart.isRowSelection()) detailsModel = createSelectionModel();
-        else detailsModel = null;
+        if (!chart.isRowSelection()) detailsModel = null;
+        else detailsModel = createSelectionModel();
         return detailsModel;
     }
 
@@ -394,14 +396,15 @@ public final class TimelineSupport {
         final List<ValueItemDescriptor> selectedDescriptors = getSelectedDescriptors();
         int selectedItemsCount = selectedItems.size();
         
-        final int columnCount = selectedItemsCount + 1;
+        final int columnCount = selectedItemsCount + 2;
         final SynchronousXYItem[] selectedItemsArr =
                 selectedItems.toArray(new SynchronousXYItem[selectedItemsCount]);
         final String[] columnNames = new String[columnCount];
-        columnNames[0] = "Time [ms]";
-        for (int i = 1; i < columnCount; i++) {
-            String itemName = selectedItemsArr[i - 1].getName();
-            String unitsString = selectedDescriptors.get(i - 1).
+        columnNames[0] = "Mark";
+        columnNames[1] = "Time [ms]";
+        for (int i = 2; i < columnCount; i++) {
+            String itemName = selectedItemsArr[i - 2].getName();
+            String unitsString = selectedDescriptors.get(i - 2).
                                  getUnitsString(ItemValueFormatter.FORMAT_DETAILS);
             String unitsExt = unitsString == null ? "" : " [" + unitsString + "]";
             columnNames[i] = itemName + unitsExt;
@@ -422,18 +425,30 @@ public final class TimelineSupport {
             }
 
             public Class getColumnClass(int columnIndex) {
-                if (columnIndex == 0) return DetailsPanel.class;
+                if (columnIndex == 0) return Boolean.class;
+                if (columnIndex == 1) return DetailsPanel.class;
                 return Long.class;
             }
 
             public ValueItemDescriptor getDescriptor(int columnIndex) {
                 if (columnIndex == 0) return null;
-                return selectedDescriptors.get(columnIndex - 1);
+                if (columnIndex == 1) return null;
+                return selectedDescriptors.get(columnIndex - 2);
             }
 
             public Object getValueAt(int rowIndex, int columnIndex) {
-                if (columnIndex == 0) return model.getTimestamp(rowIndex);
-                return selectedItemsArr[columnIndex - 1].getYValue(rowIndex);
+                if (columnIndex == 0) return selectedTimestamps.contains(rowIndex);
+                if (columnIndex == 1) return model.getTimestamp(rowIndex);
+                return selectedItemsArr[columnIndex - 2].getYValue(rowIndex);
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return columnIndex == 0;
+            }
+
+            public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+                if (Boolean.TRUE.equals(aValue)) selectTimestamp(rowIndex, false);
+                else unselectTimestamp(rowIndex, false);
             }
 
         };
@@ -446,28 +461,77 @@ public final class TimelineSupport {
     private static final int SCROLL_MARGIN_RIGHT = 50;
 
 
-    public void setSelectedTimestamps(int[] selectedIndexes) {
-        selectedTimestamps = selectedIndexes;
+    public void selectTimestamp(int index) {
+        selectTimestamp(index, true);
+    }
+
+    private void selectTimestamp(int index, boolean notifyTable) {
+        boolean change = selectedTimestamps.add(index);
+        if (notifyTable && detailsModel != null)
+            detailsModel.fireTableCellUpdated(index, 0);
+        if (change) {
+            updateSelectedItems();
+            notifyTimeSelectionChanged();
+        }
+    }
+
+    public void unselectTimestamp(int index) {
+        unselectTimestamp(index, true);
+    }
+
+    private void unselectTimestamp(int index, boolean notifyTable) {
+        boolean change = selectedTimestamps.remove(index);
+        if (notifyTable && detailsModel != null)
+            detailsModel.fireTableCellUpdated(index, 0);
+        if (change) {
+            updateSelectedItems();
+            notifyTimeSelectionChanged();
+        }
+    }
+
+    private void resetSelectedTimestamps() {
+        if (selectedTimestamps.isEmpty()) return;
+        selectedTimestamps.clear();
+        updateSelectedItems();
+        notifyTimeSelectionChanged();
+    }
+
+    private void updateSelectedItems() {
         List<SynchronousXYItem> selectedItems = getSelectedItems();
-        List<ItemSelection> selections = new ArrayList(selectedItems.size());
-        for (int selectedIndex : selectedIndexes)
+        List<ItemSelection> selections =
+                new ArrayList(selectedItems.size() * selectedTimestamps.size());
+
+        for (int selectedIndex : selectedTimestamps)
             for (SynchronousXYItem selectedItem : selectedItems)
                 selections.add(new XYItemSelection.Default(selectedItem,
                                selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
 
-        ChartSelectionModel selectionModel = chart.getSelectionModel();
-        List<ItemSelection> oldSelection = selectionModel.getSelectedItems();
-        selectionModel.setSelectedItems(selections);
-
-        int selectedSize = selectedIndexes.length;
-        if (selectedSize > 0) {
-            int oldIndex = oldSelection.isEmpty() ? -1 :
-                           ((XYItemSelection)oldSelection.get(0)).getValueIndex();
-            scrollChartToSelection(oldIndex, selectedIndexes[0]);
-        }
+        chart.getSelectionModel().setSelectedItems(selections);
     }
 
-    public int[] getSelectedTimestamps() {
+    public void setSelectedTimestamps(int[] selectedIndexes) {
+//        selectedTimestamps = selectedIndexes;
+//        List<SynchronousXYItem> selectedItems = getSelectedItems();
+//        List<ItemSelection> selections = new ArrayList(selectedItems.size());
+//        for (int selectedIndex : selectedIndexes)
+//            for (SynchronousXYItem selectedItem : selectedItems)
+//                selections.add(new XYItemSelection.Default(selectedItem,
+//                               selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
+//
+//        ChartSelectionModel selectionModel = chart.getSelectionModel();
+//        List<ItemSelection> oldSelection = selectionModel.getSelectedItems();
+//        selectionModel.setSelectedItems(selections);
+//
+//        int selectedSize = selectedIndexes.length;
+//        if (selectedSize > 0) {
+//            int oldIndex = oldSelection.isEmpty() ? -1 :
+//                           ((XYItemSelection)oldSelection.get(0)).getValueIndex();
+////            System.err.println(">>> Scroll to selection...");
+//            scrollChartToSelection(oldIndex, selectedIndexes[0]);
+//        }
+    }
+
+    public Set<Integer> getSelectedTimestamps() {
         return selectedTimestamps;
     }
 
@@ -524,15 +588,22 @@ public final class TimelineSupport {
         selectionListeners.remove(listener);
     }
 
-    private void notifySelectionChanged() {
+    private void notifyRowSelectionChanged() {
         for (SelectionListener selectionListener: selectionListeners)
-            selectionListener.selectionChanged();
+            selectionListener.rowSelectionChanged();
+    }
+
+    private void notifyTimeSelectionChanged() {
+        for (SelectionListener selectionListener: selectionListeners)
+            selectionListener.timeSelectionChanged();
     }
 
 
     public static interface SelectionListener {
 
-        public void selectionChanged();
+        public void rowSelectionChanged();
+
+        public void timeSelectionChanged();
 
     }
 

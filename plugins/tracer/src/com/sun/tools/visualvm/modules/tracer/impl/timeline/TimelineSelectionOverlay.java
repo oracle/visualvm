@@ -40,6 +40,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.ChartContext;
@@ -130,71 +132,86 @@ final class TimelineSelectionOverlay extends ChartOverlay {
         selectionExtent = 3;
     }
 
+    private final Set<Integer> paintedLines = new HashSet();
 
     public void paint(Graphics g) {
         if (highlightedValues.isEmpty() && selectedValues.isEmpty()) return;
 
         Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHints(chart.getRenderingHints());
-        
+
         Iterator<Point> it = selectedValues.iterator();
-        boolean linePainted = false;
+        paintedLines.clear();
 
         while (it.hasNext()) {
             Point p = it.next();
+            int x = p.x;
 
-            if (!linePainted) {
+            if (!paintedLines.contains(x)) {
                 g2.setPaint(sEvenPerfPaint);
                 g2.setStroke(evenPerfStroke);
-                g2.drawLine(p.x, 0, p.x, getHeight());
+                g2.drawLine(x, 0, x, getHeight());
                 g2.setPaint(sOddPerfPaint);
                 g2.setStroke(oddPerfStroke);
-                g2.drawLine(p.x, 0, p.x, getHeight());
+                g2.drawLine(x, 0, x, getHeight());
 
                 g2.setPaint(sMarkPaint);
                 g2.setStroke(markStroke);
 
-                linePainted = true;
+                paintedLines.add(x);
             }
 
-            g2.fillOval(p.x - selectionExtent + 1, p.y - selectionExtent + 1,
+            g2.fillOval(x - selectionExtent + 1, p.y - selectionExtent + 1,
                         selectionExtent * 2 - 1, selectionExtent * 2 - 1);
         }
 
         it = highlightedValues.iterator();
-        linePainted = false;
+        paintedLines.clear();
 
         while (it.hasNext()) {
             Point p = it.next();
+            int x = p.x;
 
-            if (!linePainted) {
+            if (!paintedLines.contains(x)) {
                 g2.setPaint(hEvenPerfPaint);
                 g2.setStroke(evenPerfStroke);
-                g2.drawLine(p.x, 0, p.x, getHeight());
+                g2.drawLine(x, 0, x, getHeight());
                 g2.setPaint(hOddPerfPaint);
                 g2.setStroke(oddPerfStroke);
-                g2.drawLine(p.x, 0, p.x, getHeight());
+                g2.drawLine(x, 0, x, getHeight());
 
                 g2.setPaint(hMarkPaint);
                 g2.setStroke(markStroke);
 
-                linePainted = true;
+                paintedLines.add(x);
             }
 
-            g2.fillOval(p.x - selectionExtent + 1, p.y - selectionExtent + 1,
+            g2.fillOval(x - selectionExtent + 1, p.y - selectionExtent + 1,
                         selectionExtent * 2 - 1, selectionExtent * 2 - 1);
         }
 
     }
 
     private void vLineBoundsChanged(Set<Point> oldSelection, Set<Point> newSelection) {
-        Point oldSel = oldSelection.isEmpty() ? null : oldSelection.iterator().next();
-        Point newSel = newSelection.isEmpty() ? null : newSelection.iterator().next();
+        SortedSet selectionBounds = new TreeSet();
+        for (Point p : oldSelection) selectionBounds.add(p.x);
+        int selections = selectionBounds.size();
+        if (selections == 1) {
+            repaint((Integer)selectionBounds.first() - selectionExtent,
+                        0, selectionExtent * 2, getHeight());
+            selectionBounds.clear();
+        }
 
-        if (oldSel != null) repaint(oldSel.x - selectionExtent, 0,
-                                             selectionExtent * 2, getHeight());
-        if (newSel != null) repaint(newSel.x - selectionExtent, 0,
-                                             selectionExtent * 2, getHeight());
+        for (Point p : newSelection) selectionBounds.add(p.x);
+        selections = selectionBounds.size();
+        if (selections == 1) {
+            repaint((Integer)selectionBounds.first() - selectionExtent,
+                        0, selectionExtent * 2, getHeight());
+        } else if (selections > 1) {
+            int firstX = (Integer)selectionBounds.first() - selectionExtent;
+            int lastX  = (Integer)selectionBounds.last() + selectionExtent;
+            repaint(firstX, 0, lastX - firstX, getHeight());
+        }
     }
 
     private static void updateValues(Set<Point> values,
@@ -208,9 +225,11 @@ final class TimelineSelectionOverlay extends ChartOverlay {
             ChartContext context = chart.getChartContext(item);
             long xValue = item.getXValue(xySel.getValueIndex());
             long yValue = item.getYValue(xySel.getValueIndex());
-//            long yValue = painter.getItemView(item.getYValue(xySel.getValueIndex()), item, context);
-            values.add(new Point(Utils.checkedInt(Math.ceil(context.getViewX(xValue))),
-                                 Utils.checkedInt(Math.ceil(painter.getItemView(yValue, item, context)))));
+            int xPos = Utils.checkedInt(Math.ceil(context.getViewX(xValue)));
+            int yPos = Utils.checkedInt(Math.ceil(painter.getItemView(yValue, item, context)));
+//            if (xPos >= 0 && xPos <= chart.getWidth() &&
+//                yPos >= 0 && yPos <= chart.getHeight())
+                values.add(new Point(xPos, yPos));
         }
     }
 
@@ -237,7 +256,8 @@ final class TimelineSelectionOverlay extends ChartOverlay {
             if (highlightedValues.isEmpty() && selectedValues.isEmpty()) return;
             if (lastOffsetX != offsetX || lastOffsetY != offsetY ||
                 scaleX != lastScaleX || scaleY != lastScaleY)
-                SwingUtilities.invokeLater(selectionUpdater);
+//                SwingUtilities.invokeLater(selectionUpdater);
+                selectionUpdater.run();
         }
         public void rowsAdded(List<TimelineChart.Row> rows) { selectionUpdater.run(); };
 

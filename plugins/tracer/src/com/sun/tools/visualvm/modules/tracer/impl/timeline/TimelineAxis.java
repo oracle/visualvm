@@ -46,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -214,22 +215,22 @@ final class TimelineAxis extends JPanel {
 
 
         void refresh() {
-            int[] selectedIndexes = support.getSelectedTimestamps();
-            if (selectedIndexes.length == 0 && selections.isEmpty()) return;
+            Set<Integer> selectedIndexes = support.getSelectedTimestamps();
+            if (selectedIndexes.size() == 0 && selections.isEmpty()) return;
 
             TimelineChart chart = support.getChart();
             SynchronousXYItemsModel model = (SynchronousXYItemsModel)chart.getItemsModel();
             Timeline timeline = model.getTimeline();
             ChartContext context = chart.getChartContext();
             selections.clear();
-            times.clear();
+//            times.clear();
 
             for (int selectedIndex : selectedIndexes) {
                 long time = timeline.getTimestamp(selectedIndex);
                 int x = Utils.checkedInt(context.getViewX(time));
                 if (x > -markExtent && x < getWidth() + markExtent) {
                     selections.add(x);
-                    times.add(time);
+//                    times.add(time);
                 }
             }
         }
@@ -240,18 +241,18 @@ final class TimelineAxis extends JPanel {
 
             int h = getHeight();
             int my = h - 5 - MARK_HEIGHT;
-            int py = (h - timeRendererHeight) / 2;
+//            int py = (h - timeRendererHeight) / 2;
             int selectionsCount = selections.size();
             
             for (int i = 0; i < selectionsCount; i++)
-                paintMark(g, selections.get(i), my, py, times.get(i));
+                paintMark(g, selections.get(i), my/*, py, times.get(i)*/);
         }
 
-        private void paintMark(Graphics g, int x, int my, int py, long time) {
+        private void paintMark(Graphics g, int x, int my/*, int py, long time*/) {
             g.drawImage(MARK, x - MARK_EXTENT + 1, my, null);
-            timeRenderer.setText(timeFormat.format(time));
-            timeRenderer.setLocation(x + MARK_EXTENT + TimelineTooltipOverlay.TOOLTIP_OFFSET + 1, py);
-            timeRenderer.paint(g);
+//            timeRenderer.setText(timeFormat.format(time));
+//            timeRenderer.setLocation(x + MARK_EXTENT + TimelineTooltipOverlay.TOOLTIP_OFFSET + 1, py);
+//            timeRenderer.paint(g);
         }
 
     }

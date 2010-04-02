@@ -156,9 +156,17 @@ final class ChartPanel extends JPanel {
 
     // --- Internal interface --------------------------------------------------
 
-    void reset() {
+    boolean reset() {
         chart.setScale(0.02, 1);
         chart.setOffset(0, 0);
+        
+        if (chart.isRowSelection()) {
+            chart.clearRowsSelection();
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
 

@@ -25,8 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.details;
 
-import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
+import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
@@ -34,23 +33,21 @@ import javax.swing.table.TableCellRenderer;
  *
  * @author Jiri Sedlacek
  */
-final class ItemValueRenderer extends DetailsTableCellRenderer {
+final class MarkRenderer extends DetailsTableCellRenderer {
 
-    ItemValueRenderer(TableCellRenderer renderer) {
+    MarkRenderer(TableCellRenderer renderer) {
         super(renderer);
     }
 
-    protected Object formatValue(JTable table, Object value, boolean isSelected,
-                                 boolean hasFocus, int row, int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value,
+                                                   boolean isSelected, boolean hasFocus,
+                                                   int row, int column) {
 
-        DetailsTableModel model = (DetailsTableModel)table.getModel();
-        int columnIndex = table.convertColumnIndexToModel(column);
-        ValueItemDescriptor descriptor = model.getDescriptor(columnIndex);
+        // Workaround strange selection behavior for newly selected checkbox
+        isSelected = isSelected || hasFocus;
 
-        String valueString = descriptor.getValueString((Long)value,
-                             ItemValueFormatter.FORMAT_DETAILS);
-        // Improve spacing of the text
-        return " " + valueString + " "; // NOI18N
+        return super.getTableCellRendererComponent(table, value, isSelected,
+                                                   hasFocus, row, column);
     }
-    
+
 }

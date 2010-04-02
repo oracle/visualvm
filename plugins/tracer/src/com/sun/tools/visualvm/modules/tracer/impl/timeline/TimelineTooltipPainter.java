@@ -54,6 +54,7 @@ final class TimelineTooltipPainter extends JPanel {
                                             new Color(80, 80, 80) :
                                             new Color(0, 0, 0, 170);
 
+    private JLabel[] valueNames;
     private JLabel[] valuePainters;
     private JLabel[] unitsPainters;
 
@@ -80,6 +81,7 @@ final class TimelineTooltipPainter extends JPanel {
         for (int i = 0; i < rowsCount; i++) {
             XYItemSelection sel = (XYItemSelection)selectedItems.get(i);
             long itemValue = sel.getItem().getYValue(sel.getValueIndex());
+            valueNames[i].setText(rowModel.getRowName(i));
             valuePainters[i].setText(rowModel.getRowValue(i, itemValue));
             unitsPainters[i].setText(rowModel.getRowUnits(i));
         }
@@ -105,12 +107,13 @@ final class TimelineTooltipPainter extends JPanel {
         GridBagConstraints constraints;
 
         int count = rowModel.getRowsCount();
+        valueNames = new JLabel[count];
         valuePainters = new JLabel[count];
         unitsPainters = new JLabel[count];
         for (int i = 0; i < count; i++) {
 
             JLabel itemLabel = new JLabel();
-            itemLabel.setText(rowModel.getRowName(i));
+            valueNames[i] = itemLabel;
             itemLabel.setFont(new LegendFont());
             itemLabel.setForeground(foreground);
             itemLabel.setOpaque(false);

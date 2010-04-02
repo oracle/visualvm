@@ -31,6 +31,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -38,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.Scrollable;
 import javax.swing.event.ChangeEvent;
@@ -63,6 +66,9 @@ public final class DetailsPanel extends JPanel {
     private DetailsTable table;
     private final TimelineSupport support;
 
+    private boolean selectionAdjusting;
+    private KeyStroke tableKeyStroke;
+
 
     public DetailsPanel(TimelineSupport support) {
         this.support = support;
@@ -78,11 +84,11 @@ public final class DetailsPanel extends JPanel {
             removeAll();
             add(noDataContainer, BorderLayout.CENTER);
         } else {
-            int selectedRow = getSelectedRow();
+//            int selectedRow = getSelectedRow();
             table.setModel(model);
-            if (selectedRow != -1)
-                table.getSelectionModel().setSelectionInterval(selectedRow,
-                                                               selectedRow);
+//            if (selectedRow != -1)
+//                table.getSelectionModel().setSelectionInterval(selectedRow,
+//                                                               selectedRow);
             removeAll();
             add(dataContainer, BorderLayout.CENTER);
         }
@@ -93,17 +99,32 @@ public final class DetailsPanel extends JPanel {
 
 
     private void initListeners() {
-        table.getSelectionModel().addListSelectionListener(new TableListener());
+        TableListener tableListener = new TableListener();
+        table.getSelectionModel().addListSelectionListener(tableListener);
+        table.addKeyListener(tableListener);
     }
 
-    private int getSelectedRow() {
-        int selectedRow = table.getSelectedRow();
-        return selectedRow == -1 ? -1 : table.convertRowIndexToModel(selectedRow);
+//    private int getSelectedRow() {
+//        int selectedRow = table.getSelectedRow();
+//        return selectedRow == -1 ? -1 : table.convertRowIndexToModel(selectedRow);
+//    }
+
+    private int[] getSelectedRows() {
+        int[] selectedRows = table.getSelectedRows();
+        for (int i = 0; i < selectedRows.length; i++)
+            selectedRows[i] = table.convertRowIndexToModel(selectedRows[i]);
+        return selectedRows;
     }
 
     private boolean isTrackingEnd() {
         if (scrollBar == null) return false;
         return scrollBar.getValue() + scrollBar.getVisibleAmount() >= scrollBar.getMaximum();
+    }
+
+    private boolean isSelectionChanging() {
+        if (selectionAdjusting) return true;
+        if (tableKeyStroke == null) return false;
+        return table.getActionForKeyStroke(tableKeyStroke) != null;
     }
 
     private void initComponents() {        
@@ -134,7 +155,8 @@ public final class DetailsPanel extends JPanel {
             }
             public void setValues(int newValue, int newExtent, int newMin, int newMax) {
                 setEnabled(newExtent < newMax);
-                if (isEnabled() && isTrackingEnd()) newValue = newMax - newExtent;
+                if (isEnabled() && !isSelectionChanging() && isTrackingEnd())
+                    newValue = newMax - newExtent;
                 super.setValues(newValue, newExtent, newMin, newMax);
             }
         };
@@ -153,13 +175,18 @@ public final class DetailsPanel extends JPanel {
     }
 
 
-    private class TableListener implements ListSelectionListener {
+    private class TableListener implements ListSelectionListener, KeyListener {
         public void valueChanged(ListSelectionEvent e) {
-//            if (e.getValueIsAdjusting()) return;
-            int selectedRow = getSelectedRow();
-            support.setSelectedTimestamps(selectedRow != -1 ? new int[] { selectedRow } :
-                                          TimelineSupport.EMPTY_TIMESTAMPS);
+            selectionAdjusting = e.getValueIsAdjusting();
+            support.setSelectedTimestamps(getSelectedRows());
         }
+        public void keyPressed(KeyEvent e) {
+            tableKeyStroke = KeyStroke.getKeyStrokeForEvent(e);
+        }
+        public void keyReleased(KeyEvent e) {
+            tableKeyStroke = null;
+        }
+        public void keyTyped(KeyEvent e) {}
     }
 
 

@@ -44,6 +44,7 @@ import javax.swing.SwingUtilities;
 public final class TimelinePanel extends JPanel {
 
     private final ChartPanel chartPanel;
+    private final RowMouseHandler mouseHandler;
 
 
     // --- Constructor ---------------------------------------------------------
@@ -59,14 +60,15 @@ public final class TimelinePanel extends JPanel {
         add(chartPanel, BorderLayout.CENTER);
 
         new ProbesWheelHandler(chartPanel, probesPanel).register();
-        new RowMouseHandler(support, probesPanel).register();
+        mouseHandler = new RowMouseHandler(support, probesPanel);
+        mouseHandler.register();
     }
 
 
     // --- Public interface ----------------------------------------------------
 
     public void reset() {
-        chartPanel.reset();
+        if (chartPanel.reset()) mouseHandler.updateSelection();
     }
 
     public Action zoomInAction() {
@@ -186,7 +188,7 @@ public final class TimelinePanel extends JPanel {
             }
         }
 
-        private void updateSelection() {
+        void updateSelection() {
             probesPanel.updateSelection();
             support.rowSelectionChanged();
         }

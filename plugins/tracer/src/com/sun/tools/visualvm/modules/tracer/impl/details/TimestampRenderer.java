@@ -53,8 +53,8 @@ final class TimestampRenderer extends DetailsTableCellRenderer {
     protected Object formatValue(JTable table, Object value, boolean isSelected,
                                  boolean hasFocus, int row, int column) {
         String valueString = format.format(value);
-        return super.formatValue(table, valueString, isSelected, hasFocus, row,
-                                 column);
+        // Improve spacing of the text
+        return " " + valueString + " "; // NOI18N
     }
 
     protected void updateRenderer(Component c, JTable table, Object value,
@@ -67,8 +67,8 @@ final class TimestampRenderer extends DetailsTableCellRenderer {
     boolean updateFormat(TableModel model) {
         int rowCount = model.getRowCount();
 
-        long first = rowCount > 0 ? (Long)model.getValueAt(0, 0) : REFERENCE_TIMESTAMP;
-        long last = rowCount > 0  ? (Long)model.getValueAt(rowCount - 1, 0) :
+        long first = rowCount > 0 ? (Long)model.getValueAt(0, 1) : REFERENCE_TIMESTAMP;
+        long last  = rowCount > 0 ? (Long)model.getValueAt(rowCount - 1, 1) :
                                     REFERENCE_TIMESTAMP + 1;
         
         String newFormatString = TimeAxisUtils.getFormatString(1, first, last);

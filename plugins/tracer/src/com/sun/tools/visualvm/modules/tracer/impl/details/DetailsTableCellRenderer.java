@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.tracer.impl.details;
 
 import java.awt.Color;
 import java.awt.Component;
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
@@ -48,8 +49,7 @@ class DetailsTableCellRenderer implements TableCellRenderer {
 
     protected Object formatValue(JTable table, Object value, boolean isSelected,
                                  boolean hasFocus, int row, int column) {
-        // Improve spacing of the text
-        return " " + value + " "; // NOI18N
+        return value;
     }
 
     protected void updateRenderer(Component c, JTable table, Object value,
@@ -58,12 +58,18 @@ class DetailsTableCellRenderer implements TableCellRenderer {
         if (color == null) {
             color = table.getBackground();
             if (color == null) color = c.getBackground();
+            // Neutralize LaF colors with unpredictable behavior (Nimbus)
+            color = color == null ? Color.WHITE : new Color(color.getRGB());
             darkerColor = darker(color);
         }
-        if (!isSelected) c.setBackground(row % 2 == 0 ? darkerColor : color);
+        if (!isSelected) {
+            c.setBackground(row % 2 == 0 ? darkerColor : color);
+            // Make sure the renderer paints its background (Nimbus)
+            if (c instanceof JComponent) ((JComponent)c).setOpaque(true);
+        }
     }
 
-    public final Component getTableCellRendererComponent(JTable table, Object value,
+    public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus,
                                                    int row, int column) {
 
@@ -80,9 +86,10 @@ class DetailsTableCellRenderer implements TableCellRenderer {
 
     private static Color darker(Color c) {
         if (c == null) return null;
-        int r = Math.abs(c.getRed() - 11);
-        int g = Math.abs(c.getGreen() - 11);
-        int b = Math.abs(c.getBlue() - 11);
+        // Unify with Nimbus (-13)
+        int r = Math.abs(c.getRed() - 13);
+        int g = Math.abs(c.getGreen() - 13);
+        int b = Math.abs(c.getBlue() - 13);
         int a = c.getAlpha();
         return new Color(r, g, b, a);
     }

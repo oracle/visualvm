@@ -49,9 +49,10 @@ final class DetailsView {
     DataViewComponent.DetailsView getView() {
         final DetailsPanel panel = new DetailsPanel(timelineSupport);
         timelineSupport.addSelectionListener(new TimelineSupport.SelectionListener() {
-            public void selectionChanged() {
+            public void rowSelectionChanged() {
                 panel.setTableModel(timelineSupport.getDetailsModel());
             }
+            public void timeSelectionChanged() {}
         });
         return new DataViewComponent.DetailsView("Details", null, 10, panel, null);
     }
