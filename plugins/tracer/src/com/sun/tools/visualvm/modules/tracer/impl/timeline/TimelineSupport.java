@@ -509,30 +509,35 @@ public final class TimelineSupport {
         chart.getSelectionModel().setSelectedItems(selections);
     }
 
-    public void setSelectedTimestamps(int[] selectedIndexes) {
-//        selectedTimestamps = selectedIndexes;
-//        List<SynchronousXYItem> selectedItems = getSelectedItems();
-//        List<ItemSelection> selections = new ArrayList(selectedItems.size());
-//        for (int selectedIndex : selectedIndexes)
-//            for (SynchronousXYItem selectedItem : selectedItems)
-//                selections.add(new XYItemSelection.Default(selectedItem,
-//                               selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
-//
-//        ChartSelectionModel selectionModel = chart.getSelectionModel();
-//        List<ItemSelection> oldSelection = selectionModel.getSelectedItems();
-//        selectionModel.setSelectedItems(selections);
-//
-//        int selectedSize = selectedIndexes.length;
-//        if (selectedSize > 0) {
-//            int oldIndex = oldSelection.isEmpty() ? -1 :
-//                           ((XYItemSelection)oldSelection.get(0)).getValueIndex();
-////            System.err.println(">>> Scroll to selection...");
-//            scrollChartToSelection(oldIndex, selectedIndexes[0]);
-//        }
-    }
-
     public Set<Integer> getSelectedTimestamps() {
         return selectedTimestamps;
+    }
+
+    public void highlightTimestamp(int selectedIndex) {
+        List<SynchronousXYItem> selectedItems = new ArrayList();
+        if (selectedIndex != -1) {
+            int rowsCount = chart.getRowsCount();
+            for (int i = 0; i < rowsCount; i++)
+                selectedItems.addAll(Arrays.asList(chart.getRow(i).getItems()));
+        }
+        List<ItemSelection> selections = new ArrayList(selectedItems.size());
+        if (selectedIndex != -1) {
+            for (SynchronousXYItem selectedItem : selectedItems)
+                selections.add(new XYItemSelection.Default(selectedItem,
+                               selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
+        }
+
+        ChartSelectionModel selectionModel = chart.getSelectionModel();
+        List<ItemSelection> oldSelection = selectionModel.getHighlightedItems();
+        int oldSelectedIndex = -1;
+        if (!oldSelection.isEmpty()) {
+            XYItemSelection sel = (XYItemSelection)oldSelection.get(0);
+            oldSelectedIndex = sel.getValueIndex();
+        }
+        selectionModel.setHighlightedItems(selections);
+
+        if (selectedIndex != -1)
+            scrollChartToSelection(oldSelectedIndex, selectedIndex);
     }
 
 

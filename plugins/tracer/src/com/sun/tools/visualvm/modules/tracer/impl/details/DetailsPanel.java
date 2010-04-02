@@ -104,16 +104,9 @@ public final class DetailsPanel extends JPanel {
         table.addKeyListener(tableListener);
     }
 
-//    private int getSelectedRow() {
-//        int selectedRow = table.getSelectedRow();
-//        return selectedRow == -1 ? -1 : table.convertRowIndexToModel(selectedRow);
-//    }
-
-    private int[] getSelectedRows() {
-        int[] selectedRows = table.getSelectedRows();
-        for (int i = 0; i < selectedRows.length; i++)
-            selectedRows[i] = table.convertRowIndexToModel(selectedRows[i]);
-        return selectedRows;
+    private int getSelectedRow() {
+        int selectedRow = table.getSelectedRow();
+        return selectedRow == -1 ? -1 : table.convertRowIndexToModel(selectedRow);
     }
 
     private boolean isTrackingEnd() {
@@ -178,7 +171,7 @@ public final class DetailsPanel extends JPanel {
     private class TableListener implements ListSelectionListener, KeyListener {
         public void valueChanged(ListSelectionEvent e) {
             selectionAdjusting = e.getValueIsAdjusting();
-            support.setSelectedTimestamps(getSelectedRows());
+//            support.highlightTimestamp(getSelectedRow());
         }
         public void keyPressed(KeyEvent e) {
             tableKeyStroke = KeyStroke.getKeyStrokeForEvent(e);

@@ -590,6 +590,11 @@ final class TimelineChart extends SynchronousXYChart {
             return items.toArray(new SynchronousXYItem[items.size()]);
         }
 
+        @SuppressWarnings("element-type-mismatch")
+        boolean containsItem(ChartItem item) {
+            return items.contains(item);
+        }
+
 
         // --- Row context -----------------------------------------------------
 
