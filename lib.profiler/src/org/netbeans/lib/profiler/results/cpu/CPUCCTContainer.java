@@ -630,6 +630,8 @@ public class CPUCCTContainer {
         } else {
             if (!parent.isRoot()) { // no propagation of filtered-out data to the Thread level node
                 parent.addNetTime0(node.getNetTime0());
+                parent.addSleepTime0(node.getSleepTime0());
+                parent.addWaitTime0(node.getWaitTime0());
                 parent.addNCallsDiff(node.getNCalls());
 
                 if (collectingTwoTimeStamps) {

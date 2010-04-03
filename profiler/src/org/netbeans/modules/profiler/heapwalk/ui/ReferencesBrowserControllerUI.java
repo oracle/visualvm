@@ -41,6 +41,7 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 
+import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
@@ -625,8 +626,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                         while (className.endsWith("[]")) {
                             className = className.substring(0, className.length() - 2); // NOI18N
                         }
-
-                        NetBeansProfiler.getDefaultNB().openJavaSource(null, className, null, null);
+                        Project p = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
+                        NetBeansProfiler.getDefaultNB().openJavaSource(p, className, null, null);
                     }
                 }
             });
