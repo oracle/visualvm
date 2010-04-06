@@ -500,7 +500,7 @@ public class ClassFileParser implements JavaClassConstants {
 
         if ((majorVersion > JAVA_MAJOR_VERSION)
                 || (((majorVersion * 1000) + minorVersion) < ((JAVA_MIN_MAJOR_VERSION * 1000) + JAVA_MIN_MINOR_VERSION))) {
-            if ((majorVersion != 49) && (majorVersion != 50)) {
+            if ((majorVersion != 49) && (majorVersion != 50) && (majorVersion != 51)) {
                 String versionCode = majorVersion + "." + minorVersion; // NOI18N
                 String message = "Unsupported class file version: " + versionCode; // NOI18N
                 throw classFileReadException(message);
