@@ -40,7 +40,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -196,6 +195,8 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
     @SuppressWarnings("element-type-mismatch")
     private void updateTooltip(TimelineChart chart) {
+        if (rowModels == null) return;
+
         ChartSelectionModel selectionModel = chart.getSelectionModel();
         if (selectionModel == null) return;
 
