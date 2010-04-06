@@ -25,15 +25,19 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.details;
 
-import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderPanel;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderButton;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -84,11 +88,11 @@ public final class DetailsPanel extends JPanel {
             removeAll();
             add(noDataContainer, BorderLayout.CENTER);
         } else {
-//            int selectedRow = getSelectedRow();
+            int selectedRow = getSelectedRow();
             table.setModel(model);
-//            if (selectedRow != -1)
-//                table.getSelectionModel().setSelectionInterval(selectedRow,
-//                                                               selectedRow);
+            if (selectedRow != -1)
+                table.getSelectionModel().setSelectionInterval(selectedRow,
+                                                               selectedRow);
             removeAll();
             add(dataContainer, BorderLayout.CENTER);
         }
@@ -124,6 +128,19 @@ public final class DetailsPanel extends JPanel {
         table = new DetailsTable();
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        JCheckBox checkBox = new JCheckBox();
+        checkBox.setBorder(BorderFactory.createEmptyBorder());
+        checkBox.setEnabled(false);
+        checkBox.setSize(checkBox.getMinimumSize());
+        BufferedImage img = new BufferedImage(checkBox.getWidth(), checkBox.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        checkBox.print(img.getGraphics());
+        HeaderButton hb = new HeaderButton(null, new ImageIcon(img)) {
+            protected void performAction(ActionEvent e) {
+               support.resetSelectedTimestamps();
+            }
+        };
+        hb.setToolTipText("Clear Marks");
+
         JViewport viewport = new Viewport(table);
 
         final JScrollPane tableScroll = new JScrollPane(
@@ -132,7 +149,7 @@ public final class DetailsPanel extends JPanel {
         tableScroll.setViewport(viewport);
         tableScroll.setBorder(BorderFactory.createEmptyBorder());
         tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-        tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, new HeaderPanel());
+        tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, hb);
         scrollBar = new JScrollBar(JScrollBar.VERTICAL) {
             public int getUnitIncrement(int direction) {
                 JViewport vp = tableScroll.getViewport();
@@ -171,7 +188,7 @@ public final class DetailsPanel extends JPanel {
     private class TableListener implements ListSelectionListener, KeyListener {
         public void valueChanged(ListSelectionEvent e) {
             selectionAdjusting = e.getValueIsAdjusting();
-//            support.highlightTimestamp(getSelectedRow());
+            support.highlightTimestamp(getSelectedRow());
         }
         public void keyPressed(KeyEvent e) {
             tableKeyStroke = KeyStroke.getKeyStrokeForEvent(e);

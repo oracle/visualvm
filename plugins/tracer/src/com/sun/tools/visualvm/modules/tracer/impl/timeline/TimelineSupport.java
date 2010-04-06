@@ -402,12 +402,16 @@ public final class TimelineSupport {
         final String[] columnNames = new String[columnCount];
         columnNames[0] = "Mark";
         columnNames[1] = "Time [ms]";
+        final String[] columnTooltips = new String[columnCount];
+        columnTooltips[0] = "Mark a timestamp in Timeline view";
+        columnTooltips[1] = "Timestamp of the data";
         for (int i = 2; i < columnCount; i++) {
             String itemName = selectedItemsArr[i - 2].getName();
             String unitsString = selectedDescriptors.get(i - 2).
                                  getUnitsString(ItemValueFormatter.FORMAT_DETAILS);
             String unitsExt = unitsString == null ? "" : " [" + unitsString + "]";
             columnNames[i] = itemName + unitsExt;
+            columnTooltips[i] = selectedDescriptors.get(i - 2).getDescription();
         }
 
         return new DetailsTableModel() {
@@ -422,6 +426,10 @@ public final class TimelineSupport {
 
             public String getColumnName(int columnIndex) {
                 return columnNames[columnIndex];
+            }
+
+            public String getColumnTooltip(int columnIndex) {
+                return columnTooltips[columnIndex];
             }
 
             public Class getColumnClass(int columnIndex) {
@@ -489,9 +497,10 @@ public final class TimelineSupport {
         }
     }
 
-    private void resetSelectedTimestamps() {
+    public void resetSelectedTimestamps() {
         if (selectedTimestamps.isEmpty()) return;
         selectedTimestamps.clear();
+        detailsModel.fireTableDataChanged();
         updateSelectedItems();
         notifyTimeSelectionChanged();
     }
@@ -514,19 +523,19 @@ public final class TimelineSupport {
     }
 
     public void highlightTimestamp(int selectedIndex) {
-        List<SynchronousXYItem> selectedItems = new ArrayList();
-        if (selectedIndex != -1) {
-            int rowsCount = chart.getRowsCount();
-            for (int i = 0; i < rowsCount; i++)
-                selectedItems.addAll(Arrays.asList(chart.getRow(i).getItems()));
-        }
-        List<ItemSelection> selections = new ArrayList(selectedItems.size());
-        if (selectedIndex != -1) {
-            for (SynchronousXYItem selectedItem : selectedItems)
-                selections.add(new XYItemSelection.Default(selectedItem,
-                               selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
-        }
-
+//        List<SynchronousXYItem> selectedItems = new ArrayList();
+//        if (selectedIndex != -1) {
+//            int rowsCount = chart.getRowsCount();
+//            for (int i = 0; i < rowsCount; i++)
+//                selectedItems.addAll(Arrays.asList(chart.getRow(i).getItems()));
+//        }
+//        List<ItemSelection> selections = new ArrayList(selectedItems.size());
+//        if (selectedIndex != -1) {
+//            for (SynchronousXYItem selectedItem : selectedItems)
+//                selections.add(new XYItemSelection.Default(selectedItem,
+//                               selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
+//        }
+//
         ChartSelectionModel selectionModel = chart.getSelectionModel();
         List<ItemSelection> oldSelection = selectionModel.getHighlightedItems();
         int oldSelectedIndex = -1;
@@ -534,7 +543,7 @@ public final class TimelineSupport {
             XYItemSelection sel = (XYItemSelection)oldSelection.get(0);
             oldSelectedIndex = sel.getValueIndex();
         }
-        selectionModel.setHighlightedItems(selections);
+//        selectionModel.setHighlightedItems(selections);
 
         if (selectedIndex != -1)
             scrollChartToSelection(oldSelectedIndex, selectedIndex);

@@ -36,6 +36,7 @@ import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.plaf.ButtonUI;
@@ -52,10 +53,10 @@ public class HeaderButton extends HeaderPanel {
     private final JButton button;
 
 
-    public HeaderButton(String text) {
+    public HeaderButton(String text, Icon icon) {
         JPanel panel = super.getClientContainer();
         panel.setLayout(new BorderLayout());
-        button = new JButton(text) {
+        button = new JButton(text, icon) {
             protected void processMouseEvent(MouseEvent e) {
                 super.processMouseEvent(e);
                 if (!isEnabled()) return;

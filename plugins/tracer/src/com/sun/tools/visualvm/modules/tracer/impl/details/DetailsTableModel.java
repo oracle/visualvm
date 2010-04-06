@@ -34,6 +34,8 @@ import javax.swing.table.AbstractTableModel;
  */
 public abstract class DetailsTableModel extends AbstractTableModel {
 
+    public abstract String getColumnTooltip(int columnIndex);
+
     public abstract ValueItemDescriptor getDescriptor(int columnIndex);
 
 }

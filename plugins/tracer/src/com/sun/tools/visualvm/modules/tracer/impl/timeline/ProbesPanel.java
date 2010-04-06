@@ -97,7 +97,7 @@ final class ProbesPanel extends JPanel {
                                      HORIZONTAL).getPreferredSize().height));
         bottomPanel.setOpaque(false);
 
-        increaseB = new HeaderButton("+") {
+        increaseB = new HeaderButton("+", null) {
             protected void performAction(ActionEvent e) {
                 chart.increaseRowHeights((e.getModifiers() & Toolkit.getDefaultToolkit().
                                          getMenuShortcutKeyMask()) == 0);
@@ -106,7 +106,7 @@ final class ProbesPanel extends JPanel {
         increaseB.setToolTipText("Increase rows height");
         bottomPanel.add(increaseB);
 
-        decreaseB = new HeaderButton("-") {
+        decreaseB = new HeaderButton("-", null) {
             protected void performAction(ActionEvent e) {
                 chart.decreaseRowHeights((e.getModifiers() & Toolkit.getDefaultToolkit().
                                          getMenuShortcutKeyMask()) == 0);
@@ -115,7 +115,7 @@ final class ProbesPanel extends JPanel {
         decreaseB.setToolTipText("Decrease rows height");
         bottomPanel.add(decreaseB);
 
-        resetB = new HeaderButton("=") {
+        resetB = new HeaderButton("=", null) {
             protected void performAction(ActionEvent e) {
                 chart.resetRowHeights();
             }

@@ -29,9 +29,11 @@ import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -70,6 +72,16 @@ final class DetailsTable extends JTable {
     public void tableChanged(TableModelEvent e) {
         super.tableChanged(e);
         if (e.getType() == TableModelEvent.INSERT) updateColumns(false);
+    }
+
+    protected JTableHeader createDefaultTableHeader() {
+        return new JTableHeader(columnModel) {
+            public String getToolTipText(MouseEvent e) {
+                int index = columnModel.getColumnIndexAtX(e.getPoint().x);
+                int realIndex = columnModel.getColumn(index).getModelIndex();
+                return ((DetailsTableModel)dataModel).getColumnTooltip(realIndex);
+            }
+        };
     }
 
 
