@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="VisualVM">
+        <folder name="Tracer">
+            <folder name="Deployer">
+                <!--
+                <file name="BTrace">
+                    <attr name="instance" newvalue="net.java.btrace.visualvm.tracer.DeployerImpl"/>
+                </file>
+                -->
+            </folder>
+            <folder name="packages">
+                <!--
+                <folder name="FXMetrics">
+                    <attr name="displayName" stringvalue="JavaFX Metrics"/>
+                    <attr name="position" intvalue="0"/>
+                    <attr name="desc" stringvalue="Provides various metrics for monitoring runtime behavior of a JavaFX application."/>
+                    <attr name="icon" stringvalue="net/java/btrace/visualvm/tracer/fx/resources/fx.png"/>
+                    <folder name="probes">
+                        <folder name="fx_metrics">
+                            <attr name="displayName" bundlevalue="net.java.btrace.visualvm.tracer.fx.Bundle#VisualVM/BTracer/JavaFX/probes/fx_metrics"/>
+                            <attr name="position" intvalue="-190"/>
+                            <attr name="desc" stringvalue="Monitors Invalidation Rate and Replacement Rate"/>
+                            <attr name="mbean" stringvalue="btrace:name=FxBtraceTracker"/>
+                            <folder name="deployment">
+                                <file name="deployer.shadow">
+                                    <attr name="originalFile" stringvalue="VisualVM/Tracer/Deployer/BTrace"/>
+                                    <attr name="script" urlvalue="nbres:/net/java/btrace/visualvm/tracer/fx/resources/FXBtraceTracker.java"/>
+                                    <attr name="fragment" stringvalue="metrics"/>
+                                </file>
+                            </folder>
+                            <folder name="properties">
+                                <attr name="descriptorProvider" newvalue="net.java.btrace.visualvm.tracer.fx.impl.JavaFXItemDescriptorProvider"/>
+                                <file name="invalidationRate">
+                                    <attr name="displayName" bundlevalue="net.java.btrace.visualvm.tracer.fx.Bundle#VisualVM/BTracer/JavaFX/probes/fx_metrics/properties/invalidationRate"/>
+                                </file>
+                                <file name="replacementRate">
+                                    <attr name="displayName" bundlevalue="net.java.btrace.visualvm.tracer.fx.Bundle#VisualVM/BTracer/JavaFX/probes/fx_metrics/properties/replacementRate"/>
+                                </file>
+                            </folder>
+                        </folder>
+                    </folder>
+                </folder>
+                -->
+            </folder>
+        </folder>
+    </folder>
+</filesystem>
