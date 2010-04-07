@@ -118,7 +118,7 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
                 time = 0;
             }
 
-            timePM0[i] = (long) time;
+            timePM0[i] = Math.round(time);
 
             // don't include the Thread time into wholegraphtime
             if (i > 0) {
@@ -129,7 +129,7 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
                 time = TimingAdjusterOld.getInstance(status)
                                         .adjustTime(timePM1[i], (invPM[i] + invDiff[i]), (nCalleeInvocations[i] + invDiff[i]),
                                                     true);
-                timePM1[i] = (long) time;
+                timePM1[i] = Math.round(time);
 
                 // don't include the Thread time into wholegraphtime
                 if (i > 0) {
