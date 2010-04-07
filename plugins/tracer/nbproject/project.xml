@@ -51,6 +51,7 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>com.sun.tools.visualvm.modules.tracer.dynamic</friend>
                 <friend>com.sun.tools.visualvm.modules.tracer.javafx</friend>
                 <friend>com.sun.tools.visualvm.modules.tracer.monitor</friend>
                 <friend>net.java.btrace.visualvm.tracer</friend>
