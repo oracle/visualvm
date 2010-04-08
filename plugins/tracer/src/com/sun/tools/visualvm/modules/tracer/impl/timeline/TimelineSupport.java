@@ -67,6 +67,7 @@ public final class TimelineSupport {
     private final SynchronousXYItemsModel itemsModel;
 
     private final TimelineTooltipOverlay tooltips;
+    private final TimelineLegendOverlay legend;
     private final TimelineUnitsOverlay units;
 
     private final List<TracerProbe> probes = new ArrayList();
@@ -89,12 +90,13 @@ public final class TimelineSupport {
         tooltips = new TimelineTooltipOverlay(this);
         chart.addOverlayComponent(tooltips);
 
-        if (TracerOptions.getInstance().isShowValuesEnabled()) {
-            units = new TimelineUnitsOverlay(chart);
-            chart.addOverlayComponent(units);
-        } else {
-            units = null;
-        }
+        legend = new TimelineLegendOverlay(chart);
+        legend.setVisible(TracerOptions.getInstance().isShowLegendEnabled());
+        chart.addOverlayComponent(legend);
+
+        units = new TimelineUnitsOverlay(chart);
+        units.setVisible(TracerOptions.getInstance().isShowValuesEnabled());
+        chart.addOverlayComponent(units);
     }
 
 
@@ -106,6 +108,25 @@ public final class TimelineSupport {
 
     public ChartSelectionModel getChartSelectionModel() {
         return chart.getSelectionModel();
+    }
+
+
+    // --- Overlays access -----------------------------------------------------
+
+    public void setShowValuesEnabled(boolean enabled) {
+        units.setVisible(enabled);
+    }
+
+    public boolean isShowValuesEnabled() {
+        return units.isVisible();
+    }
+
+    public void setShowLegendEnabled(boolean enabled) {
+        legend.setVisible(enabled);
+    }
+
+    public boolean isShowLegendEnabled() {
+        return legend.isVisible();
     }
 
 
@@ -204,7 +225,7 @@ public final class TimelineSupport {
         }
         tooltips.setupModel(rowModels);
 
-        if (units != null) units.setupModel(new TimelineUnitsOverlay.Model() {
+        units.setupModel(new TimelineUnitsOverlay.Model() {
 
             private final String LAST_UNITS_STRING = "lastUnitsString"; // NOI18N
 
@@ -480,6 +501,7 @@ public final class TimelineSupport {
         if (change) {
             updateSelectedItems();
             notifyTimeSelectionChanged();
+            highlightTimestamp(index);
         }
     }
 
@@ -500,7 +522,7 @@ public final class TimelineSupport {
     public void resetSelectedTimestamps() {
         if (selectedTimestamps.isEmpty()) return;
         selectedTimestamps.clear();
-        detailsModel.fireTableDataChanged();
+        if (detailsModel != null) detailsModel.fireTableDataChanged();
         updateSelectedItems();
         notifyTimeSelectionChanged();
     }
@@ -522,7 +544,7 @@ public final class TimelineSupport {
         return selectedTimestamps;
     }
 
-    public void highlightTimestamp(int selectedIndex) {
+    private void highlightTimestamp(int selectedIndex) {
 //        List<SynchronousXYItem> selectedItems = new ArrayList();
 //        if (selectedIndex != -1) {
 //            int rowsCount = chart.getRowsCount();

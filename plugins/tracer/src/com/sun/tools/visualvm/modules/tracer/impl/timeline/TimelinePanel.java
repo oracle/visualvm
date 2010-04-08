@@ -68,7 +68,12 @@ public final class TimelinePanel extends JPanel {
     // --- Public interface ----------------------------------------------------
 
     public void reset() {
-        if (chartPanel.reset()) mouseHandler.updateSelection();
+        chartPanel.resetChart();
+        resetSelection();
+    }
+
+    public void resetSelection() {
+        if (chartPanel.resetSelection()) mouseHandler.updateSelection();
     }
 
     public Action zoomInAction() {

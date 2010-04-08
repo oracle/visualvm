@@ -32,8 +32,10 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
 import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
 import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.DropdownButton;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HorizontalLayout;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.SimpleSeparator;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.VisibilityHandler;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -81,6 +83,7 @@ final class TracerView extends DataSourceView {
 
     private DataViewComponent dvc;
     private TimelineView timelineView;
+    private DetailsView detailsView;
 
     
     TracerView(TracerModel model, TracerController controller) {
@@ -96,7 +99,7 @@ final class TracerView extends DataSourceView {
     protected DataViewComponent createComponent() {
         PackagesView packagesView = new PackagesView(model, controller);
         timelineView = new TimelineView(model);
-        DetailsView detailsView = new DetailsView(model);
+        detailsView = new DetailsView(model);
         MasterViewSupport masterView = new MasterViewSupport();
         
         dvc = new DataViewComponent(masterView.getView(),
@@ -136,6 +139,8 @@ final class TracerView extends DataSourceView {
             "com/sun/tools/visualvm/modules/tracer/impl/resources/stop.png"; // NOI18N
         private static final String ERROR_IMAGE_PATH =
             "com/sun/tools/visualvm/modules/tracer/impl/resources/error.png"; // NOI18N
+        private static final String SETTINGS_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/settings.png"; // NOI18N
 
         private static final String SYSTEM_TOOLBAR = "systemToolbar"; // NOI18N
         private static final String CLIENT_TOOLBAR = "clientToolbar"; // NOI18N
@@ -229,10 +234,22 @@ final class TracerView extends DataSourceView {
                 public void timeSelectionChanged(boolean timestampsSelected) {}
             });
 
-            timelineView.registerViewListener(new TimelineView.ViewListener() {
-                public void viewShown()  { showTimelineToolbar(); }
-                public void viewHidden() { hideTimelineToolbar(); }
+            timelineView.registerViewListener(new VisibilityHandler() {
+                public void shown()  { showTimelineToolbar(); }
+                public void hidden() { hideTimelineToolbar(); }
             });
+
+            detailsView.registerViewListener(new VisibilityHandler() {
+                public void shown()  {}
+                public void hidden() { clearSelections(); }
+            });
+        }
+
+        private void clearSelections() {
+            if (TracerOptions.getInstance().isClearSelection()) {
+                timelineView.resetSelection();
+//                model.getTimelineSupport().resetSelectedTimestamps();
+            }
         }
 
         private void updateViewsOnSessionStart() {
@@ -402,6 +419,66 @@ final class TracerView extends DataSourceView {
                 b3.setPreferredSize(size);
                 b3.setMaximumSize(size);
                 timelineToolbar.addItem(b3);
+
+                JPanel sp2 = new JPanel(null) {
+                    public Dimension getPreferredSize() {
+                        Dimension d = super.getPreferredSize();
+                        d.width = 14;
+                        return d;
+                    }
+                };
+                timelineToolbar.addItem(sp2);
+
+                DropdownButton d1 = new DropdownButton(new ImageIcon(
+                        ImageUtilities.loadImage(SETTINGS_IMAGE_PATH)));
+                Action action = new AbstractAction("Show min/max values") {
+                    public Object getValue(String key) {
+                        if (DropdownButton.KEY_BOOLVALUE.equals(key)) {
+                            putValue(DropdownButton.KEY_BOOLVALUE, model.
+                                     getTimelineSupport().isShowValuesEnabled());
+                        }
+                        return super.getValue(key);
+                    }
+                    public void actionPerformed(ActionEvent e) {
+                        model.getTimelineSupport().setShowValuesEnabled(!model.
+                                getTimelineSupport().isShowValuesEnabled());
+                    }
+                };
+                action.putValue(DropdownButton.KEY_CLASS, Boolean.class);
+                d1.addAction(action);
+                
+                Action action2 = new AbstractAction("Show row legend") {
+                    public Object getValue(String key) {
+                        if (DropdownButton.KEY_BOOLVALUE.equals(key)) {
+                            putValue(DropdownButton.KEY_BOOLVALUE, model.
+                                     getTimelineSupport().isShowLegendEnabled());
+                        }
+                        return super.getValue(key);
+                    }
+                    public void actionPerformed(ActionEvent e) {
+                        model.getTimelineSupport().setShowLegendEnabled(!model.
+                                getTimelineSupport().isShowLegendEnabled());
+                    }
+                };
+                action2.putValue(DropdownButton.KEY_CLASS, Boolean.class);
+                d1.addAction(action2);
+//                d1.addAction(new AbstractAction("Show row legend") {
+//                    public Object getValue(String key) {
+//                        if (DropdownButton.KEY_BOOLVALUE.equals(key)) {
+//                            putValue(DropdownButton.KEY_BOOLVALUE, model.
+//                                     getTimelineSupport().isShowLegendEnabled());
+//                        }
+//                        return super.getValue(key);
+//                    }
+//                    public void actionPerformed(ActionEvent e) {
+//                        model.getTimelineSupport().setShowLegendEnabled(model.
+//                                getTimelineSupport().isShowLegendEnabled());
+//                    }
+//                });
+                d1.setMinimumSize(size);
+                d1.setPreferredSize(size);
+                d1.setMaximumSize(size);
+                timelineToolbar.addItem(d1);
             }
 
             addClientToobarItem(timelineToolbar);

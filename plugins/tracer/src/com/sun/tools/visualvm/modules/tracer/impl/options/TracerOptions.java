@@ -62,6 +62,8 @@ public final class TracerOptions {
     static final String ROW_SELECTED_DEFAULT = SESSION_STARTED_DEFAULT + "," + VIEW_DETAILS; // NOI18N
     static final String ROW_SELECTED_DEFAULT2 = SESSION_STARTED_DEFAULT;
 
+    private static final String PROP_CLEAR_SELECTION = "TracerOptions.clearSelection"; // NOI18N
+
     private static final String PROP_ZOOM_MODE = "TracerOptions.zoomMode"; // NOI18N
     private static final String KEY_FIXED_SCALE = "KEY_fixedScale"; // NOI18N
     private static final String KEY_SCALE_TO_FIT = "KEY_scaleToFit"; // NOI18N
@@ -217,6 +219,14 @@ public final class TracerOptions {
         if (KEY_MOUSE_WHEEL_HSCROLLS.equals(mouseWheelAction)) return MOUSE_WHEEL_HSCROLLS;
         else if (KEY_MOUSE_WHEEL_VSCROLLS.equals(mouseWheelAction)) return MOUSE_WHEEL_VSCROLLS;
         return MOUSE_WHEEL_ZOOMS;
+    }
+
+    void setClearSelection(boolean clear) {
+        prefs.putBoolean(PROP_CLEAR_SELECTION, clear);
+    }
+
+    public boolean isClearSelection() {
+        return prefs.getBoolean(PROP_CLEAR_SELECTION, true);
     }
 
 

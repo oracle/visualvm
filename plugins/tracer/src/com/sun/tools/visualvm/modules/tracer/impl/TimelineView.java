@@ -26,13 +26,10 @@
 package com.sun.tools.visualvm.modules.tracer.impl;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.VisibilityHandler;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelinePanel;
-import java.awt.Component;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
-import javax.swing.JComponent;
 
 /**
  *
@@ -43,7 +40,7 @@ final class TimelineView {
     private final TracerModel model;
     private TimelinePanel panel;
 
-    private ViewListener viewListener;
+    private VisibilityHandler viewHandler;
 
 
     // --- Constructor ---------------------------------------------------------
@@ -57,6 +54,10 @@ final class TimelineView {
 
     void reset() {
         if (panel != null) panel.reset();
+    }
+
+    void resetSelection() {
+        if (panel != null) panel.resetSelection();
     }
 
     Action zoomInAction() {
@@ -90,11 +91,11 @@ final class TimelineView {
     }
 
 
-    void registerViewListener(ViewListener viewListener) {
+    void registerViewListener(VisibilityHandler viewHandler) {
         if (panel != null) {
-            registerListener(panel, viewListener);
+            viewHandler.handle(panel);
         } else {
-            this.viewListener = viewListener;
+            this.viewHandler = viewHandler;
         }
 
     }
@@ -105,61 +106,12 @@ final class TimelineView {
     DataViewComponent.DetailsView getView() {
         panel = new TimelinePanel(model.getTimelineSupport());
 
-        if (viewListener != null) {
-            registerListener(panel, viewListener);
-            viewListener = null;
+        if (viewHandler != null) {
+            viewHandler.handle(panel);
+            viewHandler = null;
         }
 
         return new DataViewComponent.DetailsView("Timeline", null, 10, panel, null);
-    }
-
-
-    // --- Private implementation ----------------------------------------------
-
-    private static void registerListener(final JComponent c, final ViewListener l) {
-        c.addHierarchyListener(new VisibilityListener(c) {
-            void shown() { l.viewShown(); }
-            void hidden() { l.viewHidden(); }
-        });
-    }
-
-    
-    // --- View visibility listener --------------------------------------------
-
-    static interface ViewListener {
-
-        public void viewShown();
-
-        public void viewHidden();
-
-    }
-
-
-    private static abstract class VisibilityListener implements HierarchyListener {
-
-        private boolean wasVisible;
-        private final Component c;
-
-        VisibilityListener(Component c) {
-            this.c = c;
-            wasVisible = c.isVisible();
-        }
-
-        public void hierarchyChanged(HierarchyEvent e) {
-            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                boolean visible = c.isShowing();
-                if (wasVisible == visible) return;
-
-                wasVisible = visible;
-                
-                if (visible) shown();
-                else hidden();
-            }
-        }
-
-        abstract void shown();
-        abstract void hidden();
-
     }
 
 }

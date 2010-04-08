@@ -67,6 +67,8 @@ final class TracerOptionsPanelController extends OptionsPanelController {
         p.setZoomMode(options.getZoomMode());
         p.setMouseWheelAction(options.getMouseWheelAction());
 
+        p.setClearSelection(options.isClearSelection());
+
         p.update();
     }
 
@@ -90,6 +92,8 @@ final class TracerOptionsPanelController extends OptionsPanelController {
 
         options.setZoomMode(p.getZoomMode());
         options.setMouseWheelAction(p.getMouseWheelAction());
+
+        options.setClearSelection(p.isClearSelection());
     }
 
     public void cancel() {}
@@ -118,6 +122,8 @@ final class TracerOptionsPanelController extends OptionsPanelController {
 
         if (!options.getZoomMode().equals(p.getZoomMode())) return true;
         if (!options.getMouseWheelAction().equals(p.getMouseWheelAction())) return true;
+
+        if (options.isClearSelection() != p.isClearSelection()) return true;
 
         return false;
     }

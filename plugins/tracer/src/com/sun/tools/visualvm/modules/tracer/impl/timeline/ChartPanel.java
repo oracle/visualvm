@@ -111,9 +111,6 @@ final class ChartPanel extends JPanel {
             selectionModel.setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
             selectionModel.setMoveMode(ChartSelectionModel.SELECTION_LINE_V);
         }
-
-        if (TracerOptions.getInstance().isShowLegendEnabled())
-            chart.addOverlayComponent(new TimelineLegendOverlay(chart));
         
         TimelineAxis axis = new TimelineAxis(chart, support);
         
@@ -149,23 +146,25 @@ final class ChartPanel extends JPanel {
         add(chart, BorderLayout.CENTER);
         add(vScrollBar, BorderLayout.EAST);
         add(hScrollBar, BorderLayout.SOUTH);
-        reset();
+
+        resetChart();
     }
 
 
     // --- Internal interface --------------------------------------------------
 
-    boolean reset() {
+    void resetChart() {
         chart.setScale(0.02, 1);
         chart.setOffset(0, 0);
-        
+    }
+
+    boolean resetSelection() {
         if (chart.isRowSelection()) {
             chart.clearRowsSelection();
             return true;
         } else {
             return false;
         }
-
     }
 
 

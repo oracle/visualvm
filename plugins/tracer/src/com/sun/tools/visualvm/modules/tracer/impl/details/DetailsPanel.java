@@ -188,7 +188,7 @@ public final class DetailsPanel extends JPanel {
     private class TableListener implements ListSelectionListener, KeyListener {
         public void valueChanged(ListSelectionEvent e) {
             selectionAdjusting = e.getValueIsAdjusting();
-            support.highlightTimestamp(getSelectedRow());
+//            support.highlightTimestamp(getSelectedRow());
         }
         public void keyPressed(KeyEvent e) {
             tableKeyStroke = KeyStroke.getKeyStrokeForEvent(e);

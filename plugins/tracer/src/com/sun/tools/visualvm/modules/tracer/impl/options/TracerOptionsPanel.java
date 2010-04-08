@@ -330,6 +330,14 @@ final class TracerOptionsPanel extends JPanel {
     String getMouseWheelAction() {
         return mouseWheelCombo.getSelectedItem().toString();
     }
+    
+    void setClearSelection(boolean clear) {
+        clearSelectionsCheckBox.setSelected(clear);
+    }
+
+    boolean isClearSelection() {
+        return clearSelectionsCheckBox.isSelected();
+    }
 
 
     private String append(String result, String item, boolean append) {
@@ -1162,6 +1170,21 @@ final class TracerOptionsPanel extends JPanel {
         onRowSelectedContainer.add(onRowSelectedPanel2);
         viewsSettingsContainer.add(onRowSelectedContainer, OPEN_ROW_SELECTED);
 
+        // clearSelectionsCheckBox
+        clearSelectionsCheckBox = new JCheckBox("Clear selected rows when closing Details view") {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+        };
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 12;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.NONE;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = new Insets(8, 15, 0, 0);
+        add(clearSelectionsCheckBox, c);
+
 
         // bottomFiller
         JPanel bottomFiller = new JPanel(null);
@@ -1213,6 +1236,7 @@ final class TracerOptionsPanel extends JPanel {
     private JCheckBox onRowSelectedTimelineCheckBox2;
     private JCheckBox onRowSelectedDetailsCheckBox2;
     private JCheckBox onRowSelectedNothingCheckBox2;
+    private JCheckBox clearSelectionsCheckBox;
 
     private JComboBox zoomModeCombo;
     private JComboBox mouseWheelCombo;
@@ -1220,8 +1244,7 @@ final class TracerOptionsPanel extends JPanel {
 
     private static Border titledBorder(String title) {
         String titleBorder = isWindowsLookAndFeel() ? " " : ""; //NOI18N
-//        Border inner = BorderFactory.createEmptyBorder(0, 12, 3, 3);
-        Border inner = BorderFactory.createEmptyBorder(0, 12, 0, 3);
+        Border inner = BorderFactory.createEmptyBorder(0, 12, 3, 3);
         Border outer = BorderFactory.createTitledBorder(titleBorder + title);
         return BorderFactory.createCompoundBorder(outer, inner);
     }

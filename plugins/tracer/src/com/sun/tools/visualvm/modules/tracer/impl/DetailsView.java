@@ -27,6 +27,8 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsPanel;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.VisibilityHandler;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelinePanel;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 
 /**
@@ -36,6 +38,9 @@ import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 final class DetailsView {
 
     private final TimelineSupport timelineSupport;
+    private DetailsPanel panel;
+
+    private VisibilityHandler viewHandler;
 
     // --- Constructor ---------------------------------------------------------
 
@@ -44,16 +49,34 @@ final class DetailsView {
     }
 
 
+    // --- Internal interface --------------------------------------------------
+
+    void registerViewListener(VisibilityHandler viewHandler) {
+        if (panel != null) {
+            viewHandler.handle(panel);
+        } else {
+            this.viewHandler = viewHandler;
+        }
+
+    }
+
+
     // --- UI implementation ---------------------------------------------------
 
     DataViewComponent.DetailsView getView() {
-        final DetailsPanel panel = new DetailsPanel(timelineSupport);
+        panel = new DetailsPanel(timelineSupport);
+
         timelineSupport.addSelectionListener(new TimelineSupport.SelectionListener() {
             public void rowSelectionChanged(boolean rowsSelected) {
                 panel.setTableModel(timelineSupport.getDetailsModel());
             }
             public void timeSelectionChanged(boolean timestampsSelected) {}
         });
+        if (viewHandler != null) {
+            viewHandler.handle(panel);
+            viewHandler = null;
+        }
+
         return new DataViewComponent.DetailsView("Details", null, 10, panel, null);
     }
 
