@@ -29,6 +29,8 @@ import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.VerticalLayout;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -40,10 +42,17 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -118,6 +127,16 @@ final class TracerOptionsPanel extends JPanel {
         return (Boolean)rowsDecorationCombo.getSelectedItem();
     }
 
+    void setRowsSelectionEnabled(boolean rowsSelectionEnabled) {
+        internalChange = true;
+        rowsSelectionCombo.setSelectedIndex(rowsSelectionEnabled ? 0 : 1);
+        internalChange = false;
+    }
+
+    boolean isRowsSelectionEnabled() {
+        return rowsSelectionCombo.getSelectedIndex() == 0;
+    }
+
     void setInitiallyOpened(String opened) {
         internalChange = true;
         initialProbesCheckBox.setSelected(
@@ -170,6 +189,36 @@ final class TracerOptionsPanel extends JPanel {
         return result;
     }
 
+    void setOnProbeAdded2(String opened) {
+        internalChange = true;
+        if (TracerOptions.VIEWS_UNCHANGED.equals(opened)) {
+            onProbeAddedProbesCheckBox2.setSelected(false);
+            onProbeAddedTimelineCheckBox2.setSelected(false);
+            onProbeAddedDetailsCheckBox2.setSelected(false);
+            onProbeAddedNothingCheckBox2.setSelected(true);
+        } else {
+            onProbeAddedProbesCheckBox2.setSelected(
+                    opened.contains(TracerOptions.VIEW_PROBES));
+            onProbeAddedTimelineCheckBox2.setSelected(
+                    opened.contains(TracerOptions.VIEW_TIMELINE));
+            onProbeAddedDetailsCheckBox2.setSelected(
+                    opened.contains(TracerOptions.VIEW_DETAILS));
+            onProbeAddedNothingCheckBox2.setSelected(false);
+        }
+        internalChange = false;
+    }
+
+    String getOnProbeAdded2() {
+        String result = TracerOptions.VIEWS_UNCHANGED;
+        result = append(result, TracerOptions.VIEW_PROBES,
+               onProbeAddedProbesCheckBox2.isSelected());
+        result = append(result, TracerOptions.VIEW_TIMELINE,
+               onProbeAddedTimelineCheckBox2.isSelected());
+        result = append(result, TracerOptions.VIEW_DETAILS,
+               onProbeAddedDetailsCheckBox2.isSelected());
+        return result;
+    }
+
     void setOnSessionStart(String opened) {
         internalChange = true;
         if (TracerOptions.VIEWS_UNCHANGED.equals(opened)) {
@@ -197,6 +246,66 @@ final class TracerOptionsPanel extends JPanel {
                onStartTimelineCheckBox.isSelected());
         result = append(result, TracerOptions.VIEW_DETAILS,
                onStartDetailsCheckBox.isSelected());
+        return result;
+    }
+
+    void setOnRowSelected(String opened) {
+        internalChange = true;
+        if (TracerOptions.VIEWS_UNCHANGED.equals(opened)) {
+            onRowSelectedProbesCheckBox.setSelected(false);
+            onRowSelectedTimelineCheckBox.setSelected(false);
+            onRowSelectedDetailsCheckBox.setSelected(false);
+            onRowSelectedNothingCheckBox.setSelected(true);
+        } else {
+            onRowSelectedProbesCheckBox.setSelected(
+                    opened.contains(TracerOptions.VIEW_PROBES));
+            onRowSelectedTimelineCheckBox.setSelected(
+                    opened.contains(TracerOptions.VIEW_TIMELINE));
+            onRowSelectedDetailsCheckBox.setSelected(
+                    opened.contains(TracerOptions.VIEW_DETAILS));
+            onRowSelectedNothingCheckBox.setSelected(false);
+        }
+        internalChange = false;
+    }
+
+    String getOnRowSelected() {
+        String result = TracerOptions.VIEWS_UNCHANGED;
+        result = append(result, TracerOptions.VIEW_PROBES,
+               onRowSelectedProbesCheckBox.isSelected());
+        result = append(result, TracerOptions.VIEW_TIMELINE,
+               onRowSelectedTimelineCheckBox.isSelected());
+        result = append(result, TracerOptions.VIEW_DETAILS,
+               onRowSelectedDetailsCheckBox.isSelected());
+        return result;
+    }
+
+    void setOnRowSelected2(String opened) {
+        internalChange = true;
+        if (TracerOptions.VIEWS_UNCHANGED.equals(opened)) {
+            onRowSelectedProbesCheckBox2.setSelected(false);
+            onRowSelectedTimelineCheckBox2.setSelected(false);
+            onRowSelectedDetailsCheckBox2.setSelected(false);
+            onRowSelectedNothingCheckBox2.setSelected(true);
+        } else {
+            onRowSelectedProbesCheckBox2.setSelected(
+                    opened.contains(TracerOptions.VIEW_PROBES));
+            onRowSelectedTimelineCheckBox2.setSelected(
+                    opened.contains(TracerOptions.VIEW_TIMELINE));
+            onRowSelectedDetailsCheckBox2.setSelected(
+                    opened.contains(TracerOptions.VIEW_DETAILS));
+            onRowSelectedNothingCheckBox2.setSelected(false);
+        }
+        internalChange = false;
+    }
+
+    String getOnRowSelected2() {
+        String result = TracerOptions.VIEWS_UNCHANGED;
+        result = append(result, TracerOptions.VIEW_PROBES,
+               onRowSelectedProbesCheckBox2.isSelected());
+        result = append(result, TracerOptions.VIEW_TIMELINE,
+               onRowSelectedTimelineCheckBox2.isSelected());
+        result = append(result, TracerOptions.VIEW_DETAILS,
+               onRowSelectedDetailsCheckBox2.isSelected());
         return result;
     }
 
@@ -245,7 +354,13 @@ final class TracerOptionsPanel extends JPanel {
             rowsDecorationCombo.setSelectedItem(Boolean.FALSE);
             rowsDecorationCombo.setEnabled(false);
         }
-        
+
+        // --- rowsSelection ---------------------------------------------------
+        if (Utils.forceSpeed()) {
+            rowsSelectionCombo.setSelectedIndex(1);
+            rowsSelectionCombo.setEnabled(false);
+        }
+
         // --- initiallyOpened -------------------------------------------------
         List selected = getSelected(initiallyOpenedPanel);
 
@@ -295,6 +410,34 @@ final class TracerOptionsPanel extends JPanel {
             }
         }
 
+        if (onProbeAddedNothingCheckBox2.isSelected()) {
+            onProbeAddedProbesCheckBox2.setSelected(false);
+            onProbeAddedProbesCheckBox2.setEnabled(false);
+            onProbeAddedTimelineCheckBox2.setSelected(false);
+            onProbeAddedTimelineCheckBox2.setEnabled(false);
+            onProbeAddedDetailsCheckBox2.setSelected(false);
+            onProbeAddedDetailsCheckBox2.setEnabled(false);
+        } else {
+            selected = getSelected(onProbeAddedPanel2);
+
+            if (selected.isEmpty()) {
+                // Fallback to defaults
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        setOnProbeAdded2(TracerOptions.PROBE_ADDED_DEFAULT2);
+                        update();
+                    }
+                });
+            } else {
+                onProbeAddedProbesCheckBox2.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onProbeAddedProbesCheckBox2));
+                onProbeAddedTimelineCheckBox2.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onProbeAddedTimelineCheckBox2));
+                onProbeAddedDetailsCheckBox2.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onProbeAddedDetailsCheckBox2));
+            }
+        }
+
         // --- onStart ---------------------------------------------------------
         if (onStartNothingCheckBox.isSelected()) {
             onStartProbesCheckBox.setSelected(false);
@@ -321,6 +464,63 @@ final class TracerOptionsPanel extends JPanel {
                         !selected.contains(onStartTimelineCheckBox));
                 onStartDetailsCheckBox.setEnabled(selected.size() > 1 ||
                         !selected.contains(onStartDetailsCheckBox));
+            }
+        }
+
+        // --- onRowSelected ---------------------------------------------------
+        if (onRowSelectedNothingCheckBox.isSelected()) {
+            onRowSelectedProbesCheckBox.setSelected(false);
+            onRowSelectedProbesCheckBox.setEnabled(false);
+            onRowSelectedTimelineCheckBox.setSelected(false);
+            onRowSelectedTimelineCheckBox.setEnabled(false);
+            onRowSelectedDetailsCheckBox.setSelected(false);
+            onRowSelectedDetailsCheckBox.setEnabled(false);
+        } else {
+            selected = getSelected(onRowSelectedPanel);
+
+            if (selected.isEmpty()) {
+                // Fallback to defaults
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        setOnProbeAdded(TracerOptions.ROW_SELECTED_DEFAULT);
+                        update();
+                    }
+                });
+            } else {
+                onRowSelectedProbesCheckBox.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onRowSelectedProbesCheckBox));
+                onRowSelectedTimelineCheckBox.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onRowSelectedTimelineCheckBox));
+                onRowSelectedDetailsCheckBox.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onRowSelectedDetailsCheckBox));
+            }
+        }
+
+        if (onRowSelectedNothingCheckBox2.isSelected()) {
+            onRowSelectedProbesCheckBox2.setSelected(false);
+            onRowSelectedProbesCheckBox2.setEnabled(false);
+            onRowSelectedTimelineCheckBox2.setSelected(false);
+            onRowSelectedTimelineCheckBox2.setEnabled(false);
+            onRowSelectedDetailsCheckBox2.setSelected(false);
+            onRowSelectedDetailsCheckBox2.setEnabled(false);
+        } else {
+            selected = getSelected(onRowSelectedPanel2);
+
+            if (selected.isEmpty()) {
+                // Fallback to defaults
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        setOnProbeAdded2(TracerOptions.ROW_SELECTED_DEFAULT2);
+                        update();
+                    }
+                });
+            } else {
+                onRowSelectedProbesCheckBox2.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onRowSelectedProbesCheckBox2));
+                onRowSelectedTimelineCheckBox2.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onRowSelectedTimelineCheckBox2));
+                onRowSelectedDetailsCheckBox2.setEnabled(selected.size() > 1 ||
+                        !selected.contains(onRowSelectedDetailsCheckBox2));
             }
         }
 
@@ -387,6 +587,9 @@ final class TracerOptionsPanel extends JPanel {
                 Dimension d = super.getPreferredSize();
                 d.height = Math.min(d.height, refreshCombo.getPreferredSize().height);
                 return d;
+            }
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
             }
         };
         c.gridx = 2;
@@ -623,6 +826,39 @@ final class TracerOptionsPanel extends JPanel {
         c.insets = new Insets(3, 5, 3, 0);
         add(rowsDecorationCombo, c);
 
+        // rowsSelectionLabel
+        JLabel rowsSelectionLabel = new JLabel("Rows selection:");
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 8;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 15, 3, 5);
+        add(rowsSelectionLabel, c);
+
+        // rowsSelectionCombo
+        rowsSelectionCombo = new JComboBox(new String[] { "panel and chart",
+                                                          "panel only" }) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+//            protected void selectedItemChanged() {
+//                TracerOptionsPanel.this.update();
+//                super.selectedItemChanged();
+//            }
+        };
+        rowsSelectionLabel.setLabelFor(rowsSelectionCombo);
+//        rowsSelectionCombo.setRenderer(new CustomComboRenderer.Boolean(rowsSelectionCombo));
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 8;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 5, 3, 0);
+        add(rowsSelectionCombo, c);
+
 
         // viewsBehaviorSeparator
         SectionSeparator viewsBehaviorSeparator =
@@ -636,19 +872,64 @@ final class TracerOptionsPanel extends JPanel {
         add(viewsBehaviorSeparator, c);
 
         // viewsBehaviorPanel
-        JPanel viewsBehaviorPanel = new JPanel(new GridLayout(1, 3));
+//        JPanel viewsBehaviorPanel = new JPanel(new GridLayout(1, 3));
+        JPanel viewsBehaviorPanel = new JPanel(new BorderLayout(0, 0));
         viewsBehaviorPanel.setOpaque(false);
         c = new GridBagConstraints();
         c.gridy = 11;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(3, 15, 0, 0);
+//        c.insets = new Insets(3, 15, 0, 0);
+        c.insets = new Insets(8, 15, 0, 0);
         add(viewsBehaviorPanel, c);
 
-        // initiallyOpenedPanel
+        final CardLayout viewsSettingsLayout = new CardLayout();
+        final JPanel viewsSettingsContainer = new JPanel(viewsSettingsLayout);
+        final String INITIALLY_OPEN = "Initial appearance";
+        final String OPEN_PROBE_ADDED = "Probe added or removed";
+        final String OPEN_SESSION_STARTS = "Session started";
+        final String OPEN_ROW_SELECTED = "Row selected or unselected";
+
+        final DefaultListModel connectionTypeListModel = new DefaultListModel();
+        connectionTypeListModel.addElement(INITIALLY_OPEN);
+        connectionTypeListModel.addElement(OPEN_PROBE_ADDED);
+        connectionTypeListModel.addElement(OPEN_SESSION_STARTS);
+        connectionTypeListModel.addElement(OPEN_ROW_SELECTED);
+
+        JList connectionTypeList = new JList(connectionTypeListModel);
+        connectionTypeList.setVisibleRowCount(connectionTypeListModel.getSize());
+
+        connectionTypeList.setSelectionModel(new DefaultListSelectionModel() {
+            public void setSelectionInterval(int index0, int index1) {
+                super.setSelectionInterval(index0, index1);
+                viewsSettingsLayout.show(viewsSettingsContainer, connectionTypeListModel.get(getMinSelectionIndex()).toString());
+            }
+            public void removeSelectionInterval(int i1, int i2) {}
+        });
+        connectionTypeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        connectionTypeList.setSelectedIndex(0);
+        final ListCellRenderer defaultRenderer = connectionTypeList.getCellRenderer();
+        Component rc = defaultRenderer.getListCellRendererComponent(connectionTypeList, "X", 0, false, false); // NOI18N
+        connectionTypeList.setFixedCellHeight(rc.getPreferredSize().height + 2);
+        connectionTypeList.setCellRenderer(new ListCellRenderer() {
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                return defaultRenderer.getListCellRendererComponent(list, " " + value + " ", index, isSelected, cellHasFocus); // NOI18N
+            }
+        });
+        JScrollPane connectionTypeScroll = new JScrollPane(connectionTypeList,
+                                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
+            public Dimension getMinimumSize() { return getPreferredSize(); }
+        };
+        createBorder(connectionTypeScroll, BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        viewsBehaviorPanel.add(connectionTypeScroll, BorderLayout.WEST);
+        viewsBehaviorPanel.add(viewsSettingsContainer, BorderLayout.CENTER);
+
+
+//        // initiallyOpenedPanel
         initiallyOpenedPanel = new JPanel(new VerticalLayout(false));
-        initiallyOpenedPanel.setBorder(titledBorder("Initially open:"));
+        initiallyOpenedPanel.setBorder(titledBorder("Select the views to open:"));
         initiallyOpenedPanel.setOpaque(false);
         // initialProbesCheckBox
         initialProbesCheckBox = new JCheckBox("Probes") {
@@ -675,11 +956,12 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         initiallyOpenedPanel.add(initialDetailsCheckBox);
-        viewsBehaviorPanel.add(initiallyOpenedPanel);
+//        viewsBehaviorPanel.add(initiallyOpenedPanel);
+        viewsSettingsContainer.add(initiallyOpenedPanel, INITIALLY_OPEN);
 
         // onProbeAddedPanel
         onProbeAddedPanel = new JPanel(new VerticalLayout(false));
-        onProbeAddedPanel.setBorder(titledBorder("Open when probe added:"));
+        onProbeAddedPanel.setBorder(titledBorder("Open for selected probes:"));
         onProbeAddedPanel.setOpaque(false);
         // initialProbesCheckBox
         onProbeAddedProbesCheckBox = new JCheckBox("Probes") {
@@ -713,11 +995,55 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onProbeAddedPanel.add(onProbeAddedNothingCheckBox);
-        viewsBehaviorPanel.add(onProbeAddedPanel);
+//        viewsBehaviorPanel.add(onProbeAddedPanel);
+
+
+        // onProbeAddedPanel2
+        onProbeAddedPanel2 = new JPanel(new VerticalLayout(false));
+        onProbeAddedPanel2.setBorder(titledBorder("Open for no selection:"));
+        onProbeAddedPanel2.setOpaque(false);
+        // initialProbesCheckBox2
+        onProbeAddedProbesCheckBox2 = new JCheckBox("Probes") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onProbeAddedPanel2.add(onProbeAddedProbesCheckBox2);
+        // initialTimelineCheckBox2
+        onProbeAddedTimelineCheckBox2 = new JCheckBox("Timeline") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onProbeAddedPanel2.add(onProbeAddedTimelineCheckBox2);
+//        // onProbeAddedSettingsCheckBox2
+//        JCheckBox onProbeAddedSettingsCheckBox2 = new JCheckBox("Settings");
+//        onProbeAddedPanel2.add(onProbeAddedSettingsCheckBox2);
+//        onProbeAddedSettingsCheckBox2.setEnabled(false);
+        // onProbeAddedDetailsCheckBox2
+        onProbeAddedDetailsCheckBox2 = new JCheckBox("Details") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onProbeAddedPanel2.add(onProbeAddedDetailsCheckBox2);
+        // onProbeAddedNothingCheckBox2
+        onProbeAddedNothingCheckBox2 = new JCheckBox("No change") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onProbeAddedPanel2.add(onProbeAddedNothingCheckBox2);
+//        viewsBehaviorPanel.add(onProbeAddedPanel2);
+
+        JPanel onProbeAddedContainer = new JPanel(new GridLayout(1, 2));
+        onProbeAddedContainer.add(onProbeAddedPanel);
+        onProbeAddedContainer.add(onProbeAddedPanel2);
+        viewsSettingsContainer.add(onProbeAddedContainer, OPEN_PROBE_ADDED);
 
         // onStartOpenedPanel
         onStartOpenedPanel = new JPanel(new VerticalLayout(false));
-        onStartOpenedPanel.setBorder(titledBorder("Open when session starts:"));
+        onStartOpenedPanel.setBorder(titledBorder("Select the views to open:"));
         onStartOpenedPanel.setOpaque(false);
         // initialProbesCheckBox
         onStartProbesCheckBox = new JCheckBox("Probes") {
@@ -751,7 +1077,90 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onStartOpenedPanel.add(onStartNothingCheckBox);
-        viewsBehaviorPanel.add(onStartOpenedPanel);
+//        viewsBehaviorPanel.add(onStartOpenedPanel);
+        viewsSettingsContainer.add(onStartOpenedPanel, OPEN_SESSION_STARTS);
+
+        // onRowSelectedPanel
+        onRowSelectedPanel = new JPanel(new VerticalLayout(false));
+        onRowSelectedPanel.setBorder(titledBorder("Open for selected rows:"));
+        onRowSelectedPanel.setOpaque(false);
+        // initialProbesCheckBox
+        onRowSelectedProbesCheckBox = new JCheckBox("Probes") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onRowSelectedPanel.add(onRowSelectedProbesCheckBox);
+        // initialTimelineCheckBox
+        onRowSelectedTimelineCheckBox = new JCheckBox("Timeline") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onRowSelectedPanel.add(onRowSelectedTimelineCheckBox);
+//        // initialSettingsCheckBox
+//        JCheckBox onProbeAddedSettingsCheckBox = new JCheckBox("Settings");
+//        onProbeAddedPanel.add(onProbeAddedSettingsCheckBox);
+//        onProbeAddedSettingsCheckBox.setEnabled(false);
+        // initialDetailsCheckBox
+        onRowSelectedDetailsCheckBox = new JCheckBox("Details") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onRowSelectedPanel.add(onRowSelectedDetailsCheckBox);
+        // onStartNothingCheckBox
+        onRowSelectedNothingCheckBox = new JCheckBox("No change") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onRowSelectedPanel.add(onRowSelectedNothingCheckBox);
+//        viewsBehaviorPanel.add(onProbeAddedPanel);
+
+
+        // onRowSelectedPanel2
+        onRowSelectedPanel2 = new JPanel(new VerticalLayout(false));
+        onRowSelectedPanel2.setBorder(titledBorder("Open for no selection:"));
+        onRowSelectedPanel2.setOpaque(false);
+        // initialProbesCheckBox2
+        onRowSelectedProbesCheckBox2 = new JCheckBox("Probes") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onRowSelectedPanel2.add(onRowSelectedProbesCheckBox2);
+        // initialTimelineCheckBox2
+        onRowSelectedTimelineCheckBox2 = new JCheckBox("Timeline") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onRowSelectedPanel2.add(onRowSelectedTimelineCheckBox2);
+//        // onProbeAddedSettingsCheckBox2
+//        JCheckBox onProbeAddedSettingsCheckBox2 = new JCheckBox("Settings");
+//        onProbeAddedPanel2.add(onProbeAddedSettingsCheckBox2);
+//        onProbeAddedSettingsCheckBox2.setEnabled(false);
+        // onProbeAddedDetailsCheckBox2
+        onRowSelectedDetailsCheckBox2 = new JCheckBox("Details") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onRowSelectedPanel2.add(onRowSelectedDetailsCheckBox2);
+        // onProbeAddedNothingCheckBox2
+        onRowSelectedNothingCheckBox2 = new JCheckBox("No change") {
+            protected void fireActionPerformed(ActionEvent e) {
+                TracerOptionsPanel.this.update();
+            }
+        };
+        onRowSelectedPanel2.add(onRowSelectedNothingCheckBox2);
+//        viewsBehaviorPanel.add(onProbeAddedPanel2);
+
+        JPanel onRowSelectedContainer = new JPanel(new GridLayout(1, 2));
+        onRowSelectedContainer.add(onRowSelectedPanel);
+        onRowSelectedContainer.add(onRowSelectedPanel2);
+        viewsSettingsContainer.add(onRowSelectedContainer, OPEN_ROW_SELECTED);
 
 
         // bottomFiller
@@ -774,6 +1183,7 @@ final class TracerOptionsPanel extends JPanel {
     private JComboBox minMaxValsCombo;
     private JComboBox rowLegendCombo;
     private JComboBox rowsDecorationCombo;
+    private JComboBox rowsSelectionCombo;
     private JPanel initiallyOpenedPanel;
     private JCheckBox initialProbesCheckBox;
     private JCheckBox initialTimelineCheckBox;
@@ -783,11 +1193,26 @@ final class TracerOptionsPanel extends JPanel {
     private JCheckBox onProbeAddedTimelineCheckBox;
     private JCheckBox onProbeAddedDetailsCheckBox;
     private JCheckBox onProbeAddedNothingCheckBox;
+    private JPanel onProbeAddedPanel2;
+    private JCheckBox onProbeAddedProbesCheckBox2;
+    private JCheckBox onProbeAddedTimelineCheckBox2;
+    private JCheckBox onProbeAddedDetailsCheckBox2;
+    private JCheckBox onProbeAddedNothingCheckBox2;
     private JPanel onStartOpenedPanel;
     private JCheckBox onStartProbesCheckBox;
     private JCheckBox onStartTimelineCheckBox;
     private JCheckBox onStartDetailsCheckBox;
     private JCheckBox onStartNothingCheckBox;
+    private JPanel onRowSelectedPanel;
+    private JCheckBox onRowSelectedProbesCheckBox;
+    private JCheckBox onRowSelectedTimelineCheckBox;
+    private JCheckBox onRowSelectedDetailsCheckBox;
+    private JCheckBox onRowSelectedNothingCheckBox;
+    private JPanel onRowSelectedPanel2;
+    private JCheckBox onRowSelectedProbesCheckBox2;
+    private JCheckBox onRowSelectedTimelineCheckBox2;
+    private JCheckBox onRowSelectedDetailsCheckBox2;
+    private JCheckBox onRowSelectedNothingCheckBox2;
 
     private JComboBox zoomModeCombo;
     private JComboBox mouseWheelCombo;
@@ -795,9 +1220,16 @@ final class TracerOptionsPanel extends JPanel {
 
     private static Border titledBorder(String title) {
         String titleBorder = isWindowsLookAndFeel() ? " " : ""; //NOI18N
-        Border inner = BorderFactory.createEmptyBorder(0, 12, 3, 3);
+//        Border inner = BorderFactory.createEmptyBorder(0, 12, 3, 3);
+        Border inner = BorderFactory.createEmptyBorder(0, 12, 0, 3);
         Border outer = BorderFactory.createTitledBorder(titleBorder + title);
         return BorderFactory.createCompoundBorder(outer, inner);
+    }
+
+    private static void createBorder(JComponent component, Border border) {
+        Border cBorder = component.getBorder();
+        if (cBorder == null) component.setBorder(border);
+        else component.setBorder(BorderFactory.createCompoundBorder(border, cBorder));
     }
 
     private static boolean isWindowsLookAndFeel() {

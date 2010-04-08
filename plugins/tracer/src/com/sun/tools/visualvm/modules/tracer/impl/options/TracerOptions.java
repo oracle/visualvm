@@ -42,18 +42,25 @@ public final class TracerOptions {
     private static final String PROP_SHOW_VALUES = "TracerOptions.showValues"; // NOI18N
     private static final String PROP_SHOW_LEGEND = "TracerOptions.showLegend"; // NOI18N
     private static final String PROP_ROWS_DECORATION = "TracerOptions.rowsDecoration"; // NOI18N
+    private static final String PROP_ROWS_SELECTION = "TracerOptions.rowsSelection"; // NOI18N
 
     private static final String PROP_INITIALLY_OPEN = "TracerOptions.initiallyOpen"; // NOI18N
     private static final String PROP_PROBE_ADDED = "TracerOptions.probeAdded"; // NOI18N
+    private static final String PROP_PROBE_ADDED2 = "TracerOptions.probeAdded2"; // NOI18N
     private static final String PROP_SESSION_STARTED = "TracerOptions.sessionStarted"; // NOI18N
+    private static final String PROP_ROW_SELECTED = "TracerOptions.rowSelected"; // NOI18N
+    private static final String PROP_ROW_SELECTED2 = "TracerOptions.rowSelected2"; // NOI18N
     public static final String VIEWS_UNCHANGED = ""; // NOI18N
     public static final String VIEW_PROBES = "KEY_probes"; // NOI18N
     public static final String VIEW_TIMELINE = "KEY_timeline"; // NOI18N
     public static final String VIEW_SETTINGS = "KEY_settings"; // NOI18N
     public static final String VIEW_DETAILS = "KEY_details"; // NOI18N
     static final String INITIALLY_OPEN_DEFAULT = VIEW_PROBES;
-    static final String PROBE_ADDED_DEFAULT = VIEW_PROBES + "," + VIEW_TIMELINE; // NOI18N
+    static final String PROBE_ADDED_DEFAULT = INITIALLY_OPEN_DEFAULT + "," + VIEW_TIMELINE; // NOI18N
+    static final String PROBE_ADDED_DEFAULT2 = INITIALLY_OPEN_DEFAULT;
     static final String SESSION_STARTED_DEFAULT = VIEW_TIMELINE;
+    static final String ROW_SELECTED_DEFAULT = SESSION_STARTED_DEFAULT + "," + VIEW_DETAILS; // NOI18N
+    static final String ROW_SELECTED_DEFAULT2 = SESSION_STARTED_DEFAULT;
 
     private static final String PROP_ZOOM_MODE = "TracerOptions.zoomMode"; // NOI18N
     private static final String KEY_FIXED_SCALE = "KEY_fixedScale"; // NOI18N
@@ -127,6 +134,14 @@ public final class TracerOptions {
         return prefs.getBoolean(PROP_ROWS_DECORATION, !Utils.forceSpeed());
     }
 
+    void setRowsSelectionEnabled(boolean rowsSelectionEnabled) {
+        prefs.putBoolean(PROP_ROWS_SELECTION, rowsSelectionEnabled);
+    }
+
+    public boolean isRowsSelectionEnabled() {
+        return prefs.getBoolean(PROP_ROWS_SELECTION, !Utils.forceSpeed());
+    }
+
     void setInitiallyOpened(String opened) {
         prefs.put(PROP_INITIALLY_OPEN, opened);
     }
@@ -135,12 +150,20 @@ public final class TracerOptions {
         return prefs.get(PROP_INITIALLY_OPEN, INITIALLY_OPEN_DEFAULT);
     }
 
-    void setOnProbeAddded(String opened) {
+    void setOnProbeAdded(String opened) {
         prefs.put(PROP_PROBE_ADDED, opened);
     }
 
     public String getOnProbeAdded() {
         return prefs.get(PROP_PROBE_ADDED, PROBE_ADDED_DEFAULT);
+    }
+
+    void setOnProbeAdded2(String opened) {
+        prefs.put(PROP_PROBE_ADDED2, opened);
+    }
+
+    public String getOnProbeAdded2() {
+        return prefs.get(PROP_PROBE_ADDED2, PROBE_ADDED_DEFAULT2);
     }
 
     void setOnSessionStart(String opened) {
@@ -149,6 +172,22 @@ public final class TracerOptions {
 
     public String getOnSessionStart() {
         return prefs.get(PROP_SESSION_STARTED, SESSION_STARTED_DEFAULT);
+    }
+
+     void setOnRowSelected(String opened) {
+        prefs.put(PROP_ROW_SELECTED, opened);
+    }
+
+    public String getOnRowSelected() {
+        return prefs.get(PROP_ROW_SELECTED, ROW_SELECTED_DEFAULT);
+    }
+
+    void setOnRowSelected2(String opened) {
+        prefs.put(PROP_ROW_SELECTED2, opened);
+    }
+
+    public String getOnRowSelected2() {
+        return prefs.get(PROP_ROW_SELECTED2, ROW_SELECTED_DEFAULT2);
     }
 
     void setZoomMode(String zoomMode) {

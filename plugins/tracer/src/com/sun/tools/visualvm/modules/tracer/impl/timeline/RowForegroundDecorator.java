@@ -37,7 +37,7 @@ import org.netbeans.lib.profiler.charts.swing.Utils;
  *
  * @author Jiri Sedlacek
  */
-final class RowGradientDecorator implements ChartDecorator {
+final class RowForegroundDecorator implements ChartDecorator {
 
     private static final Color SELECTED_FILTER = new Color(0, 0, 200, 25);
     private static final float[] FRACTIONS = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
@@ -47,28 +47,36 @@ final class RowGradientDecorator implements ChartDecorator {
                                                         new Color(200, 200, 210, 110) };
 
     private final TimelineChart chart;
+    private final boolean gradient;
+    private final boolean selection;
 
 
-    RowGradientDecorator(TimelineChart chart) {
+    RowForegroundDecorator(TimelineChart chart, boolean gradient, boolean selection) {
         this.chart = chart;
+        this.gradient = gradient;
+        this.selection = selection;
     }
 
 
     public void paint(Graphics2D g, Rectangle dirtyArea, ChartContext context) {
-        int rowsCount = chart.getRowsCount();
-        for (int i = 0; i < rowsCount; i++) {
-            TimelineChart.Row row = chart.getRow(i);
-            ChartContext rowContext = row.getContext();
+        if (gradient || selection) {
+            int rowsCount = chart.getRowsCount();
+            for (int i = 0; i < rowsCount; i++) {
+                TimelineChart.Row row = chart.getRow(i);
+                ChartContext rowContext = row.getContext();
 
-            int y = Utils.checkedInt(rowContext.getViewportOffsetY());
-            int h = Utils.checkedInt(rowContext.getViewportHeight() - 1);
+                int y = Utils.checkedInt(rowContext.getViewportOffsetY());
+                int h = Utils.checkedInt(rowContext.getViewportHeight() - 1);
 
-            g.setPaint(new LinearGradientPaint(0, y, 0, y + h, FRACTIONS, COLORS));
-            g.fillRect(0, y, chart.getWidth(), h);
+                if (gradient) {
+                    g.setPaint(new LinearGradientPaint(0, y, 0, y + h, FRACTIONS, COLORS));
+                    g.fillRect(0, y, chart.getWidth(), h);
+                }
 
-            if (chart.isRowSelected(row)) {
-                g.setColor(SELECTED_FILTER);
-                g.fillRect(0, y, chart.getWidth(), h);
+                if (selection && chart.isRowSelected(row)) {
+                    g.setColor(SELECTED_FILTER);
+                    g.fillRect(0, y, chart.getWidth(), h);
+                }
             }
         }
     }

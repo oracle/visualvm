@@ -139,7 +139,7 @@ public final class DetailsPanel extends JPanel {
                support.resetSelectedTimestamps();
             }
         };
-        hb.setToolTipText("Clear Marks");
+        hb.setToolTipText("Clear marked timestamps");
 
         JViewport viewport = new Viewport(table);
 

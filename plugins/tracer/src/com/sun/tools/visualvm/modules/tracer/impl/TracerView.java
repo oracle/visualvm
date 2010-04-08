@@ -34,6 +34,7 @@ import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
 import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HorizontalLayout;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.SimpleSeparator;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -212,12 +213,20 @@ final class TracerView extends DataSourceView {
             model.addListener(new TracerModel.Listener() {
                 public void probeAdded(TracerProbe probe) {
                     refreshState(true);
-                    updateViewsOnProbesChange();
+                    updateViewsOnProbesChange(true);
                 }
                 public void probeRemoved(TracerProbe probe, boolean probesDefined) {
                     refreshState(probesDefined);
-                    updateViewsOnProbesChange();
+                    updateViewsOnProbesChange(probesDefined);
                 }
+            });
+
+            model.getTimelineSupport().addSelectionListener(
+                    new TimelineSupport.SelectionListener() {
+                public void rowSelectionChanged(boolean rowsSelected) {
+                    updateViewsOnSelectionChange(rowsSelected);
+                }
+                public void timeSelectionChanged(boolean timestampsSelected) {}
             });
 
             timelineView.registerViewListener(new TimelineView.ViewListener() {
@@ -229,26 +238,34 @@ final class TracerView extends DataSourceView {
         private void updateViewsOnSessionStart() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    String onSessionStart = TracerOptions.getInstance().getOnSessionStart();
-                    if (!onSessionStart.equals(TracerOptions.VIEWS_UNCHANGED)) {
-                        // Probes
-                        setProbesVisible(onSessionStart.contains(TracerOptions.VIEW_PROBES));
-                        // Timeline
-                        setTimelineVisible(onSessionStart.contains(TracerOptions.VIEW_TIMELINE));
-                        // Details
-                        setDetailsVisible(onSessionStart.contains(TracerOptions.VIEW_DETAILS));
-                    }
+                    String views = TracerOptions.getInstance().getOnSessionStart();
+                    updateViews(views);
                 }
             });
         }
 
-        private void updateViewsOnProbesChange() {
-            String onSessionStart = TracerOptions.getInstance().getOnProbeAdded();
-            if (!onSessionStart.equals(TracerOptions.VIEWS_UNCHANGED)) {
+        private void updateViewsOnProbesChange(boolean probesDefined) {
+            String views = probesDefined ?
+                TracerOptions.getInstance().getOnProbeAdded() :
+                TracerOptions.getInstance().getOnProbeAdded2();
+            updateViews(views);
+        }
+
+        private void updateViewsOnSelectionChange(boolean rowsSelected) {
+            String views = rowsSelected ?
+                TracerOptions.getInstance().getOnRowSelected() :
+                TracerOptions.getInstance().getOnRowSelected2();
+            updateViews(views);
+        }
+
+        private void updateViews(String views) {
+            if (!views.equals(TracerOptions.VIEWS_UNCHANGED)) {
                 // Probes
-                setProbesVisible(onSessionStart.contains(TracerOptions.VIEW_PROBES));
+                setProbesVisible(views.contains(TracerOptions.VIEW_PROBES));
                 // Timeline
-                setTimelineVisible(onSessionStart.contains(TracerOptions.VIEW_TIMELINE));
+                setTimelineVisible(views.contains(TracerOptions.VIEW_TIMELINE));
+                // Details
+                setDetailsVisible(views.contains(TracerOptions.VIEW_DETAILS));
             }
         }
 

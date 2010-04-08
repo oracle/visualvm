@@ -55,10 +55,14 @@ final class TracerOptionsPanelController extends OptionsPanelController {
         p.setShowValuesEnabled(options.isShowValuesEnabled());
         p.setShowLegendEnabled(options.isShowLegendEnabled());
         p.setRowsDecorationEnabled(options.isRowsDecorationEnabled());
+        p.setRowsSelectionEnabled(options.isRowsSelectionEnabled());
 
         p.setInitiallyOpened(options.getInitiallyOpened());
         p.setOnProbeAdded(options.getOnProbeAdded());
+        p.setOnProbeAdded2(options.getOnProbeAdded2());
         p.setOnSessionStart(options.getOnSessionStart());
+        p.setOnRowSelected(options.getOnRowSelected());
+        p.setOnRowSelected2(options.getOnRowSelected2());
 
         p.setZoomMode(options.getZoomMode());
         p.setMouseWheelAction(options.getMouseWheelAction());
@@ -75,10 +79,14 @@ final class TracerOptionsPanelController extends OptionsPanelController {
         options.setShowValuesEnabled(p.isShowValuesEnabled());
         options.setShowLegendEnabled(p.isShowLegendEnabled());
         options.setRowsDecorationEnabled(p.isRowsDecorationEnabled());
+        options.setRowsSelectionEnabled(p.isRowsSelectionEnabled());
 
         options.setInitiallyOpened(p.getInitiallyOpened());
-        options.setOnProbeAddded(p.getOnProbeAdded());
+        options.setOnProbeAdded(p.getOnProbeAdded());
+        options.setOnProbeAdded2(p.getOnProbeAdded2());
         options.setOnSessionStart(p.getOnSessionStart());
+        options.setOnRowSelected(p.getOnRowSelected());
+        options.setOnRowSelected2(p.getOnRowSelected2());
 
         options.setZoomMode(p.getZoomMode());
         options.setMouseWheelAction(p.getMouseWheelAction());
@@ -93,9 +101,20 @@ final class TracerOptionsPanelController extends OptionsPanelController {
     public boolean isChanged() {
         TracerOptionsPanel p = getPanel();
 
+        if (options.getRefresh() != p.getRefresh()) return true;
+        if (options.isRefreshCustomizable() != p.isRefreshCustomizable()) return true;
+
+        if (options.isShowValuesEnabled() != p.isShowValuesEnabled()) return true;
+        if (options.isShowLegendEnabled() != p.isShowLegendEnabled()) return true;
+        if (options.isRowsDecorationEnabled() != p.isRowsDecorationEnabled()) return true;
+        if (options.isRowsSelectionEnabled() != p.isRowsSelectionEnabled()) return true;
+
         if (!options.getInitiallyOpened().equals(p.getInitiallyOpened())) return true;
         if (!options.getOnProbeAdded().equals(p.getOnProbeAdded())) return true;
+        if (!options.getOnProbeAdded2().equals(p.getOnProbeAdded2())) return true;
         if (!options.getOnSessionStart().equals(p.getOnSessionStart())) return true;
+        if (!options.getOnRowSelected().equals(p.getOnRowSelected())) return true;
+        if (!options.getOnRowSelected2().equals(p.getOnRowSelected2())) return true;
 
         if (!options.getZoomMode().equals(p.getZoomMode())) return true;
         if (!options.getMouseWheelAction().equals(p.getMouseWheelAction())) return true;

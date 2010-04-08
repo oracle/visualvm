@@ -603,21 +603,23 @@ public final class TimelineSupport {
     }
 
     private void notifyRowSelectionChanged() {
+        boolean rowsSelected = chart.isRowSelection();
         for (SelectionListener selectionListener: selectionListeners)
-            selectionListener.rowSelectionChanged();
+            selectionListener.rowSelectionChanged(rowsSelected);
     }
 
     private void notifyTimeSelectionChanged() {
+        boolean timestampsSelected = selectedTimestamps.isEmpty();
         for (SelectionListener selectionListener: selectionListeners)
-            selectionListener.timeSelectionChanged();
+            selectionListener.timeSelectionChanged(timestampsSelected);
     }
 
 
     public static interface SelectionListener {
 
-        public void rowSelectionChanged();
+        public void rowSelectionChanged(boolean rowsSelected);
 
-        public void timeSelectionChanged();
+        public void timeSelectionChanged(boolean timestampsSelected);
 
     }
 
