@@ -48,4 +48,9 @@ made subject to such option by the copyright holder.
 <!--        <magic hex="426e52"/> -->
         <resolver mime="application/x-netbeans-profiler"/>
     </file>
+    <file>
+    <ext name="npss"/>
+<!--        <magic hex="4e505353"/> -->
+        <resolver mime="application/x-netbeans-profiler"/>
+    </file>
 </MIME-resolver>
