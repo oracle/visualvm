@@ -42,24 +42,30 @@ package org.netbeans.modules.profiler;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.coderegion.CodeRegionResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.openide.util.NbBundle;
 import java.io.*;
+import java.lang.management.ThreadInfo;
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
+import javax.management.openmbean.CompositeData;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 
 
 public class LoadedSnapshot {
@@ -205,13 +211,41 @@ public class LoadedSnapshot {
      */
     public static LoadedSnapshot loadSnapshot(DataInputStream dis)
                                        throws IOException {
-        LoadedSnapshot ls = new LoadedSnapshot();
+        dis.mark(100);
+        try {
+            LoadedSnapshot ls = new LoadedSnapshot();
 
-        if (ls.load(dis)) {
-            return ls;
-        } else {
-            return null;
+            if (ls.load(dis)) {
+                return ls;
+            } else {
+                return null;
+            }
+        } catch (IOException ex) {
+            if (INVALID_SNAPSHOT_FILE_MSG.equals(ex.getMessage())) {
+                dis.reset();
+                return loadSnapshotFromStackTraces(dis);
+            }
+            throw ex;
         }
+    }
+
+    private static LoadedSnapshot loadSnapshotFromStackTraces(DataInputStream dis) throws IOException {
+        SamplesInputStream is = new SamplesInputStream(dis);
+        StackTraceSnapshotBuilder builder = new StackTraceSnapshotBuilder();
+        ThreadsSample sample = is.readSample();
+        long startTime = sample.getTime();
+
+        for ( ;sample != null; sample = is.readSample()) {
+            builder.addStacktrace(sample.getTinfos(),sample.getTime());
+            
+        }
+        CPUResultsSnapshot snapshot;
+        try {
+            snapshot = builder.createSnapshot(startTime);
+        } catch (NoDataAvailableException ex) {
+            throw new IOException(ex);
+        }
+        return new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
     }
 
     public void setProject(Project project) {
@@ -479,6 +513,94 @@ public class LoadedSnapshot {
         }
 
         return true;
+    }
+
+    static class SamplesInputStream {
+        static final String ID = "NPSS"; // NetBeans Profiler samples stream, it must match org.netbeans.core.ui.sampler.SamplesOutputStream.ID
+
+        int version;
+        ObjectInputStream in;
+        Map<Long,ThreadInfo> threads;
+        
+        SamplesInputStream(File file) throws IOException {
+            this(new FileInputStream(file));
+        }
+
+        SamplesInputStream(InputStream is) throws IOException {
+            readHeader(is);
+            in = new ObjectInputStream(new GZIPInputStream(is));
+            threads = new HashMap(128);
+        }
+
+        ThreadsSample readSample() throws IOException {
+            long time;
+            ThreadInfo infos[];
+            int sameThreads;
+            Map<Long,ThreadInfo> newThreads;
+            
+            try {
+                time = in.readLong();
+            } catch (EOFException ex) {
+                return null;
+            }
+            newThreads = new HashMap(threads.size());
+            sameThreads = in.readInt();
+            for (int i=0;i<sameThreads;i++) {
+                Long tid = Long.valueOf(in.readLong());
+                ThreadInfo oldThread = threads.get(tid);
+                assert oldThread != null;
+                newThreads.put(tid,oldThread);
+            }
+            infos = new ThreadInfo[in.readInt()];
+            for (int i = 0 ; i < infos.length; i++) {
+                CompositeData infoData;
+                ThreadInfo thread;
+                
+                try {
+                    infoData = (CompositeData) in.readObject();
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
+                thread = ThreadInfo.from(infoData);
+                newThreads.put(Long.valueOf(thread.getThreadId()),thread);
+            }
+            threads = newThreads;
+            return new ThreadsSample(time,threads.values());
+        }
+
+        void close() throws IOException {
+            in.close();
+        }
+
+        private void readHeader(InputStream is) throws IOException {
+            String id;
+            byte[] idarr = new byte[ID.length()];
+
+            is.read(idarr);
+            id = new String(idarr);
+            if (!ID.equals(id)) {
+                new IOException("Invalid header "+id); // NOI18N
+            }
+            version = is.read();
+        }
+    }
+
+    static final class ThreadsSample {
+        private final long time;
+        private final ThreadInfo[] tinfos;
+
+        ThreadsSample(long t, Collection<ThreadInfo> tis) {
+            time = t;
+            tinfos = tis.toArray(new ThreadInfo[tis.size()]);
+        }
+
+        long getTime() {
+            return time;
+        }
+
+        ThreadInfo[] getTinfos() {
+            return tinfos;
+        }
     }
 }
 /* Code to do persist into a ZIP file
