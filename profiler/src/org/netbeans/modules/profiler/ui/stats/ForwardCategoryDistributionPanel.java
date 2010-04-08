@@ -163,7 +163,7 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
                     markTime = Long.valueOf(0L);
                 }
 
-                long cleansedTime = Math.round(TimingAdjusterOld.getDefault().adjustTime(time0, inCalls - lastCalls, outCalls, false));
+                long cleansedTime = (long) TimingAdjusterOld.getDefault().adjustTime(time0, inCalls - lastCalls, outCalls, false);
 
                 if (cleansedTime > 0L) {
                     markMap.put(usedMark, markTime + cleansedTime);
@@ -204,7 +204,7 @@ public class ForwardCategoryDistributionPanel extends StatisticalModule {
                     markTime = Long.valueOf(0L);
                 }
 
-                long cleansedTime = Math.round(TimingAdjusterOld.getDefault().adjustTime(time0, inCalls, outCalls - lastCalls, false));
+                long cleansedTime = (long) TimingAdjusterOld.getDefault().adjustTime(time0, inCalls, outCalls - lastCalls, false);
 
                 if (cleansedTime > 0L) {
                     markMap.put(usedMark, markTime + cleansedTime);

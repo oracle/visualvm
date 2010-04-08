@@ -86,9 +86,9 @@ public class TimeCollector extends MarkBasedNodeVisitor {
 
         TimingData currentTiming = (TimingData) timing.get(mark);
         long time = (currentTiming != null)
-                    ? Math.round(TimingAdjusterOld.getDefault()
+                    ? (long) TimingAdjusterOld.getDefault()
                                               .adjustTime(currentTiming.netTime0, currentTiming.inCalls, currentTiming.outCalls,
-                                                          false)) : 0;
+                                                          false) : 0;
 
         return (time > 0) ? time : 0;
     }
@@ -100,9 +100,9 @@ public class TimeCollector extends MarkBasedNodeVisitor {
 
         TimingData currentTiming = (TimingData) timing.get(mark);
         long time = (currentTiming != null)
-                    ? Math.round(TimingAdjusterOld.getDefault()
+                    ? (long) TimingAdjusterOld.getDefault()
                                               .adjustTime(currentTiming.netTime1, currentTiming.inCalls, currentTiming.outCalls,
-                                                          true)) : 0;
+                                                          true) : 0;
 
         return (time > 0) ? time : 0;
     }
