@@ -175,6 +175,8 @@ public final class ResultsManager {
                                                                                                                             // -----
     public static final String SNAPSHOT_EXTENSION = "nps"; // NOI18N
     public static final String HEAPDUMP_EXTENSION = "hprof"; // NOI18N
+    /* see  org.netbeans.core.ui.sampler.SampleOutputStream.FILE_EXT */
+    public static final String STACKTRACES_SNAPSHOT_EXTENSION = "npss"; // NOI18N 
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
