@@ -627,7 +627,7 @@ public class CPUCCTContainer {
 
         if (newChild != null) {
             parent.attachNodeAsChild(newChild);
-        } else {
+        } else if (compParent == parent) { // filtered-out node
             if (!parent.isRoot()) { // no propagation of filtered-out data to the Thread level node
                 parent.addNetTime0(node.getNetTime0());
                 parent.addSleepTime0(node.getSleepTime0());
@@ -890,7 +890,7 @@ public class CPUCCTContainer {
         /* PROTOTYPE [wait]
            long time = (long) (((double) rtNode.netTime0 - rtNode.waitTime0 - rtNode.nCalls * timingData.methodEntryExitInnerTime0 - nCallsFromThisNode * timingData.methodEntryExitOuterTime0) * 1000000 / timingData.timerCountsInSecond0);
          */
-        long time = (long) timingAdjuster.adjustTime(rtNode.getNetTime0(), rtNode.getNCalls(), nCallsFromThisNode, false);
+        long time = Math.round(timingAdjuster.adjustTime(rtNode.getNetTime0(), rtNode.getNCalls()+rtNode.getNCallsDiff(), nCallsFromThisNode, false));
 
         //    (long) (((double) rtNode.getNetTime0() - rtNode.getNCalls() * timingData.methodEntryExitInnerTime0
         //      - nCallsFromThisNode * timingData.methodEntryExitOuterTime0) * 1000000 / timingData
@@ -918,8 +918,8 @@ public class CPUCCTContainer {
         childTotalTime0InTimerUnits = thisNodeTotalTime0InTimerUnits; // It will be effectively returned by this method
                                                                       // Calculate cleansed total time
 
-        time = (long) timingAdjuster.adjustTime(thisNodeTotalTime0InTimerUnits, rtNode.getNCalls(), totalNCallsFromThisNode,
-                                                   false);
+        time = Math.round(timingAdjuster.adjustTime(thisNodeTotalTime0InTimerUnits, rtNode.getNCalls()+totalNCallsFromThisNode, totalNCallsFromThisNode,
+                                                   false));
 
         //    time = (long) (((double) thisNodeTotalTime0InTimerUnits - rtNode.getNCalls()* timingData.methodEntryExitInnerTime0
         //      - totalNCallsFromThisNode * timingData.methodEntryExitCallTime0) * 1000000 / timingData
@@ -933,7 +933,7 @@ public class CPUCCTContainer {
 
         if (collectingTwoTimeStamps) {
             // Calculate cleansed self time
-            time = (long) timingAdjuster.adjustTime(rtNode.getNetTime1(), rtNode.getNCalls(), nCallsFromThisNode, true);
+            time = Math.round(timingAdjuster.adjustTime(rtNode.getNetTime1(), rtNode.getNCalls()+rtNode.getNCallsDiff(), nCallsFromThisNode, true));
 
             //      time = (long) (((double) rtNode.getNetTime1()
             //        - rtNode.getNCalls() * timingData.methodEntryExitInnerTime1
@@ -948,8 +948,8 @@ public class CPUCCTContainer {
             childTotalTime1InTimerUnits = thisNodeTotalTime1InTimerUnits; // It will be effectively returned by this method
                                                                           // Calculate cleansed total time
 
-            time = (long) timingAdjuster.adjustTime(thisNodeTotalTime1InTimerUnits, rtNode.getNCalls(),
-                                                       totalNCallsFromThisNode, true);
+            time = Math.round(timingAdjuster.adjustTime(thisNodeTotalTime1InTimerUnits, rtNode.getNCalls()+totalNCallsFromThisNode,
+                                                       totalNCallsFromThisNode, true));
 
             //      time = (long) (((double) thisNodeTotalTime1InTimerUnits - rtNode.getNCalls() * timingData.methodEntryExitInnerTime0
             //        - totalNCallsFromThisNode * timingData.methodEntryExitCallTime1) * 1000000 / timingData
