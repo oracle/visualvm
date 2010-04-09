@@ -39,6 +39,6 @@ public interface DeployerImpl {
     Config configFor(FileObject deployerCfg);
 
     void applyConfig(Application app, Config config);
-    void deploy(Application app, TracerProgressObject progress);
+    boolean deploy(Application app, TracerProgressObject progress, int availableSteps);
     void undeploy(Application app);
 }

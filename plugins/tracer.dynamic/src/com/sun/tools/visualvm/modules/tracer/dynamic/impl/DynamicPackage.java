@@ -37,7 +37,9 @@ import com.sun.tools.visualvm.modules.tracer.dynamic.spi.DeployerImpl;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +64,8 @@ class DynamicPackage extends TracerPackage.SessionAware<Application> {
 
     private final boolean available;
     private final FileObject cfgRoot;
+
+    final private Set<DeployerImpl> applicableDeployers = new HashSet<DeployerImpl>();
 
     DynamicPackage(FileObject cfgRoot, String name, String desc, Icon icon, int position, boolean available) {
         super(name, desc, icon, position);
@@ -103,7 +107,19 @@ class DynamicPackage extends TracerPackage.SessionAware<Application> {
             Object descProviderObj = propsFolder.getAttribute("descriptorProvider"); // NOI18N
             ItemDescriptorProvider idp = (descProviderObj instanceof ItemDescriptorProvider) ? (ItemDescriptorProvider)descProviderObj : null;
 
-            for(FileObject prop : propsFolder.getChildren()) {
+            FileObject[] children = propsFolder.getChildren();
+
+            Arrays.sort(children, new Comparator<FileObject>() {
+
+                @Override
+                public int compare(FileObject o1, FileObject o2) {
+                    Integer p1 = (Integer)o1.getAttribute("position");
+                    Integer p2 = (Integer)o2.getAttribute("position");
+                    return (p1 != null && p2 != null) ? p1.compareTo(p2) : 0;
+                }
+            });
+
+            for(FileObject prop : children) {
                 if (prop.isData()) {
                     attrNames.add(prop.getName());
 
@@ -122,20 +138,15 @@ class DynamicPackage extends TracerPackage.SessionAware<Application> {
     }
 
     @Override
-    protected TracerProgressObject sessionInitializing(TracerProbe<Application>[] probes, Application dataSource, int refresh) {
-        progress = new TracerProgressObject(30, "");
-
-        Set<DeployerImpl> deployers = new HashSet<DeployerImpl>();
+    protected TracerProgressObject sessionInitializing(TracerProbe<Application>[] probes, final Application dataSource, int refresh) {
         for(TracerProbe probe : probes) {
             DynamicProbe dp = (DynamicProbe)probe;
             DeployerImpl di = dp.getDeployment().getDeployer();
             di.applyConfig(dataSource, dp.getDeployment().getConfig());
-            deployers.add(di);
+            applicableDeployers.add(di);
         }
 
-        for(DeployerImpl di : deployers) {
-            di.deploy(dataSource, progress);
-        }
+        progress = new TracerProgressObject(applicableDeployers.size() * 50 + probes.length + 5, "");
 
         return progress;
     }
@@ -145,6 +156,11 @@ class DynamicPackage extends TracerPackage.SessionAware<Application> {
                 throws SessionInitializationException {
         MBeanServerConnection mbsc = null;
         try {
+            for(DeployerImpl di : applicableDeployers) {
+                if (!di.deploy(application, progress, 50)) {
+                    throw new SessionInitializationException("Error deploying BTrace probes"); // NOI18N
+                }
+            }
             for(TracerProbe probe : probes) {
                 if (probe instanceof DynamicProbe) {
                     if (mbsc == null) {
@@ -165,15 +181,10 @@ class DynamicPackage extends TracerPackage.SessionAware<Application> {
 
     @Override
     protected void sessionStopping(TracerProbe<Application>[] probes, Application application) {
-        Set<DeployerImpl> deployers = new HashSet<DeployerImpl>();
-        for (TracerProbe probe : probes) {
-            DynamicProbe dp = (DynamicProbe)probe;
-            dp.resetConnection();
-            deployers.add(dp.getDeployment().getDeployer());
-        }
-        for(DeployerImpl d : deployers) {
+        for(DeployerImpl d : applicableDeployers) {
             d.undeploy(application);
         }
+        applicableDeployers.clear();
     }
 
 
@@ -211,4 +222,5 @@ class DynamicPackage extends TracerPackage.SessionAware<Application> {
         return attrs;
     }
 
+    
 }

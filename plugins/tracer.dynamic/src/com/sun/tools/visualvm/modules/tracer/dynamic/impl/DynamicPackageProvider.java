@@ -70,6 +70,8 @@ class DynamicPackageProvider extends ModuleInstall {
         public TracerPackage<Application>[] getPackages(Application application) {
             Set<TracerPackage<Application>> packages = new HashSet<TracerPackage<Application>>();
             FileObject probesRoot = FileUtil.getConfigFile("VisualVM/Tracer/packages"); // NOI18N
+            
+            int defaultCounter = 1000;
             for(FileObject pkg : probesRoot.getChildren()) {
                 Object name = pkg.getAttribute("displayName"); // NOI18N
                 Object desc = pkg.getAttribute("desc"); // NOI18N
@@ -77,7 +79,7 @@ class DynamicPackageProvider extends ModuleInstall {
                 Object position = pkg.getAttribute("position"); // NOI18N
 
                 ApplicationValidator validator = (ApplicationValidator)pkg.getAttribute("validator"); // NOI18N
-                packages.add(new DynamicPackage(pkg, (String)name, desc != null ? (String)desc : "", icon != null ? ImageUtilities.loadImageIcon((String)icon, true) : defaultIcon, position != null ? ((Integer)position).intValue() : Integer.MAX_VALUE, isAvailable(validator, application)));
+                packages.add(new DynamicPackage(pkg, (String)name, desc != null ? (String)desc : "", icon != null ? ImageUtilities.loadImageIcon((String)icon, true) : defaultIcon, position != null ? ((Integer)position).intValue() : defaultCounter++, isAvailable(validator, application)));
             }
             return (DynamicPackage[])packages.toArray(new DynamicPackage[packages.size()]);
         }
