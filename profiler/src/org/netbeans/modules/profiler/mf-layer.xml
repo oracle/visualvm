@@ -310,12 +310,6 @@ made subject to such option by the copyright holder.
                 <attr name="misplaced.action.allowed" boolvalue="true"/>
             </file>
         </folder>
-        <folder name="Memory">
-            <file name="org-netbeans-modules-profiler-actions-SelfSamplerAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-SelfSamplerAction.instance"/>
-                <attr name="position" intvalue="2000"/>
-            </file>
-        </folder>
     </folder>
 
     <folder name="Shortcuts">
@@ -345,9 +339,6 @@ made subject to such option by the copyright holder.
             <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.LiveResultsWindow$ActivateDrillDownAction"/>
         </file>
         -->
-        <file name="AS-Y.shadow">
-            <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-SelfSamplerAction.instance"/>
-        </file>
     </folder>
 
     <folder name="Actions">
@@ -397,14 +388,6 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-SelfSamplerAction.instance">
-                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#SelfSamplerAction_ActionNameStart"/>
-                <attr name="ShortDescription" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#SelfSamplerAction_ActionDescription"/>
-                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/actions/resources/openSnapshot.png"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
-                <attr name="noIconInMenu" boolvalue="false"/>
-                <attr name="delegate" methodvalue="org.netbeans.modules.profiler.actions.SelfSamplerAction.getInstance"/>
-            </file>
             <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
             <file name="org-netbeans-modules-profiler-ppoints-ui-ToggleProfilingPointAction.instance">
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.ppoints.ui.ToggleProfilingPointAction.getInstance"/>
