@@ -206,6 +206,7 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
                 double percentdiff = (Math.abs(percent - node.getTotalTime0InPerCent()) * 100.0) / node.getTotalTime0InPerCent();
 
                 if ((timediff > tolerance) || (percentdiff > tolerance)) {
+                    log("Node : " + node.getNodeName());
                     log("Time diff: " + timediff + " %");
                     log("Percent diff: " + percentdiff + " %");
                     assertTrue("Node's and sum of subnodes values differ", false);
