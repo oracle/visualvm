@@ -97,14 +97,15 @@ public final class NBProfileAttachTask extends Task {
 
     // main methods ---------------------------------------------------------------
     public void execute() throws BuildException {
-        final Hashtable props = getProject().getProperties();
+        Project antProject = getProject();
+        final Hashtable props = antProject.getProperties();
         final ProfilingSettings ps = new ProfilingSettings();
 
         // 1. process parameters passed via Properties
         ps.load(props);
 
         final AttachSettings as = new AttachSettings();
-        as.load(getProject().getProperties());
+        as.load(antProject.getProperties());
 
         // 2. Process those passed as attributes/elements from the buildl script
         if (directDefinedExplicitely) {
@@ -120,16 +121,16 @@ public final class NBProfileAttachTask extends Task {
         }
 
         // 3. log used properties in verbose level
-        getProject().log("Attaching to Profiled Application", Project.MSG_VERBOSE); //NOI18N
-        getProject().log("  classpath: " + classpath, Project.MSG_VERBOSE); //NOI18N
-        getProject().log("  attach direct: " + as.isDirect(), Project.MSG_VERBOSE); //NOI18N
-        getProject().log("  remote attach: " + as.isRemote(), Project.MSG_VERBOSE); //NOI18N
-        getProject().log("  remote host: " + as.getHost(), Project.MSG_VERBOSE); //NOI18N
-        getProject().log("  profiler port: " + as.getPort(), Project.MSG_VERBOSE); //NOI18N
+        antProject.log("Attaching to Profiled Application", Project.MSG_VERBOSE); //NOI18N
+        antProject.log("  classpath: " + classpath, Project.MSG_VERBOSE); //NOI18N
+        antProject.log("  attach direct: " + as.isDirect(), Project.MSG_VERBOSE); //NOI18N
+        antProject.log("  remote attach: " + as.isRemote(), Project.MSG_VERBOSE); //NOI18N
+        antProject.log("  remote host: " + as.getHost(), Project.MSG_VERBOSE); //NOI18N
+        antProject.log("  profiler port: " + as.getPort(), Project.MSG_VERBOSE); //NOI18N
 
         // 4. log profiling and session settings in debug level
-        getProject().log("  profiling settings: " + ps.debug(), Project.MSG_DEBUG); //NOI18N
-        getProject().log("  attach settings: " + as.debug(), Project.MSG_DEBUG); //NOI18N
+        antProject.log("  profiling settings: " + ps.debug(), Project.MSG_DEBUG); //NOI18N
+        antProject.log("  attach settings: " + as.debug(), Project.MSG_DEBUG); //NOI18N
 
         // 5. determine project being profiled
         org.netbeans.api.project.Project profiledProject = null;
@@ -143,7 +144,7 @@ public final class NBProfileAttachTask extends Task {
                 try {
                     profiledProject = ProjectManager.getDefault().findProject(projectFO);
                 } catch (IOException e) {
-                    getProject().log("Could not determine project: " + e.getMessage(), Project.MSG_WARN); //NOI18N
+                    antProject.log("Could not determine project: " + e.getMessage(), Project.MSG_WARN); //NOI18N
                 }
             }
         }
