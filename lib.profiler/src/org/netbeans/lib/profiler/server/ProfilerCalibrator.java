@@ -429,12 +429,6 @@ class ProfilerCalibrator extends ProfilerRuntime {
             int recordSize = 1 + 2 + 7 + ((nCall >= 2) ? 7 : 0); // Event type, method id, and 1 or 2 7-byte timestamps
             int curPos = (cycleWhenMinResultDetected * innerIterationBufferSize) + (1 * recordSize);
 
-            // Take into account that when only one timestamp per standard event is collected, ROOT_ENTRY and ROOT_EXIT
-            // still generate two timestamps
-            if (nCall < 2) {
-                curPos += 7;
-            }
-
             int totalCalls = noOfInnerIterations * 4;
             long innerTime = 0;
             long outerTime = 0;
