@@ -290,41 +290,12 @@ final class TimelineXYPainter extends XYItemPainter.Abstract {
                                         double dataFactor) {
 
         int valuesCount = item.getValuesCount();
-        int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
 
-        int firstFirst = visibleBounds[0][0];
-        int firstIndex = firstFirst;
-        if (firstIndex == -1) firstIndex = visibleBounds[0][1];
-        if (firstIndex == -1) return null;
-        if (firstFirst != -1 && firstIndex > 0) firstIndex -= 1;
+        int[] xPoints = IndexesComputer.getVisible(dirtyArea, valuesCount, context);
+        int[] yPoints = new int[xPoints.length];
 
-        int lastFirst = visibleBounds[1][0];
-        int lastIndex = lastFirst;
-        if (lastIndex == -1) lastIndex = visibleBounds[1][1];
-        if (lastIndex == -1) lastIndex = valuesCount - 1;
-        if (lastFirst != -1 && lastIndex < valuesCount - 1) lastIndex += 1;
-
-        int itemsStep = (int)Math.ceil(valuesCount / context.getViewWidth());
-        if (itemsStep == 0) itemsStep = 1;
-
-        int visibleCount = lastIndex - firstIndex + 1;
-
-        if (itemsStep > 1) {
-            int firstMod = firstIndex % itemsStep;
-            firstIndex -= firstMod;
-            int lastMod = lastIndex % itemsStep;
-            lastIndex = lastIndex - lastMod + itemsStep;
-            visibleCount = (lastIndex - firstIndex) / itemsStep + 1;
-            lastIndex = Math.min(lastIndex, valuesCount - 1);
-        }
-
-        int[] xPoints = new int[visibleCount + 2];
-        int[] yPoints = new int[visibleCount + 2];
-
-
-        for (int i = 0; i < visibleCount; i++) {
-            int dataIndex = i == visibleCount - 1 ? lastIndex :
-                                 firstIndex + i * itemsStep;
+        for (int i = 0; i < xPoints.length; i++) {
+            int dataIndex = xPoints[i];
             xPoints[i] = Utils.checkedInt(Math.ceil(
                          context.getViewX(item.getXValue(dataIndex))));
             yPoints[i] = Utils.checkedInt(Math.ceil(

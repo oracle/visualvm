@@ -40,9 +40,10 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.swing.LongRect;
@@ -56,14 +57,14 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
 final class TimelineTooltipOverlay extends ChartOverlay implements ActionListener {
 
     static final int TOOLTIP_OFFSET = 15;
-    private static final int TOOLTIP_MARGIN = 10;
+    static final int TOOLTIP_MARGIN = 10;
     private static final int TOOLTIP_RESPONSE = 50;
     private static final int ANIMATION_STEPS = 5;
 
     private TimelineTooltipPainter.Model[] rowModels;
 
-    private List<TimelineChart.Row> selectedRows = new ArrayList(1);
-    private Set<Integer> selectedTimestamps = new HashSet();
+    private Set<Integer> selectedTimestamps = Collections.EMPTY_SET;
+    private final List<ItemSelection> selections = new ArrayList(100);
 
     private Timer timer;
     private int currentStep;
@@ -83,6 +84,10 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
         setLayout(null);
 
+        final Runnable tooltipUpdater = new Runnable() {
+            public void run() { updateTooltip(chart); }
+        };
+
         chart.getSelectionModel().addSelectionListener(new ChartSelectionListener() {
 
             public void selectionModeChanged(int newMode, int oldMode) {}
@@ -91,20 +96,16 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
             public void highlightedItemsChanged(List<ItemSelection> currentItems,
                 List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-                updateTooltip(chart);
+                tooltipUpdater.run();
             }
 
             public void selectedItemsChanged(List<ItemSelection> currentItems,
-                List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-                selectedRows = chart.getSelectedRows();
-                selectedTimestamps = support.getSelectedTimestamps();
-                updateTooltip(chart);
-            }
+                List<ItemSelection> addedItems, List<ItemSelection> removedItems) {}
 
         });
 
         chart.addConfigurationListener(new ChartConfigurationListener.Adapter() {
-
+            
             public void contentsUpdated(long offsetX, long offsetY,
                                     double scaleX, double scaleY,
                                     long lastOffsetX, long lastOffsetY,
@@ -112,19 +113,28 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
                                     int shiftX, int shiftY) {
                 if (lastOffsetX != offsetX || lastOffsetY != offsetY ||
                     scaleX != lastScaleX || scaleY != lastScaleY)
-                updateTooltip(chart);
+                    SwingUtilities.invokeLater(tooltipUpdater);
             }
 
         });
 
         chart.addRowListener(new TimelineChart.RowListener() {
 
-            public void rowsAdded(List<Row> rows)   { updateTooltip(chart); }
+            public void rowsAdded(List<Row> rows) { tooltipUpdater.run(); }
 
-            public void rowsRemoved(List<Row> rows) { updateTooltip(chart); }
+            public void rowsRemoved(List<Row> rows) { tooltipUpdater.run(); }
 
-            public void rowsResized(List<Row> rows) { updateTooltip(chart); }
-            
+            public void rowsResized(List<Row> rows) { tooltipUpdater.run(); }
+        });
+
+        support.addSelectionListener(new TimelineSupport.SelectionListener() {
+
+            public void rowSelectionChanged(boolean rowsSelected) {}
+
+            public void timeSelectionChanged(boolean timestampsSelected) {
+                selectedTimestamps = support.getSelectedTimestamps();
+                tooltipUpdater.run();
+            }
         });
     }
 
@@ -179,7 +189,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
     private void checkAllocatedSelectionPainters() {
         int allocatedPainters = getComponentCount() - rowModels.length;
-        int requiredPainters = selectedRows.size() * selectedTimestamps.size();
+        int requiredPainters = rowModels.length * selectedTimestamps.size();
         if (allocatedPainters == requiredPainters) return;
 
         int diff = requiredPainters - allocatedPainters;
@@ -191,8 +201,6 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
         }
     }
 
-    private final List<ItemSelection> selections = new ArrayList(100);
-
     @SuppressWarnings("element-type-mismatch")
     private void updateTooltip(TimelineChart chart) {
         if (rowModels == null) return;
@@ -203,7 +211,8 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
         checkAllocatedSelectionPainters();
         
         int painterIndex = rowModels.length;
-        for (TimelineChart.Row row : selectedRows) {
+        for (int rowIndex = 0; rowIndex < rowModels.length; rowIndex++) {
+            TimelineChart.Row row = chart.getRow(rowIndex);
             ChartContext rowContext = row.getContext();
             int itemsCount = row.getItemsCount();
             TimelineTooltipPainter.Model model = rowModels[row.getIndex()];

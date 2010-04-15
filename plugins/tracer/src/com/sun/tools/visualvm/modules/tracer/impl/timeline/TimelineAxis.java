@@ -32,6 +32,7 @@ import com.sun.tools.visualvm.modules.tracer.impl.swing.LegendFont;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.TimelineMarksPainter;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -40,6 +41,9 @@ import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -55,14 +59,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.ChartContext;
-import org.netbeans.lib.profiler.charts.ChartSelectionListener;
-import org.netbeans.lib.profiler.charts.ItemSelection;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.axis.AxisMark;
 import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
 import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
 import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChartContext;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.openide.util.ImageUtilities;
 
@@ -77,6 +80,8 @@ final class TimelineAxis extends JPanel {
     private final MarksComponent marks;
 
     private int preferredHeight;
+    
+    private int pointerX;
 
 
     TimelineAxis(TimelineChart chart, TimelineSupport support) {
@@ -98,34 +103,66 @@ final class TimelineAxis extends JPanel {
 
         chart.addConfigurationListener(new ChartConfigurationListener.Adapter() {
 
+            private final Runnable updater = new Runnable() {
+                public void run() {
+                    marks.refreshTicks();
+                    marks.refreshHoverMark(pointerX);
+                    marks.repaint();
+                }
+            };
+
             public void contentsUpdated(long offsetX, long offsetY,
                                         double scaleX, double scaleY,
                                         long lastOffsetX, long lastOffsetY,
                                         double lastScaleX, double lastScaleY,
                                         int shiftX, int shiftY) {
                 
-                if (lastOffsetX != offsetX || lastScaleX != scaleX) marks.refresh();
+                if (lastOffsetX != offsetX || lastScaleX != scaleX)
+                    marks.refreshMarks();
+                if (!axis.isVisible()) SwingUtilities.invokeLater(updater);
             }
 
         });
 
-        chart.getSelectionModel().addSelectionListener(new ChartSelectionListener() {
+        support.addSelectionListener(new TimelineSupport.SelectionListener() {
 
-            public void selectionModeChanged(int i, int i1) {}
+            public void rowSelectionChanged(boolean rowsSelected) {}
 
-            public void selectionBoundsChanged(Rectangle rctngl, Rectangle rctngl1) {}
-
-            public void highlightedItemsChanged(List<ItemSelection> list,
-                                                List<ItemSelection> list1,
-                                                List<ItemSelection> list2) {}
-
-            public void selectedItemsChanged(List<ItemSelection> currentItems,
-              List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-                
-                marks.refresh();
+            public void timeSelectionChanged(boolean timestampsSelected) {
+                marks.refreshMarks();
                 marks.repaint();
             }
-            
+        });
+
+        marks.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                pointerX = e.getX();
+                marks.refreshTicks();
+                marks.refreshHoverMark(pointerX);
+                axis.setVisible(false);
+            }
+
+            public void mouseExited(MouseEvent e) {
+                axis.setVisible(true);
+                marks.clearItems();
+                marks.refreshHoverMark(-10);
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                marks.handleAction();
+                marks.repaint();
+            }
+        });
+
+        marks.addMouseMotionListener(new MouseMotionListener() {
+            public void mouseDragged(MouseEvent e) {
+                pointerX = e.getX();
+            }
+
+            public void mouseMoved(MouseEvent e) {
+                pointerX = e.getX();
+                if (!axis.isVisible()) marks.refreshHoverMark(pointerX);
+            }
         });
 
     }
@@ -181,30 +218,42 @@ final class TimelineAxis extends JPanel {
     private static class MarksComponent extends JComponent {
 
         private static final Image MARK = ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/modules/tracer/impl/resources/timeMark.png");  // NOI18N
+                "com/sun/tools/visualvm/modules/tracer/impl/resources/mark.png");  // NOI18N
+        private static final Image MARK_HIGHL = ImageUtilities.loadImage(
+                "com/sun/tools/visualvm/modules/tracer/impl/resources/markHighl.png");  // NOI18N
         private static final int MARK_EXTENT = MARK.getWidth(null) / 2;
         private static final int MARK_HEIGHT = MARK.getHeight(null);
 
         private final TimelineSupport support;
+        private final Timeline timeline;
+        private final SynchronousXYChartContext context;
 
         private final EnhancedLabelRenderer timeRenderer;
-        private final int timeRendererHeight;
         private final Format timeFormat;
 
+        private int[] ticks;
+        private int hoverIndex = -1;
+        private int hoverX = -10;
+        private boolean wasSelected;
+        private long hoverTime;
+
         private final List<Integer> selections = new ArrayList();
-        private final List<Long> times = new ArrayList();
         private final int markExtent = 2;
 
 
         MarksComponent(TimelineSupport support) {
             this.support = support;
 
+            TimelineChart chart = support.getChart();
+            SynchronousXYItemsModel model = (SynchronousXYItemsModel)chart.getItemsModel();
+            context = (SynchronousXYChartContext)chart.getChartContext();
+            timeline = model.getTimeline();
+
             timeRenderer = new EnhancedLabelRenderer();
             timeRenderer.setFont(new LegendFont());
             timeRenderer.setBackground(Color.WHITE);
             timeRenderer.setMargin(new Insets(1, 2, 1, 2));
             timeRenderer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            timeRendererHeight = timeRenderer.getPreferredSize().height;
             timeFormat = new SimpleDateFormat(TimeAxisUtils.getFormatString(1, 1, 1));
 
             setOpaque(false);
@@ -214,45 +263,90 @@ final class TimelineAxis extends JPanel {
         public void doLayout() {}
 
 
-        void refresh() {
+        void refreshMarks() {
             Set<Integer> selectedIndexes = support.getSelectedTimestamps();
             if (selectedIndexes.size() == 0 && selections.isEmpty()) return;
 
-            TimelineChart chart = support.getChart();
-            SynchronousXYItemsModel model = (SynchronousXYItemsModel)chart.getItemsModel();
-            Timeline timeline = model.getTimeline();
-            ChartContext context = chart.getChartContext();
             selections.clear();
-//            times.clear();
 
             for (int selectedIndex : selectedIndexes) {
                 long time = timeline.getTimestamp(selectedIndex);
                 int x = Utils.checkedInt(context.getViewX(time));
-                if (x > -markExtent && x < getWidth() + markExtent) {
-                    selections.add(x);
-//                    times.add(time);
-                }
+                if (x > -markExtent && x < getWidth() + markExtent)
+                    selections.add(x + 1);
             }
+        }
+
+        void refreshTicks() {
+            ticks = IndexesComputer.getVisible(getBounds(),
+                    timeline.getTimestampsCount(), context);
+            if (ticks != null) for (int i = 0; i < ticks.length; i++)
+                ticks[i] = Utils.checkedInt(context.getViewX(timeline.
+                                            getTimestamp(ticks[i]))) + 1;
+        }
+
+        void refreshHoverMark(int pointerX) {
+            int lastHoverIndex = hoverIndex;
+
+            hoverIndex = context.getNearestTimestampIndex(pointerX - 1, 0);
+            hoverX = hoverIndex == -1 ? -10 : Utils.checkedInt(context.getViewX(
+                                        timeline.getTimestamp(hoverIndex))) + 1;
+            if (Math.abs(hoverX - pointerX + 1) > MARK_EXTENT) {
+                hoverIndex = -1;
+                hoverX = -10;
+            }
+
+            if (lastHoverIndex != hoverIndex) {
+                if (!wasSelected) support.unselectTimestamp(lastHoverIndex);
+                wasSelected = hoverIndex != -1 && support.isTimestampSelected(hoverIndex);
+                if (hoverIndex != -1) {
+                    support.selectTimestamp(hoverIndex, false);
+                    hoverTime = timeline.getTimestamp(hoverIndex);
+                    if (wasSelected) repaint();
+                } else {
+                    if (!wasSelected) repaint();
+                }
+                if (hoverIndex == -1) setCursor(Cursor.getDefaultCursor());
+                else setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
+        }
+
+        void clearItems() {
+            ticks = null;
+        }
+
+        void handleAction() {
+            wasSelected = !wasSelected;
         }
 
 
         public void paint(Graphics g) {
+            int top = getHeight() / 2 - 1;
+            int bottom = top + 2;
+
+            if (ticks != null)
+                for (int i = 0; i < ticks.length; i++)
+                    g.drawLine(ticks[i], top, ticks[i], bottom);
+
             if (selections == null || selections.isEmpty()) return;
 
-            int h = getHeight();
-            int my = h - 5 - MARK_HEIGHT;
-//            int py = (h - timeRendererHeight) / 2;
-            int selectionsCount = selections.size();
-            
-            for (int i = 0; i < selectionsCount; i++)
-                paintMark(g, selections.get(i), my/*, py, times.get(i)*/);
-        }
+            int y = getHeight() - 5 - MARK_HEIGHT;
+            for (int x : selections)
+                g.drawImage((x == hoverX && wasSelected) ? MARK_HIGHL :
+                            MARK, x - MARK_EXTENT + 1, y, null);
 
-        private void paintMark(Graphics g, int x, int my/*, int py, long time*/) {
-            g.drawImage(MARK, x - MARK_EXTENT + 1, my, null);
-//            timeRenderer.setText(timeFormat.format(time));
-//            timeRenderer.setLocation(x + MARK_EXTENT + TimelineTooltipOverlay.TOOLTIP_OFFSET + 1, py);
-//            timeRenderer.paint(g);
+            if (hoverIndex != -1) {
+                timeRenderer.setText(timeFormat.format(hoverTime));
+                Dimension timeSize = timeRenderer.getPreferredSize();
+                int timeWidth = timeSize.width;
+                int extraWidth = MARK_EXTENT + TimelineTooltipOverlay.TOOLTIP_OFFSET;
+                int timeX = hoverX + extraWidth;
+                if (timeX > getWidth() - timeWidth - TimelineTooltipOverlay.TOOLTIP_MARGIN)
+                    timeX = hoverX - timeWidth - extraWidth;
+                timeRenderer.setLocation(timeX, top - timeSize.height / 2);
+                timeRenderer.paint(g);
+            }
         }
 
     }

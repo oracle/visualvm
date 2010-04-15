@@ -490,7 +490,7 @@ final class TracerOptionsPanel extends JPanel {
                 // Fallback to defaults
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        setOnProbeAdded(TracerOptions.ROW_SELECTED_DEFAULT);
+                        setOnRowSelected(TracerOptions.ROW_SELECTED_DEFAULT);
                         update();
                     }
                 });
@@ -518,7 +518,7 @@ final class TracerOptionsPanel extends JPanel {
                 // Fallback to defaults
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        setOnProbeAdded2(TracerOptions.ROW_SELECTED_DEFAULT2);
+                        setOnRowSelected2(TracerOptions.ROW_SELECTED_DEFAULT2);
                         update();
                     }
                 });

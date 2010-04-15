@@ -36,6 +36,7 @@ import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -48,6 +49,7 @@ import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
+import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 
 /**
  *
@@ -56,11 +58,13 @@ import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 final class TimelineSelectionOverlay extends ChartOverlay {
 
     private TimelineChart chart;
+    private TimelineSupport support;
 
     private int selectionExtent;
 
     private ConfigurationListener configurationListener;
     private SelectionListener selectionListener;
+    private TimeSelectionListener timeSelectionListener;
     private final Set<Point> highlightedValues;
     private final Set<Point> selectedValues;
 
@@ -80,6 +84,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     TimelineSelectionOverlay() {
         configurationListener = new ConfigurationListener();
         selectionListener = new SelectionListener();
+        timeSelectionListener = new TimeSelectionListener();
         highlightedValues = new HashSet();
         selectedValues = new HashSet();
         initDefaultValues();
@@ -88,14 +93,16 @@ final class TimelineSelectionOverlay extends ChartOverlay {
 
     // --- Internal API --------------------------------------------------------
 
-    final void registerChart(TimelineChart chart) {
+    final void registerChart(TimelineSupport support) {
         unregisterListener();
-        this.chart = chart;
+        this.support = support;
+        this.chart = support.getChart();
         registerListener();
     }
 
-    final void unregisterChart(TimelineChart chart) {
+    final void unregisterChart(TimelineSupport support) {
         unregisterListener();
+        this.support = null;
         this.chart = null;
     }
 
@@ -103,17 +110,19 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     // --- Private implementation ----------------------------------------------
 
     private void registerListener() {
-        if (chart == null) return;
+        if (support == null || chart == null) return;
         chart.addConfigurationListener(configurationListener);
         chart.addRowListener(configurationListener);
         chart.getSelectionModel().addSelectionListener(selectionListener);
+        support.addSelectionListener(timeSelectionListener);
     }
 
     private void unregisterListener() {
-        if (chart == null) return;
+        if (support == null || chart == null) return;
         chart.removeConfigurationListener(configurationListener);
         chart.removeRowListener(configurationListener);
         chart.getSelectionModel().removeSelectionListener(selectionListener);
+        support.removeSelectionListener(timeSelectionListener);
     }
 
     private void initDefaultValues() {
@@ -193,25 +202,39 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     }
 
     private void vLineBoundsChanged(Set<Point> oldSelection, Set<Point> newSelection) {
-        SortedSet selectionBounds = new TreeSet();
+        SortedSet<Integer> selectionBounds = new TreeSet();
         for (Point p : oldSelection) selectionBounds.add(p.x);
         int selections = selectionBounds.size();
         if (selections == 1) {
-            repaint((Integer)selectionBounds.first() - selectionExtent,
-                        0, selectionExtent * 2, getHeight());
+            repaint(selectionBounds.first() - selectionExtent,
+                    0, selectionExtent * 2, getHeight());
             selectionBounds.clear();
         }
 
         for (Point p : newSelection) selectionBounds.add(p.x);
         selections = selectionBounds.size();
         if (selections == 1) {
-            repaint((Integer)selectionBounds.first() - selectionExtent,
-                        0, selectionExtent * 2, getHeight());
+            repaint(selectionBounds.first() - selectionExtent,
+                    0, selectionExtent * 2, getHeight());
         } else if (selections > 1) {
-            int firstX = (Integer)selectionBounds.first() - selectionExtent;
-            int lastX  = (Integer)selectionBounds.last() + selectionExtent;
+            int firstX = selectionBounds.first() - selectionExtent;
+            int lastX  = selectionBounds.last() + selectionExtent;
             repaint(firstX, 0, lastX - firstX, getHeight());
         }
+    }
+
+    private List<ItemSelection> getSelections() {
+        List<ItemSelection> items = new ArrayList();
+
+        Set<Integer> timestamps = support.getSelectedTimestamps();
+        SynchronousXYItemsModel model = (SynchronousXYItemsModel)chart.getItemsModel();
+        int itemsCount = model.getItemsCount();
+        for (int itemIndex = 0; itemIndex < itemsCount; itemIndex++)
+            for (int timestamp : timestamps)
+                items.add(new XYItemSelection.Default(model.getItem(itemIndex),
+                          timestamp, XYItemSelection.DISTANCE_UNKNOWN));
+
+        return items;
     }
 
     private static void updateValues(Set<Point> values,
@@ -227,8 +250,8 @@ final class TimelineSelectionOverlay extends ChartOverlay {
             long yValue = item.getYValue(xySel.getValueIndex());
             int xPos = Utils.checkedInt(Math.ceil(context.getViewX(xValue)));
             int yPos = Utils.checkedInt(Math.ceil(painter.getItemView(yValue, item, context)));
-//            if (xPos >= 0 && xPos <= chart.getWidth() &&
-//                yPos >= 0 && yPos <= chart.getHeight())
+            if (xPos >= 0 && xPos <= chart.getWidth() &&
+                yPos >= 0 && yPos <= chart.getHeight())
                 values.add(new Point(xPos, yPos));
         }
     }
@@ -238,11 +261,11 @@ final class TimelineSelectionOverlay extends ChartOverlay {
                                         implements TimelineChart.RowListener {
         private final Runnable selectionUpdater = new Runnable() {
             public void run() {
-                Set<Point> oldValues = new HashSet(selectedValues);
-                updateValues(selectedValues, chart.getSelectionModel().
-                             getSelectedItems(), chart);
-                vLineBoundsChanged(oldValues, selectedValues);
-                oldValues = new HashSet(highlightedValues);
+                Set<Point> oldSelectedValues = new HashSet(selectedValues);
+                updateValues(selectedValues, getSelections(), chart);
+                vLineBoundsChanged(oldSelectedValues, selectedValues);
+                
+                Set<Point> oldValues = new HashSet(highlightedValues);
                 updateValues(highlightedValues, chart.getSelectionModel().
                              getHighlightedItems(), chart);
                 vLineBoundsChanged(oldValues, highlightedValues);
@@ -253,11 +276,10 @@ final class TimelineSelectionOverlay extends ChartOverlay {
                                     long lastOffsetX, long lastOffsetY,
                                     double lastScaleX, double lastScaleY,
                                     int shiftX, int shiftY) {
-            if (highlightedValues.isEmpty() && selectedValues.isEmpty()) return;
+            if (highlightedValues.isEmpty() && !support.isTimestampSelection()) return;
             if (lastOffsetX != offsetX || lastOffsetY != offsetY ||
                 scaleX != lastScaleX || scaleY != lastScaleY)
-//                SwingUtilities.invokeLater(selectionUpdater);
-                selectionUpdater.run();
+                SwingUtilities.invokeLater(selectionUpdater);
         }
         public void rowsAdded(List<TimelineChart.Row> rows) { selectionUpdater.run(); };
 
@@ -268,22 +290,12 @@ final class TimelineSelectionOverlay extends ChartOverlay {
 
     private class SelectionListener implements ChartSelectionListener {
 
-        private final Runnable selectionUpdater = new Runnable() {
-            public void run() {
-                Set<Point> oldSelectedValues = new HashSet(selectedValues);
-                updateValues(selectedValues, chart.getSelectionModel().
-                             getSelectedItems(), chart);
-                vLineBoundsChanged(oldSelectedValues, selectedValues);
-            }
-        };
-
         public void selectionModeChanged(int newMode, int oldMode) {}
 
         public void selectionBoundsChanged(Rectangle newBounds, Rectangle oldBounds) {}
 
         public void selectedItemsChanged(List<ItemSelection> currentItems,
               List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
-            SwingUtilities.invokeLater(selectionUpdater);
         }
 
         public void highlightedItemsChanged(List<ItemSelection> currentItems,
@@ -291,6 +303,18 @@ final class TimelineSelectionOverlay extends ChartOverlay {
             Set<Point> oldHighlightedValues = new HashSet(highlightedValues);
             updateValues(highlightedValues, currentItems, chart);
             vLineBoundsChanged(oldHighlightedValues, highlightedValues);
+        }
+
+    }
+
+    private class TimeSelectionListener implements TimelineSupport.SelectionListener {
+
+        public void rowSelectionChanged(boolean rowsSelected) {}
+
+        public void timeSelectionChanged(boolean timestampsSelected) {
+            Set<Point> oldSelectedValues = new HashSet(selectedValues);
+            updateValues(selectedValues, getSelections(), chart);
+            vLineBoundsChanged(oldSelectedValues, selectedValues);
         }
 
     }

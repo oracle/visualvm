@@ -185,7 +185,6 @@ public final class TimelineSupport {
     private void setupOverlays() {
         final int rowsCount = chart.getRowsCount();
 
-//        TimelineTooltipPainter[] ttPainters = new TimelineTooltipPainter[rowsCount];
         TimelineTooltipPainter.Model[] rowModels = new TimelineTooltipPainter.Model[rowsCount];
         
         for (int rowIndex = 0; rowIndex < rowModels.length; rowIndex++) {
@@ -388,11 +387,10 @@ public final class TimelineSupport {
     public void resetValues() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                int lastRow = detailsModel == null ? -1 : detailsModel.getRowCount() - 1;
                 model.reset();
                 itemsModel.valuesReset();
                 resetSelectedTimestamps();
-                if (lastRow != -1) detailsModel.fireTableRowsDeleted(0, lastRow);
+                if (detailsModel != null) detailsModel.fireTableStructureChanged();
             }
         });
     }
@@ -476,7 +474,7 @@ public final class TimelineSupport {
             }
 
             public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-                if (Boolean.TRUE.equals(aValue)) selectTimestamp(rowIndex, false);
+                if (Boolean.TRUE.equals(aValue)) selectTimestamp(rowIndex, true, false);
                 else unselectTimestamp(rowIndex, false);
             }
 
@@ -490,23 +488,36 @@ public final class TimelineSupport {
     private static final int SCROLL_MARGIN_RIGHT = 50;
 
 
-    public void selectTimestamp(int index) {
-        selectTimestamp(index, true);
+    public void selectTimestamp(int index, boolean scrollToVisible) {
+        selectTimestamp(index, scrollToVisible, true);
     }
 
-    private void selectTimestamp(int index, boolean notifyTable) {
+    private void selectTimestamp(int index, boolean scrollToVisible, boolean notifyTable) {
         boolean change = selectedTimestamps.add(index);
         if (notifyTable && detailsModel != null)
             detailsModel.fireTableCellUpdated(index, 0);
         if (change) {
             updateSelectedItems();
             notifyTimeSelectionChanged();
-            highlightTimestamp(index);
+            if (scrollToVisible) highlightTimestamp(index);
         }
     }
 
     public void unselectTimestamp(int index) {
         unselectTimestamp(index, true);
+    }
+
+    public void toggleTimestampSelection(int index) {
+        if (!selectedTimestamps.contains(index)) selectTimestamp(index, false);
+        else unselectTimestamp(index);
+    }
+
+    public boolean isTimestampSelected(int index) {
+        return selectedTimestamps.contains(index);
+    }
+
+    public boolean isTimestampSelection() {
+        return !selectedTimestamps.isEmpty();
     }
 
     private void unselectTimestamp(int index, boolean notifyTable) {
@@ -593,7 +604,7 @@ public final class TimelineSupport {
             chart.setOffset(newOffsetX - context.getViewportWidth() + SCROLL_MARGIN_RIGHT, chart.getOffsetY());
         }
 
-        chart.repaintDirtyAccel();
+        chart.repaintDirty();
     }
 
 
@@ -631,7 +642,7 @@ public final class TimelineSupport {
     }
 
     private void notifyTimeSelectionChanged() {
-        boolean timestampsSelected = selectedTimestamps.isEmpty();
+        boolean timestampsSelected = !selectedTimestamps.isEmpty();
         for (SelectionListener selectionListener: selectionListeners)
             selectionListener.timeSelectionChanged(timestampsSelected);
     }

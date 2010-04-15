@@ -83,6 +83,11 @@ public class HeaderButton extends HeaderPanel {
         super.setEnabled(enabled);
     }
 
+    public void reset() {
+        processMouseEvent(new MouseEvent(this, MouseEvent.MOUSE_EXITED,
+                          System.currentTimeMillis(), 0, -1, -1, 0, false));
+    }
+
     protected boolean processMouseEvents() { return true; }
 
     protected void performAction(ActionEvent e) {}

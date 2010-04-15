@@ -104,7 +104,7 @@ final class ChartPanel extends JPanel {
 
         TimelineSelectionOverlay selectionOverlay = new TimelineSelectionOverlay();
         chart.addOverlayComponent(selectionOverlay);
-        selectionOverlay.registerChart(chart);
+        selectionOverlay.registerChart(support);
 
         ChartSelectionModel selectionModel = chart.getSelectionModel();
         if (selectionModel != null) {

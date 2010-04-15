@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl.details;
 
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderButton;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderPanel;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,6 +48,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.Scrollable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -130,16 +132,21 @@ public final class DetailsPanel extends JPanel {
 
         JCheckBox checkBox = new JCheckBox();
         checkBox.setBorder(BorderFactory.createEmptyBorder());
-        checkBox.setEnabled(false);
         checkBox.setSize(checkBox.getMinimumSize());
         BufferedImage img = new BufferedImage(checkBox.getWidth(), checkBox.getHeight(), BufferedImage.TYPE_INT_ARGB);
         checkBox.print(img.getGraphics());
-        HeaderButton hb = new HeaderButton(null, new ImageIcon(img)) {
+        final HeaderButton hb = new HeaderButton(null, new ImageIcon(img)) {
             protected void performAction(ActionEvent e) {
-               support.resetSelectedTimestamps();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        support.resetSelectedTimestamps();
+                    }
+                });
             }
         };
         hb.setToolTipText("Clear marked timestamps");
+        
+        final HeaderPanel corner = new HeaderPanel();
 
         JViewport viewport = new Viewport(table);
 
@@ -149,7 +156,25 @@ public final class DetailsPanel extends JPanel {
         tableScroll.setViewport(viewport);
         tableScroll.setBorder(BorderFactory.createEmptyBorder());
         tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-        tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, hb);
+        tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, corner);
+        
+        support.addSelectionListener(new TimelineSupport.SelectionListener() {
+            
+            private boolean lastSelected = false;
+
+            public void rowSelectionChanged(boolean rowsSelected) {}
+
+            public void timeSelectionChanged(boolean timestampsSelected) {
+                if (lastSelected == timestampsSelected) return;
+                
+                tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER,
+                                      timestampsSelected ? hb : corner);
+                hb.reset();
+
+                lastSelected = timestampsSelected;
+            }
+        });
+        
         scrollBar = new JScrollBar(JScrollBar.VERTICAL) {
             public int getUnitIncrement(int direction) {
                 JViewport vp = tableScroll.getViewport();
