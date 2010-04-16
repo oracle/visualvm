@@ -105,9 +105,11 @@ final class TimelineAxis extends JPanel {
 
             private final Runnable updater = new Runnable() {
                 public void run() {
-                    marks.refreshTicks();
-                    marks.refreshHoverMark(pointerX);
-                    marks.repaint();
+                    if (!axis.isVisible()) {
+                        marks.setupTicks();
+                        marks.refreshHoverMark(pointerX);
+                        marks.repaint();
+                    }
                 }
             };
 
@@ -119,7 +121,7 @@ final class TimelineAxis extends JPanel {
                 
                 if (lastOffsetX != offsetX || lastScaleX != scaleX)
                     marks.refreshMarks();
-                if (!axis.isVisible()) SwingUtilities.invokeLater(updater);
+                SwingUtilities.invokeLater(updater);
             }
 
         });
@@ -137,14 +139,14 @@ final class TimelineAxis extends JPanel {
         marks.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 pointerX = e.getX();
-                marks.refreshTicks();
+                marks.setupTicks();
                 marks.refreshHoverMark(pointerX);
                 axis.setVisible(false);
             }
 
             public void mouseExited(MouseEvent e) {
                 axis.setVisible(true);
-                marks.clearItems();
+                marks.clearTicks();
                 marks.refreshHoverMark(-10);
             }
 
@@ -256,6 +258,8 @@ final class TimelineAxis extends JPanel {
             timeRenderer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             timeFormat = new SimpleDateFormat(TimeAxisUtils.getFormatString(1, 1, 1));
 
+            setToolTipText("Click a mark to select or unselect it");
+
             setOpaque(false);
         }
         
@@ -277,7 +281,7 @@ final class TimelineAxis extends JPanel {
             }
         }
 
-        void refreshTicks() {
+        void setupTicks() {
             ticks = IndexesComputer.getVisible(getBounds(),
                     timeline.getTimestampsCount(), context);
             if (ticks != null) for (int i = 0; i < ticks.length; i++)
@@ -312,7 +316,7 @@ final class TimelineAxis extends JPanel {
 
         }
 
-        void clearItems() {
+        void clearTicks() {
             ticks = null;
         }
 
