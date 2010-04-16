@@ -41,6 +41,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.plaf.ButtonUI;
 import javax.swing.plaf.basic.BasicButtonUI;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 
 /**
  *
@@ -101,8 +102,11 @@ public class HeaderButton extends HeaderPanel {
         private static final Stroke FOCUS_STROKE =
                 new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL,
                                 0, new float[] {0, 2}, 0);
+        private static final Color PRESSED_FOREGROUND =
+                Utils.checkedColor(new Color(100, 100, 100, 70));
 
-        protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect, Rectangle textRect, Rectangle iconRect) {
+        protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect,
+                                  Rectangle textRect, Rectangle iconRect) {
             Graphics2D g2 = (Graphics2D)g;
             g2.setStroke(FOCUS_STROKE);
             g2.setColor(FOCUS_COLOR);
@@ -110,7 +114,7 @@ public class HeaderButton extends HeaderPanel {
         }
 
         protected void paintButtonPressed(Graphics g, AbstractButton b) {
-            g.setColor(new Color(100, 100, 100, 70));
+            g.setColor(PRESSED_FOREGROUND);
             g.fillRect(0, 0, b.getWidth(), b.getHeight());
         }
 

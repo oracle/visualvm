@@ -49,6 +49,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.Timeline;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.openide.util.ImageUtilities;
 
@@ -96,11 +97,15 @@ final class ChartPanel extends JPanel {
     ChartPanel(TimelineChart chart, TimelineSupport support) {
         this.chart = chart;
 
+        boolean speed = Utils.forceSpeed();
+
         chart.setBackground(Color.WHITE);
+        if (speed && TracerOptions.getInstance().isRowsSelectionEnabled())
+            chart.addPreDecorator(new RowBackgroundDecorator(chart));
         chart.addPreDecorator(new RowBoundsDecorator(chart));
         chart.addPostDecorator(new RowForegroundDecorator(chart,
                 TracerOptions.getInstance().isRowsDecorationEnabled(),
-                TracerOptions.getInstance().isRowsSelectionEnabled()));
+                speed ? false : TracerOptions.getInstance().isRowsSelectionEnabled()));
 
         TimelineSelectionOverlay selectionOverlay = new TimelineSelectionOverlay();
         chart.addOverlayComponent(selectionOverlay);

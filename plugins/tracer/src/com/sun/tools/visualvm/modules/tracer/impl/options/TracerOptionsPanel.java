@@ -363,12 +363,6 @@ final class TracerOptionsPanel extends JPanel {
             rowsDecorationCombo.setEnabled(false);
         }
 
-        // --- rowsSelection ---------------------------------------------------
-        if (Utils.forceSpeed()) {
-            rowsSelectionCombo.setSelectedIndex(1);
-            rowsSelectionCombo.setEnabled(false);
-        }
-
         // --- initiallyOpened -------------------------------------------------
         List selected = getSelected(initiallyOpenedPanel);
 

@@ -129,10 +129,12 @@ public final class TracerOptions {
     }
 
     void setRowsDecorationEnabled(boolean rowsDecorationEnabled) {
+        if (Utils.forceSpeed()) return;
         prefs.putBoolean(PROP_ROWS_DECORATION, rowsDecorationEnabled);
     }
 
     public boolean isRowsDecorationEnabled() {
+        if (Utils.forceSpeed()) return false;
         return prefs.getBoolean(PROP_ROWS_DECORATION, !Utils.forceSpeed());
     }
 

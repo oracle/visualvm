@@ -33,6 +33,8 @@ import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.UIManager;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 
 /**
  *
@@ -46,9 +48,11 @@ public final class ProbePresenter extends JLabel {
                                                         new Color(205, 205, 220, 30),
                                                         new Color(180, 180, 195, 30),
                                                         new Color(200, 200, 210, 110) };
+    private static final Color BACKGROUND = UIManager.getColor("Panel.background"); // NOI18N
 
     private LinearGradientPaint gradientPaint;
-    
+
+    private static final boolean GRADIENT = !Utils.forceSpeed();
     private boolean isSelected = false;
 
     public ProbePresenter(TracerProbe p, TracerProbeDescriptor d) {
@@ -73,7 +77,8 @@ public final class ProbePresenter extends JLabel {
 
 
     public void reshape(int x, int y, int w, int h) {
-        gradientPaint = new LinearGradientPaint(0, 0, 0, h - 1, FRACTIONS, COLORS);
+        if (GRADIENT) gradientPaint = new LinearGradientPaint(0, 0, 0, h - 1,
+                                                              FRACTIONS, COLORS);
         super.reshape(x, y, w, h);
     }
 
@@ -81,9 +86,9 @@ public final class ProbePresenter extends JLabel {
     protected void paintComponent(Graphics g) {
         int y = getHeight() - 1;
 
-        ((Graphics2D)g).setPaint(gradientPaint);
+        ((Graphics2D)g).setPaint(GRADIENT ? gradientPaint : BACKGROUND);
         g.fillRect(0, 0, getWidth(), y);
-
+        
         if (isSelected) {
             g.setColor(SELECTED_FILTER);
             g.fillRect(0, 0, getWidth(), y);
