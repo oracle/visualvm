@@ -68,7 +68,7 @@ class PermgenMonitorProbe extends MonitorProbe {
                     "Monitors current PermGen size", ItemValueFormatter.DEFAULT_BYTES,
                     0, 10 * 1024 * 1024),
             ProbeItemDescriptor.lineFillItem("Used",
-                    "Monitors currently PermGen heap", ItemValueFormatter.DEFAULT_BYTES,
+                    "Monitors currently used PermGen", ItemValueFormatter.DEFAULT_BYTES,
                     0, 10 * 1024 * 1024)
         };
     }
