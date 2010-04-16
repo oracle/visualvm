@@ -107,7 +107,7 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
         if (!instrMethodInvoked[methodIdInt]) {
             if (ti.rootMethodStackDepth > 0) { // marker method under root method - perform instrumentation of nearest callees
                 long absTimeStamp = Timers.getCurrentTimeInCounts();
-                long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
+                long threadTimeStamp = threadCPUTimerOn ? Timers.getThreadCPUTimeInNanos() : 0;
                 externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
                 instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
                 writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
@@ -172,7 +172,7 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
             // Now check if it's the first invocation of this method, and if so, perform instrumentation of nearest callees
             if (!instrMethodInvoked[methodIdInt]) {
                 long absTimeStamp = Timers.getCurrentTimeInCounts();
-                long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
+                long threadTimeStamp = threadCPUTimerOn ? Timers.getThreadCPUTimeInNanos() : 0;
                 externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
                 instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
                 writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);

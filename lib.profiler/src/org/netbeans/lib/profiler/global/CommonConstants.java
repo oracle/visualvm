@@ -131,9 +131,6 @@ public interface CommonConstants {
     public static final byte BUFFEREVENT_PROFILEPOINT_HIT = 26;
     public static final byte SERVLET_DO_METHOD = 27;
 
-    // Used to easily check for those events that always carry two timestamps (absolute and thread CPU)
-    public static final byte TWO_TIMESTAMP_EVENTS = 6;
-
     // The following are used when storing unstamped method entry/exit events in the "compact" format, when both
     // event code and method id are packed in a single char. See more comments in ProfilerRuntimeCPUSampledInstr.java
     public static final char MAX_METHOD_ID_FOR_COMPACT_FORMAT = 0x3FFF;
@@ -258,5 +255,6 @@ public interface CommonConstants {
     public static final int AGENT_VERSION_60_M10 = 7;
     public static final int AGENT_VERSION_60_BETA1 = 8;
     public static final int AGENT_VERSION_67_BETA = 9;
-    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_67_BETA;
+    public static final int AGENT_VERSION_69 = 10;
+    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_69;
 }
