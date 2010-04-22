@@ -239,6 +239,8 @@ public class LoadedSnapshot {
             builder.addStacktrace(sample.getTinfos(),sample.getTime());
             
         }
+        is.close();
+        is = null;
         CPUResultsSnapshot snapshot;
         try {
             snapshot = builder.createSnapshot(startTime);
