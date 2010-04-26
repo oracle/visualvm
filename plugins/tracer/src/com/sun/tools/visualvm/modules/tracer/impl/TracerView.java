@@ -601,8 +601,8 @@ final class TracerView extends DataSourceView {
                 JPanel refreshRateContainer = new JPanel(new HorizontalLayout(true, 4));
                 refreshRateContainer.setOpaque(false);
 
-                JLabel refreshRateLabel = new JLabel("Refresh:");
-                refreshRateLabel.setToolTipText("Tracer refresh rate");
+                JLabel refreshRateLabel = new JLabel("Sample:");
+                refreshRateLabel.setToolTipText("Tracer sampling frequency");
                 refreshRateContainer.add(refreshRateLabel);
 
                 Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
@@ -610,7 +610,7 @@ final class TracerView extends DataSourceView {
                     public Dimension getMinimumSize() { return getPreferredSize(); }
                     public Dimension getMaximumSize() { return getPreferredSize(); }
                 };
-                refreshCombo.setToolTipText("Tracer refresh rate");
+                refreshCombo.setToolTipText("Tracer sampling frequency");
                 refreshCombo.setEditable(false);
                 refreshCombo.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -627,7 +627,7 @@ final class TracerView extends DataSourceView {
                 refreshRateContainer.add(refreshCombo);
 
                 JLabel refreshUnitsLabel = new JLabel("ms");
-                refreshUnitsLabel.setToolTipText("Tracer refresh rate");
+                refreshUnitsLabel.setToolTipText("Tracer sampling frequency");
                 refreshRateContainer.add(refreshUnitsLabel);
 
                 addClientToobarItem(refreshRateContainer);

@@ -554,7 +554,7 @@ final class TracerOptionsPanel extends JPanel {
         c.insets = new Insets(0, 0, 5, 0);
         add(timelineDefaultsSeparator, c);
 
-        JLabel refreshRateLabel = new JLabel("Refresh interval:");
+        JLabel refreshRateLabel = new JLabel("Sampling frequency:");
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 1;
