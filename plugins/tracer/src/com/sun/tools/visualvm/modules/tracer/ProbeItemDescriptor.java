@@ -31,8 +31,48 @@ import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescri
 import java.awt.Color;
 
 /**
- * ProbeItemDescriptor describes TracerProbe items appearance in the UI.
- * Use the predefined static methods to create instances of ProbeItemDescriptor.
+ * ProbeItemDescriptor describes a TracerProbe item appearance in the UI.
+ * <p>
+ *
+ * Current version supports two general types of items: continuous and discrete.
+ * Continuous items consist of non-rectangular polyline or polygon segments
+ * connecting the values. The values define vertices of the segments.
+ * <p>
+ *
+ * Discrete items consist of rectangular segments either connected together or
+ * divided into bar segments. The values are located in the middle of the segments.
+ * <p>
+ *
+ * Each descriptor requires a common set of mandatory options:
+ * <ul>
+ * <li><code>name</code>: item name
+ * <li><code>description</code>: item description, may be <code>null</code>
+ * <li><code>formatter</code>: ItemValueFormatter instance which defines how the item values are presented in UI
+ * </ul>
+ * <p>
+ *
+ * The other options which may be set are:
+ * <ul>
+ * <li><code>dataFactor</code>: a multiplication factor for item values, useful when displaying multiple items in one graph
+ * <li<code>minValue</code>: minimum (initial) item value, typically set for zero-based metrics (heap size)
+ * <li><code>maxValue</code>: maximum (initial) item value, may be used for the initial graph scale
+ * </ul>
+ * <p>
+ *
+ * There's no need to define line width and/or line/fill colors, the framework
+ * guarantees that each item in a graph will be displayed by a different color.
+ * If needed, line width and/or line/fill colors may be customized by setting
+ * these options:
+ * <ul>
+ * <li><code>lineWidth</code>: width of the line, default is <code>2f</code>
+ * <li><code>lineColor</code>: color of the line, may be <code>null</code>
+ * <li><code>fillColor</code>: color of the filled area, may be <code>null</code>
+ * </ul>
+ * <p>
+ *
+ * <b>Note:</b> Use the predefined static methods to create instances of ProbeItemDescriptor.
+ * Custom instances of ProbeItemDescriptor are not supported and will cause a
+ * <code>RuntimeException</code>.
  *
  * @author Jiri Sedlacek
  */
@@ -40,12 +80,28 @@ public abstract class ProbeItemDescriptor {
 
     // --- Public predefined constants -----------------------------------------
 
+    /**
+     * Minimum item value is undefined.
+     */
     public static final long MIN_VALUE_UNDEFINED = Long.MAX_VALUE;
+    /**
+     * Maximum item value is undefined.
+     */
     public static final long MAX_VALUE_UNDEFINED = Long.MIN_VALUE;
+    /**
+     * Value is undefined. For minimum/maximum value use MIN_VALUE_UNDEFINED or
+     * MAX_VALUE_UNDEFINED.
+     */
     public static final long VALUE_UNDEFINED = Long.MIN_VALUE - 1;
 
+    /**
+     * Default color.
+     */
     public static final Color DEFAULT_COLOR = new Color(0, 0, 0); // use == to identify this instance!
 
+    /**
+     * Default line width.
+     */
     public static final float DEFAULT_LINE_WIDTH = -1.0F;
 
 
@@ -73,8 +129,16 @@ public abstract class ProbeItemDescriptor {
 
     // --- Common implementation -----------------------------------------------
 
+    /**
+     * Returns name of the item.
+     * @return name of the item
+     */
     public final String getName() { return name; }
 
+    /**
+     * Returns description of the item.
+     * @return description of the item
+     */
     public final String getDescription() { return description; }
 
 
@@ -82,6 +146,14 @@ public abstract class ProbeItemDescriptor {
 
     // --- Continuous items ----------------------------------------------------
 
+    /**
+     * Creates descriptor for a continuous item created by line segments.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @return descriptor for a continuous item created by line segments
+     */
     public static ProbeItemDescriptor continuousLineItem(String name, String description,
                                                          ItemValueFormatter formatter) {
 
@@ -89,6 +161,17 @@ public abstract class ProbeItemDescriptor {
                               DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
+    /**
+     * Creates descriptor for a continuous item created by line segments with custom dataFactor ad min/max values.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @return descriptor for a continuous item created by line segments
+     */
     public static ProbeItemDescriptor continuousLineItem(String name, String description,
                                                          ItemValueFormatter formatter,
                                                          double dataFactor,
@@ -98,6 +181,14 @@ public abstract class ProbeItemDescriptor {
                               maxValue, DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
+    /**
+     * Creates descriptor for a continuous item created by filled segments.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @return descriptor for a continuous item created by filled segments
+     */
     public static ProbeItemDescriptor continuousFillItem(String name, String description,
                                                          ItemValueFormatter formatter) {
 
@@ -105,6 +196,17 @@ public abstract class ProbeItemDescriptor {
                               DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
+    /**
+     * Creates descriptor for a continuous item created by filled segments with custom dataFactor ad min/max values.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @return descriptor for a continuous item created by filled segments
+     */
     public static ProbeItemDescriptor continuousFillItem(String name, String description,
                                                          ItemValueFormatter formatter,
                                                          double dataFactor,
@@ -114,6 +216,14 @@ public abstract class ProbeItemDescriptor {
                               maxValue, DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
+    /**
+     * Creates descriptor for a continuous item created by line and filled segments.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @return descriptor for a continuous item created by line and filled segments
+     */
     public static ProbeItemDescriptor continuousLineFillItem(String name, String description,
                                                              ItemValueFormatter formatter) {
 
@@ -121,6 +231,17 @@ public abstract class ProbeItemDescriptor {
                               DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
     }
 
+    /**
+     * Creates descriptor for a continuous item created by line and filled segments with custom dataFactor ad min/max values.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @return descriptor for a continuous item created by line and filled segments
+     */
     public static ProbeItemDescriptor continuousLineFillItem(String name, String description,
                                                              ItemValueFormatter formatter,
                                                              double dataFactor,
@@ -130,6 +251,20 @@ public abstract class ProbeItemDescriptor {
                               maxValue, DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
     }
 
+    /**
+     * Creates descriptor for a general continuous item with custom dataFactor ad min/max values, and custom line width and line/fill colors.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @param lineWidth line width
+     * @param lineColor line color or null
+     * @param fillColor fill color or null
+     * @return descriptor for a general continuous item
+     */
     public static ProbeItemDescriptor continuousItem(String name, String description,
                                                      ItemValueFormatter formatter,
                                                      double dataFactor, long minValue,
@@ -144,6 +279,14 @@ public abstract class ProbeItemDescriptor {
 
     // --- Discrete items ------------------------------------------------------
 
+    /**
+     * Creates descriptor for a discrete item created by line segments representing the outline.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @return descriptor for a discrete item created by line segments representing the outline
+     */
     public static ProbeItemDescriptor discreteLineItem(String name, String description,
                                                        ItemValueFormatter formatter) {
 
@@ -151,6 +294,17 @@ public abstract class ProbeItemDescriptor {
                                    DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
+    /**
+     * Creates descriptor for a discrete item created by line segments representing the outline with custom dataFactor ad min/max values.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @return descriptor for a discrete item created by line segments representing the outline
+     */
     public static ProbeItemDescriptor discreteLineItem(String name, String description,
                                                        ItemValueFormatter formatter,
                                                        double dataFactor,
@@ -160,6 +314,14 @@ public abstract class ProbeItemDescriptor {
                                    maxValue, DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
+    /**
+     * Creates descriptor of a discrete item created by filled segments.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @return descriptor of a discrete item created by filled segments
+     */
     public static ProbeItemDescriptor discreteFillItem(String name, String description,
                                                        ItemValueFormatter formatter) {
 
@@ -167,6 +329,17 @@ public abstract class ProbeItemDescriptor {
                                    DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
+    /**
+     * Creates descriptor of a discrete item created by filled segments with custom dataFactor ad min/max values.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @return descriptor of a discrete item created by filled segments
+     */
     public static ProbeItemDescriptor discreteFillItem(String name, String description,
                                                        ItemValueFormatter formatter,
                                                        double dataFactor,
@@ -176,6 +349,14 @@ public abstract class ProbeItemDescriptor {
                                    maxValue, DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
+    /**
+     * Creates descriptor for a discrete item created by line segments representing the outline and filled segments.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @return descriptor for a discrete item created by line segments representing the outline and filled segments
+     */
     public static ProbeItemDescriptor discreteLineFillItem(String name, String description,
                                                            ItemValueFormatter formatter) {
 
@@ -183,6 +364,17 @@ public abstract class ProbeItemDescriptor {
                                   DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
     }
 
+    /**
+     * Creates descriptor for a discrete item created by line segments representing the outline and filled segments with custom dataFactor ad min/max values.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @return descriptor for a discrete item created by line segments representing the outline and filled segments
+     */
     public static ProbeItemDescriptor discreteLineFillItem(String name, String description,
                                                            ItemValueFormatter formatter,
                                                            double dataFactor,
@@ -192,16 +384,20 @@ public abstract class ProbeItemDescriptor {
                                    maxValue, DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
     }
 
-    public static ProbeItemDescriptor discreteOutlineItem(String name, String description,
-                                                          ItemValueFormatter formatter,
-                                                          double dataFactor, long minValue,
-                                                          long maxValue) {
-        
-        return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
-                            DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR, 0, false, false,
-                            true);
-    }
-
+    /**
+     * Creates descriptor for a general discrete outlined item with custom dataFactor ad min/max values, and custom line width and line/fill colors.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @param lineWidth line width
+     * @param lineColor line color or null
+     * @param fillColor fill color or null
+     * @return descriptor for a general discrete outlined item
+     */
     public static ProbeItemDescriptor discreteOutlineItem(String name, String description,
                                                           ItemValueFormatter formatter,
                                                           double dataFactor, long minValue,
@@ -212,17 +408,47 @@ public abstract class ProbeItemDescriptor {
                             lineWidth, lineColor, fillColor, 0, false, false, true);
     }
 
+    /**
+     * Creates descriptor for a discrete item represented by a horizontal line segment, optionally filled, with custom dataFactor ad min/max values.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @param filled true if the segments are filled
+     * @param width width of/between the segments
+     * @param fixedWidth true if width defines segment width, false if width defines segments spacing
+     * @return descriptor for a discrete item represented by a horizontal line segment, optionally filled
+     */
     public static ProbeItemDescriptor discreteToplineItem(String name, String description,
                                                           ItemValueFormatter formatter,
                                                           double dataFactor, long minValue,
-                                                          long maxValue, int width,
-                                                          boolean fixedWidth) {
+                                                          long maxValue, boolean filled,
+                                                          int width, boolean fixedWidth) {
 
         return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
-                            DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR, width,
-                            fixedWidth, true, false);
+                            DEFAULT_LINE_WIDTH, DEFAULT_COLOR, filled ? DEFAULT_COLOR : null,
+                            width, fixedWidth, true, false);
     }
 
+    /**
+     * Creates descriptor for a discrete item represented by a horizontal line segment, optionally filled, with custom dataFactor ad min/max values, and custom line width and line/fill colors.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @param lineWidth line width
+     * @param lineColor line color or null
+     * @param fillColor fill color or null
+     * @param width width width of/between the segments
+     * @param fixedWidth fixedWidth true if width defines segment width, false if width defines segments spacing
+     * @return descriptor for a discrete item represented by a horizontal line segment, optionally filled
+     */
     public static ProbeItemDescriptor discreteToplineItem(String name, String description,
                                                           ItemValueFormatter formatter,
                                                           double dataFactor, long minValue,
@@ -234,21 +460,59 @@ public abstract class ProbeItemDescriptor {
                             lineWidth, lineColor, fillColor, width, fixedWidth, true, false);
     }
 
+    /**
+     * Creates descriptor for a discrete item represented by vertical bars, with custom dataFactor ad min/max values
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @param outlined  true if the bars are outlined
+     * @param filled true if the bars are filled
+     * @param width width width of/between the bars
+     * @param fixedWidth fixedWidth true if width defines bar width, false if width defines bars spacing
+     * @return descriptor for a discrete item represented by vertical bars
+     */
     public static ProbeItemDescriptor discreteBarItem(String name, String description,
                                                       ItemValueFormatter formatter,
                                                       double dataFactor, long minValue,
-                                                      long maxValue, int width,
+                                                      long maxValue, boolean outlined,
+                                                      boolean filled, int width,
                                                       boolean fixedWidth) {
+
+        if (!outlined && !filled)
+            throw new IllegalArgumentException("Bar must be either outlined or filled");
 
         return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
                             DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR, width,
                             fixedWidth, false, false);
     }
 
+    /**
+     * Creates descriptor for a discrete item represented by vertical bars, with custom dataFactor ad min/max values, and custom line width and line/fill colors.
+     *
+     * @param name item name
+     * @param description item description or null
+     * @param formatter item formatter
+     * @param dataFactor multiplication factor
+     * @param minValue minimum (initial) item value
+     * @param maxValue maximum (initial) item value
+     * @param outlined  true if the bars are outlined
+     * @param filled true if the bars are filled
+     * @param lineWidth line width
+     * @param lineColor line color or null
+     * @param fillColor fill color or null
+     * @param width width width of/between the bars
+     * @param fixedWidth fixedWidth true if width defines bar width, false if width defines bars spacing
+     * @return descriptor for a discrete item represented by vertical bars
+     */
     public static ProbeItemDescriptor discreteBarItem(String name, String description,
                                                       ItemValueFormatter formatter,
                                                       double dataFactor, long minValue,
-                                                      long maxValue, float lineWidth,
+                                                      long maxValue, boolean outlined,
+                                                      boolean filled, float lineWidth,
                                                       Color lineColor, Color fillColor,
                                                       int width, boolean fixedWidth) {
 
