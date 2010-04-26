@@ -64,12 +64,12 @@ class ThreadsMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            ProbeItemDescriptor.lineItem("Live",
+            ProbeItemDescriptor.discreteLineItem("Live",
                     "Monitors total number of live Threads in the JVM",
-                    ItemValueFormatter.DEFAULT_DECIMAL, 0, 3),
-            ProbeItemDescriptor.lineItem("Daemon",
+                    ItemValueFormatter.DEFAULT_DECIMAL, 1d, 0, 3),
+            ProbeItemDescriptor.discreteLineItem("Daemon",
                     "Monitors number of live daemon Threads in the JVM",
-                    ItemValueFormatter.DEFAULT_DECIMAL, 0, 3)
+                    ItemValueFormatter.DEFAULT_DECIMAL, 1d, 0, 3)
         };
     }
 

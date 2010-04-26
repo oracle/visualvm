@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.dynamic.impl;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.SessionInitializationException;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
@@ -128,7 +129,7 @@ class DynamicPackage extends TracerPackage.SessionAware<Application> {
                         pid = idp.create(prop.getName(), getAttributes(prop));
                     }
                     if (pid == null) {
-                        pid = ProbeItemDescriptor.lineItem((String)prop.getAttribute("displayName"), (String)prop.getAttribute("desc")); // NOI18N
+                        pid = ProbeItemDescriptor.continuousLineItem((String)prop.getAttribute("displayName"), (String)prop.getAttribute("desc"), ItemValueFormatter.SIMPLE); // NOI18N
                     }
                     itemDescs.add(pid);
                 }

@@ -25,9 +25,8 @@
 
 package com.sun.tools.visualvm.modules.tracer;
 
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.FillItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.LineFillItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.LineItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ContinuousXYItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.DiscreteXYItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
 
@@ -81,125 +80,195 @@ public abstract class ProbeItemDescriptor {
 
     // === Public factory methods ==============================================
 
-    // --- LineItem ------------------------------------------------------------
+    // --- Continuous items ----------------------------------------------------
 
-    public static ProbeItemDescriptor lineItem(String name, String description) {
-        return new LineItemDescriptor(name, description);
-    }
-    
-    public static ProbeItemDescriptor lineItem(String name, String description,
-                                               ItemValueFormatter formatter) {
+    public static ProbeItemDescriptor continuousLineItem(String name, String description,
+                                                         ItemValueFormatter formatter) {
 
-        return new LineItemDescriptor(name, description, formatter);
+        return continuousItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+                              DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
-    public static ProbeItemDescriptor lineItem(String name, String description,
-                                               ItemValueFormatter formatter,
-                                               long minValue, long maxValue) {
+    public static ProbeItemDescriptor continuousLineItem(String name, String description,
+                                                         ItemValueFormatter formatter,
+                                                         double dataFactor,
+                                                         long minValue, long maxValue) {
 
-        return new LineItemDescriptor(name, description, formatter, minValue,
-                                      maxValue);
+        return continuousItem(name, description, formatter, dataFactor, minValue,
+                              maxValue, DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
-    public static ProbeItemDescriptor lineItem(String name, String description,
-                                               ItemValueFormatter formatter,
-                                               double dataFactor, long minValue,
-                                               long maxValue) {
+    public static ProbeItemDescriptor continuousFillItem(String name, String description,
+                                                         ItemValueFormatter formatter) {
 
-        return new LineItemDescriptor(name, description, formatter, dataFactor,
-                                      minValue, maxValue);
+        return continuousItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+                              DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
-    public static ProbeItemDescriptor lineItem(String name, String description,
-                                               ItemValueFormatter formatter,
-                                               double dataFactor, long minValue,
-                                               long maxValue, float lineWidth,
-                                               Color lineColor) {
+    public static ProbeItemDescriptor continuousFillItem(String name, String description,
+                                                         ItemValueFormatter formatter,
+                                                         double dataFactor,
+                                                         long minValue, long maxValue) {
 
-        return new LineItemDescriptor(name, description, formatter, dataFactor,
-                                      minValue, maxValue, lineWidth, lineColor);
+        return continuousItem(name, description, formatter, dataFactor, minValue,
+                              maxValue, DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
+    public static ProbeItemDescriptor continuousLineFillItem(String name, String description,
+                                                             ItemValueFormatter formatter) {
 
-    // --- FillItem ------------------------------------------------------------
-
-    public static ProbeItemDescriptor fillItem(String name, String description) {
-        return new FillItemDescriptor(name, description);
+        return continuousItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+                              DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
     }
 
-    public static ProbeItemDescriptor fillItem(String name, String description,
-                                               ItemValueFormatter formatter) {
+    public static ProbeItemDescriptor continuousLineFillItem(String name, String description,
+                                                             ItemValueFormatter formatter,
+                                                             double dataFactor,
+                                                             long minValue, long maxValue) {
 
-        return new FillItemDescriptor(name, description, formatter);
+        return continuousItem(name, description, formatter, dataFactor, minValue,
+                              maxValue, DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
     }
 
-    public static ProbeItemDescriptor fillItem(String name, String description,
-                                               ItemValueFormatter formatter,
-                                               long minValue, long maxValue) {
+    public static ProbeItemDescriptor continuousItem(String name, String description,
+                                                     ItemValueFormatter formatter,
+                                                     double dataFactor, long minValue,
+                                                     long maxValue, float lineWidth,
+                                                     Color lineColor, Color fillColor) {
 
-        return new FillItemDescriptor(name, description, formatter, minValue,
-                                      maxValue);
-    }
-
-    public static ProbeItemDescriptor fillItem(String name, String description,
-                                               ItemValueFormatter formatter,
-                                               double dataFactor, long minValue,
-                                               long maxValue) {
-
-        return new FillItemDescriptor(name, description, formatter, dataFactor,
-                                      minValue, maxValue);
-    }
-
-    public static ProbeItemDescriptor fillItem(String name, String description,
-                                               ItemValueFormatter formatter,
-                                               double dataFactor, long minValue,
-                                               long maxValue, Color fillColor1,
-                                               Color fillColor2) {
-
-        return new FillItemDescriptor(name, description, formatter, dataFactor,
-                                      minValue, maxValue, fillColor1, fillColor2);
+        return new ContinuousXYItemDescriptor(name, description, formatter, dataFactor,
+                                              minValue, maxValue, lineWidth, lineColor,
+                                              fillColor);
     }
 
 
-    // --- LineFillItem --------------------------------------------------------
+    // --- Discrete items ------------------------------------------------------
 
-    public static ProbeItemDescriptor lineFillItem(String name, String description) {
-        return new LineFillItemDescriptor(name, description);
+    public static ProbeItemDescriptor discreteLineItem(String name, String description,
+                                                       ItemValueFormatter formatter) {
+
+        return discreteOutlineItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+                                   DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
-    public static ProbeItemDescriptor lineFillItem(String name, String description,
-                                                   ItemValueFormatter formatter) {
+    public static ProbeItemDescriptor discreteLineItem(String name, String description,
+                                                       ItemValueFormatter formatter,
+                                                       double dataFactor,
+                                                       long minValue, long maxValue) {
 
-        return new LineFillItemDescriptor(name, description, formatter);
+        return discreteOutlineItem(name, description, formatter, dataFactor, minValue,
+                                   maxValue, DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
-    public static ProbeItemDescriptor lineFillItem(String name, String description,
-                                                   ItemValueFormatter formatter,
-                                                   long minValue, long maxValue) {
+    public static ProbeItemDescriptor discreteFillItem(String name, String description,
+                                                       ItemValueFormatter formatter) {
 
-        return new LineFillItemDescriptor(name, description, formatter, minValue,
-                                          maxValue);
+        return discreteOutlineItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+                                   DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
-    public static ProbeItemDescriptor lineFillItem(String name, String description,
-                                                   ItemValueFormatter formatter,
-                                                   double dataFactor, long minValue,
-                                                   long maxValue) {
+    public static ProbeItemDescriptor discreteFillItem(String name, String description,
+                                                       ItemValueFormatter formatter,
+                                                       double dataFactor,
+                                                       long minValue, long maxValue) {
 
-        return new LineFillItemDescriptor(name, description, formatter, dataFactor,
-                                          minValue, maxValue);
+        return discreteOutlineItem(name, description, formatter, dataFactor, minValue,
+                                   maxValue, DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
-    public static ProbeItemDescriptor lineFillItem(String name, String description,
-                                                   ItemValueFormatter formatter,
-                                                   double dataFactor, long minValue,
-                                                   long maxValue, float lineWidth,
-                                                   Color lineColor, Color fillColor1,
-                                                   Color fillColor2) {
+    public static ProbeItemDescriptor discreteLineFillItem(String name, String description,
+                                                           ItemValueFormatter formatter) {
 
-        return new LineFillItemDescriptor(name, description, formatter, dataFactor,
-                                          minValue, maxValue, lineWidth, lineColor,
-                                          fillColor1, fillColor2);
+        return discreteOutlineItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+                                  DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
+    }
+
+    public static ProbeItemDescriptor discreteLineFillItem(String name, String description,
+                                                           ItemValueFormatter formatter,
+                                                           double dataFactor,
+                                                           long minValue, long maxValue) {
+        
+        return discreteOutlineItem(name, description, formatter, dataFactor, minValue,
+                                   maxValue, DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
+    }
+
+    public static ProbeItemDescriptor discreteOutlineItem(String name, String description,
+                                                          ItemValueFormatter formatter,
+                                                          double dataFactor, long minValue,
+                                                          long maxValue) {
+        
+        return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
+                            DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR, 0, false, false,
+                            true);
+    }
+
+    public static ProbeItemDescriptor discreteOutlineItem(String name, String description,
+                                                          ItemValueFormatter formatter,
+                                                          double dataFactor, long minValue,
+                                                          long maxValue, float lineWidth,
+                                                          Color lineColor, Color fillColor) {
+
+        return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
+                            lineWidth, lineColor, fillColor, 0, false, false, true);
+    }
+
+    public static ProbeItemDescriptor discreteToplineItem(String name, String description,
+                                                          ItemValueFormatter formatter,
+                                                          double dataFactor, long minValue,
+                                                          long maxValue, int width,
+                                                          boolean fixedWidth) {
+
+        return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
+                            DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR, width,
+                            fixedWidth, true, false);
+    }
+
+    public static ProbeItemDescriptor discreteToplineItem(String name, String description,
+                                                          ItemValueFormatter formatter,
+                                                          double dataFactor, long minValue,
+                                                          long maxValue, float lineWidth,
+                                                          Color lineColor, Color fillColor,
+                                                          int width, boolean fixedWidth) {
+
+        return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
+                            lineWidth, lineColor, fillColor, width, fixedWidth, true, false);
+    }
+
+    public static ProbeItemDescriptor discreteBarItem(String name, String description,
+                                                      ItemValueFormatter formatter,
+                                                      double dataFactor, long minValue,
+                                                      long maxValue, int width,
+                                                      boolean fixedWidth) {
+
+        return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
+                            DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR, width,
+                            fixedWidth, false, false);
+    }
+
+    public static ProbeItemDescriptor discreteBarItem(String name, String description,
+                                                      ItemValueFormatter formatter,
+                                                      double dataFactor, long minValue,
+                                                      long maxValue, float lineWidth,
+                                                      Color lineColor, Color fillColor,
+                                                      int width, boolean fixedWidth) {
+
+        return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
+                            lineWidth, lineColor, fillColor, width, fixedWidth, false, false);
+    }
+
+    private static ProbeItemDescriptor discreteItem(String name, String description,
+                                                    ItemValueFormatter formatter,
+                                                    double dataFactor, long minValue,
+                                                    long maxValue, float lineWidth,
+                                                    Color lineColor, Color fillColor,
+                                                    int width, boolean fixedWidth,
+                                                    boolean topLineOnly,
+                                                    boolean outlineOnly) {
+
+        return new DiscreteXYItemDescriptor(name, description, formatter, dataFactor,
+                                            minValue, maxValue, lineWidth, lineColor,
+                                            fillColor, width, fixedWidth, topLineOnly,
+                                            outlineOnly);
     }
 
 }

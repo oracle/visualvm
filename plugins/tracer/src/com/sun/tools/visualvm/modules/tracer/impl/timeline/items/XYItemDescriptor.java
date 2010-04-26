@@ -36,20 +36,18 @@ public abstract class XYItemDescriptor extends ValueItemDescriptor {
 
     private final float lineWidth;
     private final Color lineColor;
-    private final Color fillColor1;
-    private final Color fillColor2;
+    private final Color fillColor;
 
 
     XYItemDescriptor(String name, String description,
                      ItemValueFormatter formatter, double dataFactor,
                      long minValue, long maxValue, float lineWidth,
-                     Color lineColor, Color fillColor1, Color fillColor2) {
+                     Color lineColor, Color fillColor) {
 
         super(name, description, formatter, dataFactor, minValue, maxValue);
         this.lineWidth = lineWidth;
         this.lineColor = lineColor;
-        this.fillColor1 = fillColor1;
-        this.fillColor2 = fillColor2;
+        this.fillColor = fillColor;
     }
 
     
@@ -61,12 +59,8 @@ public abstract class XYItemDescriptor extends ValueItemDescriptor {
         return lineColor;
     }
 
-    public final Color getFillColor1() {
-        return fillColor1;
-    }
-
-    public final Color getFillColor2() {
-        return fillColor2;
+    public final Color getFillColor() {
+        return fillColor;
     }
 
 }

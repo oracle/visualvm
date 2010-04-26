@@ -124,10 +124,12 @@ class CpuMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            ProbeItemDescriptor.lineItem("CPU usage", "Monitors relative CPU usage (%)",
-                    ItemValueFormatter.DEFAULT_PERCENT, 0, 1000),
-            ProbeItemDescriptor.lineItem("GC activity", "Monitors relative GC activity (%)",
-                    ItemValueFormatter.DEFAULT_PERCENT, 0, 1000)
+            ProbeItemDescriptor.continuousLineItem("CPU usage",
+                    "Monitors relative CPU usage (%)",
+                    ItemValueFormatter.DEFAULT_PERCENT, 1d, 0, 1000),
+            ProbeItemDescriptor.continuousLineItem("GC activity",
+                    "Monitors relative GC activity (%)",
+                    ItemValueFormatter.DEFAULT_PERCENT, 1d, 0, 1000)
         };
     }
 

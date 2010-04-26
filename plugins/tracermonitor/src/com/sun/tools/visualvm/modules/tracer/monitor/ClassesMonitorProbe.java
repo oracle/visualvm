@@ -68,12 +68,12 @@ class ClassesMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            ProbeItemDescriptor.lineItem("Total loaded",
+            ProbeItemDescriptor.continuousLineItem("Total loaded",
                     "Monitors number of all Classes currently loaded by the JVM",
-                    ItemValueFormatter.DEFAULT_DECIMAL, 0, 100),
-            ProbeItemDescriptor.lineItem("Shared loaded",
+                    ItemValueFormatter.DEFAULT_DECIMAL, 1d, 0, 100),
+            ProbeItemDescriptor.continuousLineItem("Shared loaded",
                     "Monitors number of shared Classes currently loaded by the JVM",
-                    ItemValueFormatter.DEFAULT_DECIMAL, 0, 100)
+                    ItemValueFormatter.DEFAULT_DECIMAL, 1d, 0, 100)
         };
     }
 

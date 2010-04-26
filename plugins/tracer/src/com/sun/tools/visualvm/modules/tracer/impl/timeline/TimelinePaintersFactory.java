@@ -26,7 +26,8 @@
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.FillItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ContinuousXYItemDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.DiscreteXYItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.XYItemDescriptor;
 import java.awt.Color;
@@ -38,33 +39,31 @@ import java.awt.Color;
 final class TimelinePaintersFactory {
 
     static TimelineXYPainter createPainter(ProbeItemDescriptor descriptor,
-                                           int itemIndex) {
+                                           int itemIndex, PointsComputer c) {
 
         // --- ValueItem -------------------------------------------------------
         if (descriptor instanceof ValueItemDescriptor)
-            return createValuePainter((ValueItemDescriptor)descriptor, itemIndex);
+            return createValuePainter((ValueItemDescriptor)descriptor, itemIndex, c);
 
         return null;
     }
 
     private static TimelineXYPainter createValuePainter(
-            ValueItemDescriptor descriptor, int itemIndex) {
+            ValueItemDescriptor descriptor, int itemIndex, PointsComputer c) {
 
         // --- XYItem ----------------------------------------------------------
-        if (descriptor instanceof XYItemDescriptor)
-            return createXYPainter((XYItemDescriptor)descriptor,
-                                   itemIndex);
+        if (descriptor instanceof ContinuousXYItemDescriptor)
+            return createContinuousPainter((ContinuousXYItemDescriptor)descriptor, itemIndex, c);
         
-//        // --- BarItem ---------------------------------------------------------
-//        if (descriptor instanceof ProbeItemDescriptor.BarItem)
-//            return createXYPainter((ProbeItemDescriptor.BarItem)descriptor,
-//                                   itemIndex);
+        // --- BarItem ---------------------------------------------------------
+        if (descriptor instanceof DiscreteXYItemDescriptor)
+            return createDiscretePainter((DiscreteXYItemDescriptor)descriptor, itemIndex, c);
 
         return null;
     }
 
-    private static TimelineXYPainter createXYPainter(
-            XYItemDescriptor descriptor, int itemIndex) {
+    private static TimelineXYPainter createContinuousPainter(
+            XYItemDescriptor descriptor, int itemIndex, PointsComputer c) {
 
         double dataFactor = descriptor.getDataFactor();
 
@@ -76,23 +75,41 @@ final class TimelinePaintersFactory {
         if (lineColor == ProbeItemDescriptor.DEFAULT_COLOR)
             lineColor = TimelineColorFactory.getColor(itemIndex);
 
-        Color fillColor1 = descriptor.getFillColor1();
-        if (fillColor1 == ProbeItemDescriptor.DEFAULT_COLOR) {
-            if (descriptor instanceof FillItemDescriptor)
-                fillColor1 = TimelineColorFactory.getColor(itemIndex);
+        Color fillColor = descriptor.getFillColor();
+        if (fillColor == ProbeItemDescriptor.DEFAULT_COLOR) {
+            if (lineColor == null)
+                fillColor = TimelineColorFactory.getColor(itemIndex);
             else
-                fillColor1 = TimelineColorFactory.getGradient(itemIndex)[0];
+                fillColor = TimelineColorFactory.getGradient(itemIndex)[0];
         }
 
-        Color fillColor2 = descriptor.getFillColor2();
-        if (fillColor2 == ProbeItemDescriptor.DEFAULT_COLOR) {
-            if (descriptor instanceof FillItemDescriptor)
-                fillColor2 = null;
+        return new ContinuousXYPainter(lineWidth, lineColor, fillColor, dataFactor, c);
+    }
+
+    private static DiscreteXYPainter createDiscretePainter(
+            DiscreteXYItemDescriptor descriptor, int itemIndex, PointsComputer c) {
+
+        double dataFactor = descriptor.getDataFactor();
+
+        float lineWidth = descriptor.getLineWidth();
+        if (lineWidth == ProbeItemDescriptor.DEFAULT_LINE_WIDTH)
+            lineWidth = 2f;
+
+        Color lineColor = descriptor.getLineColor();
+        if (lineColor == ProbeItemDescriptor.DEFAULT_COLOR)
+            lineColor = TimelineColorFactory.getColor(itemIndex);
+
+        Color fillColor = descriptor.getFillColor();
+        if (fillColor == ProbeItemDescriptor.DEFAULT_COLOR) {
+            if (lineColor == null)
+                fillColor = TimelineColorFactory.getColor(itemIndex);
             else
-                fillColor2 = TimelineColorFactory.getGradient(itemIndex)[1];
+                fillColor = TimelineColorFactory.getGradient(itemIndex)[0];
         }
 
-        return new TimelineXYPainter(lineWidth, lineColor, fillColor1, fillColor2, dataFactor);
+        return new DiscreteXYPainter(lineWidth, lineColor, fillColor, descriptor.getWidth(),
+                                     descriptor.isFixedWidth(), descriptor.isTopLineOnly(),
+                                     descriptor.isOutlineOnly(), dataFactor, c);
     }
 
 }

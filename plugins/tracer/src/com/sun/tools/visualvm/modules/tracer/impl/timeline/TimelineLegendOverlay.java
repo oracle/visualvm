@@ -78,7 +78,7 @@ final class TimelineLegendOverlay extends ChartOverlay {
                 TimelineXYPainter itemPainter =
                         (TimelineXYPainter)chart.getPaintersModel().getPainter(rowItem);
                 if (itemPainter.isPainting()) {
-                    setupPainter(rowItem.getName(), itemColor(itemPainter));
+                    setupPainter(rowItem.getName(), itemPainter.getDefiningColor());
                     Dimension pd = painter.getPreferredSize();
                     if (y == -1)
                         y = Utils.checkedInt(rowContext.getViewportOffsetY()) +
@@ -99,13 +99,6 @@ final class TimelineLegendOverlay extends ChartOverlay {
         painter.setForeground(LegendFont.FOREGROUND_COLOR);
         painter.setIcon(ColorIcon.BOTTOM_SHADOW);
         painter.paint(g);
-    }
-
-
-    private static Color itemColor(TimelineXYPainter painter) {
-        Color color = painter.lineColor;
-        if (color == null) color = painter.fillColor;
-        return color;
     }
 
     // --- Peformance tweaks ---------------------------------------------------

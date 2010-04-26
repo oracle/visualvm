@@ -64,12 +64,12 @@ class HeapMonitorProbe extends MonitorProbe {
     
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         return new ProbeItemDescriptor[] {
-            ProbeItemDescriptor.lineFillItem("Size",
+            ProbeItemDescriptor.continuousLineFillItem("Size",
                     "Monitors current Heap size", ItemValueFormatter.DEFAULT_BYTES,
-                    0, 10 * 1024 * 1024),
-            ProbeItemDescriptor.lineFillItem("Used",
+                    1d, 0, 10 * 1024 * 1024),
+            ProbeItemDescriptor.continuousLineFillItem("Used",
                     "Monitors currently used Heap", ItemValueFormatter.DEFAULT_BYTES,
-                    0, 10 * 1024 * 1024)
+                    1d, 0, 10 * 1024 * 1024)
         };
     }
 

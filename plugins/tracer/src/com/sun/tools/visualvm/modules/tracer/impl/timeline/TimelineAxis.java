@@ -282,11 +282,12 @@ final class TimelineAxis extends JPanel {
         }
 
         void setupTicks() {
-            ticks = IndexesComputer.getVisible(getBounds(),
-                    timeline.getTimestampsCount(), context);
-            if (ticks != null) for (int i = 0; i < ticks.length; i++)
-                ticks[i] = Utils.checkedInt(context.getViewX(timeline.
-                                            getTimestamp(ticks[i]))) + 1;
+            int[][] idxs = support.getPointsComputer().getVisible(getBounds(),
+                           timeline.getTimestampsCount(), context, 1, 0);
+            ticks = idxs == null ? null : idxs[0];
+            if (ticks != null) for (int i = 0; i < idxs[1][0]; i++)
+                    ticks[i] = Utils.checkedInt(context.getViewX(timeline.
+                                                getTimestamp(ticks[i]))) + 1;
         }
 
         void refreshHoverMark(int pointerX) {

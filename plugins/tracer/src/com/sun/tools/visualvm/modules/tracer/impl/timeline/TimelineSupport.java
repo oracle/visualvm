@@ -66,6 +66,8 @@ public final class TimelineSupport {
     private final TimelineModel model;
     private final SynchronousXYItemsModel itemsModel;
 
+    private final PointsComputer pointsComputer;
+
     private final TimelineTooltipOverlay tooltips;
     private final TimelineLegendOverlay legend;
     private final TimelineUnitsOverlay units;
@@ -90,6 +92,8 @@ public final class TimelineSupport {
         tooltips = new TimelineTooltipOverlay(this);
         chart.addOverlayComponent(tooltips);
 
+        pointsComputer = new PointsComputer();
+
         legend = new TimelineLegendOverlay(chart);
         legend.setVisible(TracerOptions.getInstance().isShowLegendEnabled());
         chart.addOverlayComponent(legend);
@@ -108,6 +112,13 @@ public final class TimelineSupport {
 
     public ChartSelectionModel getChartSelectionModel() {
         return chart.getSelectionModel();
+    }
+
+
+    // --- Indexes computer access ---------------------------------------------
+
+    PointsComputer getPointsComputer() {
+        return pointsComputer;
     }
 
 
@@ -145,7 +156,7 @@ public final class TimelineSupport {
                 XYItemPainter[] painters  = new XYItemPainter[items.length];
                 for (int i = 0; i < painters.length; i++)
                     painters[i] = TimelinePaintersFactory.createPainter(
-                            itemDescriptors[i], i);
+                            itemDescriptors[i], i, pointsComputer);
                 
                 row.addItems(items, painters);
 
@@ -268,7 +279,7 @@ public final class TimelineSupport {
                                 (TimelineXYPainter)paintersModel.getPainter(item);
 
                         if (painter.isPainting()) {
-                            visibleRowItemColors.add(itemColor(painter));
+                            visibleRowItemColors.add(painter.getDefiningColor());
 
                             ValueItemDescriptor descriptor = (ValueItemDescriptor)
                                     probe.getItemDescriptors()[itemIndex];
@@ -334,12 +345,6 @@ public final class TimelineSupport {
                 return rowMaxValues[row.getIndex()];
             }
 
-            private Color itemColor(TimelineXYPainter painter) {
-                Color color = painter.lineColor;
-                if (color == null) color = painter.fillColor;
-                return color;
-            }
-
             private boolean equals(String s1, String s2) {
                 if (s1 == null) {
                     if (s2 == null) return true;
@@ -390,6 +395,7 @@ public final class TimelineSupport {
                 model.reset();
                 itemsModel.valuesReset();
                 resetSelectedTimestamps();
+                pointsComputer.reset();
                 if (detailsModel != null) detailsModel.fireTableStructureChanged();
             }
         });
