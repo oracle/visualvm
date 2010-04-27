@@ -55,6 +55,7 @@ class RemoteHostOverview extends HostOverview  {
     private boolean loadAverageAvailable;
     private Host remoteHost;
     private volatile Application jmxApp;
+    private boolean staticDataInitialized;
     private String name;
     private String version;
     private String patchLevel;
@@ -62,20 +63,26 @@ class RemoteHostOverview extends HostOverview  {
     
     RemoteHostOverview(Host h) {
         remoteHost = h;
-        jmxApp = getJMXApplication();
-        initStaticData(jmxApp);
     }
     
     public String getName() {
+        initStaticData();
         return name;
     }
     
     public String getVersion() {
+        initStaticData();
         return version;
     }
     
     public String getPatchLevel() {
+        initStaticData();
         return patchLevel;
+    }
+    
+    public String getArch() {
+        initStaticData();
+        return arch;
     }
     
     public int getAvailableProcessors() {
@@ -92,10 +99,6 @@ class RemoteHostOverview extends HostOverview  {
             }
             throw ex;
         }
-    }
-    
-    public String getArch() {
-        return arch;
     }
     
     public String getHostName() {
@@ -189,9 +192,11 @@ class RemoteHostOverview extends HostOverview  {
         return remoteHost.getInetAddress().getHostAddress();
     }
     
-    private void initStaticData(Application app) {
-        if (app == null) return;
-        Properties sysProp = JvmFactory.getJVMFor(app).getSystemProperties();
+    private synchronized void initStaticData() {
+        if (staticDataInitialized) return;
+        checkJmxApp();
+        if (jmxApp == null) return;
+        Properties sysProp = JvmFactory.getJVMFor(jmxApp).getSystemProperties();
         name = osMXBean.getName();
         version = osMXBean.getVersion();
         patchLevel = sysProp.getProperty("sun.os.patch.level", ""); // NOI18N
@@ -200,7 +205,7 @@ class RemoteHostOverview extends HostOverview  {
         if (bits != null) {
             arch += " "+bits+"bit";   // NOI18N
         }
-        
+        staticDataInitialized = true;
     }
     
     private Application getJMXApplication() {

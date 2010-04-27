@@ -38,7 +38,7 @@ import java.util.Set;
 public class HostOverviewViewProvider extends PluggableDataSourceViewProvider<Host> {
     
     protected boolean supportsViewFor(Host host) {
-        return HostOverviewFactory.getSystemOverviewFor(host) != null;
+        return HostOverviewFactory.getSystemOverviewFor(host).getName() != null;
     }
 
     protected DataSourceView createView(Host host) {

@@ -37,10 +37,7 @@ public class RemoteHostModelProvider extends AbstractModelProvider<HostOverview,
     
     public HostOverview createModelFor(Host host) {
         if (!Host.LOCALHOST.equals(host)) {
-            RemoteHostOverview overview = new RemoteHostOverview(host);
-            if (overview.getName() != null) {
-                return overview;
-            }
+            return new RemoteHostOverview(host);
         }
         return null;
     }
