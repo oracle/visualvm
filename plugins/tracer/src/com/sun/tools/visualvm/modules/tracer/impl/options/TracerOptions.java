@@ -36,6 +36,12 @@ import org.openide.util.NbPreferences;
  */
 public final class TracerOptions {
 
+    private static final String PROP_PROBES_APP = "TracerOptions.probesApp"; // NOI18N
+    public static final int KEY_PROBES_FIRSTEXP = 0;
+    public static final int KEY_PROBES_ALLEXP = 1;
+    public static final int KEY_PROBES_ALLCOLL = 2;
+    private static final int PROBES_APP_DEFAULT = KEY_PROBES_FIRSTEXP;
+
     private static final String PROP_REFRESH_RATE = "TracerOptions.refreshRate"; // NOI18N
     private static final String PROP_REFRESH_CUSTOMIZABLE = "TracerOptions.refreshCustomizable"; // NOI18N
 
@@ -89,6 +95,14 @@ public final class TracerOptions {
         return INSTANCE;
     }
 
+
+    void setProbesApp(int probesApp) {
+        prefs.putInt(PROP_PROBES_APP, probesApp);
+    }
+
+    public int getProbesApp() {
+        return prefs.getInt(PROP_PROBES_APP, PROBES_APP_DEFAULT);
+    }
 
     void setRefresh(int refreshRate) {
         prefs.putInt(PROP_REFRESH_RATE, refreshRate);

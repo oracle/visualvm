@@ -79,6 +79,16 @@ final class TracerOptionsPanel extends JPanel {
     }
 
 
+    void setProbesApp(int probesApp) {
+        internalChange = true;
+        probesDefaultsCombo.setSelectedIndex(probesApp);
+        internalChange = false;
+    }
+
+    int getProbesApp() {
+        return probesDefaultsCombo.getSelectedIndex();
+    }
+
     void setRefresh(int refresh) {
         internalChange = true;
         refreshCombo.setSelectedItem(refresh);
@@ -543,20 +553,62 @@ final class TracerOptionsPanel extends JPanel {
 
         GridBagConstraints c;
 
-        // timelineDefaultsSeparator
-        SectionSeparator timelineDefaultsSeparator =
-                UISupport.createSectionSeparator("Timeline Settings"); // NOI18N
+        // probesDefaultsSeparator
+        SectionSeparator probesDefaultsSeparator =
+                UISupport.createSectionSeparator("Probes Settings"); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 0;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(0, 0, 5, 0);
+        add(probesDefaultsSeparator, c);
+
+        JLabel probesDefaultsLabel = new JLabel("Initial appearance:");
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.NONE;
+        c.insets = new Insets(3, 15, 3, 5);
+        add(probesDefaultsLabel, c);
+
+        // probesDefaultsCombo
+        probesDefaultsCombo = new JComboBox(new String[] { "first expanded",
+                                                           "all expanded",
+                                                           "all collapsed" }) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+            protected void selectedItemChanged() {
+                TracerOptionsPanel.this.update();
+                super.selectedItemChanged();
+            }
+        };
+        probesDefaultsLabel.setLabelFor(probesDefaultsCombo);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 5, 3, 0);
+        add(probesDefaultsCombo, c);
+
+        // timelineDefaultsSeparator
+        SectionSeparator timelineDefaultsSeparator =
+                UISupport.createSectionSeparator("Timeline Settings"); // NOI18N
+        c = new GridBagConstraints();
+        c.gridy = 2;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(15, 0, 5, 0);
         add(timelineDefaultsSeparator, c);
 
         JLabel refreshRateLabel = new JLabel("Sampling frequency:");
         c.gridx = 0;
-        c.gridy = 1;
+        c.gridy = 3;
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
@@ -577,7 +629,7 @@ final class TracerOptionsPanel extends JPanel {
         refreshCombo.setRenderer(new CustomComboRenderer.Number(refreshCombo, "ms", true));
         refreshCombo.setEditable(false);
         c.gridx = 1;
-        c.gridy = 1;
+        c.gridy = 3;
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -595,7 +647,7 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         c.gridx = 2;
-        c.gridy = 1;
+        c.gridy = 3;
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
@@ -606,7 +658,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel zoomModeLabel = new JLabel("Zoom mode:");
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 4;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
@@ -630,7 +682,7 @@ final class TracerOptionsPanel extends JPanel {
         zoomModeCombo.setEditable(false);
         c = new GridBagConstraints();
         c.gridx = 1;
-        c.gridy = 2;
+        c.gridy = 4;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.WEST;
@@ -641,7 +693,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel customizableZoomModeLabel = new JLabel("Customizable in Tracer tab");
         customizableZoomModeLabel.setEnabled(false);
         c.gridx = 2;
-        c.gridy = 2;
+        c.gridy = 4;
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
@@ -652,7 +704,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel mouseWheelLabel = new JLabel("Mouse wheel action:");
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 3;
+        c.gridy = 5;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
@@ -677,7 +729,7 @@ final class TracerOptionsPanel extends JPanel {
         mouseWheelCombo.setEditable(false);
         c = new GridBagConstraints();
         c.gridx = 1;
-        c.gridy = 3;
+        c.gridy = 5;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.WEST;
@@ -688,7 +740,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel customizableMouseWheelLabel = new JLabel("Customizable in Tracer tab");
         customizableMouseWheelLabel.setEnabled(false);
         c.gridx = 2;
-        c.gridy = 3;
+        c.gridy = 5;
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
@@ -700,7 +752,7 @@ final class TracerOptionsPanel extends JPanel {
         SectionSeparator timelineAppearanceSeparator =
                 UISupport.createSectionSeparator("Timeline Appearance"); // NOI18N
         c = new GridBagConstraints();
-        c.gridy = 4;
+        c.gridy = 6;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -711,7 +763,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel minMaxValsLabel = new JLabel("Show min/max values:");
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 5;
+        c.gridy = 7;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
@@ -733,7 +785,7 @@ final class TracerOptionsPanel extends JPanel {
         minMaxValsCombo.setRenderer(new CustomComboRenderer.Boolean(minMaxValsCombo));
         c = new GridBagConstraints();
         c.gridx = 1;
-        c.gridy = 5;
+        c.gridy = 7;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.WEST;
@@ -744,7 +796,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel customizableMinMaxValsLabel = new JLabel("Customizable in Tracer tab");
         customizableMinMaxValsLabel.setEnabled(false);
         c.gridx = 2;
-        c.gridy = 5;
+        c.gridy = 7;
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
@@ -755,7 +807,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel rowLegendLabel = new JLabel("Show row legend:");
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 6;
+        c.gridy = 8;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
@@ -777,7 +829,7 @@ final class TracerOptionsPanel extends JPanel {
         rowLegendCombo.setRenderer(new CustomComboRenderer.Boolean(rowLegendCombo));
         c = new GridBagConstraints();
         c.gridx = 1;
-        c.gridy = 6;
+        c.gridy = 8;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.WEST;
@@ -788,7 +840,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel customizableRowLegendLabel = new JLabel("Customizable in Tracer tab");
         customizableRowLegendLabel.setEnabled(false);
         c.gridx = 2;
-        c.gridy = 6;
+        c.gridy = 8;
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
@@ -799,7 +851,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel rowsDecorationLabel = new JLabel("Rows decoration:");
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 7;
+        c.gridy = 9;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
@@ -821,7 +873,7 @@ final class TracerOptionsPanel extends JPanel {
         rowsDecorationCombo.setRenderer(new CustomComboRenderer.Boolean(rowsDecorationCombo));
         c = new GridBagConstraints();
         c.gridx = 1;
-        c.gridy = 7;
+        c.gridy = 9;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.WEST;
@@ -832,7 +884,7 @@ final class TracerOptionsPanel extends JPanel {
         JLabel rowsSelectionLabel = new JLabel("Rows selection:");
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 8;
+        c.gridy = 10;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
@@ -854,7 +906,7 @@ final class TracerOptionsPanel extends JPanel {
 //        rowsSelectionCombo.setRenderer(new CustomComboRenderer.Boolean(rowsSelectionCombo));
         c = new GridBagConstraints();
         c.gridx = 1;
-        c.gridy = 8;
+        c.gridy = 10;
         c.gridwidth = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.WEST;
@@ -866,7 +918,7 @@ final class TracerOptionsPanel extends JPanel {
         SectionSeparator viewsBehaviorSeparator =
                 UISupport.createSectionSeparator("Views Behavior"); // NOI18N
         c = new GridBagConstraints();
-        c.gridy = 10;
+        c.gridy = 12;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -878,7 +930,7 @@ final class TracerOptionsPanel extends JPanel {
         JPanel viewsBehaviorPanel = new JPanel(new BorderLayout(0, 0));
         viewsBehaviorPanel.setOpaque(false);
         c = new GridBagConstraints();
-        c.gridy = 11;
+        c.gridy = 13;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -1172,7 +1224,7 @@ final class TracerOptionsPanel extends JPanel {
         };
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 12;
+        c.gridy = 14;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -1195,6 +1247,7 @@ final class TracerOptionsPanel extends JPanel {
     }
 
 
+    private JComboBox probesDefaultsCombo;
     private JComboBox refreshCombo;
     private JCheckBox refreshCheckBox;
     private JComboBox minMaxValsCombo;

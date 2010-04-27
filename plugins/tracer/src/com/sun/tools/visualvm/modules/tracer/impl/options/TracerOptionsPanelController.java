@@ -49,6 +49,8 @@ final class TracerOptionsPanelController extends OptionsPanelController {
     public void update() {
         TracerOptionsPanel p = getPanel();
 
+        p.setProbesApp(options.getProbesApp());
+
         p.setRefresh(options.getRefresh());
         p.setRefreshCustomizable(options.isRefreshCustomizable());
 
@@ -74,6 +76,8 @@ final class TracerOptionsPanelController extends OptionsPanelController {
 
     public void applyChanges() {
         TracerOptionsPanel p = getPanel();
+
+        options.setProbesApp(p.getProbesApp());
 
         options.setRefresh(p.getRefresh());
         options.setRefreshCustomizable(p.isRefreshCustomizable());
@@ -104,6 +108,8 @@ final class TracerOptionsPanelController extends OptionsPanelController {
 
     public boolean isChanged() {
         TracerOptionsPanel p = getPanel();
+
+        if (options.getProbesApp() != p.getProbesApp()) return true;
 
         if (options.getRefresh() != p.getRefresh()) return true;
         if (options.isRefreshCustomizable() != p.isRefreshCustomizable()) return true;

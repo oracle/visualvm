@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
 import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
+import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.CategoryList;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -42,7 +43,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -150,11 +150,17 @@ final class PackagesView {
             }
         };
 
+        int probesApp = TracerOptions.getInstance().getProbesApp();
+        Boolean expanded = null;
+        if (probesApp == TracerOptions.KEY_PROBES_ALLEXP) expanded = true;
+        else if (probesApp == TracerOptions.KEY_PROBES_ALLCOLL) expanded = false;
+
         for (int i = 0; i < packagesCount; i++) {
             TracerPackage p = packages.get(i);
             categories[i] = new String(p.getName());
             tooltips[i] = new String(p.getDescription());
-            initialStates[i] = true;
+            initialStates[i] = expanded == null || expanded;
+            if (expanded == null) expanded = false;
 
             List<TracerProbeDescriptor> d = descriptors.get(i);
             int descriptorsCount = d.size();
