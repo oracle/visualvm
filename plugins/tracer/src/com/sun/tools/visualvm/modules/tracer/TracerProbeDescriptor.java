@@ -95,9 +95,9 @@ public final class TracerProbeDescriptor implements Positionable {
     public int getPreferredPosition() { return preferredPosition; }
 
     /**
-     * Returns true if the probe is available in actual context, false otherwise.
+     * Returns true if the probe is available in current context, false otherwise.
      *
-     * @return true if the probe is available in actual context, false otherwise
+     * @return true if the probe is available in current context, false otherwise
      */
     public boolean isProbeAvailable() { return available; }
 

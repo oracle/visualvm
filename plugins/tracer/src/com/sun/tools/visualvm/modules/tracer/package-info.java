@@ -26,5 +26,9 @@
 /**
  * Framework and graphical user interface for visual tracing of applications or
  * other data sources using the Tracer probes.
+ * <p>
+ * The entrypoint is TracerSupport where custom TracerPackageProviders providing
+ * TracerPackages need to be registered. TracerPackages provide TracerProbes
+ * representing the monitored targets like JVM metrics or MBean values.
  */
 package com.sun.tools.visualvm.modules.tracer;

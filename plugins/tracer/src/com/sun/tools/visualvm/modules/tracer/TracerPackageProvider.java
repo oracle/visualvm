@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.modules.tracer;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 
 /**
- * Provider of TracerPackage for a DataSource type.
+ * Provider of TracerPackage(s) for a DataSource type.
  *
  * @param <X> any DataSource type
  * @author Jiri Sedlacek

@@ -28,15 +28,31 @@ package com.sun.tools.visualvm.modules.tracer;
 import java.text.NumberFormat;
 
 /**
+ * This class is responsible for formatting item values in the UI. In the current
+ * version it formats values for chart tooltips, chart units (min/max values) and
+ * details table.
  *
  * @author Jiri Sedlacek
  */
 public abstract class ItemValueFormatter {
 
+    /**
+     * Code for tooltip formatting.
+     */
     public static final int FORMAT_TOOLTIP = 0;
+    /**
+     * Code for units (min/max values) formatting.
+     */
     public static final int FORMAT_UNITS = 1;
+    /**
+     * Code for details table formatting.
+     */
     public static final int FORMAT_DETAILS = 2;
 
+    /**
+     * Predefined formatter providing simple numeric values.
+     * Uses Number.getInstance().toString().
+     */
     public static final ItemValueFormatter SIMPLE = new ItemValueFormatter() {
         public String formatValue(long value, int format) {
             return Long.toString(value);
@@ -46,34 +62,73 @@ public abstract class ItemValueFormatter {
         }
     };
 
+    /**
+     * Predefined formatter for decimal values with custom units.
+     * Uses Number.getInstance().toString().
+     */
     public static final ItemValueFormatter DEFAULT_DECIMAL = new Decimal();
+    /**
+     * Predefined formatter for memory values. Uses B (Bytes) for tooltip and
+     * details table, uses MB for units (min/max values).
+     * Uses Number.getInstance().toString().
+     */
     public static final ItemValueFormatter DEFAULT_BYTES = new Bytes();
+    /**
+     * Predefined formatter for percent values with custom factor.
+     * Uses Number.getPercentInstance().toString().
+     */
     public static final ItemValueFormatter DEFAULT_PERCENT = new Percent();
 
 
+    /**
+     * Returns value formatted in the requested format.
+     *
+     * @param value value to be formatted
+     * @param format format to be used
+     * @return value formatted in the requested format
+     */
     public abstract String formatValue(long value, int format);
-    
+
+    /**
+     * Returns value units for the requested format.
+     *
+     * @param format format to be used
+     * @return value units for the requested format or null for no units
+     */
     public abstract String getUnits(int format);
 
-    
+
+    /**
+     * Predefined formatter for decimal values with custom factor and units.
+     * Uses Number.getInstance().toString().
+     */
     public static final class Decimal extends ItemValueFormatter {
         
         private static final NumberFormat FORMAT = NumberFormat.getInstance();
 
+        private final int factor;
         private final String units;
 
 
-        public Decimal() {
-            this(null);
+        Decimal() {
+            this(1, null);
         }
 
-        public Decimal(String units) {
+        /**
+         * Creates new instance of Decimal formatter with the defined units.
+         * The values are computed as value / factor.
+         *
+         * @param factor factor for computing values
+         * @param units units
+         */
+        public Decimal(int factor, String units) {
+            this.factor = factor;
             this.units = units;
         }
 
 
         public String formatValue(long value, int format) {
-            return FORMAT.format(value);
+            return FORMAT.format(value / factor);
         }
         
         public String getUnits(int format) {
@@ -83,9 +138,17 @@ public abstract class ItemValueFormatter {
     }
 
 
-    public static final class Bytes extends ItemValueFormatter {
+    /**
+     * Predefined formatter for memory values. Uses B (Bytes) for tooltip and
+     * details table, uses MB for units (min/max values).
+     * Uses Number.getInstance().toString().
+     */
+    private static final class Bytes extends ItemValueFormatter {
 
         private static final NumberFormat FORMAT = NumberFormat.getInstance();
+
+
+        Bytes() {}
 
 
         public String formatValue(long value, int format) {
@@ -116,6 +179,10 @@ public abstract class ItemValueFormatter {
     }
 
 
+    /**
+     * Predefined formatter for percent values with custom factor.
+     * Uses Number.getPercentInstance().toString().
+     */
     public static final class Percent extends ItemValueFormatter {
 
         private static final NumberFormat PERCENT_FORMAT;
@@ -133,10 +200,16 @@ public abstract class ItemValueFormatter {
         private double factor;
 
 
-        public Percent() {
+        Percent() {
             this(3);
         }
 
+        /**
+         * Creates new instance of Percent formatter with the defined decimal
+         * exponent. The values are computed as value / Math.pow(10, decexp).
+         *
+         * @param decexp decimal exponent for computing values
+         */
         public Percent(int decexp) {
             factor = Math.pow(10, decexp);
         }
@@ -153,6 +226,7 @@ public abstract class ItemValueFormatter {
                     return null;
             }
         }
+        
         public String getUnits(int format) {
             switch (format) {
                 case FORMAT_TOOLTIP:

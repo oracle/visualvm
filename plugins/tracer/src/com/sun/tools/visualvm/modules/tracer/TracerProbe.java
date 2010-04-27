@@ -104,7 +104,6 @@ public abstract class TracerProbe<X extends DataSource> {
         /**
          * Creates new instance of TracerProbe.SessionAware.
          *
-         * @param descriptor descriptor of UI appearance of the probe
          * @param itemDescriptors descriptors of UI appearance of items provided by the probe
          */
         public SessionAware(ProbeItemDescriptor[] itemDescriptors) {
