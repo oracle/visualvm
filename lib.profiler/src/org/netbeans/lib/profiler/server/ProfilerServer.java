@@ -1473,6 +1473,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 ProfilerRuntimeCPU.setTimerTypes(sucipCmd.getAbsoluteTimerOn(), sucipCmd.getThreadCPUTimerOn());
                 status.instrScheme = sucipCmd.getInstrScheme();
                 ProfilerRuntimeCPUCodeRegion.setCPUResBufSize(sucipCmd.getCodeRegionCPUResBufSize());
+                ProfilerRuntimeCPU.enableFirstTimeMethodInvoke(status.instrScheme != CommonConstants.INSTRSCHEME_TOTAL);
                 sendSimpleResponseToClient(true, null);
 
                 break;
