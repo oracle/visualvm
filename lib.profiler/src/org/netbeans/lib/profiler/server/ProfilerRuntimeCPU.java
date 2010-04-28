@@ -57,6 +57,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     private static final boolean DEBUG = false;
     private static int nProfiledThreadsLimit;
     protected static int nProfiledThreadsAllowed;
+    protected static boolean enableFirstTimeMethodInvoke;
 
     // The following flag is used to prevent deadlock inside getThreadInfo() by forcing immediate return from methodEntry() etc.
     // in case methodEntry() (typically when it's injected in some core class method) is executed on behalf of some profiler server thread,
@@ -107,6 +108,10 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
         absoluteTimerOn = absolute;
         threadCPUTimerOn = threadCPU;
+    }
+    
+    public static void enableFirstTimeMethodInvoke(boolean enabled) {
+        enableFirstTimeMethodInvoke = enabled;
     }
 
     // This is currently used only when calibrating the profiler, to pre-create a ThreadInfo before calling methodEntry/Exit.
@@ -395,6 +400,15 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         }
     }
 
+    protected static void firstTimeMethodInvoke(final ThreadInfo ti, final char methodId) {
+        if (enableFirstTimeMethodInvoke) {
+            long absTimeStamp = Timers.getCurrentTimeInCounts();
+            long threadTimeStamp = threadCPUTimerOn ? Timers.getThreadCPUTimeInNanos() : 0;
+            externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
+            writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
+        }
+    }
+    
     static void writeAdjustTimeEvent(ThreadInfo ti, long absTimeStamp, long threadTimeStamp) {
         //if (printEvents) System.out.println("*** Writing ADJUST_TIME event, metodId = " + (int)methodId + ", ts = " + timeStamp);
         byte[] evBuf = ti.evBuf;

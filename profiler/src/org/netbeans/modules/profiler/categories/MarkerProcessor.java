@@ -93,7 +93,7 @@ public class MarkerProcessor extends CategoryDefinitionProcessor implements Mark
     public MarkerProcessor(Project project) {
         this.project = project;
         this.cpInfo = ProjectUtilities.getClasspathInfo(project, true);
-        this.js = JavaSource.create(cpInfo, new FileObject[0]);
+        this.js = cpInfo != null ? JavaSource.create(cpInfo, new FileObject[0]) : null;
     }
 
     @Override
@@ -160,16 +160,18 @@ public class MarkerProcessor extends CategoryDefinitionProcessor implements Mark
             final String[] methodNameRestriction, final boolean inclusive, final Mark mark) {
 
         try {
-            js.runUserActionTask(new CancellableTask<CompilationController>() {
+            if (js != null) {
+                js.runUserActionTask(new CancellableTask<CompilationController>() {
 
-                public void cancel() {
-                }
+                    public void cancel() {
+                    }
 
-                public void run(CompilationController controller)
-                        throws Exception {
-                    doAddInterfaceMarker(marker, interfaceName, methodNameRestriction, inclusive, mark, controller);
-                }
-            }, true);
+                    public void run(CompilationController controller)
+                            throws Exception {
+                        doAddInterfaceMarker(marker, interfaceName, methodNameRestriction, inclusive, mark, controller);
+                    }
+                }, true);
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -177,18 +179,20 @@ public class MarkerProcessor extends CategoryDefinitionProcessor implements Mark
 
     protected void addInterfaceMarkers(final MethodMarker marker, final String[] interfaceNames, final Mark mark) {
         try {
-            js.runUserActionTask(new CancellableTask<CompilationController>() {
+            if (js != null) {
+                js.runUserActionTask(new CancellableTask<CompilationController>() {
 
-                public void cancel() {
-                }
-
-                public void run(CompilationController controller)
-                        throws Exception {
-                    for (String interfaceName : interfaceNames) {
-                        doAddInterfaceMarker(marker, interfaceName, null, false, mark, controller);
+                    public void cancel() {
                     }
-                }
-            }, true);
+
+                    public void run(CompilationController controller)
+                            throws Exception {
+                        for (String interfaceName : interfaceNames) {
+                            doAddInterfaceMarker(marker, interfaceName, null, false, mark, controller);
+                        }
+                    }
+                }, true);
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -197,18 +201,20 @@ public class MarkerProcessor extends CategoryDefinitionProcessor implements Mark
     protected void addInterfaceMarkers(final MethodMarker marker, final String[] interfaceNames,
             final String[] methodNameRestriction, final boolean inclusive, final Mark mark) {
         try {
-            js.runUserActionTask(new CancellableTask<CompilationController>() {
+            if (js != null) {
+                js.runUserActionTask(new CancellableTask<CompilationController>() {
 
-                public void cancel() {
-                }
-
-                public void run(CompilationController controller)
-                        throws Exception {
-                    for (String interfaceName : interfaceNames) {
-                        doAddInterfaceMarker(marker, interfaceName, methodNameRestriction, inclusive, mark, controller);
+                    public void cancel() {
                     }
-                }
-            }, true);
+
+                    public void run(CompilationController controller)
+                            throws Exception {
+                        for (String interfaceName : interfaceNames) {
+                            doAddInterfaceMarker(marker, interfaceName, methodNameRestriction, inclusive, mark, controller);
+                        }
+                    }
+                }, true);
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -223,17 +229,19 @@ public class MarkerProcessor extends CategoryDefinitionProcessor implements Mark
         final List<String> restrictors = (methodNameRestriction != null) ? Arrays.asList(methodNameRestriction) : new ArrayList();
 
         try {
-            js.runUserActionTask(new CancellableTask<CompilationController>() {
+            if (js != null) {
+                js.runUserActionTask(new CancellableTask<CompilationController>() {
 
-                public void cancel() {
-                }
+                    public void cancel() {
+                    }
 
-                public void run(CompilationController controller)
-                        throws Exception {
-                    TypeElement typeElement = controller.getElements().getTypeElement(type);
-                    addTypeMethods(marker, typeElement, restrictors, inclusive, mark, controller);
-                }
-            }, true);
+                    public void run(CompilationController controller)
+                            throws Exception {
+                        TypeElement typeElement = controller.getElements().getTypeElement(type);
+                        addTypeMethods(marker, typeElement, restrictors, inclusive, mark, controller);
+                    }
+                }, true);
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }

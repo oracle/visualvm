@@ -433,7 +433,7 @@ public class ProfilingSessionStatus {
                     System.arraycopy(isMethodLeaf, 0, instrMethodInvoked, nInstrMethods + emptyCell, nMethods);
                 }
 
-                if (instrScheme == 2) {
+                if (instrScheme == CommonConstants.INSTRSCHEME_EAGER) {
                     for (int i = nInstrMethods; i < (nInstrMethods + nAddedMethods); i++) {
                         instrMethodInvoked[i] = true;
                     }
