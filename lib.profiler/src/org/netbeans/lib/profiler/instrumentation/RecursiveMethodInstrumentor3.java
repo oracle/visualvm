@@ -185,7 +185,8 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
 
     public Object[] getMethodsToInstrumentUponMethodInvocation(String className, int classLoaderId, String methodName,
                                                                String methodSignature) {
-        return null; // This method is just not used with this flavour of MethodScanner
+        // This method is just not used with this flavour of MethodScanner
+        throw new IllegalStateException("Class "+className+" method "+methodName);
     }
 
     public Object[] getMethodsToInstrumentUponReflectInvoke(String className, int classLoaderId, String methodName,
