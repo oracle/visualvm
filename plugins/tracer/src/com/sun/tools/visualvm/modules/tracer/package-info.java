@@ -30,5 +30,8 @@
  * The entrypoint is TracerSupport where custom TracerPackageProviders providing
  * TracerPackages need to be registered. TracerPackages provide TracerProbes
  * representing the monitored targets like JVM metrics or MBean values.
+ * <p>
+ * <b>Note:</b> the API is not stable yet and may be changed in an incompatible
+ * way in the following releases.
  */
 package com.sun.tools.visualvm.modules.tracer;
