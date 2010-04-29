@@ -147,6 +147,36 @@ final class TracerOptionsPanel extends JPanel {
         return rowsSelectionCombo.getSelectedIndex() == 0;
     }
 
+    void setTimelineToolbar(int visible) {
+        internalChange = true;
+        timelineToolbarCombo.setSelectedIndex(visible);
+        internalChange = false;
+    }
+
+    int getTimelineToolbar() {
+        return timelineToolbarCombo.getSelectedIndex();
+    }
+
+    void setSelectionToolbar(int visible) {
+        internalChange = true;
+        selectionToolbarCombo.setSelectedIndex(visible);
+        internalChange = false;
+    }
+
+    int getSelectionToolbar() {
+        return selectionToolbarCombo.getSelectedIndex();
+    }
+
+    void setExtraToolbar(int visible) {
+        internalChange = true;
+        extraToolbarCombo.setSelectedIndex(visible);
+        internalChange = false;
+    }
+
+    int getExtraToolbar() {
+        return extraToolbarCombo.getSelectedIndex();
+    }
+
     void setInitiallyOpened(String opened) {
         internalChange = true;
         initialProbesCheckBox.setSelected(
@@ -914,11 +944,121 @@ final class TracerOptionsPanel extends JPanel {
         add(rowsSelectionCombo, c);
 
 
+        // toolbarsBehaviorSeparator
+        SectionSeparator toolbarsBehaviorSeparator =
+                UISupport.createSectionSeparator("Toolbars Behavior"); // NOI18N
+        c = new GridBagConstraints();
+        c.gridy = 11;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(15, 0, 5, 0);
+        add(toolbarsBehaviorSeparator, c);
+
+        // minMaxValsLabel
+        JLabel timelineToolbarLabel = new JLabel("Timeline toolbar:");
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 12;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 15, 3, 5);
+        add(timelineToolbarLabel, c);
+
+        // timelineToolbarCombo
+        timelineToolbarCombo = new JComboBox(new String[] { "always visible",
+                                                            "show with timeline" }) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+            protected void selectedItemChanged() {
+                TracerOptionsPanel.this.update();
+                super.selectedItemChanged();
+            }
+        };
+        timelineToolbarLabel.setLabelFor(timelineToolbarCombo);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 12;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 5, 3, 0);
+        add(timelineToolbarCombo, c);
+
+        // selectionToolbarLabel
+        JLabel selectionToolbarLabel = new JLabel("Selection toolbar:");
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 13;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 15, 3, 5);
+        add(selectionToolbarLabel, c);
+
+        // rowLegendCombo
+        selectionToolbarCombo = new JComboBox(new String[] { "always visible",
+                                                             "show on selection",
+                                                             "always hidden"}) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+            protected void selectedItemChanged() {
+                TracerOptionsPanel.this.update();
+                super.selectedItemChanged();
+            }
+        };
+        selectionToolbarLabel.setLabelFor(selectionToolbarCombo);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 13;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 5, 3, 0);
+        add(selectionToolbarCombo, c);
+
+        // extraToolbarLabel
+        JLabel extraToolbarLabel = new JLabel("Export toolbar:");
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 14;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 15, 3, 5);
+        add(extraToolbarLabel, c);
+
+        // extraToolbarCombo
+        extraToolbarCombo = new JComboBox(new String[] { "always visible",
+                                                          "show on data",
+                                                          "always hidden"}) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+            protected void selectedItemChanged() {
+                TracerOptionsPanel.this.update();
+                super.selectedItemChanged();
+            }
+        };
+        extraToolbarLabel.setLabelFor(extraToolbarCombo);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 14;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 5, 3, 0);
+        add(extraToolbarCombo, c);
+
+
         // viewsBehaviorSeparator
         SectionSeparator viewsBehaviorSeparator =
                 UISupport.createSectionSeparator("Views Behavior"); // NOI18N
         c = new GridBagConstraints();
-        c.gridy = 12;
+        c.gridy = 15;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -930,7 +1070,7 @@ final class TracerOptionsPanel extends JPanel {
         JPanel viewsBehaviorPanel = new JPanel(new BorderLayout(0, 0));
         viewsBehaviorPanel.setOpaque(false);
         c = new GridBagConstraints();
-        c.gridy = 13;
+        c.gridy = 16;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -1224,7 +1364,7 @@ final class TracerOptionsPanel extends JPanel {
         };
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 14;
+        c.gridy = 17;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -1254,6 +1394,9 @@ final class TracerOptionsPanel extends JPanel {
     private JComboBox rowLegendCombo;
     private JComboBox rowsDecorationCombo;
     private JComboBox rowsSelectionCombo;
+    private JComboBox timelineToolbarCombo;
+    private JComboBox selectionToolbarCombo;
+    private JComboBox extraToolbarCombo;
     private JPanel initiallyOpenedPanel;
     private JCheckBox initialProbesCheckBox;
     private JCheckBox initialTimelineCheckBox;

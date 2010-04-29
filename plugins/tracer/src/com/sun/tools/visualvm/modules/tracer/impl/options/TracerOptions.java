@@ -84,6 +84,17 @@ public final class TracerOptions {
     public static final String MOUSE_WHEEL_HSCROLLS = "horizontal scroll";
     public static final String MOUSE_WHEEL_VSCROLLS = "vertical scroll";
 
+    private static final String PROP_TIMELINE_TOOLBAR = "TracerOptions.timelineToolbar"; // NOI18N
+    private static final String PROP_SELECTION_TOOLBAR = "TracerOptions.selectionToolbar"; // NOI18N
+    private static final String PROP_EXTRA_TOOLBAR = "TracerOptions.extraToolbar"; // NOI18N
+    public static final int SHOW_ALWAYS = 0;
+    public static final int SHOW_AS_NEEDED = 1;
+    public static final int SHOW_NEVER = 2;
+    private static final int TIMELINE_TOOLBAR_DEFAULT = SHOW_AS_NEEDED;
+    private static final int SELECTION_TOOLBAR_DEFAULT = SHOW_AS_NEEDED;
+    private static final int EXTRA_TOOLBAR_DEFAULT = SHOW_AS_NEEDED;
+
+
 
     private static TracerOptions INSTANCE;
 
@@ -235,6 +246,30 @@ public final class TracerOptions {
         if (KEY_MOUSE_WHEEL_HSCROLLS.equals(mouseWheelAction)) return MOUSE_WHEEL_HSCROLLS;
         else if (KEY_MOUSE_WHEEL_VSCROLLS.equals(mouseWheelAction)) return MOUSE_WHEEL_VSCROLLS;
         return MOUSE_WHEEL_ZOOMS;
+    }
+
+    void setTimelineToolbar(int visible) {
+        prefs.putInt(PROP_TIMELINE_TOOLBAR, visible);
+    }
+
+    public int getTimelineToolbar() {
+        return prefs.getInt(PROP_TIMELINE_TOOLBAR, TIMELINE_TOOLBAR_DEFAULT);
+    }
+
+    void setSelectionToolbar(int visible) {
+        prefs.putInt(PROP_SELECTION_TOOLBAR, visible);
+    }
+
+    public int getSelectionToolbar() {
+        return prefs.getInt(PROP_SELECTION_TOOLBAR, SELECTION_TOOLBAR_DEFAULT);
+    }
+
+    void setExtraToolbar(int visible) {
+        prefs.putInt(PROP_EXTRA_TOOLBAR, visible);
+    }
+
+    public int getExtraToolbar() {
+        return prefs.getInt(PROP_EXTRA_TOOLBAR, EXTRA_TOOLBAR_DEFAULT);
     }
 
     void setClearSelection(boolean clear) {

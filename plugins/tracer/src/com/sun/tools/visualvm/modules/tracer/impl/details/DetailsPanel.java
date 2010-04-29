@@ -25,20 +25,15 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.details;
 
-import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderButton;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderPanel;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,7 +43,6 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.Scrollable;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -130,24 +124,6 @@ public final class DetailsPanel extends JPanel {
         table = new DetailsTable();
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        JCheckBox checkBox = new JCheckBox();
-        checkBox.setBorder(BorderFactory.createEmptyBorder());
-        checkBox.setSize(checkBox.getMinimumSize());
-        BufferedImage img = new BufferedImage(checkBox.getWidth(), checkBox.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        checkBox.print(img.getGraphics());
-        final HeaderButton hb = new HeaderButton(null, new ImageIcon(img)) {
-            protected void performAction(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        support.resetSelectedTimestamps();
-                    }
-                });
-            }
-        };
-        hb.setToolTipText("Clear marked timestamps");
-        
-        final HeaderPanel corner = new HeaderPanel();
-
         JViewport viewport = new Viewport(table);
 
         final JScrollPane tableScroll = new JScrollPane(
@@ -156,24 +132,7 @@ public final class DetailsPanel extends JPanel {
         tableScroll.setViewport(viewport);
         tableScroll.setBorder(BorderFactory.createEmptyBorder());
         tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-        tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, corner);
-        
-        support.addSelectionListener(new TimelineSupport.SelectionListener() {
-            
-            private boolean lastSelected = false;
-
-            public void rowSelectionChanged(boolean rowsSelected) {}
-
-            public void timeSelectionChanged(boolean timestampsSelected) {
-                if (lastSelected == timestampsSelected) return;
-                
-                tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER,
-                                      timestampsSelected ? hb : corner);
-                hb.reset();
-
-                lastSelected = timestampsSelected;
-            }
-        });
+        tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, new HeaderPanel());
         
         scrollBar = new JScrollBar(JScrollBar.VERTICAL) {
             public int getUnitIncrement(int direction) {

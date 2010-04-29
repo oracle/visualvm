@@ -76,6 +76,8 @@ public final class TimelineSupport {
     private final List<TimelineChart.Row> rows = new ArrayList();
     private final DescriptorResolver descriptorResolver;
 
+    private final Set<ValuesListener> valuesListeners = new HashSet();
+
     private final Set<Integer> selectedTimestamps = new HashSet();
     private final Set<SelectionListener> selectionListeners = new HashSet();
 
@@ -188,6 +190,10 @@ public final class TimelineSupport {
 
     public int getItemsCount() {
         return model.getItemsCount();
+    }
+
+    public boolean hasData() {
+        return model.getTimestampsCount() > 0;
     }
 
 
@@ -379,14 +385,15 @@ public final class TimelineSupport {
     // --- Values management ---------------------------------------------------
 
     public void addValues(final long timestamp, final long[] newValues) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+//        SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
                 int newRow = detailsModel == null ? -1 : detailsModel.getRowCount();
                 model.addValues(timestamp, newValues);
                 itemsModel.valuesAdded();
                 if (newRow != -1) detailsModel.fireTableRowsInserted(newRow, newRow);
-            }
-        });
+                fireValuesAdded();
+//            }
+//        });
     }
 
     public void resetValues() {
@@ -397,8 +404,44 @@ public final class TimelineSupport {
                 resetSelectedTimestamps();
                 pointsComputer.reset();
                 if (detailsModel != null) detailsModel.fireTableStructureChanged();
+                fireValuesReset();
             }
         });
+    }
+
+    public void exportAllValues() {
+
+    }
+
+    public void exportDetailsValues() {
+
+    }
+
+    public void addValuesListener(ValuesListener listener) {
+        valuesListeners.add(listener);
+    }
+
+    public void removeValuesListener(ValuesListener listener) {
+        valuesListeners.remove(listener);
+    }
+    
+    private void fireValuesAdded() {
+        for (ValuesListener listener : valuesListeners)
+            listener.valuesAdded();
+    }
+    
+    private void fireValuesReset() {
+        for (ValuesListener listener : valuesListeners)
+            listener.valuesReset();
+    }
+
+
+    public static interface ValuesListener {
+
+        public void valuesAdded();
+
+        public void valuesReset();
+
     }
 
     // --- Row selection management --------------------------------------------
@@ -408,6 +451,10 @@ public final class TimelineSupport {
     void rowSelectionChanged() {
         updateSelectedItems();
         notifyRowSelectionChanged();
+    }
+
+    public boolean isRowSelection() {
+        return chart.isRowSelection();
     }
 
     public TableModel getDetailsModel() {
@@ -493,6 +540,15 @@ public final class TimelineSupport {
     private static final int SCROLL_MARGIN_LEFT = 10;
     private static final int SCROLL_MARGIN_RIGHT = 50;
 
+    private boolean hovering;
+    private boolean hoveredSelected;
+
+    
+    void setTimestampHovering(boolean hovering, boolean hoveredSelected) {
+        this.hovering = hovering;
+        this.hoveredSelected = hoveredSelected;
+        notifyTimeSelectionChanged();
+    }
 
     public void selectTimestamp(int index, boolean scrollToVisible) {
         selectTimestamp(index, scrollToVisible, true);
@@ -522,9 +578,13 @@ public final class TimelineSupport {
         return selectedTimestamps.contains(index);
     }
 
-    public boolean isTimestampSelection() {
-        return !selectedTimestamps.isEmpty();
+    public boolean isTimestampSelection(boolean includeHover) {
+        int selectedTimestampsCount = selectedTimestamps.size();
+        if (selectedTimestampsCount == 0) return false;
+        if (selectedTimestampsCount > 1)  return true;
+        return (includeHover || !hovering || hoveredSelected);
     }
+
 
     private void unselectTimestamp(int index, boolean notifyTable) {
         boolean change = selectedTimestamps.remove(index);
@@ -648,9 +708,10 @@ public final class TimelineSupport {
     }
 
     private void notifyTimeSelectionChanged() {
-        boolean timestampsSelected = !selectedTimestamps.isEmpty();
+        boolean sel = isTimestampSelection(true);
+        boolean hov = sel && !isTimestampSelection(false);
         for (SelectionListener selectionListener: selectionListeners)
-            selectionListener.timeSelectionChanged(timestampsSelected);
+            selectionListener.timeSelectionChanged(sel, hov);
     }
 
 
@@ -658,7 +719,8 @@ public final class TimelineSupport {
 
         public void rowSelectionChanged(boolean rowsSelected);
 
-        public void timeSelectionChanged(boolean timestampsSelected);
+        public void timeSelectionChanged(boolean timestampsSelected,
+                                         boolean justHovering);
 
     }
 

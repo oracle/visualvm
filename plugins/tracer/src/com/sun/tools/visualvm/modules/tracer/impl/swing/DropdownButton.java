@@ -57,6 +57,10 @@ public final class DropdownButton extends JToggleButton {
         actions.add(action);
     }
 
+    public void addSeparator() {
+        actions.add(null);
+    }
+
 
     protected void fireActionPerformed(ActionEvent event) {
         JPopupMenu popup = new JPopupMenu();
@@ -75,14 +79,18 @@ public final class DropdownButton extends JToggleButton {
     }
 
     private void addAction(JPopupMenu popup, Action action) {
-        Class cls = (Class)action.getValue(KEY_CLASS);
-        if (Boolean.class.equals(cls)) {
-            Boolean boolvalue = (Boolean)action.getValue(KEY_BOOLVALUE);
-            JCheckBoxMenuItem item = new JCheckBoxMenuItem(action);
-            item.setSelected(boolvalue);
-            popup.add(item);
+        if (action == null) {
+            popup.addSeparator();
         } else {
-            popup.add(action);
+            Class cls = (Class)action.getValue(KEY_CLASS);
+            if (Boolean.class.equals(cls)) {
+                Boolean boolvalue = (Boolean)action.getValue(KEY_BOOLVALUE);
+                JCheckBoxMenuItem item = new JCheckBoxMenuItem(action);
+                item.setSelected(boolvalue);
+                popup.add(item);
+            } else {
+                popup.add(action);
+            }
         }
     }
 

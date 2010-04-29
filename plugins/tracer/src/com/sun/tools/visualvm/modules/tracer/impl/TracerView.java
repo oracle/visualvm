@@ -63,6 +63,8 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 
@@ -141,6 +143,12 @@ final class TracerView extends DataSourceView {
             "com/sun/tools/visualvm/modules/tracer/impl/resources/error.png"; // NOI18N
         private static final String SETTINGS_IMAGE_PATH =
             "com/sun/tools/visualvm/modules/tracer/impl/resources/settings.png"; // NOI18N
+        private static final String CLPROBE_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/probeClear.png"; // NOI18N
+        private static final String CLMARK_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/markClear.png"; // NOI18N
+        private static final String EXPORT_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/export.png"; // NOI18N
 
         private static final String SYSTEM_TOOLBAR = "systemToolbar"; // NOI18N
         private static final String CLIENT_TOOLBAR = "clientToolbar"; // NOI18N
@@ -156,12 +164,30 @@ final class TracerView extends DataSourceView {
         private JPanel clientToolbar;
 
         private TransparentToolBar timelineToolbar;
+        private TransparentToolBar selectionToolbar;
+        private TransparentToolBar extraToolbar;
+
+        private JButton clearRowSelectionButton;
+        private JButton clearTimestampSelectionButton;
+
+        private Action exportAllAction;
+        private Action exportDetailsAction;
 
 
         DataViewComponent.MasterView getView() {
             JComponent view = createComponents();
             initListeners();
             refreshState(model.areProbesDefined());
+
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    Dimension size = new Dimension(commonControlHeight, commonControlHeight);
+                    createTimelineToolbar(size);
+                    createSelectionToolbar(size);
+                    createExtraToolbar(size);
+                }
+            });
+
             return new DataViewComponent.MasterView("Tracer", null, view);
         }
 
@@ -226,23 +252,34 @@ final class TracerView extends DataSourceView {
                 }
             });
 
+            final boolean dynamicSelection = TracerOptions.getInstance().getSelectionToolbar() == TracerOptions.SHOW_AS_NEEDED;
             model.getTimelineSupport().addSelectionListener(
                     new TimelineSupport.SelectionListener() {
                 public void rowSelectionChanged(boolean rowsSelected) {
                     updateViewsOnSelectionChange(rowsSelected);
+                    updateSelectionToolbar(dynamicSelection);
                 }
-                public void timeSelectionChanged(boolean timestampsSelected) {}
+                public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {
+                    updateSelectionToolbar(dynamicSelection);
+                }
             });
 
-            timelineView.registerViewListener(new VisibilityHandler() {
-                public void shown()  { showTimelineToolbar(); }
-                public void hidden() { hideTimelineToolbar(); }
-            });
-
+            if (TracerOptions.getInstance().getTimelineToolbar() == TracerOptions.SHOW_AS_NEEDED)
+                timelineView.registerViewListener(new VisibilityHandler() {
+                    public void shown()  { showTimelineToolbar(); }
+                    public void hidden() { hideTimelineToolbar(); }
+                });
+            
             detailsView.registerViewListener(new VisibilityHandler() {
                 public void shown()  {}
                 public void hidden() { clearSelections(); }
             });
+
+            if (TracerOptions.getInstance().getExtraToolbar() == TracerOptions.SHOW_AS_NEEDED)
+                model.getTimelineSupport().addValuesListener(new TimelineSupport.ValuesListener() {
+                    public void valuesAdded() { showExtraToolbar(); }
+                    public void valuesReset() { hideExtraToolbar(); }
+                });
         }
 
         private void clearSelections() {
@@ -364,133 +401,246 @@ final class TracerView extends DataSourceView {
         }
 
 
-        private void showTimelineToolbar() {
-            if (timelineToolbar == null) {
-                timelineToolbar = new TransparentToolBar();
+        private void createTimelineToolbar(Dimension size) {
+            timelineToolbar = new TransparentToolBar();
 
-                Dimension size = new Dimension(commonControlHeight, commonControlHeight);
+            JButton c1 = new JButton(timelineView.zoomInAction());
+            c1.setMinimumSize(size);
+            c1.setPreferredSize(size);
+            c1.setMaximumSize(size);
+            timelineToolbar.addItem(c1);
 
-                JButton c1 = new JButton(timelineView.zoomInAction());
-                c1.setMinimumSize(size);
-                c1.setPreferredSize(size);
-                c1.setMaximumSize(size);
-                timelineToolbar.addItem(c1);
+            JButton c2 = new JButton(timelineView.zoomOutAction());
+            c2.setMinimumSize(size);
+            c2.setPreferredSize(size);
+            c2.setMaximumSize(size);
+            timelineToolbar.addItem(c2);
 
-                JButton c2 = new JButton(timelineView.zoomOutAction());
-                c2.setMinimumSize(size);
-                c2.setPreferredSize(size);
-                c2.setMaximumSize(size);
-                timelineToolbar.addItem(c2);
+            JButton c3 = new JButton(timelineView.toggleViewAction());
+            c3.setMinimumSize(size);
+            c3.setPreferredSize(size);
+            c3.setMaximumSize(size);
+            timelineToolbar.addItem(c3);
 
-                JButton c3 = new JButton(timelineView.toggleViewAction());
-                c3.setMinimumSize(size);
-                c3.setPreferredSize(size);
-                c3.setMaximumSize(size);
-                timelineToolbar.addItem(c3);
+            JPanel sp1 = new JPanel(null) {
+                public Dimension getPreferredSize() {
+                    Dimension d = super.getPreferredSize();
+                    d.width = 14;
+                    return d;
+                }
+            };
+            timelineToolbar.addItem(sp1);
 
-                JPanel sp1 = new JPanel(null) {
-                    public Dimension getPreferredSize() {
-                        Dimension d = super.getPreferredSize();
-                        d.width = 14;
-                        return d;
+            ButtonGroup bg = new ButtonGroup();
+
+            AbstractButton b1 = timelineView.mouseZoom();
+            bg.add(b1);
+            b1.setMinimumSize(size);
+            b1.setPreferredSize(size);
+            b1.setMaximumSize(size);
+            timelineToolbar.addItem(b1);
+
+            AbstractButton b2 = timelineView.mouseHScroll();
+            bg.add(b2);
+            b2.setMinimumSize(size);
+            b2.setPreferredSize(size);
+            b2.setMaximumSize(size);
+            timelineToolbar.addItem(b2);
+
+            AbstractButton b3 = timelineView.mouseVScroll();
+            bg.add(b3);
+            b3.setMinimumSize(size);
+            b3.setPreferredSize(size);
+            b3.setMaximumSize(size);
+            timelineToolbar.addItem(b3);
+
+            JPanel sp2 = new JPanel(null) {
+                public Dimension getPreferredSize() {
+                    Dimension d = super.getPreferredSize();
+                    d.width = 14;
+                    return d;
+                }
+            };
+            timelineToolbar.addItem(sp2);
+
+            DropdownButton d = new DropdownButton(new ImageIcon(
+                    ImageUtilities.loadImage(SETTINGS_IMAGE_PATH)));
+            d.setToolTipText("Settings");
+            Action action21 = new AbstractAction("Show min/max values") {
+                public Object getValue(String key) {
+                    if (DropdownButton.KEY_BOOLVALUE.equals(key)) {
+                        putValue(DropdownButton.KEY_BOOLVALUE, model.
+                                 getTimelineSupport().isShowValuesEnabled());
                     }
-                };
-                timelineToolbar.addItem(sp1);
+                    return super.getValue(key);
+                }
+                public void actionPerformed(ActionEvent e) {
+                    model.getTimelineSupport().setShowValuesEnabled(!model.
+                            getTimelineSupport().isShowValuesEnabled());
+                }
+            };
+            action21.putValue(DropdownButton.KEY_CLASS, Boolean.class);
+            d.addAction(action21);
 
-                ButtonGroup bg = new ButtonGroup();
-
-                AbstractButton b1 = timelineView.mouseZoom();
-                bg.add(b1);
-                b1.setMinimumSize(size);
-                b1.setPreferredSize(size);
-                b1.setMaximumSize(size);
-                timelineToolbar.addItem(b1);
-
-                AbstractButton b2 = timelineView.mouseHScroll();
-                bg.add(b2);
-                b2.setMinimumSize(size);
-                b2.setPreferredSize(size);
-                b2.setMaximumSize(size);
-                timelineToolbar.addItem(b2);
-
-                AbstractButton b3 = timelineView.mouseVScroll();
-                bg.add(b3);
-                b3.setMinimumSize(size);
-                b3.setPreferredSize(size);
-                b3.setMaximumSize(size);
-                timelineToolbar.addItem(b3);
-
-                JPanel sp2 = new JPanel(null) {
-                    public Dimension getPreferredSize() {
-                        Dimension d = super.getPreferredSize();
-                        d.width = 14;
-                        return d;
+            Action action22 = new AbstractAction("Show row legend") {
+                public Object getValue(String key) {
+                    if (DropdownButton.KEY_BOOLVALUE.equals(key)) {
+                        putValue(DropdownButton.KEY_BOOLVALUE, model.
+                                 getTimelineSupport().isShowLegendEnabled());
                     }
-                };
-                timelineToolbar.addItem(sp2);
+                    return super.getValue(key);
+                }
+                public void actionPerformed(ActionEvent e) {
+                    model.getTimelineSupport().setShowLegendEnabled(!model.
+                            getTimelineSupport().isShowLegendEnabled());
+                }
+            };
+            action22.putValue(DropdownButton.KEY_CLASS, Boolean.class);
+            d.addAction(action22);
 
-                DropdownButton d1 = new DropdownButton(new ImageIcon(
-                        ImageUtilities.loadImage(SETTINGS_IMAGE_PATH)));
-                Action action = new AbstractAction("Show min/max values") {
-                    public Object getValue(String key) {
-                        if (DropdownButton.KEY_BOOLVALUE.equals(key)) {
-                            putValue(DropdownButton.KEY_BOOLVALUE, model.
-                                     getTimelineSupport().isShowValuesEnabled());
-                        }
-                        return super.getValue(key);
-                    }
-                    public void actionPerformed(ActionEvent e) {
-                        model.getTimelineSupport().setShowValuesEnabled(!model.
-                                getTimelineSupport().isShowValuesEnabled());
-                    }
-                };
-                action.putValue(DropdownButton.KEY_CLASS, Boolean.class);
-                d1.addAction(action);
-                
-                Action action2 = new AbstractAction("Show row legend") {
-                    public Object getValue(String key) {
-                        if (DropdownButton.KEY_BOOLVALUE.equals(key)) {
-                            putValue(DropdownButton.KEY_BOOLVALUE, model.
-                                     getTimelineSupport().isShowLegendEnabled());
-                        }
-                        return super.getValue(key);
-                    }
-                    public void actionPerformed(ActionEvent e) {
-                        model.getTimelineSupport().setShowLegendEnabled(!model.
-                                getTimelineSupport().isShowLegendEnabled());
-                    }
-                };
-                action2.putValue(DropdownButton.KEY_CLASS, Boolean.class);
-                d1.addAction(action2);
-//                d1.addAction(new AbstractAction("Show row legend") {
-//                    public Object getValue(String key) {
-//                        if (DropdownButton.KEY_BOOLVALUE.equals(key)) {
-//                            putValue(DropdownButton.KEY_BOOLVALUE, model.
-//                                     getTimelineSupport().isShowLegendEnabled());
-//                        }
-//                        return super.getValue(key);
-//                    }
-//                    public void actionPerformed(ActionEvent e) {
-//                        model.getTimelineSupport().setShowLegendEnabled(model.
-//                                getTimelineSupport().isShowLegendEnabled());
-//                    }
-//                });
-                d1.setMinimumSize(size);
-                d1.setPreferredSize(size);
-                d1.setMaximumSize(size);
-                timelineToolbar.addItem(d1);
-            }
+            d.setMinimumSize(size);
+            d.setPreferredSize(size);
+            d.setMaximumSize(size);
+            timelineToolbar.addItem(d);
 
+            TracerOptions options = TracerOptions.getInstance();
+            int tbVis = options.getTimelineToolbar();
+            if (tbVis == TracerOptions.SHOW_NEVER)
+                timelineToolbar.setVisible(false);
+            else if (tbVis == TracerOptions.SHOW_AS_NEEDED)
+                timelineToolbar.setVisible(timelineView.isShowing());
+            
             addClientToobarItem(timelineToolbar);
         }
 
         private void hideTimelineToolbar() {
-            if (timelineToolbar != null)
-                removeClientToolbarItem(timelineToolbar);
+            if (timelineToolbar != null) timelineToolbar.setVisible(false);
+        }
+
+        private void showTimelineToolbar() {
+            if (timelineToolbar != null) timelineToolbar.setVisible(true);
+        }
+
+
+        private void createSelectionToolbar(Dimension size) {
+            selectionToolbar = new TransparentToolBar();
+            final TimelineSupport support = model.getTimelineSupport();
+
+            clearRowSelectionButton = new JButton(new ImageIcon(
+                    ImageUtilities.loadImage(CLPROBE_IMAGE_PATH))) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            timelineView.resetSelection();
+                        }
+                    });
+                }
+            };
+            clearRowSelectionButton.setToolTipText("Clear selected probes");
+            clearRowSelectionButton.setMinimumSize(size);
+            clearRowSelectionButton.setPreferredSize(size);
+            clearRowSelectionButton.setMaximumSize(size);
+            selectionToolbar.addItem(clearRowSelectionButton);
+
+            clearTimestampSelectionButton = new JButton(new ImageIcon(
+                    ImageUtilities.loadImage(CLMARK_IMAGE_PATH))) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            support.resetSelectedTimestamps();
+                        }
+                    });
+                }
+            };
+            clearTimestampSelectionButton.setToolTipText("Clear marks");
+            clearTimestampSelectionButton.setMinimumSize(size);
+            clearTimestampSelectionButton.setPreferredSize(size);
+            clearTimestampSelectionButton.setMaximumSize(size);
+            selectionToolbar.addItem(clearTimestampSelectionButton);
+
+            TracerOptions options = TracerOptions.getInstance();
+            int tbVis = options.getSelectionToolbar();
+            if (tbVis == TracerOptions.SHOW_AS_NEEDED) {
+                updateSelectionToolbar(true);
+            } else {
+                if (tbVis == TracerOptions.SHOW_NEVER)
+                    selectionToolbar.setVisible(false);
+                updateSelectionToolbar(false);
+            }
+
+            addClientToobarItem(selectionToolbar);
+        }
+
+        private void updateSelectionToolbar(boolean dynamicSelection) {
+            TimelineSupport support = model.getTimelineSupport();
+            boolean rowSelection = support.isRowSelection();
+            boolean timestampSelection = support.isTimestampSelection(false);
+            clearRowSelectionButton.setEnabled(rowSelection);
+            clearTimestampSelectionButton.setEnabled(timestampSelection);
+            if (dynamicSelection)
+                selectionToolbar.setVisible(rowSelection || timestampSelection);
+        }
+
+
+        private void createExtraToolbar(Dimension size) {
+            extraToolbar = new TransparentToolBar();
+
+            DropdownButton d = new DropdownButton(new ImageIcon(
+                    ImageUtilities.loadImage(EXPORT_IMAGE_PATH)));
+            d.setToolTipText("Export data");
+            exportAllAction = new AbstractAction("Export all data") {
+                public void actionPerformed(ActionEvent e) {
+                    DialogDisplayer.getDefault().notify(
+                            new NotifyDescriptor.Message("Not yet supported"));
+                }
+                public boolean isEnabled() {
+                    return model.getTimelineSupport().hasData();
+                }
+            };
+            d.addAction(exportAllAction);
+
+            exportDetailsAction = new AbstractAction("Export Details table") {
+                public void actionPerformed(ActionEvent e) {
+                    DialogDisplayer.getDefault().notify(
+                            new NotifyDescriptor.Message("Not yet supported"));
+                }
+                public boolean isEnabled() {
+                    return detailsView.hasData();
+                }
+            };
+            d.addAction(exportDetailsAction);
+
+            d.setMinimumSize(size);
+            d.setPreferredSize(size);
+            d.setMaximumSize(size);
+            extraToolbar.addItem(d);
+
+            TracerOptions options = TracerOptions.getInstance();
+            int tbVis = options.getExtraToolbar();
+            if (tbVis == TracerOptions.SHOW_NEVER)
+                extraToolbar.setVisible(false);
+            else if (tbVis == TracerOptions.SHOW_AS_NEEDED)
+                extraToolbar.setVisible(exportAllAction.isEnabled());
+
+            addClientToobarItem(extraToolbar);
+        }
+
+        private void hideExtraToolbar() {
+            if (extraToolbar != null) extraToolbar.setVisible(false);
+        }
+
+        private void showExtraToolbar() {
+            if (extraToolbar != null) extraToolbar.setVisible(true);
         }
 
         private void addClientToobarItem(Component c) {
-            clientToolbar.add(createToolbarSeparator()); // separator
+            final SimpleSeparator s = createToolbarSeparator();
+            new VisibilityHandler() {
+                public void shown() { s.setVisible(true); }
+                public void hidden() { s.setVisible(false); }
+            }.handle(c);
+            s.setVisible(c.isShowing());
+            clientToolbar.add(s);
             clientToolbar.add(c);
             clientToolbar.revalidate();
             clientToolbar.repaint();
@@ -632,18 +782,6 @@ final class TracerView extends DataSourceView {
 
                 addClientToobarItem(refreshRateContainer);
             }
-//
-//            add(new JButton("Zoom In"));
-//            add(new JButton("Zoom Pad"));
-//            add(new JButton("Zoom Out"));
-//
-//            SimpleSeparator s2 = new SimpleSeparator(SwingConstants.VERTICAL);
-//            s2.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-//            add(s2);
-//
-//            add(new JToggleButton("Sel None"));
-//            add(new JToggleButton("Sel Line"));
-//            add(new JToggleButton("Sel Rect"));
 
             return view;
         }

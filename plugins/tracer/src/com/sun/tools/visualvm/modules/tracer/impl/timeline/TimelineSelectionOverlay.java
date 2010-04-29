@@ -276,7 +276,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
                                     long lastOffsetX, long lastOffsetY,
                                     double lastScaleX, double lastScaleY,
                                     int shiftX, int shiftY) {
-            if (highlightedValues.isEmpty() && !support.isTimestampSelection()) return;
+            if (highlightedValues.isEmpty() && !support.isTimestampSelection(true)) return;
             if (lastOffsetX != offsetX || lastOffsetY != offsetY ||
                 scaleX != lastScaleX || scaleY != lastScaleY)
                 SwingUtilities.invokeLater(selectionUpdater);
@@ -311,7 +311,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
 
         public void rowSelectionChanged(boolean rowsSelected) {}
 
-        public void timeSelectionChanged(boolean timestampsSelected) {
+        public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {
             Set<Point> oldSelectedValues = new HashSet(selectedValues);
             updateValues(selectedValues, getSelections(), chart);
             vLineBoundsChanged(oldSelectedValues, selectedValues);

@@ -69,6 +69,10 @@ final class TracerOptionsPanelController extends OptionsPanelController {
         p.setZoomMode(options.getZoomMode());
         p.setMouseWheelAction(options.getMouseWheelAction());
 
+        p.setTimelineToolbar(options.getTimelineToolbar());
+        p.setSelectionToolbar(options.getSelectionToolbar());
+        p.setExtraToolbar(options.getExtraToolbar());
+
         p.setClearSelection(options.isClearSelection());
 
         p.update();
@@ -96,6 +100,10 @@ final class TracerOptionsPanelController extends OptionsPanelController {
 
         options.setZoomMode(p.getZoomMode());
         options.setMouseWheelAction(p.getMouseWheelAction());
+
+        options.setTimelineToolbar(p.getTimelineToolbar());
+        options.setSelectionToolbar(p.getSelectionToolbar());
+        options.setExtraToolbar(p.getExtraToolbar());
 
         options.setClearSelection(p.isClearSelection());
     }
@@ -128,6 +136,10 @@ final class TracerOptionsPanelController extends OptionsPanelController {
 
         if (!options.getZoomMode().equals(p.getZoomMode())) return true;
         if (!options.getMouseWheelAction().equals(p.getMouseWheelAction())) return true;
+
+        if (options.getTimelineToolbar() != p.getTimelineToolbar()) return true;
+        if (options.getSelectionToolbar() != p.getSelectionToolbar()) return true;
+        if (options.getExtraToolbar() != p.getExtraToolbar()) return true;
 
         if (options.isClearSelection() != p.isClearSelection()) return true;
 

@@ -100,6 +100,9 @@ final class TimelineView {
 
     }
 
+    boolean isShowing() {
+        return panel != null && panel.isShowing();
+    }
 
     // --- UI implementation ---------------------------------------------------
 

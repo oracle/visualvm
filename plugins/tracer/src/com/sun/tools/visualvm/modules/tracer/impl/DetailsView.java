@@ -28,7 +28,6 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsPanel;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.VisibilityHandler;
-import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelinePanel;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 
 /**
@@ -39,6 +38,8 @@ final class DetailsView {
 
     private final TimelineSupport timelineSupport;
     private DetailsPanel panel;
+
+    private boolean hasData;
 
     private VisibilityHandler viewHandler;
 
@@ -60,6 +61,14 @@ final class DetailsView {
 
     }
 
+    boolean isShowing() {
+        return panel != null && panel.isShowing();
+    }
+
+    boolean hasData() {
+        return hasData;
+    }
+
 
     // --- UI implementation ---------------------------------------------------
 
@@ -69,8 +78,9 @@ final class DetailsView {
         timelineSupport.addSelectionListener(new TimelineSupport.SelectionListener() {
             public void rowSelectionChanged(boolean rowsSelected) {
                 panel.setTableModel(timelineSupport.getDetailsModel());
+                hasData = rowsSelected;
             }
-            public void timeSelectionChanged(boolean timestampsSelected) {}
+            public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {}
         });
         if (viewHandler != null) {
             viewHandler.handle(panel);

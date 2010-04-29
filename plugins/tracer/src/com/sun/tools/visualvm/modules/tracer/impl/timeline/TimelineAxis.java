@@ -130,7 +130,7 @@ final class TimelineAxis extends JPanel {
 
             public void rowSelectionChanged(boolean rowsSelected) {}
 
-            public void timeSelectionChanged(boolean timestampsSelected) {
+            public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {
                 marks.refreshMarks();
                 marks.repaint();
             }
@@ -304,6 +304,7 @@ final class TimelineAxis extends JPanel {
             if (lastHoverIndex != hoverIndex) {
                 if (!wasSelected) support.unselectTimestamp(lastHoverIndex);
                 wasSelected = hoverIndex != -1 && support.isTimestampSelected(hoverIndex);
+                support.setTimestampHovering(hoverIndex != -1, wasSelected);
                 if (hoverIndex != -1) {
                     support.selectTimestamp(hoverIndex, false);
                     hoverTime = timeline.getTimestamp(hoverIndex);
@@ -323,6 +324,7 @@ final class TimelineAxis extends JPanel {
 
         void handleAction() {
             wasSelected = !wasSelected;
+            support.setTimestampHovering(hoverIndex != -1, wasSelected);
         }
 
 
