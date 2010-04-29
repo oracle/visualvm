@@ -158,7 +158,7 @@ public final class LoadSnapshotAction extends AbstractAction {
                 }
             }
 
-            if (snapshotsFOArr.size() > 0) {
+            if (!snapshotsFOArr.isEmpty()) {
                 LoadedSnapshot[] imported = ResultsManager.getDefault()
                                                           .loadSnapshots(snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
                 ResultsManager.getDefault().openSnapshots(imported);
@@ -169,7 +169,7 @@ public final class LoadSnapshotAction extends AbstractAction {
 
             }
 
-            if (heapdumpsFArr.size() > 0) {
+            if (!heapdumpsFArr.isEmpty()) {
                 RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
                             HeapWalkerManager.getDefault().openHeapWalkers(heapdumpsFArr.toArray(new File[heapdumpsFArr.size()]));
