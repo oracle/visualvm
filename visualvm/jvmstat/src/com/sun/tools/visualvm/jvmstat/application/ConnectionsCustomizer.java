@@ -131,10 +131,10 @@ class ConnectionsCustomizer extends PropertiesPanel {
         return b;
     }
 
-    private static Border emptyBorder(Border selectedBorder) {
-        Insets i = selectedBorder == null ? new Insets(0, 0, 0, 0) :
-                   selectedBorder.getBorderInsets(new JTextField());
-        return BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right);
+    private static Border emptyBorder(Border border) {
+        Insets i = border == null ? null : border.getBorderInsets(new JTextField());
+        return i == null ? BorderFactory.createEmptyBorder() :
+               BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right);
     }
 
 
