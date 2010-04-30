@@ -55,6 +55,9 @@ class SAViewProvider extends DataSourceViewProvider<DataSource> {
         if (ds instanceof Application) {
             if (Host.LOCALHOST.equals(((Application) ds).getHost())) {
                 JvmJvmstatModel jvmstat = JvmJvmstatModelFactory.getJvmstatModelFor((Application) ds);
+                if (jvmstat == null) {
+                    return false;
+                }
                 File jdkHome = new File(jvmstat.getJavaHome());
                 if ("jre".equals(jdkHome.getName())) {
                     jdkHome = jdkHome.getParentFile();
