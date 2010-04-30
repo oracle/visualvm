@@ -44,6 +44,8 @@ import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -84,7 +86,7 @@ final class TimelineAxis extends JPanel {
     private int pointerX;
 
 
-    TimelineAxis(TimelineChart chart, TimelineSupport support) {
+    TimelineAxis(final TimelineChart chart, TimelineSupport support) {
 
         super(null);
 
@@ -164,6 +166,12 @@ final class TimelineAxis extends JPanel {
             public void mouseMoved(MouseEvent e) {
                 pointerX = e.getX();
                 if (!axis.isVisible()) marks.refreshHoverMark(pointerX);
+            }
+        });
+
+        marks.addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                chart.processMouseWheelEvent(e);
             }
         });
 

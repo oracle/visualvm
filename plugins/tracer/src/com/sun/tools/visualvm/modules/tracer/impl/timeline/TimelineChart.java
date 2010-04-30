@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
 import java.awt.Rectangle;
+import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -373,6 +374,10 @@ final class TimelineChart extends SynchronousXYChart {
 
     double viewWidth(double d) {
         return super.getViewWidth(d);
+    }
+
+    protected void processMouseWheelEvent(MouseWheelEvent e) {
+        super.processMouseWheelEvent(e);
     }
 
 
