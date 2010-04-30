@@ -649,6 +649,10 @@ public final class TimelineSupport {
     }
 
 
+    public void scrollChartToIndex(int index) {
+        scrollChartToSelection(-1, index);
+    }
+
     private void scrollChartToSelection(int oldIndex, int newIndex) {
         Timeline timeline = itemsModel.getTimeline();
         ChartContext context = chart.getChartContext();
@@ -664,7 +668,9 @@ public final class TimelineSupport {
         long oldDataX = oldIndex == -1 ? -1 : timeline.getTimestamp(oldIndex);
         long oldOffsetX = oldIndex == -1 ? -1 : (long)context.getViewWidth(oldDataX - dataOffsetX);
 
-        if (oldOffsetX > newOffsetX) {
+        if (oldIndex == -1) {
+            chart.setOffset(newOffsetX - context.getViewportWidth() / 2, chart.getOffsetY());
+        } else if (oldOffsetX > newOffsetX) {
             chart.setOffset(newOffsetX - SCROLL_MARGIN_LEFT, chart.getOffsetY());
         } else {
             chart.setOffset(newOffsetX - context.getViewportWidth() + SCROLL_MARGIN_RIGHT, chart.getOffsetY());

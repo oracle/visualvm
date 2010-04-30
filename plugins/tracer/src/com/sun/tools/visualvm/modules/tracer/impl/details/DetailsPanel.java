@@ -33,6 +33,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -43,6 +45,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.Scrollable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -102,6 +105,7 @@ public final class DetailsPanel extends JPanel {
         TableListener tableListener = new TableListener();
         table.getSelectionModel().addListSelectionListener(tableListener);
         table.addKeyListener(tableListener);
+        table.addMouseListener(tableListener);
     }
 
     private int getSelectedRow() {
@@ -169,18 +173,24 @@ public final class DetailsPanel extends JPanel {
     }
 
 
-    private class TableListener implements ListSelectionListener, KeyListener {
+    private class TableListener extends MouseAdapter implements
+                                ListSelectionListener, KeyListener {
         public void valueChanged(ListSelectionEvent e) {
             selectionAdjusting = e.getValueIsAdjusting();
-//            support.highlightTimestamp(getSelectedRow());
         }
         public void keyPressed(KeyEvent e) {
             tableKeyStroke = KeyStroke.getKeyStrokeForEvent(e);
         }
         public void keyReleased(KeyEvent e) {
             tableKeyStroke = null;
+            if (e.getKeyCode() == KeyEvent.VK_SPACE)
+                support.scrollChartToIndex(getSelectedRow());
         }
         public void keyTyped(KeyEvent e) {}
+        public void mouseClicked(MouseEvent e) {
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
+                support.scrollChartToIndex(getSelectedRow());
+        }
     }
 
 
