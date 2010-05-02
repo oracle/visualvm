@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.4" maxVersion="1.4" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <Properties>
@@ -23,7 +23,7 @@
     <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="true"/>
-    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
@@ -35,9 +35,9 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="label" alignment="0" pref="472" max="32767" attributes="0"/>
-                  <Component id="comboJvms" alignment="0" pref="472" max="32767" attributes="0"/>
-                  <Component id="stepsPanel" alignment="0" pref="472" max="32767" attributes="2"/>
+                  <Component id="label" alignment="0" max="32767" attributes="0"/>
+                  <Component id="comboJvms" alignment="0" pref="456" max="32767" attributes="0"/>
+                  <Component id="stepsPanel" alignment="0" pref="456" max="32767" attributes="2"/>
                   <Component id="generateRemotePack" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -52,7 +52,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="comboJvms" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-              <Component id="stepsPanel" pref="272" max="32767" attributes="0"/>
+              <Component id="stepsPanel" pref="263" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="generateRemotePack" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
