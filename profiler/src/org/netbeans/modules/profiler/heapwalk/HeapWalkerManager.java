@@ -79,6 +79,8 @@ public class HeapWalkerManager {
     private List<HeapWalker> heapWalkers = new ArrayList();
     private List<TopComponent> topComponents = new ArrayList();
 
+    final private RequestProcessor heapwalkerRp = new RequestProcessor(HeapWalkerManager.class);
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     private HeapWalkerManager() {
@@ -227,7 +229,7 @@ public class HeapWalkerManager {
     }
 
     private void deleteHeapDumpImpl(final File file, final int retries) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        heapwalkerRp.post(new Runnable() {
                 public void run() {
                     if (!file.delete()) {
                         if ((retries > 0) && Platform.isWindows()) {
