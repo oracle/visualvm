@@ -111,7 +111,6 @@ public class StepsPanelComponent extends javax.swing.JPanel {
 
         labelHints.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
         labelHints.setText(org.openide.util.NbBundle.getMessage(StepsPanelComponent.class, "StepsPanelComponent.labelHints.text")); // NOI18N
-        labelHints.setAutoscrolls(true);
         labelHints.setMaximumSize(new java.awt.Dimension(300, 100));
         labelHints.setMinimumSize(new java.awt.Dimension(300, 0));
         labelHints.setPreferredSize(new java.awt.Dimension(300, 0));
