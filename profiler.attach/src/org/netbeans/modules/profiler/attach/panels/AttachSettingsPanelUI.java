@@ -166,39 +166,38 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
             }
         });
 
-        org.jdesktop.layout.GroupLayout panelTypeLayout = new org.jdesktop.layout.GroupLayout(panelType);
+        javax.swing.GroupLayout panelTypeLayout = new javax.swing.GroupLayout(panelType);
         panelType.setLayout(panelTypeLayout);
         panelTypeLayout.setHorizontalGroup(
-            panelTypeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelTypeLayout.createSequentialGroup()
+            panelTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTypeLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(panelTypeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(panelTypeLayout.createSequentialGroup()
-                        .add(labelTargetType)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 377, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(comboGroups, 0, 452, Short.MAX_VALUE)
-                    .add(comboTargets, 0, 452, Short.MAX_VALUE)
-                    .add(labelTargetName))
+                .addGroup(panelTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelTypeLayout.createSequentialGroup()
+                        .addComponent(labelTargetType)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 362, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(comboGroups, 0, 436, Short.MAX_VALUE)
+                    .addComponent(comboTargets, 0, 436, Short.MAX_VALUE)
+                    .addComponent(labelTargetName))
                 .addContainerGap())
         );
         panelTypeLayout.setVerticalGroup(
-            panelTypeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelTypeLayout.createSequentialGroup()
+            panelTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTypeLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(labelTargetType)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(comboGroups, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(14, 14, 14)
-                .add(labelTargetName)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(comboTargets, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addComponent(labelTargetType)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(comboGroups, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
+                .addComponent(labelTargetName)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(comboTargets, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
         comboGroups.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "AttachSettingsPanelUI.comboGroups.AccessibleContext.accessibleName")); // NOI18N
         comboGroups.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "AttachSettingsPanelUI.comboGroups.AccessibleContext.accessibleDescription")); // NOI18N
         comboTargets.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "AttachSettingsPanelUI.comboTargets.AccessibleContext.accessibleDescription")); // NOI18N
-
 
         panelDetails.setLayout(new javax.swing.BoxLayout(panelDetails, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -225,25 +224,25 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
             }
         });
 
-        org.jdesktop.layout.GroupLayout panelMethodLayout = new org.jdesktop.layout.GroupLayout(panelMethod);
+        javax.swing.GroupLayout panelMethodLayout = new javax.swing.GroupLayout(panelMethod);
         panelMethod.setLayout(panelMethodLayout);
         panelMethodLayout.setHorizontalGroup(
-            panelMethodLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelMethodLayout.createSequentialGroup()
+            panelMethodLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMethodLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(panelMethodLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(buttonLocal)
-                    .add(buttonRemote))
-                .addContainerGap(100, Short.MAX_VALUE))
+                .addGroup(panelMethodLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(buttonLocal)
+                    .addComponent(buttonRemote))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
         panelMethodLayout.setVerticalGroup(
-            panelMethodLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelMethodLayout.createSequentialGroup()
+            panelMethodLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMethodLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(buttonLocal)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(buttonRemote)
-                .add(0, 18, Short.MAX_VALUE))
+                .addComponent(buttonLocal)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonRemote)
+                .addGap(0, 9, Short.MAX_VALUE))
         );
 
         panelDetails.add(panelMethod);
@@ -252,15 +251,15 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
         blankPanel.setMinimumSize(new java.awt.Dimension(20, 10));
         blankPanel.setPreferredSize(new java.awt.Dimension(20, 10));
 
-        org.jdesktop.layout.GroupLayout blankPanelLayout = new org.jdesktop.layout.GroupLayout(blankPanel);
+        javax.swing.GroupLayout blankPanelLayout = new javax.swing.GroupLayout(blankPanel);
         blankPanel.setLayout(blankPanelLayout);
         blankPanelLayout.setHorizontalGroup(
-            blankPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 20, Short.MAX_VALUE)
+            blankPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 20, Short.MAX_VALUE)
         );
         blankPanelLayout.setVerticalGroup(
-            blankPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 10, Short.MAX_VALUE)
+            blankPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 10, Short.MAX_VALUE)
         );
 
         panelDetails.add(blankPanel);
@@ -288,25 +287,25 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
             }
         });
 
-        org.jdesktop.layout.GroupLayout panelInvocationLayout = new org.jdesktop.layout.GroupLayout(panelInvocation);
+        javax.swing.GroupLayout panelInvocationLayout = new javax.swing.GroupLayout(panelInvocation);
         panelInvocation.setLayout(panelInvocationLayout);
         panelInvocationLayout.setHorizontalGroup(
-            panelInvocationLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelInvocationLayout.createSequentialGroup()
+            panelInvocationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelInvocationLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(panelInvocationLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(buttonDirect)
-                    .add(buttonDynamic16))
-                .addContainerGap(100, Short.MAX_VALUE))
+                .addGroup(panelInvocationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(buttonDirect)
+                    .addComponent(buttonDynamic16))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
         panelInvocationLayout.setVerticalGroup(
-            panelInvocationLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelInvocationLayout.createSequentialGroup()
+            panelInvocationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelInvocationLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(buttonDirect)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(buttonDynamic16)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addComponent(buttonDirect)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonDynamic16)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         panelDetails.add(panelInvocation);
@@ -315,46 +314,46 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
         hintPanel.setMinimumSize(new java.awt.Dimension(0, 0));
         hintPanel.setPreferredSize(new java.awt.Dimension(500, 80));
 
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 476, Short.MAX_VALUE)
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 468, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 29, Short.MAX_VALUE)
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(panelType, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(13, 13, 13)
-                        .add(panelDetails, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
+                        .addComponent(panelType, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(13, 13, 13)
+                        .addComponent(panelDetails, javax.swing.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .add(12, 12, 12))
-            .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(12, 12, 12))
+            .addComponent(hintPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(panelType, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(panelDetails, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 99, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE))
+                .addComponent(panelType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(hintPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE))
         );
 
         hintPanel.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(AttachSettingsPanelUI.class, "AttachSettingsPanelUI.hintPanel.AccessibleContext.accessibleName")); // NOI18N
