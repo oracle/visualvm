@@ -28,7 +28,7 @@
 <p>
 OQL is a SQL-like query language to query Java heap. OQL allows to filter/select information
 wanted from Java heap. While pre-defined queries such as "show all instances of class X"
-are already supported by HAT, OQL adds more flexibility. OQL is based on JavaScript expression
+are already supported by VisualVM, OQL adds more flexibility. OQL is based on JavaScript expression
 language.
 </p>
 
@@ -44,7 +44,7 @@ OQL query is of the following form:
 </code>
 </pre>
 <p>where class name is fully qualified Java class name (example: java.net.URL) or array class name.
-[C is char array name, [Ljava.io.File; is name of java.io.File[] and so on. 
+char[] (or [C) is char array name, java.io.File (or [Ljava.io.File;) is name of java.io.File[] and so on.
 Note that fully qualified class name does not always uniquely identify a 
 Java class at runtime. There may be more than one Java class with the same 
 name but loaded by different loaders. So, class name is permitted to be
@@ -447,7 +447,7 @@ Returns size of the given Java object in bytes
 Example: 
 <pre>
 <code>
-    select sizeof(o) from [I o
+    select sizeof(o) from int[] o
 </code>
 </pre>
 
@@ -698,14 +698,14 @@ Examples:
 <li> print all char[] objects in the order of size.
 <pre>
 <code>
-    select sort(<a href="#objects">heap.objects</a>('[C'), '<a href="#sizeof">sizeof</a>(lhs) - sizeof(rhs)')
+    select sort(<a href="#objects">heap.objects</a>('char[]'), '<a href="#sizeof">sizeof</a>(lhs) - sizeof(rhs)')
 </code>
 </pre>
 <li> print all char[] objects in the order of size but print
 size as well.
 <pre>
 <code>
-    select <a href="#map">map</a>(sort(<a href="#objects">heap.objects</a>('[C'), '<a href="#sizeof">sizeof</a>(lhs) - sizeof(rhs)'), '{ size: sizeof(it), obj: it }')
+    select <a href="#map">map</a>(sort(<a href="#objects">heap.objects</a>('char[]'), '<a href="#sizeof">sizeof</a>(lhs) - sizeof(rhs)'), '{ size: sizeof(it), obj: it }')
 </code>
 </pre>
 </ul>
