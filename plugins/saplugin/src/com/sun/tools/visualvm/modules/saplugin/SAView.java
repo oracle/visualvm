@@ -214,6 +214,9 @@ public class SAView extends DataSourceView implements PropertyChangeListener, Da
 
         } catch (Exception e) {
             e.printStackTrace();
+            NotifyDescriptor nd = new NotifyDescriptor.Message(e.getCause().toString(), NotifyDescriptor.INFORMATION_MESSAGE);
+            DialogDisplayer.getDefault().notify(nd);
+
 //            System.out.println(e.getCause().toString());
 //            if (e.getCause().toString().contains("Windbg Error: AttachProcess failed!")) {
             detachFromProcess(ds);
@@ -226,7 +229,7 @@ public class SAView extends DataSourceView implements PropertyChangeListener, Da
     public void detachFromProcess(DataSource ds) {
 
         try {
-            saModel = (SAModelImpl) SaModelFactory.getSAAgentFor(ds);
+            saModel = (SAModelImpl) SaModelFactory.getSAAgentFor(ds);            
             saModel.detach();
             isAttached = false;
         } catch (Exception e) {
@@ -487,6 +490,7 @@ public class SAView extends DataSourceView implements PropertyChangeListener, Da
         private JPanel codeviewer;
         private String caption;
         private int position;
+        private DataViewComponent.DetailsView detailsView;
 
         public CodeViewer(String caption, int position) {
             this.caption = caption;
@@ -495,12 +499,22 @@ public class SAView extends DataSourceView implements PropertyChangeListener, Da
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView(caption, null, position, this, null);
+            if (detailsView == null) {
+              detailsView = new DataViewComponent.DetailsView(caption, null, position, this, null);
+            }
+            return detailsView;
         }
 
         public void refresh() {
             this.removeAll();
-            codeviewer = saModel.createCodeViewerPanel().getPanel();
+            try {
+                codeviewer = saModel.createCodeViewerPanel().getPanel();
+            } catch (Throwable t) {
+                NotifyDescriptor nd = new NotifyDescriptor.Message("Code Viewer is not yet implemented for this platform", NotifyDescriptor.INFORMATION_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
+                dvc.removeDetailsView(detailsView);
+                return;
+            }
             add(codeviewer, BorderLayout.CENTER);
         }
 
@@ -579,11 +593,19 @@ public class SAView extends DataSourceView implements PropertyChangeListener, Da
 
         public void refresh(Object thread) {
             this.removeAll();
-            JavaStackTracePanel tracePanel = saModel.createJavaStackTracePanel();
-            if (thread != null) {
-                tracePanel.setJavaThread(thread);
+            try {
+                JavaStackTracePanel tracePanel = saModel.createJavaStackTracePanel();
+
+                if (thread != null) {
+                    tracePanel.setJavaThread(thread);
+                }
+                traceViewer = tracePanel.getPanel();
+            } catch (Throwable t) {
+                NotifyDescriptor nd = new NotifyDescriptor.Message("Java Stack Trace Viewer is not yet implemented for this platform", NotifyDescriptor.INFORMATION_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
+                dvc.removeDetailsView(detailsView);
+                return;
             }
-            traceViewer = tracePanel.getPanel();
             add(traceViewer, BorderLayout.CENTER);
         }
 
