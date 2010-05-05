@@ -172,7 +172,10 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     }
     
     public boolean is15() {
-        String ver = getVmVersion();
+        String ver = getJavaVersion();
+        if (ver == null) {
+           ver = getVmVersion();
+        }
         if (ver != null && ver.startsWith("1.5.")) {    // NOI18N
             return true;
         }
