@@ -102,7 +102,7 @@ public class JmxSupport implements DataRemovedListener {
         return null;
     }
 
-    OperatingSystemMXBean getOperationSystem() {
+    OperatingSystemMXBean getOperatingSystem() {
         synchronized (operatingSystemMXBeanLock) {
             if (operatingSystemMXBeanInitialized) {
                 return operatingSystemMXBean;

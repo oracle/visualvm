@@ -51,7 +51,7 @@ public class MonitoredDataImpl extends MonitoredData {
 
   private MonitoredDataImpl(Jvm vm,JmxSupport jmxSupport) {
     try {
-        OperatingSystemMXBean osMXBean = jmxSupport.getOperationSystem();
+        OperatingSystemMXBean osMXBean = jmxSupport.getOperatingSystem();
         Collection<GarbageCollectorMXBean> gcList = jmxSupport.getGarbageCollectorMXBeans();
         if (osMXBean != null) {
             processCpuTime = osMXBean.getProcessCpuTime();

@@ -386,7 +386,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     }
     
     public boolean isCpuMonitoringSupported() {
-        return jmxSupport.getOperationSystem() instanceof OperatingSystemMXBean;
+        return jmxSupport.getOperatingSystem() instanceof OperatingSystemMXBean;
     }
     
     public boolean isCollectionTimeSupported() {
