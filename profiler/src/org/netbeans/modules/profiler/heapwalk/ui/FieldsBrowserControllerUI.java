@@ -41,6 +41,7 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 
+import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -580,8 +581,8 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                         while (className.endsWith("[]")) { // NOI18N
                             className = className.substring(0, className.length() - 2);
                         }
-
-                        NetBeansProfiler.getDefaultNB().openJavaSource(null, className, null, null);
+                        Project p = fieldsBrowserController.getInstancesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
+                        NetBeansProfiler.getDefaultNB().openJavaSource(p, className, null, null);
                     }
                 }
             });

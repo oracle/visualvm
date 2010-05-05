@@ -105,14 +105,9 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
         methodIdInt |= methodId&0xff00;
             
         if (!instrMethodInvoked[methodIdInt]) {
+            instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
             if (ti.rootMethodStackDepth > 0) { // marker method under root method - perform instrumentation of nearest callees
-                long absTimeStamp = Timers.getCurrentTimeInCounts();
-                long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
-                externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
-                instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
-                writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
-            } else { // DO NOT perform instrumentation of its immediate callees
-                instrMethodInvoked[methodIdInt] = true;
+                firstTimeMethodInvoke(ti, methodId);
             }
         }
 
@@ -171,11 +166,8 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
             
             // Now check if it's the first invocation of this method, and if so, perform instrumentation of nearest callees
             if (!instrMethodInvoked[methodIdInt]) {
-                long absTimeStamp = Timers.getCurrentTimeInCounts();
-                long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
-                externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
                 instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
-                writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
+                firstTimeMethodInvoke(ti, methodId);
             }
 
             ti.stackDepth++;
@@ -287,8 +279,8 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
             
             // Check if it's the first invocation of this method, and if so, perform instrumentation of its immediate callees
             if (!instrMethodInvoked[methodIdInt]) {
-                externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
                 instrMethodInvoked[methodIdInt] = true;
+                if (enableFirstTimeMethodInvoke) externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
             }
 
             ti.stackDepth++; //= 1;  // This is the logical stack depth
