@@ -33,6 +33,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -128,6 +129,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
     private static Border selectedBorder() {
         Border b = UIManager.getBorder("Table.focusSelectedCellHighlightBorder"); // NOI18N
         if (b == null) b = UIManager.getBorder("Table.focusCellHighlightBorder"); // NOI18N
+        if (b != null) b = new SafeBorder(b); // #372, workarounds null from Border.getBorderInsets
         return b;
     }
 
@@ -317,6 +319,29 @@ class ConnectionsCustomizer extends PropertiesPanel {
     private ConnectionsTable table;
     private JButton addDefault;
     private JButton remove;
+
+
+    private static class SafeBorder implements Border {
+
+        private final Border impl;
+
+        SafeBorder(Border impl) { this.impl = impl; }
+
+        public void paintBorder(Component cmpnt, Graphics grphcs, int i, int i1, int i2, int i3) {
+            impl.paintBorder(cmpnt, grphcs, i, i1, i2, i3);
+        }
+
+        public Insets getBorderInsets(Component cmpnt) {
+            Insets insets = impl.getBorderInsets(cmpnt);
+            if (insets == null) insets = new Insets(0, 0, 0, 0);
+            return insets;
+        }
+
+        public boolean isBorderOpaque() {
+            return impl.isBorderOpaque();
+        }
+
+    }
 
 
     private static class CellRenderer extends JPanel implements TableCellRenderer {
