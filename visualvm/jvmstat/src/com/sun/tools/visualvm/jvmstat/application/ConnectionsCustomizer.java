@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -33,6 +33,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -128,6 +129,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
     private static Border selectedBorder() {
         Border b = UIManager.getBorder("Table.focusSelectedCellHighlightBorder"); // NOI18N
         if (b == null) b = UIManager.getBorder("Table.focusCellHighlightBorder"); // NOI18N
+        if (b != null) b = new SafeBorder(b); // #372, workarounds null from Border.getBorderInsets
         return b;
     }
 
@@ -317,6 +319,29 @@ class ConnectionsCustomizer extends PropertiesPanel {
     private ConnectionsTable table;
     private JButton addDefault;
     private JButton remove;
+
+
+    private static class SafeBorder implements Border {
+
+        private final Border impl;
+
+        SafeBorder(Border impl) { this.impl = impl; }
+
+        public void paintBorder(Component cmpnt, Graphics grphcs, int i, int i1, int i2, int i3) {
+            impl.paintBorder(cmpnt, grphcs, i, i1, i2, i3);
+        }
+
+        public Insets getBorderInsets(Component cmpnt) {
+            Insets insets = impl.getBorderInsets(cmpnt);
+            if (insets == null) insets = new Insets(0, 0, 0, 0);
+            return insets;
+        }
+
+        public boolean isBorderOpaque() {
+            return impl.isBorderOpaque();
+        }
+
+    }
 
 
     private static class CellRenderer extends JPanel implements TableCellRenderer {
