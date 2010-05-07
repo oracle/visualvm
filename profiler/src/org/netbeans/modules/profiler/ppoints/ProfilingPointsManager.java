@@ -318,7 +318,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private Set<ProfilingPoint> dirtyProfilingPoints = Collections.synchronizedSet(new HashSet());
     private Vector<ValidityAwarePanel> customizers = new Vector();
-    private Vector<Project> openedProjects = new Vector();
+    private final Vector<Project> openedProjects = new Vector();
     private Vector<ProfilingPoint> profilingPoints = new Vector();
     private ProfilingPointFactory[] profilingPointFactories = new ProfilingPointFactory[0];
     private boolean profilingInProgress = false; // collecting data
@@ -397,7 +397,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         Set<Project> projects = new HashSet();
 
         if (project == null) {
-            projects.addAll(openedProjects);
+            synchronized (openedProjects) { projects.addAll(openedProjects); }
         } else {
             projects.add(project);
             if (inclSubprojects) projects.addAll(getOpenSubprojects(project));
@@ -818,9 +818,11 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         if (subprojects.isEmpty()) return subprojects;
 
         Set<Project> openSubprojects = new HashSet();
-        for (Project openProject : openedProjects)
-            if (containsProject(subprojects, openProject))
-                openSubprojects.add(openProject);
+        synchronized(openedProjects) {
+            for (Project openProject : openedProjects)
+                if (containsProject(subprojects, openProject))
+                    openSubprojects.add(openProject);
+        }
 
         return openSubprojects;
     }
@@ -1016,7 +1018,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     private synchronized void processOpenedProjectsChanged() {
-        Vector<Project> lastOpenedProjects = new Vector(openedProjects);
+        Vector<Project> lastOpenedProjects = new Vector();
+        synchronized (openedProjects) { lastOpenedProjects.addAll(openedProjects); }
         refreshOpenedProjects();
 
         for (Project project : lastOpenedProjects) {
