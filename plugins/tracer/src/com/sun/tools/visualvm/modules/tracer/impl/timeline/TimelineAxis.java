@@ -171,6 +171,7 @@ final class TimelineAxis extends JPanel {
 
         marks.addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
+                e.setSource(chart);
                 chart.processMouseWheelEvent(e);
             }
         });

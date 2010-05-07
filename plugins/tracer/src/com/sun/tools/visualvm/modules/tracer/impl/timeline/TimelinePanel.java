@@ -163,6 +163,11 @@ public final class TimelinePanel extends JPanel {
             updateCursor();
         }
 
+//        public void mouseClicked(MouseEvent e) {
+//            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
+//                if (e.getSource() == chart) ; // TODO: select row in Details
+//        }
+
         public void mouseMoved(MouseEvent e) {
             updateRowState(e, false);
             updateCursor();

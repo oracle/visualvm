@@ -32,9 +32,13 @@ import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import com.sun.tools.visualvm.modules.tracer.impl.options.TracerOptions;
 import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsPanel;
 import com.sun.tools.visualvm.modules.tracer.impl.details.DetailsTableModel;
+import com.sun.tools.visualvm.modules.tracer.impl.export.DataExport;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineChart.Row;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
+import java.text.Format;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -48,6 +52,7 @@ import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.ItemSelection;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.Timeline;
+import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
@@ -409,12 +414,84 @@ public final class TimelineSupport {
         });
     }
 
-    public void exportAllValues() {
+    public void exportAllValues(String title) {
+        final int rowsCount = model.getTimestampsCount();
+        final int columnsCount = model.getItemsCount();
+        
+        final Format timeFormatter = new SimpleDateFormat(MessageFormat.format(
+                                     TimeAxisUtils.TIME_DATE_FORMAT, new Object[] {
+                                     TimeAxisUtils.TIME_MSEC, TimeAxisUtils.DATE_YEAR}));
 
+        final List<ProbeItemDescriptor> probeDescriptors = new ArrayList(columnsCount);
+        for (TracerProbe probe : probes)
+            probeDescriptors.addAll(Arrays.asList(probe.getItemDescriptors()));
+        final ValueItemDescriptor[] descriptors = new ValueItemDescriptor[columnsCount];
+        for (int i = 0; i < columnsCount; i++)
+            descriptors[i] = (ValueItemDescriptor)probeDescriptors.get(i);
+
+        TableModel exportModel = new AbstractTableModel() {
+            public int getRowCount() {
+                return rowsCount;
+            }
+
+            public int getColumnCount() {
+                return columnsCount + 1;
+            }
+
+            public String getColumnName(int columnIndex) {
+                if (columnIndex == 0) return "Time [ms]";
+
+                String unitsString = descriptors[columnIndex - 1].getUnitsString(
+                                     ItemValueFormatter.FORMAT_EXPORT);
+                unitsString = unitsString == null ? "" : " [" + unitsString + "]";
+                return itemsModel.getItem(columnIndex - 1).getName() + unitsString;
+            }
+
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                if (columnIndex == 0) return timeFormatter.format(model.
+                                             getTimestamp(rowIndex));
+
+                long value = itemsModel.getItem(columnIndex - 1).getYValue(rowIndex);
+                return descriptors[columnIndex - 1].getValueString(value,
+                                                    ItemValueFormatter.FORMAT_EXPORT);
+            }
+        };
+        DataExport.exportData(exportModel, title);
     }
 
-    public void exportDetailsValues() {
+    public void exportDetailsValues(String title) {
+        if (detailsModel == null) return;
 
+        final int rowsCount = detailsModel.getRowCount();
+        final int columnsCount = detailsModel.getColumnCount();
+
+        final Format timeFormatter = new SimpleDateFormat(MessageFormat.format(
+                                     TimeAxisUtils.TIME_DATE_FORMAT, new Object[] {
+                                     TimeAxisUtils.TIME_MSEC, TimeAxisUtils.DATE_YEAR}));
+        
+        TableModel exportModel = new AbstractTableModel() {
+            public int getRowCount() {
+                return rowsCount;
+            }
+
+            public int getColumnCount() {
+                return columnsCount - 1;
+            }
+
+            public String getColumnName(int columnIndex) {
+                return detailsModel.getColumnName(columnIndex + 1);
+            }
+
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                Object value = detailsModel.getValueAt(rowIndex, columnIndex + 1);
+
+                if (columnIndex == 0) return timeFormatter.format(value);
+
+                return detailsModel.getDescriptor(columnIndex + 1).getValueString(
+                                    (Long)value, ItemValueFormatter.FORMAT_EXPORT);
+            }
+        };
+        DataExport.exportData(exportModel, title);
     }
 
     public void addValuesListener(ValuesListener listener) {
@@ -446,7 +523,7 @@ public final class TimelineSupport {
 
     // --- Row selection management --------------------------------------------
 
-    private AbstractTableModel detailsModel;
+    private DetailsTableModel detailsModel;
 
     void rowSelectionChanged() {
         updateSelectedItems();
@@ -463,7 +540,7 @@ public final class TimelineSupport {
         return detailsModel;
     }
 
-    private AbstractTableModel createSelectionModel() {
+    private DetailsTableModel createSelectionModel() {
         final List<SynchronousXYItem> selectedItems = getSelectedItems();
         final List<ValueItemDescriptor> selectedDescriptors = getSelectedDescriptors();
         int selectedItemsCount = selectedItems.size();
@@ -481,8 +558,8 @@ public final class TimelineSupport {
             String itemName = selectedItemsArr[i - 2].getName();
             String unitsString = selectedDescriptors.get(i - 2).
                                  getUnitsString(ItemValueFormatter.FORMAT_DETAILS);
-            String unitsExt = unitsString == null ? "" : " [" + unitsString + "]";
-            columnNames[i] = itemName + unitsExt;
+            unitsString = unitsString == null ? "" : " [" + unitsString + "]";
+            columnNames[i] = itemName + unitsString;
             columnTooltips[i] = selectedDescriptors.get(i - 2).getDescription();
         }
 

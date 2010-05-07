@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.modules.tracer;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
@@ -71,7 +70,7 @@ public final class TracerProgressObject {
         this.text = text;
         currentStep = 0;
         lastStep = 0;
-        listeners = Collections.synchronizedSet(new HashSet());
+        listeners = new HashSet();
     }
 
 
@@ -80,21 +79,21 @@ public final class TracerProgressObject {
      *
      * @return number of steps to finish the initialization
      */
-    public int getSteps() { return steps; }
+    public synchronized int getSteps() { return steps; }
 
     /**
      * Returns current step of the initialization progress.
      *
      * @return current step of the initialization progress
      */
-    public int getCurrentStep() { return currentStep; }
+    public synchronized int getCurrentStep() { return currentStep; }
 
     /**
      * Returns text describing the current state or null.
      *
      * @return text describing the current state or null
      */
-    public String getText() { return text; }
+    public synchronized String getText() { return text; }
 
 
     /**
@@ -124,7 +123,7 @@ public final class TracerProgressObject {
      * @param steps number of steps to be addded to the current initialization progress
      * @param text text describing the current state
      */
-    public void addSteps(int steps, String text) {
+    public synchronized void addSteps(int steps, String text) {
         if (steps < 0)
             throw new IllegalArgumentException("steps value must be >= 0: " + steps); // NOI18N
         if (currentStep + steps > this.steps)
@@ -142,7 +141,7 @@ public final class TracerProgressObject {
      *
      * @param text text describing the current state
      */
-    public void setText(String text) {
+    public synchronized void setText(String text) {
         this.text = text;
         fireChange();
     }
@@ -150,7 +149,8 @@ public final class TracerProgressObject {
     /**
      * Adds all remaining steps to finish the initialization progress.
      */
-    public void finish() {
+    public synchronized void finish() {
+        if (isFinished()) return;
         currentStep = steps;
         fireChange();
     }
@@ -160,7 +160,7 @@ public final class TracerProgressObject {
      *
      * @return true for a finished TracerProgressObject, false otherwise.
      */
-    public boolean isFinished() {
+    public synchronized boolean isFinished() {
         return currentStep == steps;
     }
 
@@ -170,24 +170,23 @@ public final class TracerProgressObject {
      *
      * @param l listener to be added
      */
-    public void addListener(Listener l) { listeners.add(l); }
+    public synchronized void addListener(Listener l) { listeners.add(l); }
 
     /**
      * Removes a listener receiving progress notifications.
      *
      * @param l listener to be removed.
      */
-    public void removeListener(Listener l) { listeners.remove(l); }
+    public synchronized void removeListener(Listener l) { listeners.remove(l); }
 
     private void fireChange() {
-        final Set<Listener> toNotify = new HashSet();
         final int currentStepF = currentStep;
         final int addedStepsF = currentStep - lastStep;
         final String textF = text;
-        synchronized (listeners) { toNotify.addAll(listeners); }
+        final Set<Listener> toNotify = new HashSet(listeners);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                for (Listener listener : listeners)
+                for (Listener listener : toNotify)
                     listener.progressChanged(addedStepsF, currentStepF, textF);
             }
         });

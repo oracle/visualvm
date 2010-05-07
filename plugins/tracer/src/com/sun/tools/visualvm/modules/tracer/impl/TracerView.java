@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl;
 
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.TransparentToolBar;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -46,6 +47,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -63,8 +65,6 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 
@@ -590,8 +590,11 @@ final class TracerView extends DataSourceView {
             d.setToolTipText("Export data");
             exportAllAction = new AbstractAction("Export all data") {
                 public void actionPerformed(ActionEvent e) {
-                    DialogDisplayer.getDefault().notify(
-                            new NotifyDescriptor.Message("Not yet supported"));
+                    String title = DataSourceDescriptorFactory.
+                                   getDescriptor(model.getDataSource()).getName();
+                    title = "Exported Tracer Data for " + title + " at " +
+                            new Date(System.currentTimeMillis()).toString();
+                    model.getTimelineSupport().exportAllValues(title);
                 }
                 public boolean isEnabled() {
                     return model.getTimelineSupport().hasData();
@@ -601,8 +604,11 @@ final class TracerView extends DataSourceView {
 
             exportDetailsAction = new AbstractAction("Export Details table") {
                 public void actionPerformed(ActionEvent e) {
-                    DialogDisplayer.getDefault().notify(
-                            new NotifyDescriptor.Message("Not yet supported"));
+                    String title = DataSourceDescriptorFactory.
+                                   getDescriptor(model.getDataSource()).getName();
+                    title = "Exported Tracer Details for " + title + " at " +
+                            new Date(System.currentTimeMillis()).toString();
+                    model.getTimelineSupport().exportDetailsValues(title);
                 }
                 public boolean isEnabled() {
                     return detailsView.hasData();

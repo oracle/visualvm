@@ -48,6 +48,10 @@ public abstract class ItemValueFormatter {
      * Code for details table formatting.
      */
     public static final int FORMAT_DETAILS = 2;
+    /**
+     * Code for exported data formatting.
+     */
+    public static final int FORMAT_EXPORT = 3;
 
     /**
      * Predefined formatter providing simple numeric values.
@@ -68,8 +72,8 @@ public abstract class ItemValueFormatter {
      */
     public static final ItemValueFormatter DEFAULT_DECIMAL = new Decimal();
     /**
-     * Predefined formatter for memory values. Uses B (Bytes) for tooltip and
-     * details table, uses MB for units (min/max values).
+     * Predefined formatter for memory values. Uses B (Bytes) for tooltip,
+     * details table and export, uses MB for units (min/max values).
      * Uses Number.getInstance().toString().
      */
     public static final ItemValueFormatter DEFAULT_BYTES = new Bytes();
@@ -139,8 +143,8 @@ public abstract class ItemValueFormatter {
 
 
     /**
-     * Predefined formatter for memory values. Uses B (Bytes) for tooltip and
-     * details table, uses MB for units (min/max values).
+     * Predefined formatter for memory values. Uses B (Bytes) for tooltip,
+     * details table and export, uses MB for units (min/max values).
      * Uses Number.getInstance().toString().
      */
     private static final class Bytes extends ItemValueFormatter {
@@ -155,6 +159,7 @@ public abstract class ItemValueFormatter {
             switch (format) {
                 case FORMAT_TOOLTIP:
                 case FORMAT_DETAILS:
+                case FORMAT_EXPORT:
                     return FORMAT.format(value);
                 case FORMAT_UNITS:
                     String est = value == 0 ? "" : "~";
@@ -168,6 +173,7 @@ public abstract class ItemValueFormatter {
             switch (format) {
                 case FORMAT_TOOLTIP:
                 case FORMAT_DETAILS:
+                case FORMAT_EXPORT:
                     return "B";
                 case FORMAT_UNITS:
                     return "MB";
@@ -221,6 +227,7 @@ public abstract class ItemValueFormatter {
                 case FORMAT_UNITS:
                     return PERCENT_FORMAT.format(value / factor);
                 case FORMAT_DETAILS:
+                case FORMAT_EXPORT:
                     return NUMBER_FORMAT.format(value * 100 / factor);
                 default:
                     return null;
@@ -233,6 +240,7 @@ public abstract class ItemValueFormatter {
                 case FORMAT_UNITS:
                     return null; // '%' provided by NumberFormat.getPercentInstance()
                 case FORMAT_DETAILS:
+                case FORMAT_EXPORT:
                     return "%"; // '%' is part of column header
                 default:
                     return null;
