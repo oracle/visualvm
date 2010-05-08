@@ -139,10 +139,9 @@ class ThreadDumpView extends DataSourceView {
                   LOGGER.throwing(ThreadDumpView.class.getName(), "loadThreadDump", ex);     // NOI18N
                 }
                 try {
-                  HTMLTextArea area = new HTMLTextArea("<pre>" +   // NOI18N
-                          transform(htmlize(new String(data, "UTF-8"))) +    // NOI18N
-                          "</pre>");  // NOI18N
+                  HTMLTextArea area = new HTMLTextArea();
                   area.setForeground(new Color(0xcc, 0x33, 0));
+                  area.setText("<pre>" + transform(htmlize(new String(data, "UTF-8"))) + "</pre>"); // NOI18N
                   area.setCaretPosition(0);
                   area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
                   contentsPanel.remove(progressLabel);
