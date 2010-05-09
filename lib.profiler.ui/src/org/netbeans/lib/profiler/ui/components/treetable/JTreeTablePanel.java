@@ -212,16 +212,12 @@ public class JTreeTablePanel extends JPanel {
         treeTableScrollPane.setViewport(treeTableViewport);
         treeTableScrollPane.addMouseWheelListener(treeTable);
         // Enable vertical scrollbar only if needed
-        JScrollBar vScrollBar = treeTableScrollPane.getVerticalScrollBar();
-        vScrollBar.getModel().addChangeListener(new javax.swing.event.ChangeListener() {
+        final JScrollBar vScrollBar = treeTableScrollPane.getVerticalScrollBar();
+        vScrollBar.getModel().addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                if (treeTableScrollPane.getVerticalScrollBar().getModel().getExtent() == treeTableScrollPane.getVerticalScrollBar()
-                                                                                                                .getModel()
-                                                                                                                .getMaximum()) {
-                    treeTableScrollPane.getVerticalScrollBar().setEnabled(false);
-                } else {
-                    treeTableScrollPane.getVerticalScrollBar().setEnabled(true);
-                }
+                Component c = treeTableViewport.getView();
+                vScrollBar.setEnabled(JTreeTablePanel.this.isEnabled() &&
+                vScrollBar.getVisibleAmount() < vScrollBar.getMaximum());
             }
         });
         vScrollBar.addAdjustmentListener(new AdjustmentListener() {
