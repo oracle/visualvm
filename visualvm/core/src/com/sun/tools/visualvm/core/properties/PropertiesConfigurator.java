@@ -38,8 +38,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
 
 /**
@@ -65,7 +65,7 @@ class PropertiesConfigurator extends JPanel {
                 DataSourceDescriptorFactory.getDescriptor(dataSource).getName() }),
                 true, new Object[] { pc.okButton, DialogDescriptor.CANCEL_OPTION },
                 pc.okButton, 0, null, null);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         String className = dataSource.getClass().getName();
         Dimension savedSize = SAVED_SIZES.get(className);
         if (savedSize != null) pc.setPreferredSize(savedSize);

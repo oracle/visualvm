@@ -37,8 +37,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicFileChooserUI;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
@@ -101,7 +102,10 @@ class LoadSnapshotAction extends AbstractAction {
         if (chooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
             if (selectedFile == null || !selectedFile.exists()) {
-                NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(LoadSnapshotAction.class, "MSG_Selected_file_does_not_exist"));    // NOI18N
+                DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
+                                            NbBundle.getMessage(LoadSnapshotAction.class,
+                                            "MSG_Selected_file_does_not_exist"), // NOI18N
+                                            NotifyDescriptor.ERROR_MESSAGE));
             } else {
                 FileFilter fileFilter = chooser.getFileFilter();
                 if (fileFilter.accept(selectedFile)) {
@@ -109,7 +113,10 @@ class LoadSnapshotAction extends AbstractAction {
                     lastFilter = fileFilter.getDescription();
                     categories.get(fileFilters.indexOf(fileFilter)).openSnapshot(selectedFile);
                 } else {
-                    NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(LoadSnapshotAction.class, "MSG_Selected_file_does_not_match_snapshot_type"));  // NOI18N
+                    DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
+                                            NbBundle.getMessage(LoadSnapshotAction.class,
+                                            "MSG_Selected_file_does_not_match_snapshot_type"), // NOI18N
+                                            NotifyDescriptor.ERROR_MESSAGE));
                 }
             }
         }

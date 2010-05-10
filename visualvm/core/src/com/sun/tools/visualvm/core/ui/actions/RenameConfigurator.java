@@ -39,9 +39,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
 
 /**
@@ -57,7 +56,7 @@ class RenameConfigurator extends JPanel {
     
     final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(RenameConfigurator.class, "LBL_Rename"), true, new Object[] {  // NOI18N
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
-    final Dialog d = ProfilerDialogs.createDialog(dd);
+    final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
     d.pack();
     d.setVisible(true);
     
@@ -128,7 +127,8 @@ class RenameConfigurator extends JPanel {
     add(nameField, constraints);
     
     // spacer
-    JPanel spacer = Utils.createFillerPanel();
+    JPanel spacer = new JPanel(null);
+    spacer.setOpaque(false);
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 1;

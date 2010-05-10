@@ -33,7 +33,8 @@ import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Set;
 import javax.swing.AbstractAction;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 
 /**
@@ -68,7 +69,10 @@ public abstract class DataSourceAction<X extends DataSource> extends AbstractAct
      * Displays a dialog that the action cannot be invoked in current context.
      */
     protected void notifyCannotPerform() {
-        NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(DataSourceAction.class, "MSG_Cannot_perform_action_in_this_context")); // NOI18N
+        DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
+                NbBundle.getMessage(DataSourceAction.class,
+                "MSG_Cannot_perform_action_in_this_context"), // NOI18N
+                NotifyDescriptor.ERROR_MESSAGE));
     }
     
     /**
