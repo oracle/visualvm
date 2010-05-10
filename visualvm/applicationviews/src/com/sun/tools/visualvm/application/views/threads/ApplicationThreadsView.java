@@ -57,9 +57,9 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsTablePanel;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 import org.openide.util.WeakListeners;
 
 /**
@@ -170,6 +170,8 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     private static class MasterViewSupport extends JPanel implements DataRemovedListener<Application>, PropertyChangeListener {
 
+        private static RequestProcessor worker = null;
+
         private Application application;
         private HTMLTextArea area;
         private JButton threadDumpButton;
@@ -237,8 +239,8 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
             final int[] threads = new int[2];
 
-            new NBSwingWorker() {
-                protected void doInBackground() {
+            getWorker().post(new Runnable() {
+                public void run() {
                     try {
                         threads[0] = threadsManager.getThreadCount();
                         threads[1] = threadsManager.getDaemonThreadCount();
@@ -246,12 +248,13 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
                         threads[0] = 0;
                         threads[1] = 0;
                     }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            updateThreadsCounts(threads[0], threads[1]);
+                        }
+                    });
                 }
-                @Override
-                protected void done() {
-                    updateThreadsCounts(threads[0], threads[1]);
-                }
-            }.execute();
+            });
         }
 
         private void updateThreadsCounts(int liveThreads, int daemonThreads) {
@@ -265,6 +268,12 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             area.setText(data.toString());
             area.select(selStart, selEnd);
         }
+
+        private static synchronized RequestProcessor getWorker() {
+            if (worker == null) worker = new RequestProcessor("ThreadsWorker", 1); // NOI18N
+            return worker;
+        }
+
     }
 
     // --- Timeline ------------------------------------------------------------
