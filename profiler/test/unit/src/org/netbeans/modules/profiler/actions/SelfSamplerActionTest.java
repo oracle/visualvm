@@ -106,8 +106,10 @@ public class SelfSamplerActionTest {
 
     @Test
     public void testSelfProfileCancel() throws Exception {
-        SelfSamplerAction result = SelfSamplerAction.getInstance();
-        Object obj = result.getValue("logger-testprofile");
+        FileObject afo = FileUtil.getConfigFile("Actions/Profile/org-netbeans-modules-profiler-actions-SelfSamplerAction.instance");
+        assertNotNull("SelfSamplerAction is in the right fileobject", afo);
+        Action a = (Action)afo.getAttribute("delegate"); // NOI18N
+        Object obj = a.getValue("logger-testprofile");
         assertTrue("It is runnable", obj instanceof Runnable);
         assertTrue("It is action listener", obj instanceof ActionListener);
 
@@ -119,6 +121,7 @@ public class SelfSamplerActionTest {
         assertLoggerThread("logger-testprofile shall be there", true);
 
         al.actionPerformed(new ActionEvent(this, 0, "cancel")); // NOI18N
+        Thread.sleep(1000);
 
         assertLoggerThread("no logger- thread shall be there", false);
     }
@@ -126,11 +129,11 @@ public class SelfSamplerActionTest {
     private void assertLoggerThread(String msg, boolean exist) {
         for (Thread t : Thread.getAllStackTraces().keySet()) {
             if (t.getName().startsWith("logger-")) {
-                assertTrue(msg + "There is " + t.getName() + " thread", exist);
+                assertTrue(msg + " There is " + t.getName() + " thread", exist);
                 return;
             }
         }
-        assertFalse(msg + "There is no logger- thread", exist);
+        assertFalse(msg + " There is no logger- thread", exist);
     }
 
 

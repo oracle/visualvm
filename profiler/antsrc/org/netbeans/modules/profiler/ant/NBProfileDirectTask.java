@@ -186,7 +186,8 @@ public final class NBProfileDirectTask extends Task {
         //   2. profiling settings (configuration)
         //         - possibly override some of the settings from 1. if ps.getOverrideGlobalSettings() is set
         //   3. explicitely override anything and everything in the build script
-        final Hashtable props = getProject().getProperties();
+        Project antProject = getProject();
+        final Hashtable props = antProject.getProperties();
         ProfilingSettings ps = new ProfilingSettings();
         final SessionSettings ss = new SessionSettings();
         String projectDir = (String) props.get("profiler.info.project.dir"); //NOI18N
@@ -215,16 +216,16 @@ public final class NBProfileDirectTask extends Task {
 
                 args = args.replaceAll("\\s+(\\-)", " -J$1"); // NOI18N
 
-                String origArgs = getProject().getProperty(EXTRA_RUN_ARGS);
+                String origArgs = antProject.getProperty(EXTRA_RUN_ARGS);
                 origArgs = (origArgs != null) ? (" " + origArgs + " ") : ""; // NOI18N
 
-                getProject().setProperty("run.args.extra", origArgs + args); // merge the profiler extra JVM args with the platform extra JVM args
+                antProject.setProperty("run.args.extra", origArgs + args); // merge the profiler extra JVM args with the platform extra JVM args
 
                 String usedAgentJvmArgs = jvmArgsPrefix + props.get(DEFAULT_AGENT_JVMARGS_PROPERTY);
-                getProject().setProperty(jvmArgsProperty, usedAgentJvmArgs);
-                getProject().log("Profiler agent JVM arguments: " + usedAgentJvmArgs, Project.MSG_VERBOSE); //NOI18N
-                getProject().log("Profiler agent JVM arguments stored in property " + jvmArgsProperty, Project.MSG_INFO); //NOI18N
-                getProject().log("Extra JVM arguments: " + getProject().getProperty("run.args.extra")); // NOI18N
+                antProject.setProperty(jvmArgsProperty, usedAgentJvmArgs);
+                antProject.log("Profiler agent JVM arguments: " + usedAgentJvmArgs, Project.MSG_VERBOSE); //NOI18N
+                antProject.log("Profiler agent JVM arguments stored in property " + jvmArgsProperty, Project.MSG_INFO); //NOI18N
+                antProject.log("Extra JVM arguments: " + antProject.getProperty("run.args.extra")); // NOI18N
             }
 
             // 2. process parameters passed via Properties
@@ -253,7 +254,7 @@ public final class NBProfileDirectTask extends Task {
                 }
             }
 
-            getProject().setProperty("profiler.info.dir", workingDirectory); // NOI18N
+            antProject.setProperty("profiler.info.dir", workingDirectory); // NOI18N
         }
 
         if (classpath != null) {
@@ -261,7 +262,7 @@ public final class NBProfileDirectTask extends Task {
         }
 
         if (ps.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
-            getProject().log("Roots path: " + rootsPath, Project.MSG_VERBOSE); //NOI18N
+            antProject.log("Roots path: " + rootsPath, Project.MSG_VERBOSE); //NOI18N
 
             if (rootsPath != null) {
                 String[] paths = rootsPath.list();
@@ -286,26 +287,26 @@ public final class NBProfileDirectTask extends Task {
         }
 
         // 3. log used properties in verbose level
-        getProject().log("Starting Profiled Application", Project.MSG_VERBOSE); //NOI18N
-        getProject().log("  mainClass: " + ss.getMainClass(), Project.MSG_VERBOSE); //NOI18N
-        getProject().log("  classpath: " + ss.getMainClassPath(), Project.MSG_VERBOSE); //NOI18N
-        getProject().log("  arguments: " + ss.getMainArgs(), Project.MSG_VERBOSE); //NOI18N
+        antProject.log("Starting Profiled Application", Project.MSG_VERBOSE); //NOI18N
+        antProject.log("  mainClass: " + ss.getMainClass(), Project.MSG_VERBOSE); //NOI18N
+        antProject.log("  classpath: " + ss.getMainClassPath(), Project.MSG_VERBOSE); //NOI18N
+        antProject.log("  arguments: " + ss.getMainArgs(), Project.MSG_VERBOSE); //NOI18N
 
         if (ps.getOverrideGlobalSettings()) {
-            getProject().log("  jvm arguments: " + ps.getJVMArgs(), Project.MSG_VERBOSE); //NOI18N
+            antProject.log("  jvm arguments: " + ps.getJVMArgs(), Project.MSG_VERBOSE); //NOI18N
         } else {
-            getProject().log("  jvm arguments: " + ss.getJVMArgs(), Project.MSG_VERBOSE); //NOI18N
+            antProject.log("  jvm arguments: " + ss.getJVMArgs(), Project.MSG_VERBOSE); //NOI18N
         }
 
         if (ps.getOverrideGlobalSettings()) {
-            getProject().log("  working dir: " + ps.getWorkingDir(), Project.MSG_VERBOSE); //NOI18N
+            antProject.log("  working dir: " + ps.getWorkingDir(), Project.MSG_VERBOSE); //NOI18N
         } else {
-            getProject().log("  working dir: " + ss.getWorkingDir(), Project.MSG_VERBOSE); //NOI18N
+            antProject.log("  working dir: " + ss.getWorkingDir(), Project.MSG_VERBOSE); //NOI18N
         }
 
         // 4. log profiling and session settings in debug level
-        getProject().log("  profiling settings: " + ps.debug(), Project.MSG_DEBUG); //NOI18N
-        getProject().log("  session settings: " + ss.debug(), Project.MSG_DEBUG); //NOI18N
+        antProject.log("  profiling settings: " + ps.debug(), Project.MSG_DEBUG); //NOI18N
+        antProject.log("  session settings: " + ss.debug(), Project.MSG_DEBUG); //NOI18N
 
         // 5. determine project being profiled
         org.netbeans.api.project.Project profiledProject = null;
@@ -326,15 +327,15 @@ public final class NBProfileDirectTask extends Task {
             }
 
             if (errorMessage != null) {
-                getProject().log("Could not determine project: " + errorMessage, Project.MSG_INFO); //NOI18N
-                getProject().log("Using global (no project) attach context", Project.MSG_INFO); //NOI18N
+                antProject.log("Could not determine project: " + errorMessage, Project.MSG_INFO); //NOI18N
+                antProject.log("Using global (no project) attach context", Project.MSG_INFO); //NOI18N
             }
 
             if (singleFile != null) {
                 singleFO = FileUtil.toFileObject(FileUtil.normalizeFile(new File(singleFile)));
             }
         } else {
-            getProject().log("You can use property profiler.info.project.dir to specify project that is being profiled.", //NOI18N
+            antProject.log("You can use property profiler.info.project.dir to specify project that is being profiled.", //NOI18N
                              Project.MSG_VERBOSE);
         }
 
@@ -363,14 +364,15 @@ public final class NBProfileDirectTask extends Task {
     }
 
     private void addPackagesForArchive(ArrayList list, String s, File f) {
-        getProject().log("Add root packages for archive: " + f.getName(), Project.MSG_VERBOSE); //NOI18N
-
+        Project antProject = getProject();
+        
+        antProject.log("Add root packages for archive: " + f.getName(), Project.MSG_VERBOSE); //NOI18N
         try {
             JarFile jf = new JarFile(f);
 
             for (Enumeration e = jf.entries(); e.hasMoreElements();) {
                 JarEntry je = (JarEntry) e.nextElement();
-                getProject().log("Checking jar entry: " + je.getName(), Project.MSG_VERBOSE); //NOI18N
+                antProject.log("Checking jar entry: " + je.getName(), Project.MSG_VERBOSE); //NOI18N
 
                 if (!je.isDirectory() && je.getName().endsWith(".class")) { //NOI18N
 
@@ -380,13 +382,13 @@ public final class NBProfileDirectTask extends Task {
                     packageName = packageName.replace('/', '.'); //NOI18N
 
                     if (!list.contains(packageName)) {
-                        getProject().log("Adding package: " + packageName, Project.MSG_VERBOSE); //NOI18N
+                        antProject.log("Adding package: " + packageName, Project.MSG_VERBOSE); //NOI18N
                         list.add(packageName);
                     }
                 }
             }
         } catch (IOException e) {
-            getProject().log("Failed to scan packages for archive: " + f.getName()); //NOI18N
+            antProject.log("Failed to scan packages for archive: " + f.getName()); //NOI18N
         }
     }
 
@@ -449,12 +451,13 @@ public final class NBProfileDirectTask extends Task {
     private String initializeInteractively(ProfilingSettings ps, SessionSettings ss)
                                     throws BuildException {
         String projectDir = null;
-        getProject().log("Entering interactive mode of nbprofiledirect task...", Project.MSG_VERBOSE); //NOI18N
+        Project antProject = getProject();
+        antProject.log("Entering interactive mode of nbprofiledirect task...", Project.MSG_VERBOSE); //NOI18N
 
         org.netbeans.api.project.Project p = ProjectUtilities.getProjectForBuildScript(getLocation().getFileName());
 
         if (p != null) {
-            getProject().log("Using project: " + ProjectUtilities.getProjectName(p), Project.MSG_INFO); //NOI18N
+            antProject.log("Using project: " + ProjectUtilities.getProjectName(p), Project.MSG_INFO); //NOI18N
             projectDir = FileUtil.toFile(p.getProjectDirectory()).getAbsolutePath();
         }
 
@@ -501,7 +504,7 @@ public final class NBProfileDirectTask extends Task {
         String usedWorkDir = null;
 
         if (ps.getOverrideGlobalSettings()) {
-            getProject().log("Global settings are overridden by the profiling configuration", Project.MSG_VERBOSE); //NOI18N
+            antProject.log("Global settings are overridden by the profiling configuration", Project.MSG_VERBOSE); //NOI18N
 
             if (ps.getJavaPlatformName() != null) {
                 usedJavaExecutable = Profiler.getDefault().getPlatformJavaFile(ps.getJavaPlatformName());
@@ -511,27 +514,27 @@ public final class NBProfileDirectTask extends Task {
             usedWorkDir = ps.getWorkingDir();
 
             if (usedJavaExecutable != null) {
-                getProject().log("Overridden Java Executable: " + usedJavaExecutable //NOI18N
+                antProject.log("Overridden Java Executable: " + usedJavaExecutable //NOI18N
                                  + ", stored in property: " + jvmProperty, Project.MSG_VERBOSE //NOI18N
                 );
-                getProject().setProperty(jvmProperty, usedJavaExecutable);
+                antProject.setProperty(jvmProperty, usedJavaExecutable);
             }
 
             if (usedJvmArgs != null) {
-                getProject().log("Overridden Working Directory: " + usedWorkDir, Project.MSG_VERBOSE); //NOI18N
-                getProject().setProperty("profiler.info.jvmargs", usedJvmArgs); // NOI18N
+                antProject.log("Overridden Working Directory: " + usedWorkDir, Project.MSG_VERBOSE); //NOI18N
+                antProject.setProperty("profiler.info.jvmargs", usedJvmArgs); // NOI18N
             }
 
             if (usedWorkDir != null) {
-                getProject().setProperty("profiler.info.dir", usedWorkDir); // NOI18N
+                antProject.setProperty("profiler.info.dir", usedWorkDir); // NOI18N
             }
         }
 
         String usedAgentJvmArgs = jvmArgsPrefix
                                   + IDEUtils.getAntProfilerStartArgument15(ss.getPortNo(), ss.getSystemArchitecture());
-        getProject().setProperty(jvmArgsProperty, usedAgentJvmArgs); // NOI18N
-        getProject().log("Profiler agent JVM arguments: " + usedAgentJvmArgs, Project.MSG_VERBOSE); //NOI18N
-        getProject().log("Profiler agent JVM arguments stored in property " + jvmArgsProperty, Project.MSG_INFO); //NOI18N
+        antProject.setProperty(jvmArgsProperty, usedAgentJvmArgs); // NOI18N
+        antProject.log("Profiler agent JVM arguments: " + usedAgentJvmArgs, Project.MSG_VERBOSE); //NOI18N
+        antProject.log("Profiler agent JVM arguments stored in property " + jvmArgsProperty, Project.MSG_INFO); //NOI18N
 
         return projectDir;
     }

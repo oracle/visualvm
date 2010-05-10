@@ -97,10 +97,10 @@ public class DirectorySelector extends javax.swing.JPanel {
         buttonBrowse = new javax.swing.JButton();
         hintPanel = new org.netbeans.modules.profiler.attach.panels.components.ResizableHintPanel();
 
-        textPath.setText("null");
+        textPath.setText(org.openide.util.NbBundle.getMessage(DirectorySelector.class, "DirectorySelector.textPath.text")); // NOI18N
         textPath.getDocument().addDocumentListener(this.pathListener);
 
-        org.openide.awt.Mnemonics.setLocalizedText(buttonBrowse, "null");
+        org.openide.awt.Mnemonics.setLocalizedText(buttonBrowse, org.openide.util.NbBundle.getMessage(DirectorySelector.class, "DirectorySelector.buttonBrowse.text")); // NOI18N
         buttonBrowse.setMaximumSize(new java.awt.Dimension(43, 23));
         buttonBrowse.setMinimumSize(new java.awt.Dimension(43, 23));
         buttonBrowse.addActionListener(new java.awt.event.ActionListener() {
@@ -109,43 +109,43 @@ public class DirectorySelector extends javax.swing.JPanel {
             }
         });
 
-        org.jdesktop.layout.GroupLayout browsePanelLayout = new org.jdesktop.layout.GroupLayout(browsePanel);
+        javax.swing.GroupLayout browsePanelLayout = new javax.swing.GroupLayout(browsePanel);
         browsePanel.setLayout(browsePanelLayout);
         browsePanelLayout.setHorizontalGroup(
-            browsePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, browsePanelLayout.createSequentialGroup()
-                .add(textPath, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(buttonBrowse, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            browsePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, browsePanelLayout.createSequentialGroup()
+                .addComponent(textPath, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonBrowse, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         browsePanelLayout.setVerticalGroup(
-            browsePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(browsePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                .add(buttonBrowse, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(textPath, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            browsePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(browsePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(buttonBrowse, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(textPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        textPath.getAccessibleContext().setAccessibleName("null");
-        textPath.getAccessibleContext().setAccessibleDescription("null");
-        buttonBrowse.getAccessibleContext().setAccessibleDescription("null");
+        textPath.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(DirectorySelector.class, "DirectorySelector.textPath.AccessibleContext.accessibleName")); // NOI18N
+        textPath.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(DirectorySelector.class, "DirectorySelector.textPath.AccessibleContext.accessibleDescription")); // NOI18N
+        buttonBrowse.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(DirectorySelector.class, "DirectorySelector.buttonBrowse.AccessibleContext.accessibleDescription")); // NOI18N
 
         hintPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         hintPanel.setMinimumSize(new java.awt.Dimension(0, 0));
         hintPanel.setPreferredSize(new java.awt.Dimension(0, 0));
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(browsePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(browsePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(hintPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(browsePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(hintPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(browsePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(hintPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

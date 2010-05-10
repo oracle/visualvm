@@ -215,8 +215,7 @@ public class SynchronousXYItemMarker extends XYItemPainter.Abstract {
         if (nearestTimestampIndex == -1) return null; // item not visible
 
         SynchronousXYItem xyItem = (SynchronousXYItem)item;
-        return new XYItemSelection.Default(xyItem, nearestTimestampIndex,
-                                           ItemSelection.DISTANCE_UNKNOWN);
+        return new XYItemSelection.Default(xyItem, nearestTimestampIndex);
     }
 
     public void paintItem(ChartItem item, List<ItemSelection> highlighted,

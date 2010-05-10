@@ -373,7 +373,7 @@ public final class NetBeansProfiler extends Profiler {
                 LiveResultsWindow.getDefault().handleShutdown();
             }
 
-            if ((Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType() == CommonConstants.INSTR_NONE)
+            if ((getTargetAppRunner().getProfilerClient().getCurrentInstrType() == CommonConstants.INSTR_NONE)
                     || !ResultsManager.getDefault().resultsAvailable()) {
                 ProfilerDialogs.DNSAMessage dnsa = new ProfilerDialogs.DNSAMessage("NetBeansProfiler.handleShutdown.noResults", //NOI18N
                                                                                    TERMINATE_VM_ON_EXIT_MSG,
@@ -1845,12 +1845,10 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     private void cleanupBeforeProfiling(ProfilerEngineSettings sharedSettings) {
-        final Profiler profiler = Profiler.getDefault();
-
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                profiler.getThreadsManager().reset();
-                profiler.getVMTelemetryManager().reset();
+                NetBeansProfiler.this.getThreadsManager().reset();
+                NetBeansProfiler.this.getVMTelemetryManager().reset();
                 if (LiveResultsWindow.hasDefault())
                     LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
             }
@@ -1998,7 +1996,7 @@ public final class NetBeansProfiler extends Profiler {
 
     private void setupDispatcher(ProfilingSettings profilingSettings) {
         synchronized (setupLock) {
-            final Project project = ((NetBeansProfiler) Profiler.getDefault()).getProfiledProject();
+            final Project project = getProfiledProject();
 
             // configure call-context-tree dispatching infrastructure
             CCTProvider cctProvider = null;

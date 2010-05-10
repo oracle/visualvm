@@ -40,6 +40,7 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
+import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIConstants;
@@ -568,8 +569,8 @@ public class ClassesListControllerUI extends JTitledPanel {
                         while (className.endsWith("[]")) {
                             className = className.substring(0, className.length() - 2); // NOI18N
                         }
-
-                        NetBeansProfiler.getDefaultNB().openJavaSource(null, className, null, null);
+                        Project p = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject();
+                        NetBeansProfiler.getDefaultNB().openJavaSource(p, className, null, null);
                     }
                 }
             });
