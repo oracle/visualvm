@@ -56,7 +56,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -102,12 +101,10 @@ public class HostProvider {
                     inetAddress = InetAddress.getByName(hostName);
                 } catch (UnknownHostException e) {
                     if (interactive) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                String error = NbBundle.getMessage(HostProvider.class, "MSG_Wrong_Host", hostName); // NOI18N
-                                NetBeansProfiler.getDefaultNB().displayError(error);
-                            }
-                        });
+                        DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.
+                                Message(NbBundle.getMessage(HostProvider.class,
+                                "MSG_Wrong_Host", hostName), NotifyDescriptor. // NOI18N
+                                ERROR_MESSAGE));
                     }
                 }
             } finally {
@@ -124,8 +121,12 @@ public class HostProvider {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ExplorerSupport.sharedInstance().selectDataSource(knownHost);
-                                String warning = NbBundle.getMessage(HostProvider.class, "MSG_Already_Monitored",new Object[] {hostName,DataSourceDescriptorFactory.getDescriptor(knownHost).getName()});    // NOI18N
-                                NetBeansProfiler.getDefaultNB().displayWarning(warning);
+                                DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.
+                                Message(NbBundle.getMessage(HostProvider.class,
+                                        "MSG_Already_Monitored",new Object[] // NOI18N
+                                        {hostName,DataSourceDescriptorFactory.
+                                        getDescriptor(knownHost).getName()}),
+                                        NotifyDescriptor.WARNING_MESSAGE));
                             }
                         });
                     }

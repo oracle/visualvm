@@ -50,8 +50,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
@@ -81,7 +81,7 @@ public class HostCustomizer extends JPanel {
             HostCustomizer.class, "Title_Add_Remote_Host"), true, new Object[] {   // NOI18N
             hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
     dd.setAdditionalOptions(new Object[] { hc.settingsButton });
-    final Dialog d = ProfilerDialogs.createDialog(dd);
+    final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
     d.pack();
     d.setVisible(true);
 
