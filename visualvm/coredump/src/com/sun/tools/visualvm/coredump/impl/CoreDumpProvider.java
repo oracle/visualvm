@@ -46,7 +46,6 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.ui.SwingWorker;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -129,7 +128,11 @@ public class CoreDumpProvider {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     ExplorerSupport.sharedInstance().selectDataSource(knownCoreDump);
-                    NetBeansProfiler.getDefaultNB().displayWarning(NbBundle.getMessage(CoreDumpProvider.class, "MSG_Core_dump_already_added", new Object[] {displayName,DataSourceDescriptorFactory.getDescriptor(knownCoreDump).getName()}));  // NOI18N
+                    DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.
+                            Message(NbBundle.getMessage(CoreDumpProvider.class,
+                            "MSG_Core_dump_already_added", new Object[] {displayName, // NOI18N
+                            DataSourceDescriptorFactory.getDescriptor(knownCoreDump).
+                            getName()}), NotifyDescriptor.ERROR_MESSAGE));
                 }
             });
             return;

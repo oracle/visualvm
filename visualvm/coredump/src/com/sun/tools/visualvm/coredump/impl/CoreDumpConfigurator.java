@@ -43,9 +43,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
@@ -66,7 +65,7 @@ class CoreDumpConfigurator extends JPanel {
     
     final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(CoreDumpConfigurator.class, "Title_Add_VM_Coredump"), true, new Object[] { // NOI18N
       hc.okButton, DialogDescriptor.CANCEL_OPTION }, hc.okButton, 0, null, null);
-    final Dialog d = ProfilerDialogs.createDialog(dd);
+    final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
     d.pack();
     d.setVisible(true);
     
@@ -304,7 +303,8 @@ class CoreDumpConfigurator extends JPanel {
     add(deleteSourceCheckbox, constraints);
     
     // spacer
-    JPanel spacer = Utils.createFillerPanel();
+    JPanel spacer = new JPanel(null);
+    spacer.setOpaque(false);
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 4;
