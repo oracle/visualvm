@@ -161,22 +161,26 @@ public class ObjectNode extends InstanceNode {
                     HeapWalkerNode[] children = null;
 
                     if (getMode() == HeapWalkerNode.MODE_FIELDS) {
-                        ArrayList fieldValues = new ArrayList();
-                        fieldValues.addAll(getInstance().getFieldValues());
-                        fieldValues.addAll(getInstance().getStaticFieldValues());
+                        if (hasInstance()) {
+                            ArrayList fieldValues = new ArrayList();
+                            fieldValues.addAll(getInstance().getFieldValues());
+                            fieldValues.addAll(getInstance().getStaticFieldValues());
 
-                        if (fieldValues.size() == 0) {
-                            // Instance has no fields
-                            children = new HeapWalkerNode[1];
-                            children[0] = HeapWalkerNodeFactory.createNoFieldsNode(ObjectNode.this);
-                        } else {
-                            // Instance has at least one field
-                            children = new HeapWalkerNode[fieldValues.size()];
+                            if (fieldValues.size() == 0) {
+                                // Instance has no fields
+                                children = new HeapWalkerNode[1];
+                                children[0] = HeapWalkerNodeFactory.createNoFieldsNode(ObjectNode.this);
+                            } else {
+                                // Instance has at least one field
+                                children = new HeapWalkerNode[fieldValues.size()];
 
-                            for (int i = 0; i < children.length; i++) {
-                                children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i),
-                                                                                    ObjectNode.this);
+                                for (int i = 0; i < children.length; i++) {
+                                    children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i),
+                                                                                        ObjectNode.this);
+                                }
                             }
+                        } else {
+                            children = new HeapWalkerNode[0];
                         }
                     } else if (getMode() == HeapWalkerNode.MODE_REFERENCES) {
                         children = HeapWalkerNodeFactory.createReferences(ObjectNode.this);
