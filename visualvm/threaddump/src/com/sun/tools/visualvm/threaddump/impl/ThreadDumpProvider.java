@@ -48,8 +48,9 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -65,11 +66,10 @@ public class ThreadDumpProvider {
             public void run() {
                 Jvm jvm = JvmFactory.getJVMFor(application);
                 if (!jvm.isTakeThreadDumpSupported()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(ThreadDumpProvider.class, "MSG_Cannot_take_thread_dump_for_") + DataSourceDescriptorFactory.getDescriptor(application).getName());  // NOI18N
-                        }
-                    });
+                    DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.
+                            Message(NbBundle.getMessage(ThreadDumpProvider.class,
+                            "MSG_Cannot_take_thread_dump_for_") + DataSourceDescriptorFactory. // NOI18N
+                            getDescriptor(application).getName(), NotifyDescriptor.ERROR_MESSAGE));
                     return;
                 }
                 
