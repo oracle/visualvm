@@ -36,6 +36,7 @@ import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.modules.sampler.cpu.CPUSamplerSupport;
 import com.sun.tools.visualvm.modules.sampler.memory.MemorySamplerSupport;
@@ -768,8 +769,6 @@ class SamplerImpl {
         view.add(stopButton, constraints);
 
         // filler1
-        JPanel filler1 = new JPanel(null);
-        filler1.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 5;
         constraints.gridy = 2;
@@ -779,7 +778,7 @@ class SamplerImpl {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.insets = new Insets(0, 0, 0, 0);
-        view.add(filler1, constraints);
+        view.add(Spacer.create(), constraints);
 
         // statusLabel
         statusLabel = new JLabel(NbBundle.getMessage(ApplicationSamplerView.class, "LBL_Status")); // NOI18N
@@ -820,8 +819,6 @@ class SamplerImpl {
         view.add(statusValueLabel, constraints);
 
         // filler2
-        JPanel filler2 = new JPanel(null);
-        filler2.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 2;
         constraints.gridy = 3;
@@ -831,7 +828,7 @@ class SamplerImpl {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.insets = new Insets(0, 0, 0, 0);
-        view.add(filler2, constraints);
+        view.add(Spacer.create(), constraints);
 
         Dimension cpuD     = cpuButton.getPreferredSize();
         Dimension memoryD  = memoryButton.getPreferredSize();

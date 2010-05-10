@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.timeline;
 
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.LegendFont;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -151,8 +152,6 @@ final class TimelineTooltipPainter extends JPanel {
             constraints.insets = new Insets(0, 3, 0, 0);
             add(unitsLabel, constraints);
 
-            JPanel valueSpacer = new JPanel(null);
-            valueSpacer.setOpaque(false);
             constraints = new GridBagConstraints();
             constraints.gridx = 3;
             constraints.gridy = i;
@@ -160,7 +159,7 @@ final class TimelineTooltipPainter extends JPanel {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.anchor = GridBagConstraints.NORTHEAST;
             constraints.insets = new Insets(0, 0, 0, 0);
-            add(valueSpacer, constraints);
+            add(Spacer.create(), constraints);
 
         }
 

@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.mbeans.options;
 
 import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -169,7 +170,6 @@ public class MBeansOptionsPanel extends JPanel {
         add(propertyListField, c);
 
         // filler
-        JPanel fillerPanel = new JPanel(null);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 3;
@@ -178,7 +178,7 @@ public class MBeansOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        add(fillerPanel, c);
+        add(Spacer.create(), c);
     }
 
     private void startTrackingChanges() {

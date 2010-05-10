@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.swing;
 
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
@@ -63,8 +64,7 @@ public class HeaderPanel extends JPanel {
 
     public JPanel getClientContainer() {
         if (clientContainer == null) {
-            clientContainer = new JPanel(null);
-            clientContainer.setOpaque(false);
+            clientContainer = Spacer.create();
             add(clientContainer, 0);
         }
         return clientContainer;

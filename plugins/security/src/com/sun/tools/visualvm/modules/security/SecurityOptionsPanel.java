@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.security;
 
 import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -48,7 +49,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -854,8 +854,6 @@ class SecurityOptionsPanel extends JPanel {
         hintPanel.add(restartCheckBox, c);
 
         // --- Filler ---
-        JPanel fillerPanel = new JPanel(null);
-        fillerPanel.setOpaque(false);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 12;
@@ -863,7 +861,7 @@ class SecurityOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        add(fillerPanel, c);
+        add(Spacer.create(), c);
 
         c = new GridBagConstraints();
         c.gridy = 13;

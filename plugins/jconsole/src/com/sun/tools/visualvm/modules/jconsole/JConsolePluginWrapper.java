@@ -30,6 +30,7 @@ import static com.sun.tools.jconsole.JConsoleContext.*;
 import com.sun.tools.jconsole.JConsoleContext.ConnectionState;
 import com.sun.tools.jconsole.JConsolePlugin;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.modules.jconsole.options.JConsoleSettings;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -147,15 +148,13 @@ class JConsolePluginWrapper {
                 c.insets = new Insets(10, 0, 0, 0);
                 hintPanel.add(optionsButton, c);
 
-                JPanel fillerPanel = new JPanel(null);
-                fillerPanel.setOpaque(false);
                 c = new GridBagConstraints();
                 c.gridy = 3;
                 c.weighty = 1;
                 c.anchor = GridBagConstraints.NORTHWEST;
                 c.fill = GridBagConstraints.BOTH;
                 c.gridwidth = GridBagConstraints.REMAINDER;
-                hintPanel.add(fillerPanel, c);
+                hintPanel.add(Spacer.create(), c);
 
                 jconsoleView = hintPanel;
             }

@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -432,8 +433,6 @@ public class CPUSettingsSupport {
         constraints.insets = new Insets(10, 5, 5, 10);
         radiosPanel.add(exclFilterRadioButton, constraints);
 
-        JPanel spacer1 = new JPanel(null);
-        spacer1.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 2;
         constraints.gridy = 0;
@@ -443,7 +442,7 @@ public class CPUSettingsSupport {
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(10, 0, 5, 0);
-        radiosPanel.add(spacer1, constraints);
+        radiosPanel.add(Spacer.create(), constraints);
         
         filtersArea = createTextArea(2);
         filtersArea.getTextArea().setToolTipText(NbBundle.getMessage(CPUSettingsSupport.class, "TOOLTIP_Instrumentation_Filter")); // NOI18N
@@ -502,8 +501,6 @@ public class CPUSettingsSupport {
         constraints.insets = new Insets(5, 0, 15, 5);
         panelImpl.add(sampleRateUnitsLabel, constraints);
 
-        JPanel spacer2 = new JPanel(null);
-        spacer2.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 3;
         constraints.gridy = 6;
@@ -511,7 +508,7 @@ public class CPUSettingsSupport {
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(5, 0, 15, 0);
-        panelImpl.add(spacer2, constraints);
+        panelImpl.add(Spacer.create(), constraints);
         
         resetDefaultsButton = new JButton(NbBundle.getMessage(CPUSettingsSupport.class, "LBL_Restore_Defaults")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) { setDefaults(); }

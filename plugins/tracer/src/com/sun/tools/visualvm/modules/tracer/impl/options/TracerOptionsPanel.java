@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.tracer.impl.options;
 
 import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.VerticalLayout;
 import java.awt.BorderLayout;
@@ -1373,8 +1374,6 @@ final class TracerOptionsPanel extends JPanel {
 
 
         // bottomFiller
-        JPanel bottomFiller = new JPanel(null);
-        bottomFiller.setOpaque(false);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 100;
@@ -1383,7 +1382,7 @@ final class TracerOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        add(bottomFiller, c);
+        add(Spacer.create(), c);
     }
 
 

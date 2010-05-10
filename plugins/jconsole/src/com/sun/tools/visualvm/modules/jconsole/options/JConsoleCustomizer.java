@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.jconsole.options;
 
 import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -234,7 +235,6 @@ public class JConsoleCustomizer extends JPanel {
         c.insets = new Insets(3, 5, 3, 0);
         add(jButtonMoveDown, c);
 
-        JPanel fillerPanel = new JPanel(null);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 7;
@@ -242,7 +242,7 @@ public class JConsoleCustomizer extends JPanel {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        add(fillerPanel, c);
+        add(Spacer.create(), c);
     }
 
 
