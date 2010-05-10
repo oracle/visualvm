@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.jvmstat.application;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -428,8 +429,6 @@ class ConnectionsCustomizer extends PropertiesPanel {
             c.insets = new Insets(BORDER_HEIGHT, 5, BORDER_HEIGHT, 0);
             add(refreshUnitsLabel, c);
 
-            JPanel filler = new JPanel(null);
-            filler.setOpaque(false);
             c = new GridBagConstraints();
             c.gridx = 5;
             c.gridy = 0;
@@ -440,7 +439,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
             c.fill = GridBagConstraints.BOTH;
             c.anchor = GridBagConstraints.NORTHWEST;
             c.insets = new Insets(0, 5, 0, 0);
-            add(filler, c);
+            add(Spacer.create(), c);
 
             setOpaque(true);
             setBorder(EMPTY_BORDER);
@@ -585,8 +584,6 @@ class ConnectionsCustomizer extends PropertiesPanel {
             c.insets = new Insets(BORDER_HEIGHT, 5, BORDER_HEIGHT, 5);
             add(refreshUnitsLabel, c);
 
-            JPanel filler = new JPanel(null);
-            filler.setOpaque(false);
             c = new GridBagConstraints();
             c.gridx = 5;
             c.gridy = 0;
@@ -597,7 +594,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
             c.fill = GridBagConstraints.BOTH;
             c.anchor = GridBagConstraints.NORTHWEST;
             c.insets = new Insets(0, 5, 0, 0);
-            add(filler, c);
+            add(Spacer.create(), c);
 
             setOpaque(true);
             setBackground(BACKGROUND_COLOR);

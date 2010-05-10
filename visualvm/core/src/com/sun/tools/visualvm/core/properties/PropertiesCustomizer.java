@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -43,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -299,12 +299,10 @@ public final class PropertiesCustomizer<X extends DataSource> extends Properties
                 }
             }
 
-            JPanel spacer = new JPanel(null);
-            spacer.setOpaque(false);
             constraints = createConstraints(currentRow++);
             constraints.weightx = 1;
             constraints.weighty = 1;
-            add(spacer, constraints);
+            add(Spacer.create(), constraints);
         }
 
         private static GridBagConstraints createConstraints(int row) {

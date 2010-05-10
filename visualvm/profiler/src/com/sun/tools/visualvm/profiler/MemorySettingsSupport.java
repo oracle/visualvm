@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.profiler;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -273,8 +274,6 @@ class MemorySettingsSupport {
         constraints.insets = new Insets(5, 10, 10, 10);
         panelImpl.add(stackTracesCheckBox, constraints);
         
-        JPanel filler = new JPanel(null);
-        filler.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 4;
@@ -284,7 +283,7 @@ class MemorySettingsSupport {
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.insets = new Insets(0, 0, 0, 0);
-        panelImpl.add(filler, constraints);
+        panelImpl.add(Spacer.create(), constraints);
         
         resetDefaultsButton = new JButton(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Restore_Defaults")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) { setDefaults(); }

@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.options;
 
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import com.sun.tools.visualvm.core.datasupport.Utils;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -306,7 +307,6 @@ final class GeneralOptionsPanel extends JPanel {
 
         // --- Filler ---
 
-        JPanel fillerPanel = new JPanel(null);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 10;
@@ -315,7 +315,7 @@ final class GeneralOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        add(fillerPanel, c);
+        add(Spacer.create(), c);
     }
 
     private void resetDNSAButtonAction() {

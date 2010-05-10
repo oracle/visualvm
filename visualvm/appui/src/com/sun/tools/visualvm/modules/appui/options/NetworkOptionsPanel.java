@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.appui.options;
 
 import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -450,7 +451,6 @@ class NetworkOptionsPanel extends JPanel {
 
         // --- Filler ---
 
-        JPanel fillerPanel = new JPanel(null);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 9;
@@ -458,7 +458,7 @@ class NetworkOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        manualSettingsPanel.add(fillerPanel, c);
+        manualSettingsPanel.add(Spacer.create(), c);
 
 
         c = new GridBagConstraints();

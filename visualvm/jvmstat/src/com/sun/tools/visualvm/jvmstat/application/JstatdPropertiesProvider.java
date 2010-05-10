@@ -27,13 +27,13 @@ package com.sun.tools.visualvm.jvmstat.application;
 
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.properties.PropertiesProvider;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.openide.util.NbBundle;
 import org.openide.awt.Mnemonics;
@@ -95,8 +95,6 @@ class JstatdPropertiesProvider extends PropertiesProvider<JvmstatApplication> {
         panel.add(connectionField, constraints);
 
         // Filler
-        JPanel filler = new JPanel(null);
-        filler.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -105,7 +103,7 @@ class JstatdPropertiesProvider extends PropertiesProvider<JvmstatApplication> {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.insets = new Insets(0, 0, 0, 0);
-        panel.add(filler, constraints);
+        panel.add(Spacer.create(), constraints);
 
         return panel;
     }

@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.charts.xy;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -140,7 +141,10 @@ public class XYTooltipPainter extends JPanel {
             constraints.insets = new Insets(0, 8, 0, 0);
             add(valueLabel, constraints);
 
-            JPanel valueSpacer = new JPanel(null);
+            final Dimension ZERO = new Dimension(0, 0);
+            JPanel valueSpacer = new JPanel(null) {
+                public Dimension getPreferredSize() { return ZERO; }
+            };
             valueSpacer.setOpaque(false);
             constraints = new GridBagConstraints();
             constraints.gridx = 2;

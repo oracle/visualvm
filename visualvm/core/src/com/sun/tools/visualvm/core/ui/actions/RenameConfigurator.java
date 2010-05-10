@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.ui.actions;
 
 import com.sun.tools.visualvm.core.datasource.descriptor.*;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -127,8 +128,6 @@ class RenameConfigurator extends JPanel {
     add(nameField, constraints);
     
     // spacer
-    JPanel spacer = new JPanel(null);
-    spacer.setOpaque(false);
     constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 1;
@@ -137,7 +136,7 @@ class RenameConfigurator extends JPanel {
     constraints.fill = GridBagConstraints.BOTH;
     constraints.anchor = GridBagConstraints.NORTHWEST;
     constraints.insets = new Insets(0, 0, 15, 0);
-    add(spacer, constraints);
+    add(Spacer.create(), constraints);
     
     // okButton
     okButton = new JButton(NbBundle.getMessage(RenameConfigurator.class, "LBL_OK"));    // NOI18N

@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.datasource.descriptor;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.properties.PropertiesProvider;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -36,7 +37,6 @@ import java.awt.Insets;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -147,8 +147,6 @@ class GeneralPropertiesProvider extends PropertiesProvider<DataSource> {
         c.insets = new Insets(0, 0, 5, 0);
         panel.add(descriptionScroll, c);
 
-        JPanel filler = new JPanel(null);
-        filler.setOpaque(false);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 10;
@@ -156,7 +154,7 @@ class GeneralPropertiesProvider extends PropertiesProvider<DataSource> {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(0, 0, 0, 0);
-        panel.add(filler, c);
+        panel.add(Spacer.create(), c);
         
         return panel;
     }
