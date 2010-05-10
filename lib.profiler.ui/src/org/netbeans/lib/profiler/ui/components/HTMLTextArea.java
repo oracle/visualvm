@@ -47,6 +47,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -557,8 +559,12 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
 
     // --- Popup menu support ----------------------------------------------------
     private JPopupMenu popupMenu;
-    private String originalText;
     private boolean showPopup = true;
+
+    // --- Lazy setting text ---------------------------------------------------
+    private String pendingText;
+    private String currentText;
+    private boolean forceSetText;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -572,6 +578,15 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         setFont(UIManager.getFont("Label.font")); //NOI18N
         setBackground(UIUtils.getProfilerResultsBackground());
         addMouseListener(this);
+
+        // Bugfix #185777, update text only if visible
+        addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (isShowing() && pendingText != null) setText(pendingText);
+                }
+            }
+        });
     }
 
     public HTMLTextArea(String text) {
@@ -582,8 +597,12 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void setForeground(Color color) {
+        Color foreground = getForeground();
+        if (foreground != null && foreground.equals(color)) return;
+
         super.setForeground(color);
-        setText(originalText);
+        forceSetText = true;
+        setText(getText());
     }
 
     public void setShowPopup(boolean showPopup) {
@@ -597,19 +616,60 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
     public void setText(String value) {
         if (value == null) return;
 
-        originalText = value;
+        if (!isShowing() && !forceSetText) {
 
-        Font font = getFont();
-        Color textColor = getForeground();
-        value = value.replaceAll("\\n\\r|\\r\\n|\\n|\\r", "<br>"); //NOI18N
-        value = value.replace("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
+            pendingText = value;
 
-        String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
-        String newText = "<html><body text=\"" + colorText + "\" style=\"font-size: " + font.getSize() + //NOI18N
-                         "pt; font-family: " + font.getName() + ";\">" + value + "</body></html>"; //NOI18N
+        } else {
 
-        setDocument(getEditorKit().createDefaultDocument()); // Workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5042872
-        super.setText(newText);
+            if (!forceSetText && value.equals(currentText)) return;
+
+            currentText = value;
+            pendingText = null;
+
+            Font font = getFont();
+            Color textColor = getForeground();
+            value = value.replaceAll("\\n\\r|\\r\\n|\\n|\\r", "<br>"); //NOI18N
+            value = value.replace("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
+
+            String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
+            String newText = "<html><body text=\"" + colorText + "\" style=\"font-size: " + font.getSize() + //NOI18N
+                             "pt; font-family: " + font.getName() + ";\">" + value + "</body></html>"; //NOI18N
+
+            setDocument(getEditorKit().createDefaultDocument()); // Workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5042872
+            super.setText(newText);
+
+        }
+
+        forceSetText = false;
+    }
+
+    public String getText() {
+        return pendingText != null ? pendingText : currentText;
+    }
+
+    public Dimension getMinimumSize() {
+        if (pendingText != null) {
+            forceSetText = true;
+            setText(pendingText);
+        }
+        return super.getMinimumSize();
+    }
+
+    public Dimension getPreferredSize() {
+        if (pendingText != null) {
+            forceSetText = true;
+            setText(pendingText);
+        }
+        return super.getPreferredSize();
+    }
+
+    public Dimension getMaximumSize() {
+        if (pendingText != null) {
+            forceSetText = true;
+            setText(pendingText);
+        }
+        return super.getMaximumSize();
     }
 
     public void deleteSelection() {
