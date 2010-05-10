@@ -70,7 +70,9 @@ public class ThreadInfo {
 
     // ThreadInfo hash table
     private static ThreadInfo[] threadInfos = new ThreadInfo[1]; // To avoid null checks - important!
+    private static int threadInfosSize;
     private static int nThreads;
+    private static boolean hasDeadThreads;
     private static ThreadInfo lastThreadInfo = dummyThreadInfo;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -210,6 +212,7 @@ public class ThreadInfo {
         evBufSize = MAX_EVENT_ENTRIES_IN_LOCAL_BUFFER * MAX_EVENT_SIZE;
         evBufPosThreshold = evBufSize - (4 * MAX_EVENT_SIZE) - 1;
         threadInfos = new ThreadInfo[1]; // To avoid null checks
+        threadInfosSize = 0;
     }
 
     final boolean isInitialized() {
@@ -344,6 +347,7 @@ public class ThreadInfo {
                         ti.evBuf = null; // release results buffer
                     }
                     ti.thread = null; // release dead thread
+                    hasDeadThreads = true;
                 }
             }
         }
@@ -371,7 +375,7 @@ public class ThreadInfo {
     }
 
     private static void addThreadInfo(final ThreadInfo res, final Thread thread) {
-        if (nThreads > ((threadInfos.length * 3) / 4)) {
+        if (threadInfosSize >= ((threadInfos.length * 3) / 4)) {
             rehash();
         }
 
@@ -383,6 +387,7 @@ public class ThreadInfo {
         }
 
         threadInfos[pos] = res;
+        threadInfosSize++;
     }
 
     private static ThreadInfo newThreadInfo(Thread thread) {
@@ -404,8 +409,9 @@ public class ThreadInfo {
     }
 
     private static void rehash() {
-        int capacity = (threadInfos.length * 2) + 1;
+        int capacity = hasDeadThreads ? threadInfos.length : (threadInfos.length * 2) + 1;
         ThreadInfo[] newTIs = new ThreadInfo[capacity];
+        int size = 0;
 
         for (int i = 0; i < threadInfos.length; i++) {
             ThreadInfo ti = threadInfos[i];
@@ -421,9 +427,12 @@ public class ThreadInfo {
             }
 
             newTIs[pos] = ti;
+            size++;
         }
 
         threadInfos = newTIs;
+        threadInfosSize = size;
+        hasDeadThreads = false;
     }
 
     private void resetInternalState() {

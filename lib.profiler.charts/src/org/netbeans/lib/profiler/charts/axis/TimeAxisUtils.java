@@ -70,6 +70,8 @@ public class TimeAxisUtils {
 
     private static final String PATTERN_CHARS = "GyMwWDdFEaHkKhmsSzZ"; // NOI18N
     private static final Map<String, Format> FORMATS = new HashMap();
+    private static final Calendar c1 = Calendar.getInstance();
+    private static final Calendar c2 = Calendar.getInstance();
 
     public static final long[] timeUnitsGrid = new long[] {
         1 /*1*/, 2 /*2*/, 5 /*5*/, 10 /*10*/, 20 /*20*/, 50 /*50*/, 100 /*100*/, 250 /*250*/, 500 /*500*/,  // milliseconds
@@ -103,9 +105,7 @@ public class TimeAxisUtils {
     }
 
     public static int getRangeFlag(long startTime, long endTime) {
-        Calendar c1 = Calendar.getInstance();
         c1.setTimeInMillis(startTime);
-        Calendar c2 = Calendar.getInstance();
         c2.setTimeInMillis(endTime);
 
         if (c1.get(Calendar.YEAR) != c2.get(Calendar.YEAR))
