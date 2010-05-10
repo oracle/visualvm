@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.jmx.impl.JmxApplication;
 import com.sun.tools.visualvm.jmx.impl.JmxApplicationProvider;
@@ -46,14 +47,12 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import sun.net.util.IPAddressUtil;
@@ -484,7 +483,6 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             add(saveCheckbox, constraints);
 
             // spacer
-            JPanel spacer = Utils.createFillerPanel();
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 7;
@@ -494,7 +492,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.fill = GridBagConstraints.BOTH;
             constraints.anchor = GridBagConstraints.NORTHWEST;
             constraints.insets = new Insets(10, 0, 0, 0);
-            add(spacer, constraints);
+            add(Spacer.create(), constraints);
 
             // UI tweaks
             displaynameCheckbox.setBorder(connectionLabel.getBorder());
@@ -689,7 +687,6 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             add(saveCheckbox, constraints);
 
             // spacer
-            JPanel spacer = Utils.createFillerPanel();
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 7;
@@ -699,7 +696,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.fill = GridBagConstraints.BOTH;
             constraints.anchor = GridBagConstraints.NORTHWEST;
             constraints.insets = new Insets(0, 0, 0, 0);
-            add(spacer, constraints);
+            add(Spacer.create(), constraints);
         }
 
         private JLabel connectionLabel;

@@ -58,8 +58,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
-import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
@@ -407,11 +407,10 @@ public class JmxApplicationProvider {
                                                                  getProvider(epid);
                                         addJmxApplication(false, null, values[0], values[2], values[1], ep, storage);
                                     } catch (final JmxApplicationException e) {
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            public void run() {
-                                                NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
-                                            }
-                                        });
+                                        DialogDisplayer.getDefault().notifyLater(
+                                                new NotifyDescriptor.Message(e.
+                                                getMessage(), NotifyDescriptor.
+                                                ERROR_MESSAGE));
                                     }
                                 }
                             });

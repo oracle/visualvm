@@ -58,8 +58,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -79,7 +79,7 @@ class JmxConnectionConfigurator extends JPanel {
                 true, new Object[] { configurator.okButton, DialogDescriptor.CANCEL_OPTION},
                 configurator.okButton, 0, null, null);
         dd.setAdditionalOptions(new Object[] { configurator.hintLabel });
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         configurator.updateWindowTitle(d);
         d.pack();
         d.setVisible(true);

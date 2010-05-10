@@ -33,7 +33,8 @@ import java.io.File;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 
 /**
@@ -212,7 +213,8 @@ public final class JmxApplicationsSupport {
             return createJmxApplicationImpl(connectionString, displayName,
                                             epr, persistent);
         } catch (JmxApplicationException e) {
-            NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(e.
+                    getMessage(), NotifyDescriptor.ERROR_MESSAGE));
         } finally {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -261,7 +263,8 @@ public final class JmxApplicationsSupport {
             return createJmxApplicationImpl(connectionString, displayName,
                                             provider, persistent);
         } catch (JmxApplicationException e) {
-            NetBeansProfiler.getDefaultNB().displayError(e.getMessage());
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(e.
+                    getMessage(), NotifyDescriptor.ERROR_MESSAGE));
         } finally {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.jmx.impl;
 
+import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -38,9 +39,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.Utils;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
@@ -59,7 +59,7 @@ public final class CredentialsConfigurator extends JPanel {
                 asc, title, true,
                 new Object[]{asc.okButton, DialogDescriptor.CANCEL_OPTION},
                 asc.okButton, 0, null, null);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.pack();
         d.setVisible(true);
 
@@ -179,7 +179,6 @@ public final class CredentialsConfigurator extends JPanel {
         add(passwordField, constraints);
 
         // spacer
-        JPanel spacer = Utils.createFillerPanel();
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 3;
@@ -189,7 +188,7 @@ public final class CredentialsConfigurator extends JPanel {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.insets = new Insets(0, 0, 15, 0);
-        add(spacer, constraints);
+        add(Spacer.create(), constraints);
 
         // okButton
         okButton = new JButton(NbBundle.getMessage(CredentialsConfigurator.class, "LBL_OK"));   // NOI18N
