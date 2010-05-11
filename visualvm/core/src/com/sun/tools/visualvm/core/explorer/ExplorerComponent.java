@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.explorer;
 
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
@@ -60,7 +61,6 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.openide.windows.WindowManager;
 
 /**
@@ -125,7 +125,7 @@ class ExplorerComponent extends JPanel {
         explorerTree.addMouseListener(new ExplorerTreeMouseAdapter());
 
         // Aqua LaF customizations
-        if (UIUtils.isAquaLookAndFeel()) {
+        if (UISupport.isAquaLookAndFeel()) {
             final Window mainWindow = WindowManager.getDefault().getMainWindow();
             final Window[] ownerWindow = new Window[1];
             final WindowFocusListener focusListener = new WindowFocusListener() {

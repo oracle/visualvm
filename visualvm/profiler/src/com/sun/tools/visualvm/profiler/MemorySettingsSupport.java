@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.Spacer;
+import com.sun.tools.visualvm.uisupport.JExtendedSpinner;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -44,7 +45,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.openide.util.NbBundle;
 
 /**

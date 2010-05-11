@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.ui;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -55,8 +56,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.Exceptions;
 
 /**
@@ -109,12 +108,12 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
 
       final boolean closable = view.isClosable();
       
-      if (UIUtils.isGTKLookAndFeel()) {
+      if (UISupport.isGTKLookAndFeel()) {
           setTitleAt(getComponentCount() - 1, view.getName() + (closable ? "" : " "));  // NOI18N
           super.setIconAt(getComponentCount() - 1, new ImageIcon(view.getImage()) {
               public int getIconWidth() { return super.getIconWidth() + (closable ? 15 : 8); }
           });
-      } else if (UIUtils.isNimbusLookAndFeel()) {
+      } else if (UISupport.isNimbusLookAndFeel()) {
           setTitleAt(getComponentCount() - 1, view.getName() + (closable ? "" : "  "));  // NOI18N
           super.setIconAt(getComponentCount() - 1, new ImageIcon(view.getImage()) {
               public int getIconWidth() { return super.getIconWidth() + (closable ? 10 : 0); }
@@ -138,7 +137,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   public int indexOfView(final DataSourceView view) {
       final int[] index = new int[1];
       index[0] = -1;
-      IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+      UISupport.runInEventDispatchThreadAndWait(new Runnable() {
           public void run() {
               for (int i = 0; i < getTabCount(); i++)
                   if (((ViewContainer)getComponentAt(i)).getViewComponent() == view.getView()) index[0] = i;
@@ -224,7 +223,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
         else if( isAquaLaF() )
           b.x -= 3;
       }
-      return new Rectangle(b.x + b.width - (UIUtils.isGTKLookAndFeel() ? 14 : 13),
+      return new Rectangle(b.x + b.width - (UISupport.isGTKLookAndFeel() ? 14 : 13),
         b.y + b.height / 2 - 5,
         12,
         12);
@@ -565,7 +564,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       private DataViewComponent viewComponent;
       
       public ViewContainer(DataSourceCaption caption, DataSourceView view) {
-          Color backgroundColor = UIUtils.getProfilerResultsBackground();
+          Color backgroundColor = UISupport.getDefaultBackground();
 
           this.caption = caption;
           this.view = view;

@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui.about;
 
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -39,7 +40,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -79,7 +79,7 @@ public class TextViewerComponent extends JTextArea implements MouseListener {
         setOpaque(true);
         setAutoscrolls(true);
         setFont(new Font("Monospaced", Font.PLAIN, UIManager.getFont("Label.font").getSize())); // NOI18N
-        setBackground(UIUtils.getProfilerResultsBackground());
+        setBackground(UISupport.getDefaultBackground());
         addMouseListener(this);
     }
 

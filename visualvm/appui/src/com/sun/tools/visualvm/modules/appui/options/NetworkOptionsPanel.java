@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.modules.appui.options;
 import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import com.sun.tools.visualvm.core.ui.components.Spacer;
+import com.sun.tools.visualvm.uisupport.JExtendedSpinner;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -46,7 +47,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 

@@ -39,6 +39,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -47,7 +48,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
 

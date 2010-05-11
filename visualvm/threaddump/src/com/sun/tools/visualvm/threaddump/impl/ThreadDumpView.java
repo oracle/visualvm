@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.threaddump.ThreadDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.File;
@@ -43,7 +44,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 

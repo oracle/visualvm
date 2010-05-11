@@ -25,6 +25,7 @@
 package com.sun.tools.visualvm.modules.appui.about;
 
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -41,7 +42,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.Caret;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.ImagePanel;
 
 /**

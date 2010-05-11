@@ -26,9 +26,9 @@
 package com.sun.tools.visualvm.core.ui.actions;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.event.ActionEvent;
 import java.util.Set;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 
 /**
  * Abstract DataSourceAction which can be used as a basis for any action available (enabled) just for single selected DataSource in Applications window..
@@ -76,7 +76,7 @@ public abstract class SingleDataSourceAction<X extends DataSource> extends DataS
         X selectedDataSource = selectedDataSources.size() == 1 ? selectedDataSources.iterator().next() : null;
         final boolean isEnabled = selectedDataSource != null ? isEnabled(selectedDataSource) : false;
 
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        UISupport.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() { setEnabled(isEnabled); }
         });
     }

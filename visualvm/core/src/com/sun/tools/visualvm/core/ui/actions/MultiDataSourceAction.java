@@ -26,9 +26,9 @@
 package com.sun.tools.visualvm.core.ui.actions;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.event.ActionEvent;
 import java.util.Set;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 
 /**
  * Abstract DataSourceAction which can be used as a basis for any action available (enabled) just for one or more selected DataSources in Applications window..
@@ -75,7 +75,7 @@ public abstract class MultiDataSourceAction<X extends DataSource> extends DataSo
     protected void updateState(Set<X> selectedDataSources) {
         final boolean isEnabled = selectedDataSources.isEmpty() ? false : isEnabled(selectedDataSources);
 
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        UISupport.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() { setEnabled(isEnabled); }
         });
     }

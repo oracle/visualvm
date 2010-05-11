@@ -30,12 +30,12 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.sa.SaModel;
 import com.sun.tools.visualvm.tools.sa.SaModelFactory;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.util.Properties;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 

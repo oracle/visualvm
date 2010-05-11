@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.core.ui.actions;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategoriesListener;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -37,7 +38,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicFileChooserUI;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
@@ -125,7 +125,7 @@ class LoadSnapshotAction extends AbstractAction {
     private void updateEnabled() {
         final boolean isEnabled = !RegisteredSnapshotCategories.sharedInstance().getOpenSnapshotCategories().isEmpty();
         
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        UISupport.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() { setEnabled(isEnabled); }
         });
     }

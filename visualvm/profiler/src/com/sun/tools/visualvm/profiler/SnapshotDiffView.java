@@ -29,6 +29,8 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.uisupport.HTMLLabel;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -37,8 +39,6 @@ import javax.swing.JComponent;
 import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.modules.profiler.MemoryDiffPanel;
 import org.netbeans.modules.profiler.SnapshotsDiffWindow;
 import org.netbeans.modules.profiler.utils.IDEUtils;
@@ -127,7 +127,7 @@ class SnapshotDiffView extends DataSourceView {
 
                 JPanel toolbarSpacer = new JPanel(null) {
                     public Dimension getPreferredSize() {
-                        if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
+                        if (UISupport.isGTKLookAndFeel() || UISupport.isNimbusLookAndFeel()) {
                             int currentWidth = toolBar.getSize().width;
                             int minimumWidth = toolBar.getMinimumSize().width;
                             int extraWidth = currentWidth - minimumWidth;

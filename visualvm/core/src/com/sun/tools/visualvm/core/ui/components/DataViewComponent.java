@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.ui.components;
 
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -36,7 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  * UI component displaying single subtab for opened DataSource.
@@ -82,7 +82,7 @@ public final class DataViewComponent extends JPanel {
 
 
     static {
-        BACKGROUND_COLOR = UIUtils.getProfilerResultsBackground();
+        BACKGROUND_COLOR = UISupport.getDefaultBackground();
 
         int darkerR = BACKGROUND_COLOR.getRed() - 20;
         if (darkerR < 0) darkerR += 40;

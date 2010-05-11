@@ -26,6 +26,8 @@
 package com.sun.tools.visualvm.charts.xy;
 
 import com.sun.tools.visualvm.charts.swing.RotateLabelUI;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -69,9 +71,6 @@ import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.ColorIcon;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.NbBundle;
 
 /**
@@ -119,7 +118,7 @@ public class SimpleXYChartUtils {
         DEFAULT_BUFFER_STEP = 50;
 
         AXIS_FONT_COLOR = new Color(90, 90, 90);
-        BACKGROUND_COLOR = UIUtils.getProfilerResultsBackground();
+        BACKGROUND_COLOR = UISupport.getDefaultBackground();
 
         VALUES_SPACING = Math.max(new TimeMarksPainter().getFont().getSize(), 15) + 10;
         TIMELINE_SPACING = 80;
@@ -573,10 +572,10 @@ public class SimpleXYChartUtils {
 
 
         private static int getCheckBoxOffset() {
-            if (UIUtils.isWindowsLookAndFeel()) return 3;
-            else if (UIUtils.isNimbusLookAndFeel()) return -3;
-            else if (UIUtils.isMetalLookAndFeel()) return 3;
-            else if (UIUtils.isAquaLookAndFeel()) return 6;
+            if (UISupport.isWindowsLookAndFeel()) return 3;
+            else if (UISupport.isNimbusLookAndFeel()) return -3;
+            else if (UISupport.isMetalLookAndFeel()) return 3;
+            else if (UISupport.isAquaLookAndFeel()) return 6;
             else return 0;
         }
 

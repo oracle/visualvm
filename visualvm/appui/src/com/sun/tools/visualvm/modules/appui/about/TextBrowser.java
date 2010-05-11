@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui.about;
 
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -45,7 +46,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
