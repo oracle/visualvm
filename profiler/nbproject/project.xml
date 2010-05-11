@@ -445,6 +445,11 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <friend-packages>
+                <friend>com.sun.tools.visualvm.core</friend>
+                <friend>com.sun.tools.visualvm.heapdump</friend>
+                <friend>com.sun.tools.visualvm.modules.oqlsyntax</friend>
+                <friend>com.sun.tools.visualvm.modules.sampler</friend>
+                <friend>com.sun.tools.visualvm.profiler</friend>
                 <friend>org.netbeans.modules.autoproject.profiler</friend>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
@@ -465,8 +470,6 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.modules.profiler.actions</package>
                 <package>org.netbeans.modules.profiler.categories</package>
                 <package>org.netbeans.modules.profiler.heapwalk</package>
-                <package>org.netbeans.modules.profiler.heapwalk.oql</package>
-                <package>org.netbeans.modules.profiler.heapwalk.oql.model</package>
                 <package>org.netbeans.modules.profiler.spi</package>
                 <package>org.netbeans.modules.profiler.ui</package>
                 <package>org.netbeans.modules.profiler.ui.stats</package>
