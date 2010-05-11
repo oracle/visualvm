@@ -26,6 +26,8 @@
 package com.sun.tools.visualvm.modules.sampler.cpu;
 
 import com.sun.tools.visualvm.modules.sampler.AbstractSamplerSupport;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -49,8 +51,6 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.ImageUtilities;
 
 /**
@@ -208,7 +208,7 @@ class CPUView extends JPanel {
 
         JPanel toolbarSpacer = new JPanel(null) {
             public Dimension getPreferredSize() {
-                if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
+                if (UISupport.isGTKLookAndFeel() || UISupport.isNimbusLookAndFeel()) {
                     int currentWidth = toolBar.getSize().width;
                     int minimumWidth = toolBar.getMinimumSize().width;
                     int extraWidth = currentWidth - minimumWidth;

@@ -15,12 +15,12 @@ import com.sun.tools.visualvm.core.scheduler.Scheduler;
 import com.sun.tools.visualvm.core.scheduler.SchedulerTask;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.util.ImageUtilities;
 
 class HTTPServiceView extends DataSourceView {

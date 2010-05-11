@@ -25,11 +25,11 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.swing;
 
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 
 /**
  *
@@ -98,9 +98,8 @@ public final class HeaderLabel extends HeaderPanel {
 
     private static int computeHeight() {
         int height = new HeaderLabel("X").getPreferredSizeSuper().height; // NOI18N
-        String lafID = UIManager.getLookAndFeel().getID();
-        if ("Metal".equals(lafID)) height += 4; // NOI18N
-        else if ("Aqua".equals(lafID)) height += 6; // NOI18N
+        if (UISupport.isMetalLookAndFeel()) height += 4;
+        else if (UISupport.isAquaLookAndFeel()) height += 6;
         return height;
     }
 

@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderPanel;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.LegendFont;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.TimelineMarksPainter;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -58,7 +59,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.Timeline;
@@ -480,10 +480,9 @@ final class TimelineAxis extends JPanel {
         }
 
         private static int resolveOffset() {
-            String uiId = UIManager.getLookAndFeel().getID();
-            if ("Windows".equals(uiId) || // NOI18N
-                "Metal".equals(uiId) || // NOI18N
-                "GTK".equals(uiId)) return 1; // NOI18N
+            if (UISupport.isWindowsLookAndFeel() ||
+                UISupport.isMetalLookAndFeel() ||
+                UISupport.isGTKLookAndFeel()) return 1;
             return 0;
         }
 

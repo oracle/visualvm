@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl.swing;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -42,7 +43,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -122,7 +122,7 @@ public final class TransparentToolBar extends JPanel {
     }
 
     private static boolean needsPanel() {
-        return UIManager.getLookAndFeel().getID().equals("GTK"); //NOI18N
+        return UISupport.isGTKLookAndFeel();
     }
 
     private static final class ItemListener extends MouseAdapter implements ChangeListener, FocusListener {

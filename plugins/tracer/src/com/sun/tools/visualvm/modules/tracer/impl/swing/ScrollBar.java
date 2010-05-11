@@ -25,10 +25,10 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.swing;
 
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;
-import javax.swing.UIManager;
 
 /**
  * Use only for creating ScrollBars which mimic insets of JScrollPane's SBs.
@@ -40,7 +40,7 @@ public final class ScrollBar extends JScrollBar {
     public ScrollBar(int orientation) {
         super(orientation);
 
-        if (UIManager.getLookAndFeel().getID().equals("GTK")) { //NOI18N
+        if (UISupport.isGTKLookAndFeel()) {
             Insets insets = getBorder().getBorderInsets(this);
             // Typically the insets are 2 for GTK themes except for Nimbus theme
             // which uses 3 and requires 1 (other themes seem to require 0). Lets

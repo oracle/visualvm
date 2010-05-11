@@ -50,12 +50,12 @@ import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.HTMLLabel;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import net.java.visualvm.modules.glassfish.datasource.GlassFishWebModule;
 
 import org.openide.util.ImageUtilities;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Image;
 import java.net.URL;
 import java.util.HashMap;
@@ -69,7 +69,6 @@ import javax.swing.JScrollPane;
 import javax.swing.RowSorter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 
 
 /**

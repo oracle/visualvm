@@ -55,7 +55,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 import org.netbeans.lib.profiler.charts.swing.Utils;
 
@@ -1432,7 +1431,8 @@ final class TracerOptionsPanel extends JPanel {
 
 
     private static Border titledBorder(String title) {
-        String titleBorder = isWindowsLookAndFeel() ? " " : ""; //NOI18N
+        String titleBorder = com.sun.tools.visualvm.uisupport.UISupport.
+                             isWindowsLookAndFeel() ? " " : ""; //NOI18N
         Border inner = BorderFactory.createEmptyBorder(0, 12, 3, 3);
         Border outer = BorderFactory.createTitledBorder(titleBorder + title);
         return BorderFactory.createCompoundBorder(outer, inner);
@@ -1442,10 +1442,6 @@ final class TracerOptionsPanel extends JPanel {
         Border cBorder = component.getBorder();
         if (cBorder == null) component.setBorder(border);
         else component.setBorder(BorderFactory.createCompoundBorder(border, cBorder));
-    }
-
-    private static boolean isWindowsLookAndFeel() {
-        return UIManager.getLookAndFeel().getID().equals("Windows"); //NOI18N
     }
 
 }
