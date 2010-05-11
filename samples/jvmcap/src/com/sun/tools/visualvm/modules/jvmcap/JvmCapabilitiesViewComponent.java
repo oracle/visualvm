@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.modules.jvmcap;
 import java.awt.BorderLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 
 /**
  *
