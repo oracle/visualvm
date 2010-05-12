@@ -44,7 +44,7 @@ public interface XYItemSelection extends ItemSelection {
 
 
         public Default(XYItem item, int valueIndex) {
-            this(item, DISTANCE_UNKNOWN, valueIndex);
+            this(item, valueIndex, DISTANCE_UNKNOWN);
         }
 
         public Default(XYItem item, int valueIndex, int distance) {

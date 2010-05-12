@@ -110,7 +110,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                             && (eventType != CommonConstants.METHOD_EXIT_MONITOR)
                             && (eventType != CommonConstants.METHOD_ENTRY_SLEEP)
                             && (eventType != CommonConstants.METHOD_EXIT_SLEEP)) {
-                        if (collectingTwoTimeStamps || (eventType < CommonConstants.TWO_TIMESTAMP_EVENTS)) {
+                        if (collectingTwoTimeStamps) {
                             timeStamp1 = (((long) buffer[position++] & 0xFF) << 48) | (((long) buffer[position++] & 0xFF) << 40)
                                          | (((long) buffer[position++] & 0xFF) << 32)
                                          | (((long) buffer[position++] & 0xFF) << 24)

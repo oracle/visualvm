@@ -275,6 +275,8 @@ function wrapJavaValue(thing) {
             // wrap Java object as script object
             return wrapJavaObject(thing.instance);
         }
+    } else if (thing instanceof Packages.org.netbeans.lib.profiler.heap.GCRoot) {
+        return wrapRoot(thing);
     } else {
         return wrapJavaObject(thing);
     }
@@ -645,7 +647,7 @@ function wrapHeapSnapshot(heap) {
          * Returns an Enumeration of all roots.
          */
         roots: function() {
-            return wrapIterator(this.snapshot.roots);
+            return wrapIterator(this.snapshot.roots, true);
         },
 
         /**

@@ -71,6 +71,7 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native]"),
         new MethodInfo("java.lang.Object", "wait[native]"),
         new MethodInfo("java.lang.Thread", "sleep[native]"),
+        new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0[native]"),
     });
 
     private InstrumentationFilter filter;

@@ -180,28 +180,27 @@ public class JExtendedTablePanel extends JPanel {
     private void initComponents() {
         setBorder(BorderFactory.createLoweredBevelBorder());
 
-        extendedTableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        extendedTableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                                  JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         extendedTableScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         extendedTableViewport = new CustomExtendedTableViewport(extendedTable);
         extendedTableScrollPane.setViewport(extendedTableViewport);
         extendedTableScrollPane.addMouseWheelListener(extendedTable);
         // Enable vertical scrollbar only if needed
-        extendedTableScrollPane.getVerticalScrollBar().getModel().addChangeListener(new javax.swing.event.ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    updateVerticalScrollbar();
-                }
-            });
+        JScrollBar vScrollbar = extendedTableScrollPane.getVerticalScrollBar();
+        vScrollbar.getModel().addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                updateVerticalScrollbar();
+            }
+        });
 
         add(extendedTableScrollPane, BorderLayout.CENTER);
     }
 
     private void updateVerticalScrollbar() {
-        if (extendedTableScrollPane.getVerticalScrollBar().getModel().getExtent() == extendedTableScrollPane.getVerticalScrollBar()
-                                                                                                                .getModel()
-                                                                                                                .getMaximum()) {
-            extendedTableScrollPane.getVerticalScrollBar().setEnabled(false);
-        } else {
-            extendedTableScrollPane.getVerticalScrollBar().setEnabled(JExtendedTablePanel.this.isEnabled());
-        }
+        JScrollBar vScrollbar = extendedTableScrollPane.getVerticalScrollBar();
+        vScrollbar.setEnabled(JExtendedTablePanel.this.isEnabled() &&
+                              vScrollbar.getVisibleAmount() < vScrollbar.getMaximum());
     }
+    
 }

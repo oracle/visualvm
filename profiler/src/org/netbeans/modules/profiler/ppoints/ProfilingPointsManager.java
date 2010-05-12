@@ -183,7 +183,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void windowClosed(WindowEvent e) {
-            if (dd.getValue() == customizerButton) {
+            if (dd.getValue() == getCustomizerButton()) {
                 updater.run();
             }
 
@@ -303,7 +303,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private CustomizerButton customizerButton = new CustomizerButton();
+    private CustomizerButton customizerButton;
     private List<GlobalProfilingPoint> activeGlobalProfilingPoints = new ArrayList();
     private Map<Integer, RuntimeProfilingPointMapper> activeCodeProfilingPoints = new HashMap();
     private PropertyChangeListener pcl = new PropertyChangeListener() {
@@ -318,7 +318,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private Set<ProfilingPoint> dirtyProfilingPoints = Collections.synchronizedSet(new HashSet());
     private Vector<ValidityAwarePanel> customizers = new Vector();
-    private Vector<Project> openedProjects = new Vector();
+    private final Vector<Project> openedProjects = new Vector();
     private Vector<ProfilingPoint> profilingPoints = new Vector();
     private ProfilingPointFactory[] profilingPointFactories = new ProfilingPointFactory[0];
     private boolean profilingInProgress = false; // collecting data
@@ -397,7 +397,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         Set<Project> projects = new HashSet();
 
         if (project == null) {
-            projects.addAll(openedProjects);
+            synchronized (openedProjects) { projects.addAll(openedProjects); }
         } else {
             projects.add(project);
             if (inclSubprojects) projects.addAll(getOpenSubprojects(project));
@@ -708,8 +708,9 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             SwingUtilities.getWindowAncestor(showingCustomizer).requestFocus();
             showingCustomizer.requestFocusInWindow();
         } else {
-            customizer.addValidityListener(customizerButton);
-            customizerButton.setEnabled(customizer.areSettingsValid()); // In fact customizer should be valid but just to be sure...
+            CustomizerButton cb = getCustomizerButton();
+            customizer.addValidityListener(cb);
+            cb.setEnabled(customizer.areSettingsValid()); // In fact customizer should be valid but just to be sure...
 
             JPanel customizerContainer = new JPanel(new BorderLayout());
             JPanel customizerSpacer = new JPanel(new BorderLayout());
@@ -725,8 +726,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             }
 
             DialogDescriptor dd = new DialogDescriptor(customizerContainer, PP_CUSTOMIZER_CAPTION, false,
-                                                       new Object[] { customizerButton, DialogDescriptor.CANCEL_OPTION },
-                                                       customizerButton, 0, helpCtx, null);
+                                                       new Object[] { cb, DialogDescriptor.CANCEL_OPTION },
+                                                       cb, 0, helpCtx, null);
             final Dialog d = ProfilerDialogs.createDialog(dd);
             d.addWindowListener(new CustomizerListener(d, dd, updater));
             d.setVisible(true);
@@ -817,9 +818,11 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         if (subprojects.isEmpty()) return subprojects;
 
         Set<Project> openSubprojects = new HashSet();
-        for (Project openProject : openedProjects)
-            if (containsProject(subprojects, openProject))
-                openSubprojects.add(openProject);
+        synchronized(openedProjects) {
+            for (Project openProject : openedProjects)
+                if (containsProject(subprojects, openProject))
+                    openSubprojects.add(openProject);
+        }
 
         return openSubprojects;
     }
@@ -1015,7 +1018,8 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     private synchronized void processOpenedProjectsChanged() {
-        Vector<Project> lastOpenedProjects = new Vector(openedProjects);
+        Vector<Project> lastOpenedProjects = new Vector();
+        synchronized (openedProjects) { lastOpenedProjects.addAll(openedProjects); }
         refreshOpenedProjects();
 
         for (Project project : lastOpenedProjects) {
@@ -1150,4 +1154,10 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             profilingPoints.remove(closedProfilingPoint);
         }
     }
+
+    private CustomizerButton getCustomizerButton() {
+        if (customizerButton == null) customizerButton = new CustomizerButton();
+        return customizerButton;
+    }
+
 }
