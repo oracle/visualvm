@@ -465,8 +465,7 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
 
             jFluidRootDirName = rootDir.getCanonicalPath();
         } catch (IOException e) {
-            throw new IOException("Problem with a required JFluid installation directory or file " + checkedPath
-                                  + "\nOriginal message: " + e.getMessage()); // NOI18N
+            throw new IOException("Problem with a required JFluid installation directory or file " + checkedPath, e);
         }
     }
 }

@@ -47,7 +47,7 @@ made subject to such option by the copyright holder.
 <!DOCTYPE type PUBLIC "-//NetBeans//DTD annotation type 1.1//EN" "http://www.netbeans.org/dtds/annotation-type-1_1.dtd">
 <type
     name='loadgenProfilingPoint'
-    description_key='TT_ProfilePoint'
+    description_key='TT_LoadGenProfilePoint'
     localizing_bundle='org.netbeans.modules.profiler.ppoints.ui.Bundle'
     visible='true'
     glyph='nbresloc:/org/netbeans/modules/profiler/ppoints/ui/resources/loadgenProfilingPoint.png'

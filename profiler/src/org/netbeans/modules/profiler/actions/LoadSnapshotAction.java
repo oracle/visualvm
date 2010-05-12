@@ -123,10 +123,12 @@ public final class LoadSnapshotAction extends AbstractAction {
         chooser.setDialogTitle(handleHeapdumps ? OPEN_SNAPSHOT_HEAPDUMP_DIALOG_CAPTION : OPEN_SNAPSHOT_DIALOG_CAPTION);
         chooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
-                    return handleHeapdumps
-                           ? (f.isDirectory() || f.getName().endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)
-                           || f.getName().endsWith("." + ResultsManager.HEAPDUMP_EXTENSION) // NOI18N
-                    ) : (f.isDirectory() || f.getName().endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)); // NOI18N
+                    if (f.isDirectory()) return true;
+                    String fname = f.getName();
+                    if (fname.endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)) return true;
+                    if (fname.endsWith("." + ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) return true;
+                    if (handleHeapdumps && fname.endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) return true;
+                    return false;
                 }
 
                 public String getDescription() {
@@ -147,15 +149,16 @@ public final class LoadSnapshotAction extends AbstractAction {
 
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
+                String fname = file.getName();
 
-                if (file.getName().endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)) {
+                if (fname.endsWith("." + ResultsManager.SNAPSHOT_EXTENSION) || fname.endsWith("." + ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) {
                     snapshotsFOArr.add(FileUtil.toFileObject(FileUtil.normalizeFile(file))); // NOI18N
-                } else if (file.getName().endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) {
+                } else if (fname.endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) {
                     heapdumpsFArr.add(file); // NOI18N
                 }
             }
 
-            if (snapshotsFOArr.size() > 0) {
+            if (!snapshotsFOArr.isEmpty()) {
                 LoadedSnapshot[] imported = ResultsManager.getDefault()
                                                           .loadSnapshots(snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
                 ResultsManager.getDefault().openSnapshots(imported);
@@ -166,7 +169,7 @@ public final class LoadSnapshotAction extends AbstractAction {
 
             }
 
-            if (heapdumpsFArr.size() > 0) {
+            if (!heapdumpsFArr.isEmpty()) {
                 RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
                             HeapWalkerManager.getDefault().openHeapWalkers(heapdumpsFArr.toArray(new File[heapdumpsFArr.size()]));
