@@ -233,27 +233,29 @@ class SamplerImpl {
 
 
     private void updateStatus() {
-        String status = "<undefined>"; // NOI18N
+        if (statusValueLabel != null) {
+            String status = "<undefined>"; // NOI18N
 
-        switch (getState()) {
-            case TERMINATED:
-                status = "application terminated";
-                break;
-            case INACTIVE:
-                status = "sampling inactive";
-                break;
-            case CPU:
-                status = "CPU sampling in progress";
-                break;
-            case MEMORY:
-                status = "memory sampling in progress";
-                break;
-            case TRANSITION:
-                status = "refreshing...";
-                break;
+            switch (getState()) {
+                case TERMINATED:
+                    status = "application terminated";
+                    break;
+                case INACTIVE:
+                    status = "sampling inactive";
+                    break;
+                case CPU:
+                    status = "CPU sampling in progress";
+                    break;
+                case MEMORY:
+                    status = "memory sampling in progress";
+                    break;
+                case TRANSITION:
+                    status = "refreshing...";
+                    break;
+            }
+
+            statusValueLabel.setText(status);
         }
-
-        statusValueLabel.setText(status);
     }
 
     private void updateSettings() {
@@ -275,59 +277,61 @@ class SamplerImpl {
     }
 
     private void updateButtons() {
-        switch (getState()) {
-            case TERMINATED:
-                cpuButton.setSelected(false);
-                cpuButton.setEnabled(false);
+        if (cpuButton != null && memoryButton != null && stopButton != null) {
+            switch (getState()) {
+                case TERMINATED:
+                    cpuButton.setSelected(false);
+                    cpuButton.setEnabled(false);
 
-                memoryButton.setSelected(false);
-                memoryButton.setEnabled(false);
+                    memoryButton.setSelected(false);
+                    memoryButton.setEnabled(false);
 
-                stopButton.setEnabled(false);
+                    stopButton.setEnabled(false);
 
-                break;
+                    break;
 
-            case INACTIVE:
-                cpuButton.setSelected(false);
-                cpuButton.setEnabled(cpuProfilingSupported);
+                case INACTIVE:
+                    cpuButton.setSelected(false);
+                    cpuButton.setEnabled(cpuProfilingSupported);
 
-                memoryButton.setSelected(false);
-                memoryButton.setEnabled(memoryProfilingSupported);
+                    memoryButton.setSelected(false);
+                    memoryButton.setEnabled(memoryProfilingSupported);
 
-                stopButton.setEnabled(false);
+                    stopButton.setEnabled(false);
 
-                break;
+                    break;
 
-            case CPU:
-                cpuButton.setSelected(true);
-                cpuButton.setEnabled(true);
+                case CPU:
+                    cpuButton.setSelected(true);
+                    cpuButton.setEnabled(true);
 
-                memoryButton.setSelected(false);
-                memoryButton.setEnabled(memoryProfilingSupported);
+                    memoryButton.setSelected(false);
+                    memoryButton.setEnabled(memoryProfilingSupported);
 
-                stopButton.setEnabled(true);
+                    stopButton.setEnabled(true);
 
-                break;
+                    break;
 
-            case MEMORY:
-                cpuButton.setSelected(false);
-                cpuButton.setEnabled(cpuProfilingSupported);
+                case MEMORY:
+                    cpuButton.setSelected(false);
+                    cpuButton.setEnabled(cpuProfilingSupported);
 
-                memoryButton.setSelected(true);
-                memoryButton.setEnabled(true);
+                    memoryButton.setSelected(true);
+                    memoryButton.setEnabled(true);
 
-                stopButton.setEnabled(true);
+                    stopButton.setEnabled(true);
 
-                break;
+                    break;
 
-            case TRANSITION:
-                cpuButton.setEnabled(false);
+                case TRANSITION:
+                    cpuButton.setEnabled(false);
 
-                memoryButton.setEnabled(false);
+                    memoryButton.setEnabled(false);
 
-                stopButton.setEnabled(false);
+                    stopButton.setEnabled(false);
 
-                break;
+                    break;
+            }
         }
     }
 
