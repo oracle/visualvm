@@ -104,6 +104,11 @@ final class TimelineModel implements Timeline {
     void addValues(long timestamp, long[] newValues) {
         updateStorage();
 
+        // Check last timestamp whether greater than the new one
+        long lastTimestamp = valuesCount == 0 ? -1 : timestamps[valuesCount - 1];
+        // Silently increase timestamp, JVM was busy - timer out of sync
+        if (lastTimestamp >= timestamp) timestamp = lastTimestamp + 1;
+
         timestamps[valuesCount] = timestamp;
         for (int i = 0; i < values.length; i++)
             values[i][valuesCount] = newValues[i];
