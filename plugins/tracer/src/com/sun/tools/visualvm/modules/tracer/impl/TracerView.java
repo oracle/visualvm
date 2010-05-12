@@ -272,7 +272,16 @@ final class TracerView extends DataSourceView {
             
             detailsView.registerViewListener(new VisibilityHandler() {
                 public void shown()  {}
-                public void hidden() { clearSelections(); }
+                public void hidden() {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            // Doesn't clear the selection when switching tabs and
+                            // manipulating topcomponents
+                            if (!detailsView.isShowing() && timelineView.isShowing())
+                                clearSelections();
+                        }
+                    });
+                }
             });
 
             if (TracerOptions.getInstance().getExtraToolbar() == TracerOptions.SHOW_AS_NEEDED)
