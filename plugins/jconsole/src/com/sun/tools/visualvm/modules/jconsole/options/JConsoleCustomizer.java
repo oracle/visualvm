@@ -47,6 +47,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.openide.awt.Mnemonics;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
@@ -243,6 +244,22 @@ public class JConsoleCustomizer extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
         add(Spacer.create(), c);
+
+        // hintLabel
+        JLabel hintLabel = new JLabel();
+        Mnemonics.setLocalizedText(hintLabel, NbBundle.getMessage(
+                JConsoleCustomizer.class, "MSG_ReopenTab")); // NOI18N
+        hintLabel.setIcon(ImageUtilities.loadImageIcon(
+                "com/sun/tools/visualvm/modules/jconsole/ui/resources/infoIcon.png", false)); // NOI18N)
+        hintLabel.setIconTextGap(10);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 8;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(3, 0, 0, 0);
+        add(hintLabel, c);
     }
 
 
