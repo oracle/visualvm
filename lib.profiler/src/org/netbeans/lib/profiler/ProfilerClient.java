@@ -1098,7 +1098,8 @@ public class ProfilerClient implements CommonConstants {
         }
 
         if (!changeableOnly) {
-            SetUnchangeableInstrParamsCommand cmd1 = new SetUnchangeableInstrParamsCommand(settings.getAbsoluteTimerOn(),
+            SetUnchangeableInstrParamsCommand cmd1 = new SetUnchangeableInstrParamsCommand(status.remoteProfiling,
+                                                                                           settings.getAbsoluteTimerOn(),
                                                                                            settings.getThreadCPUTimerOn(),
                                                                                            settings.getInstrScheme(),
                                                                                            settings.getCodeRegionCPUResBufSize());
@@ -1533,7 +1534,7 @@ public class ProfilerClient implements CommonConstants {
 
         String taHost = (attachMode == 1) ? settings.getRemoteHost() : ""; // NOI18N
 
-        if (taHost.equals("") || taHost.equals("localhost") || taHost.equals("127.0.0.1")) { // NOI18N
+        if (taHost.equals("")) { // NOI18N
             status.remoteProfiling = false;
             taHost = "127.0.0.1"; // NOI18N
         } else {
