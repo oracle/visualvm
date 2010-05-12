@@ -312,6 +312,7 @@ public class SynchronousXYChart extends ChartComponent {
 
         int lastIndex = lastVisibleIndex[0];
         if (lastIndex == -1) lastIndex = lastVisibleIndex[1];
+        else if (currentlyFollowingDataWidth()) lastIndex = timestampsCount - 1;
         while(nearestIndex + 1 <= lastIndex) {
             itemDataX = timeline.getTimestamp(nearestIndex + 1);
             long distance = Math.abs(dataX - itemDataX);
