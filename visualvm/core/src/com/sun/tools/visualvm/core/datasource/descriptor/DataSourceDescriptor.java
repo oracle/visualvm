@@ -198,6 +198,8 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      *
      * @return true if the General properties section should be available for
      * the DataSource, false otherwise
+     *
+     * @since VisualVM 1.2
      */
     public boolean providesProperties() {
         return false;
