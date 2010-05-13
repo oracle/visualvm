@@ -45,6 +45,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultButtonModel;
 import javax.swing.GrayFilter;
@@ -61,25 +63,25 @@ import javax.swing.border.Border;
  * @author Jiri Sedlacek
  */
 class DisplayAreaSupport {
-    
+
     static final Color BORDER_COLOR_NORMAL = new Color(192, 192, 192);
     static final Color BORDER_COLOR_HIGHLIGHT = new Color(128, 128, 128);
     static final Color BACKGROUND_COLOR_NORMAL = new Color(245, 245, 245);
     static final Color BACKGROUND_COLOR_HIGHLIGHT = new Color(235, 235, 235);
-    
+
     static final Color COLOR_NONE = new Color(0, 0, 0);
     static final Color TABS_SEPARATOR = new Color(UIManager.getColor("Label.foreground").getRGB()); // NOI18N
-    
+
     static final int TABBUTTON_MARGIN_TOP = 3;
     static final int TABBUTTON_MARGIN_LEFT = 8;
     static final int TABBUTTON_MARGIN_BOTTOM = 3;
     static final int TABBUTTON_MARGIN_RIGHT = 8;
-    
+
     private static final Color TABBUTTON_FOCUS_COLOR = Color.BLACK;
     private static final Stroke TABBUTTON_FOCUS_STROKE = new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 0, new float[] {0, 2}, 0);
-    
+
     static class TabButton extends JButton {
-        
+
         public TabButton(String text, String description) {
             super(text);
             setModel(new DefaultButtonModel() {
@@ -92,10 +94,10 @@ class DisplayAreaSupport {
             setBorder(BorderFactory.createEmptyBorder(TABBUTTON_MARGIN_TOP, TABBUTTON_MARGIN_LEFT, TABBUTTON_MARGIN_BOTTOM, TABBUTTON_MARGIN_RIGHT));
             setToolTipText(description);
         }
-        
+
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            
+
             Dimension size = getSize();
             Graphics2D g2 = (Graphics2D)g;
             if( hasFocus() && isEnabled() ) {
@@ -104,38 +106,38 @@ class DisplayAreaSupport {
                 g2.drawRect(2, 2, size.width - 5, size.height - 5);
             }
         }
-        
+
     }
-    
+
     static class TabButtonContainer extends JPanel {
-        
+
         private TabButton tabButton;
-        
+
         public TabButtonContainer(TabButton tabButton) {
             this.tabButton = tabButton;
             setOpaque(true);
             setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
             setBackground(BACKGROUND_COLOR_NORMAL);
-            setBorder(new TabbedCaptionBorder(null, null, null, null));
+            setBorder(TabbedCaptionBorder.get(null, null, null, null));
             add(tabButton, BorderLayout.CENTER);
         }
-        
+
         public void setEnabled(boolean enabled) {
             super.setEnabled(enabled);
             tabButton.setEnabled(enabled);
         }
-        
+
         public void updateTabButton(int index, int selectedIndex, int buttonsCount) {
             if (buttonsCount == 1) {
                 tabButton.setFocusable(false);
                 tabButton.setCursor(Cursor.getDefaultCursor());
                 setBackground(BACKGROUND_COLOR_NORMAL);
-                setBorder(new TabbedCaptionBorder(BORDER_COLOR_NORMAL, BORDER_COLOR_NORMAL, COLOR_NONE, COLOR_NONE));
+                setBorder(TabbedCaptionBorder.get(BORDER_COLOR_NORMAL, BORDER_COLOR_NORMAL, COLOR_NONE, COLOR_NONE));
             } else if (index == selectedIndex) {
                 tabButton.setFocusable(true);
                 tabButton.setCursor(Cursor.getDefaultCursor());
                 setBackground(BACKGROUND_COLOR_HIGHLIGHT);
-                setBorder(new TabbedCaptionBorder(BORDER_COLOR_HIGHLIGHT, BORDER_COLOR_HIGHLIGHT, COLOR_NONE, BORDER_COLOR_HIGHLIGHT));
+                setBorder(TabbedCaptionBorder.get(BORDER_COLOR_HIGHLIGHT, BORDER_COLOR_HIGHLIGHT, COLOR_NONE, BORDER_COLOR_HIGHLIGHT));
             } else {
                 tabButton.setFocusable(true);
                 tabButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -144,35 +146,50 @@ class DisplayAreaSupport {
                 Color leftColor = index == 0 ? BORDER_COLOR_NORMAL : null;
                 Color bottomColor = BORDER_COLOR_HIGHLIGHT;
                 Color rightColor = index == selectedIndex - 1 ? null : index == buttonsCount - 1 ? COLOR_NONE : TABS_SEPARATOR;
-                setBorder(new TabbedCaptionBorder(topColor, leftColor, bottomColor, rightColor));
+                setBorder(TabbedCaptionBorder.get(topColor, leftColor, bottomColor, rightColor));
             }
         }
-                
+
     }
-    
+
     static class TabbedCaptionBorder implements Border {
-        
+
+        private static final Set<TabbedCaptionBorder> borders = new HashSet();
+
         private Color COLOR_TOP;
         private Color COLOR_LEFT;
         private Color COLOR_BOTTOM;
         private Color COLOR_RIGHT;
         private Insets insets;
-        
-        
-        public TabbedCaptionBorder(Color colorTop, Color colorLeft, Color colorBottom, Color colorRight) {
+
+
+        public static TabbedCaptionBorder get(Color colorTop, Color colorLeft, Color colorBottom, Color colorRight) {
+            for (TabbedCaptionBorder border : borders)
+                // Note: identity must be used for the comparison!
+                if (border.COLOR_TOP == colorTop &&
+                    border.COLOR_LEFT == colorLeft &&
+                    border.COLOR_BOTTOM == colorBottom &&
+                    border.COLOR_RIGHT == colorRight) return border;
+
+            TabbedCaptionBorder border = new TabbedCaptionBorder(colorTop, colorLeft, colorBottom, colorRight);
+            borders.add(border);
+            return border;
+        }
+
+        private TabbedCaptionBorder(Color colorTop, Color colorLeft, Color colorBottom, Color colorRight) {
             COLOR_TOP = colorTop;
             COLOR_LEFT = colorLeft;
             COLOR_BOTTOM = colorBottom;
             COLOR_RIGHT = colorRight;
-            
+
             insets = new Insets(
                     COLOR_TOP == null ? 0 : 1,
                     COLOR_LEFT == null ? 0 : 1,
                     COLOR_BOTTOM == null ? 0 : 1,
                     COLOR_RIGHT == null ? 0 : 1);
         }
-        
-        
+
+
         public Insets getBorderInsets(Component c) { return insets; }
 
         public boolean isBorderOpaque() { return true; }
@@ -203,9 +220,9 @@ class DisplayAreaSupport {
                 g.drawLine(x, y + height - 1, x + width - 1, y + height - 1);
             }
         }
-        
+
     }
-    
+
     private static class ThinBevelBorder extends BevelBorder {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -271,13 +288,13 @@ class DisplayAreaSupport {
             g.setColor(oldColor);
         }
     }
-    
+
     static class ImageIconButton extends JButton implements MouseListener {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private Border emptyBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
-        private Border loweredBorder = new ThinBevelBorder(BevelBorder.LOWERED, Color.WHITE, Color.GRAY);
-        private Border raisedBorder = new ThinBevelBorder(BevelBorder.RAISED, Color.WHITE, Color.GRAY);
+        private static final Border EMPTY_BORDER = BorderFactory.createEmptyBorder(1, 1, 1, 1);
+        private static final Border LOWERED_BORDER = new ThinBevelBorder(BevelBorder.LOWERED, Color.WHITE, Color.GRAY);
+        private static final Border RAISED_BORDER = new ThinBevelBorder(BevelBorder.RAISED, Color.WHITE, Color.GRAY);
         private boolean rollover = false;
         private boolean pressed = false;
 
@@ -299,7 +316,7 @@ class DisplayAreaSupport {
             setPressedIcon(icon);
             setDisabledIcon(disabledIcon);
             setIconTextGap(0);
-            setBorder(emptyBorder);
+            setBorder(EMPTY_BORDER);
             setFocusPainted(false);
             setContentAreaFilled(false);
 
@@ -315,39 +332,39 @@ class DisplayAreaSupport {
             rollover = true;
 
             if (pressed) {
-                setBorder(loweredBorder);
+                setBorder(LOWERED_BORDER);
             } else {
-                setBorder(raisedBorder);
+                setBorder(RAISED_BORDER);
             }
         }
 
         public void mouseExited(MouseEvent e) {
             rollover = false;
-            setBorder(emptyBorder);
+            setBorder(EMPTY_BORDER);
         }
 
         public void mousePressed(MouseEvent e) {
             pressed = true;
-            setBorder(loweredBorder);
+            setBorder(LOWERED_BORDER);
         }
 
         public void mouseReleased(MouseEvent e) {
             pressed = false;
 
             if (rollover) {
-                setBorder(raisedBorder);
+                setBorder(RAISED_BORDER);
             } else {
-                setBorder(emptyBorder);
+                setBorder(EMPTY_BORDER);
             }
         }
-        
+
         public Dimension getPreferredSize() {
             return new Dimension(TABBUTTON_MARGIN_LEFT + TABBUTTON_MARGIN_RIGHT, TABBUTTON_MARGIN_LEFT + TABBUTTON_MARGIN_RIGHT);
         }
-        
+
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            
+
             Dimension size = getSize();
             Graphics2D g2 = (Graphics2D)g;
             if( hasFocus() && isEnabled() ) {
