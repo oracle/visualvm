@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.core.model.Model;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Comparator;
 
 /**
  * DataSourceDescriptor defines runtime appearance of the DataSource in Applications window.
@@ -56,6 +57,10 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * Named property for DataSource position within its owner.
      */
     public static final String PROPERTY_PREFERRED_POSITION = "prop_preferred_position"; // NOI18N
+    /**
+     * Named property for comparator used to sort nested DataSources.
+     */
+    public static final String PROPERTY_CHILDREN_COMPARATOR = "prop_children_comparator"; // NOI18N
     /**
      * Named property for DataSource expansion policy.
      */
@@ -86,6 +91,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     private String name;
     private String description;
     private int preferredPosition;
+    private Comparator<DataSource> childrenComparator;
     private int autoExpansionPolicy;
     private final PropertyChangeSupport changeSupport;
     
@@ -181,6 +187,19 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      */
     public int getPreferredPosition() {
         return preferredPosition;
+    }
+
+    /**
+     * Returns comparator used to sort nested DataSources. If defined, it overrides
+     * the default sorting which uses DataSourceDescriptor.getPreferredPosition().
+     * Default implementation returns null.
+     *
+     * @return comparator used to sort nested DataSources or null
+     *
+     * @since VisualVM 1.2.3
+     */
+    public Comparator<DataSource> getChildrenComparator() {
+        return childrenComparator;
     }
     
     /**
@@ -291,6 +310,15 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
         int oldPosition = preferredPosition;
         preferredPosition = newPosition;
         getChangeSupport().firePropertyChange(PROPERTY_PREFERRED_POSITION, oldPosition, newPosition);
+    }
+
+    /**
+     * @since VisualVM 1.2.3
+     */
+    protected void setChildrenComparator(Comparator<DataSource> newComparator) {
+        Comparator<DataSource> oldComparator = childrenComparator;
+        childrenComparator = newComparator;
+        getChangeSupport().firePropertyChange(PROPERTY_CHILDREN_COMPARATOR, oldComparator, newComparator);
     }
     
     protected void getAutoExpansionPolicy(int newPolicy) {

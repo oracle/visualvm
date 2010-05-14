@@ -37,11 +37,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
@@ -63,10 +65,13 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     private final ExplorerNode explorerRoot;
     private final DefaultTreeModel explorerModel;
     
-    private final Map<DataSource, ExplorerNode> nodes;
+    private final Map<DataSource, ExplorerNode> nodes = new HashMap();
     private final Map<DataSource, PropertyChangeListener> visibilityListeners = new HashMap();
     private final Map<DataSourceDescriptor, PropertyChangeListener> descriptorListeners = new HashMap();
-    
+
+    private static final ExplorerNodesComparator RELATIVE_COMPARATOR =
+            new ExplorerNodesComparator(new RelativePositionComparator());
+
     
     public static synchronized ExplorerModelBuilder getInstance() {
         if (instance == null) instance = new ExplorerModelBuilder();
@@ -81,8 +86,8 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     ExplorerNode getNodeFor(DataSource dataSource) {
         return nodes.get(dataSource);
     }
-    
-    
+
+        
     public void dataChanged(final DataChangeEvent event) {
         queue.post(new Runnable() {
             public void run() {
@@ -126,7 +131,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     private void processAddedDisplayableDataSources(Set<DataSource> addedDisplayable) {
-        final Set<ExplorerNode> addedNodes = new HashSet();
+        final Set<ExplorerNode> addedNodes = new TreeSet(RELATIVE_COMPARATOR);
         final ProgressHandle[] pHandle = new ProgressHandle[1];
         
         SwingUtilities.invokeLater(new Runnable() {
@@ -199,6 +204,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         node.setName(descriptor.getName());
         node.setIcon(descriptor.getIcon() == null ? null : new ImageIcon(descriptor.getIcon()));
         node.setPreferredPosition(descriptor.getPreferredPosition());
+        node.setComparator(descriptor.getChildrenComparator());
         node.setAutoExpansionPolicy(descriptor.getAutoExpansionPolicy());
     }
     
@@ -233,9 +239,20 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
                         explorerModel.nodesWereRemoved(parent, new int[] { nodeIndex }, new Object[] { node });
                         parent.addNode(node);
                         explorerModel.nodesWereInserted(parent, new int[] { parent.getIndex(node) });
+                        queue.post(new Runnable() {
+                            public void run() { parent.syncRelativePositions(); }
+                        });
                     }
                 }); } catch (Exception e) {}
             }
+        } else if (DataSourceDescriptor.PROPERTY_CHILDREN_COMPARATOR.equals(property)) {
+            final Comparator<DataSource> comparator = (Comparator<DataSource>)newValue;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (node.setComparator(comparator))
+                        explorerModel.nodeStructureChanged(node);
+                }
+            });
         } else if (DataSourceDescriptor.PROPERTY_EXPANSION_POLICY.equals(property)) {
             node.setAutoExpansionPolicy((Integer)evt.getNewValue());
         }
@@ -261,20 +278,25 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             ExplorerNode nodeParent = (ExplorerNode)node.getParent();
             indexes.get(nodeParent).add(nodeParent.getIndex(node));
         }
-        
+
         // Notify tree model
+        // Synchronize relative positions
         for (Map.Entry<ExplorerNode, List<Integer>> entry : indexes.entrySet()) {
             List<Integer> indexesList = entry.getValue();
             Collections.sort(indexesList);
             int[] indexesArr = new int[indexesList.size()];
             for (int i = 0; i < indexesArr.length; i++) indexesArr[i] = indexesList.get(i);
-            explorerModel.nodesWereInserted(entry.getKey(), indexesArr);
+            final ExplorerNode parent = entry.getKey();
+            explorerModel.nodesWereInserted(parent, indexesArr);
+            queue.post(new Runnable() {
+                public void run() { parent.syncRelativePositions(); }
+            });
         }
         
         // Try to restore selection
         ExplorerSupport.sharedInstance().selectDataSources(selectedDataSources);
     }
-    
+
     private void removeNodes(Set<ExplorerNode> removed) {
         Map<ExplorerNode, List<IndexNodePair>> pairs = new HashMap();
         
@@ -299,6 +321,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         }
         
         // Notify tree model
+        // Synchronize relative positions
         for (Map.Entry<ExplorerNode, List<IndexNodePair>> entry : pairs.entrySet()) {
             List<IndexNodePair> indexesList = entry.getValue();
             Collections.sort(indexesList);
@@ -309,7 +332,11 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
                 indexesArr[i] = pair.index;
                 childsArr[i] = pair.node;
             }
-            explorerModel.nodesWereRemoved(entry.getKey(), indexesArr, childsArr);
+            final ExplorerNode parent = entry.getKey();
+            explorerModel.nodesWereRemoved(parent, indexesArr, childsArr);
+            queue.post(new Runnable() {
+                public void run() { parent.syncRelativePositions(); }
+            });
         }
         
         // Try to restore selection
@@ -357,13 +384,26 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         explorerRoot.setAutoExpansionPolicy(DataSourceDescriptor.EXPAND_ON_EACH_FIRST_CHILD);
         explorerModel = new DefaultTreeModel(explorerRoot);
         
-        nodes = new HashMap();
         nodes.put(DataSource.ROOT, explorerRoot);
         
         DataSourceRepository.sharedInstance().addDataChangeListener(this, DataSource.class);
     }
-    
-    
+
+
+    private static class RelativePositionComparator extends DataSourcesComparator {
+
+        protected int getRelativePosition(DataSource d, int positionType) {
+            try {
+                return Integer.parseInt(d.getStorage().getCustomProperty(
+                                        ExplorerNode.PROPERTY_RELATIVE_POSITION));
+            } catch (Exception e) {
+                return positionType;
+            }
+        }
+
+    }
+
+
     private static class IndexNodePair implements Comparable {
         
         public int index;
