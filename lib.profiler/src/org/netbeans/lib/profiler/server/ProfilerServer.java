@@ -346,8 +346,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static String INCORRECT_MAIN_MODIFIERS_MSG = "Method {0}.main(String args[]) has incorrect modifiers"; // NOI18N
     private static String UNEXPECTED_EXCEPTION_MSG = "Target application threw an unexpected exception: {0}"; // NOI18N
     private static String ELAPSED_TIME_MSG = "Main application thread elapsed time: {0} ms."; // NOI18N
-    private static String REMOTE_CONNECTION_MSG = "Profiler Agent: Established remote connection with the tool"; // NOI18N
-    private static String LOCAL_CONNECTION_MSG = "Profiler Agent: Established local connection with the tool"; // NOI18N
+    private static String CONNECTION_MSG = "Profiler Agent: Established connection with the tool"; // NOI18N
     private static String WAITING_ON_PORT_MSG = "Profiler Agent: Waiting for connection on port {0} (Protocol version: {1})"; // NOI18N
     private static String WAITING_ON_PORT_TIMEOUT_MSG = "Profiler Agent: Waiting for connection on port {0}, timeout {1} seconds (Protocol version: {2})"; // NOI18N
     private static String CONNECTION_EXCEPTION_MSG = "Profiler Agent Error: Exception when trying to establish connection with client:\n{0}"; // NOI18N
@@ -360,7 +359,9 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static String INCORRECT_AGENT_ID_MSG = "Profiler Agent Warning: Wrong agentId specified: {0}"; // NOI18N
     private static String THREAD_EXCEPTION_MSG = "Profiler Agent Error: Exception in executeInSeparateThread()"; // NOI18N
     private static String THREAD_WAIT_EXCEPTION_MSG = "Profiler Agent Error: Exception in wait in SeparateCmdExecutionThread"; // NOI18N
-                                                                                                                               // -----
+    private static String LOCAL_SESSION_MSG = "Profiler Agent: Local accelerated session";
+    private static String REMOTE_SESSION_MSG = "Profiler Agent: Standard session";
+    
     public static final int ATTACH_DYNAMIC = 0;
     public static final int ATTACH_DIRECT = 1;
     private static volatile boolean profilerInterfaceInitialized;
@@ -585,7 +586,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
         ProfilerInterface.setProfilerServer(profilerServer);
 
-        initSupportingFunctionality(false, profilerServer.isRemoteProfiling());
+        initSupportingFunctionality(false);
 
         // Accept, or wait for, the client command to start the target app, and then start it.
         while (!startTargetApp) {
@@ -622,17 +623,15 @@ public class ProfilerServer extends Thread implements CommonConstants {
         forcedShutdown();
     }
 
-    public boolean isRemoteProfiling() {
-        String socketAddr = clientSocket.getRemoteSocketAddress().toString();
-        boolean res = !(((socketAddr.indexOf("127.0.0.1") != -1) || socketAddr.startsWith("localhost"))); // NOI18N
-
-        if (res) {
-            System.out.println(REMOTE_CONNECTION_MSG);
+    public void setRemoteProfiling(boolean remote) {
+        status.remoteProfiling = remote;
+        if (remote) {
+            System.out.println(REMOTE_SESSION_MSG);
+            // This is to preload some classes that can otherwise be loaded at inappropriate time and cause class load hook firing.
+            ClassBytesLoader.preloadClasses();
         } else {
-            System.out.println(LOCAL_CONNECTION_MSG);
+            System.out.println(LOCAL_SESSION_MSG);
         }
-
-        return res;
     }
 
     public static void notifyClientOnResultsAvailability() {
@@ -795,8 +794,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             INCORRECT_MAIN_MODIFIERS_MSG = messages.getString("ProfilerServer_IncorrectMainModifiersMsg"); // NOI18N
             UNEXPECTED_EXCEPTION_MSG = messages.getString("ProfilerServer_UnexpectedExceptionMsg"); // NOI18N
             ELAPSED_TIME_MSG = messages.getString("ProfilerServer_ElapsedTimeMsg"); // NOI18N
-            REMOTE_CONNECTION_MSG = messages.getString("ProfilerServer_RemoteConnectionMsg"); // NOI18N
-            LOCAL_CONNECTION_MSG = messages.getString("ProfilerServer_LocalConnectionMsg"); // NOI18N
+            CONNECTION_MSG = messages.getString("ProfilerServer_ConnectionMsg"); // NOI18N
             WAITING_ON_PORT_MSG = messages.getString("ProfilerServer_WaitingOnPortMsg"); // NOI18N
             WAITING_ON_PORT_TIMEOUT_MSG = messages.getString("ProfilerServer_WaitingOnPortTimeoutMsg"); // NOI18N
             CONNECTION_EXCEPTION_MSG = messages.getString("ProfilerServer_ConnectionExceptionMsg"); // NOI18N
@@ -809,6 +807,8 @@ public class ProfilerServer extends Thread implements CommonConstants {
             INCORRECT_AGENT_ID_MSG = messages.getString("ProfilerServer_IncorrectAgentIdMsg"); // NOI18N
             THREAD_EXCEPTION_MSG = messages.getString("ProfilerServer_ThreadExceptionMsg"); // NOI18N
             THREAD_WAIT_EXCEPTION_MSG = messages.getString("ProfilerServer_ThreadWaitExceptionMsg"); // NOI18N
+            LOCAL_SESSION_MSG = messages.getString("ProfilerServer_LocalSessionMsg"); // NOI18N
+            REMOTE_SESSION_MSG = messages.getString("ProfilerServer_RemoteSessionMsg"); // NOI18N
             resourcesInitialized = true;
         }
     }
@@ -893,7 +893,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
         ProfilerInterface.setProfilerServer(profilerServer);
 
-        initSupportingFunctionality(true, profilerServer.isRemoteProfiling());
+        initSupportingFunctionality(true);
 
         if (_activateCode == ATTACH_DIRECT) {
             // "Attach on startup", where we normally wait until the initiate instrumentation request arrives and instrumentation starts.
@@ -949,10 +949,9 @@ public class ProfilerServer extends Thread implements CommonConstants {
      * Called after the connection with the tool is established, i.e. we know that we are connected, in which mode
      * (attached or called directly) and whether it's local or remote connection.
      */
-    private static void initSupportingFunctionality(boolean inAttachedMode, boolean remoteProfiling) {
+    private static void initSupportingFunctionality(boolean inAttachedMode) {
         status = new ProfilingSessionStatus();
         status.runningInAttachedMode = inAttachedMode;
-        status.remoteProfiling = remoteProfiling;
         status.targetJDKVersionString = Platform.getJDKVersionString();
 
         Monitors.initialize(); // Initialize before initProfilerInterface to get monitor thread(s) recorded as system thread(s)
@@ -963,11 +962,6 @@ public class ProfilerServer extends Thread implements CommonConstants {
         // Profiler interface initialization includes recording profiler's own threads (all currently running threads minus the
         // current thread, since it will become the target app's main thread).
         ProfilerInterface.initProfilerInterface(status, inAttachedMode ? profilerServer : Thread.currentThread());
-
-        // This is to preload some classes that can otherwise be loaded at inappropriate time and cause class load hook firing.
-        if (remoteProfiling) {
-            ClassBytesLoader.preloadClasses();
-        }
 
         profilerInterfaceInitialized = true;
     }
@@ -1273,7 +1267,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             socketOut = new ObjectOutputStream(clientSocket.getOutputStream());
             wireIO = new WireIO(socketOut, socketIn);
             connectionOpen = true;
-
+            System.out.println(CONNECTION_MSG);
             return true;
         } catch (SocketTimeoutException ex) {
             System.err.println(CONNECTION_TIMEOUT_MSG); // NOI18N
@@ -1474,6 +1468,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 status.instrScheme = sucipCmd.getInstrScheme();
                 ProfilerRuntimeCPUCodeRegion.setCPUResBufSize(sucipCmd.getCodeRegionCPUResBufSize());
                 ProfilerRuntimeCPU.enableFirstTimeMethodInvoke(status.instrScheme != CommonConstants.INSTRSCHEME_TOTAL);
+                setRemoteProfiling(sucipCmd.getRemoteProfiling());
                 sendSimpleResponseToClient(true, null);
 
                 break;
