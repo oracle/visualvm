@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -40,38 +40,39 @@
 
 package org.netbeans.lib.profiler.heap;
 
-import java.util.List;
-
 
 /**
  *
  * @author Tomas Hurka
  */
-class ObjectArrayDump extends ArrayDump implements ObjectArrayInstance {
+class ClassLoaderFieldValue extends HprofFieldObjectValue {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    ObjectArrayDump(ClassDump cls, long offset) {
+    
+    ClassLoaderFieldValue(ClassDump cls, long offset) {
         super(cls, offset);
     }
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public int getSize() {
-        int idSize = dumpClass.getHprofBuffer().getIDSize();
-
-        return dumpClass.classDumpSegment.getMinimumInstanceSize() + HPROF_ARRAY_OVERHEAD + (idSize * getLength());
+    
+    public String getName() {
+        return "$classLoader$";  // NOI18N
     }
-
-    public List /*<Instance>*/ getValues() {
-        HprofByteBuffer dumpBuffer = dumpClass.getHprofBuffer();
-        HprofHeap heap = dumpClass.getHprof();
-
-        return new ObjectArrayLazyList(heap, dumpBuffer, getLength(), getOffset());
+    
+    byte getValueType() {
+        return (byte)HprofHeap.OBJECT;
     }
-
-    long getOffset() {
-        int idSize = dumpClass.getHprofBuffer().getIDSize();
-        
-        return fileOffset + 1 + idSize + 4 + 4 + idSize;
+    
+    public Instance getInstance() {
+        return classDump.getClassLoader();
     }
+    
+    long getInstanceID() {
+        return classDump.getClassLoaderId();
+    }
+    
+    Object getTypeValue() {
+        return Long.valueOf(getInstanceID());
+    }
+    
+    
 }
