@@ -38,7 +38,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-public class RemoteHostsContainer extends DataSource {
+public final class RemoteHostsContainer extends DataSource {
     
     private static RemoteHostsContainer sharedInstance;
     
