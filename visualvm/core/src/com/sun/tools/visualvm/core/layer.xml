@@ -106,6 +106,13 @@
                 <attr name="position" intvalue="2000"/>
             </file>
         </folder>
+
+        <folder name="View">
+            <file name="File-Separator-2000.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="2000"/>
+            </file>
+        </folder>
         
         <folder name="Window">
             <file name="ExplorerTopComponentAction.shadow">

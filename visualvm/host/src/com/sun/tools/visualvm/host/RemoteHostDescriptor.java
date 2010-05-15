@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.host;
 
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
@@ -32,7 +33,8 @@ import org.openide.util.NbBundle;
 
 /**
  * DataSourceDescriptor for remote hosts.
- * Jiri Sedlacek
+ *
+ * @author Jiri Sedlacek
  */
 public class RemoteHostDescriptor extends DataSourceDescriptor {
 
@@ -45,7 +47,7 @@ public class RemoteHostDescriptor extends DataSourceDescriptor {
      */
     public RemoteHostDescriptor(Host host) {
         super(host, resolveName(host), NbBundle.getMessage(RemoteHostDescriptor.class,
-              "DESCR_Remote"), NODE_ICON, POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+              "DESCR_Remote"), NODE_ICON, resolvePosition(host), EXPAND_ON_FIRST_CHILD); // NOI18N
     }
 
     private static String resolveName(Host host) {
@@ -55,6 +57,20 @@ public class RemoteHostDescriptor extends DataSourceDescriptor {
         } else {
             return host.getHostName();
         }
+    }
+
+    private static int resolvePosition(Host host) {
+        Storage storage = host.getStorage();
+        int position = POSITION_AT_THE_END;
+        String positionS = storage.getCustomProperty(PROPERTY_PREFERRED_POSITION);
+        if (positionS != null) try {
+                position = Integer.parseInt(positionS);
+            } catch (NumberFormatException e) {
+                storage.setCustomProperty(PROPERTY_PREFERRED_POSITION, Integer.toString(position));
+        } else {
+            storage.setCustomProperty(PROPERTY_PREFERRED_POSITION, Integer.toString(position));
+        }
+        return position;
     }
 
     public boolean supportsRename() {

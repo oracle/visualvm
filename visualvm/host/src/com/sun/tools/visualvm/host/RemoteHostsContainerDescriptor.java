@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -27,39 +27,40 @@ package com.sun.tools.visualvm.host;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import java.awt.Image;
+import java.util.Comparator;
+import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
- * Toplevel node Remote in Applications window.
+ * DataSourceDescriptor for Remote node in Applications window.
  *
  * @author Jiri Sedlacek
+ *
+ * @since VisualVM 1.2.3
  */
-public final class RemoteHostsContainer extends DataSource {
+public final class RemoteHostsContainerDescriptor extends DataSourceDescriptor<RemoteHostsContainer> {
 
-    private static RemoteHostsContainer sharedInstance;
+    private static final Image NODE_ICON = ImageUtilities.loadImage(
+                "com/sun/tools/visualvm/host/resources/remoteHosts.png", true);  // NOI18N
 
-    /**
-     * Returns singleton instance of RemoteHostsContainer.
-     *
-     * @return singleton instance of RemoteHostsContainer.
-     */
-    public static synchronized RemoteHostsContainer sharedInstance() {
-        if (sharedInstance == null) sharedInstance = new RemoteHostsContainer();
-        return sharedInstance;
+    RemoteHostsContainerDescriptor() {
+        super(RemoteHostsContainer.sharedInstance(), NbBundle.getMessage(
+              RemoteHostsContainer.class, "LBL_Remote"), null, NODE_ICON, 10, // NOI18N
+              EXPAND_ON_EACH_NEW_CHILD);
+        
+        // Initialize sorting
+        setChildrenComparator(HostsSorting.instance().getInitialSorting());
     }
 
-    
-    private RemoteHostsContainer() {
-        DataSourceDescriptorFactory.getDefault().registerProvider(
-            new AbstractModelProvider<DataSourceDescriptor,DataSource>() {
-                public DataSourceDescriptor createModelFor(DataSource ds) {
-                    if (RemoteHostsContainer.sharedInstance().equals(ds))
-                        return new RemoteHostsContainerDescriptor();
-                    else return null;
-                }
-            }
-        );
+    /**
+     * Sets a custom comparator for sorting DataSources within the RemoteHostsContainer.
+     * Use setChildrenComparator(null) to restore the default sorting.
+     *
+     * @param newComparator comparator for sorting DataSources within the RemoteHostsContainer
+     */
+    public void setChildrenComparator(Comparator<DataSource> newComparator) {
+        super.setChildrenComparator(newComparator);
     }
 
 }
