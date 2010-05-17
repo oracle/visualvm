@@ -46,7 +46,7 @@ public final class RemoteHostsContainerDescriptor extends DataSourceDescriptor<R
 
     RemoteHostsContainerDescriptor() {
         super(RemoteHostsContainer.sharedInstance(), NbBundle.getMessage(
-              RemoteHostsContainer.class, "LBL_Remote"), null, NODE_ICON, 10, // NOI18N
+              RemoteHostsContainerDescriptor.class, "LBL_Remote"), null, NODE_ICON, 10, // NOI18N
               EXPAND_ON_EACH_NEW_CHILD);
         
         // Initialize sorting
