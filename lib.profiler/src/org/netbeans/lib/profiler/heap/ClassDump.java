@@ -87,9 +87,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public Instance getClassLoader() {
-        long loaderId = getHprofBuffer().getID(fileOffset + classDumpSegment.classLoaderIDOffset);
-
-        return getHprof().getInstanceByID(loaderId);
+        return getHprof().getInstanceByID(getClassLoaderId());
     }
 
     public Field getField(String name) {
@@ -202,33 +200,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public List /*<FieldValue>*/ getStaticFieldValues() {
-        HprofByteBuffer buffer = getHprofBuffer();
-        long offset = fileOffset + getStaticFieldOffset();
-        int i;
-        int fields;
-        List filedsList;
-        HprofHeap heap = getHprof();
-
-        fields = buffer.getShort(offset);
-        offset += 2;
-        filedsList = new ArrayList(fields);
-
-        for (i = 0; i < fields; i++) {
-            byte type = buffer.get(offset + classDumpSegment.fieldTypeOffset);
-            int fieldSize = classDumpSegment.fieldSize + heap.getValueSize(type);
-            HprofFieldValue value;
-
-            if (type == HprofHeap.OBJECT) {
-                value = new HprofFieldObjectValue(this, offset);
-            } else {
-                value = new HprofFieldValue(this, offset);
-            }
-
-            filedsList.add(value);
-            offset += fieldSize;
-        }
-
-        return filedsList;
+        return getStaticFieldValues(true);
     }
 
     public Collection /*<JavaClass>*/ getSubClasses() {
@@ -291,6 +263,40 @@ class ClassDump extends HprofObject implements JavaClass {
 
         return filedsList;
     }
+
+    List /*<FieldValue>*/ getStaticFieldValues(boolean addClassLoader) {
+        HprofByteBuffer buffer = getHprofBuffer();
+        long offset = fileOffset + getStaticFieldOffset();
+        int i;
+        int fields;
+        List filedsList;
+        HprofHeap heap = getHprof();
+
+        fields = buffer.getShort(offset);
+        offset += 2;
+        filedsList = new ArrayList(fields+(addClassLoader?0:1));
+
+        for (i = 0; i < fields; i++) {
+            byte type = buffer.get(offset + classDumpSegment.fieldTypeOffset);
+            int fieldSize = classDumpSegment.fieldSize + heap.getValueSize(type);
+            HprofFieldValue value;
+
+            if (type == HprofHeap.OBJECT) {
+                value = new HprofFieldObjectValue(this, offset);
+            } else {
+                value = new HprofFieldValue(this, offset);
+            }
+
+            filedsList.add(value);
+            offset += fieldSize;
+        }
+        if (addClassLoader) {
+            long classLoaderOffset = fileOffset + classDumpSegment.classLoaderIDOffset;
+            
+            filedsList.add(new ClassLoaderFieldValue(this, classLoaderOffset));
+        }
+        return filedsList;
+    }
     
     List getAllInstanceFields() {
         List fields = new ArrayList(50);
@@ -339,6 +345,10 @@ class ClassDump extends HprofObject implements JavaClass {
 
     LoadClass getLoadClass() {
         return new LoadClass(getHprof().getLoadClassSegment(), loadClassOffset);
+    }
+
+    long getClassLoaderId() {
+        return getHprofBuffer().getID(fileOffset + classDumpSegment.classLoaderIDOffset);
     }
 
     List getReferences() {
@@ -392,6 +402,12 @@ class ClassDump extends HprofObject implements JavaClass {
             }
 
             fieldOffset += (idSize + 1 + size);
+        }
+        if (instanceId == getClassLoaderId()) {
+            if (staticFileds == null) {
+                staticFileds = getStaticFieldValues();
+            }
+            refs.add(staticFileds.get(fields));
         }
     }
 
