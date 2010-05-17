@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.host;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,6 +37,8 @@ import java.util.prefs.Preferences;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -80,7 +83,18 @@ final class HostsSorting implements Presenter.Menu {
 
 
     private JMenuItem createPresenter() {
-        JMenu menu = new JMenu();
+        final JMenu menu = new JMenu();
+        menu.addMenuListener(new MenuListener() {
+            public void menuSelected(MenuEvent e) {
+                Component[] items = menu.getMenuComponents();
+                for (Component item : items)
+                    if (item instanceof SortAction)
+                        ((SortAction)item).updateAction();
+            }
+
+            public void menuDeselected(MenuEvent e) {}
+            public void menuCanceled(MenuEvent e) {}
+        });
         Mnemonics.setLocalizedText(menu, NbBundle.getMessage(HostsSorting.class,
                                    "ACT_SortHosts")); // NOI18N
 
@@ -138,12 +152,12 @@ final class HostsSorting implements Presenter.Menu {
             this.sorter = sorter;
         }
 
-        public boolean isSelected() {
+        void updateAction() {
             DataSourceDescriptor d = DataSourceDescriptorFactory.getDescriptor(
                                      RemoteHostsContainer.sharedInstance());
             setEnabled(d instanceof RemoteHostsContainerDescriptor);
             currentlySelected = d.getChildrenComparator() == comparator;
-            return currentlySelected;
+            setSelected(currentlySelected);
         }
 
         protected void fireActionPerformed(ActionEvent e) {
