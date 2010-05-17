@@ -55,6 +55,7 @@ import java.io.ObjectOutputStream;
 public class SetUnchangeableInstrParamsCommand extends Command {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    private boolean remoteProfiling;
     private boolean absoluteTimerOn;
     private boolean threadCPUTimerOn;
     private int codeRegionCPUResBufSize;
@@ -62,9 +63,10 @@ public class SetUnchangeableInstrParamsCommand extends Command {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SetUnchangeableInstrParamsCommand(boolean absoluteTimerOn, boolean threadCPUTimerOn, int instrScheme,
+    public SetUnchangeableInstrParamsCommand(boolean remote, boolean absoluteTimerOn, boolean threadCPUTimerOn, int instrScheme,
                                              int codeRegionCPUResBufSize) {
         super(SET_UNCHANGEABLE_INSTR_PARAMS);
+        remoteProfiling = remote;
         this.absoluteTimerOn = absoluteTimerOn;
         this.threadCPUTimerOn = threadCPUTimerOn;
         this.instrScheme = instrScheme;
@@ -77,6 +79,10 @@ public class SetUnchangeableInstrParamsCommand extends Command {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    public boolean getRemoteProfiling() {
+        return remoteProfiling;
+    }
 
     public boolean getAbsoluteTimerOn() {
         return absoluteTimerOn;
@@ -96,13 +102,15 @@ public class SetUnchangeableInstrParamsCommand extends Command {
 
     // For debugging
     public String toString() {
-        return super.toString() + ", absoluteTimerOn: " + absoluteTimerOn // NOI18N
+        return super.toString() + ", remoteProfiling: " + remoteProfiling // NOI18N
+               + ", absoluteTimerOn: " + absoluteTimerOn // NOI18N
                + ", threadCPUTimerOn: " + threadCPUTimerOn // NOI18N
                + ", instrScheme: " + instrScheme // NOI18N
                + ", codeRegionCPUResBufSize: " + codeRegionCPUResBufSize; // NOI18N
     }
 
     void readObject(ObjectInputStream in) throws IOException {
+        remoteProfiling = in.readBoolean();
         absoluteTimerOn = in.readBoolean();
         threadCPUTimerOn = in.readBoolean();
         instrScheme = in.readInt();
@@ -110,6 +118,7 @@ public class SetUnchangeableInstrParamsCommand extends Command {
     }
 
     void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeBoolean(remoteProfiling);
         out.writeBoolean(absoluteTimerOn);
         out.writeBoolean(threadCPUTimerOn);
         out.writeInt(instrScheme);
