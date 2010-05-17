@@ -131,9 +131,9 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
     }
     
     private void processAddedDisplayableDataSources(Set<DataSource> addedDisplayable) {
-        final Set<ExplorerNode> addedNodes = new TreeSet(RELATIVE_COMPARATOR);
+        final List<ExplorerNode> addedNodes = new ArrayList();
         final ProgressHandle[] pHandle = new ProgressHandle[1];
-        
+
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
@@ -167,6 +167,9 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
                 public void run() { pHandle[0].finish(); }
             });
         }
+
+        Collections.sort(addedNodes, RELATIVE_COMPARATOR);
+
         try { SwingUtilities.invokeAndWait(new Runnable() {
             public void run() { addNodes(addedNodes); }
         }); } catch (Exception e) {}
@@ -258,7 +261,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         }
     }
     
-    private void addNodes(Set<ExplorerNode> added) {
+    private void addNodes(List<ExplorerNode> added) {
         Map<ExplorerNode, List<Integer>> indexes = new HashMap();
         
         // Save selection
