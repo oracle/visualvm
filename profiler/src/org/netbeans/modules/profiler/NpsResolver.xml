@@ -45,12 +45,21 @@ made subject to such option by the copyright holder.
 <MIME-resolver>
     <file>
         <ext name="nps"/>
-<!--        <magic hex="426e52"/> -->
         <resolver mime="application/x-netbeans-profiler"/>
     </file>
     <file>
-    <ext name="npss"/>
-<!--        <magic hex="4e505353"/> -->
+        <magic hex="6e4270526f46694c6552"
+              mask="ffffffffffffffffffff"/>
+        <resolver mime="application/x-netbeans-profiler"/>
+    </file>
+    
+    <file>
+        <ext name="npss"/>
+        <resolver mime="application/x-netbeans-profiler"/>
+    </file>
+    <file>
+        <magic hex="4e505353"
+              mask="ffffffff"/>
         <resolver mime="application/x-netbeans-profiler"/>
     </file>
 </MIME-resolver>

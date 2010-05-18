@@ -65,6 +65,9 @@ made subject to such option by the copyright holder.
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>com.sun.tools.visualvm.core</friend>
+                <friend>com.sun.tools.visualvm.modules.sampler</friend>
+                <friend>com.sun.tools.visualvm.profiler</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>
