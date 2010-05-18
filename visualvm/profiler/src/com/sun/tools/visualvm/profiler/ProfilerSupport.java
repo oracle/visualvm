@@ -53,7 +53,7 @@ final class ProfilerSupport {
     private static final String OPENJDK_VM_NAME_PREFIX = "OpenJDK ";    // NOI18N
     private static final String SUN_VM_VENDOR_PREFIX = "Sun ";  // NOI18N
     private static final String APPLE_VM_VENDOR_PREFIX = "Apple ";  // NOI18N
-    private static final String HP_VM_VENDOR_PREFIX = "Hewlett-Packard "; // NOI18N
+    private static final String HP_VM_VENDOR_PREFIX = "\"Hewlett-Packard "; // NOI18N
     
     private static final String JAVA_RT_16_PREFIX = "1.6.0";  // NOI18N
     private static final String JAVA_RT_17_PREFIX = "1.7.0";  // NOI18N
