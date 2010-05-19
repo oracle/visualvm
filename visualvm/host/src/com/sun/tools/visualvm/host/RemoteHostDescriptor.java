@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.host;
 
-import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
@@ -38,7 +37,8 @@ import org.openide.util.NbBundle;
  */
 public class RemoteHostDescriptor extends DataSourceDescriptor {
 
-    private static final Image NODE_ICON = ImageUtilities.loadImage("com/sun/tools/visualvm/host/resources/remoteHost.png", true);   // NOI18N
+    private static final Image NODE_ICON = ImageUtilities.loadImage(
+            "com/sun/tools/visualvm/host/resources/remoteHost.png", true);   // NOI18N
 
     /**
      * Creates new instance of RemoteHostDescriptor for a given host.
@@ -47,7 +47,8 @@ public class RemoteHostDescriptor extends DataSourceDescriptor {
      */
     public RemoteHostDescriptor(Host host) {
         super(host, resolveName(host), NbBundle.getMessage(RemoteHostDescriptor.class,
-              "DESCR_Remote"), NODE_ICON, resolvePosition(host), EXPAND_ON_FIRST_CHILD); // NOI18N
+              "DESCR_Remote"), NODE_ICON, resolvePosition(host, POSITION_AT_THE_END, // NOI18N
+              true), EXPAND_ON_FIRST_CHILD);
     }
 
     private static String resolveName(Host host) {
@@ -57,20 +58,6 @@ public class RemoteHostDescriptor extends DataSourceDescriptor {
         } else {
             return host.getHostName();
         }
-    }
-
-    private static int resolvePosition(Host host) {
-        Storage storage = host.getStorage();
-        int position = POSITION_AT_THE_END;
-        String positionS = storage.getCustomProperty(PROPERTY_PREFERRED_POSITION);
-        if (positionS != null) try {
-                position = Integer.parseInt(positionS);
-            } catch (NumberFormatException e) {
-                storage.setCustomProperty(PROPERTY_PREFERRED_POSITION, Integer.toString(position));
-        } else {
-            storage.setCustomProperty(PROPERTY_PREFERRED_POSITION, Integer.toString(position));
-        }
-        return position;
     }
 
     public boolean supportsRename() {

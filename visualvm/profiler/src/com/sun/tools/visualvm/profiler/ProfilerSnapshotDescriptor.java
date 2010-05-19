@@ -40,9 +40,12 @@ import org.openide.util.NbBundle;
 class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
     private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotDescriptor.class.getName());
     
-    private static final Image CPU_ICON = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpuSmall.png", true);    // NOI18N
-    private static final Image MEMORY_ICON = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memorySmall.png", true);  // NOI18N
-    private static final Image NODE_BADGE = ImageUtilities.loadImage("com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
+    private static final Image CPU_ICON = ImageUtilities.loadImage(
+            "org/netbeans/modules/profiler/resources/cpuSmall.png", true);    // NOI18N
+    private static final Image MEMORY_ICON = ImageUtilities.loadImage(
+            "org/netbeans/modules/profiler/resources/memorySmall.png", true);  // NOI18N
+    private static final Image NODE_BADGE = ImageUtilities.loadImage(
+            "com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
     
 
     public ProfilerSnapshotDescriptor(ProfilerSnapshot snapshot) {
@@ -60,7 +63,8 @@ class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
             int snapshotType = snapshot.getLoadedSnapshot().getType();
             if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_CPU)
                 return ImageUtilities.mergeImages(CPU_ICON, NODE_BADGE, 0, 0);
-            else if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS || snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
+            else if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS ||
+                     snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
                 return ImageUtilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
             else return null;
         } catch (Exception e) {

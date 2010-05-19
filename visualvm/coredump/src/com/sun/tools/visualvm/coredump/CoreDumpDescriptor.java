@@ -37,7 +37,8 @@ import org.openide.util.NbBundle;
  */
 public class CoreDumpDescriptor extends SnapshotDescriptor<CoreDump> {
 
-    private static final Image ICON = ImageUtilities.loadImage("com/sun/tools/visualvm/coredump/resources/coredump.png", true);  // NOI18N
+    private static final Image ICON = ImageUtilities.loadImage(
+            "com/sun/tools/visualvm/coredump/resources/coredump.png", true);  // NOI18N
 
     /**
      * Creates new instance of CoreDumpDescriptor.
