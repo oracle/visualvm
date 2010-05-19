@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -25,7 +25,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Contributor(s):
- *
  * The Original Software is NetBeans. The Initial Developer of the Original
  * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
  * Microsystems, Inc. All Rights Reserved.
@@ -42,64 +41,41 @@
  * made subject to such option by the copyright holder.
  */
 
-extern jvmtiEnv            *_jvmti;
-extern jvmtiEventCallbacks *_jvmti_callbacks;
+package org.netbeans.lib.profiler.heap;
 
-jlong get_nano_time();
 
-void JNICALL class_file_load_hook(
-            jvmtiEnv *jvmti_env,
-            JNIEnv* jni_env,
-            jclass class_being_redefined,
-            jobject loader,
-            const char* name,
-            jobject protection_domain,
-            jint class_data_len,
-            const unsigned char* class_data,
-            jint* new_class_data_len,
-            unsigned char** new_class_data);
-
-void JNICALL native_method_bind_hook(
-            jvmtiEnv *jvmti_env,
-            JNIEnv* env,
-            jthread thread,
-            jmethodID method,
-            void* address,
-            void** new_address_ptr);
-
-void JNICALL monitor_contended_enter_hook(
-            jvmtiEnv *jvmti_env,
-            JNIEnv* jni_env,
-            jthread thread,
-            jobject object);
-
-void JNICALL monitor_contended_entered_hook(
-            jvmtiEnv *jvmti_env,
-            JNIEnv* jni_env,
-            jthread thread,
-            jobject object);
-
-void JNICALL vm_object_alloc(
-            jvmtiEnv *jvmti_env,
-            JNIEnv* jni_env,
-            jthread thread,
-            jobject object,
-            jclass object_klass,
-            jlong size);
-
-typedef void (JNICALL *waitCall) (JNIEnv *env, jobject obj, jlong arg);
-typedef void (JNICALL *sleepCall) (JNIEnv *env, jclass clazz, jlong arg);
-
-void JNICALL waitInterceptor(JNIEnv *env, jobject obj, jlong arg);
-void JNICALL sleepInterceptor(JNIEnv *env, jclass clazz, jlong arg);
-
-void get_saved_class_file_bytes(JNIEnv *env, char *name, jobject loader, jint *class_data_len, unsigned char **class_data);
-
-void try_removing_bytes_for_unloaded_classes(JNIEnv *env);
-
-void cache_loaded_classes(jvmtiEnv *jvmti_env,jclass *classes,jint class_count); 
-
-void JNICALL vm_init_hook(jvmtiEnv *jvmti_env, JNIEnv* jni_env, jthread thread);
-
-void parse_options_and_extract_params(char *options);
-
+/**
+ *
+ * @author Tomas Hurka
+ */
+class ClassLoaderFieldValue extends HprofFieldObjectValue {
+    //~ Constructors -------------------------------------------------------------------------------------------------------------
+    
+    ClassLoaderFieldValue(ClassDump cls, long offset) {
+        super(cls, offset);
+    }
+    
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public String getName() {
+        return "$classLoader$";  // NOI18N
+    }
+    
+    byte getValueType() {
+        return (byte)HprofHeap.OBJECT;
+    }
+    
+    public Instance getInstance() {
+        return classDump.getClassLoader();
+    }
+    
+    long getInstanceID() {
+        return classDump.getClassLoaderId();
+    }
+    
+    Object getTypeValue() {
+        return Long.valueOf(getInstanceID());
+    }
+    
+    
+}

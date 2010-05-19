@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -87,9 +90,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public Instance getClassLoader() {
-        long loaderId = getHprofBuffer().getID(fileOffset + classDumpSegment.classLoaderIDOffset);
-
-        return getHprof().getInstanceByID(loaderId);
+        return getHprof().getInstanceByID(getClassLoaderId());
     }
 
     public Field getField(String name) {
@@ -202,33 +203,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public List /*<FieldValue>*/ getStaticFieldValues() {
-        HprofByteBuffer buffer = getHprofBuffer();
-        long offset = fileOffset + getStaticFieldOffset();
-        int i;
-        int fields;
-        List filedsList;
-        HprofHeap heap = getHprof();
-
-        fields = buffer.getShort(offset);
-        offset += 2;
-        filedsList = new ArrayList(fields);
-
-        for (i = 0; i < fields; i++) {
-            byte type = buffer.get(offset + classDumpSegment.fieldTypeOffset);
-            int fieldSize = classDumpSegment.fieldSize + heap.getValueSize(type);
-            HprofFieldValue value;
-
-            if (type == HprofHeap.OBJECT) {
-                value = new HprofFieldObjectValue(this, offset);
-            } else {
-                value = new HprofFieldValue(this, offset);
-            }
-
-            filedsList.add(value);
-            offset += fieldSize;
-        }
-
-        return filedsList;
+        return getStaticFieldValues(true);
     }
 
     public Collection /*<JavaClass>*/ getSubClasses() {
@@ -291,6 +266,40 @@ class ClassDump extends HprofObject implements JavaClass {
 
         return filedsList;
     }
+
+    List /*<FieldValue>*/ getStaticFieldValues(boolean addClassLoader) {
+        HprofByteBuffer buffer = getHprofBuffer();
+        long offset = fileOffset + getStaticFieldOffset();
+        int i;
+        int fields;
+        List filedsList;
+        HprofHeap heap = getHprof();
+
+        fields = buffer.getShort(offset);
+        offset += 2;
+        filedsList = new ArrayList(fields+(addClassLoader?0:1));
+
+        for (i = 0; i < fields; i++) {
+            byte type = buffer.get(offset + classDumpSegment.fieldTypeOffset);
+            int fieldSize = classDumpSegment.fieldSize + heap.getValueSize(type);
+            HprofFieldValue value;
+
+            if (type == HprofHeap.OBJECT) {
+                value = new HprofFieldObjectValue(this, offset);
+            } else {
+                value = new HprofFieldValue(this, offset);
+            }
+
+            filedsList.add(value);
+            offset += fieldSize;
+        }
+        if (addClassLoader) {
+            long classLoaderOffset = fileOffset + classDumpSegment.classLoaderIDOffset;
+            
+            filedsList.add(new ClassLoaderFieldValue(this, classLoaderOffset));
+        }
+        return filedsList;
+    }
     
     List getAllInstanceFields() {
         List fields = new ArrayList(50);
@@ -339,6 +348,10 @@ class ClassDump extends HprofObject implements JavaClass {
 
     LoadClass getLoadClass() {
         return new LoadClass(getHprof().getLoadClassSegment(), loadClassOffset);
+    }
+
+    long getClassLoaderId() {
+        return getHprofBuffer().getID(fileOffset + classDumpSegment.classLoaderIDOffset);
     }
 
     List getReferences() {
@@ -392,6 +405,12 @@ class ClassDump extends HprofObject implements JavaClass {
             }
 
             fieldOffset += (idSize + 1 + size);
+        }
+        if (instanceId == getClassLoaderId()) {
+            if (staticFileds == null) {
+                staticFileds = getStaticFieldValues();
+            }
+            refs.add(staticFileds.get(fields));
         }
     }
 
