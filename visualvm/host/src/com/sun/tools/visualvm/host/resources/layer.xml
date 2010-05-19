@@ -45,7 +45,7 @@
         <folder name="View">
             <file name="com-sun-tools-visualvm-host-HostsSorting.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.host.HostsSorting.instance"/>
-                <attr name="position" intvalue="2100"/>
+                <attr name="position" intvalue="800"/>
             </file>
         </folder>
     </folder>

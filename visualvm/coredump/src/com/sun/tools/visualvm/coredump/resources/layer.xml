@@ -45,7 +45,7 @@
         <folder name="View">
             <file name="com-sun-tools-visualvm-coredump-CoreDumpsSorting.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.coredump.CoreDumpsSorting.instance"/>
-                <attr name="position" intvalue="2300"/>
+                <attr name="position" intvalue="900"/>
             </file>
         </folder>
     </folder>

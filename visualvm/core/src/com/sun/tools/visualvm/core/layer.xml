@@ -108,13 +108,13 @@
         </folder>
 
         <folder name="View">
-            <file name="File-Separator-2000.instance">
+            <file name="File-Separator-750.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
-                <attr name="position" intvalue="2000"/>
+                <attr name="position" intvalue="750"/>
             </file>
             <file name="com-sun-tools-visualvm-core-snapshot-SnapshotsSorting.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.SnapshotsSorting.instance"/>
-                <attr name="position" intvalue="2400"/>
+                <attr name="position" intvalue="950"/>
             </file>
         </folder>
         
