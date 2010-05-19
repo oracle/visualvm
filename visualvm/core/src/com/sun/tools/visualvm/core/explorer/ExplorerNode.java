@@ -37,6 +37,7 @@ import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 /**
  *
@@ -149,8 +150,20 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
     }
     
     
-    void setName(String name) {
-        this.name = name;
+    boolean setName(String name) {
+        // No parent, no structure changes
+        if (parent == null) {
+            this.name = name;
+            return false;
+        // Name changed
+        } else if (this.name == null || !this.name.equals(name)) {
+            this.name = name;
+            ((ExplorerNode)parent).sortChildren();
+            return true;
+        // Name unchanged
+        } else {
+            return false;
+        }
     }
     
     void setIcon(Icon icon) {

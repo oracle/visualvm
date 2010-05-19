@@ -43,10 +43,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
@@ -218,10 +218,13 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
         // Node name needs to be updated
         if (DataSourceDescriptor.PROPERTY_NAME.equals(property)) {
             String name = (String)newValue;
-            node.setName(name);
-            try { SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() { explorerModel.nodeChanged(node); }
-            }); } catch (Exception e) {}
+            Runnable updater = node.setName(name) ?
+                new Runnable() {
+                    public void run() { updateContainer(node.getParent()); }
+                } : new Runnable() {
+                    public void run() { explorerModel.nodeChanged(node); }
+                };
+            try { SwingUtilities.invokeAndWait(updater); } catch (Exception e) {}
         // Node icon needs to be updated
         } else if (DataSourceDescriptor.PROPERTY_ICON.equals(property)) {
             Image icon = (Image)newValue;
@@ -252,13 +255,23 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             final Comparator<DataSource> comparator = (Comparator<DataSource>)newValue;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (node.setComparator(comparator))
-                        explorerModel.nodeStructureChanged(node);
+                    if (node.setComparator(comparator)) updateContainer(node);
                 }
             });
         } else if (DataSourceDescriptor.PROPERTY_EXPANSION_POLICY.equals(property)) {
             node.setAutoExpansionPolicy((Integer)evt.getNewValue());
         }
+    }
+
+    private void updateContainer(TreeNode node) {
+        // Save selection
+        Set<DataSource> selectedDataSources = ExplorerSupport.sharedInstance().
+                                              getSelectedDataSources();
+
+        explorerModel.nodeStructureChanged(node);
+
+        // Try to restore selection
+        ExplorerSupport.sharedInstance().selectDataSources(selectedDataSources);
     }
     
     private void addNodes(List<ExplorerNode> added) {
