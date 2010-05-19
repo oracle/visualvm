@@ -47,15 +47,15 @@ import java.beans.PropertyChangeSupport;
     }
 
     private ApplicationDescriptor(final Application application, final ApplicationType type) {
-        super(application, resolveName(application, type), type.getDescription(),
-                type.getIcon(), POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+        super(application, resolveApplicationName(application, type), type.getDescription(),
+              type.getIcon(), POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
         name = super.getName();
         type.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 String propertyName = evt.getPropertyName();
                 if (ApplicationType.PROPERTY_NAME.equals(propertyName)) {
                     // Name already customized by the user, do not change it
-                    if (getPersistedName(application) != null) return;
+                    if (resolveName(application, null) != null) return;
                     
                     if (supportsRename()) {
                         // Descriptor supports renaming, use setName(), sync name
@@ -88,9 +88,19 @@ import java.beans.PropertyChangeSupport;
         return true;
     }
 
-    private static String resolveName(Application application, ApplicationType type) {
+    /**
+     * Returns Application name if available in Snapshot Storage as PROPERTY_NAME
+     * or generates new name using the provided ApplicationType.
+     *
+     * @param application Application for which to resolve the name
+     * @param type ApplicationType to be used for generating Application name
+     * @return persisted Application name if available or new generated name
+     *
+     * @since VisualVM 1.2.3
+     */
+    protected static String resolveApplicationName(Application application, ApplicationType type) {
         // Check for persisted displayname (currently only for JmxApplications)
-        String persistedName = getPersistedName(application);
+        String persistedName = resolveName(application, null);
         if (persistedName != null) return persistedName;
 
         // Provide generic displayname
@@ -102,10 +112,6 @@ import java.beans.PropertyChangeSupport;
         String id = Application.CURRENT_APPLICATION.getPid() == pid ||
         pid == Application.UNKNOWN_PID ? "" : " (pid " + pid + ")"; // NOI18N
         return nameBase + id;
-    }
-    
-    private static String getPersistedName(Application application) {
-        return application.getStorage().getCustomProperty(PROPERTY_NAME);
     }
     
 }

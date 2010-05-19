@@ -49,7 +49,7 @@ public class ApplicationSnapshotDescriptor extends SnapshotDescriptor<Applicatio
      * @param snapshot ApplicationSnapshot for the descriptor.
      */
     public ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {
-        super(snapshot, resolveName(snapshot), NbBundle.getMessage(
+        super(snapshot, resolveSnapshotName(snapshot), NbBundle.getMessage(
               ApplicationSnapshotDescriptor.class, "DESCR_ApplicationSnapshot"), // NOI18N
               resolveIcon(snapshot), resolvePosition(snapshot, POSITION_AT_THE_END,
               true), EXPAND_NEVER);

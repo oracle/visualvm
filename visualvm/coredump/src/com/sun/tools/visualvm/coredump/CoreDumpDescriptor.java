@@ -46,10 +46,8 @@ public class CoreDumpDescriptor extends SnapshotDescriptor<CoreDump> {
      * @param coreDump CoreDump for the descriptor.
      */
     public CoreDumpDescriptor(CoreDump coreDump) {
-        super(coreDump, ICON);
-    }
-
-    public String getDescription() {
-        return NbBundle.getMessage(CoreDumpDescriptor.class, "DESCR_CoreDump"); // NOI18N
+        super(coreDump, resolveSnapshotName(coreDump), NbBundle.getMessage(
+              CoreDumpDescriptor.class, "DESCR_CoreDump"), ICON, // NOI18N
+              resolvePosition(coreDump, POSITION_AT_THE_END, true), EXPAND_NEVER);
     }
 }

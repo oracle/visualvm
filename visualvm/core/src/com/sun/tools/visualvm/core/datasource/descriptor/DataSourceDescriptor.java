@@ -334,6 +334,22 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
 
 
     /**
+     * Returns persisted DataSource name if available in DataSource Storage as
+     * PROPERTY_NAME. Otherwise returns the provided name.
+     *
+     * @param dataSource DataSource for which to resolve the name
+     * @param name name to be used if not available in DataSource Storage
+     * @return persisted DataSource name if available or the provided name
+     *
+     * @since VisualVM 1.2.3
+     */
+    protected static String resolveName(DataSource dataSource, String name) {
+        String persistedName = dataSource.getStorage().getCustomProperty(PROPERTY_NAME);
+        if (persistedName != null) return persistedName;
+        else return name;
+    }
+
+    /**
      * Returns persisted DataSource position if available in DataSource Storage
      * as PROPERTY_PREFERRED_POSITION. Otherwise uses the provided position.
      * Optionally saves the position to DataSource storage which also ensures that

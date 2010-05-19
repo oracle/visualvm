@@ -56,8 +56,8 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
      * @since VisualVM 1.2.3
      */
     public SnapshotDescriptor(X snapshot, String description, Image icon) {
-        super(snapshot, resolveName(snapshot), description, icon, resolvePosition(
-              snapshot, POSITION_AT_THE_END, false), EXPAND_NEVER);
+        super(snapshot, resolveSnapshotName(snapshot), description, icon,
+              resolvePosition(snapshot, POSITION_AT_THE_END, false), EXPAND_NEVER);
     }
 
     /**
@@ -86,8 +86,8 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
      *
      * @since VisualVM 1.2.3
      */
-    protected static String resolveName(Snapshot snapshot) {
-        String persistedName = snapshot.getStorage().getCustomProperty(PROPERTY_NAME);
+    protected static String resolveSnapshotName(Snapshot snapshot) {
+        String persistedName = resolveName(snapshot, null);
         if (persistedName != null) return persistedName;
         
         File file = snapshot.getFile();

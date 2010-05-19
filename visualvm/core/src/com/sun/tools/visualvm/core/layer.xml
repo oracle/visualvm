@@ -114,7 +114,7 @@
             </file>
             <file name="com-sun-tools-visualvm-core-snapshot-SnapshotsSorting.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.SnapshotsSorting.instance"/>
-                <attr name="position" intvalue="2300"/>
+                <attr name="position" intvalue="2400"/>
             </file>
         </folder>
         

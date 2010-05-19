@@ -42,6 +42,12 @@
                 <attr name="position" intvalue="700"/>
             </file>
         </folder>
+        <folder name="View">
+            <file name="com-sun-tools-visualvm-coredump-CoreDumpsSorting.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.coredump.CoreDumpsSorting.instance"/>
+                <attr name="position" intvalue="2300"/>
+            </file>
+        </folder>
     </folder>
     
     <folder name="Toolbars">
