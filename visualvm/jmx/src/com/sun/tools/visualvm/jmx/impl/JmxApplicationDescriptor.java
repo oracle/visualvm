@@ -35,7 +35,8 @@ import org.openide.util.ImageUtilities;
  */
 public class JmxApplicationDescriptor extends ApplicationDescriptor {
      
-    private static final Image NODE_BADGE = ImageUtilities.loadImage("com/sun/tools/visualvm/jmx/resources/jmxBadge.png", true); // NOI18N
+    private static final Image NODE_BADGE = ImageUtilities.loadImage(
+            "com/sun/tools/visualvm/jmx/resources/jmxBadge.png", true); // NOI18N
      
 
     protected JmxApplicationDescriptor(JmxApplication application) {
@@ -48,7 +49,8 @@ public class JmxApplicationDescriptor extends ApplicationDescriptor {
     
     public Image getIcon() {
         Image originalIcon = super.getIcon();
-        return originalIcon == null ? null : ImageUtilities.mergeImages(originalIcon, NODE_BADGE, 0, 0);
+        return originalIcon == null ? null : ImageUtilities.mergeImages(
+                                             originalIcon, NODE_BADGE, 0, 0);
     }
     
 }
