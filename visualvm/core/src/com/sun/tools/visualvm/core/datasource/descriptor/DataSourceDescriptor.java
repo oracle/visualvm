@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.core.datasource.descriptor;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.model.Model;
 import java.awt.Image;
@@ -329,6 +330,37 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     
     protected final PropertyChangeSupport getChangeSupport() {
         return changeSupport;
+    }
+
+
+    /**
+     * Returns persisted DataSource position if available in DataSource Storage
+     * as PROPERTY_PREFERRED_POSITION. Otherwise uses the provided position.
+     * Optionally saves the position to DataSource storage which also ensures that
+     * relative positions POSITION_AT_THE_END and POSITION_LAST will be correctly
+     * persisted.
+     *
+     * @param dataSource DataSource for which to resolve the position
+     * @param position position to be used if not available in DataSource Storage
+     * @param savePosition true when the position should be saved to DataSource's Storage
+     * @return persisted DataSource position if available or the provided position
+     *
+     * @since VisualVM 1.2.3
+     */
+    protected static int resolvePosition(DataSource dataSource, int position,
+                                         boolean savePosition) {
+        Storage storage = dataSource.getStorage();
+        String positionS = storage.getCustomProperty(PROPERTY_PREFERRED_POSITION);
+        if (positionS != null) try {
+                position = Integer.parseInt(positionS);
+            } catch (NumberFormatException e) {
+                if (savePosition) storage.setCustomProperty(PROPERTY_PREFERRED_POSITION,
+                                                            Integer.toString(position));
+        } else {
+            if (savePosition) storage.setCustomProperty(PROPERTY_PREFERRED_POSITION,
+                                                        Integer.toString(position));
+        }
+        return position;
     }
 
 }

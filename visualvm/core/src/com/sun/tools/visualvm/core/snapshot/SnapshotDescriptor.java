@@ -43,11 +43,50 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
      * @param icon icon for the Snapshot.
      */
     public SnapshotDescriptor(X snapshot, Image icon) {
-        super(snapshot, resolveName(snapshot), null,
-              icon, POSITION_AT_THE_END, EXPAND_NEVER);
+        this(snapshot, null, icon);
     }
-    
-    private static String resolveName(Snapshot snapshot) {
+
+    /**
+     * Creates new instance of SnapshotDescriptor.
+     *
+     * @param snapshot Snapshot for the descriptor.
+     * @param description description of the snapshot
+     * @param icon icon for the Snapshot.
+     *
+     * @since VisualVM 1.2.3
+     */
+    public SnapshotDescriptor(X snapshot, String description, Image icon) {
+        super(snapshot, resolveName(snapshot), description, icon, resolvePosition(
+              snapshot, POSITION_AT_THE_END, false), EXPAND_NEVER);
+    }
+
+    /**
+     * Creates new instance of SnapshotDescriptor.
+     *
+     * @param snapshot snapshot.
+     * @param n snapshot name.
+     * @param desc snapshot description.
+     * @param ic snapshot icon.
+     * @param pos snapshot position.
+     * @param aep snapshot expansion policy.
+     *
+     * @since VisualVM 1.2.3
+     */
+    public SnapshotDescriptor(X snapshot, String name, String description,
+                              Image icon, int position, int autoExpansionPolicy) {
+        super(snapshot, name, description, icon, position, autoExpansionPolicy);
+    }
+
+    /**
+     * Returns Snapshot name if available in Snapshot Storage as PROPERTY_NAME
+     * or generates new name using Snapshot's Category.
+     *
+     * @param snapshot Snapshot for which to resolve the name
+     * @return persisted Snapshot name if available or new generated name
+     *
+     * @since VisualVM 1.2.3
+     */
+    protected static String resolveName(Snapshot snapshot) {
         String persistedName = snapshot.getStorage().getCustomProperty(PROPERTY_NAME);
         if (persistedName != null) return persistedName;
         

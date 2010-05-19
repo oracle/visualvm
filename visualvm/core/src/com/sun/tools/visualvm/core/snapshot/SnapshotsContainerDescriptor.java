@@ -1,23 +1,23 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  *  This code is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License version 2 only, as
  *  published by the Free Software Foundation.  Sun designates this
  *  particular file as subject to the "Classpath" exception as provided
  *  by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  *  This code is distributed in the hope that it will be useful, but WITHOUT
  *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  *  version 2 for more details (a copy is included in the LICENSE file that
  *  accompanied this code).
- * 
+ *
  *  You should have received a copy of the GNU General Public License version
  *  2 along with this work; if not, write to the Free Software Foundation,
  *  Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  *  Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
@@ -27,40 +27,40 @@ package com.sun.tools.visualvm.core.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import java.awt.Image;
+import java.util.Comparator;
+import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
- * Toplevel node Snapshots in Applications window.
+ * DataSourceDescriptor for Snapshots node in Applications window.
  *
  * @author Jiri Sedlacek
+ *
+ * @since VisualVM 1.2.3
  */
-public final class SnapshotsContainer extends DataSource {
+public final class SnapshotsContainerDescriptor extends DataSourceDescriptor<SnapshotsContainer> {
 
-    private static SnapshotsContainer sharedInstance;
+    private static final Image NODE_ICON = ImageUtilities.loadImage(
+                "com/sun/tools/visualvm/core/ui/resources/snapshots.png", true);  // NOI18N
 
-    /**
-     * Returns singleton instance of SnapshotsContainer.
-     *
-     * @return singleton instance of SnapshotsContainer.
-     */
-    public static synchronized SnapshotsContainer sharedInstance() {
-        if (sharedInstance == null) sharedInstance = new SnapshotsContainer();
-        return sharedInstance;
+    SnapshotsContainerDescriptor() {
+        super(SnapshotsContainer.sharedInstance(), NbBundle.getMessage(
+              SnapshotsContainer.class, "LBL_Snapshots"), null, NODE_ICON, 30, // NOI18N
+              EXPAND_ON_EACH_FIRST_CHILD);
+        
+        // Initialize sorting
+        setChildrenComparator(SnapshotsSorting.instance().getInitialSorting());
     }
 
-
-    private SnapshotsContainer() {
-        DataSourceDescriptorFactory.getDefault().registerProvider(
-            new AbstractModelProvider<DataSourceDescriptor,DataSource>() {
-                public DataSourceDescriptor createModelFor(DataSource ds) {
-                    if (SnapshotsContainer.sharedInstance().equals(ds))
-                        return new SnapshotsContainerDescriptor();
-                    else return null;
-                }
-            }
-        );
-        DataSource.ROOT.getRepository().addDataSource(this);
+    /**
+     * Sets a custom comparator for sorting DataSources within the SnapshotsContainer.
+     * Use setChildrenComparator(null) to restore the default sorting.
+     *
+     * @param newComparator comparator for sorting DataSources within the SnapshotsContainer
+     */
+    public void setChildrenComparator(Comparator<DataSource> newComparator) {
+        super.setChildrenComparator(newComparator);
     }
 
 }

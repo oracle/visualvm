@@ -39,7 +39,8 @@ import org.openide.util.NbBundle;
  */
 public class ApplicationSnapshotDescriptor extends SnapshotDescriptor<ApplicationSnapshot> {
 
-    private static final Image NODE_ICON = ImageUtilities.loadImage("com/sun/tools/visualvm/core/ui/resources/application.png", true);    // NOI18N
+    private static final Image NODE_ICON = ImageUtilities.loadImage(
+            "com/sun/tools/visualvm/core/ui/resources/application.png", true);    // NOI18N
 
     
     /**
@@ -48,11 +49,10 @@ public class ApplicationSnapshotDescriptor extends SnapshotDescriptor<Applicatio
      * @param snapshot ApplicationSnapshot for the descriptor.
      */
     public ApplicationSnapshotDescriptor(ApplicationSnapshot snapshot) {
-        super(snapshot, resolveIcon(snapshot));
-    }
-
-    public String getDescription() {
-        return NbBundle.getMessage(ApplicationSnapshotDescriptor.class, "DESCR_ApplicationSnapshot"); // NOI18N
+        super(snapshot, resolveName(snapshot), NbBundle.getMessage(
+              ApplicationSnapshotDescriptor.class, "DESCR_ApplicationSnapshot"), // NOI18N
+              resolveIcon(snapshot), resolvePosition(snapshot, POSITION_AT_THE_END,
+              true), EXPAND_NEVER);
     }
 
     private static Image resolveIcon(ApplicationSnapshot snapshot) {

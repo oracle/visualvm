@@ -112,6 +112,10 @@
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="2000"/>
             </file>
+            <file name="com-sun-tools-visualvm-core-snapshot-SnapshotsSorting.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.snapshot.SnapshotsSorting.instance"/>
+                <attr name="position" intvalue="2300"/>
+            </file>
         </folder>
         
         <folder name="Window">
