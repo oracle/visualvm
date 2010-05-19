@@ -157,7 +157,7 @@ public abstract class ProbeItemDescriptor {
     public static ProbeItemDescriptor continuousLineItem(String name, String description,
                                                          ItemValueFormatter formatter) {
 
-        return continuousItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+        return continuousItem(name, description, formatter, 1d, 0, MAX_VALUE_UNDEFINED,
                               DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
@@ -192,7 +192,7 @@ public abstract class ProbeItemDescriptor {
     public static ProbeItemDescriptor continuousFillItem(String name, String description,
                                                          ItemValueFormatter formatter) {
 
-        return continuousItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+        return continuousItem(name, description, formatter, 1d, 0, MAX_VALUE_UNDEFINED,
                               DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
@@ -227,7 +227,7 @@ public abstract class ProbeItemDescriptor {
     public static ProbeItemDescriptor continuousLineFillItem(String name, String description,
                                                              ItemValueFormatter formatter) {
 
-        return continuousItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+        return continuousItem(name, description, formatter, 1d, 0, MAX_VALUE_UNDEFINED,
                               DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
     }
 
@@ -290,7 +290,7 @@ public abstract class ProbeItemDescriptor {
     public static ProbeItemDescriptor discreteLineItem(String name, String description,
                                                        ItemValueFormatter formatter) {
 
-        return discreteOutlineItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+        return discreteOutlineItem(name, description, formatter, 1d, 0, MAX_VALUE_UNDEFINED,
                                    DEFAULT_LINE_WIDTH, DEFAULT_COLOR, null);
     }
 
@@ -325,7 +325,7 @@ public abstract class ProbeItemDescriptor {
     public static ProbeItemDescriptor discreteFillItem(String name, String description,
                                                        ItemValueFormatter formatter) {
 
-        return discreteOutlineItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+        return discreteOutlineItem(name, description, formatter, 1d, 0, MAX_VALUE_UNDEFINED,
                                    DEFAULT_LINE_WIDTH, null, DEFAULT_COLOR);
     }
 
@@ -360,7 +360,7 @@ public abstract class ProbeItemDescriptor {
     public static ProbeItemDescriptor discreteLineFillItem(String name, String description,
                                                            ItemValueFormatter formatter) {
 
-        return discreteOutlineItem(name, description, formatter, 1d, 0, VALUE_UNDEFINED,
+        return discreteOutlineItem(name, description, formatter, 1d, 0, MAX_VALUE_UNDEFINED,
                                   DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR);
     }
 
