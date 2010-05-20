@@ -37,7 +37,6 @@ import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 /**
  *
@@ -85,25 +84,6 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
     public void addNodes(Set<ExplorerNode> newChildren) {
         int originalChildCount = getChildCount();
         
-////        List<ExplorerNode> sortedNewChildren = new ArrayList(newChildren);
-////        Collections.sort(sortedNewChildren, Positionable.COMPARATOR);
-////        int insertPosition = 0;
-////        for (ExplorerNode newChild : sortedNewChildren) {
-////            int newChildPreferredPosition = newChild.getPreferredPosition();
-////            if (insertPosition == getChildCount()) {
-////                add(newChild);
-////                insertPosition++;
-////            } else {
-////                ExplorerNode node = (ExplorerNode)getChildAt(insertPosition);
-////                while (node.getPreferredPosition() <= newChildPreferredPosition && insertPosition < getChildCount()) {
-////                    insertPosition++;
-////                    if (insertPosition < getChildCount()) node = (ExplorerNode)getChildAt(insertPosition);
-////                }
-////                if (insertPosition == getChildCount()) add(newChild);
-////                else insert(newChild, insertPosition);
-////                insertPosition++;
-////            }
-////        }
         for (ExplorerNode child : newChildren) {
             add(child);
             checkAddRelativePosition(child);
