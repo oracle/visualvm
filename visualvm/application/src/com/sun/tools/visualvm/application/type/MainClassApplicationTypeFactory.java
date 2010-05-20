@@ -94,6 +94,9 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         
         // Java DB
         {"org.apache.derby.drda.NetworkServerControl", "JavaDB", descr("DESCR_JavaDb"), "com/sun/tools/visualvm/application/type/resources/JavaDB.png"},   // NOI18N
+
+        // JRockit Mission Control
+        {"com.jrockit.mc.rcp.start.MCMain","JRockit Mission Control",descr("DESCR_JRMC"),"com/sun/tools/visualvm/application/type/resources/JRMC.png"},  // NOI18N
     };
     
     Map<String,String[]> map;
