@@ -57,7 +57,8 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
      */
     public SnapshotDescriptor(X snapshot, String description, Image icon) {
         super(snapshot, resolveSnapshotName(snapshot), description, icon,
-              resolvePosition(snapshot, POSITION_AT_THE_END, false), EXPAND_NEVER);
+              resolvePosition(snapshot, POSITION_AT_THE_END, snapshot.
+              isInSnapshot()), EXPAND_NEVER);
     }
 
     /**

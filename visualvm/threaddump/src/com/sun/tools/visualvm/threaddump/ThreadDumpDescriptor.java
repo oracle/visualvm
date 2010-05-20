@@ -44,14 +44,11 @@ public class ThreadDumpDescriptor extends SnapshotDescriptor<ThreadDump> {
     /**
      * Creates new instance of ThreadDumpDescriptor.
      * 
-     * @param threadDump
+     * @param threadDump ThreadDump for the descriptor
      */
     public ThreadDumpDescriptor(ThreadDump threadDump) {
-        super(threadDump, ICON);
-    }
-
-    public String getDescription() {
-        return NbBundle.getMessage(ThreadDumpDescriptor.class, "DESCR_ThreadDump"); // NOI18N
+        super(threadDump, NbBundle.getMessage(ThreadDumpDescriptor.class,
+              "DESCR_ThreadDump"), ICON); // NOI18N
     }
         
 }

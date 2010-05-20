@@ -49,12 +49,8 @@ class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
     
 
     public ProfilerSnapshotDescriptor(ProfilerSnapshot snapshot) {
-        super(snapshot, resolveIcon(snapshot));
-    }
-
-
-    public String getDescription() {
-        return NbBundle.getMessage(ProfilerSnapshotDescriptor.class, "DESCR_ProfilerSnapshot"); // NOI18N
+        super(snapshot, NbBundle.getMessage(ProfilerSnapshotDescriptor.class,
+              "DESCR_ProfilerSnapshot"), resolveIcon(snapshot)); // NOI18N
     }
 
     

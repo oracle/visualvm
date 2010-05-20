@@ -48,10 +48,7 @@ public class HeapDumpDescriptor extends SnapshotDescriptor<HeapDump> {
      * @param heapDump HeapDump for the descriptor.
      */
     public HeapDumpDescriptor(HeapDump heapDump) {
-        super(heapDump, ICON);
-    }
-
-    public String getDescription() {
-        return NbBundle.getMessage(HeapDumpDescriptor.class, "DESCR_HeapDump"); // NOI18N
+        super(heapDump, NbBundle.getMessage(HeapDumpDescriptor.class,
+              "DESCR_HeapDump"), ICON); // NOI18N
     }
 }

@@ -183,4 +183,15 @@ public abstract class Snapshot extends DataSource {
         return super.createStorage();
     }
 
+    /**
+     * Returns true if the Snapshot is present in other Snapshot's repository, false otherwise.
+     *
+     * @return true if the Snapshot is present in other Snapshot's repository
+     *
+     * @since VisualVM 1.2.3
+     */
+    protected final boolean isInSnapshot() {
+        return getOwner() instanceof Snapshot;
+    }
+
 }

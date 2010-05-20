@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsContainer;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
 import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
@@ -109,7 +110,18 @@ class ApplicationSnapshotProvider {
         
         for (Snapshot snapshot : snapshots) {
             try {
+                Storage storage = snapshot.getStorage();
+                String prop = DataSourceDescriptor.PROPERTY_PREFERRED_POSITION;
+                boolean customPos = storage.getCustomProperty(prop) != null;
+                if (!customPos) {
+                    int pos = ExplorerSupport.sharedInstance().getDataSourcePosition(snapshot);
+                    storage.setCustomProperty(prop, Integer.toString(pos));
+                }
                 snapshot.save(snapshotDirectory);
+                if (!customPos) {
+                    storage.clearCustomProperty(prop);
+                    if (!storage.hasCustomProperties()) storage.deleteCustomPropertiesStorage();
+                }
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error saving snapshot to application snapshot", e);   // NOI18N
             }
