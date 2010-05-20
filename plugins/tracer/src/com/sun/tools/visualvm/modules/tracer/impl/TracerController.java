@@ -177,7 +177,9 @@ final class TracerController implements DataRemovedListener<DataSource>,
     }
 
     private boolean doStartSession() {
-        model.getTimelineSupport().resetValues();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { model.getTimelineSupport().resetValues(); }
+        });
         Set<Map.Entry<TracerPackage, List<TracerProbe>>> toNotify =
                 model.getDefinedProbeSets();
         notifySessionInitializing(toNotify);

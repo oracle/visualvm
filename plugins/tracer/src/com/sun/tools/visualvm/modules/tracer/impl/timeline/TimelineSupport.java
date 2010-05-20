@@ -153,6 +153,8 @@ public final class TimelineSupport {
     public void addProbe(final TracerProbe probe) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                resetValues();
+
                 TimelineChart.Row row = chart.addRow();
 
                 probes.add(probe);
@@ -175,6 +177,8 @@ public final class TimelineSupport {
     public void removeProbe(final TracerProbe probe) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                resetValues();
+                
                 TimelineChart.Row row = getRow(probe);
 
                 chart.removeRow(row);
@@ -390,28 +394,20 @@ public final class TimelineSupport {
     // --- Values management ---------------------------------------------------
 
     public void addValues(final long timestamp, final long[] newValues) {
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-                int newRow = detailsModel == null ? -1 : detailsModel.getRowCount();
-                model.addValues(timestamp, newValues);
-                itemsModel.valuesAdded();
-                if (newRow != -1) detailsModel.fireTableRowsInserted(newRow, newRow);
-                fireValuesAdded();
-//            }
-//        });
+        int newRow = detailsModel == null ? -1 : detailsModel.getRowCount();
+        model.addValues(timestamp, newValues);
+        itemsModel.valuesAdded();
+        if (newRow != -1) detailsModel.fireTableRowsInserted(newRow, newRow);
+        fireValuesAdded();
     }
 
     public void resetValues() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                model.reset();
-                itemsModel.valuesReset();
-                resetSelectedTimestamps();
-                pointsComputer.reset();
-                if (detailsModel != null) detailsModel.fireTableStructureChanged();
-                fireValuesReset();
-            }
-        });
+        model.reset();
+        itemsModel.valuesReset();
+        resetSelectedTimestamps();
+        pointsComputer.reset();
+        if (detailsModel != null) detailsModel.fireTableStructureChanged();
+        fireValuesReset();
     }
 
     public void exportAllValues(String title) {
