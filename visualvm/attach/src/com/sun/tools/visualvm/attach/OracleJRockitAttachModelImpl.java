@@ -23,29 +23,33 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.jvmstat;
+package com.sun.tools.visualvm.attach;
 
-import com.sun.tools.visualvm.jvmstat.application.JvmstatApplicationProvider;
-import com.sun.tools.visualvm.jvmstat.application.PropertiesImpl;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
-import org.openide.modules.ModuleInstall;
+import com.sun.tools.visualvm.application.Application;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
 
 /**
- * Manages a module's lifecycle. Remember that an installer is optional and
- * often not needed at all.
+ *
+ * @author Tomas Hurka
  */
-public class Installer extends ModuleInstall {
+public class OracleJRockitAttachModelImpl extends AttachModelImpl {
     
-    public void restored() {
-        JvmJvmstatModelFactory factory = JvmJvmstatModelFactory.getDefault();
-        
-        JvmstatModelFactory.getDefault().registerProvider(new JvmstatModelProvider());
-        factory.registerProvider(new JvmJvmstatModelProvider());
-        factory.registerProvider(new JRockitJvmJvmstatModelProvider());
-        factory.registerProvider(new OracleJRockitJvmJvmstatModelProvider());
-        JvmstatApplicationProvider.register();
-        PropertiesImpl.initialize();
+    OracleJRockitAttachModelImpl(Application app) {
+        super(app);
     }
     
+    public synchronized HeapHistogramImpl takeHeapHistogram() {
+        try {
+            InputStream in = getVirtualMachine().heapHisto(ALL_OBJECTS_OPTION);
+            HeapHistogramImpl h = new JRockitHeapHistogramImpl(in);
+            in.close();
+            return h;
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO,"takeHeapHistogram",ex);  // NOI18N
+        }
+        return null;
+    }
+        
 }

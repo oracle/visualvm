@@ -25,27 +25,38 @@
 
 package com.sun.tools.visualvm.jvmstat;
 
-import com.sun.tools.visualvm.jvmstat.application.JvmstatApplicationProvider;
-import com.sun.tools.visualvm.jvmstat.application.PropertiesImpl;
+import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
-import org.openide.modules.ModuleInstall;
+import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 
 /**
- * Manages a module's lifecycle. Remember that an installer is optional and
- * often not needed at all.
+ *
+ * @author Tomas Hurka
  */
-public class Installer extends ModuleInstall {
+public class OracleJRockitJvmJvmstatModelProvider extends JvmJvmstatModelProvider {
     
-    public void restored() {
-        JvmJvmstatModelFactory factory = JvmJvmstatModelFactory.getDefault();
-        
-        JvmstatModelFactory.getDefault().registerProvider(new JvmstatModelProvider());
-        factory.registerProvider(new JvmJvmstatModelProvider());
-        factory.registerProvider(new JRockitJvmJvmstatModelProvider());
-        factory.registerProvider(new OracleJRockitJvmJvmstatModelProvider());
-        JvmstatApplicationProvider.register();
-        PropertiesImpl.initialize();
+    public JvmJvmstatModel createModelFor(Application app) {
+        JvmstatModel jvmstat = JvmstatModelFactory.getJvmstatFor(app);
+        if (jvmstat != null) {
+            String vmName = jvmstat.findByName("java.property.java.vm.name");   // NOI18N
+            
+            if (vmName != null && "Oracle JRockit(R)".equals(vmName)) {  // NOI18N
+                JvmJvmstatModel jvm = null;
+                String vmVersion = jvmstat.findByName("java.property.java.vm.version"); // NOI18N
+                
+                if (vmVersion != null) {
+                    if (vmVersion.contains("1.6.0")) {  // NOI18N
+                        jvm = new OracleJRockitJvmJvmstatModel(app,jvmstat);
+                    } else {
+                        jvm = new OracleJRockitJvmJvmstatModel(app,jvmstat);
+                    }
+                }
+                return jvm;
+            }
+        }
+        return null;
     }
     
 }

@@ -34,7 +34,7 @@ import java.util.logging.Level;
  *
  * @author Tomas Hurka
  */
-public class JRockitAttachModelImpl extends AttachModelImpl {
+public class JRockitAttachModelImpl extends OracleJRockitAttachModelImpl {
     
     JRockitAttachModelImpl(Application app) {
         super(app);
@@ -42,18 +42,6 @@ public class JRockitAttachModelImpl extends AttachModelImpl {
  
     public synchronized boolean takeHeapDump(String fileName) {
         return false;
-    }
-    
-    public synchronized HeapHistogramImpl takeHeapHistogram() {
-        try {
-            InputStream in = getVirtualMachine().heapHisto(ALL_OBJECTS_OPTION);
-            HeapHistogramImpl h = new JRockitHeapHistogramImpl(in);
-            in.close();
-            return h;
-        } catch (IOException ex) {
-            LOGGER.log(Level.INFO,"takeHeapHistogram",ex);  // NOI18N
-        }
-        return null;
-    }
-        
+    }   
 }
+

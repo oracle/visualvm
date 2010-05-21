@@ -65,8 +65,13 @@ public final class AttachModelProvider extends AbstractModelProvider<AttachModel
                 for (VirtualMachineDescriptor descr : VirtualMachine.list()) {
                     if (pid.equals(descr.id())) {
                         String vmName = jvmstat.getVmName();
-                        if (vmName != null && "BEA JRockit(R)".equals(vmName)) {  // NOI18N
-                            return new JRockitAttachModelImpl(app);
+                        if (vmName != null) {
+                            if ("BEA JRockit(R)".equals(vmName)) {  // NOI18N
+                                return new JRockitAttachModelImpl(app);
+                            }
+                            if ("Oracle JRockit(R)".equals(vmName)) {  // NOI18N
+                                return new OracleJRockitAttachModelImpl(app);
+                            }                            
                         }
                         return new AttachModelImpl(app);
                     }
