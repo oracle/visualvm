@@ -117,7 +117,7 @@ public class AboutDialog {
         aboutDialogControls.updateAppearance();
         dialog.pack();
         aboutDialogControls.getDefaultButton().requestFocusInWindow();
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(parentFrame);
         dialog.setVisible(true);
     }
     
