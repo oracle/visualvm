@@ -25,8 +25,11 @@
 
 package com.sun.tools.visualvm.host;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import java.awt.Image;
+import java.util.Comparator;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -35,7 +38,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-public class RemoteHostDescriptor extends DataSourceDescriptor {
+public class RemoteHostDescriptor extends DataSourceDescriptor<Host> {
 
     private static final Image NODE_ICON = ImageUtilities.loadImage(
             "com/sun/tools/visualvm/host/resources/remoteHost.png", true);   // NOI18N
@@ -49,8 +52,23 @@ public class RemoteHostDescriptor extends DataSourceDescriptor {
         super(host, resolveName(host, host.getHostName()), NbBundle.getMessage(
               RemoteHostDescriptor.class, "DESCR_Remote"), NODE_ICON, // NOI18N
               resolvePosition(host, POSITION_AT_THE_END, true), EXPAND_ON_FIRST_CHILD);
+
+        setChildrenComparator(DataSourceDescriptorFactory.getDescriptor(
+                              Host.LOCALHOST).getChildrenComparator());
     }
-    
+
+
+    /**
+     * Sets a custom comparator for sorting DataSources within a Host.
+     * Use setChildrenComparator(null) to restore the default sorting.
+     *
+     * @param newComparator comparator for sorting DataSources within a Host
+     *
+     * @since VisualVM 1.2.3
+     */
+    public void setChildrenComparator(Comparator<DataSource> newComparator) {
+        super.setChildrenComparator(newComparator);
+    }
 
     public boolean supportsRename() {
         return true;

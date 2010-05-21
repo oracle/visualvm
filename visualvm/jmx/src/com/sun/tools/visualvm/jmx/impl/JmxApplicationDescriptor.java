@@ -40,7 +40,7 @@ public class JmxApplicationDescriptor extends ApplicationDescriptor {
      
 
     protected JmxApplicationDescriptor(JmxApplication application) {
-        super(application);
+        super(application, resolvePosition(application, POSITION_AT_THE_END, true));
     }
 
     public boolean supportsRename() {

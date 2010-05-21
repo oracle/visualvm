@@ -26,9 +26,11 @@
 package com.sun.tools.visualvm.application;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.properties.PropertiesSupport;
 import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.host.LocalHostDescriptor;
 import java.lang.management.ManagementFactory;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
@@ -57,6 +59,14 @@ final class ApplicationSupport {
             public void run() {
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
+                        // Initialize sorting
+                        DataSourceDescriptor localHostDescriptor =
+                                DataSourceDescriptorFactory.getDescriptor(Host.LOCALHOST);
+                        if (localHostDescriptor instanceof LocalHostDescriptor) {
+                            ((LocalHostDescriptor)localHostDescriptor).setChildrenComparator(
+                                    ApplicationsSorting.instance().getInitialSorting());
+                        }
+                        
                         Host.LOCALHOST.getRepository().addDataSource(Application.CURRENT_APPLICATION);
                     }
                 });

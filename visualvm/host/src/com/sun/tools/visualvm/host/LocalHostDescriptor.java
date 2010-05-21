@@ -25,8 +25,10 @@
 
 package com.sun.tools.visualvm.host;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
+import java.util.Comparator;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -35,9 +37,10 @@ import org.openide.util.NbBundle;
  * 
  * @author Jiri Sedlacek
  */
-public class LocalHostDescriptor extends DataSourceDescriptor {
+public class LocalHostDescriptor extends DataSourceDescriptor<Host> {
 
-    private static final Image NODE_ICON = ImageUtilities.loadImage("com/sun/tools/visualvm/host/resources/localHost.png", true);    // NOI18N
+    private static final Image NODE_ICON = ImageUtilities.loadImage(
+            "com/sun/tools/visualvm/host/resources/localHost.png", true);    // NOI18N
 
     /**
      * Creates new instance of LocalHostDescriptor.
@@ -48,7 +51,25 @@ public class LocalHostDescriptor extends DataSourceDescriptor {
               EXPAND_ON_FIRST_CHILD);  // NOI18N
     }
 
+    
+    /**
+     * Sets a custom comparator for sorting DataSources within the Host.LOCALHOST.
+     * Use setChildrenComparator(null) to restore the default sorting.
+     *
+     * @param newComparator comparator for sorting DataSources within the Host.LOCALHOST
+     *
+     * @since VisualVM 1.2.3
+     */
+    public void setChildrenComparator(Comparator<DataSource> newComparator) {
+        super.setChildrenComparator(newComparator);
+    }
+
+    public Comparator<DataSource> getChildrenComparator() {
+        return super.getChildrenComparator();
+    }
+
     public boolean providesProperties() {
         return true;
     }
+
 }

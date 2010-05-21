@@ -52,6 +52,13 @@
                 <attr name="position" intvalue="2500"/>
             </file>
         </folder>
+
+        <folder name="View">
+            <file name="com-sun-tools-visualvm-application-ApplicationsSorting.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.ApplicationsSorting.instance"/>
+                <attr name="position" intvalue="850"/>
+            </file>
+        </folder>
     </folder>
     
     <folder name="Toolbars">

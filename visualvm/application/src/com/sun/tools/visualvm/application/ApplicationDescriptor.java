@@ -42,13 +42,33 @@ import java.beans.PropertyChangeSupport;
      
     private String name;
 
+    /**
+     * Creates new instance of Application Descriptor.
+     *
+     * @param application Application described by the descriptor
+     */
     protected ApplicationDescriptor(Application application) {
-        this(application, ApplicationTypeFactory.getApplicationTypeFor(application));
+        this(application, ApplicationTypeFactory.getApplicationTypeFor(
+             application), POSITION_AT_THE_END);
     }
 
-    private ApplicationDescriptor(final Application application, final ApplicationType type) {
+    /**
+     * Creates new instance of Application Descriptor.
+     *
+     * @param application Application described by the descriptor
+     * @param preferredPosition preferred position of the Application
+     *
+     * @since VisualVM 1.2.3
+     */
+    protected ApplicationDescriptor(Application application, int preferredPosition) {
+        this(application, ApplicationTypeFactory.getApplicationTypeFor(application),
+             preferredPosition);
+    }
+
+    private ApplicationDescriptor(final Application application, final ApplicationType type,
+                                  int preferredPosition) {
         super(application, resolveApplicationName(application, type), type.getDescription(),
-              type.getIcon(), POSITION_AT_THE_END, EXPAND_ON_FIRST_CHILD);
+              type.getIcon(), preferredPosition, EXPAND_ON_FIRST_CHILD);
         name = super.getName();
         type.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
