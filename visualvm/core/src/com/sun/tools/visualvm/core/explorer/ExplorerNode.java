@@ -29,10 +29,11 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -53,8 +54,11 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
 
     private boolean defaultComparator = true;
     private ExplorerNodesComparator comparator = new ExplorerNodesComparator(new PositionableComparator());
-    private final List<DataSource> endPositions = Collections.synchronizedList(new ArrayList());
-    private final List<DataSource> lastPositions = Collections.synchronizedList(new ArrayList());
+
+    private int maxEndPosition = -1;
+    private int maxLastPosition = -1;
+    private final Map<DataSource, Integer> endPositions = Collections.synchronizedMap(new HashMap());
+    private final Map<DataSource, Integer> lastPositions = Collections.synchronizedMap(new HashMap());
 
     private boolean firstExpansionFlag = true;
     
@@ -183,60 +187,66 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
     }
 
 
-    void syncRelativePositions() {
-        List<DataSource> nodes = new ArrayList();
-
-        synchronized (endPositions) { nodes.addAll(endPositions); }
-        if (!nodes.isEmpty()) updateRelativePositions(nodes);
-
-        nodes.clear();
-
-        synchronized (lastPositions) { nodes.addAll(lastPositions); }
-        if (!nodes.isEmpty()) updateRelativePositions(nodes);
-    }
-
-    private void updateRelativePositions(List<DataSource> positions) {
-        for (int i = 0; i < positions.size(); i++) {
-            Storage s = positions.get(i).getStorage();
-            if (s.getCustomProperty(DataSourceDescriptor.PROPERTY_PREFERRED_POSITION) != null) {
-                String posS = s.getCustomProperty(PROPERTY_RELATIVE_POSITION);
-                Integer posI = null;
-                if (posS != null)
-                    try { posI = Integer.valueOf(posS); } catch (NumberFormatException e) {}
-                if (posI == null || posI.intValue() != i)
-                    s.setCustomProperty(PROPERTY_RELATIVE_POSITION, Integer.toString(i));
-            }
-        }
-    }
-
     private void checkAddRelativePosition(ExplorerNode node) {
         int pos = node.getPreferredPosition();
         DataSource d = node.getUserObject();
-        if (pos == Positionable.POSITION_AT_THE_END) addEndPosition(d);
-        else if (pos == Positionable.POSITION_LAST) addLastPosition(d);
+        if (pos == Positionable.POSITION_AT_THE_END) addPosition(d, endPositions);
+        else if (pos == Positionable.POSITION_LAST) addPosition(d, lastPositions);
+    }
+
+    private void addPosition(DataSource node, Map<DataSource, Integer> positions) {
+        Storage s = node.getStorage();
+        String PREF = DataSourceDescriptor.PROPERTY_PREFERRED_POSITION;
+        
+        int nodePos = 0;
+        boolean posDirty = true;
+        try {
+            // throws NullPointerException
+            nodePos = getMaxPosition(positions) + 1;
+            // throws NumberFormatException
+            nodePos = Integer.parseInt(s.getCustomProperty(PROPERTY_RELATIVE_POSITION));
+            posDirty = false;
+        } catch (Exception e) {}
+
+        if (s.getCustomProperty(PREF) != null && posDirty)
+            s.setCustomProperty(PROPERTY_RELATIVE_POSITION, Integer.toString(nodePos));
+
+        positions.put(node, nodePos);
+        updateMaxPosition(positions, nodePos, false);
     }
 
     private void checkRemoveRelativePosition(ExplorerNode node) {
         int pos = node.getPreferredPosition();
         DataSource d = node.getUserObject();
-        if (pos == Positionable.POSITION_AT_THE_END) removeEndPosition(d);
-        else if (pos == Positionable.POSITION_LAST) removeLastPosition(d);
+        if (pos == Positionable.POSITION_AT_THE_END) removePosition(d, endPositions);
+        else if (pos == Positionable.POSITION_LAST) removePosition(d, lastPositions);
     }
 
-    private void addEndPosition(DataSource node) {
-        endPositions.add(node);
+    private void removePosition(DataSource node, Map<DataSource, Integer> positions) {
+        int nodePos = positions.remove(node);
+        updateMaxPosition(positions, nodePos, true);
+    }
+    
+    private int getMaxPosition(Map<DataSource, Integer> positions) {
+        if (positions == endPositions) return maxEndPosition;
+        else return maxLastPosition;
     }
 
-    private void removeEndPosition(DataSource node) {
-        endPositions.remove(node);
+    private void setMaxPosition(Map<DataSource, Integer> positions, int newMax) {
+        if (positions == endPositions) maxEndPosition = newMax;
+        else maxLastPosition = newMax;
     }
 
-    private void addLastPosition(DataSource node) {
-        lastPositions.add(node);
-    }
-
-    private void removeLastPosition(DataSource node) {
-        lastPositions.remove(node);
+    private void updateMaxPosition(Map<DataSource, Integer> positions, int position, boolean remove) {
+        int maxPos = getMaxPosition(positions);
+        if (!remove && maxPos < position)
+            setMaxPosition(positions, position);
+        else if (remove && maxPos == position) {
+            int newMax = -1;
+            Collection<Integer> values = positions.values();
+            for (int i : values) if (i > newMax) newMax = i;
+            setMaxPosition(positions, newMax);
+        }
     }
 
 
@@ -244,10 +254,10 @@ final class ExplorerNode extends DefaultMutableTreeNode implements Positionable 
 
         protected int getRelativePosition(DataSource d, int positionType) {
             if (positionType == Positionable.POSITION_AT_THE_END)
-                return endPositions.indexOf(d);
+                return endPositions.get(d);
 
             else if (positionType == Positionable.POSITION_LAST)
-                return lastPositions.indexOf(d);
+                return lastPositions.get(d);
             
             else
                 return positionType;

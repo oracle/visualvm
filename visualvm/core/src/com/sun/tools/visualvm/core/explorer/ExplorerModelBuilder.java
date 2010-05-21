@@ -245,9 +245,6 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
                         explorerModel.nodesWereRemoved(parent, new int[] { nodeIndex }, new Object[] { node });
                         parent.addNode(node);
                         explorerModel.nodesWereInserted(parent, new int[] { parent.getIndex(node) });
-                        queue.post(new Runnable() {
-                            public void run() { parent.syncRelativePositions(); }
-                        });
                     }
                 }); } catch (Exception e) {}
             }
@@ -304,9 +301,6 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             for (int i = 0; i < indexesArr.length; i++) indexesArr[i] = indexesList.get(i);
             final ExplorerNode parent = entry.getKey();
             explorerModel.nodesWereInserted(parent, indexesArr);
-            queue.post(new Runnable() {
-                public void run() { parent.syncRelativePositions(); }
-            });
         }
         
         // Try to restore selection
@@ -350,9 +344,6 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
             }
             final ExplorerNode parent = entry.getKey();
             explorerModel.nodesWereRemoved(parent, indexesArr, childsArr);
-            queue.post(new Runnable() {
-                public void run() { parent.syncRelativePositions(); }
-            });
         }
         
         // Try to restore selection
@@ -410,6 +401,7 @@ class ExplorerModelBuilder implements DataChangeListener<DataSource> {
 
         protected int getRelativePosition(DataSource d, int positionType) {
             try {
+                // throws NumberFormatException
                 return Integer.parseInt(d.getStorage().getCustomProperty(
                                         ExplorerNode.PROPERTY_RELATIVE_POSITION));
             } catch (Exception e) {
