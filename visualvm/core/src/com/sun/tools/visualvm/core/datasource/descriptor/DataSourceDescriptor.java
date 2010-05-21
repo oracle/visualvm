@@ -314,6 +314,11 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
     }
 
     /**
+     * Sets a custom comparator for sorting DataSources within a DataSource.
+     * Use setChildrenComparator(null) to restore the default sorting.
+     *
+     * @param newComparator comparator for sorting DataSources within a DataSource
+     *
      * @since VisualVM 1.2.3
      */
     protected void setChildrenComparator(Comparator<DataSource> newComparator) {
