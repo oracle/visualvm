@@ -54,7 +54,9 @@ abstract class DataSourcesComparator implements Comparator<DataSource> {
             p2 = getRelativePosition(d2, Positionable.POSITION_LAST);
         }
 
-        return doCompare(p1, p2);
+        int result = doCompare(p1, p2);
+        if (result == 0) result = dd1.getName().compareTo(dd2.getName());
+        return result;
     }
 
     protected abstract int getRelativePosition(DataSource d, int positionType);
