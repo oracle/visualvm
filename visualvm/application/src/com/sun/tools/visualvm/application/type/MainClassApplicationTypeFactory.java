@@ -97,6 +97,9 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
 
         // JRockit Mission Control
         {"com.jrockit.mc.rcp.start.MCMain","JRockit Mission Control",descr("DESCR_JRMC"),"com/sun/tools/visualvm/application/type/resources/JRMC.png"},  // NOI18N
+
+        // Oracle WebLogic
+        {"weblogic.Server","WebLogic",descr("DESCR_WLS"),"com/sun/tools/visualvm/application/type/resources/WLS.png"},  // NOI18N
     };
     
     Map<String,String[]> map;
