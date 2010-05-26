@@ -46,7 +46,8 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
   private static final String BRANDING_ID = "--branding "; // NOI18N
   private static final String VISUALVM_ID = "visualvm"; // NOI18N
   private static final String MAIN_CLASS = "org.netbeans.Main"; // NOI18N
-  private static final Pattern nbcluster_pattern = Pattern.compile("nb[0-9]+\\.[0-9]+");    // NOI18N
+  private static final Pattern NBCLUSTER_PATTERN = Pattern.compile("nb[0-9]+\\.[0-9]+");    // NOI18N
+  static final String NB_CLUSTER = "nb";    // NOI18N
 
   private boolean isNetBeans(Jvm jvm, String mainClass) {
       if (MAIN_CLASS.equals(mainClass)) {
@@ -120,11 +121,12 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
         return new VisualVMApplicationType(app);
       }
       Set<String> clusters = computeClusters(jvm);
-      Iterator<String> clIt = clusters.iterator();
       
-      while(clIt.hasNext()) {
-        String cluster = clIt.next();
-        if (nbcluster_pattern.matcher(cluster).matches()) {
+      for (String cluster : clusters) {
+        if (NBCLUSTER_PATTERN.matcher(cluster).matches()) {
+          return new NetBeansApplicationType(app,jvm,clusters);
+        }
+        if (NB_CLUSTER.equals(cluster)) {
           return new NetBeansApplicationType(app,jvm,clusters);
         }
         if (VISUALVM_ID.equals(cluster)) {

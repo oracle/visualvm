@@ -32,7 +32,7 @@ import java.util.Iterator;
 import java.util.Set;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-
+import static com.sun.tools.visualvm.application.type.NetBeansApplicationTypeFactory.NB_CLUSTER;
 
 /**
  * This {@link ApplicationType} represents NetBeans application from version 4.0.
@@ -42,7 +42,6 @@ public class NetBeansApplicationType extends ApplicationType {
     Application application;
     String name;
     Set<String> clusters;
-    private static final String NB_CLUSTER = "nb";    // NOI18N
     
     NetBeansApplicationType(Application app,Jvm jvm,Set<String> cls) {
         application = app;
@@ -77,6 +76,9 @@ public class NetBeansApplicationType extends ApplicationType {
                 if (ver.length()>0 && Character.isDigit(ver.charAt(0))) {
                     return ver;
                 }
+            }
+            if (cluster.equals(NB_CLUSTER)) {
+                return "6.9+";  // NOI18N
             }
         }
         return NbBundle.getMessage(NetBeansApplicationType.class, "LBL_Unknown");   // NOI18N
