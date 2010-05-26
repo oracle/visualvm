@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.modules.tracerjvmstat;
 
-import com.sun.management.UnixOperatingSystemMXBean;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
@@ -38,12 +37,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
 import sun.jvmstat.monitor.Monitor;
-import sun.jvmstat.monitor.MonitoredHost;
-import sun.jvmstat.monitor.MonitoredVm;
-import sun.jvmstat.monitor.MonitorException;
-import sun.management.counter.Units;
-import sun.management.counter.Variability;
-import sun.jvmstat.monitor.VmIdentifier;
 
 /**
  *
@@ -53,7 +46,7 @@ class JvmstatCountersPackage extends TracerPackage.SessionAware<Application> {
     
     private static final Logger LOGGER = Logger.getLogger(JvmstatCountersPackage.class.getName());
     static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracer/monitor/resources/monitor.png", true)); // NOI18N
+            "com/sun/tools/visualvm/modules/tracerjvmstat/resources/monitor.png", true)); // NOI18N
     private static final String NAME = "jvmstat counters metrics";
     private static final String DESCR = "Provides metric for jvmstat counters.";
     private static final int POSITION = 70;
