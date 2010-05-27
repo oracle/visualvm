@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
@@ -64,7 +65,6 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
     private TimelineTooltipPainter.Model[] rowModels;
 
     private Set<Integer> selectedTimestamps = Collections.EMPTY_SET;
-    private final List<ItemSelection> selections = new ArrayList(100);
 
     private Timer timer;
     private int currentStep;
@@ -132,7 +132,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
             public void rowSelectionChanged(boolean rowsSelected) {}
 
             public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {
-                selectedTimestamps = support.getSelectedTimestamps();
+                selectedTimestamps = new TreeSet(support.getSelectedTimestamps());
                 tooltipUpdater.run();
             }
         });
@@ -210,25 +210,25 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
         checkAllocatedSelectionPainters();
         
-        int painterIndex = rowModels.length;
-        for (int rowIndex = 0; rowIndex < rowModels.length; rowIndex++) {
+        int painterIndex = getComponentCount() - 1;
+        for (int rowIndex = 0; rowIndex < chart.getRowsCount(); rowIndex++) {
             TimelineChart.Row row = chart.getRow(rowIndex);
             ChartContext rowContext = row.getContext();
             int itemsCount = row.getItemsCount();
-            TimelineTooltipPainter.Model model = rowModels[row.getIndex()];
+            TimelineTooltipPainter.Model model = rowModels[rowIndex];
             for (int mark : selectedTimestamps) {
-                selections.clear();
+                List<ItemSelection> selections = new ArrayList(itemsCount);
                 for (int itemIndex = 0; itemIndex < itemsCount; itemIndex++) {
                     SynchronousXYItem item = (SynchronousXYItem)row.getItem(itemIndex);
                     selections.add(new XYItemSelection.Default(item, mark,
                                    XYItemSelection.DISTANCE_UNKNOWN));
                 }
                 TimelineTooltipPainter tooltipPainter =
-                        (TimelineTooltipPainter)getComponent(painterIndex++);
+                        (TimelineTooltipPainter)getComponent(painterIndex--);
                 tooltipPainter.update(model, selections);
                 tooltipPainter.setSize(tooltipPainter.getPreferredSize());
                 setPosition(selections, chart.getPaintersModel(), rowContext,
-                            tooltipPainter, row.getIndex(), true);
+                            tooltipPainter, rowIndex, true);
             }
         }
 
@@ -249,7 +249,7 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
                 setPosition(null, tooltipPainter, i, false);
             } else {
                 TimelineChart.Row row = chart.getRow(i);
-                selections.clear();
+                List<ItemSelection> selections = new ArrayList(highlightedItems.size());
 
                 for (ItemSelection sel : highlightedItems)
                     if (row.containsItem(sel.getItem()))

@@ -62,7 +62,6 @@ final class TimelineTooltipPainter extends JPanel {
     private final boolean selection;
     private final Color foreground;
     private final Color background;
-    private boolean initialized;
 
 
     TimelineTooltipPainter(boolean selection) {
@@ -71,14 +70,15 @@ final class TimelineTooltipPainter extends JPanel {
         foreground = selection ? SELECTION_FOREGROUND : HOVER_FOREGROUND;
         background = selection ? SELECTION_BACKGROUND : HOVER_BACKGROUND;
 
-        initialized = false;
+        initUI();
     }
 
 
     void update(Model rowModel, List<ItemSelection> selectedItems) {
-        if (!initialized) initComponents(rowModel);
-        
         int rowsCount = rowModel.getRowsCount();
+        if (valueNames == null || valueNames.length != rowsCount)
+            initComponents(rowsCount);
+        
         for (int i = 0; i < rowsCount; i++) {
             XYItemSelection sel = (XYItemSelection)selectedItems.get(i);
             long itemValue = sel.getItem().getYValue(sel.getValueIndex());
@@ -100,19 +100,23 @@ final class TimelineTooltipPainter extends JPanel {
     }
 
 
-    private void initComponents(Model rowModel) {
+    private void initUI() {
         setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         setLayout(new GridBagLayout());
+    }
+
+    private void initComponents(int rowsCount) {
+        removeAll();
+        
+        valueNames = new JLabel[rowsCount];
+        valuePainters = new JLabel[rowsCount];
+        unitsPainters = new JLabel[rowsCount];
+        
         GridBagConstraints constraints;
 
-        int count = rowModel.getRowsCount();
-        valueNames = new JLabel[count];
-        valuePainters = new JLabel[count];
-        unitsPainters = new JLabel[count];
-        for (int i = 0; i < count; i++) {
-
+        for (int i = 0; i < rowsCount; i++) {
             JLabel itemLabel = new JLabel();
             valueNames[i] = itemLabel;
             itemLabel.setFont(new LegendFont());
@@ -160,10 +164,7 @@ final class TimelineTooltipPainter extends JPanel {
             constraints.anchor = GridBagConstraints.NORTHEAST;
             constraints.insets = new Insets(0, 0, 0, 0);
             add(Spacer.create(), constraints);
-
         }
-
-        initialized = true;
     }
 
 
