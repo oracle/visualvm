@@ -49,7 +49,7 @@ final class TimelineTooltipPainter extends JPanel {
     private static Color SELECTION_FOREGROUND = Color.BLACK;
     private static Color SELECTION_BACKGROUND = Utils.forceSpeed() ?
                                             new Color(255, 255, 255) :
-                                            new Color(255, 255, 255, 210);
+                                            new Color(255, 255, 255, 225);
     private static Color HOVER_FOREGROUND = Color.WHITE;
     private static Color HOVER_BACKGROUND = Utils.forceSpeed() ?
                                             new Color(80, 80, 80) :
