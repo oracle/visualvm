@@ -200,6 +200,11 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
                                         selectedThreads.add(id);
                                     refreshData();
                                 }
+                                public Dimension getPreferredSize() {
+                                    Dimension size = super.getPreferredSize();
+                                    size.height += SPACING;
+                                    return size;
+                                }
                             };
                             cb.setOpaque(false);
 
@@ -207,12 +212,10 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
                                 public Dimension getPreferredSize() {
                                     Dimension size = cb.getPreferredSize();
                                     size.width += 8;
-                                    size.height += SPACING;
                                     return size;
                                 }
                                 public void doLayout() {
-                                    cb.setBounds(4, SPACING / 2, getWidth() - 8,
-                                                 getHeight() - SPACING);
+                                    cb.setBounds(4, 0, getWidth() - 8, getHeight());
                                 }
                                 public void setEnabled(boolean enabled) {
                                     super.setEnabled(enabled);
@@ -379,6 +382,7 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
 
     private static int getPresenterSpacing() {
         if (UISupport.isNimbusLookAndFeel()) return 6;
+        else if (UISupport.isGTKLookAndFeel()) return 4;
         else return 2;
     }
     
