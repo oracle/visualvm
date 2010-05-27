@@ -51,6 +51,7 @@
                 <friend>com.sun.tools.visualvm.modules.appui</friend>
                 <friend>com.sun.tools.visualvm.modules.jvmcap</friend>
                 <friend>com.sun.tools.visualvm.modules.sampler</friend>
+                <friend>com.sun.tools.visualvm.modules.threadinspect</friend>
                 <friend>com.sun.tools.visualvm.modules.tracer</friend>
                 <friend>com.sun.tools.visualvm.profiler</friend>
                 <friend>com.sun.tools.visualvm.threaddump</friend>
