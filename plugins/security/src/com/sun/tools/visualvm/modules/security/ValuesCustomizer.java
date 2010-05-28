@@ -25,11 +25,13 @@
 
 package com.sun.tools.visualvm.modules.security;
 
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -51,6 +53,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -58,14 +61,19 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
@@ -76,6 +84,10 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 abstract class ValuesCustomizer extends JPanel {
+
+    // --- Private UI constants ------------------------------------------------
+
+    private static final Color DEFAULT_GRID_COLOR = new Color(240, 240, 240);
 
     // --- Public customizer types ---------------------------------------------
     
@@ -319,25 +331,31 @@ abstract class ValuesCustomizer extends JPanel {
             }
         };
         hintLabel.setLabelFor(table);
-        table.setRowHeight(table.getRowHeight() + 4);
-        Dimension d = table.getIntercellSpacing();
-        table.setIntercellSpacing(new Dimension(d.width, 0));
-        table.setFillsViewportHeight(true);
+        table.setOpaque(true);
+        table.setBackground(UISupport.getDefaultBackground());
+        table.setRowHeight(defaultRowHeight() + 4);
+        table.setRowMargin(0);
         table.setAutoCreateRowSorter(true);
         table.setShowHorizontalLines(false);
-        table.setGridColor(new Color(214, 223, 247));
+        table.setShowVerticalLines(true);
+        table.setGridColor(DEFAULT_GRID_COLOR);
         table.setDefaultRenderer(String.class, new Renderer(
                                  table.getDefaultRenderer(String.class)));
-        table.setDefaultRenderer(Boolean.class, new Renderer(
+        table.setDefaultRenderer(Boolean.class, new BooleanRenderer(
                                  table.getDefaultRenderer(Boolean.class)));
+        table.getColumnModel().setColumnMargin(1);
         TableColumn c = table.getColumnModel().getColumn(1);
         c.setMaxWidth(c.getPreferredWidth());
         c.setResizable(false);
 
+        // viewport
+        JViewport viewport = new Viewport(table);
+
         // tableScroll
-        JScrollPane tableScroll = new JScrollPane(table,
+        JScrollPane tableScroll = new JScrollPane(
                                       JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                       JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        tableScroll.setViewport(viewport);
         final JScrollBar vScrollBar = tableScroll.getVerticalScrollBar();
         final BoundedRangeModel vScrollBarModel = vScrollBar.getModel();
         vScrollBarModel.addChangeListener(new ChangeListener() {
@@ -377,64 +395,150 @@ abstract class ValuesCustomizer extends JPanel {
         tableScroll.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, cornerButton);
 
         // this
+        setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(15, 10, 5, 10));
         setLayout(new BorderLayout(5, 5));
         add(hintLabel, BorderLayout.NORTH);
         add(tableScroll, BorderLayout.CENTER);
     }
 
-
-    private static class Renderer implements TableCellRenderer {
-
-        private TableCellRenderer impl;
-        private Color color;
-        private Color darkerColor;
-
-        public Renderer(TableCellRenderer impl) { this.impl = impl; }
-
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
-
-            if (value instanceof Boolean)
-                // Workaround strange selection behavior for newly selected checkbox
-                isSelected = isSelected || hasFocus;
-            else if (value instanceof String)
-                // Improve spacing of the text
-                value = " " + value + " "; // NOI18N
-
-            Component c = impl.getTableCellRendererComponent(
-                    table, value, isSelected, false, row, column);
-
-            if (color == null) {
-                color = c.getBackground();
-                darkerColor = darker(color);
-            }
-
-            if (!isSelected) {
-                boolean oddRow = row % 2 == 0;
-                c.setBackground(oddRow ? darkerColor : color);
-            }
-
-            return c;
-        }
-
-        private static Color darker(Color c) {
-            if (c == null) return null;
-            int r = Math.abs(c.getRed() - 11);
-            int g = Math.abs(c.getGreen() - 11);
-            int b = Math.abs(c.getBlue() - 11);
-            int a = c.getAlpha();
-            return new Color(r, g, b, a);
-        }
-
+    private static int defaultRowHeight() {
+        return new JLabel("X").getPreferredSize().height + 4; // NOI18N
     }
 
-    
+
     private ValuesCustomizer() {}
 
 
     private DefaultTableModel model;
     private JTable table;
+
+
+    private static class Renderer implements TableCellRenderer {
+
+        private static final Color BACKGROUND;
+        private static final Color DARKER_BACKGROUND;
+
+        static {
+            BACKGROUND = UISupport.getDefaultBackground();
+
+            int darkerR = BACKGROUND.getRed() - 11;
+            if (darkerR < 0) darkerR += 26;
+            int darkerG = BACKGROUND.getGreen() - 11;
+            if (darkerG < 0) darkerG += 26;
+            int darkerB = BACKGROUND.getBlue() - 11;
+            if (darkerB < 0) darkerB += 26;
+            DARKER_BACKGROUND = new Color(darkerR, darkerG, darkerB);
+        }
+
+        private TableCellRenderer impl;
+
+
+        Renderer(TableCellRenderer impl) {
+            this.impl = impl;
+        }
+
+
+        protected Object formatValue(JTable table, Object value, boolean isSelected,
+                                     boolean hasFocus, int row, int column) {
+            return value;
+        }
+
+        protected void updateRenderer(Component c, JTable table, Object value,
+                                      boolean isSelected, boolean hasFocus, int row,
+                                      int column) {
+            if (!isSelected) {
+                c.setBackground(row % 2 == 0 ? DARKER_BACKGROUND : BACKGROUND);
+                // Make sure the renderer paints its background (Nimbus)
+                if (c instanceof JComponent) ((JComponent)c).setOpaque(true);
+            }
+        }
+
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+
+            if (impl == null) impl = table.getDefaultRenderer(table.getColumnClass(column));
+
+            value = formatValue(table, value, isSelected, false, row, column);
+            Component c = impl.getTableCellRendererComponent(table, value, isSelected,
+                                                             false, row, column);
+            updateRenderer(c, table, value, isSelected, false, row, column);
+
+            return c;
+        }
+
+    }
+
+    private static class BooleanRenderer extends Renderer {
+
+        BooleanRenderer(TableCellRenderer renderer) {
+            super(renderer);
+        }
+
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+
+            // Workaround strange selection behavior for newly selected checkbox
+            isSelected = isSelected || hasFocus;
+
+            return super.getTableCellRendererComponent(table, value, isSelected,
+                                                       hasFocus, row, column);
+        }
+
+    }
+
+    private static class Viewport extends JViewport {
+
+        private final JTable view;
+        private final Color background;
+
+        Viewport(JTable view) {
+            super();
+
+            setView(view);
+            this.view = view;
+
+            setOpaque(true);
+            background = view.getBackground();
+            setBackground(background);
+
+            view.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
+                public void columnAdded(TableColumnModelEvent e) { repaint(); }
+                public void columnMoved(TableColumnModelEvent e) { repaint(); }
+                public void columnRemoved(TableColumnModelEvent e) { repaint(); }
+                public void columnMarginChanged(ChangeEvent e) { repaint(); }
+                public void columnSelectionChanged(ListSelectionEvent e) {}
+            });
+        }
+
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            paintVerticalLines(g);
+        }
+
+        private void paintVerticalLines(Graphics g) {
+            int height = getHeight();
+            int viewHeight = view.getHeight();
+            if (viewHeight >= height) return;
+
+            g.setColor(background);
+            g.fillRect(0, viewHeight, getWidth(), getHeight() - viewHeight);
+
+            int cellX = 0;
+            int cellWidth;
+            TableColumnModel model = view.getColumnModel();
+            int columnCount = model.getColumnCount();
+
+            g.setColor(DEFAULT_GRID_COLOR);
+            for (int i = 0; i < columnCount; i++) {
+                cellWidth = model.getColumn(i).getWidth();
+                cellX += cellWidth;
+                g.drawLine(cellX - 1, viewHeight, cellX - 1, height);
+            }
+        }
+
+    }
 
 }
