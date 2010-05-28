@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl.details;
 
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderPanel;
+import com.sun.tools.visualvm.modules.tracer.impl.swing.ScrollBar;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -138,7 +139,7 @@ public final class DetailsPanel extends JPanel {
         tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
         tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, new HeaderPanel());
         
-        scrollBar = new JScrollBar(JScrollBar.VERTICAL) {
+        scrollBar = new ScrollBar(JScrollBar.VERTICAL) {
             public int getUnitIncrement(int direction) {
                 JViewport vp = tableScroll.getViewport();
                 Scrollable view = (Scrollable)(vp.getView());

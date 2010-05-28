@@ -35,7 +35,7 @@ import javax.swing.JScrollBar;
  *
  * @author Jiri Sedlacek
  */
-public final class ScrollBar extends JScrollBar {
+public class ScrollBar extends JScrollBar {
 
     public ScrollBar(int orientation) {
         super(orientation);
