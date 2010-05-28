@@ -1,23 +1,23 @@
 /*
  * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
- * 
+ *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
- * 
+ *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -241,7 +241,10 @@ class ConnectionsCustomizer extends PropertiesPanel {
         JScrollPane impl = new JScrollPane();
         JScrollPane scroll = new ScrollableContainer(table);
         scroll.setBorder(impl.getBorder());
-        scroll.setViewportBorder(impl.getViewportBorder());
+        if (!UISupport.isNimbusLookAndFeel())
+            scroll.setViewportBorder(impl.getViewportBorder());
+        scroll.getViewport().setOpaque(true);
+        scroll.getViewport().setBackground(UISupport.getDefaultBackground());
         scroll.setPreferredSize(new Dimension(TABLE_WIDTH + 20, 1));
 
         JLabel noConnection = new JLabel(NbBundle.getMessage(
@@ -251,11 +254,13 @@ class ConnectionsCustomizer extends PropertiesPanel {
         noConnection.setMinimumSize(new Dimension());
         JScrollPane emptyScroll = new JScrollPane(noConnection,
                 JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        emptyScroll.getViewport().setOpaque(false);
+        emptyScroll.getViewport().setOpaque(true);
+        emptyScroll.getViewport().setBackground(UISupport.getDefaultBackground());
         emptyScroll.setOpaque(false);
+        if (UISupport.isNimbusLookAndFeel())
+            emptyScroll.setViewportBorder(BorderFactory.createEmptyBorder());
         viewPanel = new JPanel(new CardLayout());
-        viewPanel.setOpaque(true);
-        viewPanel.setBackground(UISupport.getDefaultBackground());
+        viewPanel.setOpaque(false);
         viewPanel.add(emptyScroll, NO_DATA_VIEW);
         viewPanel.add(scroll, DATA_VIEW);
         c = new GridBagConstraints();
