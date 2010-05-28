@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.core.ui.components.Spacer;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -218,7 +219,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
         };
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension());
-        table.setFillsViewportHeight(true);
+        table.setOpaque(false);
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 update();
@@ -246,15 +247,15 @@ class ConnectionsCustomizer extends PropertiesPanel {
         JLabel noConnection = new JLabel(NbBundle.getMessage(
                 ConnectionsCustomizer.class, "LBL_NoConnection"), JLabel.CENTER); // NOI18N
         noConnection.setEnabled(false);
-        noConnection.setOpaque(true);
-        noConnection.setBackground(table.getBackground());
+        noConnection.setOpaque(false);
         noConnection.setMinimumSize(new Dimension());
         JScrollPane emptyScroll = new JScrollPane(noConnection,
                 JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         emptyScroll.getViewport().setOpaque(false);
         emptyScroll.setOpaque(false);
         viewPanel = new JPanel(new CardLayout());
-        viewPanel.setOpaque(false);
+        viewPanel.setOpaque(true);
+        viewPanel.setBackground(UISupport.getDefaultBackground());
         viewPanel.add(emptyScroll, NO_DATA_VIEW);
         viewPanel.add(scroll, DATA_VIEW);
         c = new GridBagConstraints();
@@ -349,14 +350,26 @@ class ConnectionsCustomizer extends PropertiesPanel {
 
         private static final int BORDER_HEIGHT = 4;
 
+        private static final Color BACKGROUND;
+        private static final Color DARKER_BACKGROUND;
+
+        static {
+            BACKGROUND = UISupport.getDefaultBackground();
+
+            int darkerR = BACKGROUND.getRed() - 11;
+            if (darkerR < 0) darkerR += 26;
+            int darkerG = BACKGROUND.getGreen() - 11;
+            if (darkerG < 0) darkerG += 26;
+            int darkerB = BACKGROUND.getBlue() - 11;
+            if (darkerB < 0) darkerB += 26;
+            DARKER_BACKGROUND = new Color(darkerR, darkerG, darkerB);
+        }
+
         private JLabel portLabel;
         private JLabel portValueLabel;
         private JLabel refreshLabel;
         private JLabel refreshValueLabel;
         private JLabel refreshUnitsLabel;
-
-        private Color color;
-        private Color darkerColor;
 
         private final NumberFormat format = NumberFormat.getInstance();
 
@@ -452,14 +465,9 @@ class ConnectionsCustomizer extends PropertiesPanel {
             portValueLabel.setText(format.format(cd.getPort()));
             refreshValueLabel.setText(format.format(cd.getRefreshRate()));
 
-            if (color == null) {
-                color = table.getBackground();
-                darkerColor = darker(color);
-            }
-
             if (!isSelected) {
                 boolean oddRow = row % 2 == 0;
-                setBackground(oddRow ? darkerColor : color);
+                setBackground(oddRow ? DARKER_BACKGROUND : BACKGROUND);
             }
 
             return this;
