@@ -65,12 +65,16 @@ class SecurityModel {
         return environmentCustomized;
     }
 
-    void customizeEnvironment() {
+    boolean customizeEnvironment() {
         if (environmentCustomized)
             throw new UnsupportedOperationException(CUSTOMIZED_MSG);
 
+        boolean customized = false;
+
         String keyStore = getKeyStore();
         if (keyStore != null) {
+            customized = true;
+
             System.setProperty(KEYSTORE_LOCATION, keyStore);
 
             char[] keyStorePassword = getKeyStorePassword();
@@ -84,6 +88,8 @@ class SecurityModel {
 
         String trustStore = getTrustStore();
         if (trustStore != null) {
+            customized = true;
+
             System.setProperty(TRUSTSTORE_LOCATION, trustStore);
 
             char[] trustStorePassword = getTrustStorePassword();
@@ -96,12 +102,18 @@ class SecurityModel {
         }
 
         String enabledProtocols = getEnabledProtocols();
-        if (enabledProtocols != null)
+        if (enabledProtocols != null) {
+            customized = true;
             System.setProperty(ENABLED_PROTOCOLS, enabledProtocols);
+        }
 
         String enabledCipherSuites = getEnabledCipherSuites();
-        if (enabledCipherSuites != null)
+        if (enabledCipherSuites != null) {
+            customized = true;
             System.setProperty(ENABLED_CIPHER_SUITES, enabledCipherSuites);
+        }
+
+        return customized;
     }
 
 

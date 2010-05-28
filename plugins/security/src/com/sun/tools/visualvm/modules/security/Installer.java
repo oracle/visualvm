@@ -41,8 +41,8 @@ public class Installer extends ModuleInstall {
     public void restored() {
         SecurityModel model = SecurityModel.getInstance();
         if (!model.environmentCustomized()) {
-            model.customizeEnvironment();
-            LOGGER.log(Level.INFO, "VisualVM-Security customized security environment"); // NOI18N
+            if (model.customizeEnvironment())
+                LOGGER.log(Level.INFO, "VisualVM-Security customized security environment"); // NOI18N
         } else {
             LOGGER.log(Level.INFO, "VisualVM-Security detected customized security environment"); // NOI18N
         }
