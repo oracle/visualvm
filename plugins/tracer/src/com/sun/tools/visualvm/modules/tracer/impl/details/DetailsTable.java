@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl.details;
 
 import com.sun.tools.visualvm.modules.tracer.impl.swing.HeaderLabel;
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -51,6 +52,8 @@ final class DetailsTable extends JTable {
 
 
     DetailsTable() {
+        setOpaque(true);
+        setBackground(UISupport.getDefaultBackground());
         setRowHeight(DEFAULT_ROW_HEIGHT);
         setRowMargin(0);
         setAutoCreateRowSorter(true);

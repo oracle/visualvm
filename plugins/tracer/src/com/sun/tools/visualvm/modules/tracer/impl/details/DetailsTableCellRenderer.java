@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.tracer.impl.details;
 
+import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JComponent;
@@ -37,9 +38,22 @@ import javax.swing.table.TableCellRenderer;
  */
 class DetailsTableCellRenderer implements TableCellRenderer {
 
+    private static final Color BACKGROUND;
+    private static final Color DARKER_BACKGROUND;
+
+    static {
+        BACKGROUND = UISupport.getDefaultBackground();
+
+        int darkerR = BACKGROUND.getRed() - 11;
+        if (darkerR < 0) darkerR += 26;
+        int darkerG = BACKGROUND.getGreen() - 11;
+        if (darkerG < 0) darkerG += 26;
+        int darkerB = BACKGROUND.getBlue() - 11;
+        if (darkerB < 0) darkerB += 26;
+        DARKER_BACKGROUND = new Color(darkerR, darkerG, darkerB);
+    }
+
     private TableCellRenderer impl;
-    private Color color;
-    private Color darkerColor;
 
 
     DetailsTableCellRenderer(TableCellRenderer impl) {
@@ -55,15 +69,8 @@ class DetailsTableCellRenderer implements TableCellRenderer {
     protected void updateRenderer(Component c, JTable table, Object value,
                                   boolean isSelected, boolean hasFocus, int row,
                                   int column) {
-        if (color == null) {
-            color = table.getBackground();
-            if (color == null) color = c.getBackground();
-            // Neutralize LaF colors with unpredictable behavior (Nimbus)
-            color = color == null ? Color.WHITE : new Color(color.getRGB());
-            darkerColor = darker(color);
-        }
         if (!isSelected) {
-            c.setBackground(row % 2 == 0 ? darkerColor : color);
+            c.setBackground(row % 2 == 0 ? DARKER_BACKGROUND : BACKGROUND);
             // Make sure the renderer paints its background (Nimbus)
             if (c instanceof JComponent) ((JComponent)c).setOpaque(true);
         }
@@ -82,15 +89,5 @@ class DetailsTableCellRenderer implements TableCellRenderer {
 
         return c;
     }
-
-
-    private static Color darker(Color c) {
-        if (c == null) return null;
-        // Unify with Nimbus (-13)
-        int r = Math.abs(c.getRed() - 13);
-        int g = Math.abs(c.getGreen() - 13);
-        int b = Math.abs(c.getBlue() - 13);
-        int a = c.getAlpha();
-        return new Color(r, g, b, a);
-    }
+    
 }
