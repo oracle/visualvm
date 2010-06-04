@@ -248,7 +248,7 @@ public class JmxSupport implements DataRemovedListener {
                                 sb.append(" owned by: " + thread.getLockOwnerName());   // NOI18N
                             }
                         }
-                        sb.append("\n");
+                        sb.append("\n");    // NOI18N
                         for (StackTraceElement st : thread.getStackTrace()) {
                             sb.append("        at " + st.toString() + "\n");    // NOI18N
                         }
@@ -264,7 +264,7 @@ public class JmxSupport implements DataRemovedListener {
                     sb.append("\n\"" + thread.getThreadName() + // NOI18N
                             "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
                     sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
-                    sb.append("\n");
+                    sb.append("\n");   // NOI18N
                     int index = 0;
                     for (StackTraceElement st : thread.getStackTrace()) {
                         LockInfo lock = thread.getLockInfo();
@@ -275,9 +275,9 @@ public class JmxSupport implements DataRemovedListener {
                                 if ("java.lang.Object".equals(st.getClassName()) &&     // NOI18N
                                 "wait".equals(st.getMethodName())) {                // NOI18N
                                 if (lock != null) {
-                                    sb.append("\t- waiting on ");
+                                    sb.append("\t- waiting on ");    // NOI18N
                                     printLock(sb,lock);
-                                    sb.append("\n");
+                                    sb.append("\n");    // NOI18N
                                 }                                   
                             } else if (lock != null) {
                                 if (lockOwner == null) {
@@ -329,7 +329,7 @@ public class JmxSupport implements DataRemovedListener {
         String id = Integer.toHexString(lock.getIdentityHashCode());
         String className = lock.getClassName();
         
-        sb.append("<"+id+"> (a "+className+")");        
+        sb.append("<"+id+"> (a "+className+")");       // NOI18N 
     }
     
     MemoryPoolMXBean getPermGenPool() {
