@@ -36,9 +36,11 @@ import java.lang.management.LockInfo;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -115,6 +117,10 @@ final class Engine {
         if (threadInfos == null) return null;
 
         StringBuilder b = new StringBuilder();
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // NOI18N
+        b.append(df.format(new Date()) + "\n");  // NOI18N
+
         for (ThreadInfo ti : threadInfos) if (ti != null)
             b.append(limitedJvm ? stackTrace15(ti) : stackTrace16(ti, threadBean));
 
@@ -154,7 +160,7 @@ final class Engine {
         sb.append("\n\"" + thread.getThreadName() + // NOI18N
                 "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
         sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
-        sb.append("\n");
+        sb.append("\n");  // NOI18N
         int index = 0;
         for (StackTraceElement st : thread.getStackTrace()) {
             LockInfo lock = thread.getLockInfo();
@@ -165,9 +171,9 @@ final class Engine {
                     if ("java.lang.Object".equals(st.getClassName()) &&     // NOI18N
                     "wait".equals(st.getMethodName())) {                // NOI18N
                     if (lock != null) {
-                        sb.append("\t- waiting on ");
+                        sb.append("\t- waiting on ");  // NOI18N
                         printLock(sb,lock);
-                        sb.append("\n");
+                        sb.append("\n");  // NOI18N
                     }                                   
                 } else if (lock != null) {
                     if (lockOwner == null) {
@@ -215,7 +221,7 @@ final class Engine {
         String id = Integer.toHexString(lock.getIdentityHashCode());
         String className = lock.getClassName();
         
-        sb.append("<"+id+"> (a "+className+")");        
+        sb.append("<"+id+"> (a "+className+")");          // NOI18N
     }
     
     private static String htmlize(String value) {
