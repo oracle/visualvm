@@ -224,9 +224,8 @@ public class JmxSupport implements DataRemovedListener {
             if (jmx == null) {
                 return null;
             }
-            RuntimeMXBean runtimeMXBean = getRuntime();
             ThreadMXBean threadMXBean = jmx.getThreadMXBean();
-            if (runtimeMXBean == null || threadMXBean == null) {
+            if (threadMXBean == null) {
                 return null;
             }
             StringBuilder sb = new StringBuilder(4096);
