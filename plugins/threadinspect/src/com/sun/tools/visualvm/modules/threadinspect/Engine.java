@@ -144,42 +144,65 @@ final class Engine {
         return sb.toString();
     }
 
-    private static String stackTrace16(ThreadInfo thread, ThreadMXBean threadBean) {
+    private static String stackTrace16(ThreadInfo thread, ThreadMXBean threadMXBean) {
         StringBuilder sb = new StringBuilder();
 
         MonitorInfo[] monitors = null;
-        if (threadBean.isObjectMonitorUsageSupported())
+        if (threadMXBean.isObjectMonitorUsageSupported()) {
             monitors = thread.getLockedMonitors();
-        sb.append("\"" + thread.getThreadName() + // NOI18N
+        }
+        sb.append("\n\"" + thread.getThreadName() + // NOI18N
                 "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
         sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
-        if (thread.getLockName() != null) {
-            sb.append(" on " + thread.getLockName());   // NOI18N
-            if (thread.getLockOwnerName() != null) {
-                sb.append(" owned by: " + thread.getLockOwnerName());   // NOI18N
-            }
-        }
-        sb.append("\n"); // NOI18N
+        sb.append("\n");
         int index = 0;
         for (StackTraceElement st : thread.getStackTrace()) {
-            sb.append("        at " + st.toString() + "\n");  // NOI18N
+            LockInfo lock = thread.getLockInfo();
+            String lockOwner = thread.getLockOwnerName();
+
+            sb.append("\tat " + st.toString() + "\n");    // NOI18N
+            if (index == 0) {
+                    if ("java.lang.Object".equals(st.getClassName()) &&     // NOI18N
+                    "wait".equals(st.getMethodName())) {                // NOI18N
+                    if (lock != null) {
+                        sb.append("\t- waiting on ");
+                        printLock(sb,lock);
+                        sb.append("\n");
+                    }                                   
+                } else if (lock != null) {
+                    if (lockOwner == null) {
+                        sb.append("\t- parking to wait for ");      // NOI18N
+                        printLock(sb,lock);
+                        sb.append("\n");            // NOI18N
+                    } else {
+                        sb.append("\t- waiting to lock ");      // NOI18N
+                        printLock(sb,lock);
+                        sb.append(" owned by \""+lockOwner+"\" t@"+thread.getLockOwnerId()+"\n");   // NOI18N
+                    }
+                }
+            }
             if (monitors != null) {
                 for (MonitorInfo mi : monitors) {
                     if (mi.getLockedStackDepth() == index) {
-                        sb.append("        - locked " + mi.toString() + "\n");    // NOI18N
+                        sb.append("\t- locked ");   // NOI18N
+                        printLock(sb,mi);
+                        sb.append("\n");    // NOI18N
                     }
                 }
             }
             index++;
         }
-        if (threadBean.isSynchronizerUsageSupported()) {
+
+        if (threadMXBean.isSynchronizerUsageSupported()) {
             sb.append("\n   Locked ownable synchronizers:");    // NOI18N
             LockInfo[] synchronizers = thread.getLockedSynchronizers();
             if (synchronizers == null || synchronizers.length == 0) {
-                sb.append("\n        - None\n");  // NOI18N
+                sb.append("\n\t- None\n");  // NOI18N
             } else {
                 for (LockInfo li : synchronizers) {
-                    sb.append("\n        - locked " + li.toString() + "\n");  // NOI18N
+                    sb.append("\n\t- locked ");         // NOI18N
+                    printLock(sb,li);
+                    sb.append("\n");  // NOI18N
                 }
             }
         }
@@ -187,7 +210,14 @@ final class Engine {
         sb.append("\n");  // NOI18N
         return sb.toString();
     }
-
+    
+    private static void printLock(StringBuilder sb,LockInfo lock) {
+        String id = Integer.toHexString(lock.getIdentityHashCode());
+        String className = lock.getClassName();
+        
+        sb.append("<"+id+"> (a "+className+")");        
+    }
+    
     private static String htmlize(String value) {
         return value.replace("&", "&amp;").replace("<", "&lt;");     // NOI18N
     }
