@@ -65,7 +65,7 @@ import org.openide.util.Utilities;
  *
  * @author Jiri Sedlacek
  */
-public class CPUSettingsSupport {
+public final class CPUSettingsSupport {
     
     private static final String PROP_PREFIX = "SamplerCPUSettings_"; // NOI18N
 //    private static final String JAR_SUFFIX = ".jar";  // NOI18N

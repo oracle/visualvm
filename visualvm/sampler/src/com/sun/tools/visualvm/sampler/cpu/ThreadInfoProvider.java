@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  *
  * @author Tomas Hurka
  */
-public class ThreadInfoProvider {
+public final class ThreadInfoProvider {
 
     private static final Logger LOGGER = Logger.getLogger(ThreadInfoProvider.class.getName());
     

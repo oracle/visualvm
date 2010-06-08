@@ -37,7 +37,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
  *
  * @author Tomas Hurka
  */
-class CCTFlattener extends CPUCCTVisitorAdapter {
+final class CCTFlattener extends CPUCCTVisitorAdapter {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

@@ -33,7 +33,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
  *
  * @author Tomas Hurka
  */
-class FlatProfileBuilder implements FlatProfileProvider {
+final class FlatProfileBuilder implements FlatProfileProvider {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     
     private FlatProfileContainer lastFlatProfile = null;

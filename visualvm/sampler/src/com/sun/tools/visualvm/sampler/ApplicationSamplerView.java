@@ -40,7 +40,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationSamplerView extends DataSourceView {
+final class ApplicationSamplerView extends DataSourceView {
     
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/sampler/resources/sampler.png"; // NOI18N
 

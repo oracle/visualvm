@@ -34,7 +34,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class SampleApplicationAction extends SingleDataSourceAction<Application> {
+final class SampleApplicationAction extends SingleDataSourceAction<Application> {
     
     private static SampleApplicationAction instance;
     

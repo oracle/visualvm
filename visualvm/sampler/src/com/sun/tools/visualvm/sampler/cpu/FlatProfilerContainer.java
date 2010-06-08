@@ -34,7 +34,7 @@ import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
  *
  * @author Tomas Hurka
  */
-class FlatProfilerContainer extends FlatProfileContainer {
+final class FlatProfilerContainer extends FlatProfileContainer {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected double wholeGraphNetTime0;

@@ -31,7 +31,7 @@ import org.openide.modules.ModuleInstall;
  *
  * @author Jiri Sedlacek
  */
-public class Installer extends ModuleInstall {
+final class Installer extends ModuleInstall {
 
     public void restored() {
         SamplerSupport.getInstance();

@@ -91,7 +91,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class MemoryView extends JPanel {
+final class MemoryView extends JPanel {
 
     static final int MODE_HEAP = 1;
     static final int MODE_PERMGEN = 2;

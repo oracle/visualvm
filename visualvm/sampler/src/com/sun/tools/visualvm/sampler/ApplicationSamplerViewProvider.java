@@ -34,7 +34,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationSamplerViewProvider extends DataSourceViewProvider<Application>{
+final class ApplicationSamplerViewProvider extends DataSourceViewProvider<Application>{
     
     protected boolean supportsViewFor(Application application) {
         return true;

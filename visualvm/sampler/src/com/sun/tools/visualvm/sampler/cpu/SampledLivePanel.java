@@ -39,7 +39,7 @@ import org.netbeans.lib.profiler.ui.cpu.LiveFlatProfileCollectorPanel;
  *
  * @author Tomas Hurka
  */
-public class SampledLivePanel extends LiveFlatProfileCollectorPanel {
+final class SampledLivePanel extends LiveFlatProfileCollectorPanel {
     private MethodInfoMapper methodInfoMapper;
     private StackTraceSnapshotBuilder snapshotBuilder;
     

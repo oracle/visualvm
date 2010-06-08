@@ -94,7 +94,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class SamplerImpl {
+final class SamplerImpl {
 
     private static final Logger LOGGER = Logger.getLogger(SamplerImpl.class.getName());
 

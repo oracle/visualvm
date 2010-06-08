@@ -57,7 +57,7 @@ import org.openide.util.ImageUtilities;
  *
  * @author Jiri Sedlacek
  */
-class CPUView extends JPanel {
+final class CPUView extends JPanel {
 
     private final AbstractSamplerSupport.Refresher refresher;
     private boolean forceRefresh = false;

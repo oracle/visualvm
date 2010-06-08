@@ -38,7 +38,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-public class MemorySettingsSupport {
+public final class MemorySettingsSupport {
     
 //    private static final String PROP_PREFIX = "SamplerMemorySettings_"; // NOI18N
 //
