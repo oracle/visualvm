@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.profiler</code-name-base>
+            <code-name-base>com.sun.tools.visualvm.sampler</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -11,8 +11,8 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <release-version>0</release-version>
-                        <specification-version>1.0</specification-version>
+                        <release-version>0-1</release-version>
+                        <specification-version>1.2</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -20,17 +20,53 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <release-version>0</release-version>
+                        <release-version>0-1</release-version>
+                        <specification-version>1.3</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>com.sun.tools.visualvm.coredump</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>0-1</release-version>
                         <specification-version>1.0</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.host</code-name-base>
+                    <code-name-base>com.sun.tools.visualvm.heapdump</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <release-version>0</release-version>
+                        <release-version>0-1</release-version>
                         <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>com.sun.tools.visualvm.profiler</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>0-1</release-version>
+                        <specification-version>1.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>com.sun.tools.visualvm.threaddump</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>0-1</release-version>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>com.sun.tools.visualvm.tools</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>0-1</release-version>
+                        <specification-version>1.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -38,17 +74,8 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <release-version>0</release-version>
+                        <release-version>0-1</release-version>
                         <specification-version>1.0</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.api.progress</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.10.1.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -70,6 +97,15 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.lib.profiler.ui</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <implementation-version/>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.profiler</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -79,11 +115,11 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.openide.filesystems</code-name-base>
+                    <code-name-base>org.openide.dialogs</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.3.1</specification-version>
+                        <specification-version>7.15.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -91,7 +127,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.3.1</specification-version>
+                        <specification-version>7.17.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -102,19 +138,8 @@
                         <specification-version>8.6.1</specification-version>
                     </run-dependency>
                 </dependency>
-                <dependency>
-                    <code-name-base>org.openide.windows</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>6.18.1</specification-version>
-                    </run-dependency>
-                </dependency>
             </module-dependencies>
-            <friend-packages>
-                <friend>com.sun.tools.visualvm.sampler</friend>
-                <package>com.sun.tools.visualvm.profiler</package>
-            </friend-packages>
+            <public-packages/>
         </data>
     </configuration>
 </project>
