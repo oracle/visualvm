@@ -71,6 +71,9 @@ import sun.jvmstat.monitor.event.VmStatusChangeEvent;
  */
 public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     private static final Logger LOGGER = Logger.getLogger(JvmstatApplicationProvider.class.getName());
+
+    private static final RequestProcessor PROCESSOR =
+            new RequestProcessor("JvmstatApplicationProvider Processor", 10); // NOI18N
     
     private static JvmstatApplicationProvider instance;
     
@@ -90,7 +93,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             // run new host in request processor, since it will take
             // a long time that there is no jstatd running on new host
             // we do not want to block DataSource.EVENT_QUEUE for long time
-            RequestProcessor.getDefault().post(new Runnable() {
+            PROCESSOR.post(new Runnable() {
                 public void run() {
                     processNewHost(host);
                 }
@@ -101,7 +104,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
             // run removed host in request processor, since it can take
             // a long time and we do not want to block DataSource.EVENT_QUEUE
             // for long time
-            RequestProcessor.getDefault().post(new Runnable() {
+            PROCESSOR.post(new Runnable() {
                 public void run() {
                     processFinishedHost(host);
                 }
@@ -388,7 +391,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         Timer timer = new Timer(timerInterval*1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // do not block EQ - use request processor, processNewHost() can take a long time
-                RequestProcessor.getDefault().post(new Runnable() {
+                PROCESSOR.post(new Runnable() {
                     public void run() {
                         if (!host.isRemoved()) {
                             Set<ConnectionDescriptor> descriptors = HostPropertiesProvider.descriptorsForHost(host);
@@ -418,7 +421,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     
     // Invoked from AWT thread
     void connectionsChanged(final Host host, final Set<ConnectionDescriptor> added, final Set<ConnectionDescriptor> removed, final Set<ConnectionDescriptor> changed) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        PROCESSOR.post(new Runnable() {
             public void run() {
                 registerJvmstatConnections(host,added);
                 for (ConnectionDescriptor removedConnection : removed) {

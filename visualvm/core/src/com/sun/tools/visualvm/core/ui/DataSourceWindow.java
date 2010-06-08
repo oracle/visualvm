@@ -47,6 +47,9 @@ import org.openide.windows.TopComponent;
  */
 class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     private final static Logger LOGGER = Logger.getLogger(DataSourceWindow.class.getName());
+
+    private static final RequestProcessor PROCESSOR =
+            new RequestProcessor("DataSourceWindow Processor", 5); // NOI18N
     
     private int viewsCount = 0;
 
@@ -125,7 +128,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             }
         }
         
-        RequestProcessor.getDefault().post(new Runnable() {
+        PROCESSOR.post(new Runnable() {
             public void run() { view.viewRemoved(); }
         });
         
