@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Delete;
 import org.apache.tools.ant.taskdefs.Expand;
@@ -150,6 +151,19 @@ public class L10nTask extends Task {
                 unzip.setSrc(nbmFile);
                 unzip.setDest(nbmDir);
                 unzip.execute();
+
+                DirectoryScanner packGzDs = new DirectoryScanner();
+                final String suffix = ".jar.pack.gz";
+                packGzDs.setBasedir(nbmDir);
+                packGzDs.setIncludes(new String[]{"**/*" + suffix});
+                packGzDs.scan();
+                for(String packedJar : packGzDs.getIncludedFiles()) {
+                    File packedJarFile = new File(nbmDir, packedJar);
+                    File unpackedJarFile = new File(nbmDir, packedJar.substring(0, packedJar.length() - suffix.length()) + ".jar");
+                    log("Unpacking " + packedJar + " to " + unpackedJarFile, Project.MSG_VERBOSE);
+                    AutoUpdate.unpack200(packedJarFile, unpackedJarFile);
+                    packedJarFile.delete();
+                }
             }
             ds.setBasedir(tmpDir);
             String[] includesKeys = includes.keySet().toArray(new String[]{""});
@@ -170,7 +184,8 @@ public class L10nTask extends Task {
             
             Zip zip = (Zip) getProject().createTask("zip");
             zip.setDestFile(kitFile);
-            for (String file : ds.getIncludedFiles()) {
+            for (String filePath : ds.getIncludedFiles()) {
+                String file = filePath.replace("\\", "/");
                 ZipFileSet zipFileSet = new ZipFileSet();
                 boolean matching = false;
                 for (String include : includesKeys) {
@@ -220,7 +235,9 @@ public class L10nTask extends Task {
             Logger.getLogger(L10nTask.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                lnr.close();
+                if (lnr!=null) {
+                    lnr.close();
+                }
             } catch (IOException ex) {
                 Logger.getLogger(L10nTask.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -240,5 +257,5 @@ public class L10nTask extends Task {
     }
     public void setKitFile(File kitFile) {
         this.kitFile = kitFile;
-    }
+    }    
 }
