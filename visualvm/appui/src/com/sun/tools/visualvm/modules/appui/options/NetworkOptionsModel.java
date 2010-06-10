@@ -32,6 +32,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
+import org.netbeans.api.keyring.Keyring;
+import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
 
@@ -165,11 +167,18 @@ class NetworkOptionsModel {
     }
 
     char[] getAuthenticationPassword() {
-        return PREFERENCES.get(PROXY_AUTHENTICATION_PASSWORD, "").toCharArray(); // NOI18N
+        String old = PREFERENCES.get(PROXY_AUTHENTICATION_PASSWORD, null);
+        if (old != null) {
+            PREFERENCES.remove(PROXY_AUTHENTICATION_PASSWORD);
+            setAuthenticationPassword(old.toCharArray());
+        }
+        char[] pwd = Keyring.read(PROXY_AUTHENTICATION_PASSWORD);
+        return pwd != null ? pwd : new char[0];
     }
 
     void setAuthenticationPassword(char [] password) {
-        PREFERENCES.put(PROXY_AUTHENTICATION_PASSWORD, new String(password));
+        Keyring.save(PROXY_AUTHENTICATION_PASSWORD, password,
+                NbBundle.getMessage(NetworkOptionsModel.class, "NetworkOptionsPanel_Password_Description"));  // NOI18N
     }
 
 //    void addPreferenceChangeListener(PreferenceChangeListener l) {
