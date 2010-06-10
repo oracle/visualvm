@@ -42,6 +42,7 @@ package org.netbeans.l10n;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +54,7 @@ import java.util.Vector;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import org.netbeans.nbbuild.XMLUtil;
+import org.netbeans.nbbuild.AutoUpdate;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
@@ -196,8 +198,37 @@ public class Package extends Task {
                     if (bundleentry == null) {
                         //Read it from the NBM and module's jar manifest
                         JarFile nbmFile = new JarFile(destNbmFile);
-                        ZipEntry ze = nbmFile.getEntry("netbeans" + File.separator + "modules" + File.separator + nbmName + ".jar");
-                        InputStream is = nbmFile.getInputStream(ze);
+                        String jarEntryName = "netbeans/modules/" + nbmName + ".jar";
+                        ZipEntry ze = nbmFile.getEntry(jarEntryName);
+                        InputStream is;
+                        if(ze == null) {
+                            //NBM is packed with pack200
+                            ze = nbmFile.getEntry(jarEntryName + ".pack.gz");
+                            if(ze!=null) {
+                                File packedJar = File.createTempFile(nbmName, ".jar.pack.gz", tmpDir);
+                                File unpackedJar = File.createTempFile(nbmName, ".jar", tmpDir);
+                                unpackedJar.deleteOnExit();
+                                packedJar.deleteOnExit();
+                                InputStream fis = nbmFile.getInputStream(ze);
+                                BufferedOutputStream bof = new BufferedOutputStream(new FileOutputStream(packedJar));
+                                byte [] buffer = new byte [4096];
+                                int read = 0;
+                                while ((read = fis.read(buffer)) != -1) {
+                                    bof.write(buffer, 0, read);
+                                }
+                                bof.close();
+                                fis.close();
+                                AutoUpdate.unpack200(packedJar, unpackedJar);
+                                is = new FileInputStream(unpackedJar);
+                            } else {
+                                throw new BuildException("Cannot find neither " +
+                                        jarEntryName + ".pack.gz nor " +
+                                        jarEntryName + " entry in " + nbmFile.getName());
+                            }
+                        } else {
+                            is = nbmFile.getInputStream(ze);
+                        }
+                        
                         File tmpJar = File.createTempFile("module", ".jar", tmpDir);
                         BufferedOutputStream bof = new BufferedOutputStream(new FileOutputStream(tmpJar));
                         int ch = 0;
@@ -205,6 +236,7 @@ public class Package extends Task {
                             bof.write(ch);
                         }
                         bof.close();
+                        is.close();
                         JarFile moduleJar = new JarFile(tmpJar);
                         String bundlename = moduleJar.getManifest().getMainAttributes().getValue("OpenIDE-Module-Localizing-Bundle");
                         String bfname = bundlename.substring(0, bundlename.lastIndexOf('.'));
@@ -223,7 +255,7 @@ public class Package extends Task {
                         }
                         // Open the original info XML
                         JarFile nbmFile = new JarFile(destNbmFile);
-                        Document doc = XMLUtil.parse(new InputSource(nbmFile.getInputStream(nbmFile.getEntry("Info" + File.separator + "info.xml"))), false, false, new ErrorCatcher(), null);
+                        Document doc = XMLUtil.parse(new InputSource(nbmFile.getInputStream(nbmFile.getEntry("Info/info.xml"))), false, false, new ErrorCatcher(), null);
                         Element manifest = (Element) doc.getElementsByTagName("manifest").item(0);
 
                         // Now pick up attributes from the bundle and put them to the info.xml
