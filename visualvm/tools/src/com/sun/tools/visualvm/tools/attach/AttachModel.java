@@ -58,7 +58,7 @@ public abstract class AttachModel extends Model {
      * The heap is written to the <tt>fileName</tt> file in the same
      * format as the hprof heap dump.
      * @return returns <CODE>true</CODE> if operation was sucessfull.
-     * @param fileName {@link File} where heap dump will be stored.
+     * @param fileName {@link String} where heap dump will be stored.
      */
     public abstract boolean takeHeapDump(String fileName);
     
@@ -71,7 +71,7 @@ public abstract class AttachModel extends Model {
     /**
      * Takes heap histogram of target Application.
      * @since VisualVM 1.2
-     * @return Returns {@link Histogram} of the heap from target Application.
+     * @return Returns {@link HeapHistogram} of the heap from target Application.
      */
     public abstract HeapHistogram takeHeapHistogram();
     

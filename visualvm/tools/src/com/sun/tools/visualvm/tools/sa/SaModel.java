@@ -57,7 +57,7 @@ public abstract class SaModel extends Model {
      * The heap is written to the <tt>fileName</tt> file in the same
      * format as the hprof heap dump.
      * @return returns <CODE>true</CODE> if operation was sucessfull.
-     * @param fileName {@link File} where heap dump will be stored.
+     * @param fileName {@link String} where heap dump will be stored.
      */
     public abstract boolean takeHeapDump(String fileName);
     
