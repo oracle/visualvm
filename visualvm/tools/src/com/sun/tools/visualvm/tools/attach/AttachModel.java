@@ -57,7 +57,7 @@ public abstract class AttachModel extends Model {
      * Takes heap dump of target Application.
      * The heap is written to the <tt>fileName</tt> file in the same
      * format as the hprof heap dump.
-     * @return returns <CODE>true</CODE> if operation was sucessfull.
+     * @return returns <CODE>true</CODE> if operation was successful.
      * @param fileName {@link String} where heap dump will be stored.
      */
     public abstract boolean takeHeapDump(String fileName);
