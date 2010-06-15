@@ -194,7 +194,7 @@ public final class AboutAction extends AbstractAction {
     }
     
     private static String getIDEInstallValue() {
-        String nbhome = System.getProperty("netbeans.home");    // NOI18N
+        String nbhome = System.getProperties().getProperty("netbeans.home");    // NOI18N
         String nbdirs = System.getProperty("netbeans.dirs");    // NOI18N
         
         Enumeration<Object> more;
