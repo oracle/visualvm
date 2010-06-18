@@ -100,7 +100,7 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
 
     private final Application application;
 
-    private ThreadMXBean threadBean;
+    private Engine threadEngine;
     private Set<Long> selectedThreads;
 
     private JButton refreshButton;
@@ -143,8 +143,8 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
                 if (application.getState() != Stateful.STATE_AVAILABLE) {
                     showError("Application finished");
                 } else {
-                    threadBean = Engine.resolveThreadBean(application);
-                    if (threadBean == null) {
+                    threadEngine = Engine.getEngine(application);
+                    if (threadEngine == null) {
                         showError("Cannot access threads using JMX.");
                     } else {
                         application.notifyWhenRemoved(ThreadsInspector.this);
@@ -174,7 +174,7 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
 
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                final List<ThreadInfo> tinfs = Engine.getThreadInfos(threadBean);
+                final List<ThreadInfo> tinfs = threadEngine.getThreadInfos();
                 if (tinfs == null) {
                     disableUI();
                     return;
@@ -253,8 +253,7 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
     private void displayStackTraces(final List<Long> toDisplay) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                final String text = Engine.getStackTraces(threadBean,
-                                                                   toDisplay);
+                final String text = threadEngine.getStackTraces(toDisplay);
                 if (text != null) SwingUtilities.invokeLater(new Runnable() {
                     public void run() { showDetails(text); }
                 });

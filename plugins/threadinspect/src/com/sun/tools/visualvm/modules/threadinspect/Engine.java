@@ -32,15 +32,11 @@ import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
-import java.lang.management.LockInfo;
-import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,31 +44,41 @@ import java.util.logging.Logger;
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 final class Engine {
 
     private static final Logger LOGGER = Logger.getLogger(Engine.class.getName());
 
-
-    static ThreadMXBean resolveThreadBean(Application application) {
-        ThreadMXBean threadBean = null;
-
-        try {
+    private JmxModel jmxModel;
+    private ThreadMXBean threadBean;
+    
+    static Engine getEngine(Application application) {
+         try {
             JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
             if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel,
                         GlobalPreferences.sharedInstance().getThreadsPoll() * 1000);
-                if (mxbeans != null) threadBean = mxbeans.getThreadMXBean();
-                return mxbeans == null ? null : mxbeans.getThreadMXBean();
+                if (jmxModel != null) {
+                    ThreadMXBean tbean = mxbeans.getThreadMXBean();
+                    
+                    if (tbean != null) {
+                        return new Engine(jmxModel,tbean);
+                    }
+                }
             }
         } catch (Throwable t) {
             LOGGER.log(Level.INFO, "Problem resolving ThreadMXBean", t); // NOI18N
         }
-
-        return threadBean;
+        return null;       
     }
-
-    static List<ThreadInfo> getThreadInfos(ThreadMXBean threadBean) {
+    
+    Engine(JmxModel model, ThreadMXBean tbean) {
+        jmxModel = model;
+        threadBean = tbean;
+    }
+    
+    List<ThreadInfo> getThreadInfos() {
         List<ThreadInfo> tinfosList = null;
 
         try {
@@ -91,137 +97,15 @@ final class Engine {
         } catch (Throwable t) {
             LOGGER.log(Level.INFO, "Problem resolving ThreadInfos", t); // NOI18N
         }
-
         return tinfosList;
     }
 
-    static String getStackTraces(ThreadMXBean threadBean, List<Long> threadIdsL) {
+    String getStackTraces(List<Long> threadIdsL) {
         long[] threadIds = new long[threadIdsL.size()];
         for (int i = 0; i < threadIds.length; i++) threadIds[i] = threadIdsL.get(i);
+        String stackTraces = jmxModel.takeThreadDump(threadIds);
 
-        boolean limitedJvm = true;
-        ThreadInfo[] threadInfos = null;
-
-        try {
-            threadInfos = threadBean.getThreadInfo(threadIds, true, true);
-            limitedJvm = false;
-        } catch (Throwable t1) {
-            // likely a 1.5 JVM
-            try {
-                threadInfos = threadBean.getThreadInfo(threadIds, Integer.MAX_VALUE);
-            } catch (Throwable t2) {
-                LOGGER.log(Level.INFO, "Problem resolving extended ThreadInfos", t2); // NOI18N
-            }
-        }
-
-        if (threadInfos == null) return null;
-
-        StringBuilder b = new StringBuilder();
-
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // NOI18N
-        b.append(df.format(new Date()) + "\n");  // NOI18N
-
-        for (ThreadInfo ti : threadInfos) if (ti != null)
-            b.append(limitedJvm ? stackTrace15(ti) : stackTrace16(ti, threadBean));
-
-        return "<pre>" + transform(htmlize(b.toString())) + "</pre>"; // NOI18N
-    }
-
-    private static String stackTrace15(ThreadInfo thread) {
-        StringBuilder sb = new StringBuilder();
-
-        if (thread != null) {
-            sb.append("\"" + thread.getThreadName() + // NOI18N
-                    "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
-            sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
-            if (thread.getLockName() != null) {
-                sb.append(" on " + thread.getLockName());   // NOI18N
-                if (thread.getLockOwnerName() != null) {
-                    sb.append(" owned by: " + thread.getLockOwnerName());   // NOI18N
-                }
-            }
-            sb.append("\n"); // NOI18N
-            for (StackTraceElement st : thread.getStackTrace()) {
-                sb.append("        at " + st.toString() + "\n");    // NOI18N
-            }
-        }
-
-        sb.append("\n");  // NOI18N
-        return sb.toString();
-    }
-
-    private static String stackTrace16(ThreadInfo thread, ThreadMXBean threadMXBean) {
-        StringBuilder sb = new StringBuilder();
-
-        MonitorInfo[] monitors = null;
-        if (threadMXBean.isObjectMonitorUsageSupported()) {
-            monitors = thread.getLockedMonitors();
-        }
-        sb.append("\n\"" + thread.getThreadName() + // NOI18N
-                "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
-        sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
-        sb.append("\n");  // NOI18N
-        int index = 0;
-        for (StackTraceElement st : thread.getStackTrace()) {
-            LockInfo lock = thread.getLockInfo();
-            String lockOwner = thread.getLockOwnerName();
-
-            sb.append("\tat " + st.toString() + "\n");    // NOI18N
-            if (index == 0) {
-                    if ("java.lang.Object".equals(st.getClassName()) &&     // NOI18N
-                    "wait".equals(st.getMethodName())) {                // NOI18N
-                    if (lock != null) {
-                        sb.append("\t- waiting on ");  // NOI18N
-                        printLock(sb,lock);
-                        sb.append("\n");  // NOI18N
-                    }                                   
-                } else if (lock != null) {
-                    if (lockOwner == null) {
-                        sb.append("\t- parking to wait for ");      // NOI18N
-                        printLock(sb,lock);
-                        sb.append("\n");            // NOI18N
-                    } else {
-                        sb.append("\t- waiting to lock ");      // NOI18N
-                        printLock(sb,lock);
-                        sb.append(" owned by \""+lockOwner+"\" t@"+thread.getLockOwnerId()+"\n");   // NOI18N
-                    }
-                }
-            }
-            if (monitors != null) {
-                for (MonitorInfo mi : monitors) {
-                    if (mi.getLockedStackDepth() == index) {
-                        sb.append("\t- locked ");   // NOI18N
-                        printLock(sb,mi);
-                        sb.append("\n");    // NOI18N
-                    }
-                }
-            }
-            index++;
-        }
-
-        if (threadMXBean.isSynchronizerUsageSupported()) {
-            sb.append("\n   Locked ownable synchronizers:");    // NOI18N
-            LockInfo[] synchronizers = thread.getLockedSynchronizers();
-            if (synchronizers == null || synchronizers.length == 0) {
-                sb.append("\n\t- None\n");  // NOI18N
-            } else {
-                for (LockInfo li : synchronizers) {
-                    sb.append("\n\t- locked ");         // NOI18N
-                    printLock(sb,li);
-                    sb.append("\n");  // NOI18N
-                }
-            }
-        }
-
-        sb.append("\n");  // NOI18N
-        return sb.toString();
-    }
-    
-    private static void printLock(StringBuilder sb,LockInfo lock) {
-        String id = Integer.toHexString(lock.getIdentityHashCode());
-        String className = lock.getClassName();
-        
-        sb.append("<"+id+"> (a "+className+")");          // NOI18N
+        return "<pre>" + transform(htmlize(stackTraces)) + "</pre>"; // NOI18N
     }
     
     private static String htmlize(String value) {
@@ -244,8 +128,4 @@ final class Engine {
         }
         return sb.toString();
     }
-
-
-    private Engine() {}
-
 }
