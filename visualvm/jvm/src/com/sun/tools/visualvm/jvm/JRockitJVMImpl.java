@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.jvm;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 
 /**
@@ -96,7 +97,14 @@ public class JRockitJVMImpl extends JVMImpl {
         
     @Override
     public boolean isTakeThreadDumpSupported() {
-        return getAttach() != null || jmxSupport.getRuntime() != null;
+        if (getAttach() != null) {
+            return true;
+        }
+        JmxModel jmx = getJmxModel();
+        if (jmx == null) {
+            return false;
+        }
+        return jmx.isTakeThreadDumpSupported();
     }
 
 }

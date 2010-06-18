@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.jvm;
 
-import com.sun.management.HotSpotDiagnosticMXBean;
 import com.sun.management.OperatingSystemMXBean;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
@@ -37,6 +36,8 @@ import com.sun.tools.visualvm.host.Host;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.tools.attach.AttachModel;
 import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatListener;
@@ -54,6 +55,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -212,9 +214,9 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 args = attach.printFlag(HEAP_DUMP_ON_OOME);
             }
             if (args == null) {
-                HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
-                if (hsDiagnostic != null && !jmxSupport.isReadOnlyConnection()) {
-                    String value = hsDiagnostic.getVMOption(HEAP_DUMP_ON_OOME).getValue();
+                JmxModel jmx = getJmxModel();
+                if (jmx != null && jmx.isTakeHeapDumpSupported() && !jmxSupport.isReadOnlyConnection()) {
+                    String value = jmx.getFlagValue(HEAP_DUMP_ON_OOME);
                     isDumpOnOOMEnabled = Boolean.valueOf(value);
                     return isDumpOnOOMEnabled.booleanValue();
                 }
@@ -287,7 +289,10 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         if (prop != null)
             return prop;
-        prop = jmxSupport.getSystemProperties();
+        JmxModel jmx = getJmxModel();
+        if (jmx != null) {
+            prop = jmx.getSystemProperties();
+        }
         if (prop != null) {
             return prop;
         }
@@ -302,7 +307,14 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     }
     
     public boolean isDumpOnOOMEnabledSupported() {
-        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && jmxSupport.getHotSpotDiagnostic() != null); 
+        if (getAttach() != null) {
+            return true;
+        }
+        JmxModel jmx = getJmxModel();
+        if (Host.LOCALHOST.equals(application.getHost()) && jmx != null && jmx.isTakeHeapDumpSupported()) {
+            return true;
+        }
+        return false;
     }
     
     public synchronized void setDumpOnOOMEnabled(boolean enabled) {
@@ -316,10 +328,10 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 attach.setFlag(HEAP_DUMP_PATH,application.getStorage().getDirectory().getAbsolutePath());
             }
         } else {
-            HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
-            hsDiagnostic.setVMOption(HEAP_DUMP_ON_OOME,Boolean.toString(enabled));
+            JmxModel jmx = getJmxModel();
+            jmx.setFlagValue(HEAP_DUMP_ON_OOME,Boolean.toString(enabled));
             if (enabled) {
-                hsDiagnostic.setVMOption(HEAP_DUMP_PATH,application.getStorage().getDirectory().getAbsolutePath());
+                jmx.setFlagValue(HEAP_DUMP_PATH,application.getStorage().getDirectory().getAbsolutePath());
             }
         }
         Boolean oldVlue = isDumpOnOOMEnabled;
@@ -328,7 +340,14 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     }
     
     public boolean isTakeHeapDumpSupported() {
-        return  getAttach() != null || (Host.LOCALHOST.equals(application.getHost()) && jmxSupport.getHotSpotDiagnostic() != null); 
+        if (getAttach() != null) {
+            return true;
+        }
+        JmxModel jmx = getJmxModel();
+        if (Host.LOCALHOST.equals(application.getHost()) && jmx != null && jmx.isTakeHeapDumpSupported()) {
+            return true;
+        }
+        return false;
     }
     
     public File takeHeapDump() throws IOException {
@@ -345,16 +364,21 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             }
             return null;
         }
-        HotSpotDiagnosticMXBean hsDiagnostic = jmxSupport.getHotSpotDiagnostic();
-        if (hsDiagnostic != null) {
-            hsDiagnostic.dumpHeap(dumpFile.getAbsolutePath(),true);
+        if (getJmxModel().takeHeapDump(dumpFile.getAbsolutePath())) {
             return dumpFile;
         }
         return null;
     }
     
     public boolean isTakeThreadDumpSupported() {
-        return getAttach() != null || jmxSupport.getRuntime() != null || getSAAgent() != null;
+        if (getAttach() != null) {
+            return true;
+        }
+        JmxModel jmx = getJmxModel();
+        if (jmx != null && jmx.isTakeThreadDumpSupported()) {
+            return true;
+        }
+        return getSAAgent() != null;
     }
     
     public File takeThreadDump() throws IOException {
@@ -365,7 +389,10 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             threadDump = attach.takeThreadDump();
         }
         if (threadDump == null) {
-            threadDump = jmxSupport.takeThreadDump();
+            JmxModel jmx = getJmxModel();
+            if (jmx != null) {
+                threadDump = jmx.takeThreadDump();
+            }
         }
         if (threadDump == null) {
             SaModel sa = getSAAgent();
@@ -375,9 +402,9 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
         if (threadDump == null) {
             if (!isTakeThreadDumpSupported()) {
-            throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException();
             }
-            threadDump = org.openide.util.NbBundle.getMessage(JVMImpl.class, "MSG_ThreadDumpfailed");   // NOI18N
+            threadDump = NbBundle.getMessage(JVMImpl.class, "MSG_ThreadDumpfailed");   // NOI18N
         }
         File snapshotDir = application.getStorage().getDirectory();
         String name = ThreadDumpSupport.getInstance().getCategory().createFileName();
@@ -419,6 +446,10 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         return SaModelFactory.getSAAgentFor(application);
     }
     
+    protected JmxModel getJmxModel() {
+        return JmxModelFactory.getJmxModelFor(application);
+    }
+    
     protected void initStaticData() {
         synchronized (staticDataLock) {
             if (staticDataInitialized) {
@@ -438,7 +469,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
                 vmVendor = jvmstatModel.getVmVendor();
             } else {
                 jvmArgs = jmxSupport.getJvmArgs();
-                Properties prop = jmxSupport.getSystemProperties();
+                Properties prop = getJmxModel().getSystemProperties();
                 if (prop != null) {
                     vmVersion = prop.getProperty("java.vm.version");    // NOI18N
                     javaVersion = prop.getProperty("java.version");    // NOI18N

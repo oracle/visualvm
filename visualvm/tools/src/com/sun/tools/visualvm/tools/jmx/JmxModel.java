@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.datasupport.AsyncPropertyChangeSupport;
 import com.sun.tools.visualvm.core.model.Model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Properties;
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 
@@ -65,6 +66,7 @@ import javax.management.remote.JMXServiceURL;
  * {@link JmxModel#getConnectionState()}.</p>
  *
  * @author Luis-Miguel Alventosa
+ * @author Tomas Hurka
  */
 public abstract class JmxModel extends Model {
 
@@ -149,4 +151,81 @@ public abstract class JmxModel extends Model {
      * @return the {@link JMXServiceURL} associated to this (@code JmxModel}.
      */
     public abstract JMXServiceURL getJMXServiceURL();
+
+    /**
+     * Returns the current system properties in the target Application.
+     *
+     * <p> This method returns the system properties in the target virtual
+     * machine. Properties whose key or value is not a <tt>String</tt> are
+     * omitted. The method is approximately equivalent to the invocation of the
+     * method {@link java.lang.System#getProperties System.getProperties}
+     * in the target virtual machine except that properties with a key or
+     * value that is not a <tt>String</tt> are not included.
+     * @return The system properties of target Application
+     * @see java.lang.System#getProperties
+     * @since VisualVM 1.3
+     */
+    public abstract Properties getSystemProperties();
+
+    /**
+     * Tests if it is possible to obtain heap dump from target JVM via JMX.
+     * @return <CODE>true</CODE> if JMX supports heap dump,
+     * <CODE>false</CODE> otherwise
+     * @since VisualVM 1.3
+     */
+    public abstract boolean isTakeHeapDumpSupported();
+
+    /**
+     * Takes heap dump of target JVM via JMX.
+     * The heap is written to the <tt>fileName</tt> file in the same
+     * format as the hprof heap dump.
+     * @param fileName {@link String} where heap dump will be stored.
+     * @return returns <CODE>true</CODE> if operation was successful.
+     * @since VisualVM 1.3
+     */
+    public abstract boolean takeHeapDump(String fileName);
+
+    /**
+     * Tests if it is possible to obtain thread dump from target JVM via JMX.
+     * @return <CODE>true</CODE> if JMX supports thread dump,
+     * <CODE>false</CODE> otherwise
+     * @since VisualVM 1.3
+     */
+    public abstract boolean isTakeThreadDumpSupported();
+
+    /**
+     * Takes thread dump of target JVM via JMX.
+     * @return Returns {@link String} of the thread dump from target JVM.
+     * @since VisualVM 1.3
+     */
+    public abstract String takeThreadDump();
+
+    /**
+     * Returns the combined strack trace from each thread
+     * whose ID is in the input array <tt>threadIds</tt>,
+     * @param threadIds an array of thread IDs
+     * @return Returns {@link String} representing combined stack traces
+     * from all threads IDs
+     * @since VisualVM 1.3
+     */
+    public abstract String takeThreadDump(long[] threadIds);
+
+    /**
+     * print VM option.
+     * Note that VM option is the one which starts with
+     * <CODE>-XX:</CODE>
+     * @param name name of VM option. For examle <CODE>HeapDumpOnOutOfMemoryError</CODE>
+     * @return Text value of VM option. For example <CODE>true</CODE>
+     * @since VisualVM 1.3
+     */
+    public abstract String getFlagValue(String name);
+
+    /**
+     * Sets a VM option of the given name to the specified value.
+     *
+     * @param name Name of a VM option
+     * @param value New value of the VM option to be set
+     * @since VisualVM 1.3
+     */
+    public abstract void setFlagValue(String name,String value);
 }

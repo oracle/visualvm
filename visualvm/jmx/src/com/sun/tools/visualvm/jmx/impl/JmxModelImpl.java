@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -103,6 +103,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Luis-Miguel Alventosa
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 class JmxModelImpl extends JmxModel {
 //    private static final String PROPERTY_USERNAME = "prop_username";    // NOI18N
@@ -111,7 +112,9 @@ class JmxModelImpl extends JmxModel {
     private ProxyClient client;
     private ApplicationRemovedListener removedListener;
     private ApplicationAvailabilityListener availabilityListener;
-
+    private JmxSupport jmxSupport;
+    private final Object jmxSupportLock = new Object();
+    
     /**
      * Creates an instance of {@code JmxModel} for a {@link JvmstatApplication}.
      *
@@ -278,6 +281,47 @@ class JmxModelImpl extends JmxModel {
             return client.getUrl();
         }
         return null;        
+    }
+
+    public Properties getSystemProperties() {
+        return getJmxSupport().getSystemProperties();
+    }
+
+    public boolean takeHeapDump(String fileName) {
+        return getJmxSupport().takeHeapDump(fileName);
+    }
+
+    public String takeThreadDump() {
+        return getJmxSupport().takeThreadDump();
+    }
+
+    public String takeThreadDump(long[] threadIds) {
+        return getJmxSupport().takeThreadDump(threadIds);
+    }    
+
+    public String getFlagValue(String name) {
+        return getJmxSupport().getFlagValue(name);
+    }
+
+    public void setFlagValue(String name, String value) {
+        getJmxSupport().setFlagValue(name,value);
+    }
+
+    public boolean isTakeHeapDumpSupported() {
+        return getJmxSupport().getHotSpotDiagnostic() != null;
+    }
+    
+    public boolean isTakeThreadDumpSupported() {
+        return getJmxSupport().getThreadBean() != null;
+    }
+
+    private JmxSupport getJmxSupport() {
+        synchronized (jmxSupportLock) {
+            if (jmxSupport == null) {
+                jmxSupport = new JmxSupport(this);
+            }
+            return jmxSupport;
+        }
     }
 
     /**
