@@ -54,6 +54,7 @@
                 <friend>com.sun.tools.visualvm.modules.threadinspect</friend>
                 <friend>com.sun.tools.visualvm.modules.tracer</friend>
                 <friend>com.sun.tools.visualvm.profiler</friend>
+                <friend>com.sun.tools.visualvm.profiling</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
                 <friend>com.sun.tools.visualvm.threaddump</friend>
                 <friend>net.java.visualvm.modules.glassfish</friend>
