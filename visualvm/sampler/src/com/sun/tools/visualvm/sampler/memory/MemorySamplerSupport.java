@@ -87,9 +87,11 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         return detailsViews;
     }
     
-    public boolean startSampling(ProfilingSettings settings, int samplingRate) {
-        heapTimer.start();
-        permgenTimer.start();
+    public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {
+//        heapTimer.start();
+//        permgenTimer.start();
+        heapRefresher.setRefreshRate(samplingRate);
+        permgenRefresher.setRefreshRate(samplingRate);
         if (heapView != null && permgenView != null)
             doRefreshImpl(heapTimer, heapView, permgenView);
         return true;

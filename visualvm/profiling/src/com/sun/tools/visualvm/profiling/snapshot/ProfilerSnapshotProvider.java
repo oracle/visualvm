@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.snapshot;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
@@ -46,19 +46,23 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class ProfilerSnapshotProvider {
+final class ProfilerSnapshotProvider {
     
     public void createSnapshot(LoadedSnapshot loadedSnapshot, Application application, final boolean openView) {
         final ProfilerSnapshot snapshot = new ProfilerSnapshot(loadedSnapshot, application);
         application.getRepository().addDataSource(snapshot);
         if (openView) SwingUtilities.invokeLater(new Runnable() {
-            public void run() { DataSourceWindowManager.sharedInstance().openDataSource(snapshot); }
+            public void run() {
+                DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
+            }
         });
     }
     
     public void initialize() {
-        DataSourceRepository.sharedInstance().addDataChangeListener(new SnapshotListener(), Snapshot.class);
-        DataSourceRepository.sharedInstance().addDataChangeListener(new ApplicationListener(), Application.class);
+        DataSourceRepository.sharedInstance().addDataChangeListener(
+                new SnapshotListener(), Snapshot.class);
+        DataSourceRepository.sharedInstance().addDataChangeListener(
+                new ApplicationListener(), Application.class);
     }
     
     
@@ -69,7 +73,8 @@ class ProfilerSnapshotProvider {
             Set<ProfilerSnapshot> snapshots = new HashSet();
             LoadedSnapshot[] loadedSnapshots = findSnapshots(snapshotFile);
             for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
-                if (loadedSnapshot != null) snapshots.add(new ProfilerSnapshot(loadedSnapshot, snapshot));
+                if (loadedSnapshot != null)
+                    snapshots.add(new ProfilerSnapshot(loadedSnapshot, snapshot));
             snapshot.getRepository().addDataSources(snapshots);
         }
     }
@@ -80,16 +85,19 @@ class ProfilerSnapshotProvider {
             Set<ProfilerSnapshot> snapshots = new HashSet();
             LoadedSnapshot[] loadedSnapshots = findSnapshots(storage.getDirectory());
             for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
-                if (loadedSnapshot != null) snapshots.add(new ProfilerSnapshot(loadedSnapshot, application));
+                if (loadedSnapshot != null)
+                    snapshots.add(new ProfilerSnapshot(loadedSnapshot, application));
             application.getRepository().addDataSources(snapshots);
         }
     }
     
     private LoadedSnapshot[] findSnapshots(File directory) {
-        File[] files = directory.listFiles(ProfilerSupport.getInstance().getCategory().getFilenameFilter());
+        File[] files = directory.listFiles(
+                ProfilerSnapshotsSupport.getInstance().getCategory().getFilenameFilter());
         if (files == null) return new LoadedSnapshot[0];
         FileObject[] fileObjects = new FileObject[files.length];
-        for (int i = 0; i < files.length; i++) fileObjects[i] = FileUtil.toFileObject(FileUtil.normalizeFile(files[i]));
+        for (int i = 0; i < files.length; i++)
+            fileObjects[i] = FileUtil.toFileObject(FileUtil.normalizeFile(files[i]));
         return ResultsManager.getDefault().loadSnapshots(fileObjects);
     }
     
@@ -113,7 +121,8 @@ class ProfilerSnapshotProvider {
             final Set<Application> applications = event.getAdded();
             if (!applications.isEmpty()) RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    for (Application application : applications) processNewApplication(application);
+                    for (Application application : applications)
+                        processNewApplication(application);
                 }
             });
         }

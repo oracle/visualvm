@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -23,9 +23,10 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.snapshot.diff;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshot;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
@@ -37,7 +38,7 @@ import org.netbeans.modules.profiler.LoadedSnapshot;
  *
  * @author Jiri Sedlacek
  */
-class SnapshotDiffContainer extends DataSource {
+final class SnapshotDiffContainer extends DataSource {
     
     private ResultsSnapshot diffSnapshot;
     private ProfilerSnapshot snapshot1;

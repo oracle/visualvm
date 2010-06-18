@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,28 +23,41 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.presets;
 
-import com.sun.tools.visualvm.core.datasource.DataSource;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
-import com.sun.tools.visualvm.core.model.AbstractModelProvider;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import javax.swing.JPanel;
 
 /**
  *
- * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
-class ProfilerSnapshotDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
+final class SamplerMemorySettings extends JPanel {
+
+    private ProfilerPreset preset;
+    private final SamplerMemoryPanel panel;
+
     
-    public ProfilerSnapshotDescriptorProvider() {
+    SamplerMemorySettings() {
+        this.panel = new SamplerMemoryPanel() {
+            public void settingsChanged() { panel.saveToPreset(preset); }
+        };
+        setLayout(new BorderLayout());
+        add(panel, BorderLayout.CENTER);
+    }
+
+    void setPreset(ProfilerPreset preset) {
+        this.preset = preset;
+        panel.loadFromPreset(preset);
     }
     
-    public DataSourceDescriptor createModelFor(DataSource ds) {
-        if (ds instanceof ProfilerSnapshot) {
-            return new ProfilerSnapshotDescriptor((ProfilerSnapshot) ds);
-        }
-        return null;
+    boolean valid() { return panel.settingsValid(); }
+
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        for (Component c : getComponents())
+            c.setEnabled(enabled);
     }
-    
-    
 
 }

@@ -74,11 +74,11 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         refreshRate = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
 
         refresher = new Refresher() {
-            public void setRefreshRate(int refreshRate) {
-                CPUSamplerSupport.this.refreshRate = refreshRate;
+            public void setRefreshRate(int rr) {
+                CPUSamplerSupport.this.refreshRate = rr;
             }
             public int getRefreshRate() {
-                return refreshRate;
+                return CPUSamplerSupport.this.refreshRate;
             }
             protected boolean checkRefresh() {
                 return samplerTask != null && cpuView.isShowing();
@@ -86,7 +86,6 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             protected void doRefresh() {
                 doRefreshImpl();
             }
-
         };
     }
 
@@ -103,13 +102,15 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         return detailsViews;
     }
 
-    public boolean startSampling(ProfilingSettings settings, int samplingRate) {
+    public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {
         InstrumentationFilter filter = new InstrumentationFilter();
         SimpleFilter sf = (SimpleFilter)settings.getSelectedInstrumentationFilter();
         filter.setFilterStrings(sf.getFilterValue());
         filter.setFilterType(convertFilterType(sf.getFilterType()));
         builder = new StackTraceSnapshotBuilder(1, filter);
         snapshotDumper.builder = builder;
+        
+        refresher.setRefreshRate(refreshRate);
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

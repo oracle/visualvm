@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -23,7 +23,7 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
@@ -36,17 +36,17 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerSnapshot extends Snapshot {
+public final class ProfilerSnapshot extends Snapshot {
     
     private LoadedSnapshot loadedSnapshot;
-    
+
+
     public ProfilerSnapshot() {
-        super(null, ProfilerSupport.getInstance().getCategory());
+        super(null, ProfilerSnapshotsSupport.getInstance().getCategory());
     }
     
-    
     public ProfilerSnapshot(LoadedSnapshot loadedSnapshot, DataSource master) {
-        super(loadedSnapshot.getFile(), ProfilerSupport.getInstance().getCategory(), master);
+        super(loadedSnapshot.getFile(), ProfilerSnapshotsSupport.getInstance().getCategory(), master);
         this.loadedSnapshot = loadedSnapshot;
     }
     
@@ -65,7 +65,8 @@ public class ProfilerSnapshot extends Snapshot {
     }
     
     public void saveAs() {
-        SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(ProfilerSnapshot.class, "MSG_Save_Profiler_Snapshot_As"));  // NOI18N
+        SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(
+                ProfilerSnapshot.class, "MSG_Save_Profiler_Snapshot_As"));  // NOI18N
     }
 
 }

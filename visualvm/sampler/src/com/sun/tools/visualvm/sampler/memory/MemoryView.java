@@ -30,12 +30,10 @@ import com.sun.tools.visualvm.application.jvm.HeapHistogram.ClassInfo;
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.HierarchyEvent;
@@ -57,15 +55,12 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -198,9 +193,9 @@ final class MemoryView extends JPanel {
     }
 
     void terminate() {
-        refreshRateLabel.setEnabled(false);
-        refreshCombo.setEnabled(false);
-        refreshUnitsLabel.setEnabled(false);
+//        refreshRateLabel.setEnabled(false);
+//        refreshCombo.setEnabled(false);
+//        refreshUnitsLabel.setEnabled(false);
         pauseButton.setEnabled(false);
         refreshButton.setEnabled(false);
         deltaButton.setEnabled(false);
@@ -546,29 +541,29 @@ final class MemoryView extends JPanel {
         toolBar.setRollover(true);
         toolBar.setOpaque(false);
 
-        refreshRateLabel = new JLabel("Refresh: ");
-        refreshRateLabel.setToolTipText("Live results refresh rate [ms]");
-        toolBar.add(refreshRateLabel);
-
-        Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
-        refreshCombo = new JComboBox(refreshRates) {
-            public Dimension getMinimumSize() { return getPreferredSize(); }
-            public Dimension getMaximumSize() { return getPreferredSize(); }
-        };
-        refreshCombo.setToolTipText("Live results refresh rate [ms]");
-        refreshCombo.setEditable(false);
-        refreshCombo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                refresher.setRefreshRate((Integer)refreshCombo.getSelectedItem());
-            }
-        });
-        refreshCombo.setSelectedItem(refresher.getRefreshRate());
-        refreshCombo.setRenderer(new ComboRenderer(refreshCombo));
-        toolBar.add(refreshCombo);
-
-        refreshUnitsLabel = new JLabel(" ms.  ");
-        refreshUnitsLabel.setToolTipText("Live results refresh rate [ms]");
-        toolBar.add(refreshUnitsLabel);
+//        refreshRateLabel = new JLabel("Refresh: ");
+//        refreshRateLabel.setToolTipText("Live results refresh rate [ms]");
+//        toolBar.add(refreshRateLabel);
+//
+//        Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
+//        refreshCombo = new JComboBox(refreshRates) {
+//            public Dimension getMinimumSize() { return getPreferredSize(); }
+//            public Dimension getMaximumSize() { return getPreferredSize(); }
+//        };
+//        refreshCombo.setToolTipText("Live results refresh rate [ms]");
+//        refreshCombo.setEditable(false);
+//        refreshCombo.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                refresher.setRefreshRate((Integer)refreshCombo.getSelectedItem());
+//            }
+//        });
+//        refreshCombo.setSelectedItem(refresher.getRefreshRate());
+//        refreshCombo.setRenderer(new ComboRenderer(refreshCombo));
+//        toolBar.add(refreshCombo);
+//
+//        refreshUnitsLabel = new JLabel(" ms.  ");
+//        refreshUnitsLabel.setToolTipText("Live results refresh rate [ms]");
+//        toolBar.add(refreshUnitsLabel);
 
         pauseButton = new JToggleButton() {
             protected void fireActionPerformed(ActionEvent event) {
@@ -598,6 +593,17 @@ final class MemoryView extends JPanel {
 
         toolBar.addSeparator();
 
+        deltaButton = new JToggleButton("Deltas") {
+            protected void fireActionPerformed(ActionEvent event) {
+                refresher.refresh();
+            }
+        };
+        deltaButton.setToolTipText("Show delta values");
+        deltaButton.setOpaque(false);
+        toolBar.add(deltaButton);
+
+        toolBar.addSeparator();
+
         snapshotButton = new JButton("Snapshot", new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/sampler/resources/snapshot.png", true))) {
             protected void fireActionPerformed(ActionEvent event) {
@@ -608,17 +614,6 @@ final class MemoryView extends JPanel {
         snapshotButton.setOpaque(false);
         snapshotButton.setEnabled(false);
         toolBar.add(snapshotButton);
-
-        toolBar.addSeparator();
-
-        deltaButton = new JToggleButton("Deltas") {
-            protected void fireActionPerformed(ActionEvent event) {
-                refresher.refresh();
-            }
-        };
-        deltaButton.setToolTipText("Show delta values");
-        deltaButton.setOpaque(false);
-        toolBar.add(deltaButton);
 
         JPanel toolbarSpacer = new JPanel(null) {
             public Dimension getPreferredSize() {
@@ -705,7 +700,7 @@ final class MemoryView extends JPanel {
         heapdumpButton.setPreferredSize(size);
         heapdumpButton.setMaximumSize(size);
 
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 9, 3, 4));
+        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 4, 3, 4));
 
 //        controlPanel.add(toolBar, BorderLayout.NORTH);
 //        controlPanel.add(new JSeparator(), BorderLayout.CENTER);
@@ -834,9 +829,9 @@ final class MemoryView extends JPanel {
 
 
     private HTMLTextArea area;
-    private JLabel refreshRateLabel;
-    private JLabel refreshUnitsLabel;
-    private JComboBox refreshCombo;
+//    private JLabel refreshRateLabel;
+//    private JLabel refreshUnitsLabel;
+//    private JComboBox refreshCombo;
     private AbstractButton snapshotButton;
     private AbstractButton deltaButton;
     private AbstractButton pauseButton;
@@ -872,21 +867,21 @@ final class MemoryView extends JPanel {
     private int minNamesColumnWidth; // minimal width of classnames columns
 
     
-    private static class ComboRenderer implements ListCellRenderer {
-
-        private ListCellRenderer renderer;
-
-        ComboRenderer(JComboBox combo) {
-            renderer = combo.getRenderer();
-            if (renderer instanceof JLabel)
-                ((JLabel)renderer).setHorizontalAlignment(JLabel.TRAILING);
-        }
-
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            return renderer.getListCellRendererComponent(list, NumberFormat.getInstance().format(value), index, isSelected, cellHasFocus);
-        }
-
-    }
+//    private static class ComboRenderer implements ListCellRenderer {
+//
+//        private ListCellRenderer renderer;
+//
+//        ComboRenderer(JComboBox combo) {
+//            renderer = combo.getRenderer();
+//            if (renderer instanceof JLabel)
+//                ((JLabel)renderer).setHorizontalAlignment(JLabel.TRAILING);
+//        }
+//
+//        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+//            return renderer.getListCellRendererComponent(list, NumberFormat.getInstance().format(value), index, isSelected, cellHasFocus);
+//        }
+//
+//    }
 
     private static class DeltaClassInfo extends ClassInfo {
 

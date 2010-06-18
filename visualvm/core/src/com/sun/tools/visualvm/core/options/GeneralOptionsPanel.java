@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.core.options;
 
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.uisupport.JExtendedSpinner;
 import java.awt.BorderLayout;
@@ -35,9 +34,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -45,11 +41,9 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -58,7 +52,6 @@ import org.openide.util.RequestProcessor;
  */
 final class GeneralOptionsPanel extends JPanel {
 
-    final private static Logger LOGGER = Logger.getLogger("com.sun.tools.visualvm.core.options");   // NOI18N
     private final GeneralOptionsPanelController controller;
 
     transient private final ChangeListener changeListener = new ChangeListener() {
@@ -253,10 +246,10 @@ final class GeneralOptionsPanel extends JPanel {
         c.insets = new Insets(3, 0, 3, 0);
         add(monitoredDataCUnits, c);
 
-        // --- Profiler ---
+        // --- Misc ---
 
         SectionSeparator profilerSection = UISupport.createSectionSeparator(NbBundle.getMessage
-                                          (GeneralOptionsPanel.class, "LBL_Profiler")); // NOI18N
+                                          (GeneralOptionsPanel.class, "LBL_Miscellaneous")); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 7;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -285,26 +278,6 @@ final class GeneralOptionsPanel extends JPanel {
         c.insets = new Insets(2, 15, 2, 0);
         add(resetDNSAPanel, c);
 
-        JPanel resetCalibrationPanel = new JPanel(new BorderLayout());
-
-        resetCalibrationLabel = new JLabel();
-        Mnemonics.setLocalizedText(resetCalibrationLabel, NbBundle.getMessage(
-                                   GeneralOptionsPanel.class, "LBL_ResetData")); // NOI18N
-        resetCalibrationPanel.add(resetCalibrationLabel, BorderLayout.CENTER);
-
-        resetCalibrationButton = new JButton();
-        Mnemonics.setLocalizedText(resetCalibrationButton, NbBundle.getMessage(
-                                   GeneralOptionsPanel.class, "BTN_Reset2")); // NOI18N
-        resetCalibrationPanel.add(resetCalibrationButton, BorderLayout.EAST);
-
-        c = new GridBagConstraints();
-        c.gridy = 9;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(2, 15, 0, 0);
-        add(resetCalibrationPanel, c);
-
         // --- Filler ---
 
         c = new GridBagConstraints();
@@ -323,27 +296,6 @@ final class GeneralOptionsPanel extends JPanel {
         resetDNSAButton.setEnabled(false);
     }
 
-    private void resetCalibrationButtonAction() {
-        resetCalibrationButton.setEnabled(false);
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                try {
-                    File calibrationDirectory = new File(Platform.getProfilerUserDir());
-                    if (calibrationDirectory.isDirectory()) {
-                        File[] calibrationFiles = calibrationDirectory.listFiles();
-                        for (File calibrationFile : calibrationFiles) {
-                            if (calibrationFile.isFile() && calibrationFile.getName().startsWith("machinedata.")) // NOI18N
-                                Utils.delete(calibrationFile, false);
-
-                        }
-                    }
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Error resetting calibration data", e);  // NOI18N
-                }
-            }
-        });
-    }
-
     void load() {
         // TODO read settings and initialize GUI
         // Example:        
@@ -354,7 +306,6 @@ final class GeneralOptionsPanel extends JPanel {
         // someTextField.setText(SomeSystemOption.getDefault().getSomeStringProperty());
         GlobalPreferences preferences = GlobalPreferences.sharedInstance();
         resetDNSAButton.setEnabled(true);
-        resetCalibrationButton.setEnabled(true);
         monitoredHostPSpinner.setValue(preferences.getMonitoredHostPoll());
         monitoredDataPSpinner.setValue(preferences.getMonitoredDataPoll());
         threadsPSpinner.setValue(preferences.getThreadsPoll());
@@ -398,15 +349,9 @@ final class GeneralOptionsPanel extends JPanel {
         monitoredDataPSpinner.getModel().addChangeListener(changeListener);
         monitoredHostCSpinner.getModel().addChangeListener(changeListener);
         monitoredDataCSpinner.getModel().addChangeListener(changeListener);
-
         resetDNSAButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 resetDNSAButtonAction();
-            }
-        });
-        resetCalibrationButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                resetCalibrationButtonAction();
             }
         });
     }
@@ -429,7 +374,5 @@ final class GeneralOptionsPanel extends JPanel {
     private JLabel monitoredDataCUnits;
     private JLabel resetDNSALabel;
     private JButton resetDNSAButton;
-    private JLabel resetCalibrationLabel;
-    private JButton resetCalibrationButton;
     
 }

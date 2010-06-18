@@ -39,7 +39,7 @@
         <folder name="Applications">
             <file name="com-sun-tools-visualvm-sampler-SampleApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-sampler-SampleApplicationAction.instance"/>
-                <attr name="position" intvalue="1520"/>
+                <attr name="position" intvalue="1510"/>
             </file>
         </folder>
     </folder>
@@ -49,7 +49,7 @@
             
             <file name="com-sun-tools-visualvm-sampler-SampleApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-sampler-SampleApplicationAction.instance"/>
-                <attr name="position" intvalue="1015"/>
+                <attr name="position" intvalue="1010"/>
             </file>
             
         </folder>

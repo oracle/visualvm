@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.snapshot;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
 import java.awt.Image;
@@ -37,8 +37,9 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
-    private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotDescriptor.class.getName());
+final class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
+    private static final Logger LOGGER =
+            Logger.getLogger(ProfilerSnapshotDescriptor.class.getName());
     
     private static final Image CPU_ICON = ImageUtilities.loadImage(
             "org/netbeans/modules/profiler/resources/cpuSmall.png", true);    // NOI18N
@@ -64,7 +65,7 @@ class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
                 return ImageUtilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
             else return null;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to determine profiler snapshot type", e);  // NOI18N
+            LOGGER.log(Level.FINE, "Failed to determine profiler snapshot type", e);  // NOI18N
             return null;
         }
     }

@@ -37,7 +37,7 @@ public abstract class AbstractSamplerSupport {
 
     public abstract DataViewComponent.DetailsView[] getDetailsView();
 
-    public abstract boolean startSampling(ProfilingSettings settings, int samplingRate);
+    public abstract boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate);
 
     public abstract void stopSampling();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,15 +28,14 @@ package com.sun.tools.visualvm.profiler;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
-import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.host.Host;
 import java.io.File;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
@@ -48,7 +47,11 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 final class ProfilerSupport {
-    private static final boolean FORCE_PROFILING_SUPPORTED = Boolean.getBoolean("com.sun.tools.visualvm.profiler.SupportAllVMs");   // NOI18N
+    
+    private static final Logger LOGGER = Logger.getLogger(ProfilerSupport.class.getName());
+    
+    private static final boolean FORCE_PROFILING_SUPPORTED =
+            Boolean.getBoolean("com.sun.tools.visualvm.profiler.SupportAllVMs");   // NOI18N
     private static final String HOTSPOT_VM_NAME_PREFIX = "Java HotSpot";    // NOI18N
     private static final String OPENJDK_VM_NAME_PREFIX = "OpenJDK ";    // NOI18N
     private static final String SUN_VM_VENDOR_PREFIX = "Sun ";  // NOI18N
@@ -63,19 +66,12 @@ final class ProfilerSupport {
     private boolean isInitialized;
     
     private Application profiledApplication;
-    private ProfilerSnapshotCategory category;
     private ApplicationProfilerViewProvider profilerViewProvider;
-    private ProfilerSnapshotProvider profilerSnapshotsProvider;
 
 
     public static synchronized ProfilerSupport getInstance() {
         if (instance == null) instance = new ProfilerSupport();
         return instance;
-    }
-    
-    
-    public SnapshotCategory getCategory() {
-        return category;
     }
     
     
@@ -115,6 +111,8 @@ final class ProfilerSupport {
     }
     
     boolean classSharingBreaksProfiling(Application application) {
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+
         Jvm jvm = JvmFactory.getJVMFor(application);
         Properties properties = jvm.getSystemProperties();
         if (properties == null) return true;
@@ -171,10 +169,6 @@ final class ProfilerSupport {
         } catch (Exception e) {}
         
         return -1;
-    }
-    
-    ProfilerSnapshotProvider getSnapshotsProvider() {
-        return profilerSnapshotsProvider;
     }
     
     void setProfiledApplication(Application profiledApplication) {
@@ -272,15 +266,15 @@ final class ProfilerSupport {
         // TODO: this should be performed after all modules are loaded & initialized to not bias the calibration!!!
         
         // Display blocking notification
-        NetBeansProfiler.getDefaultNB().displayInfoAndWait(NbBundle.getMessage(ProfilerSupport.class, "MSG_Calibration")); // NOI18N
+        NetBeansProfiler.getDefaultNB().displayInfoAndWait(
+                NbBundle.getMessage(ProfilerSupport.class, "MSG_Calibration")); // NOI18N
 
         // Perform calibration
         boolean result = false;
         try {
             result = NetBeansProfiler.getDefaultNB().runConfiguredCalibration();
         } catch (Exception e) {
-            System.err.println("Failed to calibrate profiler:"); // NOI18N
-            e.printStackTrace();
+            LOGGER.log(Level.FINE, "Failed to calibrate profiler", e); // NOI18N
         }
 
         return result;
@@ -291,19 +285,9 @@ final class ProfilerSupport {
         isInitialized = Profiler.getDefault() != null && checkCurrentJDKCalibration();
         
         if (isInitialized) {
-        
-            DataSourceDescriptorFactory.getDefault().registerProvider(new ProfilerSnapshotDescriptorProvider());
+
             profilerViewProvider = new ApplicationProfilerViewProvider();
             profilerViewProvider.initialize();
-
-            new ProfilerSnapshotViewProvider().initialize();
-            new SnapshotDiffViewProvider().initialize();
-
-            category = new ProfilerSnapshotCategory();
-            RegisteredSnapshotCategories.sharedInstance().registerCategory(category);
-
-            profilerSnapshotsProvider = new ProfilerSnapshotProvider();
-            profilerSnapshotsProvider.initialize();
 
             ProfilerIDESettings.getInstance().setAutoOpenSnapshot(false);
             ProfilerIDESettings.getInstance().setAutoSaveSnapshot(true);

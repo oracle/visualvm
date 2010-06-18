@@ -35,9 +35,6 @@
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfilerSnapshotAction.instance"/>
             </file>
-            <file name="com-sun-tools-visualvm-profiler-CompareSnapshotsAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.CompareSnapshotsAction.instance"/>
-            </file>
         </folder>
     </folder>
     
@@ -49,7 +46,7 @@
             </file>
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
-                <attr name="position" intvalue="1510"/>
+                <attr name="position" intvalue="1520"/>
             </file>
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
@@ -57,13 +54,13 @@
             </file>
         </folder>
     </folder>
-    
+
     <folder name="VisualVM">
         <folder name="ExplorerPopupSelection">
             
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
-                <attr name="position" intvalue="1010"/>
+                <attr name="position" intvalue="1015"/>
             </file>
             <file name="ProfileApplicationAction-Separator-1020.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
@@ -73,12 +70,6 @@
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
                 <attr name="position" intvalue="1400"/>
-            </file>
-            
-            <file name="com-sun-tools-visualvm-profiler-CompareSnapshotsAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-CompareSnapshotsAction.instance"/>
-                <attr name="position" intvalue="20"/>
-                <attr name="default" boolvalue="true"/>
             </file>
             
         </folder>

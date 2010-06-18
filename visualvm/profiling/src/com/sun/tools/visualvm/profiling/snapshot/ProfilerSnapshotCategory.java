@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -23,7 +23,7 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.snapshot;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import java.io.File;
@@ -44,10 +44,12 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
-class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
-    private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotCategory.class.getName());
+final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
+    private static final Logger LOGGER =
+            Logger.getLogger(ProfilerSnapshotCategory.class.getName());
     
-    private static final String NAME = NbBundle.getMessage(ProfilerSnapshotCategory.class, "MSG_Profiler_Snapshots");   // NOI18N
+    private static final String NAME = NbBundle.getMessage(
+            ProfilerSnapshotCategory.class, "MSG_Profiler_Snapshots");   // NOI18N
     private static final String PREFIX = "snapshot";    // NOI18N
     private static final String SUFFIX = ".nps";    // NOI18N
     
@@ -60,24 +62,32 @@ class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
     }
     
     public void openSnapshot(final File file) {
-        // TODO: instance should be implemented in ProfilerSupport!
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ProfilerSnapshotCategory.class, "MSG_Opening_Profiler_Snapshot")); // NOI18N
+                    pHandle = ProgressHandleFactory.createHandle(
+                            NbBundle.getMessage(ProfilerSnapshotCategory.class,
+                                                "MSG_Opening_Profiler_Snapshot")); // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
                         FileObject fileObject = FileUtil.toFileObject(file);
-                        final LoadedSnapshot loadedSnapshot = ResultsManager.getDefault().loadSnapshot(fileObject);
+                        final LoadedSnapshot loadedSnapshot =
+                                ResultsManager.getDefault().loadSnapshot(fileObject);
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { ResultsManager.getDefault().openSnapshot(loadedSnapshot); }
+                            public void run() {
+                                ResultsManager.getDefault().openSnapshot(loadedSnapshot);
+                            }
                         });
                     } catch (Exception e) {
                         LOGGER.log(Level.INFO, "Error loading profiler snapshot", e); // NOI18N
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(ProfilerSnapshotCategory.class, "MSG_Opening_snapshot_failed.")); }    // NOI18N
+                            public void run() {
+                                NetBeansProfiler.getDefaultNB().displayError(
+                                        NbBundle.getMessage(ProfilerSnapshotCategory.class,
+                                                            "MSG_Opening_snapshot_failed")); // NOI18N
+                            }   
                         });
                     }
                 } finally {

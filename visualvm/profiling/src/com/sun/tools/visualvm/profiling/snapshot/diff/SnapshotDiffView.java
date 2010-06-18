@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.snapshot.diff;
 
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
@@ -49,7 +49,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class SnapshotDiffView extends DataSourceView {
+final class SnapshotDiffView extends DataSourceView {
     private static final Logger LOGGER = Logger.getLogger(SnapshotDiffView.class.getName());
     
     private SnapshotsDiffWindow sdw = null;

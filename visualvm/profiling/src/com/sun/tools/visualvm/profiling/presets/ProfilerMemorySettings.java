@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,29 +23,41 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.presets;
 
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import javax.swing.JPanel;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ProfilerSnapshotViewProvider extends DataSourceViewProvider<ProfilerSnapshot>{
+final class ProfilerMemorySettings extends JPanel {
     
-    protected boolean supportsViewFor(ProfilerSnapshot snapshot) {
-        return true;
+    private ProfilerPreset preset;
+    private final ProfilerMemoryPanel panel;
+    
+    
+    ProfilerMemorySettings() {
+        this.panel = new ProfilerMemoryPanel() {
+            public void settingsChanged() { panel.saveToPreset(preset); }
+        };
+        setLayout(new BorderLayout());
+        add(panel, BorderLayout.CENTER);
     }
-    
-    protected DataSourceView createView(ProfilerSnapshot snapshot) {
-        return new ProfilerSnapshotView(snapshot);
-    }
-    
 
-    void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, ProfilerSnapshot.class);
+    void setPreset(ProfilerPreset preset) {
+        this.preset = preset;
+        panel.loadFromPreset(preset);
+    }
+    
+    boolean valid() { return panel.settingsValid(); }
+
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        for (Component c : getComponents())
+            c.setEnabled(enabled);
     }
 
 }

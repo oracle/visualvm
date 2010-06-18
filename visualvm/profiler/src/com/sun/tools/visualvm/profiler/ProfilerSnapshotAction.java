@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -28,6 +28,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshotsSupport;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -47,10 +48,12 @@ import org.openide.util.actions.SystemAction;
  *
  * @author Jiri Sedlacek
  */
-class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
+final class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
     
-    private static final String NB_PROFILER_SNAPSHOTS_STORAGE = "config" + File.separator + "NBProfiler" + File.separator + "Config" + File.separator + "Settings";
     private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotAction.class.getName());
+    
+    private static final String NB_PROFILER_SNAPSHOTS_STORAGE = "config" + File.separator + // NOI18N
+            "NBProfiler" + File.separator + "Config" + File.separator + "Settings"; // NOI18N
     
     private final TakeSnapshotAction originalAction = SystemAction.get(TakeSnapshotAction.class);
     private boolean openNextSnapshot = true;
@@ -101,11 +104,11 @@ class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
                                 snapshotFile.deleteOnExit();
                             }
                             snapshot.setFile(newSnapshotFile);
-                            ProfilerSupport.getInstance().getSnapshotsProvider().createSnapshot(snapshot, profiledApplication, openNextSnapshot);
+                            ProfilerSnapshotsSupport.getInstance().createSnapshot(snapshot, profiledApplication, openNextSnapshot);
                             openNextSnapshot = true;
                         }
                     } catch (Exception e) {
-                        LOGGER.log(Level.SEVERE, "Error handling saved profiler snapshot", e);
+                        LOGGER.log(Level.SEVERE, "Error handling saved profiler snapshot", e); // NOI18N
                     }
                 }
             });

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.snapshot;
 
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
@@ -50,8 +50,9 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-class ProfilerSnapshotView extends DataSourceView {
-    private static final Logger LOGGER = Logger.getLogger(ProfilerSnapshotView.class.getName());
+final class ProfilerSnapshotView extends DataSourceView {
+    private static final Logger LOGGER =
+            Logger.getLogger(ProfilerSnapshotView.class.getName());
     
     private LoadedSnapshot loadedSnapshot = null;
     private SnapshotResultsWindow srw = null;
@@ -61,7 +62,8 @@ class ProfilerSnapshotView extends DataSourceView {
     }
     
     private ProfilerSnapshotView(ProfilerSnapshot snapshot, DataSourceDescriptor descriptor) {
-        super(snapshot, descriptor.getName(), descriptor.getIcon(), Positionable.POSITION_AT_THE_END, true);
+        super(snapshot, descriptor.getName(), descriptor.getIcon(),
+              Positionable.POSITION_AT_THE_END, true);
         loadedSnapshot = snapshot.getLoadedSnapshot();
     }
     
@@ -77,15 +79,20 @@ class ProfilerSnapshotView extends DataSourceView {
                             method.invoke(srw);
                         }
                     } catch (NoSuchMethodException noSuchMethodException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", noSuchMethodException);   // NOI18N
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
+                                        "removed", noSuchMethodException);   // NOI18N
                     } catch (SecurityException securityException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", securityException);   // NOI18N
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
+                                        "removed", securityException);   // NOI18N
                     } catch (IllegalAccessException illegalAccessException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", illegalAccessException);   // NOI18N
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
+                                        "removed", illegalAccessException);   // NOI18N
                     } catch (IllegalArgumentException illegalArgumentException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", illegalArgumentException);   // NOI18N
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
+                                        "removed", illegalArgumentException);   // NOI18N
                     } catch (InvocationTargetException invocationTargetException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(), "removed", invocationTargetException);   // NOI18N
+                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
+                                        "removed", invocationTargetException);   // NOI18N
                     }
                     srw = null;
                 }
@@ -95,7 +102,8 @@ class ProfilerSnapshotView extends DataSourceView {
     }
     
     protected DataViewComponent createComponent() {
-        srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
+        srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.
+                                        SORTING_COLUMN_DEFAULT, false);
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport().getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(true));
@@ -125,7 +133,8 @@ class ProfilerSnapshotView extends DataSourceView {
                 infoPanel.setBorder(BorderFactory.createEmptyBorder());
             } catch (Exception e) {}
             srw.setPreferredSize(new Dimension(1, 1));
-            return new DataViewComponent.MasterView(NbBundle.getMessage(ProfilerSnapshotView.class, "DESCR_Profiler_Snapshot"), null, srw);   // NOI18N
+            return new DataViewComponent.MasterView(NbBundle.getMessage(
+                    ProfilerSnapshotView.class, "DESCR_Profiler_Snapshot"), null, srw);   // NOI18N
         }
         
     }

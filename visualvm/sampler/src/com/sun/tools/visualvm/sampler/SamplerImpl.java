@@ -38,9 +38,11 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
+import com.sun.tools.visualvm.profiling.presets.PresetSelector;
+import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
+import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshot;
 import com.sun.tools.visualvm.sampler.cpu.CPUSamplerSupport;
 import com.sun.tools.visualvm.sampler.memory.MemorySamplerSupport;
-import com.sun.tools.visualvm.profiler.ProfilerSnapshot;
 import com.sun.tools.visualvm.threaddump.ThreadDumpSupport;
 import com.sun.tools.visualvm.tools.attach.AttachModel;
 import com.sun.tools.visualvm.tools.attach.AttachModelFactory;
@@ -114,6 +116,8 @@ final class SamplerImpl {
     private boolean memoryProfilingSupported;
     private AbstractSamplerSupport memorySampler;
     private MemorySettingsSupport memorySettings;
+    
+    private PresetSelector refSelector;
 
     private DataViewComponent dvc;
     private String currentName;
@@ -125,8 +129,31 @@ final class SamplerImpl {
     SamplerImpl(Application application) {
         this.application = application;
         
-        cpuSettings = new CPUSettingsSupport(application);
-        memorySettings = new MemorySettingsSupport(application);
+        cpuSettings = new CPUSettingsSupport() {
+            public boolean presetValid() {
+                return cpuSettings.settingsValid() &&
+                       memorySettings.settingsValid();
+            }
+            public PresetSelector createSelector(Runnable presetSynchronizer) {
+                return SamplerImpl.this.createSelector(presetSynchronizer);
+            }
+        };
+        memorySettings = new MemorySettingsSupport() {
+            public boolean presetValid() {
+                return cpuSettings.settingsValid() &&
+                       memorySettings.settingsValid();
+            }
+            public PresetSelector createSelector(Runnable presetSynchronizer) {
+                return SamplerImpl.this.createSelector(presetSynchronizer);
+            }
+        };
+    }
+    
+    private PresetSelector createSelector(Runnable presetSynchronizer) {
+        PresetSelector selector = ProfilerPresets.getInstance().createSelector(
+                                  application, refSelector, presetSynchronizer);
+        if (refSelector == null) refSelector = selector; else refSelector = null;
+        return selector;
     }
 
 
@@ -262,15 +289,15 @@ final class SamplerImpl {
         if (cpuSettings != null && memorySettings != null) {
             switch (getState()) {
                 case INACTIVE:
-                    cpuSettings.setUIEnabled(cpuProfilingSupported);
-                    memorySettings.setUIEnabled(memoryProfilingSupported);
+                    cpuSettings.setEnabled(cpuProfilingSupported);
+                    memorySettings.setEnabled(memoryProfilingSupported);
                     break;
                 case TERMINATED:
                 case CPU:
                 case MEMORY:
                 case TRANSITION:
-                    cpuSettings.setUIEnabled(false);
-                    memorySettings.setUIEnabled(false);
+                    cpuSettings.setEnabled(false);
+                    memorySettings.setEnabled(false);
                     break;
             }
         }
@@ -352,7 +379,9 @@ final class SamplerImpl {
                             public void run() {
                                 cpuSettings.saveSettings();
                                 setState(cpuSampler.startSampling(
-                                         cpuSettings.getSettings(), cpuSettings.getSamplingRate()) ?
+                                         cpuSettings.getSettings(),
+                                         cpuSettings.getSamplingRate(),
+                                         cpuSettings.getRefreshRate()) ?
                                          State.CPU : State.INACTIVE);
                             }
                         });
@@ -389,7 +418,9 @@ final class SamplerImpl {
                             public void run() {
                                 memorySettings.saveSettings();
                                 setState(memorySampler.startSampling(
-                                         memorySettings.getSettings(), -1) ?
+                                         memorySettings.getSettings(),
+                                         memorySettings.getSamplingRate(),
+                                         memorySettings.getRefreshRate()) ?
                                          State.MEMORY : State.INACTIVE);
                             }
                         });
@@ -713,8 +744,12 @@ final class SamplerImpl {
         GridBagConstraints constraints;
 
         // modeLabel
-        modeLabel = new JLabel(NbBundle.getMessage(ApplicationSamplerView.class, "LBL_Sample")); // NOI18N
+        modeLabel = new JLabel(NbBundle.getMessage(ApplicationSamplerView.class, "LBL_Profile")); // NOI18N
         modeLabel.setFont(modeLabel.getFont().deriveFont(Font.BOLD));
+        Dimension d = modeLabel.getPreferredSize();
+        modeLabel.setText(NbBundle.getMessage(ApplicationSamplerView.class, "LBL_Sample")); // NOI18N
+        d.width = Math.max(d.width, modeLabel.getPreferredSize().width);
+        modeLabel.setPreferredSize(d);
         modeLabel.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;

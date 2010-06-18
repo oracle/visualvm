@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -32,6 +32,8 @@ import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.profiling.presets.PresetSelector;
+import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
 import com.sun.tools.visualvm.uisupport.HTMLLabel;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
@@ -76,28 +78,55 @@ import org.openide.util.WeakListeners;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationProfilerView extends DataSourceView {
+final class ApplicationProfilerView extends DataSourceView {
     
-    private static final String IMAGE_PATH = "com/sun/tools/visualvm/profiler/resources/profiler.png";  // NOI18N
+    private static final String IMAGE_PATH =
+            "com/sun/tools/visualvm/profiler/resources/profiler.png"; // NOI18N
     
     private MasterViewSupport masterViewSupport;
-    private CPUSettingsSupport cpuSettingsSupport;
-    private MemorySettingsSupport memorySettingsSupport;
+    private CPUSettingsSupport cpuSettings;
+    private MemorySettingsSupport memorySettings;
+    
+    private PresetSelector refSelector;
     
     private boolean classSharingBreaksProfiling;
 
     
-    public ApplicationProfilerView(Application application) {
-        super(application, NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiler"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);    // NOI18N
-        cpuSettingsSupport = new CPUSettingsSupport(application);
-        memorySettingsSupport = new MemorySettingsSupport(application);
+    public ApplicationProfilerView(final Application application) {
+        super(application, NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiler"), // NOI18N
+              new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 40, false);   
+        cpuSettings = new CPUSettingsSupport() {
+            public boolean presetValid() {
+                return cpuSettings.settingsValid() &&
+                       memorySettings.settingsValid();
+            }
+            public PresetSelector createSelector(Runnable presetSynchronizer) {
+                return ApplicationProfilerView.this.createSelector(presetSynchronizer, application);
+            }
+        };
+        memorySettings = new MemorySettingsSupport() {
+            public boolean presetValid() {
+                return cpuSettings.settingsValid() &&
+                       memorySettings.settingsValid();
+            }
+            public PresetSelector createSelector(Runnable presetSynchronizer) {
+                return ApplicationProfilerView.this.createSelector(presetSynchronizer, application);
+            }
+        };
+    }
+    
+    private PresetSelector createSelector(Runnable presetSynchronizer, Application application) {
+        PresetSelector selector = ProfilerPresets.getInstance().createSelector(
+                                  application, refSelector, presetSynchronizer);
+        if (refSelector == null) refSelector = selector; else refSelector = null;
+        return selector;
     }
         
     
     protected DataViewComponent createComponent() {
         Application application = (Application)getDataSource();
         ProfilingResultsSupport profilingResultsSupport = new ProfilingResultsSupport();
-        masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettingsSupport, memorySettingsSupport, classSharingBreaksProfiling);
+        masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettings, memorySettings, classSharingBreaksProfiling);
         
         DataViewComponent dvc = new DataViewComponent(
                 masterViewSupport.getMasterView(),
@@ -107,12 +136,9 @@ class ApplicationProfilerView extends DataSourceView {
         dvc.addDetailsView(profilingResultsSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Settings"), true), DataViewComponent.TOP_RIGHT);   // NOI18N
-        dvc.addDetailsView(cpuSettingsSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(memorySettingsSupport.getDetailsView(), DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(cpuSettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(memorySettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
         dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
-        
-        cpuSettingsSupport = null;
-        memorySettingsSupport = null;
         
         return dvc;
     }
@@ -235,8 +261,7 @@ class ApplicationProfilerView extends DataSourceView {
             internalChange = true;
             memoryButton.setSelected(false);
             internalChange = false;
-            if (!cpuSettingsSupport.isRootValueValid() ||
-                    !cpuSettingsSupport.isFilterValueValid()) {
+            if (!cpuSettingsSupport.settingsValid()) {
                 internalChange = true;
                 cpuButton.setSelected(false);
                 internalChange = false;
@@ -435,13 +460,13 @@ class ApplicationProfilerView extends DataSourceView {
         }
         
         private void enableSettings() {
-            cpuSettingsSupport.setUIEnabled(true);
-            memorySettingsSupport.setUIEnabled(true);
+            cpuSettingsSupport.setEnabled(true);
+            memorySettingsSupport.setEnabled(true);
         }
         
         private void disableSettings() {
-            cpuSettingsSupport.setUIEnabled(false);
-            memorySettingsSupport.setUIEnabled(false);
+            cpuSettingsSupport.setEnabled(false);
+            memorySettingsSupport.setEnabled(false);
         }
 
         private void resetControlButtons() {
@@ -533,8 +558,12 @@ class ApplicationProfilerView extends DataSourceView {
               controlPanel.add(classShareWarningArea, constraints);
 
               // modeLabel
-              modeLabel = new JLabel(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profile"));    // NOI18N
+              modeLabel = new JLabel(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Sample"));    // NOI18N
               modeLabel.setFont(modeLabel.getFont().deriveFont(Font.BOLD));
+              Dimension d = modeLabel.getPreferredSize();
+              modeLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profile")); // NOI18N
+              d.width = Math.max(d.width, modeLabel.getPreferredSize().width);
+              modeLabel.setPreferredSize(d);
               modeLabel.setOpaque(false);
               constraints = new GridBagConstraints();
               constraints.gridx = 0;

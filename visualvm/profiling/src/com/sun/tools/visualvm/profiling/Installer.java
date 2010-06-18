@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,30 +22,22 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+package com.sun.tools.visualvm.profiling;
 
-package com.sun.tools.visualvm.profiler;
-
-import com.sun.tools.visualvm.core.ui.DataSourceView;
-import com.sun.tools.visualvm.core.ui.DataSourceViewProvider;
-import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
+import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
+import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshotsSupport;
+import com.sun.tools.visualvm.profiling.snapshot.diff.SnapshotDiffViewProvider;
+import org.openide.modules.ModuleInstall;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class SnapshotDiffViewProvider extends DataSourceViewProvider<SnapshotDiffContainer>{
-    
-    protected boolean supportsViewFor(SnapshotDiffContainer snapshotDiff) {
-        return true;
-    }
-    
-    protected DataSourceView createView(SnapshotDiffContainer snapshotDiff) {
-        return new SnapshotDiffView(snapshotDiff);
-    }
-    
+final class Installer extends ModuleInstall {
 
-    void initialize() {
-        DataSourceViewsManager.sharedInstance().addViewProvider(this, SnapshotDiffContainer.class);
+    public void restored() {
+        new SnapshotDiffViewProvider().initialize();
+        ProfilerSnapshotsSupport.getInstance();
+        ProfilerPresets.getInstance();
     }
-
 }

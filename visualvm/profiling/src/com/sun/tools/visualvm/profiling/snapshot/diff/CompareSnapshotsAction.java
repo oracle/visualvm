@@ -1,5 +1,5 @@
 /*
- *  Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ *  Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -22,10 +22,11 @@
  *  CA 95054 USA or visit www.sun.com if you need additional information or
  *  have any questions.
  */
-package com.sun.tools.visualvm.profiler;
+package com.sun.tools.visualvm.profiling.snapshot.diff;
 
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
+import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshot;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import org.netbeans.modules.profiler.LoadedSnapshot;
@@ -37,7 +38,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-class CompareSnapshotsAction extends MultiDataSourceAction<ProfilerSnapshot> {
+final class CompareSnapshotsAction extends MultiDataSourceAction<ProfilerSnapshot> {
     
     private static CompareSnapshotsAction instance;
     
@@ -55,7 +56,8 @@ class CompareSnapshotsAction extends MultiDataSourceAction<ProfilerSnapshot> {
         // Two memory snapshots of different type (alloc vs. liveness) or different
         // getAllocTrackEvery() values can be selected, perform the full check here
         if (org.netbeans.modules.profiler.actions.CompareSnapshotsAction.areComparableSnapshots(s2, s1)) { 
-            SnapshotDiffContainer sdc = new SnapshotDiffContainer(snapshotsArr[0], snapshotsArr[1], snapshotsArr[0].getMaster());
+            SnapshotDiffContainer sdc = new SnapshotDiffContainer(
+                    snapshotsArr[0], snapshotsArr[1], snapshotsArr[0].getMaster());
             DataSourceWindowManager.sharedInstance().openDataSource(sdc);
         } else {
             String msg = NbBundle.getMessage(CompareSnapshotsAction.class, "MSG_Not_Comparable");    // NOI18N
@@ -80,18 +82,12 @@ class CompareSnapshotsAction extends MultiDataSourceAction<ProfilerSnapshot> {
         return true;
     }
     
-    protected void initialize() {
-        if (ProfilerSupport.getInstance().isInitialized()) {
-            super.initialize();
-        } else {
-            setEnabled(false);
-        }
-    }
-    
     
     private CompareSnapshotsAction() {
         super(ProfilerSnapshot.class);
-        putValue(NAME, NbBundle.getMessage(CompareSnapshotsAction.class, "MSG_Compare_Snapshots")); // NOI18N
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(CompareSnapshotsAction.class, "DESCR_Compare_Snapshots"));    // NOI18N
+        putValue(NAME, NbBundle.getMessage(CompareSnapshotsAction.class,
+                                           "MSG_Compare_Snapshots")); // NOI18N
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(CompareSnapshotsAction.class,
+                                                        "DESCR_Compare_Snapshots"));    // NOI18N
     }
 }

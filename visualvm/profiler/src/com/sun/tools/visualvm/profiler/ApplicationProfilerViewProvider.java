@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -34,7 +34,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceViewsManager;
  *
  * @author Jiri Sedlacek
  */
-class ApplicationProfilerViewProvider extends DataSourceViewProvider<Application>{
+final class ApplicationProfilerViewProvider extends DataSourceViewProvider<Application>{
     
     protected boolean supportsViewFor(Application application) {
         return ProfilerSupport.getInstance().supportsProfiling(application);
