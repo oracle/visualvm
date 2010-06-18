@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.modules.tracer.impl.export;
 
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.VerticalLayout;
+import com.sun.tools.visualvm.uisupport.VerticalLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import com.sun.tools.visualvm.uisupport.UISupport;
+import com.sun.tools.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;

@@ -23,7 +23,7 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.swing;
+package com.sun.tools.visualvm.uisupport;
 
 import java.awt.Component;
 import java.awt.Container;

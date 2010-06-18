@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.tracer.impl.swing;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.uisupport.HorizontalLayout;
 import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;

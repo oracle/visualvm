@@ -23,7 +23,7 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.modules.threadinspect;
+package com.sun.tools.visualvm.uisupport;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -32,44 +32,43 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 
 /**
- * Copy of com.sun.tools.visualvm.modules.tracer.impl.swing.VerticalLayout.
  *
  * @author Jiri Sedlacek
  */
-final class VerticalLayout implements LayoutManager {
+public final class HorizontalLayout implements LayoutManager {
 
-    private final boolean proportionalWidth;
-    private final int vGap;
+    private final boolean proportionalHeight;
+    private final int hGap;
 
 
-    public VerticalLayout(boolean proportionalWidth) {
-        this(proportionalWidth, 0);
+    public HorizontalLayout(boolean proportionalHeight) {
+        this(proportionalHeight, 0);
     }
 
-    public VerticalLayout(boolean proportionalWidth, int vGap) {
-        this.proportionalWidth = proportionalWidth;
-        this.vGap = vGap;
+    public HorizontalLayout(boolean proportionalHeight, int hGap) {
+        this.proportionalHeight = proportionalHeight;
+        this.hGap = hGap;
     }
 
 
     public void layoutContainer(final Container parent) {
         final Insets insets = parent.getInsets();
-        final int posX = insets.left;
-        int posY = insets.top;
-        final int width = parent.getWidth() - insets.left - insets.right;
+        int posX = insets.left;
+        final int posY = insets.top;
+        final int height = parent.getHeight() - insets.top - insets.bottom;
 
         for (Component comp : parent.getComponents()) {
             if (comp.isVisible()) {
                 Dimension pref = comp.getPreferredSize();
-                if (proportionalWidth) {
-                    int w = Math.min(pref.width, width);
-                    int o = (width - w) / 2;
-                    comp.setBounds(posX, posY + o, w, pref.height);
+                if (proportionalHeight) {
+                    int h = Math.min(pref.height, height);
+                    int o = (height - h) / 2;
+                    comp.setBounds(posX, posY + o, pref.width, h);
                 } else {
-                    comp.setBounds(posX, posY, width, pref.height);
+                    comp.setBounds(posX, posY, pref.width, height);
                 }
-                pref.height += vGap;
-                posY += pref.height;
+                posX += hGap;
+                posX += pref.width;
             }
         }
     }
@@ -78,19 +77,19 @@ final class VerticalLayout implements LayoutManager {
 //        final Insets insets = parent.getInsets();
 //        final Dimension d = new Dimension(insets.left + insets.right,
 //                                          insets.top + insets.bottom);
-//        int maxWidth = 0;
+//        int maxHeight = 0;
 //
 //        for (Component comp : parent.getComponents()) {
 //            if (comp.isVisible()) {
-//                maxWidth = Math.max(maxWidth, comp.getMinimumSize().width);
-//                d.height += comp.getPreferredSize().height;
+//                maxHeight = Math.max(maxHeight, comp.getMinimumSize().height);
+//                d.width += comp.getPreferredSize().width;
 //            }
 //        }
 //
-//        d.width += maxWidth;
+//        d.height += maxHeight;
 //
 //        return d;
-
+        
         return preferredLayoutSize(parent);
     }
 
@@ -98,20 +97,20 @@ final class VerticalLayout implements LayoutManager {
         final Insets insets = parent.getInsets();
         final Dimension d = new Dimension(insets.left + insets.right,
                                           insets.top + insets.bottom);
-        int maxWidth = 0;
+        int maxHeight = 0;
         int visibleCount = 0;
 
         for (Component comp : parent.getComponents()) {
             if (comp.isVisible()) {
                 final Dimension size = comp.getPreferredSize();
-                maxWidth = Math.max(maxWidth, size.width);
-                d.height += size.height;
+                maxHeight = Math.max(maxHeight, size.height);
+                d.width += size.width;
                 visibleCount++;
             }
         }
 
-        d.height += (visibleCount - 1) * vGap;
-        d.width += maxWidth;
+        d.width += (visibleCount - 1) * hGap;
+        d.height += maxHeight;
 
         return d;
     }

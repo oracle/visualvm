@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.VerticalLayout;
+import com.sun.tools.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
