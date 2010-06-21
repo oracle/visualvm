@@ -197,7 +197,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      *
      * @return comparator used to sort nested DataSources or null
      *
-     * @since VisualVM 1.2.3
+     * @since VisualVM 1.3
      */
     public Comparator<DataSource> getChildrenComparator() {
         return childrenComparator;
@@ -319,7 +319,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      *
      * @param newComparator comparator for sorting DataSources within a DataSource
      *
-     * @since VisualVM 1.2.3
+     * @since VisualVM 1.3
      */
     protected void setChildrenComparator(Comparator<DataSource> newComparator) {
         Comparator<DataSource> oldComparator = childrenComparator;
@@ -346,7 +346,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * @param name name to be used if not available in DataSource Storage
      * @return persisted DataSource name if available or the provided name
      *
-     * @since VisualVM 1.2.3
+     * @since VisualVM 1.3
      */
     protected static String resolveName(DataSource dataSource, String name) {
         String persistedName = dataSource.getStorage().getCustomProperty(PROPERTY_NAME);
@@ -366,7 +366,7 @@ public abstract class DataSourceDescriptor<X extends DataSource> extends Model i
      * @param savePosition true when the position should be saved to DataSource's Storage
      * @return persisted DataSource position if available or the provided position
      *
-     * @since VisualVM 1.2.3
+     * @since VisualVM 1.3
      */
     protected static int resolvePosition(DataSource dataSource, int position,
                                          boolean savePosition) {

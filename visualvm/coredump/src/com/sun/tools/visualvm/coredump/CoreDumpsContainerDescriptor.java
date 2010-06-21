@@ -37,7 +37,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  *
- * @since VisualVM 1.2.3
+ * @since VisualVM 1.3
  */
 public final class CoreDumpsContainerDescriptor extends DataSourceDescriptor<CoreDumpsContainer> {
 

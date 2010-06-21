@@ -58,7 +58,7 @@ import java.beans.PropertyChangeSupport;
      * @param application Application described by the descriptor
      * @param preferredPosition preferred position of the Application
      *
-     * @since VisualVM 1.2.3
+     * @since VisualVM 1.3
      */
     protected ApplicationDescriptor(Application application, int preferredPosition) {
         this(application, ApplicationTypeFactory.getApplicationTypeFor(application),
@@ -116,7 +116,7 @@ import java.beans.PropertyChangeSupport;
      * @param type ApplicationType to be used for generating Application name
      * @return persisted Application name if available or new generated name
      *
-     * @since VisualVM 1.2.3
+     * @since VisualVM 1.3
      */
     protected static String resolveApplicationName(Application application, ApplicationType type) {
         // Check for persisted displayname (currently only for JmxApplications)

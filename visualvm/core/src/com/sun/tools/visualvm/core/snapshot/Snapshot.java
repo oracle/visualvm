@@ -188,7 +188,7 @@ public abstract class Snapshot extends DataSource {
      *
      * @return true if the Snapshot is present in other Snapshot's repository
      *
-     * @since VisualVM 1.2.3
+     * @since VisualVM 1.3
      */
     protected final boolean isInSnapshot() {
         return getOwner() instanceof Snapshot;

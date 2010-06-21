@@ -58,7 +58,7 @@ public class LocalHostDescriptor extends DataSourceDescriptor<Host> {
      *
      * @param newComparator comparator for sorting DataSources within the Host.LOCALHOST
      *
-     * @since VisualVM 1.2.3
+     * @since VisualVM 1.3
      */
     public void setChildrenComparator(Comparator<DataSource> newComparator) {
         super.setChildrenComparator(newComparator);

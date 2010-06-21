@@ -64,7 +64,7 @@ public class RemoteHostDescriptor extends DataSourceDescriptor<Host> {
      *
      * @param newComparator comparator for sorting DataSources within a Host
      *
-     * @since VisualVM 1.2.3
+     * @since VisualVM 1.3
      */
     public void setChildrenComparator(Comparator<DataSource> newComparator) {
         super.setChildrenComparator(newComparator);
