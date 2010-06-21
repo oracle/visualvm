@@ -81,6 +81,7 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.heapdump</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
                 <friend>com.sun.tools.visualvm.profiler</friend>
+                <friend>com.sun.tools.visualvm.profiling</friend>
                 <friend>org.netbeans.lib.profiler.common</friend>
                 <friend>org.netbeans.lib.profiler.ui</friend>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
