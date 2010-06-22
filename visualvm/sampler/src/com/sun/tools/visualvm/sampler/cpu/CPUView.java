@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.sampler.cpu;
 
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -41,11 +40,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -112,7 +111,6 @@ final class CPUView extends JPanel {
         if (!isShowing() || (pauseButton.isSelected() && !forceRefresh)) return;
         forceRefresh = false;
         resultsPanel.updateLiveResults();
-//        refreshUI();
 
         snapshotButton.setEnabled(snapshotDumper != null);
     }
@@ -170,7 +168,7 @@ final class CPUView extends JPanel {
         };
         pauseButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/sampler/resources/pause.png", true))); // NOI18N
-        pauseButton.setToolTipText("Pause live results");
+        pauseButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Pause_results")); // NOI18N
         pauseButton.setOpaque(false);
         toolBar.add(pauseButton);
 
@@ -182,20 +180,21 @@ final class CPUView extends JPanel {
         };
         refreshButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/sampler/resources/update.png", true))); // NOI18N
-        refreshButton.setToolTipText("Update live results now");
+        refreshButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Update_results")); // NOI18N
         refreshButton.setEnabled(pauseButton.isSelected());
         refreshButton.setOpaque(false);
         toolBar.add(refreshButton);
 
         toolBar.addSeparator();
 
-        snapshotButton = new JButton("Snapshot", new ImageIcon(ImageUtilities.loadImage(
+        snapshotButton = new JButton(NbBundle.getMessage(CPUView.class, "LBL_Snapshot"), // NOI18N)
+                new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/sampler/resources/snapshot.png", true))) { // NOI18N)
             protected void fireActionPerformed(ActionEvent event) {
                 snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
-        snapshotButton.setToolTipText("Take snapshot of collected results");
+        snapshotButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Snapshot")); // NOI18N
         snapshotButton.setOpaque(false);
         snapshotButton.setEnabled(false);
         toolBar.add(snapshotButton);
@@ -215,12 +214,12 @@ final class CPUView extends JPanel {
         toolbarSpacer.setOpaque(false);
         toolBar.add(toolbarSpacer);
 
-        threaddumpButton = new JButton("Thread Dump") {
+        threaddumpButton = new JButton(NbBundle.getMessage(CPUView.class, "LBL_Thread_dump")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
                 threadDumper.takeThreadDump((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
-        threaddumpButton.setToolTipText("Take thread dump");
+        threaddumpButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Thread_dump")); // NOI18N
         threaddumpButton.setOpaque(false);
         threaddumpButton.setEnabled(threadDumper != null);
         toolBar.add(threaddumpButton);
@@ -256,42 +255,14 @@ final class CPUView extends JPanel {
 
         toolBar.setBorder(BorderFactory.createEmptyBorder(4, 4, 3, 4));
 
-        JPanel dataPanel = new JPanel(new BorderLayout());
-        dataPanel.setOpaque(false);
-
-        JPanel areaPanel = new JPanel(new BorderLayout());
-        areaPanel.setOpaque(false);
-        area = new HTMLTextArea("Results data...");
-        area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        refreshUI();
-        areaPanel.add(area, BorderLayout.NORTH);
-        areaPanel.add(new JSeparator(), BorderLayout.SOUTH);
-
-        dataPanel.add(areaPanel, BorderLayout.NORTH);
-
         add(toolBar, BorderLayout.NORTH);
         
-        noDataLabel = new JLabel("<No Data>", SwingConstants.CENTER);
+        noDataLabel = new JLabel(NbBundle.getMessage(CPUView.class, "LBL_No_data"), // NOI18N
+                                 SwingConstants.CENTER);
         
     }
 
-    private void refreshUI() {
-//        int selStart = area.getSelectionStart();
-//        int selEnd   = area.getSelectionEnd();
-//        area.setText(getBasicTelemetry());
-//        area.select(selStart, selEnd);
-    }
-
-//    private String getBasicTelemetry() {
-//        boolean deltas = baseClasses != null;
-//        String sClasses = totalClasses == -1 ? "" : (deltas && totalClasses > 0 ? "+" : "") + NumberFormat.getInstance().format(totalClasses);
-//        String sInstances = totalInstances == -1 ? "" : (deltas && totalInstances > 0 ? "+" : "") + NumberFormat.getInstance().format(totalInstances);
-//        String sBytes = totalBytes == -1 ? "" : (deltas && totalBytes > 0 ? "+" : "") + NumberFormat.getInstance().format(totalBytes);
-//        return "<nobr><b>Classes: </b>" + sClasses + "&nbsp;&nbsp;&nbsp;&nbsp;<b>Instances: </b>" + sInstances + "&nbsp;&nbsp;&nbsp;&nbsp;<b>Bytes: </b>" + sBytes + "</nobr>";
-//    }
-
     
-    private HTMLTextArea area;
 //    private JLabel refreshRateLabel;
 //    private JLabel refreshUnitsLabel;
 //    private JComboBox refreshCombo;

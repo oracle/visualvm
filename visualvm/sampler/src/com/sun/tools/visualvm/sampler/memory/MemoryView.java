@@ -79,6 +79,7 @@ import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -490,10 +491,20 @@ final class MemoryView extends JPanel {
         labelTableCellRenderer = new LabelTableCellRenderer(JLabel.TRAILING);
         labelBracketTableCellRenderer = new LabelBracketTableCellRenderer(JLabel.TRAILING);
 
-        columnNames = new String[] { "Class Name", "Bytes [%]", "Bytes", "Instances" };
-        columnToolTips = new String[] { "Class Name", "Bytes [%]", "Bytes", "Instances" };
+        columnNames = new String[] { 
+            NbBundle.getMessage(MemoryView.class, "COL_Class_name"), // NOI18N
+            NbBundle.getMessage(MemoryView.class, "COL_Bytes_rel"), // NOI18N
+            NbBundle.getMessage(MemoryView.class, "COL_Bytes"), // NOI18N
+            NbBundle.getMessage(MemoryView.class, "COL_Instances") }; // NOI18N
+        columnToolTips = new String[] {
+            NbBundle.getMessage(MemoryView.class, "COL_Class_name"), // NOI18N
+            NbBundle.getMessage(MemoryView.class, "COL_Bytes_rel"), // NOI18N
+            NbBundle.getMessage(MemoryView.class, "COL_Bytes"), // NOI18N
+            NbBundle.getMessage(MemoryView.class, "COL_Instances") }; // NOI18N
         columnTypes = new Class[] { String.class, Number.class, String.class, String.class };
-        columnRenderers = new TableCellRenderer[] { classNameTableCellRenderer, customBarCellRenderer, labelBracketTableCellRenderer, labelBracketTableCellRenderer };
+        columnRenderers = new TableCellRenderer[] {
+            classNameTableCellRenderer, customBarCellRenderer, 
+            labelBracketTableCellRenderer, labelBracketTableCellRenderer };
         columnWidths = new int[] { maxWidth, maxWidth, maxWidth, maxWidth };
     }
 
@@ -574,7 +585,7 @@ final class MemoryView extends JPanel {
         };
         pauseButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/sampler/resources/pause.png", true))); // NOI18N
-        pauseButton.setToolTipText("Pause live results");
+        pauseButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Pause_results")); // NOI18N
         pauseButton.setOpaque(false);
         toolBar.add(pauseButton);
 
@@ -586,31 +597,32 @@ final class MemoryView extends JPanel {
         };
         refreshButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/sampler/resources/update.png", true))); // NOI18N
-        refreshButton.setToolTipText("Update live results now");
+        refreshButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Update_results")); // NOI18N
         refreshButton.setEnabled(pauseButton.isSelected());
         refreshButton.setOpaque(false);
         toolBar.add(refreshButton);
 
         toolBar.addSeparator();
 
-        deltaButton = new JToggleButton("Deltas") {
+        deltaButton = new JToggleButton(NbBundle.getMessage(MemoryView.class, "LBL_Deltas")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
                 refresher.refresh();
             }
         };
-        deltaButton.setToolTipText("Show delta values");
+        deltaButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Deltas")); // NOI18N
         deltaButton.setOpaque(false);
         toolBar.add(deltaButton);
 
         toolBar.addSeparator();
 
-        snapshotButton = new JButton("Snapshot", new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/sampler/resources/snapshot.png", true))) {
+        snapshotButton = new JButton(NbBundle.getMessage(MemoryView.class,
+                "LBL_Snapshot"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
+                "com/sun/tools/visualvm/sampler/resources/snapshot.png", true))) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
                 snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
-        snapshotButton.setToolTipText("Take snapshot of collected results");
+        snapshotButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Snapshot")); // NOI18N
         snapshotButton.setOpaque(false);
         snapshotButton.setEnabled(false);
         toolBar.add(snapshotButton);
@@ -630,7 +642,7 @@ final class MemoryView extends JPanel {
         toolbarSpacer.setOpaque(false);
         toolBar.add(toolbarSpacer);
 
-        gcButton = new JButton("Peform GC") {
+        gcButton = new JButton(NbBundle.getMessage(MemoryView.class, "LBL_Gc")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
@@ -642,17 +654,17 @@ final class MemoryView extends JPanel {
                 });
             }
         };
-        gcButton.setToolTipText("Peform garbage collection in target application");
+        gcButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Gc")); // NOI18N
         gcButton.setOpaque(false);
         gcButton.setEnabled(memoryBean != null);
         toolBar.add(gcButton);
 
-        heapdumpButton = new JButton("Heap Dump") {
+        heapdumpButton = new JButton(NbBundle.getMessage(MemoryView.class, "LBL_HeapDump")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
                 heapDumper.takeHeapDump((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
-        heapdumpButton.setToolTipText("Take heap dump");
+        heapdumpButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_HeapDump")); // NOI18N
         heapdumpButton.setOpaque(false);
         heapdumpButton.setEnabled(heapDumper != null);
         toolBar.add(heapdumpButton);
@@ -786,20 +798,20 @@ final class MemoryView extends JPanel {
 
         filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
            .getResource("/org/netbeans/lib/profiler/ui/resources/filterStartsWith.png")), // NOI18N
-           "Starts with", CommonConstants.FILTER_STARTS_WITH); // NOI18N
+           NbBundle.getMessage(MemoryView.class, "LBL_Starts_with"), CommonConstants.FILTER_STARTS_WITH); // NOI18N
         filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
            .getResource("/org/netbeans/lib/profiler/ui/resources/filterContains.png")), // NOI18N
-           "Contains", CommonConstants.FILTER_CONTAINS); // NOI18N
+           NbBundle.getMessage(MemoryView.class, "LBL_Contains"), CommonConstants.FILTER_CONTAINS); // NOI18N
         filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
            .getResource("/org/netbeans/lib/profiler/ui/resources/filterEndsWith.png")), // NOI18N
-           "Ends with", CommonConstants.FILTER_ENDS_WITH); // NOI18N
+           NbBundle.getMessage(MemoryView.class, "LBL_Ends_with"), CommonConstants.FILTER_ENDS_WITH); // NOI18N
         filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
            .getResource("/org/netbeans/lib/profiler/ui/resources/filterRegExp.png")), // NOI18N
-           "Regular expression", CommonConstants.FILTER_REGEXP); // NOI18N
+           NbBundle.getMessage(MemoryView.class, "LBL_Regexp"), CommonConstants.FILTER_REGEXP); // NOI18N
 
         filterComponent.setFilterValues(filterString, filterType);
 
-        filterComponent.setEmptyFilterText("[Class Name Filter]");
+        filterComponent.setEmptyFilterText(NbBundle.getMessage(MemoryView.class, "LBL_Class_filter")); // NOI18N
 
         filterComponent.addFilterListener(new FilterComponent.FilterListener() {
             public void filterChanged() {
@@ -821,10 +833,14 @@ final class MemoryView extends JPanel {
 
     private String getBasicTelemetry() {
         boolean deltas = baseClasses != null;
-        String sClasses = totalClasses == -1 ? "" : (deltas && totalClasses > 0 ? "+" : "") + NumberFormat.getInstance().format(totalClasses);
-        String sInstances = totalInstances == -1 ? "" : (deltas && totalInstances > 0 ? "+" : "") + NumberFormat.getInstance().format(totalInstances);
-        String sBytes = totalBytes == -1 ? "" : (deltas && totalBytes > 0 ? "+" : "") + NumberFormat.getInstance().format(totalBytes);
-        return "<nobr><b>Classes: </b>" + sClasses + "&nbsp;&nbsp;&nbsp;&nbsp;<b>Instances: </b>" + sInstances + "&nbsp;&nbsp;&nbsp;&nbsp;<b>Bytes: </b>" + sBytes + "</nobr>";
+        String sClasses = totalClasses == -1 ? "" : (deltas && totalClasses > 0 ? "+" : "") + NumberFormat.getInstance().format(totalClasses); // NOI18N
+        String sInstances = totalInstances == -1 ? "" : (deltas && totalInstances > 0 ? "+" : "") + NumberFormat.getInstance().format(totalInstances); // NOI18N
+        String sBytes = totalBytes == -1 ? "" : (deltas && totalBytes > 0 ? "+" : "") + NumberFormat.getInstance().format(totalBytes); // NOI18N
+        String ssClasses = NbBundle.getMessage(MemoryView.class, "LBL_Classes", sClasses); // NOI18N
+        String ssInstances = NbBundle.getMessage(MemoryView.class, "LBL_Instances", sInstances); // NOI18N
+        String ssBytes = NbBundle.getMessage(MemoryView.class, "LBL_Bytes", sBytes); // NOI18N
+        return "<nobr>" + ssClasses + "&nbsp;&nbsp;&nbsp;&nbsp;" + // NOI18N
+               ssInstances + "&nbsp;&nbsp;&nbsp;&nbsp;" + ssBytes + "</nobr>"; // NOI18N
     }
 
 

@@ -38,6 +38,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -94,8 +95,8 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         if (detailsViews == null) {
             cpuView = new CPUView(refresher, snapshotDumper, threadDumper);
                         detailsViews = new DataViewComponent.DetailsView[] {
-                new DataViewComponent.DetailsView(
-                "CPU samples", null, 10, cpuView, null) };
+                new DataViewComponent.DetailsView(NbBundle.getMessage(
+                CPUSamplerSupport.class, "LBL_Cpu_samples"), null, 10, cpuView, null) }; // NOI18N
         }
 
         cpuView.initSession();
@@ -171,7 +172,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         if (simpleFilterrType == SimpleFilter.SIMPLE_FILTER_INCLUSIVE) {
             return InstrumentationFilter.INSTR_FILTER_INCLUSIVE;
         }
-        throw new IllegalArgumentException("type "+simpleFilterrType);
+        throw new IllegalArgumentException("type "+simpleFilterrType); // NOI18N
     }
 
 

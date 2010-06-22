@@ -36,6 +36,7 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -59,34 +60,34 @@ public final class ThreadInfoProvider {
 
     private String initialize(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) {
-            return "Not available.";
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable"); // NOI18N
         }
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
         if (jmxModel == null) {
-            return "Not available. Cannot initialize JMX connection to target application. Use 'Add JMX Connection' action to attach to the application.";
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_init_jmx"); // NOI18N
         }
         if (jmxModel.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
-           return "Not available. Failed to create JMX connection to target application. Use 'Add JMX Connection' action to attach to the application.";
+           return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_create_jmx"); // NOI18N
         }
         JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
         if (mxbeans == null) {
             LOGGER.log(Level.WARNING, "JvmMXBeansFactory.getJvmMXBeans(jmxModel) returns null for " + application); // NOI18N
-            return "Not available. Cannot access threads in target application. Check the logfile for details (use Help | About | Logfile).";
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
         }
         threadBean = mxbeans.getThreadMXBean();
         if (threadBean == null) {
             LOGGER.log(Level.WARNING, "mxbeans.getThreadMXBean() returns null for " + application); // NOI18N
-            return "Not available. Cannot access threads in target application. Check the logfile for details (use Help | About | Logfile).";
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
         }
         useGetThreadInfo = JvmFactory.getJVMFor(application).is15();
         try {
             dumpAllThreads();
         } catch (SecurityException e) {
             LOGGER.log(Level.WARNING, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
-            return "Not available. Failed to access threads in target application. Check the logfile for details (use Help | About | Logfile).";
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
         } catch (Throwable t) {
             LOGGER.log(Level.WARNING, "threadBean.getThreadInfo(ids, maxDepth) throws Throwable for " + application, t); // NOI18N
-            return "Not available. Failed to access threads in target application. Check the logfile for details (use Help | About | Logfile).";
+            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
         }
         return null;
     }

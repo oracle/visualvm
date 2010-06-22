@@ -145,7 +145,7 @@ final class CCTFlattener extends CPUCCTVisitorAdapter {
         boolean filteredOut = node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_YES; // filtered out by rootmethod/markermethod rules
 
         if (!filteredOut) {
-            String jvmClassName = methodInfoMapper.getInstrMethodClass(node.getMethodId()).replace('.', '/');
+            String jvmClassName = methodInfoMapper.getInstrMethodClass(node.getMethodId()).replace('.', '/'); // NOI18N
             filteredOut = !filter.passesFilter(jvmClassName);
         }
         if (filteredOut) {

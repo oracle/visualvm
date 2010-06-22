@@ -44,6 +44,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -174,9 +175,10 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         permgenView = new MemoryView(permgenRefresher, MemoryView.MODE_PERMGEN, memoryBean, null, heapDumper);
         return new DataViewComponent.DetailsView[] {
             new DataViewComponent.DetailsView(
-                    "Heap histogram", null, 10, heapView, null),
-                    new DataViewComponent.DetailsView("PermGen histogram", null, 20,
-                    permgenView, null) };
+                    NbBundle.getMessage(MemorySamplerSupport.class, "LBL_Heap_histogram"), // NOI18N
+                    null, 10, heapView, null), new DataViewComponent.DetailsView(
+                    NbBundle.getMessage(MemorySamplerSupport.class, "LBL_PermGen_histogram"), // NOI18N
+                    null, 20, permgenView, null) };
     }
     
     
