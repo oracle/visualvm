@@ -40,7 +40,7 @@ final class SamplerCPUSettings extends JPanel {
 
     
     SamplerCPUSettings(Runnable validator) {
-        this.panel = new SamplerCPUPanel(validator) {
+        this.panel = new SamplerCPUPanel(validator, true) {
             public void settingsChanged() { panel.saveToPreset(preset); }
         };
         setLayout(new BorderLayout());

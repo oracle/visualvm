@@ -344,8 +344,9 @@ final class ProfilingOptionsPanel extends JPanel {
             }
         };
 
-        JLabel nameLabel = new JLabel(NbBundle.getMessage(ProfilingOptionsPanel.class,
-                                      "LBL_Preset_name")); // NOI18N
+        JLabel nameLabel = new JLabel();
+        Mnemonics.setLocalizedText(nameLabel, NbBundle.getMessage(
+                ProfilingOptionsPanel.class, "LBL_Preset_name")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -356,6 +357,7 @@ final class ProfilingOptionsPanel extends JPanel {
         headerPanel.add(nameLabel, c);
 
         nameField = new JTextField();
+        nameLabel.setLabelFor(nameField);
         nameField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { updatePreset(); listModel.fireItemChanged(list.getSelectedIndex()); }
             public void removeUpdate(DocumentEvent e) { updatePreset(); listModel.fireItemChanged(list.getSelectedIndex()); }
@@ -372,8 +374,9 @@ final class ProfilingOptionsPanel extends JPanel {
         c.insets = new Insets(3, 5, 3, 0);
         headerPanel.add(nameField, c);
 
-        JLabel targetLabel = new JLabel(NbBundle.getMessage(ProfilingOptionsPanel.class,
-                                        "LBL_Preselect_for")); // NOI18N
+        JLabel targetLabel = new JLabel();
+        Mnemonics.setLocalizedText(targetLabel, NbBundle.getMessage(
+                ProfilingOptionsPanel.class, "LBL_Preselect_for")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;
@@ -404,6 +407,7 @@ final class ProfilingOptionsPanel extends JPanel {
                 repaint();
             }
         };
+        targetLabel.setLabelFor(targetField);
         targetField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { updatePreset(); }
             public void removeUpdate(DocumentEvent e) { updatePreset(); }
@@ -486,7 +490,7 @@ final class ProfilingOptionsPanel extends JPanel {
             }
         };
         Mnemonics.setLocalizedText(resetCalibrationButton, NbBundle.getMessage(
-                                   ProfilingOptionsPanel.class, "BTN_Reset2")); // NOI18N
+                                   ProfilingOptionsPanel.class, "BTN_Reset")); // NOI18N
         resetCalibrationPanel.add(resetCalibrationButton, BorderLayout.EAST);
 
         c = new GridBagConstraints();
@@ -498,7 +502,7 @@ final class ProfilingOptionsPanel extends JPanel {
         add(resetCalibrationPanel, c);
 
     }
-
+    
     private void resetCalibrationButtonAction() {
         resetCalibrationButton.setEnabled(false);
         RequestProcessor.getDefault().post(new Runnable() {

@@ -40,6 +40,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
 /**
@@ -56,7 +57,11 @@ public abstract class SamplerMemoryPanel extends JPanel {
     
     
     public SamplerMemoryPanel() {
-        initComponents();
+        this(false);
+    }
+    
+    SamplerMemoryPanel(boolean mnemonics) {
+        initComponents(mnemonics);
     }
     
     
@@ -102,14 +107,15 @@ public abstract class SamplerMemoryPanel extends JPanel {
         for (Component c : getComponents()) c.setEnabled(enabled);
     }
     
-    private void initComponents() {
+    private void initComponents(boolean mnemonics) {
         setOpaque(false);
         setLayout(new GridBagLayout());
 
         GridBagConstraints constraints;
 
-        refreshRateLabel = new JLabel(NbBundle.getMessage(SamplerMemoryPanel.class,
-                "LBL_Sampling_refresh")); // NOI18N
+        refreshRateLabel = new JLabel();
+        setText(refreshRateLabel, NbBundle.getMessage(SamplerMemoryPanel.class,
+                "LBL_Sampling_refresh"), mnemonics);
         refreshRateLabel.setToolTipText(NbBundle.getMessage(SamplerMemoryPanel.class,
                 "TOOLTIP_Sampling_refresh")); // NOI18N
         constraints = new GridBagConstraints();
@@ -126,6 +132,7 @@ public abstract class SamplerMemoryPanel extends JPanel {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
+        refreshRateLabel.setLabelFor(refreshCombo);
         refreshCombo.setToolTipText(NbBundle.getMessage(SamplerMemoryPanel.class,
                 "TOOLTIP_Sampling_refresh")); // NOI18N
         refreshCombo.setEditable(false);
@@ -174,6 +181,12 @@ public abstract class SamplerMemoryPanel extends JPanel {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.insets = new Insets(0, 0, 0, 0);
         add(Spacer.create(), constraints);
+    }
+    
+    
+    private static void setText(JLabel l, String text, boolean mnemonics) {
+        if (mnemonics) Mnemonics.setLocalizedText(l, text);
+        else l.setText(text.replace("&", "")); // NOI18N
     }
 
 

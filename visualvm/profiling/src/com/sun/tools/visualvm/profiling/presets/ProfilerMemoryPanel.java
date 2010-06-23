@@ -34,6 +34,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -47,6 +48,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
 /**
@@ -66,7 +68,11 @@ public abstract class ProfilerMemoryPanel extends JPanel {
     
     
     public ProfilerMemoryPanel() {
-        initComponents();
+        this(false);
+    }
+    
+    ProfilerMemoryPanel(boolean mnemonics) {
+        initComponents(mnemonics);
     }
     
     
@@ -115,7 +121,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         for (Component c : getComponents()) c.setEnabled(enabled);
     }
     
-    private void initComponents() {
+    private void initComponents(boolean mnemonics) {
         setOpaque(false);
         setLayout(new GridBagLayout());
         
@@ -124,9 +130,11 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         ButtonGroup modesRadioGroup = new ButtonGroup();
         GridBagConstraints constraints;
         
-        allocRadioButton = new JRadioButton(NbBundle.getMessage(ProfilerMemorySettings.class, "LBL_Profile_Allocations")) { // NOI18N
+        allocRadioButton = new JRadioButton() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
+        setText(allocRadioButton, NbBundle.getMessage(ProfilerMemorySettings.class,
+                "LBL_Profile_Allocations"), mnemonics); // NOI18N
         allocRadioButton.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Allocations")); // NOI18N
         allocRadioButton.setOpaque(false);
         allocRadioButton.setBorder(referenceLabel.getBorder());
@@ -140,9 +148,11 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         constraints.insets = new Insets(10, 10, 10, 10);
         add(allocRadioButton, constraints);
         
-        livenessRadioButton = new JRadioButton(NbBundle.getMessage(ProfilerMemorySettings.class, "LBL_Profile_AllocationsGC")) { // NOI18N
+        livenessRadioButton = new JRadioButton() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
+        setText(livenessRadioButton, NbBundle.getMessage(ProfilerMemorySettings.class,
+                "LBL_Profile_AllocationsGC"), mnemonics); // NOI18N
         livenessRadioButton.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Allocations_GC")); // NOI18N
         livenessRadioButton.setOpaque(false);
         livenessRadioButton.setBorder(referenceLabel.getBorder());
@@ -166,7 +176,9 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         };
 
         // trackEveryLabel1
-        trackEveryLabel1 = new JLabel(NbBundle.getMessage(ProfilerMemorySettings.class, "LBL_Track_Every1")); // NOI18N
+        trackEveryLabel1 = new JLabel();
+        setText(trackEveryLabel1, NbBundle.getMessage(ProfilerMemorySettings.class,
+                "LBL_Track_Every1"), mnemonics); // NOI18N
         trackEveryLabel1.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Track_Every")); // NOI18N
         trackEveryLabel1.setOpaque(false);
         constraints = new GridBagConstraints();
@@ -236,9 +248,11 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         constraints.insets = new Insets(5, 10, 10, 10);
         add(trackEveryContainer, constraints);
         
-        stackTracesCheckBox = new JCheckBox(NbBundle.getMessage(ProfilerMemorySettings.class, "LBL_Record_Stacktraces")) { // NOI18N
+        stackTracesCheckBox = new JCheckBox() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
+        setText(stackTracesCheckBox, NbBundle.getMessage(ProfilerMemorySettings.class,
+                "LBL_Record_Stacktraces"), mnemonics); // NOI18N
         stackTracesCheckBox.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Stack_Traces")); // NOI18N
         stackTracesCheckBox.setOpaque(false);
         stackTracesCheckBox.setBorder(referenceLabel.getBorder());
@@ -261,6 +275,17 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.insets = new Insets(0, 0, 0, 0);
         add(Spacer.create(), constraints);
+    }
+    
+    
+    private static void setText(JLabel l, String text, boolean mnemonics) {
+        if (mnemonics) Mnemonics.setLocalizedText(l, text);
+        else l.setText(text.replace("&", "")); // NOI18N
+    }
+    
+    private static void setText(AbstractButton b, String text, boolean mnemonics) {
+        if (mnemonics) Mnemonics.setLocalizedText(b, text);
+        else b.setText(text.replace("&", "")); // NOI18N
     }
 
 }

@@ -36,6 +36,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
@@ -54,6 +55,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
 /**
@@ -78,12 +80,12 @@ public abstract class SamplerCPUPanel extends JPanel {
     
     
     public SamplerCPUPanel() {
-        this(null);
+        this(null, false);
     }
     
-    SamplerCPUPanel(Runnable validator) {
+    SamplerCPUPanel(Runnable validator, boolean mnemonics) {
         this.validator = validator;
-        initComponents();
+        initComponents(mnemonics);
     }
     
     
@@ -186,7 +188,7 @@ public abstract class SamplerCPUPanel extends JPanel {
         for (Component c : getComponents()) c.setEnabled(enabled);
     }
     
-    private void initComponents() {
+    private void initComponents(boolean mnemonics) {
         setOpaque(false);
         setLayout(new GridBagLayout());
 
@@ -212,10 +214,11 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(0, 0, 0, 0);
         add(radiosPanel, constraints);
 
-        inclFilterRadioButton = new JRadioButton(NbBundle.getMessage(
-                SamplerCPUPanel.class, "LBL_Profile_Incl_S")) { // NOI18N
+        inclFilterRadioButton = new JRadioButton() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
+        setText(inclFilterRadioButton, NbBundle.getMessage(SamplerCPUPanel.class,
+                "LBL_Profile_Incl_S"), mnemonics); // NOI18N
         inclFilterRadioButton.setToolTipText(NbBundle.getMessage(
                 SamplerCPUPanel.class, "TOOLTIP_Inclusive_Filter_S")); // NOI18N
         inclFilterRadioButton.setOpaque(false);
@@ -233,10 +236,11 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(10, 10, 5, 5);
         radiosPanel.add(inclFilterRadioButton, constraints);
 
-        exclFilterRadioButton = new JRadioButton(NbBundle.getMessage(
-                SamplerCPUPanel.class, "LBL_Profile_Excl_S")) { // NOI18N
+        exclFilterRadioButton = new JRadioButton() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
+        setText(exclFilterRadioButton, NbBundle.getMessage(SamplerCPUPanel.class,
+                "LBL_Profile_Excl_S"), mnemonics); // NOI18N
         exclFilterRadioButton.setToolTipText(NbBundle.getMessage(
                 SamplerCPUPanel.class, "TOOLTIP_Exclusive_Filter_S")); // NOI18N
         exclFilterRadioButton.setOpaque(false);
@@ -284,8 +288,9 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(0, 10, 10, 10);
         add(filtersArea, constraints);
 
-        sampleRateLabel = new JLabel(NbBundle.getMessage(
-                SamplerCPUPanel.class, "LBL_Sampling_rate")); // NOI18N
+        sampleRateLabel = new JLabel();
+        setText(sampleRateLabel, NbBundle.getMessage(SamplerCPUPanel.class,
+                "LBL_Sampling_rate"), mnemonics); // NOI18N
         sampleRateLabel.setToolTipText(NbBundle.getMessage(
                 SamplerCPUPanel.class, "TOOLTIP_Sampling_rate")); // NOI18N
         constraints = new GridBagConstraints();
@@ -303,6 +308,7 @@ public abstract class SamplerCPUPanel extends JPanel {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
+        sampleRateLabel.setLabelFor(sampleRateCombo);
         sampleRateCombo.setToolTipText(NbBundle.getMessage(
                 SamplerCPUPanel.class, "TOOLTIP_Sampling_rate")); // NOI18N
         sampleRateCombo.setEditable(false);
@@ -341,8 +347,9 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(5, 0, 5, 0);
         add(Spacer.create(), constraints);
 
-        refreshRateLabel = new JLabel(NbBundle.getMessage(
-                SamplerCPUPanel.class, "LBL_Refresh_rate")); // NOI18N
+        refreshRateLabel = new JLabel();
+        setText(refreshRateLabel, NbBundle.getMessage(SamplerCPUPanel.class,
+                "LBL_Refresh_rate"), mnemonics); // NOI18N
         refreshRateLabel.setToolTipText(NbBundle.getMessage(
                 SamplerCPUPanel.class, "TOOLTIP_Refresh_rate")); // NOI18N
         constraints = new GridBagConstraints();
@@ -359,6 +366,7 @@ public abstract class SamplerCPUPanel extends JPanel {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
+        refreshRateLabel.setLabelFor(refreshRateCombo);
         refreshRateCombo.setToolTipText(NbBundle.getMessage(
                 SamplerCPUPanel.class, "TOOLTIP_Refresh_rate")); // NOI18N
         refreshRateCombo.setEditable(false);
@@ -396,6 +404,17 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(1, 0, 10, 0);
         add(Spacer.create(), constraints);
+    }
+    
+    
+    private static void setText(JLabel l, String text, boolean mnemonics) {
+        if (mnemonics) Mnemonics.setLocalizedText(l, text);
+        else l.setText(text.replace("&", "")); // NOI18N
+    }
+    
+    private static void setText(AbstractButton b, String text, boolean mnemonics) {
+        if (mnemonics) Mnemonics.setLocalizedText(b, text);
+        else b.setText(text.replace("&", "")); // NOI18N
     }
     
     

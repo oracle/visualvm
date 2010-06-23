@@ -40,7 +40,7 @@ final class ProfilerCPUSettings extends JPanel {
     
     
     ProfilerCPUSettings(Runnable validator) {
-        this.panel = new ProfilerCPUPanel(validator) {
+        this.panel = new ProfilerCPUPanel(validator, true) {
             public void settingsChanged() { panel.saveToPreset(preset); }
         };
         setLayout(new BorderLayout());

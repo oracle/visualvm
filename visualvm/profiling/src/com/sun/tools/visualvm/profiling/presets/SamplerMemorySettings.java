@@ -40,7 +40,7 @@ final class SamplerMemorySettings extends JPanel {
 
     
     SamplerMemorySettings() {
-        this.panel = new SamplerMemoryPanel() {
+        this.panel = new SamplerMemoryPanel(true) {
             public void settingsChanged() { panel.saveToPreset(preset); }
         };
         setLayout(new BorderLayout());

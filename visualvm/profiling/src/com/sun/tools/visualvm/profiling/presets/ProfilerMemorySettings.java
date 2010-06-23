@@ -40,7 +40,7 @@ final class ProfilerMemorySettings extends JPanel {
     
     
     ProfilerMemorySettings() {
-        this.panel = new ProfilerMemoryPanel() {
+        this.panel = new ProfilerMemoryPanel(true) {
             public void settingsChanged() { panel.saveToPreset(preset); }
         };
         setLayout(new BorderLayout());

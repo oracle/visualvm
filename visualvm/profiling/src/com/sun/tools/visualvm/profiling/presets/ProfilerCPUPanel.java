@@ -33,6 +33,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -50,6 +51,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
 /**
@@ -72,12 +74,12 @@ public abstract class ProfilerCPUPanel extends JPanel {
     
     
     public ProfilerCPUPanel() {
-        this(null);
+        this(null, false);
     }
     
-    ProfilerCPUPanel(Runnable validator) {
+    ProfilerCPUPanel(Runnable validator, boolean mnemonics) {
         this.validator = validator;
-        initComponents();
+        initComponents(mnemonics);
     }
     
     
@@ -223,14 +225,16 @@ public abstract class ProfilerCPUPanel extends JPanel {
         for (Component c : getComponents()) c.setEnabled(enabled);
     }
     
-    private void initComponents() {
+    private void initComponents(boolean mnemonics) {
         setOpaque(false);
         setLayout(new GridBagLayout());
         
         ButtonGroup filterRadiosGroup = new ButtonGroup();
         GridBagConstraints constraints;
         
-        rootClassesLabel = new JLabel(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
+        rootClassesLabel = new JLabel();
+        setText(rootClassesLabel, NbBundle.getMessage(ProfilerCPUSettings.class,
+                "LBL_Root_Classes"), mnemonics);
         Dimension d = rootClassesLabel.getPreferredSize();
         JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
         refRadion.setBorder(rootClassesLabel.getBorder());
@@ -248,6 +252,7 @@ public abstract class ProfilerCPUPanel extends JPanel {
         add(rootClassesLabel, constraints);
         
         rootsArea = createTextArea(2);
+        rootClassesLabel.setLabelFor(rootsArea.getTextArea());
         rootsArea.getTextArea().setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Root_Classes")); // NOI18N
         rootsArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }
@@ -265,9 +270,11 @@ public abstract class ProfilerCPUPanel extends JPanel {
         constraints.insets = new Insets(0, 10, 7, 10);
         add(rootsArea, constraints);
         
-        runnablesCheckBox = new JCheckBox(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Profile_Runnables")) { // NOI18N
+        runnablesCheckBox = new JCheckBox() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
+        setText(runnablesCheckBox, NbBundle.getMessage(ProfilerCPUSettings.class,
+                "LBL_Profile_Runnables"), mnemonics);
         runnablesCheckBox.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_New_Runnables")); // NOI18N
         runnablesCheckBox.setOpaque(false);
         runnablesCheckBox.setBorder(rootClassesLabel.getBorder());
@@ -280,9 +287,11 @@ public abstract class ProfilerCPUPanel extends JPanel {
         constraints.insets = new Insets(0, 10, 10, 10);
         add(runnablesCheckBox, constraints);
         
-        inclFilterRadioButton = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Profile_Incl")) { // NOI18N
+        inclFilterRadioButton = new JRadioButton() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
+        setText(inclFilterRadioButton, NbBundle.getMessage(ProfilerCPUSettings.class,
+                "LBL_Profile_Incl"), mnemonics);
         inclFilterRadioButton.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Inclusive_Filter")); // NOI18N
         inclFilterRadioButton.setOpaque(false);
         inclFilterRadioButton.setBorder(rootClassesLabel.getBorder());
@@ -296,9 +305,11 @@ public abstract class ProfilerCPUPanel extends JPanel {
         constraints.insets = new Insets(5, 10, 5, 5);
         add(inclFilterRadioButton, constraints);
         
-        exclFilterRadioButton = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Profile_Excl")) { // NOI18N
+        exclFilterRadioButton = new JRadioButton() {
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
+        setText(exclFilterRadioButton, NbBundle.getMessage(ProfilerCPUSettings.class,
+                "LBL_Profile_Excl"), mnemonics);
         exclFilterRadioButton.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Exclusive_Filter")); // NOI18N
         exclFilterRadioButton.setOpaque(false);
         exclFilterRadioButton.setBorder(rootClassesLabel.getBorder());
@@ -329,6 +340,18 @@ public abstract class ProfilerCPUPanel extends JPanel {
         constraints.insets = new Insets(0, 10, 10, 10);
         add(filtersArea, constraints);
     }
+    
+    
+    private static void setText(JLabel l, String text, boolean mnemonics) {
+        if (mnemonics) Mnemonics.setLocalizedText(l, text);
+        else l.setText(text.replace("&", "")); // NOI18N
+    }
+    
+    private static void setText(AbstractButton b, String text, boolean mnemonics) {
+        if (mnemonics) Mnemonics.setLocalizedText(b, text);
+        else b.setText(text.replace("&", "")); // NOI18N
+    }
+    
     
     private static TextAreaComponent createTextArea(int rows) {
         final JTextArea rootsArea = new JTextArea();
