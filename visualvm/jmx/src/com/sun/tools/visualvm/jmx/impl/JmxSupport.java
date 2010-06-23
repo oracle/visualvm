@@ -231,18 +231,15 @@ public class JmxSupport {
                     }
                 }
             }
-            if (monitors != null) {
-                for (MonitorInfo mi : monitors) {
-                    if (mi.getLockedStackDepth() == index) {
-                        sb.append("\t- locked ");   // NOI18N
-                        printLock(sb,mi);
-                        sb.append("\n");    // NOI18N
-                    }
-                }
-            }
+            printMonitors(sb, monitors, index);
             index++;
         }
-        
+        StringBuilder jnisb = new StringBuilder();
+        printMonitors(jnisb, monitors, -1);
+        if (jnisb.length() > 0) {
+            sb.append("   JNI locked monitors:\n");
+            sb.append(jnisb);
+        }
         if (threadMXBean.isSynchronizerUsageSupported()) {
             sb.append("\n   Locked ownable synchronizers:");    // NOI18N
             LockInfo[] synchronizers = thread.getLockedSynchronizers();
@@ -253,6 +250,18 @@ public class JmxSupport {
                     sb.append("\n\t- locked ");         // NOI18N
                     printLock(sb,li);
                     sb.append("\n");  // NOI18N
+                }
+            }
+        }
+    }
+
+    private void printMonitors(final StringBuilder sb, final MonitorInfo[] monitors, final int index) {
+        if (monitors != null) {
+            for (MonitorInfo mi : monitors) {
+                if (mi.getLockedStackDepth() == index) {
+                    sb.append("\t- locked ");   // NOI18N
+                    printLock(sb,mi);
+                    sb.append("\n");    // NOI18N
                 }
             }
         }
