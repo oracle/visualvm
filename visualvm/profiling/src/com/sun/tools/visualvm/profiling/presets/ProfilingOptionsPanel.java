@@ -141,7 +141,7 @@ final class ProfilingOptionsPanel extends JPanel {
             names.add(presetsE.nextElement().toString());
 
         int presetIndex = 1;
-        String name = "Preset ";
+        String name = NbBundle.getMessage(ProfilingOptionsPanel.class, "MSG_Preset") + " "; // NOI18N
 
         while (names.contains(name + presetIndex)) presetIndex++;
 
@@ -149,7 +149,7 @@ final class ProfilingOptionsPanel extends JPanel {
     }
 
     private void createPreset() {
-        ProfilerPreset preset = new ProfilerPreset(createPresetName(), "");
+        ProfilerPreset preset = new ProfilerPreset(createPresetName(), ""); // NOI18N
         listModel.addPreset(preset);
         list.setSelectedIndex(listModel.getSize() - 1);
         preselectNameField();
@@ -222,7 +222,8 @@ final class ProfilingOptionsPanel extends JPanel {
         setLayout(new GridBagLayout());
 
         // --- Presets ---------------------------------------------------------
-        SectionSeparator presetsSection = UISupport.createSectionSeparator("Presets");
+        SectionSeparator presetsSection = UISupport.createSectionSeparator(
+                NbBundle.getMessage(ProfilingOptionsPanel.class, "CAPTION_Presets")); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 0;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -252,7 +253,8 @@ final class ProfilingOptionsPanel extends JPanel {
         });
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         final Dimension oneDim = new Dimension(1, 1);
-        final JLabel noPresetsLabel = new JLabel("<No Presets Defined>", JLabel.CENTER);
+        final JLabel noPresetsLabel = new JLabel(NbBundle.getMessage(
+                ProfilingOptionsPanel.class, "MSG_No_presets"), JLabel.CENTER); // NOI18N
         noPresetsLabel.setEnabled(false);
         noPresetsLabel.setSize(noPresetsLabel.getPreferredSize());
         JScrollPane listScroll = new JScrollPane(list) {
@@ -282,7 +284,8 @@ final class ProfilingOptionsPanel extends JPanel {
         };
         addButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/profiler/resources/add.png", true)));   // NOI18N
-        addButton.setToolTipText("Create new preset");
+        addButton.setToolTipText(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                "TOOLTIP_Create_preset")); // NOI18N
         Insets margin = addButton.getMargin();
         int mar = nimbusLaF ? 0 : 8;
         margin.left = mar;
@@ -295,7 +298,8 @@ final class ProfilingOptionsPanel extends JPanel {
         };
         removeButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/profiler/resources/remove.png", true)));   // NOI18N
-        removeButton.setToolTipText("Delete selected preset");
+        removeButton.setToolTipText(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                "TOOLTIP_Delete_preset")); // NOI18N
         removeButton.setMargin(margin);
         upButton = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
@@ -304,7 +308,8 @@ final class ProfilingOptionsPanel extends JPanel {
         };
         upButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/profiler/resources/up.png", true)));   // NOI18N
-        upButton.setToolTipText("Move selected preset up");
+        upButton.setToolTipText(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                "TOOLTIP_preset_up")); // NOI18N
         upButton.setMargin(margin);
         downButton = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
@@ -313,7 +318,8 @@ final class ProfilingOptionsPanel extends JPanel {
         };
         downButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/profiler/resources/down.png", true)));   // NOI18N
-        downButton.setToolTipText("Move selected preset down");
+        downButton.setToolTipText(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                "TOOLTIP_preset_down")); // NOI18N
         downButton.setMargin(margin);
 
         JPanel controlsPanel = new JPanel(new GridLayout(1, 4, 5, 0)) {
@@ -338,7 +344,8 @@ final class ProfilingOptionsPanel extends JPanel {
             }
         };
 
-        JLabel nameLabel = new JLabel("Preset Name:");
+        JLabel nameLabel = new JLabel(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                                      "LBL_Preset_name")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -365,7 +372,8 @@ final class ProfilingOptionsPanel extends JPanel {
         c.insets = new Insets(3, 5, 3, 0);
         headerPanel.add(nameField, c);
 
-        JLabel targetLabel = new JLabel("Preselect For:");
+        JLabel targetLabel = new JLabel(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                                        "LBL_Preselect_for")); // NOI18N
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;
@@ -375,7 +383,8 @@ final class ProfilingOptionsPanel extends JPanel {
         c.insets = new Insets(3, 3, 13, 0);
         headerPanel.add(targetLabel, c);
 
-        final JLabel noTargetLabel = new JLabel("[Optional Main Class or Display Name]", JLabel.CENTER);
+        final JLabel noTargetLabel = new JLabel(NbBundle.getMessage(
+                ProfilingOptionsPanel.class, "LBL_Optional_class"), JLabel.CENTER); // NOI18N
         noTargetLabel.setEnabled(false);
         noTargetLabel.setSize(noTargetLabel.getPreferredSize());
         targetField = new JTextField() {
@@ -416,16 +425,20 @@ final class ProfilingOptionsPanel extends JPanel {
                     c.setEnabled(enabled);
             }
         };
-        settingsPanel.addTab("Sampler CPU", new ImageIcon(ImageUtilities.loadImage(
+        settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                "LBL_Sampler_cpu"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
                 "com/sun/tools/visualvm/profiling/resources/sampler.png", true)), // NOI18N
                 samplerCpuSettings);
-        settingsPanel.addTab("Sampler Memory", new ImageIcon(ImageUtilities.loadImage(
+        settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                "LBL_Sampler_memory"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
                 "com/sun/tools/visualvm/profiling/resources/sampler.png", true)), // NOI18N
                 samplerMemorySettings);
-        settingsPanel.addTab("Profiler CPU", new ImageIcon(ImageUtilities.loadImage(
+        settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                "LBL_Profiler_cpu"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
                 "com/sun/tools/visualvm/profiling/resources/profiler.png", true)), // NOI18N
                 profilerCpuSettings);
-        settingsPanel.addTab("Profiler Memory", new ImageIcon(ImageUtilities.loadImage(
+        settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                "LBL_Profiler_memory"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
                 "com/sun/tools/visualvm/profiling/resources/profiler.png", true)), // NOI18N
                 profilerMemorySettings);
 
@@ -450,7 +463,8 @@ final class ProfilingOptionsPanel extends JPanel {
 
 
         // --- Misellaneous ----------------------------------------------------
-        SectionSeparator miscellaneousSection = UISupport.createSectionSeparator("Miscellaneous");
+        SectionSeparator miscellaneousSection = UISupport.createSectionSeparator(
+                NbBundle.getMessage(ProfilingOptionsPanel.class, "CAPTION_Misc")); // NOI18N
         c = new GridBagConstraints();
         c.gridy = 50;
         c.gridwidth = GridBagConstraints.REMAINDER;

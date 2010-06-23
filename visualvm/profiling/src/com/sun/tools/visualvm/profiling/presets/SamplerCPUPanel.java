@@ -212,10 +212,12 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(0, 0, 0, 0);
         add(radiosPanel, constraints);
 
-        inclFilterRadioButton = new JRadioButton(NbBundle.getMessage(SamplerCPUSettings.class, "LBL_Profile_Incl_S")) { // NOI18N
+        inclFilterRadioButton = new JRadioButton(NbBundle.getMessage(
+                SamplerCPUPanel.class, "LBL_Profile_Incl_S")) { // NOI18N
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
-        inclFilterRadioButton.setToolTipText(NbBundle.getMessage(SamplerCPUSettings.class, "TOOLTIP_Inclusive_Filter_S")); // NOI18N
+        inclFilterRadioButton.setToolTipText(NbBundle.getMessage(
+                SamplerCPUPanel.class, "TOOLTIP_Inclusive_Filter_S")); // NOI18N
         inclFilterRadioButton.setOpaque(false);
         inclFilterRadioButton.setBorder(referenceLabel.getBorder());
         Dimension d1 = inclFilterRadioButton.getPreferredSize();
@@ -231,10 +233,12 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(10, 10, 5, 5);
         radiosPanel.add(inclFilterRadioButton, constraints);
 
-        exclFilterRadioButton = new JRadioButton(NbBundle.getMessage(SamplerCPUSettings.class, "LBL_Profile_Excl_S")) { // NOI18N
+        exclFilterRadioButton = new JRadioButton(NbBundle.getMessage(
+                SamplerCPUPanel.class, "LBL_Profile_Excl_S")) { // NOI18N
             protected void fireActionPerformed(ActionEvent e) { syncUI(); }
         };
-        exclFilterRadioButton.setToolTipText(NbBundle.getMessage(SamplerCPUSettings.class, "TOOLTIP_Exclusive_Filter_S")); // NOI18N
+        exclFilterRadioButton.setToolTipText(NbBundle.getMessage(
+                SamplerCPUPanel.class, "TOOLTIP_Exclusive_Filter_S")); // NOI18N
         exclFilterRadioButton.setOpaque(false);
         exclFilterRadioButton.setBorder(referenceLabel.getBorder());
         Dimension d2 = exclFilterRadioButton.getPreferredSize();
@@ -262,7 +266,8 @@ public abstract class SamplerCPUPanel extends JPanel {
         radiosPanel.add(Spacer.create(), constraints);
 
         filtersArea = createTextArea(2);
-        filtersArea.getTextArea().setToolTipText(NbBundle.getMessage(SamplerCPUSettings.class, "TOOLTIP_Instrumentation_Filter")); // NOI18N
+        filtersArea.getTextArea().setToolTipText(NbBundle.getMessage(
+                SamplerCPUPanel.class, "TOOLTIP_Instrumentation_Filter")); // NOI18N
         filtersArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { checkFilterValidity(); syncUI(); }
             public void removeUpdate(DocumentEvent e) { checkFilterValidity(); syncUI(); }
@@ -279,8 +284,10 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(0, 10, 10, 10);
         add(filtersArea, constraints);
 
-        sampleRateLabel = new JLabel("Sampling frequency:");
-        sampleRateLabel.setToolTipText("Sampling frequency [ms]");
+        sampleRateLabel = new JLabel(NbBundle.getMessage(
+                SamplerCPUPanel.class, "LBL_Sampling_rate")); // NOI18N
+        sampleRateLabel.setToolTipText(NbBundle.getMessage(
+                SamplerCPUPanel.class, "TOOLTIP_Sampling_rate")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 6;
@@ -296,7 +303,8 @@ public abstract class SamplerCPUPanel extends JPanel {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
-        sampleRateCombo.setToolTipText("Sampling frequency [ms]");
+        sampleRateCombo.setToolTipText(NbBundle.getMessage(
+                SamplerCPUPanel.class, "TOOLTIP_Sampling_rate")); // NOI18N
         sampleRateCombo.setEditable(false);
         sampleRateCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { syncUI(); }
@@ -311,8 +319,10 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(5, 0, 5, 5);
         add(sampleRateCombo, constraints);
 
-        sampleRateUnitsLabel = new JLabel("ms.");
-        sampleRateUnitsLabel.setToolTipText("Sampling frequency [ms]");
+        sampleRateUnitsLabel = new JLabel(NbBundle.getMessage(
+                SamplerCPUPanel.class, "LBL_units_ms")); // NOI18N
+        sampleRateUnitsLabel.setToolTipText(NbBundle.getMessage(
+                SamplerCPUPanel.class, "TOOLTIP_Sampling_rate")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 2;
         constraints.gridy = 6;
@@ -331,8 +341,10 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(5, 0, 5, 0);
         add(Spacer.create(), constraints);
 
-        refreshRateLabel = new JLabel("Results refresh:");
-        refreshRateLabel.setToolTipText("Results refresh rate [ms]");
+        refreshRateLabel = new JLabel(NbBundle.getMessage(
+                SamplerCPUPanel.class, "LBL_Refresh_rate")); // NOI18N
+        refreshRateLabel.setToolTipText(NbBundle.getMessage(
+                SamplerCPUPanel.class, "TOOLTIP_Refresh_rate")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 7;
@@ -347,7 +359,8 @@ public abstract class SamplerCPUPanel extends JPanel {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
-        refreshRateCombo.setToolTipText("Results refresh rate [ms]");
+        refreshRateCombo.setToolTipText(NbBundle.getMessage(
+                SamplerCPUPanel.class, "TOOLTIP_Refresh_rate")); // NOI18N
         refreshRateCombo.setEditable(false);
         refreshRateCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { syncUI(); }
@@ -362,8 +375,10 @@ public abstract class SamplerCPUPanel extends JPanel {
         constraints.insets = new Insets(1, 0, 10, 5);
         add(refreshRateCombo, constraints);
 
-        refreshUnitsLabel = new JLabel("ms.");
-        refreshUnitsLabel.setToolTipText("Results refresh rate [ms]");
+        refreshUnitsLabel = new JLabel(NbBundle.getMessage(
+                SamplerCPUPanel.class, "LBL_units_ms")); // NOI18N
+        refreshUnitsLabel.setToolTipText(NbBundle.getMessage(
+                SamplerCPUPanel.class, "TOOLTIP_Refresh_rate")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 2;
         constraints.gridy = 7;
@@ -386,7 +401,8 @@ public abstract class SamplerCPUPanel extends JPanel {
     
     private static TextAreaComponent createTextArea(int rows) {
         final JTextArea rootsArea = new JTextArea();
-        rootsArea.setFont(new Font("Monospaced", Font.PLAIN, UIManager.getFont("Label.font").getSize())); // NOI18N
+        rootsArea.setFont(new Font("Monospaced", Font.PLAIN, // NOI18N
+                UIManager.getFont("Label.font").getSize())); // NOI18N
         TextAreaComponent rootsAreaScrollPane = new TextAreaComponent(rootsArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
@@ -403,14 +419,19 @@ public abstract class SamplerCPUPanel extends JPanel {
         referenceArea.setFont(rootsArea.getFont());
         referenceArea.setRows(rows);
         Insets insets = rootsAreaScrollPane.getInsets();
-        rootsAreaScrollPane.setPreferredSize(new Dimension(1, referenceArea.getPreferredSize().height +
-                (insets != null ? insets.top + insets.bottom : 0)));
+        rootsAreaScrollPane.setPreferredSize(new Dimension(1,
+                referenceArea.getPreferredSize().height + (insets != null ?
+                 insets.top + insets.bottom : 0)));
         return rootsAreaScrollPane;
     }
     
     private static class TextAreaComponent extends JScrollPane {
-        public TextAreaComponent(JTextArea textArea, int vPolicy, int hPolicy) { super(textArea, vPolicy, hPolicy); }
-        public JTextArea getTextArea() { return (JTextArea)getViewport().getView(); }
+        public TextAreaComponent(JTextArea textArea, int vPolicy, int hPolicy) {
+            super(textArea, vPolicy, hPolicy);
+        }
+        public JTextArea getTextArea() {
+            return (JTextArea)getViewport().getView();
+        }
     }
 
     private static class ComboRenderer implements ListCellRenderer {
@@ -423,8 +444,11 @@ public abstract class SamplerCPUPanel extends JPanel {
                 ((JLabel)renderer).setHorizontalAlignment(JLabel.TRAILING);
         }
 
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            return renderer.getListCellRendererComponent(list, NumberFormat.getInstance().format(value), index, isSelected, cellHasFocus);
+        public Component getListCellRendererComponent(JList list, Object value,
+                int index, boolean isSelected, boolean cellHasFocus) {
+            
+            return renderer.getListCellRendererComponent(list, NumberFormat.
+                    getInstance().format(value), index, isSelected, cellHasFocus);
         }
 
     }

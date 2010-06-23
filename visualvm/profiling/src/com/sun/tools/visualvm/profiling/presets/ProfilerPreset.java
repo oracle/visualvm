@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.profiling.presets;
 
 import com.sun.tools.visualvm.core.datasource.Storage;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -103,7 +104,7 @@ public final class ProfilerPreset {
 
     ProfilerPreset(Storage storage) {
         valid = true;
-        name = value(storage, PROP_NAME, "Preset"); // NOI18N
+        name = value(storage, PROP_NAME, NbBundle.getMessage(ProfilerPreset.class, "MSG_Preset")); // NOI18N
         selector = value(storage, PROP_SELECTOR, ""); // NOI18N
         filterModeS = Boolean.parseBoolean(value(storage, PROP_FILTER_MODE_S, "True")); // NOI18N
         filterS = value(storage, PROP_FILTER_S, ""); // NOI18N

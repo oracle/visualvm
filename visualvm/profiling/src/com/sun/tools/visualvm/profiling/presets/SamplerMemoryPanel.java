@@ -40,6 +40,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -107,8 +108,10 @@ public abstract class SamplerMemoryPanel extends JPanel {
 
         GridBagConstraints constraints;
 
-        refreshRateLabel = new JLabel("Sampling and refresh rate:");
-        refreshRateLabel.setToolTipText("Sampling frequency and results refresh rate [ms]");
+        refreshRateLabel = new JLabel(NbBundle.getMessage(SamplerMemoryPanel.class,
+                "LBL_Sampling_refresh")); // NOI18N
+        refreshRateLabel.setToolTipText(NbBundle.getMessage(SamplerMemoryPanel.class,
+                "TOOLTIP_Sampling_refresh")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -123,7 +126,8 @@ public abstract class SamplerMemoryPanel extends JPanel {
             public Dimension getMinimumSize() { return getPreferredSize(); }
             public Dimension getMaximumSize() { return getPreferredSize(); }
         };
-        refreshCombo.setToolTipText("Sampling frequency and results refresh rate [ms]");
+        refreshCombo.setToolTipText(NbBundle.getMessage(SamplerMemoryPanel.class,
+                "TOOLTIP_Sampling_refresh")); // NOI18N
         refreshCombo.setEditable(false);
         refreshCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { syncUI(); }
@@ -138,8 +142,10 @@ public abstract class SamplerMemoryPanel extends JPanel {
         constraints.insets = new Insets(7, 0, 10, 5);
         add(refreshCombo, constraints);
 
-        refreshUnitsLabel = new JLabel("ms.");
-        refreshUnitsLabel.setToolTipText("Sampling frequency and results refresh rate [ms]");
+        refreshUnitsLabel = new JLabel(NbBundle.getMessage(SamplerMemoryPanel.class,
+                "LBL_units_ms")); // NOI18N
+        refreshUnitsLabel.setToolTipText(NbBundle.getMessage(SamplerMemoryPanel.class,
+                "TOOLTIP_Sampling_refresh")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 2;
         constraints.gridy = 0;
@@ -181,8 +187,11 @@ public abstract class SamplerMemoryPanel extends JPanel {
                 ((JLabel)renderer).setHorizontalAlignment(JLabel.TRAILING);
         }
 
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            return renderer.getListCellRendererComponent(list, NumberFormat.getInstance().format(value), index, isSelected, cellHasFocus);
+        public Component getListCellRendererComponent(JList list, Object value,
+                int index, boolean isSelected, boolean cellHasFocus) {
+            
+            return renderer.getListCellRendererComponent(list, NumberFormat.
+                    getInstance().format(value), index, isSelected, cellHasFocus);
         }
 
     }

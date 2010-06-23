@@ -34,6 +34,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -90,7 +91,8 @@ public final class PresetSelector extends JPanel {
     
     public ProfilerPreset customize(boolean presetValid) {
         if (customPreset == null) {
-            customPreset = new ProfilerPreset("Custom", null);
+            customPreset = new ProfilerPreset(NbBundle.getMessage(
+                    PresetSelector.class, "LBL_Custom"), null); // NOI18N
             if (refSelector != null) refSelector.customPreset = customPreset;
         }
         customPreset.setValid(presetValid);
@@ -117,7 +119,9 @@ public final class PresetSelector extends JPanel {
         boolean custom = selected == customPreset;
         if (customSelected != custom) {
             customSelected = custom;
-            presetsButton.setText(custom ? "Save..." : "Edit...");
+            presetsButton.setText(custom ? NbBundle.getMessage(PresetSelector.class,
+                                  "BTN_Save") : NbBundle.getMessage(PresetSelector.class, // NOI18N
+                                  "BTN_Edit")); // NOI18N
         }
         updatePresetsButton(true);
         if (internalChange) return;
@@ -182,26 +186,33 @@ public final class PresetSelector extends JPanel {
         setLayout(new BorderLayout(5, 0));
         
         // presetsLabel
-        presetsLabel = new JLabel("Preset:");
+        presetsLabel = new JLabel(NbBundle.getMessage(PresetSelector.class,
+                                  "LBL_Preset")); // NOI18N
+        presetsLabel.setToolTipText(NbBundle.getMessage(PresetSelector.class,
+                                    "TOOLTIP_Defined_presets")); // NOI18N
         add(presetsLabel, BorderLayout.WEST);
         
         // presetsCombo
         presetsCombo = refSelector == null ? new JComboBox() :
                        new JComboBox(refSelector.presetsCombo.getModel());
+        presetsCombo.setToolTipText(NbBundle.getMessage(PresetSelector.class,
+                                    "TOOLTIP_Defined_presets")); // NOI18N
         presetsCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { selectedPresetChanged(); }
         });
         add(presetsCombo, BorderLayout.CENTER);
         
         // presetsButton
-        presetsButton = new JButton("Save...") {
+        presetsButton = new JButton(NbBundle.getMessage(PresetSelector.class, "BTN_Save")) { // NOI18N
             protected void fireActionPerformed(ActionEvent e) { actionRequested(); }
         };
+        presetsButton.setToolTipText(NbBundle.getMessage(PresetSelector.class,
+                                     "TOOLTIP_Manage_presets")); // NOI18N
         add(presetsButton, BorderLayout.EAST);
         
         // UI tweaks
         Dimension dim1 = presetsButton.getPreferredSize();
-        presetsButton.setText("Edit...");
+        presetsButton.setText(NbBundle.getMessage(PresetSelector.class, "BTN_Edit")); // NOI18N
         Dimension dim2 = presetsButton.getPreferredSize();
         dim1.width = Math.max(dim1.width, dim2.width);
         dim1.height = Math.max(dim1.height, dim2.height);

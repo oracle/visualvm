@@ -50,6 +50,7 @@ import java.util.jar.JarFile;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.options.OptionsDisplayer;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 
@@ -69,6 +70,8 @@ public final class ProfilerPresets {
     private static final Object profilerStorageDirectoryLock = new Object();
     // @GuardedBy profilerStorageDirectoryLock
     private static File profilerStorageDirectory;
+    
+    private static final String OPTIONS_HANDLE = "ProfilerOptions"; // NOI18N
 
     private static ProfilerPresets INSTANCE;
 
@@ -87,7 +90,7 @@ public final class ProfilerPresets {
 
     public void editPresets(ProfilerPreset preset) {
         presetToSelect = preset;
-        OptionsDisplayer.getDefault().open("ProfilerOptions"); // NOI18N
+        OptionsDisplayer.getDefault().open(OPTIONS_HANDLE);
     }
 
     ProfilerPreset presetToSelect() {
@@ -98,7 +101,7 @@ public final class ProfilerPresets {
 
     public void savePreset(ProfilerPreset preset) {
         presetToCreate = preset;
-        OptionsDisplayer.getDefault().open("ProfilerOptions"); // NOI18N
+        OptionsDisplayer.getDefault().open(OPTIONS_HANDLE);
     }
 
     ProfilerPreset presetToCreate() {
@@ -199,7 +202,8 @@ public final class ProfilerPresets {
     
 
     private static ProfilerPreset createDefaultPreset(Application application) {
-        ProfilerPreset defaultPreset = new ProfilerPreset("Default", "");
+        ProfilerPreset defaultPreset = new ProfilerPreset(NbBundle.getMessage(
+                ProfilerPresets.class, "MSG_Default"), ""); // NOI18N
         defaultPreset.setFilterS(getDefaultFiltersS());
         defaultPreset.setRootsP(getDefaultRootsP(application));
         defaultPreset.setFilterP(getDefaultFiltersP(defaultPreset.getRootsP()));
