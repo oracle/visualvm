@@ -38,19 +38,31 @@ import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.sa.SaModel;
 import com.sun.tools.visualvm.tools.sa.SaModelFactory;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -77,7 +89,8 @@ public class HeapDumpProvider {
                 
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(HeapDumpProvider.class, "LBL_Creating_Heap_Dump"));    // NOI18N
+                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(
+                            HeapDumpProvider.class, "LBL_Creating_Heap_Dump"));    // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
@@ -105,12 +118,116 @@ public class HeapDumpProvider {
         });
     }
     
+    public void createRemoteHeapDump(final Application application, final String dumpFile,
+                                     final boolean customizeDumpFile) {
+        
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                JmxModel model = JmxModelFactory.getJmxModelFor(application);
+                if (model == null || !model.isTakeHeapDumpSupported()) {
+                    DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.
+                            Message(NbBundle.getMessage(HeapDumpProvider.class,
+                            "MSG_Dump_failed"), NotifyDescriptor.ERROR_MESSAGE)); // NOI18N
+                    return;
+                }
+                
+                String file = dumpFile;
+                if (file == null) file = defineRemoteFile(model, customizeDumpFile);
+                if (file == null) return;
+
+                if (model.takeHeapDump(file)) {
+                    DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.
+                            Message(NbBundle.getMessage(HeapDumpProvider.class,
+                            "MSG_Dump_ok", file), NotifyDescriptor.INFORMATION_MESSAGE)); // NOI18N
+                } else {
+                    DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.
+                            Message(NbBundle.getMessage(HeapDumpProvider.class,
+                            "MSG_Dump_save_failed", file), NotifyDescriptor.ERROR_MESSAGE)); // NOI18N
+                }
+            }
+        });
+    }
+    
+    private static String defineRemoteFile(JmxModel model, boolean customizeDumpFile) {
+        final String[] path = new String[1];
+        path[0] = defaultHeapDumpPath(model);
+        
+        if (customizeDumpFile) try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    JLabel label = new JLabel();
+                    Mnemonics.setLocalizedText(label, NbBundle.getMessage(
+                            HeapDumpProvider.class, "MSG_Remote_heap_dump")); // NOI18N
+                    label.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+                    JTextField field = new JTextField();
+                    label.setLabelFor(field);
+                    field.setText(path[0]);
+                    Dimension dim = field.getPreferredSize();
+                    dim.width = 350;
+                    field.setPreferredSize(dim);
+                    field.selectAll();
+                    JPanel selector = new JPanel(new BorderLayout());
+                    selector.setBorder(BorderFactory.createEmptyBorder(15, 10, 5, 10));
+                    selector.add(label, BorderLayout.NORTH);
+                    selector.add(field, BorderLayout.SOUTH);
+
+                    DialogDescriptor dd = new DialogDescriptor(selector,
+                            NbBundle.getMessage(HeapDumpProvider.class,
+                            "CAPTION_Remote_heap_dump"), true, null); // NOI18N
+                    Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+                    d.pack();
+                    d.setVisible(true);
+
+                    path[0] = dd.getValue() == DialogDescriptor.OK_OPTION ?
+                                               field.getText() : null;
+                }
+            });
+        } catch (Throwable t) {
+            path[0] = null;
+        }
+        
+        return path[0];
+    }
+    
+    private static String defaultHeapDumpPath(JmxModel model) {
+        String fileName = HeapDumpSupport.getInstance().getCategory().createFileName();
+        
+        Properties sysprops = model.getSystemProperties();
+        if (sysprops == null) return fileName;
+        String heapDumpTarget = getHeapDumpTarget(sysprops);
+        if (heapDumpTarget == null || heapDumpTarget.isEmpty()) return fileName;
+        
+        String pathsep = sysprops.getProperty("file.separator"); // NOI18N
+        if (!heapDumpTarget.endsWith(pathsep)) heapDumpTarget += pathsep;
+        return heapDumpTarget + fileName;
+    }
+    
+    // OS codes listed in org.netbeans.lib.profiler.global.Platform.getOperatingSystem()
+    private static String getHeapDumpTarget(Properties sysprops) {
+        String targetDir = null;
+        
+        // Select directory based on target OS
+        String osName = sysprops.getProperty("os.name"); // NOI18N
+        if (osName != null) {
+            if (osName.equals("Solaris") || osName.startsWith("SunOS")) // NOI18N
+                targetDir = sysprops.getProperty("user.home"); // NOI18N
+
+            targetDir = sysprops.getProperty("java.io.tmpdir"); // NOI18N
+        }
+        
+        // Fallback to current working directory
+        if (targetDir == null) targetDir = sysprops.getProperty("user.dir"); // NOI18N
+        
+        return targetDir;
+    }
+    
     public void createHeapDump(final CoreDump coreDump, final boolean openView) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 ProgressHandle pHandle = null;
                 try {
-                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(HeapDumpProvider.class, "LBL_Creating_Heap_Dump"));    // NOI18N
+                    pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(
+                            HeapDumpProvider.class, "LBL_Creating_Heap_Dump"));    // NOI18N
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     File snapshotDir = coreDump.getStorage().getDirectory();

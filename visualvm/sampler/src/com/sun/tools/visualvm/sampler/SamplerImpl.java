@@ -640,8 +640,11 @@ final class SamplerImpl {
                         SamplerImpl.class, "MSG_Gc_unsupported") : null; // NOI18N
 
                 final HeapDumpSupport hds = HeapDumpSupport.getInstance();
-                final String noHeapDump = hds.supportsHeapDump(application) ? null :
-                    NbBundle.getMessage(SamplerImpl.class, "MSG_HeapDump_unsupported"); // NOI18N
+                final boolean local = application.isLocalApplication();
+                boolean supportsHD = local ? hds.supportsHeapDump(application) :
+                                     hds.supportsRemoteHeapDump(application);
+                final String noHeapDump = supportsHD ? null : NbBundle.getMessage(
+                        SamplerImpl.class, "MSG_HeapDump_unsupported"); // NOI18N
 
                 MemorySamplerSupport.SnapshotDumper snapshotDumper = new MemorySamplerSupport.SnapshotDumper() {
                     public void takeSnapshot(final boolean openView) {
@@ -689,7 +692,8 @@ final class SamplerImpl {
                 MemorySamplerSupport.HeapDumper heapDumper = noHeapDump != null ? null :
                     new MemorySamplerSupport.HeapDumper() {
                         public void takeHeapDump(boolean openView) {
-                            hds.takeHeapDump(application, openView);
+                            if (local) hds.takeHeapDump(application, openView);
+                            else hds.takeRemoteHeapDump(application, null, openView);
                         }
                     };
                 memorySampler = new MemorySamplerSupport(attachModel, memoryBean, snapshotDumper, heapDumper) {

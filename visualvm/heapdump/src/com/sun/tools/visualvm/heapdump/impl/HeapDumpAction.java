@@ -53,30 +53,36 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
         }
     };
     
-    private static HeapDumpAction instance;
+    private static HeapDumpAction INSTANCE;
     
     public static synchronized HeapDumpAction instance() {
-        if (instance == null) 
-            instance = new HeapDumpAction();
-        return instance;
+        if (INSTANCE == null) INSTANCE = new HeapDumpAction();
+        return INSTANCE;
     }
     
     
     protected void actionPerformed(Set<DataSource> dataSources, ActionEvent actionEvent) {
+        HeapDumpSupport support = HeapDumpSupport.getInstance();
         for (DataSource dataSource : dataSources) {
             if (dataSource instanceof Application) {
                 Application application = (Application)dataSource;
-                HeapDumpSupport.getInstance().takeHeapDump(application, (actionEvent.getModifiers() &
-                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+                boolean taggedAction = (actionEvent.getModifiers() & Toolkit.
+                        getDefaultToolkit().getMenuShortcutKeyMask()) == 0;
+                if (application.isLocalApplication()) {
+                    support.takeHeapDump(application, !taggedAction); 
+                } else {
+                    support.takeRemoteHeapDump(application, null, !taggedAction);
+                }
             } else if (dataSource instanceof CoreDump) {
                 CoreDump coreDump = (CoreDump)dataSource;
-                HeapDumpSupport.getInstance().takeHeapDump(coreDump, (actionEvent.getModifiers() &
+                support.takeHeapDump(coreDump, (actionEvent.getModifiers() &
                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         }
     }
     
     protected boolean isEnabled(Set<DataSource> dataSources) {
+        HeapDumpSupport support = HeapDumpSupport.getInstance();
         for (DataSource dataSource : dataSources)
             if (dataSource instanceof Application) {
                 // TODO: Listener should only be registered when heap dump is supported for the application
@@ -84,7 +90,11 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
                 lastSelectedApplications.add(application);
                 application.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
                 if (application.getState() != Stateful.STATE_AVAILABLE) return false;
-                if (!HeapDumpSupport.getInstance().supportsHeapDump((Application)dataSource)) return false;
+                if (application.isLocalApplication()) {
+                    if (!support.supportsHeapDump((Application)dataSource)) return false;
+                } else {
+                    if (!support.supportsRemoteHeapDump((Application)dataSource)) return false;
+                }
             } else if (!(dataSource instanceof CoreDump)) return false;
         return true;
     }
@@ -102,5 +112,6 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
         super(DataSource.class);
         putValue(NAME, NbBundle.getMessage(HeapDumpAction.class, "MSG_Heap_Dump")); // NOI18N
         putValue(SHORT_DESCRIPTION, NbBundle.getMessage(HeapDumpAction.class, "LBL_Heap_Dump"));    // NOI18N
-            }
     }
+    
+}

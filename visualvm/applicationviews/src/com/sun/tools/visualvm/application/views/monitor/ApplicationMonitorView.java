@@ -201,8 +201,13 @@ class ApplicationMonitorView extends DataSourceView {
             
             heapDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_Dump")) {   // NOI18N
                 public void actionPerformed(ActionEvent e) {
-                    HeapDumpSupport.getInstance().takeHeapDump((Application)model.getSource(), (e.getModifiers() &
-                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+                    Application application = (Application)model.getSource();
+                    boolean local = application.isLocalApplication();
+                    boolean tagged = (e.getModifiers() & Toolkit.getDefaultToolkit().
+                                      getMenuShortcutKeyMask()) == 0;
+                    HeapDumpSupport hds = HeapDumpSupport.getInstance();
+                    if (local) hds.takeHeapDump(application, tagged);
+                    else hds.takeRemoteHeapDump(application, null, tagged);
                 }
             });
             heapDumpButton.setEnabled(model.isTakeHeapDumpSupported());

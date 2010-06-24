@@ -37,6 +37,8 @@ import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
 import com.sun.tools.visualvm.core.ui.PluggableDataSourceViewProvider;
 import com.sun.tools.visualvm.coredump.CoreDump;
+import com.sun.tools.visualvm.tools.jmx.JmxModel;
+import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 
 /**
  * Support for heap dumps in VisualVM.
@@ -91,6 +93,35 @@ public final class HeapDumpSupport {
      */
     public void takeHeapDump(Application application, boolean openView) {
         heapDumpProvider.createHeapDump(application, openView);
+    }
+    
+    /**
+     * Returns true if taking heap dumps is supported for the remote application.
+     * 
+     * @param application remote application from which to take the heap dump
+     * @return true if taking heap dumps is supported for the remote application, false otherwise
+     * 
+     * @since VisualVM 1.3
+     */
+    public boolean supportsRemoteHeapDump(Application application) {
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        if (application.isLocalApplication()) return false; // Should be allowed???
+        JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
+        return jmxModel == null ? false : jmxModel.isTakeHeapDumpSupported();
+    }
+    
+    /**
+     * Takes heap dump from remote Application.
+     * 
+     * @param application remote Application to take the heap dump
+     * @param dumpFile target dump file on the remote machine
+     * @param customizeDumpFile true if the dumpFile customization dialog should be displayed, false otherwise
+     * 
+     * @since VisualVM 1.3
+     */
+    public void takeRemoteHeapDump(Application application, String dumpFile,
+                                   boolean customizeDumpFile) {
+        heapDumpProvider.createRemoteHeapDump(application, dumpFile, customizeDumpFile);
     }
     
     /**

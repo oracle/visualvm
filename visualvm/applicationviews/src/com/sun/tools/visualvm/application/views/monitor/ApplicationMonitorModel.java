@@ -35,6 +35,7 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
+import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
@@ -429,7 +430,12 @@ final class ApplicationMonitorModel {
         
         jvm = JvmFactory.getJVMFor(application);
         if (jvm != null) {
-            takeHeapDumpSupported = jvm.isTakeHeapDumpSupported();
+            HeapDumpSupport hds = HeapDumpSupport.getInstance();
+            if (application.isLocalApplication()) {
+                takeHeapDumpSupported = hds.supportsHeapDump(application);
+            } else {
+                takeHeapDumpSupported = hds.supportsRemoteHeapDump(application);
+            }
             cpuMonitoringSupported = jvm.isCpuMonitoringSupported();
             gcMonitoringSupported = jvm.isCollectionTimeSupported();
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
