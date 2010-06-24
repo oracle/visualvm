@@ -91,9 +91,9 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
                 application.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
                 if (application.getState() != Stateful.STATE_AVAILABLE) return false;
                 if (application.isLocalApplication()) {
-                    if (!support.supportsHeapDump((Application)dataSource)) return false;
+                    if (!support.supportsHeapDump(application)) return false;
                 } else {
-                    if (!support.supportsRemoteHeapDump((Application)dataSource)) return false;
+                    if (!support.supportsRemoteHeapDump(application)) return false;
                 }
             } else if (!(dataSource instanceof CoreDump)) return false;
         return true;
