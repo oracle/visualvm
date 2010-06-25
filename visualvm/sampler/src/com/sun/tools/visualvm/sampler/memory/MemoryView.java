@@ -644,7 +644,8 @@ final class MemoryView extends JPanel {
 
         heapdumpButton = new JButton(NbBundle.getMessage(MemoryView.class, "LBL_HeapDump")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
-                heapDumper.takeHeapDump((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+                heapDumper.takeHeapDump((event.getModifiers() &
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
         heapdumpButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_HeapDump")); // NOI18N

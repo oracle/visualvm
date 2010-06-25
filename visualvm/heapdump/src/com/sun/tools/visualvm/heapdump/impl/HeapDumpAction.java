@@ -66,12 +66,12 @@ class HeapDumpAction extends MultiDataSourceAction<DataSource> {
         for (DataSource dataSource : dataSources) {
             if (dataSource instanceof Application) {
                 Application application = (Application)dataSource;
-                boolean taggedAction = (actionEvent.getModifiers() & Toolkit.
-                        getDefaultToolkit().getMenuShortcutKeyMask()) == 0;
+                boolean tagged = (actionEvent.getModifiers() & Toolkit.
+                        getDefaultToolkit().getMenuShortcutKeyMask()) != 0;
                 if (application.isLocalApplication()) {
-                    support.takeHeapDump(application, !taggedAction); 
+                    support.takeHeapDump(application, !tagged); 
                 } else {
-                    support.takeRemoteHeapDump(application, null, !taggedAction);
+                    support.takeRemoteHeapDump(application, null, !tagged);
                 }
             } else if (dataSource instanceof CoreDump) {
                 CoreDump coreDump = (CoreDump)dataSource;

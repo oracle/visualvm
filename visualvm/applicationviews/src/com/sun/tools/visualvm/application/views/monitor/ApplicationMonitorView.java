@@ -204,10 +204,10 @@ class ApplicationMonitorView extends DataSourceView {
                     Application application = (Application)model.getSource();
                     boolean local = application.isLocalApplication();
                     boolean tagged = (e.getModifiers() & Toolkit.getDefaultToolkit().
-                                      getMenuShortcutKeyMask()) == 0;
+                                      getMenuShortcutKeyMask()) != 0;
                     HeapDumpSupport hds = HeapDumpSupport.getInstance();
-                    if (local) hds.takeHeapDump(application, tagged);
-                    else hds.takeRemoteHeapDump(application, null, tagged);
+                    if (local) hds.takeHeapDump(application, !tagged);
+                    else hds.takeRemoteHeapDump(application, null, !tagged);
                 }
             });
             heapDumpButton.setEnabled(model.isTakeHeapDumpSupported());
