@@ -36,6 +36,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.plaf.synth.SynthContext;
@@ -98,6 +99,7 @@ public final class CategoryList extends JPanel {
             setLayout(new BorderLayout());
 
             headerLabel = new JLabel(caption);
+            headerLabel.setForeground(new JMenuItem().getForeground());
             headerLabel.setToolTipText(tooltip);
             headerLabel.setIconTextGap(5);
             headerLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
