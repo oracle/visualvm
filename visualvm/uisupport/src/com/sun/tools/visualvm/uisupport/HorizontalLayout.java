@@ -30,6 +30,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import javax.swing.Box;
 
 /**
  *
@@ -74,23 +75,25 @@ public final class HorizontalLayout implements LayoutManager {
     }
 
     public Dimension minimumLayoutSize(final Container parent) {
-//        final Insets insets = parent.getInsets();
-//        final Dimension d = new Dimension(insets.left + insets.right,
-//                                          insets.top + insets.bottom);
-//        int maxHeight = 0;
-//
-//        for (Component comp : parent.getComponents()) {
-//            if (comp.isVisible()) {
-//                maxHeight = Math.max(maxHeight, comp.getMinimumSize().height);
-//                d.width += comp.getPreferredSize().width;
-//            }
-//        }
-//
-//        d.height += maxHeight;
-//
-//        return d;
-        
-        return preferredLayoutSize(parent);
+        final Insets insets = parent.getInsets();
+        final Dimension d = new Dimension(insets.left + insets.right,
+                                          insets.top + insets.bottom);
+        int maxHeight = 0;
+        int visibleCount = 0;
+
+        for (Component comp : parent.getComponents()) {
+            if (comp.isVisible() && !(comp instanceof Box.Filler)) {
+                final Dimension size = comp.getPreferredSize();
+                maxHeight = Math.max(maxHeight, size.height);
+                d.width += size.width;
+                visibleCount++;
+            }
+        }
+
+        d.width += (visibleCount - 1) * hGap;
+        d.height += maxHeight;
+
+        return d;
     }
 
     public Dimension preferredLayoutSize(final Container parent) {

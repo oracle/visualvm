@@ -30,6 +30,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import javax.swing.Box;
 
 /**
  *
@@ -74,23 +75,25 @@ public final class VerticalLayout implements LayoutManager {
     }
 
     public Dimension minimumLayoutSize(final Container parent) {
-//        final Insets insets = parent.getInsets();
-//        final Dimension d = new Dimension(insets.left + insets.right,
-//                                          insets.top + insets.bottom);
-//        int maxWidth = 0;
-//
-//        for (Component comp : parent.getComponents()) {
-//            if (comp.isVisible()) {
-//                maxWidth = Math.max(maxWidth, comp.getMinimumSize().width);
-//                d.height += comp.getPreferredSize().height;
-//            }
-//        }
-//
-//        d.width += maxWidth;
-//
-//        return d;
+        final Insets insets = parent.getInsets();
+        final Dimension d = new Dimension(insets.left + insets.right,
+                                          insets.top + insets.bottom);
+        int maxWidth = 0;
+        int visibleCount = 0;
 
-        return preferredLayoutSize(parent);
+        for (Component comp : parent.getComponents()) {
+            if (comp.isVisible() && !(comp instanceof Box.Filler)) {
+                final Dimension size = comp.getPreferredSize();
+                maxWidth = Math.max(maxWidth, size.width);
+                d.height += size.height;
+                visibleCount++;
+            }
+        }
+
+        d.height += (visibleCount - 1) * vGap;
+        d.width += maxWidth;
+
+        return d;
     }
 
     public Dimension preferredLayoutSize(final Container parent) {
