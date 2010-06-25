@@ -27,7 +27,6 @@ package com.sun.tools.visualvm.modules.tracer.impl;
 
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.CustomComboRenderer;
-import com.sun.tools.visualvm.modules.tracer.impl.swing.TransparentToolBar;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
@@ -38,6 +37,7 @@ import com.sun.tools.visualvm.modules.tracer.impl.swing.SimpleSeparator;
 import com.sun.tools.visualvm.modules.tracer.impl.swing.VisibilityHandler;
 import com.sun.tools.visualvm.modules.tracer.impl.timeline.TimelineSupport;
 import com.sun.tools.visualvm.uisupport.HorizontalLayout;
+import com.sun.tools.visualvm.uisupport.TransparentToolBar;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;

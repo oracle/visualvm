@@ -26,7 +26,7 @@
 package com.sun.tools.visualvm.sampler.cpu;
 
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
-import com.sun.tools.visualvm.uisupport.UISupport;
+import com.sun.tools.visualvm.uisupport.TransparentToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -41,7 +41,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -129,11 +128,7 @@ final class CPUView extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        final JToolBar toolBar = new JToolBar();
-        toolBar.setBorderPainted(false);
-        toolBar.setFloatable(false);
-        toolBar.setRollover(true);
-        toolBar.setOpaque(false);
+        final TransparentToolBar toolBar = new TransparentToolBar();
 
 //        refreshRateLabel = new JLabel("Refresh: ");
 //        refreshRateLabel.setToolTipText("Live results refresh rate [ms]");
@@ -170,7 +165,7 @@ final class CPUView extends JPanel {
                 "com/sun/tools/visualvm/sampler/resources/pause.png", true))); // NOI18N
         pauseButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Pause_results")); // NOI18N
         pauseButton.setOpaque(false);
-        toolBar.add(pauseButton);
+        toolBar.addItem(pauseButton);
 
         refreshButton = new JButton() {
             protected void fireActionPerformed(ActionEvent event) {
@@ -183,7 +178,7 @@ final class CPUView extends JPanel {
         refreshButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Update_results")); // NOI18N
         refreshButton.setEnabled(pauseButton.isSelected());
         refreshButton.setOpaque(false);
-        toolBar.add(refreshButton);
+        toolBar.addItem(refreshButton);
 
         toolBar.addSeparator();
 
@@ -197,22 +192,9 @@ final class CPUView extends JPanel {
         snapshotButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Snapshot")); // NOI18N
         snapshotButton.setOpaque(false);
         snapshotButton.setEnabled(false);
-        toolBar.add(snapshotButton);
-
-        JPanel toolbarSpacer = new JPanel(null) {
-            public Dimension getPreferredSize() {
-                if (UISupport.isGTKLookAndFeel() || UISupport.isNimbusLookAndFeel()) {
-                    int currentWidth = toolBar.getSize().width;
-                    int minimumWidth = toolBar.getMinimumSize().width;
-                    int extraWidth = currentWidth - minimumWidth;
-                    return new Dimension(Math.max(extraWidth, 0), 0);
-                } else {
-                    return super.getPreferredSize();
-                }
-            }
-        };
-        toolbarSpacer.setOpaque(false);
-        toolBar.add(toolbarSpacer);
+        toolBar.addItem(snapshotButton);
+        
+        toolBar.addFiller();
 
         threaddumpButton = new JButton(NbBundle.getMessage(CPUView.class, "LBL_Thread_dump")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
@@ -222,7 +204,7 @@ final class CPUView extends JPanel {
         threaddumpButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Thread_dump")); // NOI18N
         threaddumpButton.setOpaque(false);
         threaddumpButton.setEnabled(threadDumper != null);
-        toolBar.add(threaddumpButton);
+        toolBar.addItem(threaddumpButton);
 
         int maxHeight = pauseButton.getPreferredSize().height;
         maxHeight = Math.max(maxHeight, refreshButton.getPreferredSize().height);

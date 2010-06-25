@@ -23,15 +23,12 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.modules.tracer.impl.swing;
+package com.sun.tools.visualvm.uisupport;
 
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.uisupport.HorizontalLayout;
-import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.HierarchyEvent;
@@ -40,12 +37,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -53,12 +52,15 @@ import javax.swing.event.ChangeListener;
  */
 public final class TransparentToolBar extends JPanel {
 
-    private static final boolean NEEDS_PANEL = needsPanel();
+    private static Boolean NEEDS_PANEL;
+    private static Boolean CUSTOM_FILLER;
+    
     private final JToolBar toolbar;
     private final ItemListener listener = new ItemListener();
 
+    
     public TransparentToolBar() {
-        toolbar = NEEDS_PANEL ? null : new JToolBar();
+        toolbar = needsPanel() ? null : new JToolBar();
         setOpaque(false);
         if (toolbar == null) {
             // Toolbar is a JPanel (GTK)
@@ -121,15 +123,49 @@ public final class TransparentToolBar extends JPanel {
             remove(c);
         }
     }
+    
+    public void addSeparator() {
+        JToolBar.Separator separator = new JToolBar.Separator();
+        separator.setOrientation(JToolBar.Separator.VERTICAL);
+        addItem(separator);
+    }
+    
+    public void addFiller() {
+        Dimension minDim = new Dimension(0, 0);
+        Dimension maxDim = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        final boolean customFiller = customFiller();
+        Box.Filler filler = new Box.Filler(minDim, minDim, maxDim) {
+            public Dimension getPreferredSize() {
+                if (customFiller) {
+                    int currentWidth = TransparentToolBar.this.getSize().width;
+                    int minimumWidth = TransparentToolBar.this.getMinimumSize().width;
+                    int extraWidth = currentWidth - minimumWidth;
+                    return new Dimension(Math.max(extraWidth, 0), 0);
+                } else {
+                    return super.getPreferredSize();
+                }
+            }
+            protected void paintComponent(Graphics g) {}
+        };
+        addItem(filler);
+    }
+    
 
     private static boolean needsPanel() {
-        return UISupport.isGTKLookAndFeel();
+        if (NEEDS_PANEL == null) NEEDS_PANEL = UISupport.isGTKLookAndFeel();
+        return NEEDS_PANEL;
+    }
+    
+    private static boolean customFiller() {
+        if (CUSTOM_FILLER == null) CUSTOM_FILLER = UIUtils.isGTKLookAndFeel() ||
+                                                  UIUtils.isNimbusLookAndFeel();
+        return CUSTOM_FILLER;
     }
 
+            
     private static final class ItemListener extends MouseAdapter implements ChangeListener, FocusListener {
 
         private static final String PROP_HOVERED = "BUTTON_HOVERED"; // NOI18N
-        private static Color BACKGROUND_COLOR;
 
         public void mouseEntered(MouseEvent e) {
             AbstractButton b = (AbstractButton) e.getSource();
@@ -156,26 +192,13 @@ public final class TransparentToolBar extends JPanel {
         }
 
         private void refresh(final AbstractButton b) {
-            b.setBackground(getBackgroundColor(b));
+            b.setBackground(UISupport.getDefaultBackground());
             boolean hovered = Boolean.TRUE.equals(b.getClientProperty(PROP_HOVERED));
             boolean filled = b.isEnabled() && (hovered || b.isSelected() || b.isFocusOwner());
             b.setOpaque(filled);
             b.setContentAreaFilled(filled);
             b.repaint();
         }
-
-        private static Color getBackgroundColor(JComponent jc) {
-            if (BACKGROUND_COLOR == null) {
-                Container c = jc;
-                while (BACKGROUND_COLOR == null && c != null) {
-                    if (c instanceof DataViewComponent) {
-                        BACKGROUND_COLOR = c.getBackground();
-                    } else {
-                        c = c.getParent();
-                    }
-                }
-            }
-            return BACKGROUND_COLOR;
-        }
+        
     }
 }

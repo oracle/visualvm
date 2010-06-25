@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.application.jvm.HeapHistogram.ClassInfo;
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.TransparentToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
@@ -59,7 +60,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellRenderer;
@@ -546,11 +546,7 @@ final class MemoryView extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        final JToolBar toolBar = new JToolBar();
-        toolBar.setBorderPainted(false);
-        toolBar.setFloatable(false);
-        toolBar.setRollover(true);
-        toolBar.setOpaque(false);
+        final TransparentToolBar toolBar = new TransparentToolBar();
 
 //        refreshRateLabel = new JLabel("Refresh: ");
 //        refreshRateLabel.setToolTipText("Live results refresh rate [ms]");
@@ -587,7 +583,7 @@ final class MemoryView extends JPanel {
                 "com/sun/tools/visualvm/sampler/resources/pause.png", true))); // NOI18N
         pauseButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Pause_results")); // NOI18N
         pauseButton.setOpaque(false);
-        toolBar.add(pauseButton);
+        toolBar.addItem(pauseButton);
 
         refreshButton = new JButton() {
             protected void fireActionPerformed(ActionEvent event) {
@@ -600,7 +596,7 @@ final class MemoryView extends JPanel {
         refreshButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Update_results")); // NOI18N
         refreshButton.setEnabled(pauseButton.isSelected());
         refreshButton.setOpaque(false);
-        toolBar.add(refreshButton);
+        toolBar.addItem(refreshButton);
 
         toolBar.addSeparator();
 
@@ -611,7 +607,7 @@ final class MemoryView extends JPanel {
         };
         deltaButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Deltas")); // NOI18N
         deltaButton.setOpaque(false);
-        toolBar.add(deltaButton);
+        toolBar.addItem(deltaButton);
 
         toolBar.addSeparator();
 
@@ -625,22 +621,9 @@ final class MemoryView extends JPanel {
         snapshotButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Snapshot")); // NOI18N
         snapshotButton.setOpaque(false);
         snapshotButton.setEnabled(false);
-        toolBar.add(snapshotButton);
+        toolBar.addItem(snapshotButton);
 
-        JPanel toolbarSpacer = new JPanel(null) {
-            public Dimension getPreferredSize() {
-                if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
-                    int currentWidth = toolBar.getSize().width;
-                    int minimumWidth = toolBar.getMinimumSize().width;
-                    int extraWidth = currentWidth - minimumWidth;
-                    return new Dimension(Math.max(extraWidth, 0), 0);
-                } else {
-                    return super.getPreferredSize();
-                }
-            }
-        };
-        toolbarSpacer.setOpaque(false);
-        toolBar.add(toolbarSpacer);
+        toolBar.addFiller();
 
         gcButton = new JButton(NbBundle.getMessage(MemoryView.class, "LBL_Gc")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
@@ -657,7 +640,7 @@ final class MemoryView extends JPanel {
         gcButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Gc")); // NOI18N
         gcButton.setOpaque(false);
         gcButton.setEnabled(memoryBean != null);
-        toolBar.add(gcButton);
+        toolBar.addItem(gcButton);
 
         heapdumpButton = new JButton(NbBundle.getMessage(MemoryView.class, "LBL_HeapDump")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
@@ -667,7 +650,7 @@ final class MemoryView extends JPanel {
         heapdumpButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_HeapDump")); // NOI18N
         heapdumpButton.setOpaque(false);
         heapdumpButton.setEnabled(heapDumper != null);
-        toolBar.add(heapdumpButton);
+        toolBar.addItem(heapdumpButton);
 
         int maxHeight = pauseButton.getPreferredSize().height;
         maxHeight = Math.max(maxHeight, refreshButton.getPreferredSize().height);
