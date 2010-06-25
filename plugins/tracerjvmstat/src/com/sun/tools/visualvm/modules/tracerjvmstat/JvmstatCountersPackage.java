@@ -46,7 +46,7 @@ class JvmstatCountersPackage extends TracerPackage.SessionAware<Application> {
     
     private static final Logger LOGGER = Logger.getLogger(JvmstatCountersPackage.class.getName());
     static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracerjvmstat/resources/monitor.png", true)); // NOI18N
+            "com/sun/tools/visualvm/modules/tracerjvmstat/resources/jvmstatProbe.png", true)); // NOI18N
     private static final String NAME = "jvmstat counters metrics";
     private static final String DESCR = "Provides metric for jvmstat counters.";
     private static final int POSITION = 70;

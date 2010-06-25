@@ -40,18 +40,27 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.openide.util.ImageUtilities;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 final class ProbesPanel extends JPanel {
+    
+    private static final String INCREMENT_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/increment.png"; // NOI18N
+    private static final String DECREMENT_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/decrement.png"; // NOI18N
+    private static final String RESET_IMAGE_PATH =
+            "com/sun/tools/visualvm/modules/tracer/impl/resources/reset.png"; // NOI18N
 
     private final ListPanel listPanel;
     private final JViewport viewport;
@@ -97,7 +106,8 @@ final class ProbesPanel extends JPanel {
                                      HORIZONTAL).getPreferredSize().height));
         bottomPanel.setOpaque(false);
 
-        increaseB = new HeaderButton("+", null) {
+        increaseB = new HeaderButton(null, new ImageIcon(ImageUtilities.loadImage(
+                                                         INCREMENT_IMAGE_PATH))) {
             protected void performAction(ActionEvent e) {
                 chart.increaseRowHeights((e.getModifiers() & Toolkit.getDefaultToolkit().
                                          getMenuShortcutKeyMask()) == 0);
@@ -106,7 +116,8 @@ final class ProbesPanel extends JPanel {
         increaseB.setToolTipText("Increase rows height");
         bottomPanel.add(increaseB);
 
-        decreaseB = new HeaderButton("-", null) {
+        decreaseB = new HeaderButton(null, new ImageIcon(ImageUtilities.loadImage(
+                                                         DECREMENT_IMAGE_PATH))) {
             protected void performAction(ActionEvent e) {
                 chart.decreaseRowHeights((e.getModifiers() & Toolkit.getDefaultToolkit().
                                          getMenuShortcutKeyMask()) == 0);
@@ -115,7 +126,8 @@ final class ProbesPanel extends JPanel {
         decreaseB.setToolTipText("Decrease rows height");
         bottomPanel.add(decreaseB);
 
-        resetB = new HeaderButton("=", null) {
+        resetB = new HeaderButton(null, new ImageIcon(ImageUtilities.loadImage(
+                                                      RESET_IMAGE_PATH))) {
             protected void performAction(ActionEvent e) {
                 chart.resetRowHeights();
             }
