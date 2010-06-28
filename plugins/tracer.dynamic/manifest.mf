@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.modules.tracer.dynamic
+OpenIDE-Module: com.sun.tools.visualvm.modules.tracer.dynamic/0
 OpenIDE-Module-Install: com/sun/tools/visualvm/modules/tracer/dynamic/impl/DynamicPackageProvider.class
 OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/tracer/dynamic/layer.xml
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/tracer/dynamic/Bundle.properties
 OpenIDE-Module-Provides: com.sun.tools.visualvm.modules.tracer.dynamic
-OpenIDE-Module-Specification-Version: 1.0
+OpenIDE-Module-Specification-Version: 1.1
 

@@ -62,10 +62,4 @@ public class Deployer {
         }
         return null;
     }
-
-    public static DeployerImpl.Config createConfig(DeployerImpl deployer, FileObject deploymentCfg) {
-        FileObject deployerCfg = deploymentCfg.getFileObject(Deployer.CONFIG_KEY);
-        
-        return deployerCfg != null ? deployer.configFor(deployerCfg) : null;
-    }
 }

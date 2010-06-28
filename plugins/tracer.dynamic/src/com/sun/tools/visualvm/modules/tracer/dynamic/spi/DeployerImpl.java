@@ -27,18 +27,14 @@ package com.sun.tools.visualvm.modules.tracer.dynamic.spi;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
-import org.openide.filesystems.FileObject;
+import java.util.Map;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
 public interface DeployerImpl {
-    public static interface Config {}
-
-    Config configFor(FileObject deployerCfg);
-
-    void applyConfig(Application app, Config config);
+    void applyConfig(Application app, Map<String, Object> config);
     boolean deploy(Application app, TracerProgressObject progress, int availableSteps);
     void undeploy(Application app);
 }
