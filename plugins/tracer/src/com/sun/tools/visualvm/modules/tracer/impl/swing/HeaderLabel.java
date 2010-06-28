@@ -99,7 +99,7 @@ public final class HeaderLabel extends HeaderPanel {
     private static int computeHeight() {
         int height = new HeaderLabel("X").getPreferredSizeSuper().height; // NOI18N
         if (UISupport.isMetalLookAndFeel()) height += 4;
-        else if (UISupport.isAquaLookAndFeel()) height += 6;
+//        else if (UISupport.isAquaLookAndFeel()) height += 6;
         return height;
     }
 

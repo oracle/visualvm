@@ -35,6 +35,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -261,9 +262,15 @@ final class TimelineAxis extends JPanel {
             timeline = model.getTimeline();
 
             timeRenderer = new EnhancedLabelRenderer();
-            timeRenderer.setFont(new LegendFont());
+            if (UISupport.isAquaLookAndFeel()) {
+                Font f = new LegendFont();
+                timeRenderer.setFont(f.deriveFont(f.getSize2D() - 1));
+                timeRenderer.setMargin(new Insets(0, 2, 0, 2));
+            } else {
+                timeRenderer.setFont(new LegendFont());
+                timeRenderer.setMargin(new Insets(1, 2, 1, 2));
+            }
             timeRenderer.setBackground(Color.WHITE);
-            timeRenderer.setMargin(new Insets(1, 2, 1, 2));
             timeRenderer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             timeFormat = new SimpleDateFormat(TimeAxisUtils.getFormatString(1, 1, 1));
 
