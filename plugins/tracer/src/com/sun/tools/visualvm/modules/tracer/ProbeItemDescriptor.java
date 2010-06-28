@@ -469,7 +469,7 @@ public abstract class ProbeItemDescriptor {
      * @param dataFactor multiplication factor
      * @param minValue minimum (initial) item value
      * @param maxValue maximum (initial) item value
-     * @param outlined  true if the bars are outlined
+     * @param outlined true if the bars are outlined
      * @param filled true if the bars are filled
      * @param width width width of/between the bars
      * @param fixedWidth fixedWidth true if width defines bar width, false if width defines bars spacing
@@ -499,7 +499,7 @@ public abstract class ProbeItemDescriptor {
      * @param dataFactor multiplication factor
      * @param minValue minimum (initial) item value
      * @param maxValue maximum (initial) item value
-     * @param outlined  true if the bars are outlined
+     * @param outlined true if the bars are outlined
      * @param filled true if the bars are filled
      * @param lineWidth line width
      * @param lineColor line color or null
