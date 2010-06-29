@@ -270,6 +270,9 @@ public abstract class ProbeItemDescriptor {
                                                      double dataFactor, long minValue,
                                                      long maxValue, float lineWidth,
                                                      Color lineColor, Color fillColor) {
+        
+        if (lineColor == null && fillColor == null)
+            throw new IllegalArgumentException("Either lineColor or fillColor must be defined"); // NOI18N
 
         return new ContinuousXYItemDescriptor(name, description, formatter, dataFactor,
                                               minValue, maxValue, lineWidth, lineColor,
@@ -403,6 +406,9 @@ public abstract class ProbeItemDescriptor {
                                                           double dataFactor, long minValue,
                                                           long maxValue, float lineWidth,
                                                           Color lineColor, Color fillColor) {
+        
+        if (lineColor == null && fillColor == null)
+            throw new IllegalArgumentException("Either lineColor or fillColor must be defined"); // NOI18N
 
         return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
                             lineWidth, lineColor, fillColor, 0, false, false, true);
@@ -455,6 +461,9 @@ public abstract class ProbeItemDescriptor {
                                                           long maxValue, float lineWidth,
                                                           Color lineColor, Color fillColor,
                                                           int width, boolean fixedWidth) {
+        
+        if (lineColor == null && fillColor == null)
+            throw new IllegalArgumentException("Either lineColor or fillColor must be defined"); // NOI18N
 
         return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
                             lineWidth, lineColor, fillColor, width, fixedWidth, true, false);
@@ -483,11 +492,11 @@ public abstract class ProbeItemDescriptor {
                                                       boolean fixedWidth) {
 
         if (!outlined && !filled)
-            throw new IllegalArgumentException("Bar must be either outlined or filled");
+            throw new IllegalArgumentException("Either outlined or filled must be set"); // NOI18N
 
         return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
-                            DEFAULT_LINE_WIDTH, DEFAULT_COLOR, DEFAULT_COLOR, width,
-                            fixedWidth, false, false);
+                            DEFAULT_LINE_WIDTH, outlined ? DEFAULT_COLOR : null,
+                            filled ? DEFAULT_COLOR : null, width, fixedWidth, false, !filled);
     }
 
     /**
@@ -499,8 +508,6 @@ public abstract class ProbeItemDescriptor {
      * @param dataFactor multiplication factor
      * @param minValue minimum (initial) item value
      * @param maxValue maximum (initial) item value
-     * @param outlined true if the bars are outlined
-     * @param filled true if the bars are filled
      * @param lineWidth line width
      * @param lineColor line color or null
      * @param fillColor fill color or null
@@ -511,13 +518,15 @@ public abstract class ProbeItemDescriptor {
     public static ProbeItemDescriptor discreteBarItem(String name, String description,
                                                       ItemValueFormatter formatter,
                                                       double dataFactor, long minValue,
-                                                      long maxValue, boolean outlined,
-                                                      boolean filled, float lineWidth,
+                                                      long maxValue, float lineWidth,
                                                       Color lineColor, Color fillColor,
                                                       int width, boolean fixedWidth) {
+        
+        if (lineColor == null && fillColor == null)
+            throw new IllegalArgumentException("Either lineColor or fillColor must be defined"); // NOI18N
 
         return discreteItem(name, description, formatter, dataFactor, minValue, maxValue,
-                            lineWidth, lineColor, fillColor, width, fixedWidth, false, false);
+                            lineWidth, lineColor, fillColor, width, fixedWidth, false, fillColor == null);
     }
 
     private static ProbeItemDescriptor discreteItem(String name, String description,
