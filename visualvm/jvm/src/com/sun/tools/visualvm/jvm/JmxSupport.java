@@ -47,6 +47,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanInfo;
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 /**
@@ -55,18 +59,21 @@ import javax.management.ObjectName;
  */
 public class JmxSupport implements DataRemovedListener {
     private final static Logger LOGGER = Logger.getLogger(JmxSupport.class.getName());
+    private static final String PROCESS_CPU_TIME_ATTR = "ProcessCpuTime"; // NOI18N
+    private static final String PROCESSING_CAPACITY_ATTR = "ProcessingCapacity"; // NOI18N
     private static final String PERM_GEN = "Perm Gen";  // NOI18N
     private static final String PS_PERM_GEN = "PS Perm Gen";    // NOI18N
     private static final String CMS_PERM_GEN = "CMS Perm Gen";    // NOI18N
     private static final String IBM_PERM_GEN = "class storage";    // NOI18N
+    private static final ObjectName osName = getOSName();
     private static long INITIAL_DELAY = 100;
+
     private Application application;
     private JvmMXBeans mxbeans;
     private JVMImpl jvm;
-    // OperatingSystemMXBean
-    private boolean operatingSystemMXBeanInitialized;
-    private Object operatingSystemMXBeanLock = new Object();
-    private OperatingSystemMXBean operatingSystemMXBean;
+    private Object processCPUTimeAttributeLock = new Object();
+    private Boolean processCPUTimeAttribute;
+    private long processCPUTimeMultiplier;
     private Boolean readOnlyConnection;
     private Timer timer;
     private MemoryPoolMXBean permGenPool;
@@ -86,25 +93,62 @@ public class JmxSupport implements DataRemovedListener {
         return null;
     }
 
-    OperatingSystemMXBean getOperatingSystem() {
-        synchronized (operatingSystemMXBeanLock) {
-            if (operatingSystemMXBeanInitialized) {
-                return operatingSystemMXBean;
+    boolean hasProcessCPUTimeAttribute() {
+        synchronized (processCPUTimeAttributeLock) {
+            if (processCPUTimeAttribute != null) {
+                return processCPUTimeAttribute.booleanValue();
             }
-            operatingSystemMXBeanInitialized = true;
-            JvmMXBeans jmx = getJvmMXBeans();
-            if (jmx != null) {
-                ObjectName osName;
-                try {
-                    osName = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
-                    operatingSystemMXBean = jmx.getMXBean(osName,OperatingSystemMXBean.class);
-                 } catch (Exception ex) {
-                    LOGGER.throwing(JmxSupport.class.getName(), "getOperationSystem", ex); // NOI18N
-                    return null;
+            processCPUTimeAttribute = Boolean.FALSE;
+            JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
+           
+            if (jmx != null && jmx.getConnectionState().equals(ConnectionState.CONNECTED)) {
+                MBeanServerConnection conn = jmx.getMBeanServerConnection();
+                
+                if (conn != null) {
+                    try {
+                       MBeanInfo info = conn.getMBeanInfo(osName);
+                       MBeanAttributeInfo[] attrs = info.getAttributes();
+                       
+                       processCPUTimeMultiplier = 1;
+                       for (MBeanAttributeInfo attr : attrs) {
+                           String name = attr.getName();
+                           if (PROCESS_CPU_TIME_ATTR.equals(name)) {
+                               processCPUTimeAttribute = Boolean.TRUE;
+                           }
+                           if (PROCESSING_CAPACITY_ATTR.equals(name)) {
+                               Number mul = (Number) conn.getAttribute(osName,PROCESSING_CAPACITY_ATTR);
+                               processCPUTimeMultiplier = mul.longValue();
+                           }
+                        }
+                    } catch (Exception ex) {
+                       LOGGER.throwing(JmxSupport.class.getName(), "hasProcessCPUTimeAttribute", ex); // NOI18N
+                    }
                 }
-           }
-           return operatingSystemMXBean;
+            }
+            return processCPUTimeAttribute.booleanValue();
         }
+    }
+     
+    long getProcessCPUTime() {
+        if (!hasProcessCPUTimeAttribute()) {
+            throw new UnsupportedOperationException();
+        }
+        JmxModel jmx = JmxModelFactory.getJmxModelFor(application);
+        
+        if (jmx != null && jmx.getConnectionState().equals(ConnectionState.CONNECTED)) {
+           MBeanServerConnection conn = jmx.getMBeanServerConnection();
+            
+           if (conn != null) {
+                try {
+                    Long cputime = (Long)conn.getAttribute(osName,PROCESS_CPU_TIME_ATTR);
+                    
+                    return cputime.longValue()*processCPUTimeMultiplier;
+                } catch (Exception ex) {
+                    LOGGER.throwing(JmxSupport.class.getName(), "hasProcessCPUTimeAttribute", ex); // NOI18N
+                }
+            }
+        }
+        return -1;
     }
     
     synchronized JvmMXBeans getJvmMXBeans() {
@@ -215,6 +259,14 @@ public class JmxSupport implements DataRemovedListener {
         }
     }
 
+    private static ObjectName getOSName() {
+        try {
+            return new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
+        } catch (MalformedObjectNameException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     public void dataRemoved(Object dataSource) {
         disableTimer();
     }

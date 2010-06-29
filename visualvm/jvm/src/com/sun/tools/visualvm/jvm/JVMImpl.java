@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.jvm;
 
-import com.sun.management.OperatingSystemMXBean;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
@@ -416,7 +415,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     }
     
     public boolean isCpuMonitoringSupported() {
-        return jmxSupport.getOperatingSystem() instanceof OperatingSystemMXBean;
+        return jmxSupport.hasProcessCPUTimeAttribute();
     }
     
     public boolean isCollectionTimeSupported() {
