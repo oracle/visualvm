@@ -282,7 +282,7 @@ public final class ProfilerPresets {
         }
     }
     
-    private Preferences prefs() {
+    private synchronized Preferences prefs() {
         if (prefs == null) prefs = NbPreferences.forModule(ProfilerPresets.class);
         return prefs;
     }
