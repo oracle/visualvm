@@ -29,27 +29,32 @@ import com.sun.management.UnixOperatingSystemMXBean;
 import com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
 import java.util.logging.Logger;
 import sun.jvmstat.monitor.Monitor;
-import sun.management.counter.Units;
 
 /**
  *
  * @author Tomas Hurka
  */
 class JvmstatCounterFormatter extends ItemValueFormatter {
+    static final String Units_STRING = "String";  // NOI18N
+    static final String Units_NONE = "None";  // NOI18N
+    static final String Units_INVALID = "Invalid";  // NOI18N
+    static final String Units_BYTES = "Bytes";  // NOI18N
+    static final String Units_EVENTS = "Events";    // NOI18N
+    static final String Units_TICKS = "Ticks";  // NOI18N
     
     private static final Logger LOGGER = Logger.getLogger(JvmstatCounterFormatter.class.getName());
     private Monitor counter;
     private ItemValueFormatter del;
-    private Units units;
+    private String unitsName;
 
     JvmstatCounterFormatter(Monitor c) {
         counter = c;
-        units = counter.getUnits();
-        if (units.equals(Units.BYTES)) {
+        unitsName = Utils.getUnits(counter).toString();
+        if (unitsName.equals(Units_BYTES)) {
             del = ItemValueFormatter.DEFAULT_BYTES;
-        } else if (units.equals(Units.EVENTS)) {
+        } else if (unitsName.equals(Units_EVENTS)) {
             del = ItemValueFormatter.DEFAULT_DECIMAL;
-        } else if (units.equals(Units.TICKS)) {
+        } else if (unitsName.equals(Units_TICKS)) {
             
         }
     }
@@ -65,7 +70,7 @@ class JvmstatCounterFormatter extends ItemValueFormatter {
         if (del != null) {
             return del.getUnits(i);
         }
-        return units.toString();
+        return unitsName;
     }
     
 }

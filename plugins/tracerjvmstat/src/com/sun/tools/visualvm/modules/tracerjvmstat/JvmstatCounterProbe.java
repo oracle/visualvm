@@ -27,19 +27,19 @@ package com.sun.tools.visualvm.modules.tracerjvmstat;
 
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
+import static com.sun.tools.visualvm.modules.tracerjvmstat.JvmstatCounterFormatter.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sun.jvmstat.monitor.Monitor;
-import sun.management.counter.Units;
-import sun.management.counter.Variability;
 
 /**
  *
  * @author Tomas Hurka
  */
 class JvmstatCounterProbe extends TracerProbe {
-    
-    private static final Logger LOGGER = Logger.getLogger(JvmstatCounterProbe.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(JvmstatCounterProbe.class.getName());    
+    private static final String Variability_MONOTONIC = "Monotonic";    // NOI18N
+
     private Monitor counter;
     private long lastVal;
     private long lastTime;
@@ -48,8 +48,9 @@ class JvmstatCounterProbe extends TracerProbe {
     JvmstatCounterProbe(String name, String desc, Monitor c) {
         super(createItemDescriptors(name, desc, c));
         counter = c;
-        Units u = c.getUnits();
-        ticks = u.equals(Units.TICKS) || (u.equals(Units.EVENTS) && c.getVariability().equals(Variability.MONOTONIC));
+        String u = Utils.getUnits(c).toString();
+  
+        ticks = u.equals(Units_TICKS) || (u.equals(Units_EVENTS) && c.getVariability().toString().equals(Variability_MONOTONIC));
     }
     
     private static final ProbeItemDescriptor[] createItemDescriptors(String name, String desc, Monitor c) {

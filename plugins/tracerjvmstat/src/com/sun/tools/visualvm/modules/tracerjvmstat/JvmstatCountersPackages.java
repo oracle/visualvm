@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModelFactory;
+import static com.sun.tools.visualvm.modules.tracerjvmstat.JvmstatCounterFormatter.*;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,8 +44,6 @@ import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.MonitoredVm;
 import sun.jvmstat.monitor.MonitorException;
-import sun.management.counter.Units;
-import sun.management.counter.Variability;
 import sun.jvmstat.monitor.VmIdentifier;
 
 /**
@@ -52,8 +51,10 @@ import sun.jvmstat.monitor.VmIdentifier;
  * @author Tomas Hurka
  */
 class JvmstatCountersPackages  {
-    
     private static final Logger LOGGER = Logger.getLogger(JvmstatCountersPackage.class.getName());
+    private static final String Variability_INVALID = "Invalid";    // NOI18N
+    private static final String Variability_CONSTANT = "Constant";  // NOI18N
+
     private Application application;
     private MonitoredVm monitoredVm;
     
@@ -103,15 +104,15 @@ class JvmstatCountersPackages  {
             it = counters.iterator();
             for (int i=0;it.hasNext();i++) {
                 Monitor monitor = (Monitor) it.next();
-                Units units = monitor.getUnits();
-                Variability var = monitor.getVariability();
+                String unitsName = Utils.getUnits(monitor).toString();
+                String var = Utils.getVariability(monitor).toString();
                 String name = monitor.getName();
                 String baseName = monitor.getBaseName();
                 
-                if (units.equals(Units.STRING) || units.equals(Units.INVALID) || units.equals(Units.NONE)) {
+                if (unitsName.equals(Units_STRING) || unitsName.equals(Units_INVALID) || unitsName.equals(Units_NONE)) {
                     continue;
                 }
-                if (var.equals(Variability.INVALID) || var.equals(Variability.CONSTANT)) {
+                if (var.equals(Variability_INVALID) || var.equals(Variability_CONSTANT)) {
                     continue;
                 }
                 if (monitor.isVector()) {

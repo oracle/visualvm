@@ -45,13 +45,13 @@ import sun.jvmstat.monitor.MonitoredVm;
 import sun.jvmstat.monitor.event.MonitorStatusChangeEvent;
 import sun.jvmstat.monitor.event.VmEvent;
 import sun.jvmstat.monitor.event.VmListener;
-import sun.management.counter.Variability;
 
 /**
  *
  * @author Tomas Hurka
  */
 public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRemovedListener<Application> {
+    private static final String Variability_CONSTANT = "Constant";  // NOI18N
     Application application;
     MonitoredVm monitoredVm;
     Set<JvmstatListener> listeners;
@@ -95,7 +95,7 @@ public class JvmstatModelImpl extends JvmstatModel implements VmListener, DataRe
             Monitor mon = monitoredVm.findByName(name);
             if (mon != null) {
                 value = mon.getValue().toString();
-                if (mon.getVariability().equals(Variability.CONSTANT)) {
+                if (Utils.getVariability(mon).toString().equals(Variability_CONSTANT)) {
                     valueCache.put(name,value);
                 }
             }
