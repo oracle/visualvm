@@ -4,5 +4,5 @@ OpenIDE-Module-Install: com/sun/tools/visualvm/modules/tracer/dynamic/impl/Dynam
 OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/tracer/dynamic/layer.xml
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/tracer/dynamic/Bundle.properties
 OpenIDE-Module-Provides: com.sun.tools.visualvm.modules.tracer.dynamic
-OpenIDE-Module-Specification-Version: 1.2
+OpenIDE-Module-Specification-Version: 1.2.1
 

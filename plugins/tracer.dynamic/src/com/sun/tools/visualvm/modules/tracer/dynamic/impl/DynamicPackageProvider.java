@@ -93,38 +93,21 @@ class DynamicPackageProvider extends ModuleInstall {
             try {
                 FileObject probesRoot = FileUtil.getConfigFile("VisualVM/Tracer/packages"); // NOI18N
                 
-                StringBuilder sb = new StringBuilder(readResource("com/sun/tools/visualvm/modules/tracer/dynamic/resources/configurator.js"));
+                jsEngine.eval(readResource("com/sun/tools/visualvm/modules/tracer/dynamic/resources/configurator.js").toString(), bindings);
 
                 Enumeration<? extends FileObject> data = probesRoot.getData(false);
+                
                 while (data.hasMoreElements()) {
                     FileObject cfg = data.nextElement();
-                    sb.append(cfg.asText()).append('\n');
+                    jsEngine.eval(cfg.asText(), bindings);
                 }
 
-                jsEngine.eval(sb.toString(), bindings);
-
                 packages.addAll((Collection<TracerPackage<Application>>)bindings.get("configuredPackages"));
-//                for(int i=0;i<counter;i++) {
-//                    Object ret = jsEngine.eval("configure(pkgs" + i + ")", bindings);
-//                    packages.addAll((Collection<TracerPackage<Application>>)ret);
-//                }
             } catch (IOException e) {
             } catch (ScriptException e) {
                 e.printStackTrace();
             }
             return packages.toArray(new TracerPackage[packages.size()]);
-
-//            int defaultCounter = 1000;
-//            for(FileObject pkg : probesRoot.getChildren()) {
-//                Object name = pkg.getAttribute("displayName"); // NOI18N
-//                Object desc = pkg.getAttribute("desc"); // NOI18N
-//                Object icon = pkg.getAttribute("icon"); // NOI18N
-//                Object position = pkg.getAttribute("position"); // NOI18N
-//
-//                ApplicationValidator validator = (ApplicationValidator)pkg.getAttribute("validator"); // NOI18N
-//                packages.add(new DynamicPackage(pkg, (String)name, desc != null ? (String)desc : "", icon != null ? ImageUtilities.loadImageIcon((String)icon, true) : defaultIcon, position != null ? ((Integer)position).intValue() : defaultCounter++, isAvailable(validator, application)));
-//            }
-//            return (DynamicPackage[])packages.toArray(new DynamicPackage[packages.size()]);
         }
 
         private CharSequence readResource(String resName) {

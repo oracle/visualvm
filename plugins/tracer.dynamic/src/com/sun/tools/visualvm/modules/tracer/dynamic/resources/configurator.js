@@ -31,10 +31,52 @@ importPackage(org.openide.util)
 
 var Color = Packages.java.awt.Color;
 
-var Format = {
-    percent: "percent",
-    decimal: "decimal",
-    bytes: "bytes"
+function VisualVM(){}
+
+VisualVM.Tracer = {
+    Type: {
+        discrete: "discrete",
+        continuous: "continuous"
+    },
+    addPackages: function (packages) {
+        if (application != undefined && packages != undefined) {
+            if (packages instanceof Array) {
+                for(var index in packages) {
+                    processPackage(packages[index]);
+                }
+            } else {
+                processPackage(packages);
+            }
+        }
+    }
+}
+
+VisualVM.MBeans = {
+    listMBeanNames: function(objectNamePattern, query) {
+        if (query != undefined && (query instanceof QueryExp)) {
+            return undefined;
+        }
+        objectNamePattern = objectNamePattern == undefined ? "*" : objectNamePattern;
+        query = query == undefined ? null : query;
+
+        var jmxModel = JmxModelFactory.getJmxModelFor(application);
+        if (jmxModel != undefined && jmxModel != null) {
+            var connection = jmxModel.getMBeanServerConnection();
+            if (connection != undefined && connection != null) {
+                var names = connection.queryNames(Packages.javax.management.ObjectName.getInstance(objectNamePattern), query);
+                var iter = names.iterator();
+                var nameArr = new Array();
+                while (iter.hasNext()) {
+                    nameArr[nameArr.length] = iter.next().toString();
+                }
+                return nameArr;
+            }
+        }
+        return undefined;
+    },
+    attribute: function (objectName, attrName) {
+        return new MBeanAttribute(objectName, attrName);
+    }
 }
 
 var NULL_VALUE = new ValueProvider({
@@ -62,35 +104,7 @@ function L11N(baseName) {
     }
 }
 
-var MBeanSupport = {
-    listMBeanNames: function(objectNamePattern, query) {
-        if (query != undefined && (query instanceof QueryExp)) {
-            return undefined;
-        }
-        objectNamePattern = objectNamePattern == undefined ? "*" : objectNamePattern;
-        query = query == undefined ? null : query;
-
-        var jmxModel = JmxModelFactory.getJmxModelFor(application);
-        if (jmxModel != undefined && jmxModel != null) {
-            var connection = jmxModel.getMBeanServerConnection();
-            if (connection != undefined && connection != null) {
-                var names = connection.queryNames(Packages.javax.management.ObjectName.getInstance(objectNamePattern), query);
-                var iter = names.iterator();
-                var nameArr = new Array();
-                while (iter.hasNext()) {
-                    nameArr[nameArr.length] = iter.next().toString();
-                }
-                return nameArr;
-            }
-        }
-        return undefined;
-    }
-}
-
-
-var vars = new Array();
-
-function getContinousItemProvider(formatter) {
+function getContinousItemDescriptorProvider(formatter) {
     formatter = formatter || ItemValueFormatter.DECIMAL;
 
     return function(property) {
@@ -118,14 +132,14 @@ function getContinousItemProvider(formatter) {
     }
 }
 
-function getDiscreteItemProvider(formatter) {
+function getDiscreteItemDescriptorProvider(formatter) {
     formatter = formatter || ItemValueFormatter.DECIMAL;
 
     return function(property) {
-        var factor = property.presenter.factor || 1;
-        var min = property.presenter.min || 0;
-        var max = property.presenter.max || ProbeItemDescriptor.MAX_VALUE_UNDEFINED;
-        var lineWidth = property.presenter.lineWidth || ProbeItemDescriptor.DEFAULT_LINE_WIDTH;
+        var factor = property.presenter.factor == undefined ? 1 : property.presenter.factor;
+        var min = property.presenter.min == undefined ? 0 : property.presenter.min;
+        var max = property.presenter.max == undefined ? ProbeItemDescriptor.MAX_VALUE_UNDEFINED : property.presenter.max;
+        var lineWidth = property.presenter.lineWidth == undefined ? ProbeItemDescriptor.DEFAULT_LINE_WIDTH : property.presenter.lineWidth;
         var lineColor = null;
         var fillColor = null;
         if (property.presenter.lineColor == undefined && property.presenter.fillColor == undefined) {
@@ -142,26 +156,52 @@ function getDiscreteItemProvider(formatter) {
         if (fillColor != undefined && lineColor == undefined) {
             lineColor = fillColor;
         }
-
-        return ProbeItemDescriptor.discreteItem(property.name, property.desc || "",
-            formatter, factor, min, max, lineWidth, lineColor, fillColor,
-            property.presenter.width || 0, property.presenter.fixedWidth || false, property.presenter.topLine || false,
-            property.presenter.outline || false
-        );
+        
+        if (property.presenter.topLine == undefined) {
+            property.presenter.topLine = false;
+        }
+        if (property.presenter.outline == undefined) {
+            property.presenter.outline = false;
+        }
+        if (property.presenter.fixedWidth == undefined) {
+            property.presenter.fixedWidth = false;
+        }
+        
+        if (property.presenter.topLine && !property.presenter.outline) {
+            return ProbeItemDescriptor.discreteToplineItem(property.name, property.desc || "",
+                formatter, factor, min, max, lineWidth, lineColor, fillColor,
+                property.presenter.width == undefined ? 0 : property.presenter.width,
+                property.presenter.fixedWidth
+            )
+        } else if (!property.presenter.fixedWidth) {
+            return ProbeItemDescriptor.discreteOutlineItem(property.name, property.desc || "",
+                formatter, factor, min, max, lineWidth, lineColor, fillColor)
+        } else {
+            return ProbeItemDescriptor.discreteBarItem(property.name, property.desc || "",
+                formatter, factor, min, max, lineWidth, lineColor, fillColor,
+                property.presenter.width == undefined ? 0 : property.presenter.width,
+                property.presenter.fixedWidth
+            )
+        }
     }
 }
 
-var itemDescriptorMap = {
-    continuous: {
-        decimal: getContinousItemProvider(ItemValueFormatter.DEFAULT_DECIMAL),
-        percent: getContinousItemProvider(ItemValueFormatter.DEFAULT_PERCENT),
-        bytes: getContinousItemProvider(ItemValueFormatter.DEFAULT_BYTES)
-    },
-    discrete: {
-        decimal: getDiscreteItemProvider(ItemValueFormatter.DEFAULT_DECIMAL),
-        percent: getDiscreteItemProvider(ItemValueFormatter.DEFAULT_PERCENT),
-        bytes: getDiscreteItemProvider(ItemValueFormatter.DEFAULT_BYTES)
+function getItemDescriptor(property) {
+    if (property.presenter.type == undefined) {
+        property.presenter.type = VisualVM.Tracer.Type.continuous
     }
+    if (property.presenter.format == undefined) {
+        property.presenter.format = ItemValueFormatter.DEFAULT_DECIMAL
+    }
+    if (property.presenter.format instanceof Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterInterface) {
+        property.presenter.format = new Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterProxy(property.presenter.format);
+    }
+    if (property.presenter.type == VisualVM.Tracer.Type.continuous) {
+        return getContinousItemDescriptorProvider(property.presenter.format)(property);
+    } else if (property.presenter.type == VisualVM.Tracer.Type.discrete) {
+        return getDiscreteItemDescriptorProvider(property.presenter.format)(property);
+    }
+    return undefined;
 }
 
 var configuredPackages = new Packages.java.util.ArrayList();
@@ -212,10 +252,11 @@ function processPackage(pkg) {
                             // setting default
                             prop.presenter = {
                                 type: "continuous",
-                                format: "decimal"
+                                format: ItemValueFormatter.DEFAULT_DECIMAL
                             }
                         }
-                        var itemDescriptor = itemDescriptorMap[prop.presenter.type || "continuous"][prop.presenter.format || "decimal"](prop);
+                        var itemDescriptor = getItemDescriptor(prop);
+                        
                         if (itemDescriptor != null && itemDescriptor != undefined) {
                             itemDescriptors.add(itemDescriptor);
                         }
@@ -248,6 +289,9 @@ function processPackage(pkg) {
                         }
                     }
                 }
+                if (enabled && probe.validator != undefined) {
+                    enabled = probe.validator();
+                }
                 dProbe.setProbeDescriptor(new TracerProbeDescriptor(
                     probe.name,
                     probe.desc || "", null,
@@ -273,44 +317,6 @@ function getDeploymentAttributes(deployment) {
 
 function mbeanAttribute(objectName, attrName) {
     return new MBeanAttribute(objectName, attrName);
-}
-
-function mbeanQuery(params) {
-    return function() {
-        var ret = new Array();
-        if (params.exp != undefined && params.properties != undefined) {
-            var jmxModel = JmxModelFactory.getJmxModelFor(application);
-            if (jmxModel != undefined && jmxModel != null) {
-                var connection = jmxModel.getMBeanServerConnection();
-                if (connection != undefined && connection != null) {
-                    var names = connection.queryNames(Packages.javax.management.ObjectName.getInstance(params.exp), null);
-                    var iter = names.iterator();
-                    var counter = 0;
-                    while (iter.hasNext()) {
-                        var on = iter.next();
-                        var props = new Array();
-                        for(var propIndex in params.properties) {
-                            var template = params.properties[propIndex];
-                            props[propIndex] = {
-                                name: template.name,
-                                desc: template.desc,
-                                value: isFunction(template.value.clone) ? template.value.clone() : template.value
-                            }
-                            if (props[propIndex].value.setObjectName != undefined) {
-                                props[propIndex].value.setObjectName(on);
-                            }
-                        }
-                        ret[counter++] = {
-                            name: on,
-                            desc: on,
-                            properties: props
-                        }
-                    }
-                }
-            }
-        }
-        return ret;
-    }
 }
 
 function delta(valProvider) {
@@ -397,19 +403,27 @@ function MBeanAttribute(objectName, attributeName) {
     this.an = attributeName != undefined ? attributeName : "";
     this.id = MBeanAttribute.prototype.sharedId;
 
-    this.get = function (keys) {
+    var mbean = this;
+    MBeanAttribute.prototype.get = function (keys) {
         return function(timestamp) {
             var mykeys = keys.concat();
-            var val = getProvider().value(timestamp);
+            var val = mbean.getProvider().value(timestamp);
             var ret = get(val, mykeys);
             return ret;
         };
         return ret;
     }
+
+    MBeanAttribute.prototype.getInfo = function () {
+        return mbean.getProvider().getInfo();
+    }
+
     this.value = function (timestamp) {
         return this.getProvider().value(timestamp);
 //        return 0;
     }
+
+    MBeanAttribute.prototype.getValue =  this.value;
 
     this.getProvider = function() {
         if (provider == undefined) {
@@ -420,9 +434,7 @@ function MBeanAttribute(objectName, attributeName) {
 }
 
 MBeanAttribute.prototype.sharedId = 0;
-MBeanAttribute.prototype.getValue = function(timestamp) {
-    return this.value(timestamp);
-}
+
 MBeanAttribute.prototype.clone = function() {
     return new MBeanAttribute(this.on, this.an);
 }
