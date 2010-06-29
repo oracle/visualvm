@@ -57,6 +57,7 @@ public final class ProbePresenter extends JLabel {
 
     public ProbePresenter(TracerProbe p, TracerProbeDescriptor d) {
         super(d.getProbeName(), d.getProbeIcon(), JLabel.LEADING);
+        setToolTipText(d.getProbeDescription());
         setIconTextGap(7);
         setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 1, 1, 1, Color.LIGHT_GRAY),
