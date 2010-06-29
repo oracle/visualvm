@@ -29,16 +29,11 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
-import com.sun.tools.visualvm.core.datasupport.Utils;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,10 +42,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import java.util.prefs.Preferences;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.options.OptionsDisplayer;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 
@@ -60,20 +57,13 @@ import org.openide.util.Utilities;
  */
 public final class ProfilerPresets {
 
-    private static final String JAR_SUFFIX = ".jar";  // NOI18N
-
-    private static final String PROFILER_STORAGE_DIRNAME = "profiler";    // NOI18N
-    private static final String PRESETS_STORAGE_PREFIX = "preset-";    // NOI18N
-    private static final Object profilerStorageDirectoryStringLock = new Object();
-    // @GuardedBy profilerStorageDirectoryStringLock
-    private static String profilerStorageDirectoryString;
-    private static final Object profilerStorageDirectoryLock = new Object();
-    // @GuardedBy profilerStorageDirectoryLock
-    private static File profilerStorageDirectory;
-    
+    private static final String JAR_SUFFIX = ".jar";  // NOI18N    
     private static final String OPTIONS_HANDLE = "ProfilerOptions"; // NOI18N
+    private static final String PROP_PRESET_HEADER = "prof_preset_header"; // NOI18N
 
     private static ProfilerPresets INSTANCE;
+    
+    private Preferences prefs;
 
     private List<ProfilerPreset> presets;
     private ProfilerPreset presetToSelect;
@@ -265,94 +255,36 @@ public final class ProfilerPresets {
                 "java.*, javax.*,\nsun.*, sunw.*, com.sun.*,\ncom.apple.*, apple.awt.*, apple.laf.*"; // NOI18N
     }
 
-    
-    private static File[] getPresetFiles() {
-        if (storageDirectoryExists()) {
-            return getStorageDirectory().listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.startsWith(PRESETS_STORAGE_PREFIX) &&
-                           name.endsWith(Storage.DEFAULT_PROPERTIES_EXT);
-                }
-            });
-        } else {
-            return null;
-        }
-    }
 
-    private static List<ProfilerPreset> doLoadPresets() {
+    private List<ProfilerPreset> doLoadPresets() {
+        Preferences p = prefs();
         List<ProfilerPreset> loadedPresets = new ArrayList();
-
-        File[] presetFiles = getPresetFiles();
-        if (presetFiles != null) {
-            Arrays.sort(presetFiles, new Comparator<File>() {
-                private int prefixL = PRESETS_STORAGE_PREFIX.length();
-                private int suffixL = Storage.DEFAULT_PROPERTIES_EXT.length();
-                public int compare(File f1, File f2) {
-                    String n1 = f1.getName().substring(prefixL);
-                    n1 = n1.substring(0, n1.length() - suffixL);
-                    String n2 = f2.getName().substring(prefixL);
-                    n2 = n2.substring(0, n2.length() - suffixL);
-                    try {
-                        return Integer.valueOf(n1).compareTo(Integer.valueOf(n2));
-                    } catch (NumberFormatException e) {
-                        return 0;
-                    }
-                }
-            });
-
-            File storageDir = getStorageDirectory();
-            for (File file : presetFiles) {
-                Storage storage = new Storage(storageDir, file.getName());
-                loadedPresets.add(new ProfilerPreset(storage));
-            }
+        
+        int i = 0;
+        String prefix = i + "_"; // NOI18N
+        while (p.get(prefix + PROP_PRESET_HEADER, null) != null) {
+            loadedPresets.add(new ProfilerPreset(p, prefix));
+            prefix = ++i + "_"; // NOI18N
         }
         
         return loadedPresets;
     }
 
-    private static void doSavePresets(PresetsModel toSave) {
-        File[] presetFiles = getPresetFiles();
-        if (presetFiles != null)
-            for (File file : presetFiles) Utils.delete(file, false);
-
-        File storageDir = getStorageDirectory();
+    private void doSavePresets(PresetsModel toSave) {
+        Preferences p = prefs();
+        try { p.clear(); } catch (Exception e) {}
         int count = toSave.size();
         for (int i = 0; i < count; i++) {
+            String prefix = i + "_"; // NOI18N
+            p.put(prefix + PROP_PRESET_HEADER, ""); // NOI18N
             ProfilerPreset preset = (ProfilerPreset)toSave.get(i);
-            String presetFile = PRESETS_STORAGE_PREFIX + i +
-                                Storage.DEFAULT_PROPERTIES_EXT;
-            preset.toStorage(new Storage(storageDir, presetFile));
+            preset.toPreferences(p, prefix); // NOI18N
         }
     }
-
-
-    private static String getStorageDirectoryString() {
-        synchronized(profilerStorageDirectoryStringLock) {
-            if (profilerStorageDirectoryString == null)
-                profilerStorageDirectoryString = Storage.getPersistentStorageDirectoryString() +
-                        File.separator + PROFILER_STORAGE_DIRNAME;
-            return profilerStorageDirectoryString;
-        }
-    }
-
-    private static File getStorageDirectory() {
-        synchronized(profilerStorageDirectoryLock) {
-            if (profilerStorageDirectory == null) {
-                String presetsStorageString = getStorageDirectoryString();
-                profilerStorageDirectory = new File(presetsStorageString);
-                if (profilerStorageDirectory.exists() && profilerStorageDirectory.isFile())
-                    throw new IllegalStateException("Cannot create profiler storage directory " + presetsStorageString + ", file in the way");   // NOI18N
-                if (profilerStorageDirectory.exists() && (!profilerStorageDirectory.canRead() || !profilerStorageDirectory.canWrite()))
-                    throw new IllegalStateException("Cannot access profiler storage directory " + presetsStorageString + ", read&write permission required");    // NOI18N
-                if (!Utils.prepareDirectory(profilerStorageDirectory))
-                    throw new IllegalStateException("Cannot create profiler storage directory " + presetsStorageString); // NOI18N
-            }
-            return profilerStorageDirectory;
-        }
-    }
-
-    private static boolean storageDirectoryExists() {
-        return new File(getStorageDirectoryString()).isDirectory();
+    
+    private Preferences prefs() {
+        if (prefs == null) prefs = NbPreferences.forModule(ProfilerPresets.class);
+        return prefs;
     }
 
 

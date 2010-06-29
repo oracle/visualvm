@@ -25,7 +25,7 @@
 
 package com.sun.tools.visualvm.profiling.presets;
 
-import com.sun.tools.visualvm.core.datasource.Storage;
+import java.util.prefs.Preferences;
 import org.openide.util.NbBundle;
 
 /**
@@ -102,50 +102,40 @@ public final class ProfilerPreset {
         this.stacksP = preset.stacksP;
     }
 
-    ProfilerPreset(Storage storage) {
+    ProfilerPreset(Preferences prefs, String prefix) {
         valid = true;
-        name = value(storage, PROP_NAME, NbBundle.getMessage(ProfilerPreset.class, "MSG_Preset")); // NOI18N
-        selector = value(storage, PROP_SELECTOR, ""); // NOI18N
-        filterModeS = Boolean.parseBoolean(value(storage, PROP_FILTER_MODE_S, "True")); // NOI18N
-        filterS = value(storage, PROP_FILTER_S, ""); // NOI18N
-        try { samplingRateS = Integer.parseInt(value(storage, PROP_SAMPLING_RATE_S, "100")); } // NOI18N
-        catch (NumberFormatException e) { samplingRateS = 100; }
-        try { refreshRateS = Integer.parseInt(value(storage, PROP_REFRESH_RATE_S, "1000")); } // NOI18N
-        catch (NumberFormatException e) { refreshRateS = 1000; }
-        try { samplingRefreshRateS = Integer.parseInt(value(storage, PROP_SAMPLING_REFRESH_RATE_S, "1000")); } // NOI18N
-        catch (NumberFormatException e) { samplingRefreshRateS = 1000; }
-        rootsP = value(storage, PROP_ROOTS_P, ""); // NOI18N
-        runnablesP = Boolean.parseBoolean(value(storage, PROP_RUNNABLES_P, "True")); // NOI18N
-        filterModeP = Boolean.parseBoolean(value(storage, PROP_FILTER_MODE_P, "True")); // NOI18N
-        filterP = value(storage, PROP_FILTER_P, ""); // NOI18N
-        memoryModeP = Boolean.parseBoolean(value(storage, PROP_MEMORY_MODE_P, "True")); // NOI18N
-        try { allocP = Integer.parseInt(value(storage, PROP_ALLOC_P, "10")); } // NOI18N
-        catch (NumberFormatException e) { allocP = 10; }
-        stacksP = Boolean.parseBoolean(value(storage, PROP_STACKS_P, "False")); // NOI18N
+        name = prefs.get(prefix + PROP_NAME, NbBundle.getMessage(ProfilerPreset.class, "MSG_Preset")); // NOI18N
+        selector = prefs.get(prefix + PROP_SELECTOR, ""); // NOI18N
+        filterModeS = prefs.getBoolean(prefix + PROP_FILTER_MODE_S, true);
+        filterS = prefs.get(prefix + PROP_FILTER_S, ""); // NOI18N
+        samplingRateS = prefs.getInt(prefix + PROP_SAMPLING_RATE_S, 100);
+        refreshRateS = prefs.getInt(prefix + PROP_REFRESH_RATE_S, 1000);
+        samplingRefreshRateS = prefs.getInt(prefix + PROP_SAMPLING_REFRESH_RATE_S, 1000);
+        rootsP = prefs.get(prefix + PROP_ROOTS_P, ""); // NOI18N
+        runnablesP = prefs.getBoolean(prefix + PROP_RUNNABLES_P, true);
+        filterModeP = prefs.getBoolean(prefix + PROP_FILTER_MODE_P, true);
+        filterP = prefs.get(prefix + PROP_FILTER_P, ""); // NOI18N
+        memoryModeP = prefs.getBoolean(prefix + PROP_MEMORY_MODE_P, true);
+        allocP = prefs.getInt(prefix + PROP_ALLOC_P, 10);
+        stacksP = prefs.getBoolean(prefix + PROP_STACKS_P, false);
     }
+    
 
-
-    private static String value(Storage storage, String property, String fallback) {
-        String value = storage.getCustomProperty(property);
-        if (value == null) value = fallback;
-        return value;
-    }
-
-    void toStorage(Storage storage) {
-        String[] properties = new String[] {
-            PROP_NAME, PROP_SELECTOR, PROP_FILTER_MODE_S, PROP_FILTER_S,
-            PROP_SAMPLING_RATE_S, PROP_REFRESH_RATE_S, PROP_SAMPLING_REFRESH_RATE_S,
-            PROP_ROOTS_P, PROP_RUNNABLES_P, PROP_FILTER_MODE_P, PROP_FILTER_P,
-            PROP_MEMORY_MODE_P, PROP_ALLOC_P, PROP_STACKS_P
-        };
-        String[] values = new String[] {
-            name, selector, Boolean.toString(filterModeS), filterS,
-            Integer.toString(samplingRateS), Integer.toString(refreshRateS),
-            Integer.toString(samplingRefreshRateS), rootsP, Boolean.toString(runnablesP),
-            Boolean.toString(filterModeP), filterP, Boolean.toString(memoryModeP),
-            Integer.toString(allocP), Boolean.toString(stacksP)
-        };
-        storage.setCustomProperties(properties, values);
+    void toPreferences(Preferences prefs, String prefix) {
+        prefs.put(prefix + PROP_NAME, name);
+        prefs.put(prefix + PROP_SELECTOR, selector);
+        prefs.putBoolean(prefix + PROP_FILTER_MODE_S, filterModeS);
+        prefs.put(prefix + PROP_FILTER_S, filterS);
+        prefs.putInt(prefix + PROP_SAMPLING_RATE_S, samplingRateS);
+        prefs.putInt(prefix + PROP_REFRESH_RATE_S, refreshRateS);
+        prefs.putInt(prefix + PROP_SAMPLING_REFRESH_RATE_S, samplingRefreshRateS);
+        prefs.put(prefix + PROP_ROOTS_P, rootsP);
+        prefs.putBoolean(prefix + PROP_RUNNABLES_P, runnablesP);
+        prefs.putBoolean(prefix + PROP_FILTER_MODE_P, filterModeP);
+        prefs.put(prefix + PROP_FILTER_P, filterP);
+        prefs.putBoolean(prefix + PROP_MEMORY_MODE_P, memoryModeP);
+        prefs.putInt(prefix + PROP_ALLOC_P, allocP);
+        prefs.putBoolean(prefix + PROP_STACKS_P, stacksP);
     }
 
 
