@@ -117,7 +117,7 @@ public interface Positionable {
             if (o1.equals(o2)) return 0;
             
             // Compare using classname
-            int result = o1.getClass().getName().compareTo(o2.getClass().getName());
+            int result = ClassNameComparator.INSTANCE.compare(o1, o2);
             if (result != 0) return result;
             
             // Compare using System.identityHashCode(o)
