@@ -126,16 +126,7 @@ final class TracerModel {
                 new Comparator<Map.Entry<TracerPackage, List<TracerProbe>>>() {
             public int compare(Entry<TracerPackage, List<TracerProbe>> o1,
                                Entry<TracerPackage, List<TracerProbe>> o2) {
-                int result = Positionable.COMPARATOR.compare(o1.getKey(), o2.getKey());
-                if (result == 0)
-                    result = o1.getClass().getName().compareTo(o2.getClass().getName());
-                if (result == 0)
-                    result = Integer.valueOf(System.identityHashCode(o1)).compareTo(
-                             Integer.valueOf(System.identityHashCode(o2)));
-                if (result == 0)
-                    result = Integer.valueOf(o1.hashCode()).compareTo(Integer.valueOf(o2.hashCode()));
-                if (result == 0) result = 1;
-                return result;
+                return Positionable.STRONG_COMPARATOR.compare(o1.getKey(), o2.getKey());
             }
         };
         Set<Map.Entry<TracerPackage, List<TracerProbe>>> probes = new TreeSet(comp);
