@@ -57,15 +57,22 @@ public final class ProbePresenter extends JLabel {
 
     public ProbePresenter(TracerProbe p, TracerProbeDescriptor d) {
         super(d.getProbeName(), d.getProbeIcon(), JLabel.LEADING);
-        setToolTipText(d.getProbeDescription());
+        
+        // --- ToolTips support
+        // Note: cannot use setToolTipText here, breaks mouseListener on parent
+//        setToolTipText(d.getProbeDescription());
+        // Let's store the tooltip in client property and resolve it from parent
+        putClientProperty("ToolTipHelper", d.getProbeDescription()); // NOI18N
+        // ---
+        
         setIconTextGap(7);
         setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 1, 1, 1, Color.LIGHT_GRAY),
                     BorderFactory.createEmptyBorder(5, 10, 5, 10)
                 ));
     }
-
     
+
     public void setSelected(boolean selected) {
         if (isSelected == selected) return;
         isSelected = selected;

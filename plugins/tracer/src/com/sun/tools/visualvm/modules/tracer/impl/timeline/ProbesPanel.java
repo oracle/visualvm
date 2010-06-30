@@ -39,12 +39,15 @@ import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.openide.util.ImageUtilities;
@@ -85,7 +88,14 @@ final class ProbesPanel extends JPanel {
             }
         };
 
-        viewport = new JViewport();
+        viewport = new JViewport() {
+            public String getToolTipText(MouseEvent event) {
+                Point p = event.getPoint();
+                p.y += getViewPosition().y;
+                return listPanel.getToolTipText(p);
+            }
+        };
+        ToolTipManager.sharedInstance().registerComponent(viewport);
         viewport.setOpaque(true);
         viewport.setBackground(new Color(247, 247, 247));
         viewport.setView(listPanel);
@@ -206,6 +216,14 @@ final class ProbesPanel extends JPanel {
         }
 
         protected void updateSelection() {
+        }
+        
+        String getToolTipText(Point p) {
+            String tooltip = null;
+            Component c = getComponentAt(p);
+            if (c instanceof JComponent)
+                tooltip = (String)((JComponent)c).getClientProperty("ToolTipHelper"); // NOI18N
+            return tooltip;
         }
 
         private void sync() {
