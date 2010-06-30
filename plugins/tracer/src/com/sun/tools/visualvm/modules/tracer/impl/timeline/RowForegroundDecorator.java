@@ -40,11 +40,11 @@ import org.netbeans.lib.profiler.charts.swing.Utils;
 final class RowForegroundDecorator implements ChartDecorator {
 
     private static final Color SELECTED_FILTER = new Color(0, 0, 200, 25);
-    private static final float[] FRACTIONS = new float[] { 0.1f, 0.5f, 0.55f, 0.8f };
-    private static final Color[] COLORS = new Color[] { new Color(250, 250, 250, 110),
-                                                        new Color(205, 205, 220, 30),
-                                                        new Color(180, 180, 195, 30),
-                                                        new Color(200, 200, 210, 110) };
+    private static final float[] FRACTIONS = new float[] { 0.0f, 0.49f, 0.51f, 1.0f };
+    private static final Color[] COLORS = new Color[] { new Color(250, 251, 252, 120),
+                                                        new Color(237, 240, 242, 120),
+                                                        new Color(229, 233, 236, 125),
+                                                        new Color(215, 221, 226, 130) };
 
     private final TimelineChart chart;
     private final boolean gradient;
