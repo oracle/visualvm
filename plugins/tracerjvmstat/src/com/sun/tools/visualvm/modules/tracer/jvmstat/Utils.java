@@ -23,7 +23,7 @@
  * have any questions.
  */
 
-package com.sun.tools.visualvm.modules.tracerjvmstat;
+package com.sun.tools.visualvm.modules.tracer.jvmstat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

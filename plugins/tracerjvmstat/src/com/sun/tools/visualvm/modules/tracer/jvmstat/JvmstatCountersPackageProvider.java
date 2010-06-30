@@ -23,7 +23,7 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.modules.tracerjvmstat;
+package com.sun.tools.visualvm.modules.tracer.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;

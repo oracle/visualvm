@@ -23,11 +23,11 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.modules.tracerjvmstat;
+package com.sun.tools.visualvm.modules.tracer.jvmstat;
 
 import com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProbe;
-import static com.sun.tools.visualvm.modules.tracerjvmstat.JvmstatCounterFormatter.*;
+import static com.sun.tools.visualvm.modules.tracer.jvmstat.JvmstatCounterFormatter.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sun.jvmstat.monitor.Monitor;

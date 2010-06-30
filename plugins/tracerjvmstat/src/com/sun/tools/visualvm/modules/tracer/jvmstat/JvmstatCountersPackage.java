@@ -23,7 +23,7 @@
  *  have any questions.
  */
 
-package com.sun.tools.visualvm.modules.tracerjvmstat;
+package com.sun.tools.visualvm.modules.tracer.jvmstat;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.modules.tracer.TracerPackage;
@@ -32,7 +32,6 @@ import com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
 import com.sun.tools.visualvm.modules.tracer.TracerProgressObject;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.openide.util.ImageUtilities;
@@ -44,9 +43,8 @@ import sun.jvmstat.monitor.Monitor;
  */
 class JvmstatCountersPackage extends TracerPackage.SessionAware<Application> {
     
-    private static final Logger LOGGER = Logger.getLogger(JvmstatCountersPackage.class.getName());
-    static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/modules/tracerjvmstat/resources/jvmstatProbe.png", true)); // NOI18N
+    private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(
+            "com/sun/tools/visualvm/modules/tracer/jvmstat/resources/jvmstatProbe.png", true)); // NOI18N
     private static final String NAME = "jvmstat counters metrics";
     private static final String DESCR = "Provides metric for jvmstat counters.";
     private static final int POSITION = 70;
