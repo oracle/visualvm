@@ -496,16 +496,16 @@ public final class AntActions {
                             ProjectUtilities.invokeAction(project, isTest ? "profile-tests" : "profile"); //NOI18N
                         } else {
                             // Branch B: project profiling directly supported via ProjectTypeProfiler
-                            // 2. determine Java platform to use
+                            // 2. check if the project has been modified for profiling
+                            if (!ptp.checkProjectIsModifiedForProfiler(project)) {
+                                return; // something failed - has already been reported to the user
+                            }
+                            
+                            // 3. determine Java platform to use
                             final JavaPlatform platform = initPlatform(project, ptp);
 
                             if (platform == null) {
                                 return; // user already notified
-                            }
-
-                            // 3. check if the project has been modified for profiling
-                            if (!ptp.checkProjectIsModifiedForProfiler(project)) {
-                                return; // something failed - has already been reported to the user
                             }
 
                             // 3. check if the project is properly setup to be profiled (e.g. main class has a main method)
