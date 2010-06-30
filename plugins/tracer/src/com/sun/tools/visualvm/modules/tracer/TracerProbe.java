@@ -72,6 +72,10 @@ public abstract class TracerProbe<X extends DataSource> {
      * or retrieved from a private data model prefetching the values asynchronously.
      * The timestamp is the same for a single data-read event for all selected
      * probes of the actual Tracer session.
+     * <br><br>
+     * <b>Note: current Tracer version doesn't support negative values. Negative
+     * values returned by the probes will be treated as '0' and the user will be
+     * notified by a warning dialog.</b>
      *
      * @param timestamp timestamp of the data-read event
      * @return values of items provided by the probe

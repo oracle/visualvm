@@ -52,6 +52,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.RequestProcessor;
 import org.openide.util.WeakListeners;
 
@@ -79,6 +81,7 @@ final class TracerController implements DataRemovedListener<DataSource>,
 
     private TracerProgressObject progress;
     private String error;
+    private boolean wasNegativeValue;
 
     private boolean running;
     private final Timer timer;
@@ -177,6 +180,7 @@ final class TracerController implements DataRemovedListener<DataSource>,
     }
 
     private boolean doStartSession() {
+        wasNegativeValue = false;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() { model.getTimelineSupport().resetValues(); }
         });
@@ -460,8 +464,23 @@ final class TracerController implements DataRemovedListener<DataSource>,
                 Arrays.fill(itemValues, ProbeItemDescriptor.VALUE_UNDEFINED);
                 LOGGER.log(Level.INFO, "Probe exception in getItemValues", t); // NOI18N
             }
-            for (int i = 0; i < itemValues.length; i++)
-                values[currentIndex++] = itemValues[i];
+            for (int i = 0; i < itemValues.length; i++) {
+                long value = itemValues[i];
+                if (value < 0) {
+                    if (!wasNegativeValue) {
+                        DialogDisplayer.getDefault().notifyLater(
+                        new NotifyDescriptor.Message("<html><b>One or more probes "
+                        + "returned negative value.</b><br><br>Currently this is "
+                        + "not supported in Tracer,<br>all negative values will be"
+                        + " displayed as 0.</html>", NotifyDescriptor.WARNING_MESSAGE));
+                        LOGGER.info("Probe " + model.getDescriptor(probe).getProbeName() + // NOI18N
+                                    " returned negative value: " + value); // NOI18N
+                        wasNegativeValue = true;
+                    }
+                    value = 0;
+                }
+                values[currentIndex++] = value;
+            }
         }
 
         if (!running) return;
