@@ -36,12 +36,17 @@ import com.sun.tools.visualvm.coredump.CoreDumpSupport;
 import com.sun.tools.visualvm.coredump.CoreDumpsContainer;
 import com.sun.tools.visualvm.tools.sa.SaModel;
 import com.sun.tools.visualvm.tools.sa.SaModelFactory;
+import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -202,6 +207,8 @@ public class CoreDumpProvider {
             }
         });
         
+        Set<File> unresolvedCoreDumpsF = new HashSet();
+        Set<String> unresolvedCoreDumpsS = new HashSet();
         Set<CoreDumpImpl> coredumps = new HashSet();
         for (File file : files) {
             Storage storage = new Storage(file.getParentFile(), file.getName());
@@ -215,16 +222,41 @@ public class CoreDumpProvider {
             try {
                 persistedCoredump = new CoreDumpImpl(new File(propValues[0]), new File(propValues[1]), storage);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error loading persisted host", e);    // NOI18N
+                LOGGER.log(Level.INFO, "Error loading persisted coredump", e);    // NOI18N
+                unresolvedCoreDumpsF.add(file);
+                unresolvedCoreDumpsS.add(propValues[0]);
             }
             
             if (persistedCoredump != null) coredumps.add(persistedCoredump);
         }
         
+        if (!unresolvedCoreDumpsF.isEmpty()) notifyUnresolvedCoreDumps(unresolvedCoreDumpsF, unresolvedCoreDumpsS);
+        
         if (!coredumps.isEmpty())
             CoreDumpsContainer.sharedInstance().getRepository().addDataSources(coredumps);
     }
-    
+
+    private static void notifyUnresolvedCoreDumps(final Set<File> unresolvedCoreDumpsF, final Set<String> unresolvedCoreDumpsS) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
+                messagePanel.add(new JLabel(NbBundle.getMessage(CoreDumpProvider.class, "MSG_Unresolved_CoreDumps")), BorderLayout.NORTH); // NOI18N
+                JList list = new JList(unresolvedCoreDumpsS.toArray());
+                list.setVisibleRowCount(4);
+                messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
+                NotifyDescriptor dd = new NotifyDescriptor(
+                        messagePanel, NbBundle.getMessage(CoreDumpProvider.class, "Title_Unresolved_CoreDumps"), // NOI18N
+                        NotifyDescriptor.YES_NO_OPTION, NotifyDescriptor.ERROR_MESSAGE,
+                        null, NotifyDescriptor.YES_OPTION);
+                if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.NO_OPTION)
+                    for (File file : unresolvedCoreDumpsF) Utils.delete(file, true);
+
+                unresolvedCoreDumpsF.clear();
+                unresolvedCoreDumpsS.clear();
+            }
+        }, 1000);
+    }
+
     
     CoreDumpProvider() {
     }
