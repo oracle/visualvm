@@ -53,7 +53,7 @@ import java.util.Map;
  *
  * @author Jaroslav Bachorik
  */
-public class MarkMapper implements MarkingEngine.StateObserver {
+class MarkMapper implements MarkingEngine.StateObserver {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     // @GuardedBy marksGuard
