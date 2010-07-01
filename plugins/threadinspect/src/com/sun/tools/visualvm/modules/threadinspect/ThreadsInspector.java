@@ -46,7 +46,6 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
