@@ -25,36 +25,48 @@
 
 package com.sun.tools.visualvm.host.remote.model;
 
-import com.sun.management.OperatingSystemMXBean;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.host.model.*;
+import com.sun.tools.visualvm.host.model.HostOverview;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.rmi.ConnectException;
 import java.util.Properties;
 import java.util.Set;
 import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.management.ReflectionException;
 
 /**
  *
  * @author Tomas Hurka
  */
 class RemoteHostOverview extends HostOverview  {
-    private static ObjectName osMXBeanName = getOperatingSystemMXBeanName();
+    private static final ObjectName osMXBeanName = getOperatingSystemMXBeanName();
+    private static final String TotalPhysicalMemorySizeAttr = "TotalPhysicalMemorySize";    // NOI18N
+    private static final String TotalPhysicalMemorySizeAttr1 = "TotalPhysicalMemory";       // NOI18N
+    private static final String FreePhysicalMemorySizeAttr = "FreePhysicalMemorySize";      // NOI18N
+    private static final String TotalSwapSpaceSizeAttr = "TotalSwapSpaceSize";              // NOI18N
+    private static final String FreeSwapSpaceSizeAttr = "FreeSwapSpaceSize";                // NOI18N
     
-    private OperatingSystemMXBean osMXBean;
-    private boolean loadAverageAvailable;
-    private Host remoteHost;
+    private volatile OperatingSystemMXBean osMXBean;
+    private volatile MBeanServerConnection connection;
+    private volatile boolean loadAverageAvailable;
     private volatile Application jmxApp;
+    private String totalPhysicalMemorySizeAttr;
+    private Host remoteHost;
     private boolean staticDataInitialized;
     private String name;
     private String version;
@@ -130,13 +142,10 @@ class RemoteHostOverview extends HostOverview  {
             return -1;
         }
         try {
-            return osMXBean.getTotalPhysicalMemorySize();
-        } catch (UndeclaredThrowableException ex) {
-            if (ex.getCause() instanceof ConnectException) {
-                jmxApp = null;
-                return getTotalPhysicalMemorySize();
-            }
-            throw ex;
+            return getAttribute(totalPhysicalMemorySizeAttr);
+        } catch (IOException ex) {
+            jmxApp = null;
+            return getTotalPhysicalMemorySize();            
         }
     }
     
@@ -146,13 +155,10 @@ class RemoteHostOverview extends HostOverview  {
             return -1;
         }
         try {
-            return osMXBean.getFreePhysicalMemorySize();
-        } catch (UndeclaredThrowableException ex) {
-            if (ex.getCause() instanceof ConnectException) {
-                jmxApp = null;
-                return getFreePhysicalMemorySize();
-            }
-            throw ex;
+            return getAttribute(FreePhysicalMemorySizeAttr);
+        } catch (IOException ex) {
+            jmxApp = null;
+            return getTotalPhysicalMemorySize();            
         }
     }
     
@@ -162,13 +168,10 @@ class RemoteHostOverview extends HostOverview  {
             return -1;
         }
         try {
-            return osMXBean.getTotalSwapSpaceSize();
-        } catch (UndeclaredThrowableException ex) {
-            if (ex.getCause() instanceof ConnectException) {
-                jmxApp = null;
-                return getTotalSwapSpaceSize();
-            }
-            throw ex;
+            return getAttribute(TotalSwapSpaceSizeAttr);
+        } catch (IOException ex) {
+            jmxApp = null;
+            return getTotalPhysicalMemorySize();            
         }
     }
     
@@ -178,13 +181,10 @@ class RemoteHostOverview extends HostOverview  {
             return -1;
         }
         try {
-            return osMXBean.getFreeSwapSpaceSize();
-        } catch (UndeclaredThrowableException ex) {
-            if (ex.getCause() instanceof ConnectException) {
-                jmxApp = null;
-                return getFreeSwapSpaceSize();
-            }
-            throw ex;
+            return getAttribute(FreeSwapSpaceSizeAttr);
+        } catch (IOException ex) {
+            jmxApp = null;
+            return getTotalPhysicalMemorySize();            
         }
     }
     
@@ -217,9 +217,10 @@ class RemoteHostOverview extends HostOverview  {
             
             if (jmx != null && jmx.getConnectionState().equals(JmxModel.ConnectionState.CONNECTED)) {
                 JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmx);
+                connection = jmx.getMBeanServerConnection();
                 
-                if (mxbeans != null) {
-                    osMXBean = mxbeans.getMXBean(osMXBeanName, OperatingSystemMXBean.class);
+                if (mxbeans != null && connection != null) {
+                    osMXBean = mxbeans.getOperatingSystemMXBean();
                     loadAverageAvailable = false;
                     try {
                         loadAverageAvailable = osMXBean.getSystemLoadAverage() >= 0;
@@ -228,6 +229,20 @@ class RemoteHostOverview extends HostOverview  {
                         if (!(cause instanceof AttributeNotFoundException)) {
                             throw ex;
                         }
+                    }
+                    try {
+                        connection.getAttribute(osMXBeanName, TotalPhysicalMemorySizeAttr);
+                        totalPhysicalMemorySizeAttr = TotalPhysicalMemorySizeAttr;
+                    } catch (AttributeNotFoundException ex) {
+                        totalPhysicalMemorySizeAttr = TotalPhysicalMemorySizeAttr1;
+                    } catch (InstanceNotFoundException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ReflectionException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (MBeanException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
                     }
                     return app;
                 }
@@ -240,6 +255,25 @@ class RemoteHostOverview extends HostOverview  {
         if (jmxApp == null || jmxApp.getState() != Stateful.STATE_AVAILABLE) {
             jmxApp = getJMXApplication();
         }
+    }
+    
+    private long getAttribute(String name) throws IOException {
+        Object val = null;
+        try {
+            val = connection.getAttribute(osMXBeanName, name);
+        } catch (AttributeNotFoundException ex) {
+            return -1;
+        } catch (InstanceNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (MBeanException ex) {
+            throw new RuntimeException(ex);
+        } catch (ReflectionException ex) {
+            throw new RuntimeException(ex);
+        }
+        if (val instanceof Number) {
+            return ((Number)val).longValue();
+        }
+        return -1;
     }
     
     private static ObjectName getOperatingSystemMXBeanName() {
