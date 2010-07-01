@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+    <folder name="VisualVM">
+        <folder name="Tracer">
+            <folder name="packages">
+                <folder name="platformMX">
+                    <attr name="displayName" bundlevalue="com.sun.tools.visualvm.modules.tracer.platformjmx.Bundle#VisualVM/Tracer/packages/platformMX"/>
+                    <folder name="probes">
+                        <folder name="hotspot_compiler">
+                            <attr name="position" intvalue="100"/>
+                            <attr name="displayName" bundlevalue="com.sun.tools.visualvm.modules.tracer.platformjmx.Bundle#VisualVM/Tracer/packages/platformMX/probes/hotspot_compiler"/>
+                            <attr name="desc" stringvalue="Displays the hotspot compiler compilation load"/>
+                            <attr name="mbean" stringvalue="java.lang:type=Compilation"/>
+                            <folder name="properties">
+                                <attr name="descriptorProvider" newvalue="com.sun.tools.visualvm.modules.tracer.platformjmx.impl.HotspotItemDescriptorProvider"/>
+                                <file name="CpuUsage">
+                                    <attr name="attrName" stringvalue="TotalCompilationTime"/>
+                                    <attr name="displayName" bundlevalue="com.sun.tools.visualvm.modules.tracer.platformjmx.Bundle#VisualVM/Tracer/packages/platformMX/probes/hotspot_compiler/properties/CpuUsage"/>
+                                    <attr name="valueConverter" newvalue="com.sun.tools.visualvm.modules.tracer.platformjmx.impl.DiffingValueConverter"/>
+                                </file>
+                            </folder>
+                        </folder>
+                        <folder name="ps_marksweep">
+                            <attr name="position" intvalue="200"/>
+                            <attr name="desc" stringvalue="Displays internals of the Mark&amp;Sweep GC"/>
+
+                            <folder name="properties">
+                                <file name="markSweepCount">
+                                    <attr name="mbean" stringvalue="java.lang:type=GarbageCollector,name=PS MarkSweep"/>
+                                    <attr name="attrName" stringvalue="count"/>
+                                </file>
+                                <file name="scavengeCount">
+                                    <attr name="mbean" stringvalue="java.lang:type=GarbageCollector,name=PS Scavenge"/>
+                                    <attr name="attrName" stringvalue="count"/>
+                                </file>
+                            </folder>
+                        </folder>
+                    </folder>
+                </folder>
+                <file name="platform_mx.js" url="resources/platform_mx.js">
+                    <attr name="displayName" bundlevalue="com.sun.tools.visualvm.modules.tracer.platformjmx.Bundle#VisualVM/Tracer/packages/platform_mx.js"/>
+                </file>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>
