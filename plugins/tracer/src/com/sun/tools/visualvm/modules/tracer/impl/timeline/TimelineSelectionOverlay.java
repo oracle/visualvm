@@ -151,27 +151,32 @@ final class TimelineSelectionOverlay extends ChartOverlay {
 
         Iterator<Point> it = selectedValues.iterator();
         paintedLines.clear();
+        
+        int height = getHeight();
+        int extentP = 1 - selectionExtent;
+        int extentD = selectionExtent * 2 - 1;
 
         while (it.hasNext()) {
             Point p = it.next();
             int x = p.x;
+            int y = p.y;
 
             if (!paintedLines.contains(x)) {
                 g2.setPaint(sEvenPerfPaint);
                 g2.setStroke(evenPerfStroke);
-                g2.drawLine(x, 0, x, getHeight());
+                g2.drawLine(x, 0, x, height);
                 g2.setPaint(sOddPerfPaint);
                 g2.setStroke(oddPerfStroke);
-                g2.drawLine(x, 0, x, getHeight());
+                g2.drawLine(x, 0, x, height);
 
                 g2.setPaint(sMarkPaint);
                 g2.setStroke(markStroke);
 
                 paintedLines.add(x);
             }
-
-            g2.fillOval(x - selectionExtent + 1, p.y - selectionExtent + 1,
-                        selectionExtent * 2 - 1, selectionExtent * 2 - 1);
+            
+            if (y - selectionExtent >= 0 && y + selectionExtent <= height)
+                g2.fillOval(x + extentP, y + extentP, extentD, extentD);
         }
 
         it = highlightedValues.iterator();
@@ -180,23 +185,24 @@ final class TimelineSelectionOverlay extends ChartOverlay {
         while (it.hasNext()) {
             Point p = it.next();
             int x = p.x;
+            int y = p.y;
 
             if (!paintedLines.contains(x)) {
                 g2.setPaint(hEvenPerfPaint);
                 g2.setStroke(evenPerfStroke);
-                g2.drawLine(x, 0, x, getHeight());
+                g2.drawLine(x, 0, x, height);
                 g2.setPaint(hOddPerfPaint);
                 g2.setStroke(oddPerfStroke);
-                g2.drawLine(x, 0, x, getHeight());
+                g2.drawLine(x, 0, x, height);
 
                 g2.setPaint(hMarkPaint);
                 g2.setStroke(markStroke);
 
                 paintedLines.add(x);
             }
-
-            g2.fillOval(x - selectionExtent + 1, p.y - selectionExtent + 1,
-                        selectionExtent * 2 - 1, selectionExtent * 2 - 1);
+            
+            if (y - selectionExtent >= 0 && y + selectionExtent <= height)
+                g2.fillOval(x + extentP, y + extentP, extentD, extentD);
         }
 
     }
@@ -250,9 +256,7 @@ final class TimelineSelectionOverlay extends ChartOverlay {
             long yValue = item.getYValue(xySel.getValueIndex());
             int xPos = Utils.checkedInt(Math.ceil(context.getViewX(xValue)));
             int yPos = Utils.checkedInt(Math.ceil(painter.getItemView(yValue, item, context)));
-            if (xPos >= 0 && xPos <= chart.getWidth() &&
-                yPos >= 0 && yPos <= chart.getHeight())
-                values.add(new Point(xPos, yPos));
+            if (xPos >= 0 && xPos <= chart.getWidth()) values.add(new Point(xPos, yPos));
         }
     }
 
