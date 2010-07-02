@@ -28,14 +28,14 @@ var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BT
                         Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 
 
-var Format_KBPS = new Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.ItemValueFormatterInterface({
+var Format_KBPS = {
     formatValue: function (value, format) {
         return (value / 1024).toFixed(2);
     },
     getUnits: function (format) {
         return "kB/s"
     }
-})
+}
 
 function getGCRunProvider(on) {
     return function(timestamp) {
@@ -117,7 +117,7 @@ function getReclaimedMemory() {
                 presenter: {
                     format: ItemValueFormatter.DEFAULT_BYTES,
                     type: VisualVM.Tracer.Type.discrete,
-                    fillColor: ProbeItemDescriptor.DEFAULT_COLOR
+                    fillColor: AUTOCOLOR
                 }
             }
         }
@@ -152,7 +152,7 @@ function isNIOBuffersSupported() {
 VisualVM.Tracer.addPackages([{
     name: "HotSpot",
     desc: "Displays JVM HotSpot Metrics",
-    icon: Packages.org.openide.util.ImageUtilities.loadImageIcon("com/sun/tools/visualvm/modules/tracer/javase/resources/hotspot.gif", false),
+    icon: "com/sun/tools/visualvm/modules/tracer/javase/resources/hotspot.gif",
     probes: [
         {
             name: "CPU Usage",
@@ -311,6 +311,57 @@ VisualVM.Tracer.addPackages([{
                         presenter: {
                             lineColor: Color.RED,
                             format: Format_KBPS
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        name: "AWT",
+        probes: [
+            {
+                name: "EDT Utilization",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: "nbres:/com/sun/tools/visualvm/modules/tracer/javase/resources/AWTTracer.btrace",
+                    fragment: "utilization"
+                },
+                properties: [
+                    {
+                        name: "Dispatch",
+                        desc: "Displays the approximate percentage of procesing time spent in dispatching event requests",
+                        value: mbeanAttribute("btrace:name=AWTStats", "dispatch"),
+                        presenter: {
+                            type: VisualVM.Tracer.Type.discrete,
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            fillColor: AUTOCOLOR,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "Paint",
+                        desc: "Displays the approximate percentage of procesing time spent in painting AWT components",
+                        value: mbeanAttribute("btrace:name=AWTStats", "paint"),
+                        presenter: {
+                            type: VisualVM.Tracer.Type.discrete,
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            fillColor: AUTOCOLOR,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "Layout",
+                        value: mbeanAttribute("btrace:name=AWTStats", "layout"),
+                        desc: "Displays the approximate percentage of procesing time spent in laying out AWT components",
+                        presenter: {
+                            type: VisualVM.Tracer.Type.discrete,
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            fillColor: AUTOCOLOR,
+                            max: 1000
                         }
                     }
                 ]
