@@ -30,6 +30,7 @@ importPackage(javax.management)
 importPackage(org.openide.util)
 
 var Color = Packages.java.awt.Color;
+var AUTOCOLOR = ProbeItemDescriptor.DEFAULT_COLOR;
 
 function VisualVM(){}
 
@@ -86,21 +87,17 @@ var NULL_VALUE = new ValueProvider({
 })
 
 function L11N(baseName) {
-    var bundle = NbBundle.getBundle(baseName + ".Bundle");
+    this.bundle = NbBundle.getBundle(baseName + ".Bundle");
 
     this.message = function (key, attrs) {
-        if (bundle != undefined) {
-            var msg = bundle.getString(key);
+        if (this.bundle != undefined) {
+            var msg = this.bundle.getString(key);
             if (attrs != undefined && msg != undefined && msg != null) {
                 msg = Packages.java.text.MessageFormat(msg, attrs);
             }
             return msg;
         }
         return "No resource bundle available for " + baseName;
-    }
-
-    L11N.prototype.getMessage = function (key, attrs) {
-        return this.message(key, attrs);
     }
 }
 
@@ -115,7 +112,7 @@ function getContinousItemDescriptorProvider(formatter) {
         var lineColor = null;
         var fillColor = null;
         if (property.presenter.lineColor == undefined && property.presenter.fillColor == undefined) {
-            lineColor = ProbeItemDescriptor.DEFAULT_COLOR;
+            lineColor = AUTOCOLOR;
         } else {
             if (property.presenter.lineColor != undefined) {
                 lineColor = property.presenter.lineColor;
@@ -247,6 +244,14 @@ function processPackage(pkg) {
         var desc = pkg.desc != undefined ? pkg.desc : "";
         var icon = pkg.icon != undefined ? pkg.icon : null;
         var position = pkg.position != undefined ? pkg.position : Packages.java.lang.Integer.MAX_VALUE;
+
+        if (typeof(icon) == "string") {
+            try {
+                icon = Packages.org.openide.util.ImageUtilities.loadImageIcon(icon, true);
+            } catch (e) {
+                icon = null;
+            }
+        }
 
         var dPkg = new DynamicPackage(pkg.name, desc, icon, position);
 
