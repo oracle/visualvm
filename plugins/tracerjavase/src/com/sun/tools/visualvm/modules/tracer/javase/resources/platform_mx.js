@@ -153,6 +153,7 @@ VisualVM.Tracer.addPackages([{
     name: "HotSpot",
     desc: "Displays JVM HotSpot Metrics",
     icon: "com/sun/tools/visualvm/modules/tracer/javase/resources/hotspot.gif",
+    position: 500,
     probes: [
         {
             name: "CPU Usage",
@@ -190,6 +191,7 @@ VisualVM.Tracer.addPackages([{
     {
         name: "Garbage Collectors",
         desc: "GC Statistics",
+        position: 510,
         probes: [
             {
                 name: "GC Runs",
@@ -206,6 +208,7 @@ VisualVM.Tracer.addPackages([{
     {
         name: "NIO Buffers",
         desc: "NIO Buffers overview",
+        position: 520,
         probes: [
             {
                 name: "Count",
@@ -232,6 +235,7 @@ VisualVM.Tracer.addPackages([{
     {
         name: "Java I/O",
         desc: "IO subsystem stats",
+        position: 530,
         probes: [
             {
                 name: "File Descriptors",
@@ -287,7 +291,7 @@ VisualVM.Tracer.addPackages([{
                 ]
             },
             {
-                name: "NIO Buffers",
+                name: "NIO Utilization",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -319,6 +323,7 @@ VisualVM.Tracer.addPackages([{
     },
     {
         name: "AWT",
+        position: 540,
         probes: [
             {
                 name: "EDT Utilization",

@@ -45,15 +45,15 @@ class JvmstatCountersPackage extends TracerPackage.SessionAware<Application> {
     
     private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(
             "com/sun/tools/visualvm/modules/tracer/jvmstat/resources/jvmstatProbe.png", true)); // NOI18N
-    private static final String NAME = "jvmstat counters metrics";
-    private static final String DESCR = "Provides metric for jvmstat counters.";
-    private static final int POSITION = 70;
+    private static final String NAME = "Jvmstat counters";
+    private static final String DESCR = "Provides metrics for jvmstat counters.";
+    private static final int POSITION = 1000;
     
     private Map<TracerProbeDescriptor,TracerProbe<Application>> probes;
     private JvmstatCountersPackages master;
     
-    JvmstatCountersPackage(JvmstatCountersPackages m, String name,int pos) {
-        super(name+" "+NAME, DESCR, ICON, POSITION+pos);
+    JvmstatCountersPackage(JvmstatCountersPackages m, String name, int pos) {
+        super(NAME + " '" + name + "'", DESCR, ICON, POSITION + pos);
         probes = new HashMap();
         master = m;
     }
@@ -67,7 +67,7 @@ class JvmstatCountersPackage extends TracerPackage.SessionAware<Application> {
     }
 
     void addProbe(Monitor monitor, int pos, String probeName) {
-        String descName = "Jvmstat counter "+monitor.getName()+" Units: "+monitor.getUnits();
+        String descName = "Counter: "+monitor.getName()+", Units: "+monitor.getUnits();
         TracerProbeDescriptor desc = new TracerProbeDescriptor(probeName,descName,ICON,pos,true);
         probes.put(desc,new JvmstatCounterProbe(probeName, descName, monitor));
     }
