@@ -327,59 +327,5 @@ VisualVM.Tracer.addPackages([{
                 ]
             }
         ]
-    },
-    {
-        name: "AWT",
-        desc: "AWT subsystem statistics",
-        position: 540,
-        probes: [
-            {
-                name: "EDT Utilization",
-                desc: "Measures utilization of the Event Dispatch Thread. Requires Tracer-BTrace Support plugin.",
-                validator: function() {
-                    return btraceDeployer != undefined;
-                },
-                deployment: {
-                    deployer: btraceDeployer,
-                    script: "nbres:/com/sun/tools/visualvm/modules/tracer/javase/resources/AWTTracer.btrace",
-                    fragment: "utilization"
-                },
-                properties: [
-                    {
-                        name: "Dispatch",
-                        desc: "Displays the approximate percentage of procesing time spent in dispatching event requests",
-                        value: mbeanAttribute("btrace:name=AWTStats", "dispatch"),
-                        presenter: {
-                            type: VisualVM.Tracer.Type.discrete,
-                            format: ItemValueFormatter.DEFAULT_PERCENT,
-                            fillColor: AUTOCOLOR,
-                            max: 1000
-                        }
-                    },
-                    {
-                        name: "Paint",
-                        desc: "Displays the approximate percentage of procesing time spent in painting AWT components",
-                        value: mbeanAttribute("btrace:name=AWTStats", "paint"),
-                        presenter: {
-                            type: VisualVM.Tracer.Type.discrete,
-                            format: ItemValueFormatter.DEFAULT_PERCENT,
-                            fillColor: AUTOCOLOR,
-                            max: 1000
-                        }
-                    },
-                    {
-                        name: "Layout",
-                        value: mbeanAttribute("btrace:name=AWTStats", "layout"),
-                        desc: "Displays the approximate percentage of procesing time spent in laying out AWT components",
-                        presenter: {
-                            type: VisualVM.Tracer.Type.discrete,
-                            format: ItemValueFormatter.DEFAULT_PERCENT,
-                            fillColor: AUTOCOLOR,
-                            max: 1000
-                        }
-                    }
-                ]
-            }
-        ]
     }
 ])
