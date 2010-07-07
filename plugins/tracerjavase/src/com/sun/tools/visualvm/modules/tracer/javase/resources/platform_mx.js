@@ -150,17 +150,18 @@ function isNIOBuffersSupported() {
 }
 
 VisualVM.Tracer.addPackages([{
-    name: "HotSpot",
-    desc: "Displays JVM HotSpot Metrics",
+    name: "JIT Compiler",
+    desc: "Displays JIT compiler metrics",
     icon: "com/sun/tools/visualvm/modules/tracer/javase/resources/hotspot.gif",
     position: 500,
     probes: [
         {
-            name: "CPU Usage",
-            desc: "CPU usage reported by HotSpot components",
+            name: "JIT Compiler",
+            desc: "Monitors the JIT compiler activity",
             properties: [
                 {
-                    name: "JIT Compiler",
+                    name: "Compiler activity",
+                    desc: "Monitors relative JIT compiler activity (%)",
                     value: function(timestamp) {
                         if (this.valDelta == undefined) {
                             this.valDelta = delta(mbeanAttribute("java.lang:type=Compilation", "TotalCompilationTime"));
@@ -190,7 +191,7 @@ VisualVM.Tracer.addPackages([{
     },
     {
         name: "Garbage Collectors",
-        desc: "GC Statistics",
+        desc: "GC statistics",
         position: 510,
         probes: [
             {
@@ -207,16 +208,18 @@ VisualVM.Tracer.addPackages([{
     },
     {
         name: "NIO Buffers",
-        desc: "NIO Buffers overview",
+        desc: "NIO buffers metrics",
         position: 520,
         probes: [
             {
                 name: "Count",
+                desc: "Reports number of NIO buffers. Requires the target application to run on JDK 7.",
                 validator: isNIOBuffersSupported,
                 properties: getNIOBufferProperties("Count")
             },
             {
                 name: "Memory Used",
+                desc: "Reports total physical memory used by the NIO buffers. Requires the target application to run on JDK 7.",
                 validator: isNIOBuffersSupported,
                 properties: getNIOBufferProperties("MemoryUsed", {
                     format: ItemValueFormatter.DEFAULT_BYTES
@@ -224,6 +227,7 @@ VisualVM.Tracer.addPackages([{
             },
             {
                 name: "Total Capacity",
+                desc: "Reports available capacity of the NIO buffers. Requires the target application to run on JDK 7.",
                 validator: isNIOBuffersSupported,
                 properties: getNIOBufferProperties("TotalCapacity", {
                     format: ItemValueFormatter.DEFAULT_BYTES
@@ -234,11 +238,12 @@ VisualVM.Tracer.addPackages([{
     },
     {
         name: "Java I/O",
-        desc: "IO subsystem stats",
+        desc: "IO subsystem statistics",
         position: 530,
         probes: [
             {
                 name: "File Descriptors",
+                desc: "Measures number of available and used file descriptors. Not supported on Windows.",
                 validator: function() {
                     return mbeanAttribute("java.lang:type=OperatingSystem", "OpenFileDescriptorCount").getInfo() != null;
                 },
@@ -262,7 +267,8 @@ VisualVM.Tracer.addPackages([{
                 ]
             },
             {
-                name: "Java Files",
+                name: "Java Files Utilization",
+                desc: "Measures read/write rates of Java Files. Requires Tracer-BTrace Support plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -292,6 +298,7 @@ VisualVM.Tracer.addPackages([{
             },
             {
                 name: "NIO Utilization",
+                desc: "Measures read/write rates of NIO. Requires Tracer-BTrace Support plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -323,10 +330,12 @@ VisualVM.Tracer.addPackages([{
     },
     {
         name: "AWT",
+        desc: "AWT subsystem statistics",
         position: 540,
         probes: [
             {
                 name: "EDT Utilization",
+                desc: "Measures utilization of the Event Dispatch Thread. Requires Tracer-BTrace Support plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
