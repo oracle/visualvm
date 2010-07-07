@@ -159,12 +159,13 @@ public final class PropertiesSupport {
         if (dataSource != null) type = (Class<X>)dataSource.getClass();
 
         List<PropertiesProvider<X>> compatibleProviders = new ArrayList();
-        Set<PropertiesProvider> providersSet = providersCopy.keySet();
-        for (PropertiesProvider provider : providersSet)
-            if (providersCopy.get(provider).isAssignableFrom(type) &&
+        Set<Map.Entry<PropertiesProvider,Class<? extends DataSource>>> providersSet = providersCopy.entrySet();
+        for (Map.Entry<PropertiesProvider,Class<? extends DataSource>> entry : providersSet) {
+            PropertiesProvider provider = entry.getKey();
+            if (entry.getValue().isAssignableFrom(type) &&
                 provider.supportsDataSource(dataSource))
                     compatibleProviders.add(provider);
-        
+        }
         return compatibleProviders;
     }
 
