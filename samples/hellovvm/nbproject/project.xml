@@ -16,15 +16,6 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.application.views</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>0-1</release-version>
-                        <specification-version>1.0</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>com.sun.tools.visualvm.core</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -46,10 +37,10 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.10.1.1</specification-version>
+                        <specification-version>8.0</specification-version>
                     </run-dependency>
                 </dependency>
-            </module-dependencies>
+                </module-dependencies>
             <public-packages/>
         </data>
     </configuration>
