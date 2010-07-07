@@ -108,6 +108,7 @@ public class MarkingEngine {
     public synchronized void configure(MarkMapping[] mappings, Collection observers) {
         setMarks(mappings != null ? mappings : Marker.DEFAULT.getMappings());
         this.observers.clear();
+        this.observers.add( mapper );
         this.observers.addAll(observers);
     }
 
