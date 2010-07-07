@@ -23,7 +23,7 @@
  *  have any questions.
  */
 
-var scriptPath = "nbres:/com/sun/tools/visualvm/modules/tracer/javase/resources/JavaIOTracer.btrace"
+var scriptPath = "nbres:/com/sun/tools/visualvm/modules/tracer/jvm/resources/JavaIOTracer.btrace"
 var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
                         Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 
@@ -152,7 +152,7 @@ function isNIOBuffersSupported() {
 VisualVM.Tracer.addPackages([{
     name: "JIT Compiler",
     desc: "Displays JIT compiler metrics",
-    icon: "com/sun/tools/visualvm/modules/tracer/javase/resources/hotspot.gif",
+    icon: "com/sun/tools/visualvm/modules/tracer/jvm/resources/hotspot.gif",
     position: 500,
     probes: [
         {
