@@ -267,6 +267,16 @@ public class MarkerProcessor extends CategoryDefinitionProcessor implements Mark
             Set<String> adjustedRestrictors = new HashSet<String>();
 
             for (ExecutableElement method : ElementFilter.methodsIn(controller.getElements().getAllMembers(superElement))) {
+                if ( superElement.getKind() == ElementKind.INTERFACE ){
+                    if ( controller.getElementUtilities().
+                            enclosingTypeElement(method).equals( 
+                                    controller.getElements().getTypeElement(
+                                            Object.class.getCanonicalName())))
+                    {
+                        continue;
+                    }
+                    
+                }
                 if (!method.getModifiers().contains(Modifier.PRIVATE)) {
                     String methodName = method.getSimpleName().toString();
                     if (inclusive) {
