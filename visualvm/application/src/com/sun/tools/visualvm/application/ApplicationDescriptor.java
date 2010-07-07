@@ -38,7 +38,7 @@ import java.beans.PropertyChangeSupport;
  *
  * @author Jiri Sedlacek
  */
- public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
+public class ApplicationDescriptor extends DataSourceDescriptor<Application> {
      
     private String name;
 
