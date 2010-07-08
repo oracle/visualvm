@@ -27,131 +27,9 @@ var scriptPath = "nbres:/com/sun/tools/visualvm/modules/tracer/swing/resources/A
 var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
                         Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 
-
-//var Format_KBPS = {
-//    formatValue: function (value, format) {
-//        return (value / 1024).toFixed(2);
-//    },
-//    getUnits: function (format) {
-//        return "kB/s"
-//    }
-//}
-//
-//function getGCRunProvider(on) {
-//    return function(timestamp) {
-//        if (this.delta == undefined) {
-//            this.delta = delta(mbeanAttribute(on, "CollectionCount"))
-//        }
-//        if (this.lastTs == undefined) {
-//            this.lastTs = timestamp;
-//        }
-//        var timeDelta = timestamp - this.lastTs;
-//        this.lastTs = timestamp;
-//        if (timeDelta > 0) {
-//            return (this.delta.getValue(timestamp) * 1000) / timeDelta;
-//        }
-//        return 0;
-//    }
-//}
-//
-//function getGCRuns() {
-//    var metrics = new Array();
-//    var gcMbNames = VisualVM.MBeans.listMBeanNames("java.lang:type=GarbageCollector,name=*");
-//    if (gcMbNames != undefined) {
-//        for(var i in gcMbNames) {
-//            var name = gcMbNames[i];
-//            name.match(/name=(.*)/);
-//            var dispName = RegExp.$1;
-//            metrics[metrics.length] = {
-//                name: dispName,
-//                desc: "GC runs of " + dispName + " GC",
-//                value: getGCRunProvider(name),
-//                presenter: {
-//                    type: VisualVM.Tracer.Type.discrete,
-//                    format: {
-//                        getUnits: function(format) {
-//                            return "runs/s";
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    return metrics;
-//}
-//
-//function getReclaimedMemoryProvider(on) {
-//    var keys = mbeanAttribute(on, "LastGcInfo").get("memoryUsageBeforeGc").getKeys();
-//    // externalize the indexed values
-//    var before = new Array();
-//    var after = new Array();
-//    for(var pool in keys) {
-//        before[pool] = mbeanAttribute(on, "LastGcInfo").get("memoryUsageBeforeGc").get(keys[pool]).get("used");
-//        after[pool] = mbeanAttribute(on, "LastGcInfo").get("memoryUsageAfterGc").get(keys[pool]).get("used");
-//    }
-//
-//    return function(timestamp) {
-//        var delta = 0;
-//        for(var pool in keys) {
-//            var pre = before[pool].getValue(timestamp);
-//            var post = after[pool].getValue(timestamp);
-//            delta += (pre - post);
-//        }
-//        return delta;
-//    }
-//}
-//
-//function getReclaimedMemory() {
-//    var props = new Array();
-//    var gcMbNames = VisualVM.MBeans.listMBeanNames("java.lang:type=GarbageCollector,name=*");
-//    if (gcMbNames != undefined) {
-//        for(var i in gcMbNames) {
-//            var mbName = gcMbNames[i];
-//            mbName.match(/name=(.*)/);
-//            var dispName = RegExp.$1;
-//
-//            props[props.length] = {
-//                name: dispName,
-//                desc: "Memory reclaimed during the last run of " + dispName + " GC",
-//                value: getReclaimedMemoryProvider(mbName),
-//                presenter: {
-//                    format: ItemValueFormatter.DEFAULT_BYTES,
-//                    type: VisualVM.Tracer.Type.discrete,
-//                    fillColor: AUTOCOLOR
-//                }
-//            }
-//        }
-//    }
-//    return props;
-//}
-//
-//function getNIOBufferProperties(attrName, attrPresenter) {
-//    var props = new Array();
-//    var bufferNames = VisualVM.MBeans.listMBeanNames("java.nio:type=BufferPool,name=*");
-//    if (bufferNames != undefined) {
-//        for(var i in bufferNames) {
-//            var mbName = bufferNames[i];
-//            mbName.match(/name=(.*)/);
-//            var dispName = RegExp.$1;
-//
-//            props[props.length] = {
-//                name: dispName,
-//                value: mbeanAttribute(mbName, attrName),
-//                presenter: attrPresenter
-//            }
-//        }
-//    }
-//    return props;
-//}
-//
-//function isNIOBuffersSupported() {
-//    var list = VisualVM.MBeans.listMBeanNames("java.nio:type=BufferPool,name=*");
-//    return list != undefined && list.length > 0;
-//}
-
 VisualVM.Tracer.addPackages([{
-        name: "AWT",
-        desc: "AWT subsystem statistics",
+        name: "Swing & AWT",
+        desc: "Swing & AWT subsystem statistics",
         position: 540,
         probes: [
             {
@@ -162,7 +40,7 @@ VisualVM.Tracer.addPackages([{
                 },
                 deployment: {
                     deployer: btraceDeployer,
-                    script: "nbres:/com/sun/tools/visualvm/modules/tracer/swing/resources/AWTTracer.btrace",
+                    script: scriptPath,
                     fragment: "utilization"
                 },
                 properties: [
