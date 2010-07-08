@@ -34,7 +34,8 @@ VisualVM.Tracer.addPackages([{
         probes: [
             {
                 name: "EDT Utilization",
-                desc: "Measures utilization of the Event Dispatch Thread. Requires Tracer-BTrace Support plugin.",
+                desc: "Measures utilization of the Event Dispatch Thread.",
+                reqs: "Requires Tracer-BTrace Support plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
