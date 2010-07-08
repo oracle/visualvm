@@ -28,6 +28,8 @@ to this method is an array of tracer probe package definitions.
 {
   name: <package display name>,
   desc: <package description>,
+  reqs: <string or array of strings which will be appended to the description
+        when the package is disabled (according to validator)>,
   icon: <icon to be used by the package - either a path or actual instance>,
   validator: <function() returning true/false indicating package availability>,
   probes: [<list of probe definitions {3.2} separated by ",">]
@@ -42,6 +44,8 @@ The order of attributes is not important.
 {
   name: <probe display name>,
   desc: <probe description>,
+  reqs: <string or array of strings which will be appended to the description
+        when the probe is disabled (according to validator)>,
   validator: <function() returning true/false indicating probe availability>,
   deployment: <deployment definition {3.2.1}>,
   properties: [list of probe property definitions {3.3} separated by ",">]

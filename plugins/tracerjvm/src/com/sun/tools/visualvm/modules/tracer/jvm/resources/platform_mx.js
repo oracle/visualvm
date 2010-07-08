@@ -149,6 +149,14 @@ function isNIOBuffersSupported() {
     return list != undefined && list.length > 0;
 }
 
+function isFileDescriptorSupported() {
+    return mbeanAttribute("java.lang:type=OperatingSystem", "OpenFileDescriptorCount").getInfo() != null;
+}
+
+function isBTraceAvailable() {
+    return btraceDeployer != undefined;
+}
+
 VisualVM.Tracer.addPackages([{
     name: "JIT Compiler",
     desc: "Displays JIT compiler metrics",
@@ -209,26 +217,25 @@ VisualVM.Tracer.addPackages([{
     {
         name: "NIO Buffers",
         desc: "NIO buffers metrics",
+        reqs: "Requires the target application to run on JDK 7.",
         position: 520,
+        validator: isNIOBuffersSupported,
         probes: [
             {
                 name: "Count",
-                desc: "Reports number of NIO buffers. Requires the target application to run on JDK 7.",
-                validator: isNIOBuffersSupported,
+                desc: "Reports number of NIO buffers.",
                 properties: getNIOBufferProperties("Count")
             },
             {
                 name: "Memory Used",
-                desc: "Reports total physical memory used by the NIO buffers. Requires the target application to run on JDK 7.",
-                validator: isNIOBuffersSupported,
+                desc: "Reports total physical memory used by the NIO buffers.",
                 properties: getNIOBufferProperties("MemoryUsed", {
                     format: ItemValueFormatter.DEFAULT_BYTES
                 })
             },
             {
                 name: "Total Capacity",
-                desc: "Reports available capacity of the NIO buffers. Requires the target application to run on JDK 7.",
-                validator: isNIOBuffersSupported,
+                desc: "Reports available capacity of the NIO buffers",
                 properties: getNIOBufferProperties("TotalCapacity", {
                     format: ItemValueFormatter.DEFAULT_BYTES
                 })
@@ -243,10 +250,9 @@ VisualVM.Tracer.addPackages([{
         probes: [
             {
                 name: "File Descriptors",
-                desc: "Measures number of available and used file descriptors. Not supported on Windows.",
-                validator: function() {
-                    return mbeanAttribute("java.lang:type=OperatingSystem", "OpenFileDescriptorCount").getInfo() != null;
-                },
+                reqs: "Not supported on Windows.",
+                desc: "Measures number of available and used file descriptors.",
+                validator: isFileDescriptorSupported,
                 properties: [
                     {
                         name: "Available",
@@ -268,10 +274,9 @@ VisualVM.Tracer.addPackages([{
             },
             {
                 name: "Java Files Utilization",
-                desc: "Measures read/write rates of Java Files. Requires Tracer-BTrace Support plugin.",
-                validator: function() {
-                    return btraceDeployer != undefined;
-                },
+                reqs: "Requires Tracer-BTrace Support plugin.",
+                desc: "Measures read/write rates of Java Files.",
+                validator: isBTraceAvailable,
                 deployment: {
                     deployer: btraceDeployer,
                     script: scriptPath,
@@ -298,7 +303,8 @@ VisualVM.Tracer.addPackages([{
             },
             {
                 name: "NIO Utilization",
-                desc: "Measures read/write rates of NIO. Requires Tracer-BTrace Support plugin.",
+                desc: "Measures read/write rates of NIO.",
+                reqs: "Requires Tracer-BTrace Support plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },

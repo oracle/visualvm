@@ -242,6 +242,9 @@ function processPackage(pkg) {
         var enabled = pkg.validator == undefined || pkg.validator(application);
 
         var desc = pkg.desc != undefined ? pkg.desc : "";
+        if (!enabled) {
+            desc = desc.concat(getReqDesc(pkg));
+        }
         var icon = pkg.icon != undefined ? pkg.icon : null;
         var position = pkg.position != undefined ? pkg.position : Packages.java.lang.Integer.MAX_VALUE;
 
@@ -315,14 +318,23 @@ function processPackage(pkg) {
                             }
                         }
                     }
-                    if (enabled && probe.validator != undefined) {
-                        enabled = probe.validator();
+                    var pEnabled = enabled;
+                    desc = probe.desc;
+                    println("!!! pEnabled = " + pEnabled);
+                    println("!!! desc = " + desc);
+                    if (pEnabled && probe.validator != undefined) {
+                        pEnabled = probe.validator();
+                        if (!pEnabled) {
+                            desc = desc.concat(getReqDesc(probe));
+                        }
                     }
+                    println("!!! pEnabled(after) = " + pEnabled);
+                    println("!!! desc(after) = " + desc);
                     dProbe.setProbeDescriptor(new TracerProbeDescriptor(
                         probe.name,
-                        probe.desc || "", icon,
+                        desc || "", icon,
                         probe.position != undefined ? probe.position : (inferredPosition += 10),
-                        enabled
+                        pEnabled
                     ));
                     dPkg.addProbe(dProbe);
                 }
@@ -411,6 +423,22 @@ function get(map, keys) {
         }
     }
     return 0;
+}
+
+function getReqDesc(reqHolder) {
+    var desc = "";
+    if (reqHolder.reqs != undefined) {
+        desc = desc.concat(" (");
+        if (reqHolder.reqs.constructor == Array) {
+            for(var pi in reqHolder.reqs) {
+                desc = desc.concat((pi > 0) ? ", " : "", reqHolder.reqs[pi]);
+            }
+        } else {
+            desc = desc.concat(reqHolder.reqs);
+        }
+        desc = desc.concat(")");
+    }
+    return desc;
 }
 
 function isArray(obj) {
