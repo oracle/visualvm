@@ -11,7 +11,7 @@ import static com.sun.btrace.BTraceUtils.*;
     @Property volatile private static long fileReadRate = 0;
 
     @OnMethod(
-        clazz="java.io.FileInputStream",
+        clazz="/java.io.(FileInputStream|RandomAccessFile)/",
         method="read",
         type="int(byte[])",
         location=@Location(value=Kind.RETURN)
@@ -21,7 +21,7 @@ import static com.sun.btrace.BTraceUtils.*;
     }
 
     @OnMethod(
-        clazz="java.io.FileInputStream",
+        clazz="/java.io.(FileInputStream|RandomAccessFile)/",
         method="read",
         type="int(byte[], int, int)",
         location=@Location(value=Kind.RETURN)
@@ -31,7 +31,57 @@ import static com.sun.btrace.BTraceUtils.*;
     }
 
     @OnMethod(
-        clazz="java.io.FileOutputStream",
+        clazz="java.io.RandomAccessFile",
+        method="/read(Boolean|Byte|UnsignedByte)/"
+    )
+    public static void onReadByte() {
+        fileReadBytes++;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/read(Short|UnsignedShort|Char)/"
+    )
+    public static void onReadWord() {
+        fileReadBytes += 2;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/read(Int|Float)/"
+    )
+    public static void onReadDWord() {
+        fileReadBytes += 4;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/read(Long|Double)/"
+    )
+    public static void onReadQWord() {
+        fileReadBytes += 8;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="readLine",
+        location=@Location(value=Kind.RETURN)
+    )
+    public static void onReadLine(@Return String line) {
+        fileReadBytes += length(line);
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="readUTF",
+        location=@Location(value=Kind.RETURN)
+    )
+    public static void onReadUTF(@Return String text) {
+        fileReadBytes += (length(text) * 2);
+    }
+
+    @OnMethod(
+        clazz="/java.io.(FileOutputStream|RandomAccessFile)/",
         method="write"
     )
     public static void onWrite1(byte[] data) {
@@ -39,11 +89,59 @@ import static com.sun.btrace.BTraceUtils.*;
     }
 
     @OnMethod(
-        clazz="java.io.FileOutputStream",
+        clazz="/java.io.(FileOutputStream|RandomAccessFile)/",
         method="write"
     )
     public static void onWrite(byte[] data, int offset, int len) {
         fileWriteBytes += len;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/write(Boolean|Byte|UnsignedByte)/"
+    )
+    public static void onWriteByte() {
+        fileWriteBytes++;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/write(Short|UnsignedShort|Char)/"
+    )
+    public static void onWriteWord() {
+        fileWriteBytes += 2;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/write(Int|Float)/"
+    )
+    public static void onWriteDWord() {
+        fileWriteBytes += 4;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/write(Long|Double)/"
+    )
+    public static void onWriteQWord() {
+        fileWriteBytes += 8;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="writeChars"
+    )
+    public static void onWriteChars(String txt) {
+        fileWriteBytes += length(txt);
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="writeUTF"
+    )
+    public static void onWriteUTF(String txt) {
+        fileWriteBytes += (length(txt) * 2);
     }
     // </fragment>
 
