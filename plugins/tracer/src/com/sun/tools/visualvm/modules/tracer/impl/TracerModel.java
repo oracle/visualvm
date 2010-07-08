@@ -88,7 +88,12 @@ final class TracerModel {
     // --- Packages ------------------------------------------------------------
 
     List<TracerPackage> getPackages() {
-        return TracerSupportImpl.getInstance().getPackages(dataSource);
+        try {
+            return TracerSupportImpl.getInstance().getPackages(dataSource);
+        } catch (Throwable t) {
+            LOGGER.log(Level.INFO, "Package exception in getPackages", t); // NOI18N
+            return null;
+        }
     }
 
 

@@ -73,16 +73,22 @@ final class PackagesView {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 final List<TracerPackage> packages = model.getPackages();
-                final List<List<TracerProbeDescriptor>> descriptors = new ArrayList();
-                for (TracerPackage p : packages) {
-                    TracerProbeDescriptor[] da = p.getProbeDescriptors();
-                    Arrays.sort(da, Positionable.COMPARATOR);
-                    List<TracerProbeDescriptor> dl = Arrays.asList(da);
-                    descriptors.add(dl);
+                if (packages != null) {
+                    final List<List<TracerProbeDescriptor>> descriptors = new ArrayList();
+                    for (TracerPackage p : packages) {
+                        TracerProbeDescriptor[] da = p.getProbeDescriptors();
+                        Arrays.sort(da, Positionable.COMPARATOR);
+                        List<TracerProbeDescriptor> dl = Arrays.asList(da);
+                        descriptors.add(dl);
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { displayPackages(packages, descriptors, view); }
+                    });
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { displayError(view); }
+                    });
                 }
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { displayPackages(packages, descriptors, view); }
-                });
             }
         });
     }
@@ -173,6 +179,12 @@ final class PackagesView {
 
         view.removeAll();
         view.add(new CategoryList(categories, tooltips, initialStates, items));
+    }
+    
+    private void displayError(JComponent view) {
+        view.removeAll();
+        view.add(new JLabel("Failed to load probes, check the logfile",
+                 SwingConstants.CENTER), BorderLayout.CENTER);
     }
 
     private JComponent createComponents() {
