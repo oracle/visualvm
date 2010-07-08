@@ -162,7 +162,7 @@ VisualVM.Tracer.addPackages([{
                 },
                 deployment: {
                     deployer: btraceDeployer,
-                    script: "nbres:/com/sun/tools/visualvm/modules/tracer/javase/resources/AWTTracer.btrace",
+                    script: "nbres:/com/sun/tools/visualvm/modules/tracer/swing/resources/AWTTracer.btrace",
                     fragment: "utilization"
                 },
                 properties: [
