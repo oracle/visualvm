@@ -284,7 +284,7 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "Reading Rate",
+                        name: "Reading rate",
                         value: mbeanAttribute("btrace:name=JavaIOStats", "fileReadRate"),
                         presenter: {
                             lineColor: Color.GREEN,
@@ -292,7 +292,7 @@ VisualVM.Tracer.addPackages([{
                         }
                     },
                     {
-                        name: "Writing Rate",
+                        name: "Writing rate",
                         value: mbeanAttribute("btrace:name=JavaIOStats", "fileWriteRate"),
                         presenter: {
                             lineColor: Color.RED,
@@ -315,7 +315,7 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "Reading Rate",
+                        name: "Reading rate",
                         value: mbeanAttribute("btrace:name=JavaIOStats", "nioReadRate"),
                         presenter: {
                             lineColor: Color.GREEN,
@@ -323,7 +323,7 @@ VisualVM.Tracer.addPackages([{
                         }
                     },
                     {
-                        name: "Writing Rate",
+                        name: "Writing rate",
                         value: mbeanAttribute("btrace:name=JavaIOStats", "nioWriteRate"),
                         presenter: {
                             lineColor: Color.RED,
