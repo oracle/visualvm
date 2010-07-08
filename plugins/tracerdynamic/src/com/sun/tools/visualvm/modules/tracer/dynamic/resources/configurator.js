@@ -320,16 +320,12 @@ function processPackage(pkg) {
                     }
                     var pEnabled = enabled;
                     desc = probe.desc;
-                    println("!!! pEnabled = " + pEnabled);
-                    println("!!! desc = " + desc);
                     if (pEnabled && probe.validator != undefined) {
                         pEnabled = probe.validator();
                         if (!pEnabled) {
                             desc = desc.concat(getReqDesc(probe));
                         }
                     }
-                    println("!!! pEnabled(after) = " + pEnabled);
-                    println("!!! desc(after) = " + desc);
                     dProbe.setProbeDescriptor(new TracerProbeDescriptor(
                         probe.name,
                         desc || "", icon,
