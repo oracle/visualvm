@@ -54,7 +54,7 @@ import org.opensolaris.os.dtrace.DTraceException;
 class JVMOverheadProbe extends TracerProbe.SessionAware<Application> {
 
     private static final String NAME = "JVM overhead";
-    private static final String DESCR = "Monitors JVM overhrad.";
+    private static final String DESCR = "Monitors JVM overhead.";
     private static final int POSITION = 16;
     private static final String AGGREG_VALUE = "threads";
     private static final int probes = 1;
