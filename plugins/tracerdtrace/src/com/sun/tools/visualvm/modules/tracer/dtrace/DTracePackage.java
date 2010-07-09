@@ -55,7 +55,7 @@ class DTracePackage extends TracerPackage.SessionAware<Application>{
     private static final String DESCR = "DTrace probes.";
     private static final int POSITION = 120;
     private static final String DSCRIPT_FILE =
-            "com/sun/tools/visualvm/modules/tracer/dtrace/resources/probess.d"; // NOI18N
+            "com/sun/tools/visualvm/modules/tracer/dtrace/resources/probes.d"; // NOI18N
 
     private Consumer consumer;
     private Application application;
