@@ -176,7 +176,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     ViewContainer container = (ViewContainer)getComponentAt(idx);
     if (container.getView().isClosable()) {
       String nue = title.indexOf("</html>") != -1 ? // NOI18N
-        Utilities.replaceString(title, "</html>", "&nbsp;&nbsp;</html>") // NOI18N
+        title.replace("</html>", "&nbsp;&nbsp;</html>") // NOI18N
         : title + "  "; // NOI18N
       if (!title.equals(getTitleAt(idx))) {
         super.setTitleAt(idx, nue);
