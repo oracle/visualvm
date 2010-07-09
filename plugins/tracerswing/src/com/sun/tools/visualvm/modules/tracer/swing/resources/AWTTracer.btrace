@@ -1,4 +1,4 @@
-package net.java.btrace.visualvm.tracer.j2se.resources;
+package net.java.btrace.visualvm.tracer.swing.resources;
 
 import com.sun.btrace.annotations.*;
 import static com.sun.btrace.BTraceUtils.*;
