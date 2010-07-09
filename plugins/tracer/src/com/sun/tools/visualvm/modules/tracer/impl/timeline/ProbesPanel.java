@@ -159,6 +159,8 @@ final class ProbesPanel extends JPanel {
                                   getDescriptor(probe)), row.getIndex());
                 }
                 listPanel.sync();
+                revalidate();
+                repaint();
                 refreshButtons(true);
             }
 
@@ -166,11 +168,15 @@ final class ProbesPanel extends JPanel {
                 for (TimelineChart.Row row : rows)
                     listPanel.remove(row.getIndex());
                 listPanel.sync();
+                revalidate();
+                repaint();
                 refreshButtons(chart.hasRows());
             }
 
             public void rowsResized(List<TimelineChart.Row> rows) {
                 listPanel.sync();
+                revalidate();
+                repaint();
             }
         });
 
