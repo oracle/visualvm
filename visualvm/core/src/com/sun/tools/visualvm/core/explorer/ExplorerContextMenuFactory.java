@@ -39,8 +39,7 @@ import javax.swing.JSeparator;
 import org.openide.awt.Mnemonics;
 import org.openide.cookies.InstanceCookie;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileSystem;
-import org.openide.filesystems.Repository;
+import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
 
@@ -124,15 +123,13 @@ final class ExplorerContextMenuFactory {
         
     private List<Action>[] getSelectionActions() {
         // Find entrypoint into layer
-        FileSystem defaultFS = Repository.getDefault().getDefaultFileSystem();
-        FileObject actionsFO = defaultFS.getRoot().getFileObject(SELECTION_ACTIONS_FILE);
+        FileObject actionsFO = FileUtil.getConfigFile(SELECTION_ACTIONS_FILE);
         return getActions(actionsFO, true);
     }
         
     private List<Action>[] getNoSelectionActions() {
         // Find entrypoint into layer
-        FileSystem defaultFS = Repository.getDefault().getDefaultFileSystem();
-        FileObject actionsFO = defaultFS.getRoot().getFileObject(NOSELECTION_ACTIONS_FILE);
+        FileObject actionsFO = FileUtil.getConfigFile(NOSELECTION_ACTIONS_FILE);
         return getActions(actionsFO, false);
     }
     
