@@ -47,7 +47,7 @@ import org.opensolaris.os.dtrace.DTraceException;
 class BytesIOProbe extends TracerProbe.SessionAware<Application> {
 
     private static final String NAME = "I/O bytes";
-    private static final String DESCR = "I/O bytes seconds.";
+    private static final String DESCR = "Monitors I/O bytes per second.";
     private static final int POSITION = 20;
     private static final String AGGREG_VALUE = "bytes";
     private static final int probes = 2;
@@ -67,10 +67,10 @@ class BytesIOProbe extends TracerProbe.SessionAware<Application> {
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         ProbeItemDescriptor[] descs = new ProbeItemDescriptor[probes];
         descs[0] = ProbeItemDescriptor.continuousLineItem("I/O reads",
-                "Monitors read bytes.",
+                "Monitors read bytes per second.",
                 ItemValueFormatter.DEFAULT_BYTES, 1d, 0, 1000);
         descs[1] = ProbeItemDescriptor.continuousLineItem("I/O writes",
-                "Monitors written bytes.",
+                "Monitors written bytes per second.",
                 ItemValueFormatter.DEFAULT_BYTES, 1d, 0, 1000);
         return descs;
     }

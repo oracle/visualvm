@@ -78,7 +78,7 @@ class JVMOverheadProbe extends TracerProbe.SessionAware<Application> {
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         ProbeItemDescriptor[] descs = new ProbeItemDescriptor[probes];
         descs[0] = ProbeItemDescriptor.continuousLineItem("JVM overhead",
-                "Monitors JVM overhead (%)",
+                "Monitors relative JVM overhead (%)",
                 ItemValueFormatter.DEFAULT_PERCENT, 1d, 0, 1000);
         return descs;
     }

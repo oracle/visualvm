@@ -52,7 +52,7 @@ class DTracePackage extends TracerPackage.SessionAware<Application>{
     static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(
             "com/sun/tools/visualvm/modules/tracer/dtrace/resources/cpuSmall.png", true)); // NOI18N
     private static final String NAME = "DTrace probes";
-    private static final String DESCR = "DTrace probes.";
+    private static final String DESCR = "Provides low level system metrics using the DTrace technology.";
     private static final int POSITION = 120;
     private static final String DSCRIPT_FILE =
             "com/sun/tools/visualvm/modules/tracer/dtrace/resources/probes.d"; // NOI18N

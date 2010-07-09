@@ -46,7 +46,7 @@ import org.opensolaris.os.dtrace.DTraceException;
 class SyscallsProbe extends TracerProbe.SessionAware<Application> {
 
     private static final String NAME = "Syscalls";
-    private static final String DESCR = "Sycalls per seconds.";
+    private static final String DESCR = "Monitors number of system calls per second.";
     private static final int POSITION = 20;
     private static final String AGGREG_VALUE = "syscalls";
     private static final int probes = 1;
@@ -66,7 +66,7 @@ class SyscallsProbe extends TracerProbe.SessionAware<Application> {
     private static final ProbeItemDescriptor[] createItemDescriptors() {
         ProbeItemDescriptor[] descs = new ProbeItemDescriptor[probes];
         descs[0] = ProbeItemDescriptor.continuousLineItem("Syscalls",
-                "Monitors number of syscalls.",
+                "Monitors number of system calls per second.",
                 ItemValueFormatter.DEFAULT_DECIMAL, 1d, 0, 1000);
         return descs;
     }
