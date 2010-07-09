@@ -179,12 +179,18 @@ final class PackagesView {
 
         view.removeAll();
         view.add(new CategoryList(categories, tooltips, initialStates, items));
+        
+        view.revalidate();
+        view.repaint();
     }
     
     private void displayError(JComponent view) {
         view.removeAll();
         view.add(new JLabel("Failed to load probes, check the logfile",
                  SwingConstants.CENTER), BorderLayout.CENTER);
+        
+        view.revalidate();
+        view.repaint();
     }
 
     private JComponent createComponents() {
