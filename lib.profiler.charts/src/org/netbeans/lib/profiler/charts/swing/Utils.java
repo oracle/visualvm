@@ -107,24 +107,15 @@ public final class Utils {
     }
 
 
-    // Copied from sun.swing.SwingUtilities2.isLocalDisplay()
     private static boolean isLocalDisplay() {
         try {
-            // On Windows just return true. Permission to read os.name
-            // is granted to all code but wrapped in try to be safe.
-            if (System.getProperty("os.name").startsWith("Windows")) { // NOI18N
-                return true;
-            }
-            // Else probably Solaris or Linux in which case may be remote X11
-            Class x11Class = Class.forName("sun.awt.X11GraphicsEnvironment"); // NOI18N
+            Class x11Class = Class.forName("sun.swing.SwingUtilities2"); // NOI18N
             Method isDisplayLocalMethod = x11Class.getMethod(
-                      "isDisplayLocal", new Class[0]); // NOI18N
+                      "isLocalDisplay", new Class[0]); // NOI18N
             return (Boolean)isDisplayLocalMethod.invoke(null, (Object[])null);
         } catch (Throwable t) {
+            return true;
         }
-        // If we get here we're most likely being run on some other O/S
-        // or we didn't properly detect Windows.
-        return true;
     }
 
 
