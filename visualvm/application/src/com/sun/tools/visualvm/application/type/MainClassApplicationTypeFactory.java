@@ -106,6 +106,15 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         
         // Scala runtime
         {"scala.tools.nsc.MainGenericRunner",descr("LBL_Scala"),descr("DESCR_Scala"),"com/sun/tools/visualvm/application/type/resources/Scala.png"},  // NOI18N
+        
+        // Clojure runtime
+        {"clojure.main",descr("LBL_Clojure"),descr("DESCR_Clojure"),"com/sun/tools/visualvm/application/type/resources/Clojure.png"},  // NOI18N
+        {"clojure.jar",descr("LBL_Clojure"),descr("DESCR_Clojure"),"com/sun/tools/visualvm/application/type/resources/Clojure.png"},  // NOI18N
+        {"clojure.lang.Script",descr("LBL_Clojure"),descr("DESCR_Clojure"),"com/sun/tools/visualvm/application/type/resources/Clojure.png"},  // NOI18N
+        {"clojure.lang.Repl",descr("LBL_Clojure"),descr("DESCR_Clojure"),"com/sun/tools/visualvm/application/type/resources/Clojure.png"},  // NOI18N
+        
+        // Groovy runtime
+        {"org.codehaus.groovy.tools.GroovyStarter",descr("LBL_Groovy"),descr("DESCR_Groovy"),"com/sun/tools/visualvm/application/type/resources/Groovy.png"},  // NOI18N
     };
     
     Map<String,String[]> map;
