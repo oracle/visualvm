@@ -100,6 +100,12 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
 
         // Oracle WebLogic
         {"weblogic.Server","WebLogic",descr("DESCR_WLS"),"com/sun/tools/visualvm/application/type/resources/WLS.png"},  // NOI18N
+        
+        // JRuby runtime
+        {"org.jruby.Main",descr("LBL_Jruby"),descr("DESCR_Jruby"),"com/sun/tools/visualvm/application/type/resources/JRuby.png"},  // NOI18N
+        
+        // Scala runtime
+        {"scala.tools.nsc.MainGenericRunner",descr("LBL_Scala"),descr("DESCR_Scala"),"com/sun/tools/visualvm/application/type/resources/Scala.png"},  // NOI18N
     };
     
     Map<String,String[]> map;
