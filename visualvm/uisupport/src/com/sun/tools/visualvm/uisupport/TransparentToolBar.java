@@ -44,7 +44,6 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -157,8 +156,8 @@ public final class TransparentToolBar extends JPanel {
     }
     
     private static boolean customFiller() {
-        if (CUSTOM_FILLER == null) CUSTOM_FILLER = UIUtils.isGTKLookAndFeel() ||
-                                                  UIUtils.isNimbusLookAndFeel();
+        if (CUSTOM_FILLER == null) CUSTOM_FILLER = UISupport.isGTKLookAndFeel() ||
+                                                  UISupport.isNimbusLookAndFeel();
         return CUSTOM_FILLER;
     }
 
