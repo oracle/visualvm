@@ -115,6 +115,9 @@ public class MainClassApplicationTypeFactory extends AbstractModelProvider<Appli
         
         // Groovy runtime
         {"org.codehaus.groovy.tools.GroovyStarter",descr("LBL_Groovy"),descr("DESCR_Groovy"),"com/sun/tools/visualvm/application/type/resources/Groovy.png"},  // NOI18N
+        
+        // Jython runtime
+        {"org.python.util.jython",descr("LBL_Jython"),descr("DESCR_Jython"),"com/sun/tools/visualvm/application/type/resources/Jython.png"},  // NOI18N
     };
     
     Map<String,String[]> map;
