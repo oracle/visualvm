@@ -37,6 +37,7 @@ import javax.swing.OverlayLayout;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 /**
@@ -81,8 +82,10 @@ public class HeaderPanel extends JPanel {
 
     private void initComponents() {
         JTable impl = new JTable(new DefaultTableModel(new Object[] { "" }, 0)); // NOI18N
+        TableColumnModel colMod = impl.getColumnModel();
+        final TableColumn col = colMod.getColumn(0);
         impl.setFocusable(false);
-        header = new Header(impl.getColumnModel());
+        header = new Header(colMod);
         impl.setTableHeader(header);
         header.setResizingAllowed(false);
         header.setReorderingAllowed(false);
@@ -99,7 +102,7 @@ public class HeaderPanel extends JPanel {
 
                 setupRenderer(component);
 
-                table.getColumnModel().getColumn(0).setWidth(table.getWidth());
+                col.setWidth(header.getWidth());
                 return component;
             }
         });
