@@ -100,7 +100,7 @@ class JVMOverheadProbe extends TracerProbe.SessionAware<Application> {
         for (long tid : tids) {
             threadIds.add(Long.valueOf(tid));
         }
-        System.out.println(threadIds);
+//        System.out.println(threadIds);
         super.sessionRunning(dataSource);
     }
 
@@ -122,7 +122,7 @@ class JVMOverheadProbe extends TracerProbe.SessionAware<Application> {
                 for (long tid : tids) {
                     threadIds.add(Long.valueOf(tid));
                 }
-                System.out.println(threadIds);
+//                System.out.println(threadIds);
             }
         } catch (DTraceException ex) {
             Exceptions.printStackTrace(ex);
@@ -147,7 +147,7 @@ class JVMOverheadProbe extends TracerProbe.SessionAware<Application> {
                 Number val = record.getValue().getValue();
                 if (!threadIds.contains(Long.valueOf(tid.longValue()))) {
                     time += val.longValue();
-                    System.out.println("VM thread id: " + tid.longValue());
+//                    System.out.println("VM thread id: " + tid.longValue());
                 }
             }
             vals[0] = time / processorsCount;
