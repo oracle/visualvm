@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.modules.tracer.impl.swing.ScrollBar;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
@@ -183,6 +184,10 @@ final class ProbesPanel extends JPanel {
         refreshButtons(chart.hasRows());
     }
 
+    
+    public void setCursor(Cursor cursor) {
+        viewport.setCursor(cursor);
+    }
 
     Component getMouseTarget() {
         return viewport;
