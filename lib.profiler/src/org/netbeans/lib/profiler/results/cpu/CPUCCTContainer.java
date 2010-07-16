@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -627,9 +630,11 @@ public class CPUCCTContainer {
 
         if (newChild != null) {
             parent.attachNodeAsChild(newChild);
-        } else {
+        } else if (compParent == parent) { // filtered-out node
             if (!parent.isRoot()) { // no propagation of filtered-out data to the Thread level node
                 parent.addNetTime0(node.getNetTime0());
+                parent.addSleepTime0(node.getSleepTime0());
+                parent.addWaitTime0(node.getWaitTime0());
                 parent.addNCallsDiff(node.getNCalls());
 
                 if (collectingTwoTimeStamps) {
@@ -888,7 +893,7 @@ public class CPUCCTContainer {
         /* PROTOTYPE [wait]
            long time = (long) (((double) rtNode.netTime0 - rtNode.waitTime0 - rtNode.nCalls * timingData.methodEntryExitInnerTime0 - nCallsFromThisNode * timingData.methodEntryExitOuterTime0) * 1000000 / timingData.timerCountsInSecond0);
          */
-        long time = (long) timingAdjuster.adjustTime(rtNode.getNetTime0(), rtNode.getNCalls(), nCallsFromThisNode, false);
+        long time = (long) timingAdjuster.adjustTime(rtNode.getNetTime0(), rtNode.getNCalls()+rtNode.getNCallsDiff(), nCallsFromThisNode, false);
 
         //    (long) (((double) rtNode.getNetTime0() - rtNode.getNCalls() * timingData.methodEntryExitInnerTime0
         //      - nCallsFromThisNode * timingData.methodEntryExitOuterTime0) * 1000000 / timingData
@@ -916,7 +921,7 @@ public class CPUCCTContainer {
         childTotalTime0InTimerUnits = thisNodeTotalTime0InTimerUnits; // It will be effectively returned by this method
                                                                       // Calculate cleansed total time
 
-        time = (long) timingAdjuster.adjustTime(thisNodeTotalTime0InTimerUnits, rtNode.getNCalls(), totalNCallsFromThisNode,
+        time = (long) timingAdjuster.adjustTime(thisNodeTotalTime0InTimerUnits, rtNode.getNCalls()+totalNCallsFromThisNode, totalNCallsFromThisNode,
                                                    false);
 
         //    time = (long) (((double) thisNodeTotalTime0InTimerUnits - rtNode.getNCalls()* timingData.methodEntryExitInnerTime0
@@ -931,7 +936,7 @@ public class CPUCCTContainer {
 
         if (collectingTwoTimeStamps) {
             // Calculate cleansed self time
-            time = (long) timingAdjuster.adjustTime(rtNode.getNetTime1(), rtNode.getNCalls(), nCallsFromThisNode, true);
+            time = (long) timingAdjuster.adjustTime(rtNode.getNetTime1(), rtNode.getNCalls()+rtNode.getNCallsDiff(), nCallsFromThisNode, true);
 
             //      time = (long) (((double) rtNode.getNetTime1()
             //        - rtNode.getNCalls() * timingData.methodEntryExitInnerTime1
@@ -946,7 +951,7 @@ public class CPUCCTContainer {
             childTotalTime1InTimerUnits = thisNodeTotalTime1InTimerUnits; // It will be effectively returned by this method
                                                                           // Calculate cleansed total time
 
-            time = (long) timingAdjuster.adjustTime(thisNodeTotalTime1InTimerUnits, rtNode.getNCalls(),
+            time = (long) timingAdjuster.adjustTime(thisNodeTotalTime1InTimerUnits, rtNode.getNCalls()+totalNCallsFromThisNode,
                                                        totalNCallsFromThisNode, true);
 
             //      time = (long) (((double) thisNodeTotalTime1InTimerUnits - rtNode.getNCalls() * timingData.methodEntryExitInnerTime0

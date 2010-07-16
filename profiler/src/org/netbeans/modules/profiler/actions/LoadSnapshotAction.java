@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -123,10 +126,12 @@ public final class LoadSnapshotAction extends AbstractAction {
         chooser.setDialogTitle(handleHeapdumps ? OPEN_SNAPSHOT_HEAPDUMP_DIALOG_CAPTION : OPEN_SNAPSHOT_DIALOG_CAPTION);
         chooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
-                    return handleHeapdumps
-                           ? (f.isDirectory() || f.getName().endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)
-                           || f.getName().endsWith("." + ResultsManager.HEAPDUMP_EXTENSION) // NOI18N
-                    ) : (f.isDirectory() || f.getName().endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)); // NOI18N
+                    if (f.isDirectory()) return true;
+                    String fname = f.getName();
+                    if (fname.endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)) return true;
+                    if (fname.endsWith("." + ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) return true;
+                    if (handleHeapdumps && fname.endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) return true;
+                    return false;
                 }
 
                 public String getDescription() {
@@ -147,15 +152,16 @@ public final class LoadSnapshotAction extends AbstractAction {
 
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
+                String fname = file.getName();
 
-                if (file.getName().endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)) {
+                if (fname.endsWith("." + ResultsManager.SNAPSHOT_EXTENSION) || fname.endsWith("." + ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) {
                     snapshotsFOArr.add(FileUtil.toFileObject(FileUtil.normalizeFile(file))); // NOI18N
-                } else if (file.getName().endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) {
+                } else if (fname.endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) {
                     heapdumpsFArr.add(file); // NOI18N
                 }
             }
 
-            if (snapshotsFOArr.size() > 0) {
+            if (!snapshotsFOArr.isEmpty()) {
                 LoadedSnapshot[] imported = ResultsManager.getDefault()
                                                           .loadSnapshots(snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
                 ResultsManager.getDefault().openSnapshots(imported);
@@ -166,7 +172,7 @@ public final class LoadSnapshotAction extends AbstractAction {
 
             }
 
-            if (heapdumpsFArr.size() > 0) {
+            if (!heapdumpsFArr.isEmpty()) {
                 RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
                             HeapWalkerManager.getDefault().openHeapWalkers(heapdumpsFArr.toArray(new File[heapdumpsFArr.size()]));

@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -64,33 +67,31 @@ public class StackTraceSnapshotBuilder {
     private static final StackTraceElement[] NO_STACK_TRACE = new StackTraceElement[0];
     private static final boolean COLLECT_TWO_TIMESTAMPS = true;
     private static final List<MethodInfo> knownBLockingMethods = Arrays.asList(new MethodInfo[] {
-        new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native]",null),
-        new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]",null),
-        new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit[native]",null),
-        new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents[native]",null),
-        new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native]",null),
-        new MethodInfo("java.lang.Object", "wait[native]",null),
-        new MethodInfo("java.lang.Thread", "sleep[native]",null),
+        new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native]"),
+        new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]"),
+        new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit[native]"),
+        new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents[native]"),
+        new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native]"),
+        new MethodInfo("java.lang.Object", "wait[native]"),
+        new MethodInfo("java.lang.Thread", "sleep[native]"),
+        new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0[native]"),
     });
 
     private InstrumentationFilter filter;
     
     static class MethodInfo {
         
-        final public String className;
-        final public String methodName;
-        final public String signature;
+        final String className;
+        final String methodName;
         
-        public MethodInfo(String className, String methodName, String signature) {
+        MethodInfo(String className, String methodName) {
             this.className = className;
             this.methodName = methodName;
-            this.signature = signature;
         }
         
-        public MethodInfo(StackTraceElement element) {
+        MethodInfo(StackTraceElement element) {
             className = element.getClassName();
             methodName = element.getMethodName() + (element.isNativeMethod() ? "[native]" : ""); // NOI18N
-            signature = element.getFileName() + ":" + element.getLineNumber(); // NOI18N
         }
         
         @Override
@@ -105,10 +106,10 @@ public class StackTraceSnapshotBuilder {
                 return false;
             }
             final MethodInfo other = (MethodInfo) obj;
-            if ((this.className == null) ? (other.className != null) : !this.className.equals(other.className)) {
+            if ((className == null) ? (other.className != null) : !className.equals(other.className)) {
                 return false;
             }
-            if ((this.methodName == null) ? (other.methodName != null) : !this.methodName.equals(other.methodName)) {
+            if ((methodName == null) ? (other.methodName != null) : !methodName.equals(other.methodName)) {
                 return false;
             }
             return true;
@@ -124,7 +125,7 @@ public class StackTraceSnapshotBuilder {
         
         @Override
         public String toString() {
-            return className + "." + methodName + "(" + signature + ")";
+            return className + "." + methodName + "()";
         }
     }
     
@@ -210,7 +211,7 @@ public class StackTraceSnapshotBuilder {
         
         @Override
         public String getInstrMethodSignature(int methodId) {
-            return methodInfos.get(methodId).signature;
+            return "";
         }
         
         @Override
@@ -505,7 +506,7 @@ public class StackTraceSnapshotBuilder {
             for (MethodInfo mi : methodInfos) {
                 instrMethodClasses[counter] = mi.className;
                 instrMethodNames[counter] = mi.methodName;
-                instrMethodSigs[counter] = mi.signature;
+                instrMethodSigs[counter] = "";
                 counter++;
             }
             addStacktrace(new java.lang.management.ThreadInfo[0], currentDumpTimeStamp+1);

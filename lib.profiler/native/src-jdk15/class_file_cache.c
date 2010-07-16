@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -98,7 +101,10 @@ static jmethodID monitorExitID = NULL;
 static jmethodID sleepEntryID = NULL;
 static jmethodID sleepExitID = NULL;
 static jmethodID traceVMObjectAllocID = NULL;
-static char retransformIsRunning;
+static jboolean retransformIsRunning = FALSE;
+static unsigned char BOGUS_CLASSFILE[] = "HAHA";
+#define END_CLASS_NAME "org/netbeans/lib/profiler/server/ProfilerInterface$InitiateInstThread"
+
 
 /*------------------------------- Classloader related routines ------------------------------------*/
 
@@ -143,8 +149,7 @@ int loader_is_system_loader(JNIEnv *jni_env, jvmtiEnv *jvmti_env, jobject loader
 
 void cache_loaded_classes(jvmtiEnv *jvmti_env,jclass *classes,jint class_count) {
 #ifdef JNI_VERSION_1_6
-    //fprintf(stderr,"cache_loade_classes, classes %d\n",(int)class_count);
-    if (_ctable_size == 0) {
+       //fprintf(stderr,"cache_loade_classes, classes %d\n",(int)class_count);
        jvmtiError res;
 
        //fprintf(stderr,"Retransform called\n");
@@ -152,9 +157,9 @@ void cache_loaded_classes(jvmtiEnv *jvmti_env,jclass *classes,jint class_count) 
        res=(*jvmti_env)->RetransformClasses(jvmti_env,class_count,classes);
        retransformIsRunning = FALSE;
        //fprintf(stderr,"Retransform end\n");
-       assert(res == JVMTI_ERROR_NONE);
-
-   }
+       if (res != JVMTI_ERROR_INVALID_CLASS_FORMAT && res != JVMTI_ERROR_NONE) { 
+           fprintf(stderr,"Profiler Agent Warning: Retransform failed with status %d\n",res);
+       }
 #endif
 }
 
@@ -230,7 +235,12 @@ void save_class_file_bytes(JNIEnv *env, const char* name, jobject loader,
   
     pos = hash(name, loader) % _ctable_size;
     while (_ctable_classnames[pos] != NULL) {
-        pos = (pos + 1) % _ctable_size;
+        if (strcmp(name, _ctable_classnames[pos]) == 0 && (*env)->IsSameObject(env, loader, _ctable_loaders[pos])) { /* do not save class' bytecode if it is already saved */
+            (*env)->MonitorExit(env, _ctable_lock);
+            return;
+        } else {
+            pos = (pos + 1) % _ctable_size;
+        }
     }
   
     _ctable_classnames[pos] = malloc(strlen(name) + 1);
@@ -271,7 +281,6 @@ void get_saved_class_file_bytes(JNIEnv *env, char *name, jobject loader, jint *c
     }
   
     if (_ctable_classnames[pos] == NULL) {
-        printf("Profiler Agent Warning: Failed to lookup cached class %s\n", name);
         *class_data_len = 0;
         *class_data = NULL;
         (*env)->MonitorExit(env, _ctable_lock);
@@ -307,10 +316,8 @@ void JNICALL class_file_load_hook(
       jint* new_class_data_len,
       unsigned char** new_class_data) 
 {
-    if (loader == NULL) {
-        /* Bootstrap loader - no need to save such classes */
-        return; 
-    }
+    jvmtiError res;
+
     if (name == NULL) {
         /* NULL name */
         fprintf(stderr, "Profiler Agent Warning: JVMTI classLoadHook: class name is null.\n");
@@ -320,6 +327,17 @@ void JNICALL class_file_load_hook(
         /* Check if this class is being loaded for the first time (that is, not being redefined).
            If it's being redefined, we return immediately. */
         return;
+    }
+    if (loader == NULL) {
+        /* Bootstrap loader - no need to save such classes */
+        if (retransformIsRunning && strcmp(name,END_CLASS_NAME) == 0) {
+            /* Hack which will prevent unchanged classes to be redefined */ 
+            res=(*jvmti_env)->Allocate(jvmti_env,sizeof(BOGUS_CLASSFILE), new_class_data);
+            assert(res == JVMTI_ERROR_NONE);
+            memcpy(*new_class_data,BOGUS_CLASSFILE,sizeof(BOGUS_CLASSFILE));
+            *new_class_data_len = sizeof(BOGUS_CLASSFILE);
+        }
+        return; 
     }
     if (loader_is_system_loader(jni_env, jvmti_env, loader)) {
         /* Check if the class is being loaded by non-system classloader */

@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -105,14 +108,9 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
         methodIdInt |= methodId&0xff00;
             
         if (!instrMethodInvoked[methodIdInt]) {
+            instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
             if (ti.rootMethodStackDepth > 0) { // marker method under root method - perform instrumentation of nearest callees
-                long absTimeStamp = Timers.getCurrentTimeInCounts();
-                long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
-                externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
-                instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
-                writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
-            } else { // DO NOT perform instrumentation of its immediate callees
-                instrMethodInvoked[methodIdInt] = true;
+                firstTimeMethodInvoke(ti, methodId);
             }
         }
 
@@ -171,11 +169,8 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
             
             // Now check if it's the first invocation of this method, and if so, perform instrumentation of nearest callees
             if (!instrMethodInvoked[methodIdInt]) {
-                long absTimeStamp = Timers.getCurrentTimeInCounts();
-                long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
-                externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
                 instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
-                writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
+                firstTimeMethodInvoke(ti, methodId);
             }
 
             ti.stackDepth++;
@@ -287,8 +282,8 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
             
             // Check if it's the first invocation of this method, and if so, perform instrumentation of its immediate callees
             if (!instrMethodInvoked[methodIdInt]) {
-                externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
                 instrMethodInvoked[methodIdInt] = true;
+                if (enableFirstTimeMethodInvoke) externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
             }
 
             ti.stackDepth++; //= 1;  // This is the logical stack depth

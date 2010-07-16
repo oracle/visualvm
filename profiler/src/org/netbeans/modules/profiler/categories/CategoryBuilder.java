@@ -1,8 +1,11 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
+ * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -57,6 +60,7 @@ import org.openide.util.NbBundle;
 /**
  *
  * @author Jaroslav Bachorik
+ * @author ads changed by ads
  */
 public class CategoryBuilder {
 
@@ -69,7 +73,8 @@ public class CategoryBuilder {
     private static final String CATEGORY_ATTRIB_SUBTYPES = "subtypes"; // NOI18N
     private static final String CATEGORY_ATTRIB_TYPE = "type"; // NOI18N
     private static final String CATEGORY_ATTRIB_PACKAGE = "package"; // NOI18N
-    private static final String SHADOW_SUFFIX = "shadow";
+    private static final String SHADOW_SUFFIX = "shadow";// NOI18N
+    private static final String CATEGORY_ATTRIB_LINK  = "link";// NOI18N
     private String projectType;
     private CategoryContainer rootCategory = null;
     private Project project;
@@ -112,6 +117,12 @@ public class CategoryBuilder {
                 LOGGER.throwing(CategoryBuilder.class.getName(), "processCategories", e); // NOI18N
             }
         } else if (node.isFolder()) {
+            String link = (String)node.getAttribute(CATEGORY_ATTRIB_LINK);
+            if ( link != null){
+                FileObject linkedCategory = FileUtil.getConfigFile(link); 
+                processCategories(container, linkedCategory);
+                return;
+            }
             String bundleName = (String) node.getAttribute("SystemFileSystem.localizingBundle"); // NOI18N
             String label = bundleName != null ? NbBundle.getBundle(bundleName).getString(node.getPath()) : node.getName();
 
@@ -123,7 +134,8 @@ public class CategoryBuilder {
                 FileObject subNode = subNodes.nextElement();
                 String nodeName = subNode.getName();
                 if (nodeName.startsWith(CATEGORY_ATTRIB_PREFIX)) {
-                    if (nodeName.endsWith(CATEGORY_ATTRIB_SUBTYPES)) {
+                    if (nodeName.endsWith(CATEGORY_ATTRIB_SUBTYPES) 
+                            && nodeName.length()==CATEGORY_ATTRIB_SUBTYPES.length()+1) {
                         Enumeration<? extends FileObject> definitions = subNode.getChildren(false);
                         while (definitions.hasMoreElements()) {
                             FileObject typeDef = definitions.nextElement();
@@ -144,7 +156,8 @@ public class CategoryBuilder {
 
                             newCategory.getDefinitions().add(new SubtypeCategoryDefinition(newCategory, typeDef.getNameExt(), includesArr, excludesArr));
                         }
-                    } else if (nodeName.endsWith(CATEGORY_ATTRIB_TYPE)) {
+                    } else if (nodeName.endsWith(CATEGORY_ATTRIB_TYPE)&&
+                            nodeName.length()==CATEGORY_ATTRIB_TYPE.length()+1) {
                         Enumeration<? extends FileObject> definitions = subNode.getChildren(false);
                         while (definitions.hasMoreElements()) {
                             FileObject typeDef = definitions.nextElement();
@@ -166,7 +179,9 @@ public class CategoryBuilder {
 
                             newCategory.getDefinitions().add(new SingleTypeCategoryDefinition(newCategory, typeDef.getNameExt(), includesArr, excludesArr));
                         }
-                    } else if (nodeName.endsWith(CATEGORY_ATTRIB_CUSTOM)) {
+                    } else if (nodeName.endsWith(CATEGORY_ATTRIB_CUSTOM)
+                            && nodeName.length()==CATEGORY_ATTRIB_CUSTOM.length()+1) 
+                    {
                         String instanceClass = (String) subNode.getAttribute(CATEGORY_ATTRIB_INSTANCENAME);
                         if (instanceClass != null) {
                             Exception thrownException = null;
@@ -196,13 +211,20 @@ public class CategoryBuilder {
                                 LOGGER.logp(Level.WARNING, CategoryBuilder.class.getName(), "processCategories", "Error while building profiling results categories", thrownException); // NOI18N
                             }
                         }
-                    } else if (nodeName.endsWith(CATEGORY_ATTRIB_PACKAGE)) {
+                    } else if (nodeName.endsWith(CATEGORY_ATTRIB_PACKAGE)
+                            && nodeName.length()==CATEGORY_ATTRIB_PACKAGE.length()+1) 
+                    {
                         Enumeration<? extends FileObject> definitions = subNode.getChildren(false);
                         while (definitions.hasMoreElements()) {
                             FileObject packageDef = definitions.nextElement();
                             Boolean recursive = (Boolean) packageDef.getAttribute("recursive"); // NOI18N
                             newCategory.getDefinitions().add(new PackageCategoryDefinition(newCategory, packageDef.getNameExt(), recursive != null ? recursive.booleanValue() : true));
                         }
+                    }
+                    else {
+                        LOGGER.logp(Level.SEVERE, CategoryBuilder.class.getName(), 
+                                "processCategories", "Unkown category attribute name :"+
+                                nodeName); // NOI18N
                     }
                 } else {
                     processCategories(newCategory, subNode);

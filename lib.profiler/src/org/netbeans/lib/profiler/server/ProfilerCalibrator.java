@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -428,12 +431,6 @@ class ProfilerCalibrator extends ProfilerRuntime {
             // High-precision calculation of inner and outer time when really hi-res timer is used.
             int recordSize = 1 + 2 + 7 + ((nCall >= 2) ? 7 : 0); // Event type, method id, and 1 or 2 7-byte timestamps
             int curPos = (cycleWhenMinResultDetected * innerIterationBufferSize) + (1 * recordSize);
-
-            // Take into account that when only one timestamp per standard event is collected, ROOT_ENTRY and ROOT_EXIT
-            // still generate two timestamps
-            if (nCall < 2) {
-                curPos += 7;
-            }
 
             int totalCalls = noOfInnerIterations * 4;
             long innerTime = 0;

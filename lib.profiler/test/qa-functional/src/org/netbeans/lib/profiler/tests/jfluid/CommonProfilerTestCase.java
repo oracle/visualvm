@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -89,7 +92,8 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     private String mainClass;
     private String projectName;
     private String[][] rootMethods;
-    private int status = 0;
+    private volatile int status = 0;
+    private File workdir;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -135,11 +139,11 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         notifyAll();
     }
 
-    public int getStatus() {
+    public synchronized int getStatus() {
         return status;
     }
 
-    public String getStatus(int status) {
+    public synchronized String getStatus(int status) {
         StringBuffer sb = new StringBuffer();
 
         if (status == STATUS_ERROR) {
@@ -177,7 +181,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         return sb.toString();
     }
 
-    public boolean isStatus(int status) {
+    public synchronized boolean isStatus(int status) {
         if (status == STATUS_ERROR) {
             return (getStatus() == status);
         }
@@ -339,7 +343,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             String profilerHome = System.getProperty("profiler.home");
 
             if ((profilerHome == null) || !new File(profilerHome).exists()) {
-                profilerHome = System.getProperty("netbeans.home").replace("platform11", "profiler3");
+                profilerHome = System.getProperty("netbeans.home").replace("platform", "profiler");
             }
 
             settings.initialize(profilerHome + "/lib");
@@ -410,7 +414,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     }
 
     protected void setTargetVM(ProfilerEngineSettings settings) {
-        String vers = System.getProperty("java.vm.version");
+        String vers = System.getProperty("java.version");
 
         if (vers.startsWith("1.5")) {
             if (vers.startsWith("1.5.0")
@@ -443,18 +447,18 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         System.err.println("START TEST " + getClass().getName() + "." + getName());
 
         //System.setProperty("org.netbeans.lib.profiler.TargetAppRunner", "true");
-        File workdir = getWorkDir();
-        diff = new File(getWorkDir(), getName() + ".diff");
-        ref = new File(getWorkDir(), getName() + ".ref");
-        log("Test Source: http://toolscvs.sfbay.sun.com/cvsweb/profiler/libs/jfluid/test/functional/src/"
-            + getClass().getName().replace('.', '/') + ".java?cvsroot=/cvs/profiler");
+        workdir = getWorkDir();
+        diff = new File(workdir, getName() + ".diff");
+        ref = new File(workdir, getName() + ".ref");
+        log("Test Source: http://hg.netbeans.org/main-golden/file/tip/lib.profiler/test/qa-functional/src/"
+            + getClass().getName().replace('.', '/') + ".java");
 
         //check for running server
         try {
             java.net.Socket sock = new java.net.Socket("localhost", 5140);
             sock.getOutputStream().write(1);
             sock.close();
-            assertTrue("There is running another server on port 5140", false);
+            assertTrue("Another server is running on port 5140", false);
         } catch (Exception ex) {
         }
     }
@@ -496,7 +500,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         }
 
         if (!isStatus(STATUS_APP_FINISHED)) { //not handled shutdown
-            System.err.println("must be treminated target vm");
+            System.err.println("target vm must be terminated");
             runner.terminateTargetJVM();
         }
 
@@ -538,7 +542,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         System.err.println("Test " + getName() + " finalized.");
         
         try {
-            Thread.sleep(15000);
+            Thread.sleep(3000);
         } catch (InterruptedException ex) {
             ex.printStackTrace(System.err);
         }
@@ -562,6 +566,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         settings.setSeparateConsole(true);
         settings.setInstrScheme(ProfilerEngineSettings.INSTRSCHEME_TOTAL);
         settings.setJVMArgs("");
+        settings.setWorkingDir(workdir.getAbsolutePath());
         //coverage
         //addJVMArgs(settings, "-Demma.coverage.out.file=/space/tmp/testrun/coverage.emma");
         setProjectName(projectName);
@@ -644,7 +649,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             profilingProcess = Runtime.getRuntime().exec(cmdArray, null, new File(settings.getWorkingDir()));
 
             if (profilingProcess != null) {
-                runner.initiateSession(0, false);
+                runner.initiateSession(1, false);
             } else {
                 throw new NullPointerException();
             }

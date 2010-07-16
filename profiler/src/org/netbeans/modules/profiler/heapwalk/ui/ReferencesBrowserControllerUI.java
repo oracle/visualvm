@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -41,6 +44,10 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 
+import org.netbeans.api.project.Project;
+import org.netbeans.lib.profiler.heap.GCRoot;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -88,7 +95,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -240,6 +246,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                                                                             "ReferencesBrowserControllerUI_ShowGcRootItemText"); // NOI18N
     private static final String GO_TO_SOURCE_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                              "ReferencesBrowserControllerUI_GoToSourceItemText"); // NOI18N
+    private static final String SHOW_IN_THREADS_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
+                                                                             "ReferencesBrowserControllerUI_ShowInThreadsItemText"); // NOI18N
     private static final String SHOW_HIDE_COLUMNS_STRING = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
                                                                                "ReferencesBrowserControllerUI_ShowHideColumnsString"); // NOI18N
     private static final String FIELD_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
@@ -285,6 +293,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private JMenuItem showInstanceItem;
     private JMenuItem showLoopOriginItem;
     private JMenuItem showSourceItem;
+    private JMenuItem showInThreadsItem;
     private JPanel dataPanel;
     private JPanel noDataPanel;
     private JPopupMenu cornerPopup;
@@ -620,15 +629,31 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                         while (className.endsWith("[]")) {
                             className = className.substring(0, className.length() - 2); // NOI18N
                         }
-
-                        NetBeansProfiler.getDefaultNB().openJavaSource(null, className, null, null);
+                        Project p = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
+                        NetBeansProfiler.getDefaultNB().openJavaSource(p, className, null, null);
                     }
                 }
             });
+            
+        showInThreadsItem = new JMenuItem(SHOW_IN_THREADS_ITEM_TEXT);
+        showInThreadsItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    int row = fieldsListTable.getSelectedRow();
 
+                    if (row != -1) {
+                        HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
+                        if (node instanceof HeapWalkerInstanceNode) {
+                            Instance instance = ((HeapWalkerInstanceNode)node).getInstance();
+                            referencesBrowserController.showInThreads(instance);
+                        }
+                    }
+                }
+            });
+            
         popup.add(showInstanceItem);
 //        popup.add(showClassItem);
         popup.add(showGcRootItem);
+        popup.add(showInThreadsItem);
         popup.addSeparator();
         popup.add(showLoopOriginItem);
         popup.add(showSourceItem);
@@ -852,7 +877,22 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         showGcRootItem.setEnabled(node instanceof HeapWalkerInstanceNode && (!node.currentlyHasChildren() ||
                 (node.getNChildren() != 1 || !HeapWalkerNodeFactory.isMessageNode(node.getChild(0))))); // #124306
         showSourceItem.setEnabled(node instanceof HeapWalkerInstanceNode);
-
+        showInThreadsItem.setEnabled(false);
+        if (node instanceof HeapWalkerInstanceNode) {
+            Instance rootInstance = ((HeapWalkerInstanceNode)node).getInstance();
+            Heap heap = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapFragment();
+            GCRoot gcRoot = heap.getGCRoot(rootInstance);
+            
+            if (gcRoot != null && GCRoot.JAVA_FRAME.equals(gcRoot.getKind())) {
+                // make sure that thread information is available
+                JavaFrameGCRoot frameVar = (JavaFrameGCRoot) gcRoot;
+                
+                if (frameVar.getFrameNumber() != -1) {
+                    showInThreadsItem.setEnabled(true);
+                }
+            }
+        }
+        
         if ((x == -1) || (y == -1)) {
             Rectangle rowBounds = fieldsListTable.getCellRect(row, 0, true);
 

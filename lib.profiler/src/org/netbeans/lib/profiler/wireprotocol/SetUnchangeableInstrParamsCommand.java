@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -55,6 +58,7 @@ import java.io.ObjectOutputStream;
 public class SetUnchangeableInstrParamsCommand extends Command {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    private boolean remoteProfiling;
     private boolean absoluteTimerOn;
     private boolean threadCPUTimerOn;
     private int codeRegionCPUResBufSize;
@@ -62,9 +66,10 @@ public class SetUnchangeableInstrParamsCommand extends Command {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SetUnchangeableInstrParamsCommand(boolean absoluteTimerOn, boolean threadCPUTimerOn, int instrScheme,
+    public SetUnchangeableInstrParamsCommand(boolean remote, boolean absoluteTimerOn, boolean threadCPUTimerOn, int instrScheme,
                                              int codeRegionCPUResBufSize) {
         super(SET_UNCHANGEABLE_INSTR_PARAMS);
+        remoteProfiling = remote;
         this.absoluteTimerOn = absoluteTimerOn;
         this.threadCPUTimerOn = threadCPUTimerOn;
         this.instrScheme = instrScheme;
@@ -77,6 +82,10 @@ public class SetUnchangeableInstrParamsCommand extends Command {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    public boolean getRemoteProfiling() {
+        return remoteProfiling;
+    }
 
     public boolean getAbsoluteTimerOn() {
         return absoluteTimerOn;
@@ -96,13 +105,15 @@ public class SetUnchangeableInstrParamsCommand extends Command {
 
     // For debugging
     public String toString() {
-        return super.toString() + ", absoluteTimerOn: " + absoluteTimerOn // NOI18N
+        return super.toString() + ", remoteProfiling: " + remoteProfiling // NOI18N
+               + ", absoluteTimerOn: " + absoluteTimerOn // NOI18N
                + ", threadCPUTimerOn: " + threadCPUTimerOn // NOI18N
                + ", instrScheme: " + instrScheme // NOI18N
                + ", codeRegionCPUResBufSize: " + codeRegionCPUResBufSize; // NOI18N
     }
 
     void readObject(ObjectInputStream in) throws IOException {
+        remoteProfiling = in.readBoolean();
         absoluteTimerOn = in.readBoolean();
         threadCPUTimerOn = in.readBoolean();
         instrScheme = in.readInt();
@@ -110,6 +121,7 @@ public class SetUnchangeableInstrParamsCommand extends Command {
     }
 
     void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeBoolean(remoteProfiling);
         out.writeBoolean(absoluteTimerOn);
         out.writeBoolean(threadCPUTimerOn);
         out.writeInt(instrScheme);

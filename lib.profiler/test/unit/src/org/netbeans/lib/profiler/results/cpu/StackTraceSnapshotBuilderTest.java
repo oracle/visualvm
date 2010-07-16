@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -782,20 +785,24 @@ public class StackTraceSnapshotBuilderTest {
     }
 
     private java.lang.management.ThreadInfo createThreadInfo(Thread t, StackTraceElement[] stack) {
-        Constructor tinfoConstructor = java.lang.management.ThreadInfo.class.getDeclaredConstructors()[0];
-        tinfoConstructor.setAccessible(true);
         try {
+            Constructor tinfoConstructor = java.lang.management.ThreadInfo.class.getDeclaredConstructor(
+                    Thread.class,Integer.TYPE,Object.class,Thread.class,Long.TYPE,Long.TYPE,
+                    Long.TYPE,Long.TYPE,StackTraceElement[].class);
+            tinfoConstructor.setAccessible(true);
             ThreadInfo tinfo =  (ThreadInfo) tinfoConstructor.newInstance(t,0,null,null,0,0,0,0,stack);
             setState(tinfo,State.RUNNABLE);
             return tinfo;
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StackTraceSnapshotBuilderTest.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
         return null;
     }

@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -353,7 +356,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         eDD.dumpData(result);
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</td>"); //NOI18N
-            result.append("<td align=\"right\">"+percentFormat.format(flatProfileContainer.getPercentAtRow(i))+((flatProfileContainer.getTimeInMcs0AtRow(i)%10==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%100==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%1000==0)?("    "):("  ")):(" ")):(""))+"</td>"); //NOI18N
+            result.append("<td align=\"right\">"+percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)+((flatProfileContainer.getTimeInMcs0AtRow(i)%10==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%100==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%1000==0)?("    "):("  ")):(" ")):(""))+"</td>"); //NOI18N
             result.append("<td align=right>"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>"); //NOI18N
             result.append("<td align=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>"); //NOI18N
             eDD.dumpData(result);
@@ -373,7 +376,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline); //NOI18N
-            result.append("    <TableColumn><![CDATA["+percentFormat.format(flatProfileContainer.getPercentAtRow(i))+"]]></TableColumn>"+newline); //NOI18N
+            result.append("    <TableColumn><![CDATA["+percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)+"]]></TableColumn>"+newline); //NOI18N
             result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline); //NOI18N
             result.append("    <TableColumn><![CDATA["+flatProfileContainer.getNInvocationsAtRow(i)+"]]></TableColumn>"+newline+"  </TableRow>"+newline); //NOI18N
             eDD.dumpData(result);

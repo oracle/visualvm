@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -106,8 +109,10 @@ public class SelfSamplerActionTest {
 
     @Test
     public void testSelfProfileCancel() throws Exception {
-        SelfSamplerAction result = SelfSamplerAction.getInstance();
-        Object obj = result.getValue("logger-testprofile");
+        FileObject afo = FileUtil.getConfigFile("Actions/Profile/org-netbeans-modules-profiler-actions-SelfSamplerAction.instance");
+        assertNotNull("SelfSamplerAction is in the right fileobject", afo);
+        Action a = (Action)afo.getAttribute("delegate"); // NOI18N
+        Object obj = a.getValue("logger-testprofile");
         assertTrue("It is runnable", obj instanceof Runnable);
         assertTrue("It is action listener", obj instanceof ActionListener);
 
@@ -119,6 +124,7 @@ public class SelfSamplerActionTest {
         assertLoggerThread("logger-testprofile shall be there", true);
 
         al.actionPerformed(new ActionEvent(this, 0, "cancel")); // NOI18N
+        Thread.sleep(1000);
 
         assertLoggerThread("no logger- thread shall be there", false);
     }
@@ -126,11 +132,11 @@ public class SelfSamplerActionTest {
     private void assertLoggerThread(String msg, boolean exist) {
         for (Thread t : Thread.getAllStackTraces().keySet()) {
             if (t.getName().startsWith("logger-")) {
-                assertTrue(msg + "There is " + t.getName() + " thread", exist);
+                assertTrue(msg + " There is " + t.getName() + " thread", exist);
                 return;
             }
         }
-        assertFalse(msg + "There is no logger- thread", exist);
+        assertFalse(msg + " There is no logger- thread", exist);
     }
 
 

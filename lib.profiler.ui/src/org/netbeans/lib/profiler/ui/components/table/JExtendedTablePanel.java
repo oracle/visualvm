@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -180,28 +183,27 @@ public class JExtendedTablePanel extends JPanel {
     private void initComponents() {
         setBorder(BorderFactory.createLoweredBevelBorder());
 
-        extendedTableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        extendedTableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                                  JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         extendedTableScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         extendedTableViewport = new CustomExtendedTableViewport(extendedTable);
         extendedTableScrollPane.setViewport(extendedTableViewport);
         extendedTableScrollPane.addMouseWheelListener(extendedTable);
         // Enable vertical scrollbar only if needed
-        extendedTableScrollPane.getVerticalScrollBar().getModel().addChangeListener(new javax.swing.event.ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    updateVerticalScrollbar();
-                }
-            });
+        JScrollBar vScrollbar = extendedTableScrollPane.getVerticalScrollBar();
+        vScrollbar.getModel().addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                updateVerticalScrollbar();
+            }
+        });
 
         add(extendedTableScrollPane, BorderLayout.CENTER);
     }
 
     private void updateVerticalScrollbar() {
-        if (extendedTableScrollPane.getVerticalScrollBar().getModel().getExtent() == extendedTableScrollPane.getVerticalScrollBar()
-                                                                                                                .getModel()
-                                                                                                                .getMaximum()) {
-            extendedTableScrollPane.getVerticalScrollBar().setEnabled(false);
-        } else {
-            extendedTableScrollPane.getVerticalScrollBar().setEnabled(JExtendedTablePanel.this.isEnabled());
-        }
+        JScrollBar vScrollbar = extendedTableScrollPane.getVerticalScrollBar();
+        vScrollbar.setEnabled(JExtendedTablePanel.this.isEnabled() &&
+                              vScrollbar.getVisibleAmount() < vScrollbar.getMaximum());
     }
+    
 }

@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -57,6 +60,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
@@ -207,12 +211,20 @@ class SaveViewAction extends AbstractAction {
                         pHandle.start();
                         
                         BufferedImage img = (bImage == null) ? viewProvider.getViewImage(visibleArea) : bImage;
-                        if (img != null) ImageIO.write(img, "png", file); //NOI18N
-                    } catch (IOException ex) {
-                        //ex.printStackTrace();
+                        if (img != null) {
+                            FileImageOutputStream stream = new FileImageOutputStream( file );
+                            ImageIO.write(img, "png", stream); //NOI18N
+                            stream.close();
+                        }
                     } catch (OutOfMemoryError e) {
                         NetBeansProfiler.getDefaultNB().displayError(OOME_SAVING_MSG);
-                    } finally {
+                    } catch (IOException ex) {
+                        NetBeansProfiler.getDefaultNB().displayError(
+                                NbBundle.getMessage(SaveViewAction.class,
+                                "ExportAction_FileWriteErrorMsg", //NOI18N
+                                file.getAbsolutePath()));
+                    }
+                    finally {
                         if (bImage != null) {
                             bImage.flush();
                         }

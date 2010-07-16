@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -70,7 +73,9 @@ public class ThreadInfo {
 
     // ThreadInfo hash table
     private static ThreadInfo[] threadInfos = new ThreadInfo[1]; // To avoid null checks - important!
+    private static int threadInfosSize;
     private static int nThreads;
+    private static boolean hasDeadThreads;
     private static ThreadInfo lastThreadInfo = dummyThreadInfo;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -210,6 +215,7 @@ public class ThreadInfo {
         evBufSize = MAX_EVENT_ENTRIES_IN_LOCAL_BUFFER * MAX_EVENT_SIZE;
         evBufPosThreshold = evBufSize - (4 * MAX_EVENT_SIZE) - 1;
         threadInfos = new ThreadInfo[1]; // To avoid null checks
+        threadInfosSize = 0;
     }
 
     final boolean isInitialized() {
@@ -337,7 +343,14 @@ public class ThreadInfo {
                 Thread t = ti.thread;
 
                 if ((t != null) && !t.isAlive()) {
-                    ti.thread = null;
+                    if (ti.evBuf != null) {
+                        if (ti.evBufPos > 0) { // dump local event buffer
+                            ProfilerRuntimeCPU.copyLocalBuffer(ti);
+                        }
+                        ti.evBuf = null; // release results buffer
+                    }
+                    ti.thread = null; // release dead thread
+                    hasDeadThreads = true;
                 }
             }
         }
@@ -365,7 +378,7 @@ public class ThreadInfo {
     }
 
     private static void addThreadInfo(final ThreadInfo res, final Thread thread) {
-        if (nThreads > ((threadInfos.length * 3) / 4)) {
+        if (threadInfosSize >= ((threadInfos.length * 3) / 4)) {
             rehash();
         }
 
@@ -377,6 +390,7 @@ public class ThreadInfo {
         }
 
         threadInfos[pos] = res;
+        threadInfosSize++;
     }
 
     private static ThreadInfo newThreadInfo(Thread thread) {
@@ -398,8 +412,9 @@ public class ThreadInfo {
     }
 
     private static void rehash() {
-        int capacity = (threadInfos.length * 2) + 1;
+        int capacity = hasDeadThreads ? threadInfos.length : (threadInfos.length * 2) + 1;
         ThreadInfo[] newTIs = new ThreadInfo[capacity];
+        int size = 0;
 
         for (int i = 0; i < threadInfos.length; i++) {
             ThreadInfo ti = threadInfos[i];
@@ -415,9 +430,12 @@ public class ThreadInfo {
             }
 
             newTIs[pos] = ti;
+            size++;
         }
 
         threadInfos = newTIs;
+        threadInfosSize = size;
+        hasDeadThreads = false;
     }
 
     private void resetInternalState() {

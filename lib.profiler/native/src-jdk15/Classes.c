@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -111,17 +114,14 @@ JNIEXPORT jobjectArray JNICALL Java_org_netbeans_lib_profiler_server_system_Clas
     type = (*env)->FindClass(env, "java/lang/Class");
     assert(type != NULL);
     ret = (*env)->NewObjectArray(env, n_linked_classes, type, NULL);
-    if (ret == NULL) {
-        return NULL;
-    }
-  
-    j = 0;
-    for (i = 0; i < classCount; i++) {
-        if (class_status[i]) {
-            (*env)->SetObjectArrayElement(env, ret, j++, classes[i]);
+    if (ret != NULL) {  
+        j = 0;
+        for (i = 0; i < classCount; i++) {
+            if (class_status[i]) {
+                (*env)->SetObjectArrayElement(env, ret, j++, classes[i]);
+            }
         }
     }
-  
     free(class_status);
     res = (*_jvmti)->Deallocate(_jvmti, (unsigned char*) classes);
     assert(res == JVMTI_ERROR_NONE);
@@ -262,7 +262,7 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_doRe
     jvmtiClassDefinition* classDefs;
   
     if (!nativeMethodBindDisabled) {
-        // First, disable the NativeMethodBind event, assume that Thread.sleep and Object.wwait have already been intercepted
+        // First, disable the NativeMethodBind event, assume that Thread.sleep and Object.wait have already been intercepted
         res = (*_jvmti)->SetEventNotificationMode(_jvmti, JVMTI_DISABLE, JVMTI_EVENT_NATIVE_METHOD_BIND, NULL);
         if (res != JVMTI_ERROR_NONE) {
             fprintf (stderr, "Profiler Agent: Error while turning NativeMethodBind off: %d\n",res);

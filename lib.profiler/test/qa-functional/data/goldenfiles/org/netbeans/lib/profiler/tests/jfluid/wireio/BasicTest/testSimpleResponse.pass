@@ -1,2 +1,2 @@
 Server start to listen on port 5140
- received object org.netbeans.lib.profiler.wireprotocol.Response NO TYPEError, Error message.
+ received object org.netbeans.lib.profiler.wireprotocol.Response NO TYPE Error, Error message.

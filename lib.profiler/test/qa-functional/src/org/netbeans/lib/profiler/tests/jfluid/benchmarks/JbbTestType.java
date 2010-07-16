@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -104,7 +107,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
         return null;
     }
 
-    protected void evalueateResults(int[] without, int[] with) {
+    protected void evalueateResults(int[] without, int[] with, int maxSlowdown) {
         double[] diffs = new double[with.length];
 
         for (int i = 0; i < diffs.length; i++) {
@@ -124,8 +127,8 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
             }
         }
 
-        log("\nMax multiple: " + String.valueOf(maxmult) + " %\n");
-        assertTrue("Difference multiple is greater than 5 - " + String.valueOf(maxmult), (maxmult <= 5));
+        log("\nMax multiple: " + String.valueOf(maxmult) + " Max allowed: "+maxSlowdown+"\n");
+        assertTrue("Difference multiple is greater than "+maxSlowdown+" - " + String.valueOf(maxmult), (maxmult <= maxSlowdown));
     }
 
     protected ProfilerEngineSettings initCpuTest(String projectName, String mainClass) {
@@ -144,7 +147,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
         return settings;
     }
 
-    protected void startBenchmarkTest(ProfilerEngineSettings settings, long checkDelay) {
+    protected void startBenchmarkTest(ProfilerEngineSettings settings, int maxSlowdown) {
         //without profiler
         log("without profiler");
         log("*******************************************************************************");
@@ -196,13 +199,14 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
             Process p = startTargetVM(runner);
             assertNotNull("Target JVM is not started", p);
             time = System.currentTimeMillis();
-            runner.connectToStartedVMAndStartTA();
+            runner.attachToTargetVMOnStartup();
             //Thread.sleep(delay);//wait for init
             waitForStatus(STATUS_RUNNING);
             assertTrue("runner is not running", runner.targetAppIsRunning());
 
             ArrayList metods = new ArrayList();
-
+            long checkDelay = 1500;
+            
             while (!isStatus(STATUS_APP_FINISHED) && !isStatus(STATUS_ERROR)) {
                 time = System.currentTimeMillis();
                 Thread.sleep(checkDelay);
@@ -214,8 +218,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
             log("finish ****************************** " + getStatus());
 
             int[] res2 = checkResults(workdir);
-            evalueateResults(res1, res2);
-            Utils.removeFolder(new File(workdir, "results"));
+            evalueateResults(res1, res2, maxSlowdown);
         } catch (Exception ex) {
             log(ex);
             assertTrue("Exception thrown: " + ex.getMessage(), false);

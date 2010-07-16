@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -57,6 +60,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     private static final boolean DEBUG = false;
     private static int nProfiledThreadsLimit;
     protected static int nProfiledThreadsAllowed;
+    protected static boolean enableFirstTimeMethodInvoke;
 
     // The following flag is used to prevent deadlock inside getThreadInfo() by forcing immediate return from methodEntry() etc.
     // in case methodEntry() (typically when it's injected in some core class method) is executed on behalf of some profiler server thread,
@@ -107,6 +111,10 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
         absoluteTimerOn = absolute;
         threadCPUTimerOn = threadCPU;
+    }
+    
+    public static void enableFirstTimeMethodInvoke(boolean enabled) {
+        enableFirstTimeMethodInvoke = enabled;
     }
 
     // This is currently used only when calibrating the profiler, to pre-create a ThreadInfo before calling methodEntry/Exit.
@@ -192,11 +200,10 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         // profile the Timer.get... calls, by increasing the ti.inProfilingRuntimeMethod
         // see issue 65614 for a possible impact of this
         // http://profiler.netbeans.org/issues/show_bug.cgi?id=65614
-        long absTimeStamp = Timers.getCurrentTimeInCounts();
-        long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
-        ti.absEntryTime = absTimeStamp;
-        ti.threadEntryTime = threadTimeStamp;
-
+        ti.absEntryTime = Timers.getCurrentTimeInCounts();
+        if (threadCPUTimerOn) {
+            ti.threadEntryTime = Timers.getThreadCPUTimeInNanos();
+        }
         return ti;
     }
 
@@ -218,7 +225,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
         if (sendingBuffer) { // Some other thread is already sending the buffer contents
             absTimeStamp = Timers.getCurrentTimeInCounts();
-            threadTimeStamp = Timers.getThreadCPUTimeInNanos();
+            if (threadCPUTimerOn) threadTimeStamp = Timers.getThreadCPUTimeInNanos();
 
             synchronized (eventBuffer) { // Wait on the lock. When it's free, buffer has been sent and reset
 
@@ -245,7 +252,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
                 if (!needToAdjustTime) {
                     absTimeStamp = Timers.getCurrentTimeInCounts();
-                    threadTimeStamp = Timers.getThreadCPUTimeInNanos();
+                    if (threadCPUTimerOn) threadTimeStamp = Timers.getThreadCPUTimeInNanos();
                     needToAdjustTime = true;
                 }
 
@@ -396,6 +403,15 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         }
     }
 
+    protected static void firstTimeMethodInvoke(final ThreadInfo ti, final char methodId) {
+        if (enableFirstTimeMethodInvoke) {
+            long absTimeStamp = Timers.getCurrentTimeInCounts();
+            long threadTimeStamp = threadCPUTimerOn ? Timers.getThreadCPUTimeInNanos() : 0;
+            externalActionsHandler.handleFirstTimeMethodInvoke(methodId);
+            writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
+        }
+    }
+    
     static void writeAdjustTimeEvent(ThreadInfo ti, long absTimeStamp, long threadTimeStamp) {
         //if (printEvents) System.out.println("*** Writing ADJUST_TIME event, metodId = " + (int)methodId + ", ts = " + timeStamp);
         byte[] evBuf = ti.evBuf;
@@ -450,15 +466,16 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         evBuf[curPos++] = (byte) ((absInterval >> 8) & 0xFF);
         evBuf[curPos++] = (byte) ((absInterval) & 0xFF);
 
-        long threadInterval = Timers.getThreadCPUTimeInNanos() - threadTimeStamp;
-        evBuf[curPos++] = (byte) ((threadInterval >> 48) & 0xFF);
-        evBuf[curPos++] = (byte) ((threadInterval >> 40) & 0xFF);
-        evBuf[curPos++] = (byte) ((threadInterval >> 32) & 0xFF);
-        evBuf[curPos++] = (byte) ((threadInterval >> 24) & 0xFF);
-        evBuf[curPos++] = (byte) ((threadInterval >> 16) & 0xFF);
-        evBuf[curPos++] = (byte) ((threadInterval >> 8) & 0xFF);
-        evBuf[curPos++] = (byte) ((threadInterval) & 0xFF);
-
+        if (threadCPUTimerOn) {
+            long threadInterval = Timers.getThreadCPUTimeInNanos() - threadTimeStamp;
+            evBuf[curPos++] = (byte) ((threadInterval >> 48) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 40) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 32) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval) & 0xFF);
+        }
         ti.evBufPos = curPos;
     }
 
@@ -558,7 +575,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         // Note that in the code below, we write only the 7 low bytes of the 64-bit timestamp. The justification is that this saves
         // us some performance and memory, and 2^55 == 36028797018963968 ns == 36028797 sec == 10008 hr == 416 days is a sufficent
         // representation range for the foreseeable usages of our tool. (***)
-        if (absoluteTimerOn || (eventType < TWO_TIMESTAMP_EVENTS)) {
+        if (absoluteTimerOn) {
             long absTimeStamp = Timers.getCurrentTimeInCounts();
             evBuf[curPos++] = (byte) ((absTimeStamp >> 48) & 0xFF);
             evBuf[curPos++] = (byte) ((absTimeStamp >> 40) & 0xFF);
@@ -574,7 +591,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
             }
         }
 
-        if (threadCPUTimerOn || (eventType < TWO_TIMESTAMP_EVENTS)) {
+        if (threadCPUTimerOn) {
             long threadTimeStamp = Timers.getThreadCPUTimeInNanos();
             evBuf[curPos++] = (byte) ((threadTimeStamp >> 48) & 0xFF);
             evBuf[curPos++] = (byte) ((threadTimeStamp >> 40) & 0xFF);

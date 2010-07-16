@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -73,14 +76,14 @@ public class JbbTest extends JbbTestType {
             "testDefaultPart",
             "testInstrumentEager",
             "testInstrumentSampledLazy",
-            "testInstrumentSampledTotal").enableModules(".*").clusters(".*"));
+            "testInstrumentSampledTotal").enableModules(".*").clusters(".*").gui(false));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void testBasic() {
         ProfilerEngineSettings settings = initCpuTest("jbb", "spec.jbb.JBBmain");
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 20);
     }
 
     public void testDefaultEntire() {
@@ -92,7 +95,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 170);
     }
 
     public void testDefaultPart() {
@@ -104,7 +107,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(false);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 10);
     }
 
     public void testInstrumentEager() {
@@ -116,7 +119,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 165);
     }
 
     public void testInstrumentSampledLazy() {
@@ -129,7 +132,7 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 30);
     }
 
     public void testInstrumentSampledTotal() {
@@ -142,6 +145,6 @@ public class JbbTest extends JbbTestType {
         settings.setInstrumentMethodInvoke(true);
         settings.setInstrumentSpawnedThreads(true);
         settings.setExcludeWaitTime(true);
-        startBenchmarkTest(settings, 1500);
+        startBenchmarkTest(settings, 35);
     }
 }

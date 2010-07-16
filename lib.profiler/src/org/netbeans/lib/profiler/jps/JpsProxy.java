@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -40,10 +43,6 @@
 
 package org.netbeans.lib.profiler.jps;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import sun.jvmstat.monitor.*;
 import java.lang.management.ManagementFactory;
@@ -158,33 +157,12 @@ public class JpsProxy {
         return (RunningVM[]) vret.toArray(new RunningVM[vret.size()]);
     }
 
-    // invoke MonitoredVmUtil.isAttachable(MonitoredVm vm) using reflection (JDK 6 only code)
-    private static Method monitoredVmUtil_isAttachable;
-    
-    static {
-        try {
-            monitoredVmUtil_isAttachable = MonitoredVmUtil.class.getMethod("isAttachable",new Class[]{MonitoredVm.class}); // NOI18N
-        } catch (SecurityException ex) {
-            ex.printStackTrace();
-        } catch (NoSuchMethodException ex) {
-            ex.printStackTrace();
-        }
-    }
-    
     private static boolean isAttachable(MonitoredVm vm) {
-        Object ret;
         try {
-            ret = monitoredVmUtil_isAttachable.invoke(null, new Object[] {vm});
-            if (ret instanceof Boolean) {
-                return ((Boolean)ret).booleanValue();
-            }
-        } catch (IllegalArgumentException ex) {
+            return MonitoredVmUtil.isAttachable(vm);
+        } catch (MonitorException ex) {
             ex.printStackTrace();
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-        } catch (InvocationTargetException ex) {
-            ex.printStackTrace();
+            return false;
         }
-        return false;
     }
 }

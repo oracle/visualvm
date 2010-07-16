@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -136,6 +139,7 @@ class NearestGCRoot {
     }
 
     private void computeOneLevel() throws IOException {
+        int idSize = heap.dumpBuffer.getIDSize();
         for (;;) {
             long instanceId = readLong();
             Instance instance;
@@ -149,12 +153,14 @@ class NearestGCRoot {
             HeapProgress.progress(processedInstances++,allInstances);
             instance = heap.getInstanceByID(instanceId);
             if (instance instanceof ObjectArrayInstance) {
-                Iterator instanceIt = ((ObjectArrayInstance) instance).getValues().iterator();
+                ObjectArrayDump array = (ObjectArrayDump) instance;
+                int size = array.getLength();
+                long offset = array.getOffset();
 
-                while (instanceIt.hasNext()) {
-                    Instance refInstance = (Instance) instanceIt.next();
-                    writeConnection(instanceId, refInstance);
-                    if (refInstance != null) {
+                for (int i=0;i<size;i++) {
+                    long referenceId = heap.dumpBuffer.getID(offset + (i * idSize));
+
+                    if (writeConnection(instanceId, referenceId)) {
                         hasValues = true;
                     }
                 }
@@ -185,10 +191,14 @@ class NearestGCRoot {
                 if (val instanceof ObjectFieldValue) {
                      // skip Soft, Weak, Final and Phantom References
                     if (!isSpecialReference(val, instance)) {
-                        Instance refInstance = ((ObjectFieldValue) val).getInstance();
-                        
-                        writeConnection(instanceId, refInstance);
-                        if (refInstance != null) {
+                        long refInstanceId;
+
+                        if (val instanceof HprofFieldObjectValue) {
+                            refInstanceId = ((HprofFieldObjectValue) val).getInstanceID();
+                        } else {
+                             refInstanceId = ((HprofInstanceObjectValue) val).getInstanceId();
+                        }
+                        if (writeConnection(instanceId, refInstanceId)) {
                             hasValues = true;
                         }
                     }
@@ -255,13 +265,12 @@ class NearestGCRoot {
         writeBuffer.reset();
     }
 
-    private void writeConnection(long instanceId, Instance refInstance)
+    private boolean writeConnection(long instanceId, long refInstanceId)
                           throws IOException {
-        if (refInstance != null) {
-            long refInstanceId = refInstance.getInstanceId();
+        if (refInstanceId != 0) {
             LongMap.Entry entry = heap.idToOffsetMap.get(refInstanceId);
 
-            if (entry.getNearestGCRootPointer() == 0L && heap.getGCRoot(refInstance) == null) {
+            if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.getGCRoot(refInstanceId) == null) {
                 writeLong(refInstanceId);
                 entry.setNearestGCRootPointer(instanceId);
                 if (!entry.hasOnlyOneReference()) {
@@ -269,7 +278,9 @@ class NearestGCRoot {
 //multiParentsCount++;
                 }
             }
+            return entry != null;
         }
+        return false;
     }
 
     private void writeLong(long instanceId) throws IOException {
