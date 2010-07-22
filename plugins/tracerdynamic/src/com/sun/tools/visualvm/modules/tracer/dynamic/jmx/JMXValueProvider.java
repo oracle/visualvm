@@ -27,6 +27,8 @@ package com.sun.tools.visualvm.modules.tracer.dynamic.jmx;
 
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.modules.tracer.dynamic.impl.ValueProvider;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -36,6 +38,7 @@ import javax.management.ObjectName;
  * @author Jaroslav Bachorik
  */
 public class JMXValueProvider implements ValueProvider {
+    final private static Logger LOG = Logger.getLogger(JMXValueProvider.class.getName());
     private ObjectName on;
     private String attributeName;
     private JMXValueCache cache;
@@ -58,7 +61,7 @@ public class JMXValueProvider implements ValueProvider {
     public Object value(long timestamp) {
         Object val = cache.getValue(on, attributeName, timestamp);
         if (val == null) {
-            System.err.println("NULL @ " + timestamp);
+            LOG.log(Level.FINE, "NULL({0}#{1}) @ {2}", new Object[]{on, attributeName, timestamp});
         }
         return val == null ? 0 : val;
     }

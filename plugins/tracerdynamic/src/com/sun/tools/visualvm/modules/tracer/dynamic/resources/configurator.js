@@ -319,7 +319,7 @@ function processPackage(pkg) {
                         }
                     }
                     var pEnabled = enabled;
-                    desc = probe.desc;
+                    desc = probe.desc != undefined ? probe.desc : "";
                     if (pEnabled && probe.validator != undefined) {
                         pEnabled = probe.validator();
                         if (!pEnabled) {
@@ -367,17 +367,20 @@ function getKeys(map) {
         for(var counter=0; counter < map.length; counter++) {
             ret[ret.length] = map[counter].get("key");
         }
-    } else if (map.getCompositeType != undefined) {
-        var type = map.getCompositeType();
+    } else if (map instanceof Packages.javax.management.openmbean.CompositeData) {
+        if (map.getCompositeType != undefined) {
+            var type = map.getCompositeType();
         
-        var iter1 = type.keySet().iterator();
-        while (iter1.hasNext()) {
-            ret[ret.length] = iter1.next().get(0);
-        }
-    } else if (map.getTabularType != undefined) {
-        var iter2 = map.keySet().iterator();
-        while (iter2.hasNext()) {
-            ret[ret.length] = iter2.next().get(0);
+            var iter1 = type.keySet().iterator();
+            while (iter1.hasNext()) {
+                var val = iter1.next();
+                ret[ret.length] = val.get != undefined ? val.get(0) : val;
+            }
+        } else if (map.getTabularType != undefined) {
+            var iter2 = map.keySet().iterator();
+            while (iter2.hasNext()) {
+                ret[ret.length] = iter2.next().get(0);
+            }
         }
     }
     return ret;
@@ -400,22 +403,24 @@ function get(map, keys) {
                 }
             }
         }
-    } else if (map.getTabularType != undefined) {
-        // javax.management.openmbean.TabularDataSupport -> effectively a Map instance
-        if (!keyArray || keys.length == 1) {
-            ret = map.get([key]).get(["value"]);
-            return ret;
-        } else {
-            ret = get(map.get([key]).get(["value"]), keys.slice(1));
-            return ret;
-        }
-    } else if (map.getCompositeType != undefined) {
-        if (!keyArray || keys.length == 1) {
-            ret = map.get(key);
-            return ret;
-        } else {
-            ret = get(map.get(key), keys.slice(1));
-            return ret;
+    } else if (map instanceof Packages.javax.management.openmbean.CompositeData) {
+        if (map.getTabularType != undefined) {
+            // javax.management.openmbean.TabularDataSupport -> effectively a Map instance
+            if (!keyArray || keys.length == 1) {
+                ret = map.get([key]).get(["value"]);
+                return ret;
+            } else {
+                ret = get(map.get([key]).get(["value"]), keys.slice(1));
+                return ret;
+            }
+        } else if (map.getCompositeType != undefined) {
+            if (!keyArray || keys.length == 1) {
+                ret = map.get(key);
+                return ret;
+            } else {
+                ret = get(map.get(key), keys.slice(1));
+                return ret;
+            }
         }
     }
     return 0;
