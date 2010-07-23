@@ -48,7 +48,7 @@ import static com.sun.btrace.BTraceUtils.*;
     @Property(name="jcEventsProfiler") private static Profiler jcEventsProfiler = Profiling.newProfiler(10);
 
     @OnMethod(
-        clazz="+javax.swing.JComponent",
+        clazz="+java.awt.Component",
         method="/process(Component|Focus|Key|Mouse|MouseMotion|MouseWheel|InputMethod|Hierarchy)Event/"
     )
     public static void componentEventBefore(@ProbeMethodName String pmn) {
@@ -56,7 +56,7 @@ import static com.sun.btrace.BTraceUtils.*;
     }
 
     @OnMethod(
-        clazz="+javax.swing.JComponent",
+        clazz="+java.awt.Component",
         method="/process(Component|Focus|Key|Mouse|MouseMotion|MouseWheel|InputMethod|Hierarchy)Event/",
         location=@Location(Kind.RETURN)
     )
