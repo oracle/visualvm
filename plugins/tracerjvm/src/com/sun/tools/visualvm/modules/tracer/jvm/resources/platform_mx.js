@@ -274,7 +274,7 @@ VisualVM.Tracer.addPackages([{
             },
             {
                 name: "Java Files Utilization",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 desc: "Measures read/write rates of Java Files.",
                 validator: isBTraceAvailable,
                 deployment: {
@@ -304,7 +304,7 @@ VisualVM.Tracer.addPackages([{
             {
                 name: "NIO Utilization",
                 desc: "Measures read/write rates of NIO.",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },

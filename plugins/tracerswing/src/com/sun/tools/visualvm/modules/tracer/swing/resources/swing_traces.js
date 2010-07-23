@@ -59,7 +59,7 @@ VisualVM.Tracer.addPackages([{
         probes: [
             {
                 name: "EDT Events Count",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -85,7 +85,7 @@ VisualVM.Tracer.addPackages([{
             },
             {
                 name: "EDT Events Time",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -115,7 +115,7 @@ VisualVM.Tracer.addPackages([{
             },
             awt_paints_count = {
                 name: "AWT Paints Count",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -142,7 +142,7 @@ VisualVM.Tracer.addPackages([{
             },
             awt_paints_time = {
                 name: "AWT Paints Time",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -180,7 +180,7 @@ VisualVM.Tracer.addPackages([{
             },
             jc_paints_count = {
                 name: "Swing Paints Count",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -206,7 +206,7 @@ VisualVM.Tracer.addPackages([{
             },
             jc_paints_time = {
                 name: "Swing Paints Time",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -244,7 +244,7 @@ VisualVM.Tracer.addPackages([{
             },
             cu_paints_time = {
                 name: "ComponentUI Paints Time",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -274,7 +274,7 @@ VisualVM.Tracer.addPackages([{
             },
             cu_layouts_time = {
                 name: "ComponentUI Layouts Time",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -312,7 +312,7 @@ VisualVM.Tracer.addPackages([{
             },
             jc_events_time = {
                 name: "Component Events Time",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -382,7 +382,7 @@ VisualVM.Tracer.addPackages([{
             },
             jc_events_count = {
                 name: "Component Events Count",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -428,7 +428,7 @@ VisualVM.Tracer.addPackages([{
             },
             layout_time = {
                 name: "Layouts Time",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -463,7 +463,7 @@ VisualVM.Tracer.addPackages([{
             },
             layout_counts = {
                 name: "Layouts Counts",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -489,7 +489,7 @@ VisualVM.Tracer.addPackages([{
             },
             events_time = {
                 name: "Basic Events Time",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
@@ -524,7 +524,7 @@ VisualVM.Tracer.addPackages([{
             },
             events_counts = {
                 name: "Basic Events Counts",
-                reqs: "Requires Tracer-BTrace Support plugin.",
+                reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
                 },
