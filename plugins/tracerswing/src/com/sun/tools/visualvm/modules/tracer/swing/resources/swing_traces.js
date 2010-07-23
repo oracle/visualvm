@@ -55,10 +55,12 @@ function invocations(mbean, blockName) {
 VisualVM.Tracer.addPackages([{
         name: "Swing & AWT",
         desc: "Swing & AWT subsystem statistics",
+        icon: "com/sun/tools/visualvm/modules/tracer/swing/resources/icon.png",
         position: 540,
         probes: [
             {
-                name: "EDT Events Count",
+                name: "EventQueue Calls Count",
+                desc: "Invocations count of EventQueue.dispatchEvent(), EventQueue.invokeAndWait(), EventQueue.invokeLater().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -70,21 +72,25 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "dispatchEvent()",
+                        name: "dispatchEvent",
+                        desc: "Invocations count of EventQueue.dispatchEvent().",
                         value: mbeanAttribute("btrace:name=AWTStats", "dispatchEventCount")
                     },
                     {
-                        name: "invokeAndWait()",
+                        name: "invokeAndWait",
+                        desc: "Invocations count EventQueue.invokeAndWait().",
                         value: mbeanAttribute("btrace:name=AWTStats", "invokeWaitCount")
                     },
                     {
-                        name: "invokeLater()",
+                        name: "invokeLater",
+                        desc: "Invocations count of EventQueue.invokeLater().",
                         value: mbeanAttribute("btrace:name=AWTStats", "invokeLaterCount")
                     }
                 ]
             },
             {
-                name: "EDT Events Time",
+                name: "EventQueue Calls Time",
+                desc: "Relative time spent in EventQueue.dispatchEvent(), EventQueue.invokeAndWait().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -96,7 +102,8 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "dispatchEvent()",
+                        name: "dispatchEvent",
+                        desc: "Relative time spent in EventQueue.dispatchEvent().",
                         value: mbeanAttribute("btrace:name=AWTStats", "dispatchEventTime"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -104,7 +111,8 @@ VisualVM.Tracer.addPackages([{
                         }
                     },
                     {
-                        name: "invokeAndWait()",
+                        name: "invokeAndWait",
+                        desc: "Relative time spent in EventQueue.invokeAndWait().",
                         value: mbeanAttribute("btrace:name=AWTStats", "invokeWaitTime"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -114,7 +122,8 @@ VisualVM.Tracer.addPackages([{
                 ]
             },
             awt_paints_count = {
-                name: "AWT Paints Count",
+                name: "Component Paints Count",
+                desc: "Invocations count of Component.paint(), Component.update(), Component.repaint().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -126,22 +135,26 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "Paint",
+                        name: "paint",
+                        desc: "Invocations count of Component.paint().",
                         value: invocations(mbeanAttribute("btrace:name=AWTStats", "awtPaintProfiler"), "paint")
 
                     },
                     {
-                        name: "Update",
+                        name: "update",
+                        desc: "Invocations count of Component.update().",
                         value: invocations(mbeanAttribute("btrace:name=AWTStats", "awtPaintProfiler"), "update")
                     },
                     {
-                        name: "Repaint",
+                        name: "repaint",
+                        desc: "Invocations count of Component.repaint().",
                         value: invocations(mbeanAttribute("btrace:name=AWTStats", "awtPaintProfiler"), "repaint")
                     }
                 ]
             },
             awt_paints_time = {
-                name: "AWT Paints Time",
+                name: "Component Paints Time",
+                desc: "Relative time spent in Component.paint(), Component.update().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -153,7 +166,8 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "Paint",
+                        name: "paint",
+                        desc: "Relative time spent in Component.paint().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=AWTStats", "awtPaintProfiler"), "paint"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -161,16 +175,9 @@ VisualVM.Tracer.addPackages([{
                         }
                     },
                     {
-                        name: "Update",
+                        name: "update",
+                        desc: "Relative time spent in Component.update().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=AWTStats", "awtPaintProfiler"), "update"),
-                        presenter: {
-                            format: ItemValueFormatter.DEFAULT_PERCENT,
-                            max: 1000
-                        }
-                    },
-                    {
-                        name: "Repaint",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=AWTStats", "awtPaintProfiler"), "repaint"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
                             max: 1000
@@ -179,7 +186,8 @@ VisualVM.Tracer.addPackages([{
                 ]
             },
             jc_paints_count = {
-                name: "Swing Paints Count",
+                name: "JComponent Paints Count",
+                desc: "Invocations count of JComponent.paintComponent(), JComponent.paintBorder(), JComponent.paintChildren().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -191,21 +199,25 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "Component",
+                        name: "paintComponent",
+                        desc: "Invocations count of JComponent.paintComponent().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcPaintProfiler"), "paintComponent")
                     },
                     {
-                        name: "Border",
+                        name: "paintBorder",
+                        desc: "Invocations count of JComponent.paintBorder().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcPaintProfiler"), "paintBorder")
                     },
                     {
-                        name: "Children",
+                        name: "paintChildren",
+                        desc: "Invocations count of JComponent.paintChildren().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcPaintProfiler"), "paintChildren")
                     }
                 ]
             },
             jc_paints_time = {
-                name: "Swing Paints Time",
+                name: "JComponent Paints Time",
+                desc: "Relative time spent in JComponent.paintComponent(), JComponent.paintBorder(), JComponent.paintChildren().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -217,7 +229,8 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "Component",
+                        name: "paintComponent",
+                        desc: "Relative time spent in JComponent.paintComponent().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcPaintProfiler"), "paintComponent"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -225,7 +238,8 @@ VisualVM.Tracer.addPackages([{
                         }
                     },
                     {
-                        name: "Border",
+                        name: "paintBorder",
+                        desc: "Relative time spent in JComponent.paintBorder().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcPaintProfiler"), "paintBorder"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -233,7 +247,8 @@ VisualVM.Tracer.addPackages([{
                         }
                     },
                     {
-                        name: "Children",
+                        name: "paintChildren",
+                        desc: "Relative time spent in JComponent.paintChildren().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcPaintProfiler"), "paintChildren"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -244,6 +259,7 @@ VisualVM.Tracer.addPackages([{
             },
             cu_paints_time = {
                 name: "ComponentUI Paints Time",
+                desc: "Relative time spent in ComponentUI.paint(), ComponentUI.update().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -255,7 +271,8 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "Paint",
+                        name: "paint",
+                        desc: "Relative time spent in ComponentUI.paint().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "cuiProfiler"), "paint"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -263,7 +280,8 @@ VisualVM.Tracer.addPackages([{
                         }
                     },
                     {
-                        name: "Update",
+                        name: "update",
+                        desc: "Relative time spent in ComponentUI.update().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "cuiProfiler"), "update"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -274,6 +292,7 @@ VisualVM.Tracer.addPackages([{
             },
             cu_layouts_time = {
                 name: "ComponentUI Layouts Time",
+                desc: "Relative time spent in ComponentUI.getPreferredSize(), ComponentUI.getMinimumSize(), ComponentUI.getMaximumSize().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -285,7 +304,8 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "GetPreferredSize",
+                        name: "getPreferredSize",
+                        desc: "Relative time spent in ComponentUI.getPreferredSize().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "cuiProfiler"), "getPreferredSize"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -293,7 +313,8 @@ VisualVM.Tracer.addPackages([{
                         }
                     },
                     {
-                        name: "GetMaximumSize",
+                        name: "getMinimumSize",
+                        desc: "Relative time spent in ComponentUI.getMinimumSize().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "cuiProfiler"), "getMaximumSize"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -301,7 +322,8 @@ VisualVM.Tracer.addPackages([{
                         }
                     },
                     {
-                        name: "GetMinimumSize",
+                        name: "getMaximumSize",
+                        desc: "Relative time spent in ComponentUI.getMaximumSize().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "cuiProfiler"), "getMinimumSize"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
@@ -310,8 +332,9 @@ VisualVM.Tracer.addPackages([{
                     }
                 ]
             },
-            jc_events_time = {
-                name: "Component Events Time",
+            layout_counts = {
+                name: "Layouts Count",
+                desc: "Invocations count of LayoutManager.preferredLayoutSize(), LayoutManager.minimumLayoutSize(), LayoutManager.layoutContainer().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -319,61 +342,128 @@ VisualVM.Tracer.addPackages([{
                 deployment: {
                     deployer: btraceDeployer,
                     script: swingScriptPath,
-                    fragment: "component_events"
+                    fragment: "layout"
                 },
                 properties: [
                     {
-                        name: "Component Event",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processComponentEvent"),
+                        name: "preferredLayoutSize",
+                        desc: "Invocations count of LayoutManager.preferredLayoutSize().",
+                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "preferredLayoutSize")
+                    },
+                    {
+                        name: "minimumLayoutSize",
+                        desc: "Invocations count of LayoutManager.minimumLayoutSize().",
+                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "minimumLayoutSize")
+                    },
+                    {
+                        name: "layoutContainer",
+                        desc: "Invocations count of LayoutManager.layoutContainer().",
+                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "layoutContainer")
+                    }
+                ]
+            },
+            layout_time = {
+                name: "Layouts Time",
+                desc: "Relative time spent in LayoutManager.preferredLayoutSize(), LayoutManager.minimumLayoutSize(), LayoutManager.layoutContainer().",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: swingScriptPath,
+                    fragment: "layout"
+                },
+                properties: [
+                    {
+                        name: "preferredLayoutSize",
+                        desc: "Relative time spent in LayoutManager.preferredLayoutSize().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "preferredLayoutSize"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
                     },
                     {
-                        name: "Focus Event",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processFocusEvent"),
+                        name: "minimumLayoutSize",
+                        desc: "Relative time spent in LayoutManager.minimumLayoutSize().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "minimumLayoutSize"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
                     },
                     {
-                        name: "Key Event",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processKeyEvent"),
+                        name: "layoutContainer",
+                        desc: "Relative time spent in LayoutManager.layoutContainer().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "layoutContainer"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT
+                        }
+                    }
+                ]
+            },
+            events_counts = {
+                name: "Common Events Count",
+                desc: "Invocations count of ActionListener.actionPerformed(), ChangeListener.stateChanged(), PropertyChangeListener.propertyChange().",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: swingScriptPath,
+                    fragment: "basic_events"
+                },
+                properties: [
+                    {
+                        name: "actionPerformed",
+                        desc: "Invocations count of ActionListener.actionPerformed().",
+                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "actionPerformed")
+                    },
+                    {
+                        name: "stateChanged",
+                        desc: "Invocations count of ChangeListener.stateChanged().",
+                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "stateChanged")
+                    },
+                    {
+                        name: "propertyChange",
+                        desc: "Invocations count of PropertyChangeListener.propertyChange().",
+                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "propertyChange")
+                    }
+                ]
+            },
+            events_time = {
+                name: "Common Events Time",
+                desc: "Relative time spent in ActionListener.actionPerformed(), ChangeListener.stateChanged(), PropertyChangeListener.propertyChange().",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: swingScriptPath,
+                    fragment: "basic_events"
+                },
+                properties: [
+                    {
+                        name: "actionPerformed",
+                        desc: "Relative time spent in ActionListener.actionPerformed().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "actionPerformed"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
                     },
                     {
-                        name: "Mouse Event",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processMouseEvent"),
+                        name: "stateChanged",
+                        desc: "Relative time spent in ChangeListener.stateChanged().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "stateChanged"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
                     },
                     {
-                        name: "MouseMotion Event",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processMouseMotionEvent"),
-                        presenter: {
-                            format: ItemValueFormatter.DEFAULT_PERCENT
-                        }
-                    },
-                    {
-                        name: "MouseWheel Event",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processMouseWheelEvent"),
-                        presenter: {
-                            format: ItemValueFormatter.DEFAULT_PERCENT
-                        }
-                    },
-                    {
-                        name: "InputMethod Event",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processInputMethodEvent"),
-                        presenter: {
-                            format: ItemValueFormatter.DEFAULT_PERCENT
-                        }
-                    },
-                    {
-                        name: "Hierarchy Event",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processHierarchyEvent"),
+                        name: "propertyChange",
+                        desc: "Relative time spent in PropertyChangeListener.propertyChange().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "propertyChange"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
@@ -382,6 +472,7 @@ VisualVM.Tracer.addPackages([{
             },
             jc_events_count = {
                 name: "Component Events Count",
+                desc: "Invocations count of Component.processComponentEvent(), Component.processFocusEvent(), Component.processKeyEvent(), Component.processMouseEvent(), Component.processMouseMotionEvent(), Component.processMouseWheelEvent(), Component.processInputMethodEvent(), Component.processHierarchyEvent().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -393,41 +484,50 @@ VisualVM.Tracer.addPackages([{
                 },
                 properties: [
                     {
-                        name: "Component Event",
+                        name: "processComponentEvent",
+                        desc: "Invocations count of Component.processComponentEvent().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processComponentEvent")
                     },
                     {
-                        name: "Focus Event",
+                        name: "processFocusEvent",
+                        desc: "Invocations count of Component.processFocusEvent().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processFocusEvent")
                     },
                     {
-                        name: "Key Event",
+                        name: "processKeyEvent",
+                        desc: "Invocations count of Component.processKeyEvent().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processKeyEvent")
                     },
                     {
-                        name: "Mouse Event",
+                        name: "processMouseEvent",
+                        desc: "Invocations count of Component.processMouseEvent().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processMouseEvent")
                     },
                     {
-                        name: "MouseMotion Event",
+                        name: "processMouseMotionEvent",
+                        desc: "Invocations count of Component.processMouseMotionEvent().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"),"processMouseMotionEvent")
                     },
                     {
-                        name: "MouseWheel Event",
+                        name: "processMouseWheelEvent",
+                        desc: "Invocations count of Component.processMouseWheelEvent().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processMouseWheelEvent")
                     },
                     {
-                        name: "InputMethod Event",
+                        name: "processInputMethodEvent",
+                        desc: "Invocations count of Component.processInputMethodEvent().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processInputMethodEvent")
                     },
                     {
-                        name: "Hierarchy Event",
+                        name: "processHierarchyEvent",
+                        desc: "Invocations count of Component.processHierarchyEvent().",
                         value: invocations(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processHierarchyEvent")
                     }
                 ]
             },
-            layout_time = {
-                name: "Layouts Time",
+            jc_events_time = {
+                name: "Component Events Time",
+                desc: "Relative time spent in Component.processComponentEvent(), Component.processFocusEvent(), Component.processKeyEvent(), Component.processMouseEvent(), Component.processMouseMotionEvent(), Component.processMouseWheelEvent(), Component.processInputMethodEvent(), Component.processHierarchyEvent().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -435,116 +535,72 @@ VisualVM.Tracer.addPackages([{
                 deployment: {
                     deployer: btraceDeployer,
                     script: swingScriptPath,
-                    fragment: "layout"
+                    fragment: "component_events"
                 },
                 properties: [
                     {
-                        name: "Preferred Layout Size",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "preferredLayoutSize"),
+                        name: "processComponentEvent",
+                        desc: "Relative time spent in Component.processComponentEvent().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processComponentEvent"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
                     },
                     {
-                        name: "Minimum Layout Size",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "minimumLayoutSize"),
+                        name: "processFocusEvent",
+                        desc: "Relative time spent in Component.processFocusEvent().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processFocusEvent"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
                     },
                     {
-                        name: "Layout Container",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "layoutContainer"),
-                        presenter: {
-                            format: ItemValueFormatter.DEFAULT_PERCENT
-                        }
-                    }
-                ]
-            },
-            layout_counts = {
-                name: "Layouts Counts",
-                reqs: "Requires BTrace Deployer plugin.",
-                validator: function() {
-                    return btraceDeployer != undefined;
-                },
-                deployment: {
-                    deployer: btraceDeployer,
-                    script: swingScriptPath,
-                    fragment: "layout"
-                },
-                properties: [
-                    {
-                        name: "Preferred Layout Size",
-                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "preferredLayoutSize")
-                    },
-                    {
-                        name: "Minimum Layout Size",
-                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "minimumLayoutSize")
-                    },
-                    {
-                        name: "Layout Container",
-                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "layoutProfiler"), "layoutContainer")
-                    }
-                ]
-            },
-            events_time = {
-                name: "Basic Events Time",
-                reqs: "Requires BTrace Deployer plugin.",
-                validator: function() {
-                    return btraceDeployer != undefined;
-                },
-                deployment: {
-                    deployer: btraceDeployer,
-                    script: swingScriptPath,
-                    fragment: "basic_events"
-                },
-                properties: [
-                    {
-                        name: "ActionListener.actionPerformed",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "actionPerformed"),
+                        name: "processKeyEvent",
+                        desc: "Relative time spent in Component.processKeyEvent().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processKeyEvent"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
                     },
                     {
-                        name: "ChangeListener.stateChanged",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "stateChanged"),
+                        name: "processMouseEvent",
+                        desc: "Relative time spent in Component.processMouseEvent().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processMouseEvent"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
                     },
                     {
-                        name: "PropertyChangeListener.propertyChanged",
-                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "propertyChanged"),
+                        name: "processMouseMotionEvent",
+                        desc: "Relative time spent in Component.processMouseMotionEvent().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processMouseMotionEvent"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT
                         }
-                    }
-                ]
-            },
-            events_counts = {
-                name: "Basic Events Counts",
-                reqs: "Requires BTrace Deployer plugin.",
-                validator: function() {
-                    return btraceDeployer != undefined;
-                },
-                deployment: {
-                    deployer: btraceDeployer,
-                    script: swingScriptPath,
-                    fragment: "basic_events"
-                },
-                properties: [
-                    {
-                        name: "ActionListener.actionPerformed",
-                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "actionPerformed")
                     },
                     {
-                        name: "ChangeListener.stateChanged",
-                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "stateChanged")
+                        name: "processMouseWheelEvent",
+                        desc: "Relative time spent in Component.processMouseWheelEvent().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processMouseWheelEvent"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT
+                        }
                     },
                     {
-                        name: "PropertyChangeListener.propertyChanged",
-                        value: invocations(mbeanAttribute("btrace:name=SwingStats", "eventsProfiler"), "propertyChanged")
+                        name: "processInputMethodEvent",
+                        desc: "Relative time spent in Component.processInputMethodEvent().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processInputMethodEvent"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT
+                        }
+                    },
+                    {
+                        name: "processHierarchyEvent",
+                        desc: "Relative time spent in Component.processHierarchyEvent().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=SwingStats", "jcEventsProfiler"), "processHierarchyEvent"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT
+                        }
                     }
                 ]
             }
