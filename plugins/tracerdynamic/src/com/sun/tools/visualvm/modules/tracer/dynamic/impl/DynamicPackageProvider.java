@@ -92,17 +92,18 @@ class DynamicPackageProvider extends ModuleInstall {
 
             try {
                 FileObject probesRoot = FileUtil.getConfigFile("VisualVM/Tracer/packages"); // NOI18N
-                
-                jsEngine.eval(readResource("com/sun/tools/visualvm/modules/tracer/dynamic/resources/configurator.js").toString(), bindings);
+                if (probesRoot != null) {
+                    jsEngine.eval(readResource("com/sun/tools/visualvm/modules/tracer/dynamic/resources/configurator.js").toString(), bindings);
 
-                Enumeration<? extends FileObject> data = probesRoot.getData(false);
-                
-                while (data.hasMoreElements()) {
-                    FileObject cfg = data.nextElement();
-                    jsEngine.eval(cfg.asText(), bindings);
+                    Enumeration<? extends FileObject> data = probesRoot.getData(false);
+
+                    while (data.hasMoreElements()) {
+                        FileObject cfg = data.nextElement();
+                        jsEngine.eval(cfg.asText(), bindings);
+                    }
+
+                    packages.addAll((Collection<TracerPackage<Application>>)bindings.get("configuredPackages"));
                 }
-
-                packages.addAll((Collection<TracerPackage<Application>>)bindings.get("configuredPackages"));
             } catch (IOException e) {
             } catch (ScriptException e) {
                 e.printStackTrace();
