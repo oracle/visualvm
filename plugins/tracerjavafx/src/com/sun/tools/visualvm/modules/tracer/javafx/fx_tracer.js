@@ -36,6 +36,7 @@ VisualVM.Tracer.addPackages({
     desc: "Monitors runtime behavior of JavaFX applications",
     icon: "com/sun/tools/visualvm/modules/tracer/javafx/resources/fx.png",
     position: 800,
+    reqs: "Available only for JavaFX applications",
     validator: function() {
         var jvm = Packages.com.sun.tools.visualvm.application.jvm.JvmFactory.getJVMFor(application);
         return jvm != undefined && jvm.getMainClass() == "com.sun.javafx.runtime.Main";
