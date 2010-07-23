@@ -44,14 +44,19 @@
 package org.netbeans.modules.profiler.snaptracer.impl;
 
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 public final class IdeSnapshotAction implements ActionListener {
     
@@ -91,7 +96,37 @@ public final class IdeSnapshotAction implements ActionListener {
     }
 
     private File snapshotFile() {
-        return new File("C:\\Users\\JiS\\Documents\\snapshot_tracer_test.npss");
+        JFileChooser chooser = createFileChooser();
+        final Frame[] window = new Frame[1];
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    window[0] = WindowManager.getDefault().getMainWindow();
+                }
+            });
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        if (chooser.showOpenDialog(window[0]) == JFileChooser.APPROVE_OPTION) {
+            return chooser.getSelectedFile();
+        } else {
+            return null;
+        }
+//        return new File("C:\\Users\\JiS\\Documents\\snapshot_tracer_test.npss");
+    }
+
+    private static JFileChooser createFileChooser() {
+        JFileChooser chooser = new JFileChooser();
+
+        chooser.setDialogTitle("Load IDE Snapshot");
+        chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        chooser.setAcceptAllFileFilterUsed(false);
+
+        chooser.addChoosableFileFilter(Filter.create("IDE Snapshots", ".npss"));
+
+        return chooser;
     }
 
     
@@ -103,6 +138,34 @@ public final class IdeSnapshotAction implements ActionListener {
         }
 
         public int getPersistenceType() { return PERSISTENCE_NEVER; }
+
+    }
+
+    private static abstract class Filter extends FileFilter {
+
+        abstract String getExt();
+
+        static Filter create(final String descr, final String ext) {
+            return new Filter() {
+                public boolean accept(File f) {
+                    return f.isDirectory() || getFileExt(f.getName()).equals(ext);
+                }
+                public String getExt() {
+                    return ext;
+                }
+                public String getDescription() {
+                    return descr + " (*" + ext + ")";
+                }
+            };
+        }
+
+        private static String getFileExt(String fileName) {
+            int extIndex = fileName.lastIndexOf("."); // NOI18N
+            if (extIndex == -1) return ""; // NOI18N
+            return fileName.substring(extIndex);
+        }
+
+        private Filter() {}
 
     }
 
