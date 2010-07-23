@@ -30,6 +30,7 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.LoadedSnapshot;
@@ -51,16 +52,24 @@ final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> 
     private static final String NAME = NbBundle.getMessage(
             ProfilerSnapshotCategory.class, "MSG_Profiler_Snapshots");   // NOI18N
     private static final String PREFIX = "snapshot";    // NOI18N
-    private static final String SUFFIX = ".nps";    // NOI18N
+    private static final String NPS_SUFFIX = ".nps";    // NOI18N
+    private static final String NPSS_SUFFIX = ".npss";    // NOI18N
     
     public ProfilerSnapshotCategory() {
-        super(NAME, ProfilerSnapshot.class, PREFIX, SUFFIX, 30);
+        super(NAME, ProfilerSnapshot.class, PREFIX, NPS_SUFFIX, 30);
     }
     
     public boolean supportsOpenSnapshot() {
         return true;
     }
     
+    protected boolean isSnapshot(File file) {
+        if (super.isSnapshot(file)) {
+            return true;
+        }
+        return file != null && file.getName().endsWith(NPSS_SUFFIX);
+    }
+
     public void openSnapshot(final File file) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -99,5 +108,17 @@ final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> 
             }
         });
     }
+    
+    public FileFilter getFileFilter() {
+        return new FileFilter() {
+            public boolean accept(File f) {
+                return f.isDirectory() || isSnapshot(f);
+            }
+            public String getDescription() {
+                String suff = getSuffix();
+                return getName() + (suff != null ? " (*" + suff +", *" + NPSS_SUFFIX + ")" : "");    // NOI18N
+            }
+        };
+    }    
 
 }
