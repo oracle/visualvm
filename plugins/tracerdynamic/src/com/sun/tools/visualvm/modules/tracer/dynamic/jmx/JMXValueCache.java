@@ -43,8 +43,7 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import org.openide.util.Exceptions;
-import org.openide.util.NbBundle;
+import javax.management.RuntimeMBeanException;
 
 /**
  * A per application cached MBean attribute values provider<br/>
@@ -144,12 +143,15 @@ final public class JMXValueCache {
                     for(Attribute a : al.asList()) {
                         valueMap.put(getId(entry.getKey(), a.getName()), a.getValue());
                     }
+                    continue;
+                } catch (RuntimeMBeanException ex) {
                 } catch (ReflectionException ex) {
-                    Exceptions.printStackTrace(ex);
                 } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
                 } catch (InstanceNotFoundException e) {
-
+                }
+                for(String an : entry.getValue()) {
+                    String id = getId(entry.getKey(), an);
+                    if (!valueMap.containsKey(id)) valueMap.put(id, 0);
                 }
             }
         }
