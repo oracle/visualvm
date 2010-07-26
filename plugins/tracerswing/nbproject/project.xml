@@ -15,6 +15,13 @@
                         <specification-version>1.0</specification-version>
                     </run-dependency>
                 </dependency>
+                <dependency>
+                    <code-name-base>com.sun.tools.visualvm.modules.tracer.dynamic</code-name-base>
+                    <run-dependency>
+                        <release-version>0-1</release-version>
+                        <specification-version>1.2.1</specification-version>
+                    </run-dependency>
+                </dependency>
             </module-dependencies>
             <public-packages/>
         </data>
