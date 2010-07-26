@@ -479,24 +479,24 @@ function MBeanAttribute(objectName, attributeName) {
     this.id = MBeanAttribute.prototype.sharedId;
 
     var mbean = this;
-    MBeanAttribute.prototype.get = function (key) {
-        return new WrappedValueProvider(mbean, key);
+    this.get = function (key) {
+        return new WrappedValueProvider(this, key);
     }
 
-    MBeanAttribute.prototype.keys = function() {
+    this.keys = function() {
         return getKeys(mbean.getProvider().value(0));
     }
     
-    MBeanAttribute.prototype.getInfo = function () {
+    this.getInfo = function () {
         return mbean.getProvider().getInfo();
     }
 
     this.value = function (timestamp) {
-        return this.getProvider().value(timestamp);
+        return mbean.getProvider().value(timestamp);
 //        return 0;
     }
 
-    MBeanAttribute.prototype.getValue =  this.value;
+    this.getValue =  this.value;
 
     this.getProvider = function() {
         if (provider == undefined) {

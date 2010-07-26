@@ -28,24 +28,26 @@ var swingScriptPath = "nbres:/com/sun/tools/visualvm/modules/tracer/swing/resour
 var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
                         Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 
-function selfTimePercent(mbean, blockName) {
-    var lastTs = undefined
-    var duration = undefined;
-    return function(ts) {
-        if (lastTs == undefined) {
-            lastTs = mbean.get("startTime").getValue(ts);
+function SelfTimePercentAcc(mbean, blockName) {
+    this.value = function (ts) {
+        if (this.lastTs == undefined) {
+            this.lastTs = mbean.get("startTime").getValue(ts);
         }
 
         var curTs = mbean.get("lastRefresh").getValue(ts);
-        if (curTs > lastTs) {
-            duration = curTs - lastTs;
+        if (curTs > this.lastTs) {
+            this.duration = curTs - this.lastTs;
         }
-        if (duration == undefined || duration == 0) return 0; // shortcut
+        if (this.duration == undefined || this.duration == 0) return 0; // shortcut
 
         var val = mbean.get("data").get(blockName).get("selfTime").getValue(ts);
-        lastTs = curTs;
-        return  val / (duration * 1000);
+        this.lastTs = curTs;
+        return  val / (this.duration * 1000);
     }
+}
+
+function selfTimePercent(mbean, blockName) {
+    return new SelfTimePercentAcc(mbean, blockName).value;
 }
 
 function invocations(mbean, blockName) {

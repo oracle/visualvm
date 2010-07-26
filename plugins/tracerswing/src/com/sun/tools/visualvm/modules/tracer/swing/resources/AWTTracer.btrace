@@ -147,7 +147,6 @@ import static com.sun.btrace.BTraceUtils.*;
         cntInvokeWait = 0;
         // </fragment>
         // <fragment name="awt_paint">
-        println("resetting awtPaintProfiler");
         Profiling.snapshotAndReset(awtPaintProfiler);
         // </fragment>
 
