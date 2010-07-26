@@ -52,17 +52,17 @@ import com.sun.javafx.runtime.sequence.Sequence;
     private static Map<String, Integer> histo = histo1;
 
     // <fragment name="metrics">
-    @Property private static long invalidationRate = Long.MIN_VALUE;
+    @Property private static long invalidationRate = 0;
     volatile private static long invalidations = 0;
 
-    @Property private static long replacementRate = Long.MIN_VALUE;
+    @Property private static long replacementRate = 0;
     volatile private static long replacements = 0;
     // </fragment>
 
     // <fragment name="objects">
     volatile private static long fxObjectCountRunning = 0;
 
-    @Property private static long fxObjectCreationRate = Long.MIN_VALUE;
+    @Property private static long fxObjectCreationRate = 0;
     @Property private static long fxObjectDeletionRate = 0;
     // </fragment>
 
@@ -93,7 +93,7 @@ import com.sun.javafx.runtime.sequence.Sequence;
     // <fragment name="sgCss">
     //styles
     @Property private static long getStyleHelperCalls = 0;
-    @Property private static long styleHelperCount = Long.MIN_VALUE;
+    @Property private static long styleHelperCount = 0;
     @Property private static long transitionToStateCalls = 0;
     @Property private static long processCssCount = 0;
     @Property private static long processCssOnRootCount = 0;
