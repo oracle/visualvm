@@ -60,6 +60,8 @@ import org.netbeans.modules.profiler.LoadedSnapshot.ThreadsSample;
  * @author Tomas Hurka
  */
 public final class SampledCPUSnapshot {
+    public static final String OPEN_THREADS_URL = "file:/stackframe/";     // NOI18N
+
     private File npssFile;
     private SamplesInputStream samplesStream;
     private long lastTimestamp;
@@ -181,42 +183,51 @@ public final class SampledCPUSnapshot {
     }
 
     private void printThreads(final StringBuilder sb, ThreadInfo[] threads) {
+        sb.append("<pre>"); // NOI18N
         for (ThreadInfo thread : threads) {
             if (thread != null) {
                 print16Thread(sb, thread);
             }
         }
+        sb.append("</pre>"); // NOI18N
     }
 
     private void print16Thread(final StringBuilder sb, final ThreadInfo thread) {
         MonitorInfo[] monitors = thread.getLockedMonitors();
-        sb.append("\n\"" + thread.getThreadName() + // NOI18N
-                "\" - Thread t@" + thread.getThreadId() + "\n");    // NOI18N
-        sb.append("   java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
-        sb.append("\n");   // NOI18N
+        sb.append("&nbsp;<b>");   // NOI18N
+        sb.append("\"" + thread.getThreadName() + // NOI18N
+                "\" - Thread t@" + thread.getThreadId() + "<br>");    // NOI18N
+        sb.append("    java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
+        sb.append("</b><br>");   // NOI18N
         int index = 0;
         for (StackTraceElement st : thread.getStackTrace()) {
             LockInfo lock = thread.getLockInfo();
+            String stackElementText = htmlize(st.toString());
             String lockOwner = thread.getLockOwnerName();
+            String className = st.getClassName();
+            String method = st.getMethodName();
+            int lineNo = st.getLineNumber();
+            String stackUrl = OPEN_THREADS_URL+className+"|"+method+"|"+lineNo; // NOI18N
+            String stackElHref = "<a href=\""+stackUrl+"\">"+stackElementText+"</a>";    // NOI18N
 
-            sb.append("\tat " + st.toString() + "\n");    // NOI18N
+            sb.append("\tat " + stackElHref + "<br>");    // NOI18N
             if (index == 0) {
                 if ("java.lang.Object".equals(st.getClassName()) &&     // NOI18N
                         "wait".equals(st.getMethodName())) {                // NOI18N
                     if (lock != null) {
                         sb.append("\t- waiting on ");    // NOI18N
                         printLock(sb,lock);
-                        sb.append("\n");    // NOI18N
+                        sb.append("<br>");    // NOI18N
                     }
                 } else if (lock != null) {
                     if (lockOwner == null) {
                         sb.append("\t- parking to wait for ");      // NOI18N
                         printLock(sb,lock);
-                        sb.append("\n");            // NOI18N
+                        sb.append("<br>");            // NOI18N
                     } else {
                         sb.append("\t- waiting to lock ");      // NOI18N
                         printLock(sb,lock);
-                        sb.append(" owned by \""+lockOwner+"\" t@"+thread.getLockOwnerId()+"\n");   // NOI18N
+                        sb.append(" owned by \""+lockOwner+"\" t@"+thread.getLockOwnerId()+"<br>");   // NOI18N
                     }
                 }
             }
@@ -226,22 +237,23 @@ public final class SampledCPUSnapshot {
         StringBuilder jnisb = new StringBuilder();
         printMonitors(jnisb, monitors, -1);
         if (jnisb.length() > 0) {
-            sb.append("   JNI locked monitors:\n");
+            sb.append("   JNI locked monitors:<br>");
             sb.append(jnisb);
         }
         LockInfo[] synchronizers = thread.getLockedSynchronizers();
         if (synchronizers != null) {
-            sb.append("\n   Locked ownable synchronizers:");    // NOI18N
+            sb.append("<br>   Locked ownable synchronizers:");    // NOI18N
             if (synchronizers.length == 0) {
-                sb.append("\n\t- None\n");  // NOI18N
+                sb.append("<br>\t- None\n");  // NOI18N
             } else {
                 for (LockInfo li : synchronizers) {
-                    sb.append("\n\t- locked ");         // NOI18N
+                    sb.append("<br>\t- locked ");         // NOI18N
                     printLock(sb,li);
-                    sb.append("\n");  // NOI18N
+                    sb.append("<br>");  // NOI18N
                 }
             }
         }
+        sb.append("<br>");
     }
 
     private void printMonitors(final StringBuilder sb, final MonitorInfo[] monitors, final int index) {
@@ -250,7 +262,7 @@ public final class SampledCPUSnapshot {
                 if (mi.getLockedStackDepth() == index) {
                     sb.append("\t- locked ");   // NOI18N
                     printLock(sb,mi);
-                    sb.append("\n");    // NOI18N
+                    sb.append("<br>");    // NOI18N
                 }
             }
         }
@@ -260,7 +272,10 @@ public final class SampledCPUSnapshot {
         String id = Integer.toHexString(lock.getIdentityHashCode());
         String className = lock.getClassName();
 
-        sb.append("<"+id+"> (a "+className+")");       // NOI18N
+        sb.append("&lt;"+id+"&gt; (a "+className+")");       // NOI18N
     }
-
+    
+    private static String htmlize(String value) {
+            return value.replace(">", "&gt;").replace("<", "&lt;");     // NOI18N
+    }
 }
