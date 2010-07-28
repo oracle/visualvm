@@ -61,6 +61,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -88,6 +89,8 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
+import org.netbeans.modules.profiler.utils.GoToSourceHelper;
+import org.netbeans.modules.profiler.utils.JavaSourceLocation;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
@@ -354,7 +357,13 @@ final class TracerView /*extends DataSourceView*/ {
 
         if (tdF != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                HTMLTextArea a = new HTMLTextArea(tdF);
+                HTMLTextArea a = new HTMLTextArea(tdF) {
+                    protected void showURL(URL url) {
+                        if (url == null) return;
+                        String urls = url.toString();
+                        TracerView.this.showURL(urls);
+                    }                    
+                };
                 a.setCaretPosition(0);
                 JScrollPane sp = new JScrollPane(a);
                 
@@ -381,7 +390,17 @@ final class TracerView /*extends DataSourceView*/ {
         container.repaint();
     }
 
-
+    void showURL(String urls) {
+        if (urls.startsWith(SampledCPUSnapshot.OPEN_THREADS_URL)) {
+            urls = urls.substring(SampledCPUSnapshot.OPEN_THREADS_URL.length());
+            String parts[] = urls.split("\\|"); // NOI18N
+            String className = parts[0];
+            String method = parts[1];
+            int linenumber = Integer.parseInt(parts[2]);
+            GoToSourceHelper.openSource(null,new JavaSourceLocation(className, method, linenumber));
+        }
+    }
+    
     // --- Master view implementation ------------------------------------------
 
     private class MasterViewSupport {
