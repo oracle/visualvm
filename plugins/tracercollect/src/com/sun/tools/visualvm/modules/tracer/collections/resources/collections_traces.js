@@ -39,7 +39,8 @@ function SelfTimePercentAcc(mbean, blockName) {
         }
         if (this.duration == undefined || this.duration == 0) return 0; // shortcut
 
-        var val = mbean.get("data").get(blockName).get("selfTime").getValue(ts);
+        var val = mbean.get("data").get(blockName).get("selfTime.total").getValue(ts);
+//        var val = mbean.get("data").get(blockName).get("selfTime").getValue(ts);
         this.lastTs = curTs;
         return  val / (this.duration * 1000);
     }
@@ -204,9 +205,271 @@ VisualVM.Tracer.addPackages([{
                     }
                 ]
             },
-//            General Search (Collections.binarySearch, Arrays.binarySearch),
-//            Collection Search (Set.contains, Set.containsAll, List.contains, List.containsAll, Queue.contains, Queue.containsAll),
-//            Map Search (Map.containsKey, Map.containsValue, Map.get)
+            {
+                name: "General Search Count",
+                desc: "Invocations count of Collections.binarySearch(), Arrays.binarySearch().",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: scriptPath,
+                    fragment: "general_search"
+                },
+                properties: [
+                    {
+                        name: "Collections.binarySearch",
+                        desc: "Invocations count of Collections.binarySearch().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "generalSearchProfiler"), "Collections.binarySearch")
+
+                    },
+                    {
+                        name: "Arrays.binarySearch",
+                        desc: "Invocations count of Arrays.binarySearch().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "generalSearchProfiler"), "Arrays.binarySearch")
+                    }
+                ]
+            },
+            {
+                name: "General Search Time",
+                desc: "Relative time spent in Collections.binarySearch(), Arrays.binarySearch().",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: scriptPath,
+                    fragment: "general_search"
+                },
+                properties: [
+                    {
+                        name: "Collections.binarySearch",
+                        desc: "Relative time spent in Collections.binarySearch().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "generalSearchProfiler"), "Collections.binarySearch"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "Arrays.binarySearch",
+                        desc: "Relative time spent in Arrays.binarySearch().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "generalSearchProfiler"), "Arrays.binarySearch"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    }
+                ]
+            },
+            {
+                name: "Collections Search Count",
+                desc: "Invocations count of Set.contains(), Set.containsAll(), List.contains(), List.containsAll(), List.indexOf(), Queue.contains(), Queue.containsAll().",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: scriptPath,
+                    fragment: "collections_search"
+                },
+                properties: [
+                    {
+                        name: "Set.contains",
+                        desc: "Invocations count of Set.contains().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "Set.contains")
+
+                    },
+                    {
+                        name: "Set.containsAll",
+                        desc: "Invocations count of Set.containsAll().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "Set.containsAll")
+
+                    },
+                    {
+                        name: "List.contains",
+                        desc: "Invocations count of List.contains().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "List.contains")
+                    },
+                    {
+                        name: "List.containsAll",
+                        desc: "Invocations count of List.containsAll().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "List.containsAll")
+
+                    },
+                    {
+                        name: "List.indexOf",
+                        desc: "Invocations count of List.indexOf().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "List.indexOf")
+
+                    },
+                    {
+                        name: "Queue.contains",
+                        desc: "Invocations count of Queue.contains().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "Queue.contains")
+                    },
+                    {
+                        name: "Queue.containsAll",
+                        desc: "Invocations count of Queue.containsAll().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "Queue.containsAll")
+                    }
+                ]
+            },
+            {
+                name: "Collections Search Time",
+                desc: "Relative time spent in Set.contains(), Set.containsAll(), List.contains(), List.containsAll(), List.indexOf(), Queue.contains(), Queue.containsAll().",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: scriptPath,
+                    fragment: "collections_search"
+                },
+                properties: [
+                    {
+                        name: "Set.contains",
+                        desc: "Relative time spent in Set.contains().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "Set.contains"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "Set.containsAll",
+                        desc: "Relative time spent in Set.containsAll().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "Set.containsAll"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "List.contains",
+                        desc: "Relative time spent in List.contains().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "List.contains"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "List.containsAll",
+                        desc: "Relative time spent in List.containsAll().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "List.containsAll"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "List.indexOf",
+                        desc: "Relative time spent in List.indexOf().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "List.indexOf"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "Queue.contains",
+                        desc: "Relative time spent in Queue.contains().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "Queue.contains"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "Queue.containsAll",
+                        desc: "Relative time spent in Queue.containsAll().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "Queue.containsAll"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    }
+                ]
+            },
+            {
+                name: "Map Search Count",
+                desc: "Invocations count of Map.get(), Map.containsKey(), Map.containsValue().",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: scriptPath,
+                    fragment: "map_search"
+                },
+                properties: [
+//                    {
+//                        name: "Map.get",
+//                        desc: "Invocations count of Map.get().",
+//                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.get")
+//
+//                    },
+                    {
+                        name: "Map.containsKey",
+                        desc: "Invocations count of Map.containsKey().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.containsKey")
+
+                    },
+                    {
+                        name: "Map.containsValue",
+                        desc: "Invocations count of Map.containsValue().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.containsValue")
+                    }
+                ]
+            },
+            {
+                name: "Map Search Time",
+                desc: "Relative time spent in Map.get(), Map.containsKey(), Map.containsValue().",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: scriptPath,
+                    fragment: "map_search"
+                },
+                properties: [
+//                    {
+//                        name: "Map.get",
+//                        desc: "Relative time spent in Map.get().",
+//                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.get"),
+//                        presenter: {
+//                            format: ItemValueFormatter.DEFAULT_PERCENT,
+//                            max: 1000
+//                        }
+//                    },
+                    {
+                        name: "Map.containsKey",
+                        desc: "Relative time spent in Map.containsKey().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.containsKey"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "Map.containsValue",
+                        desc: "Relative time spent in Map.containsValue().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.containsValue"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    }
+                ]
+            }
         ]
     }
 ])
