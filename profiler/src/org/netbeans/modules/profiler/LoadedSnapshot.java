@@ -524,6 +524,8 @@ public class LoadedSnapshot {
         static final String ID = "NPSS"; // NetBeans Profiler samples stream, it must match org.netbeans.core.ui.sampler.SamplesOutputStream.ID
 
         int version;
+        int samples;
+        long lastTimestamp;
         ObjectInputStream in;
         Map<Long,ThreadInfo> threads;
         
@@ -534,9 +536,21 @@ public class LoadedSnapshot {
         SamplesInputStream(InputStream is) throws IOException {
             readHeader(is);
             in = new ObjectInputStream(new GZIPInputStream(is));
+            if (version > 1) {
+                samples = in.readInt();
+                lastTimestamp = in.readLong();
+            }
             threads = new HashMap(128);
         }
 
+        int getSamples() {
+            return samples;
+        }
+
+        long getLastTimestamp() {
+            return lastTimestamp;
+        }
+        
         ThreadsSample readSample() throws IOException {
             long time;
             ThreadInfo infos[];
