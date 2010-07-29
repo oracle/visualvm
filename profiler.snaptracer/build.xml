@@ -43,24 +43,7 @@ However, if you add GPL Version 2 code and therefore, elected the GPL
 Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
-<project xmlns="http://www.netbeans.org/ns/project/1">
-    <type>org.netbeans.modules.apisupport.project</type>
-    <configuration>
-        <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.lib.profiler.charts</code-name-base>
-            <module-dependencies/>
-            <friend-packages>
-                <friend>com.sun.tools.visualvm.charts</friend>
-                <friend>com.sun.tools.visualvm.modules.tracer</friend>
-                <friend>org.netbeans.lib.profiler.ui</friend>
-                <friend>org.netbeans.modules.profiler.snaptracer</friend>
-                <package>org.netbeans.lib.profiler.charts</package>
-                <package>org.netbeans.lib.profiler.charts.axis</package>
-                <package>org.netbeans.lib.profiler.charts.canvas</package>
-                <package>org.netbeans.lib.profiler.charts.swing</package>
-                <package>org.netbeans.lib.profiler.charts.xy</package>
-                <package>org.netbeans.lib.profiler.charts.xy.synchronous</package>
-            </friend-packages>
-        </data>
-    </configuration>
+<project basedir="." default="netbeans" name="profiler.snaptracer">
+    <description>Builds, tests, and runs the project org.netbeans.modules.profiler.snaptracer</description>
+    <import file="../nbbuild/templates/projectized.xml"/>
 </project>
