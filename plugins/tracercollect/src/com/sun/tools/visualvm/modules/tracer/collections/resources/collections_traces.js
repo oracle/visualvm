@@ -266,7 +266,7 @@ VisualVM.Tracer.addPackages([{
             },
             {
                 name: "Collections Search Count",
-                desc: "Invocations count of Set.contains(), Set.containsAll(), List.contains(), List.containsAll(), List.indexOf(), Queue.contains(), Queue.containsAll().",
+                desc: "Invocations count of Set.contains(), Set.containsAll(), List.contains(), List.containsAll(), List.indexOf(), List.lastIndexOf(), Queue.contains(), Queue.containsAll().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -307,6 +307,12 @@ VisualVM.Tracer.addPackages([{
 
                     },
                     {
+                        name: "List.lastIndexOf",
+                        desc: "Invocations count of List.lastIndexOf().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "List.lastIndexOf")
+
+                    },
+                    {
                         name: "Queue.contains",
                         desc: "Invocations count of Queue.contains().",
                         value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "Queue.contains")
@@ -320,7 +326,7 @@ VisualVM.Tracer.addPackages([{
             },
             {
                 name: "Collections Search Time",
-                desc: "Relative time spent in Set.contains(), Set.containsAll(), List.contains(), List.containsAll(), List.indexOf(), Queue.contains(), Queue.containsAll().",
+                desc: "Relative time spent in Set.contains(), Set.containsAll(), List.contains(), List.containsAll(), List.indexOf(), List.lastIndexOf(), Queue.contains(), Queue.containsAll().",
                 reqs: "Requires BTrace Deployer plugin.",
                 validator: function() {
                     return btraceDeployer != undefined;
@@ -371,6 +377,15 @@ VisualVM.Tracer.addPackages([{
                         name: "List.indexOf",
                         desc: "Relative time spent in List.indexOf().",
                         value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "List.indexOf"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "List.lastIndexOf",
+                        desc: "Relative time spent in List.lastIndexOf().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "collectionsSearchProfiler"), "List.lastIndexOf"),
                         presenter: {
                             format: ItemValueFormatter.DEFAULT_PERCENT,
                             max: 1000

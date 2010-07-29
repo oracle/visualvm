@@ -242,6 +242,23 @@ import static com.sun.btrace.BTraceUtils.*;
     }
 
     @OnMethod(
+        clazz="+java.util.List",
+        method="lastIndexOf"
+    )
+    public static void listLastIndexOfBefore() {
+        Profiling.recordEntry(collectionsSearchProfiler, "List.lastIndexOf");
+    }
+
+    @OnMethod(
+        clazz="+java.util.List",
+        method="lastIndexOf",
+        location=@Location(Kind.RETURN)
+    )
+    public static void listLastIndexOfAfter(@Duration long time) {
+        Profiling.recordExit(collectionsSearchProfiler, "List.lastIndexOf", time);
+    }
+
+    @OnMethod(
         clazz="+java.util.Queue",
         method="contains"
     )
