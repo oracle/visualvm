@@ -9,13 +9,7 @@
         <mkdir dir="${visualvm-platform}"/>
         <unzip src="dist/${app.name}.zip" dest="${visualvm-platform}"/>
     </target>
-    <target name="-post-build-launchers">
-        <copy file="launcher/visualvm.exe" overwrite="true" todir="${build.launcher.dir}/bin/"/>
-        <copy file="launcher/visualvm" overwrite="true" todir="${build.launcher.dir}/bin/"/>
-        <copy file="launcher/visualvm.conf" overwrite="true" todir="${build.launcher.dir}/etc/"/>
-        <copy file="launcher/visualvm.icns" overwrite="true" todir="${build.launcher.dir}/etc/"/>
-    </target>
-    <target name="build-launchers" depends="build-launchers.shadow,-post-build-launchers"/>
+    <target name="build-launchers" depends="build-launchers.shadow"/>
     <target name="build-launchers.shadow" depends="-init">
         <fail unless="app.name">Must have set at least an application name ('app.name')
         </fail>
@@ -52,9 +46,10 @@
         <property name="build.launcher.dir" location="build/launcher"/>
         <mkdir dir="${build.launcher.dir}/etc"/>
         <mkdir dir="${build.launcher.dir}/bin"/>
-        <copy file="${harness.dir}/launchers/app.exe" tofile="${build.launcher.dir}/bin/${app.name}.exe"/>
-        <copy file="${harness.dir}/launchers/app.sh" tofile="${build.launcher.dir}/bin/${app.name}"/>
-        <copy file="${harness.dir}/etc/app.conf" tofile="${build.launcher.dir}/etc/${app.name}.conf"/>
+        <copy file="launcher/visualvm.exe" todir="${build.launcher.dir}/bin/"/>
+        <copy file="launcher/visualvm" todir="${build.launcher.dir}/bin/"/>
+        <copy file="launcher/visualvm.conf" todir="${build.launcher.dir}/etc/"/>
+        <copy file="launcher/visualvm.icns" todir="${build.launcher.dir}/etc/"/>
         <echo message="${app.name}" file="${build.launcher.dir}/etc/${app.name}.clusters"/>
         <echo message="&#10;" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
         <echo message="${zip.platform.clusters.bare}" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
