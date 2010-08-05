@@ -113,7 +113,9 @@ made subject to such option by the copyright holder.
     </target>
 
     <target name="netbeans-extra">
-       <ant dir="release/remote-pack-defs" target="profiler-server-all"/>
+       <ant dir="release/remote-pack-defs" target="profiler-server-all" inheritall="false">
+           <property name="cluster" location="${cluster}"/>
+       </ant>
     </target>
 
     <target name="clean" depends="projectized-common.clean">

@@ -469,7 +469,12 @@ public class OverviewController extends AbstractController {
                                     if (locals != null) {
                                         for (JavaFrameGCRoot localVar : locals) {
                                             Instance localInstance = localVar.getInstance();
-                                            sb.append("\t   Local Variable: "+printInstance(localInstance)+"<br>"); // NOI18N
+                                            
+                                            if (localInstance != null) {
+                                                sb.append("\t   Local Variable: "+printInstance(localInstance)+"<br>"); // NOI18N
+                                            } else {
+                                                sb.append("\t   Unknown Local Variable<br>"); // NOI18N                                                
+                                            }
                                         }
                                     }
                                 }
@@ -516,13 +521,17 @@ public class OverviewController extends AbstractController {
 
     private String printInstance(Instance in) {
         String className;
+        JavaClass jcls = in.getJavaClass();
         
-        if (in.getJavaClass().equals(java_lang_Class)) {
+        if (jcls == null) {
+            return "unknown instance #"+in.getInstanceId(); // NOI18N
+        }
+        if (jcls.equals(java_lang_Class)) {
             JavaClass javaClass = heapFragmentWalker.getHeapFragment().getJavaClassByID(in.getInstanceId());
             className = javaClass.getName();
             return "<a href='"+ CLASS_URL_PREFIX + className + "' name='" + javaClass.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
         }
-        className = in.getJavaClass().getName();
+        className = jcls.getName();
         return "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "' name='" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
     }
 
