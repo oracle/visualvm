@@ -340,12 +340,22 @@ function wrapJavaObject(thing) {
                     if (name == things.get(i).field.name) return true;
                 }
                 return name == 'clazz' || name == 'toString' ||
-                name == 'id' || name == 'wrapped-object';
+                name == 'id' || name == 'wrapped-object' || name == 'statics';
             },
             __get__ : function(name) {
                 if (name == 'clazz') {
                     if (fldValueCache[name] == undefined) {
                         fldValueCache[name] = wrapJavaObject(instance.javaClass);
+                    }
+                    return fldValueCache[name];
+                } else if (name == 'statics') {
+                    if (fldValueCache[name] == undefined) {
+                        var clz = wrapJavaObject(instance.javaClass);
+                        if (clz != undefined) {
+                            fldValueCache[name] = clz.statics;
+                        } else {
+                            fldValueCache[name] = null;
+                        }
                     }
                     return fldValueCache[name];
                 } else if (name == 'id') {
@@ -1139,7 +1149,7 @@ function toHtml(obj) {
             var id = tmp.javaClassId;
             var name = tmp.name;
             return "<a href='file://class/" + name + "'>class " + name + "</a>";
-        } else if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
+        }else if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
             var id = tmp.instanceId;
             var number = tmp.instanceNumber;
             var name = tmp.javaClass.name;
@@ -1190,7 +1200,7 @@ function toHtml(obj) {
         }
     } else {
         // JavaScript primitive value
-        return obj;
+        return obj.toString().replace("<", "&lt;").replace(">", "&gt;");
     }
 }
 
