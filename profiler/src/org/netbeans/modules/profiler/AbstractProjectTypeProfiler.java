@@ -136,7 +136,9 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
 
     public abstract boolean checkProjectCanBeProfiled(Project project, FileObject profiledClassFile);
 
-    public abstract boolean checkProjectIsModifiedForProfiler(Project project);
+    public boolean checkProjectIsModifiedForProfiler(Project project) {
+        return true;
+    }
 
     public List<SimpleFilter> getPredefinedInstrumentationFilters(Project project) {
         return ProjectUtilities.getProjectDefaultInstrFilters(project);

@@ -100,6 +100,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -107,6 +109,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.netbeans.spi.project.ProjectServiceProvider;
+import org.netbeans.spi.project.ui.ProjectOpenedHook;
 import org.openide.loaders.DataObject;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
@@ -120,6 +124,34 @@ import org.openide.util.lookup.ProxyLookup;
  */
 @Deprecated
 public final class ProjectUtilities {
+    @ProjectServiceProvider(service=ProjectOpenedHook.class, 
+                            projectType={
+                                "org-netbeans-modules-java-j2seproject",
+                                "org-netbeans-modules-j2ee-earproject",
+                                "org-netbeans-modules-j2ee-ejbjarproject",
+                                "org-netbeans-modules-web-project"})
+    final public static class IntegrationUpdater extends ProjectOpenedHook {
+        private Project prj;
+
+        public IntegrationUpdater(Project prj) {
+            this.prj = prj;
+        }
+
+        @Override
+        protected void projectClosed() {
+            // ignore
+        }
+
+        @Override
+        protected void projectOpened() {
+            Element e = ProjectUtils.getAuxiliaryConfiguration(prj)
+                           .getConfigurationFragment("data", ProjectUtilities.PROFILER_NAME_SPACE, false); // NOI18N
+
+            if (e != null) {
+                unintegrateProfiler(prj);
+            }
+        }
+    }
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Logger LOGGER = Logger.getLogger(ProjectUtilities.class.getName());
@@ -310,20 +342,11 @@ public final class ProjectUtilities {
         return buildDir;
     }
 
+    final private static Pattern PROFILER_INIT = Pattern.compile("<\\s*target\\s+.*?name\\s*=\\s*\"profile-init\"", Pattern.DOTALL | Pattern.MULTILINE);
     public static boolean isProfilerIntegrated(Project project) {
-        Element e = ProjectUtils.getAuxiliaryConfiguration(project)
-                           .getConfigurationFragment("data", ProjectUtilities.PROFILER_NAME_SPACE, false); // NOI18N
-
-        return e != null;
-
-        // TODO: Should check for obsolete versions (currently commented below)
-
-        //    if (e != null) {
-        //      String storedVersion = e.getAttribute("version"); // NOI18N
-        //      if (storedVersion.equals("0.9.1")) return true; // NOI18N
-        //    }
-        //
-        //    return false;
+        String buildXml = ProjectUtilities.getProjectBuildScript(project, "nbproject/build-impl.xml"); // NOI18N
+        Matcher m = PROFILER_INIT.matcher(buildXml);
+        return m.find();
     }
 
     public static float getProfilingOverhead(ProfilingSettings settings) {
@@ -357,7 +380,11 @@ public final class ProjectUtilities {
     }
 
     public static String getProjectBuildScript(final Project project) {
-        final FileObject buildFile = findBuildFile(project);
+        return getProjectBuildScript(project, "build.xml");
+    }
+
+    public static String getProjectBuildScript(final Project project, final String buildXml) {
+        final FileObject buildFile = findBuildFile(project, buildXml);
         if (buildFile == null) {
             return null;
         }
@@ -403,12 +430,16 @@ public final class ProjectUtilities {
         Properties props = org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getProjectProperties(project);
         String buildFileName = props != null ? props.getProperty("buildfile") : null; // NOI18N
         if (buildFileName != null) {
-            buildFile = project.getProjectDirectory().getFileObject(buildFileName);
+            buildFile = findBuildFile(project, buildFileName);
         }
         if (buildFile == null) {
-            buildFile = project.getProjectDirectory().getFileObject("build.xml"); //NOI18N
+            buildFile = findBuildFile(project, "build.xml"); //NOI18N
         }
         return buildFile;
+    }
+
+    public static FileObject findBuildFile(final Project project, final String buildFileName) {
+        return project.getProjectDirectory().getFileObject(buildFileName);
     }
 
     public static java.util.List<SimpleFilter> getProjectDefaultInstrFilters(Project project) {
