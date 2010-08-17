@@ -46,7 +46,7 @@ package org.netbeans.modules.profiler.snaptracer.impl.packages;
 import org.netbeans.modules.profiler.snaptracer.TracerPackage;
 import org.netbeans.modules.profiler.snaptracer.TracerProbe;
 import org.netbeans.modules.profiler.snaptracer.TracerProbeDescriptor;
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 
 /**
  *
@@ -61,10 +61,10 @@ class TestPackage extends TracerPackage {
 //    private TracerProbe probe2;
 //    private TracerProbe probe3;
 
-    private SampledCPUSnapshot snapshot;
+    private IdeSnapshot snapshot;
     
     
-    TestPackage(SampledCPUSnapshot snapshot) {
+    TestPackage(IdeSnapshot snapshot) {
         super("Test Package", "Package for testing purposes", null, 1);
         this.snapshot = snapshot;
     }

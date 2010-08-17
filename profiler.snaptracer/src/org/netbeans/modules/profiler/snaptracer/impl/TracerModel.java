@@ -64,7 +64,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.snaptracer.Positionable;
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 
@@ -76,7 +75,7 @@ final class TracerModel {
 
     private static final Logger LOGGER = Logger.getLogger(TracerController.class.getName());
 
-    private final SampledCPUSnapshot snapshot;
+    private final IdeSnapshot snapshot;
 
     private final Map<TracerPackage, List<TracerProbe>> probesCache = new HashMap();
     private final Map<TracerProbe, TracerProbeDescriptor> descriptorsCache = new HashMap();
@@ -88,7 +87,7 @@ final class TracerModel {
 
     // --- Constructor ---------------------------------------------------------
 
-    TracerModel(SampledCPUSnapshot snapshot) {
+    TracerModel(IdeSnapshot snapshot) {
         this.snapshot = snapshot;
         timelineSupport = new TimelineSupport(new TimelineSupport.DescriptorResolver() {
             public TracerProbeDescriptor getDescriptor(TracerProbe p) {
@@ -100,7 +99,7 @@ final class TracerModel {
 
     // --- DataSource ----------------------------------------------------------
 
-    SampledCPUSnapshot getSnapshot() {
+    IdeSnapshot getSnapshot() {
         return snapshot;
     }
     

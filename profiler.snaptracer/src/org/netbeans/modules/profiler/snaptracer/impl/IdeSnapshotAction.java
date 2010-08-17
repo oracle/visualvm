@@ -53,6 +53,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.logs.LogReader;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
@@ -63,7 +64,7 @@ public final class IdeSnapshotAction implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                final SampledCPUSnapshot snapshot = snapshot();
+                final IdeSnapshot snapshot = snapshot();
                 if (snapshot == null) return;
 
                 final TracerModel model = new TracerModel(snapshot);
@@ -87,12 +88,12 @@ public final class IdeSnapshotAction implements ActionListener {
         return tc;
     }
 
-    private SampledCPUSnapshot snapshot() {
+    private IdeSnapshot snapshot() {
         File file = snapshotFile();
         if (file == null) return null;
-
-        try { return new SampledCPUSnapshot(file); }
-        catch (Throwable t) { Exceptions.printStackTrace(t); return null; }
+        try {
+            return new IdeSnapshot(file, null);
+        } catch (Throwable t) { Exceptions.printStackTrace(t); return null; }
     }
 
     private File snapshotFile() {

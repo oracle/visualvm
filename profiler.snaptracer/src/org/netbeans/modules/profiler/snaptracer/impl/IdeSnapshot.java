@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -43,63 +43,72 @@
 
 package org.netbeans.modules.profiler.snaptracer.impl;
 
-import org.netbeans.modules.profiler.snaptracer.TracerPackage;
-import org.netbeans.modules.profiler.snaptracer.TracerPackageProvider;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.netbeans.modules.profiler.snaptracer.Positionable;
-import org.netbeans.modules.profiler.snaptracer.impl.packages.TestPackageProvider;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.LogRecord;
+import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.logs.LogReader;
 
-/**
+/** Reads xml log and npss snapshot from file.
  *
- * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public final class TracerSupportImpl {
+public final class IdeSnapshot  {
+    SampledCPUSnapshot cpuSnapshot;
+    LogReader xmlLogs;
+    LogRecord lastRecord;
+    Map<Long,LogRecord> recordsMap;
 
-    private static TracerSupportImpl INSTANCE;
-
-    private final Set<TracerPackageProvider> providers;
-
-
-    public static synchronized TracerSupportImpl getInstance() {
-        if (INSTANCE == null) INSTANCE = new TracerSupportImpl();
-        return INSTANCE;
+    IdeSnapshot(File npssFile, File uigestureFile) throws IOException {
+        cpuSnapshot = new SampledCPUSnapshot((npssFile));
+        xmlLogs = new LogReader(uigestureFile);
+        xmlLogs.load();
+        recordsMap = new HashMap();
     }
 
-
-    public synchronized void registerPackageProvider(TracerPackageProvider provider) {
-        providers.add(provider);
+    int getSamplesCount() {
+        return cpuSnapshot.getSamplesCount();
     }
 
-    public synchronized void unregisterPackageProvider(TracerPackageProvider provider) {
-        providers.remove(provider);
+    long getTimestamp(int sampleIndex) throws IOException {
+        return cpuSnapshot.getTimestamp(sampleIndex);
     }
 
-
-    public synchronized boolean hasPackages(Object target) {
-        for (TracerPackageProvider provider : providers)
-            if (provider.getScope().isInstance(target))
-                return true;
-        return false;
+    LoadedSnapshot getCPUSnapshot(int startIndex, int endIndex) throws IOException {
+        return cpuSnapshot.getCPUSnapshot(startIndex, endIndex);
     }
 
-    public synchronized List<TracerPackage> getPackages(IdeSnapshot snapshot) {
-        List<TracerPackage> packages = new ArrayList();
-        for (TracerPackageProvider provider : providers)
-//            if (snapshot == null || provider.getScope().isInstance(snapshot))
-                packages.addAll(Arrays.asList(provider.getPackages(snapshot)));
-        Collections.sort(packages, Positionable.COMPARATOR);
-        return packages;
+    public long getValue(int sampleIndex, int valIndex) throws IOException {
+        if (valIndex == 0) {
+            return cpuSnapshot.getValue(sampleIndex, valIndex);
+        } else if (getLogRecord(sampleIndex) != null) {
+            return 1;
+        }
+        return 0;
     }
 
-
-    private TracerSupportImpl() {
-        providers = new HashSet();
-        registerPackageProvider(new TestPackageProvider());
+    private LogRecord getLogRecord(int sampleIndex) throws IOException {
+        long timestamp = getTimestamp(sampleIndex);
+        LogRecord rec = xmlLogs.getRecordFor(timestamp / 1000000);
+        if (rec != null) {
+            long startTime = cpuSnapshot.getStartTime();
+            long endTime = getTimestamp(getSamplesCount() - 1);
+            long recTime = rec.getMillis() * 1000000;
+            if (recTime > startTime && recTime < endTime) {
+                if (rec != lastRecord) {
+                    lastRecord = rec;
+                    recordsMap.put(new Long(sampleIndex), rec);
+                    return rec;
+                }
+            }
+        }
+        return null;
     }
 
+    String getThreadDump(int sampleIndex) throws IOException {
+        return cpuSnapshot.getThreadDump(sampleIndex);
+    }
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -41,24 +41,73 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.snaptracer.impl.packages;
+package org.netbeans.modules.profiler.snaptracer.logs;
 
-import org.netbeans.modules.profiler.snaptracer.TracerPackage;
-import org.netbeans.modules.profiler.snaptracer.TracerPackageProvider;
-import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-/**
+/** Reads log records from file.
  *
- * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public final class TestPackageProvider extends TracerPackageProvider {
-    
-    public TestPackageProvider() {
-        super(Object.class);
+public final class LogReader {
+ 
+    private static final Logger LOG = Logger.getLogger(LogRecords.class.getName());
+
+    private File logFile;
+//    private int records;
+//    private long startTime;
+    private NavigableMap<Long,LogRecord> recordList;
+
+    public LogReader(File f) {
+        logFile = f;
+        recordList = new TreeMap();
     }
 
-    public TracerPackage[] getPackages(IdeSnapshot snapshot) {
-        return new TestPackage[] { new TestPackage(snapshot) };
+
+    public void load() throws IOException {
+        InputStream is = new FileInputStream(logFile);
+        try {
+            LogRecords.scan(is, new LogHandler());
+        } finally {
+            is.close();
+        }
     }
 
+    public LogRecord getRecordFor(long time) {
+        return recordList.ceilingEntry(new Long(time)).getValue();
+    }
+    class LogHandler extends Handler {
+
+        @Override
+        public void publish(LogRecord record) {
+//            System.out.println("Record "+ records++);
+//            if (startTime == 0) {
+//                startTime = record.getMillis();
+//                System.out.println("Start date: "+new Date(startTime));
+//            } else {
+//                System.out.println("Time: "+(record.getMillis()-startTime));
+//            }
+//            System.out.println(record.getMessage());
+            recordList.put(new Long(record.getMillis()), record);
+        }
+
+        @Override
+        public void flush() {
+//            System.out.println("Flush");
+        }
+
+        @Override
+        public void close() throws SecurityException {
+//           System.out.println("Close");
+        }
+
+    }
 }
