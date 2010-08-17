@@ -59,6 +59,10 @@ import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+/**
+ *
+ * @author Jiri Sedlacek
+ */
 public final class IdeSnapshotAction implements ActionListener {
     
     public void actionPerformed(ActionEvent e) {
@@ -92,7 +96,7 @@ public final class IdeSnapshotAction implements ActionListener {
         File file = snapshotFile();
         if (file == null) return null;
         try {
-            return new IdeSnapshot(file, null);
+            return new IdeSnapshot(file, new File(file.getCanonicalPath() + ".xml"));
         } catch (Throwable t) { Exceptions.printStackTrace(t); return null; }
     }
 

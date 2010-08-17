@@ -55,10 +55,10 @@ import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 class TestPackage extends TracerPackage {
     
     private TracerProbeDescriptor descriptor1;
-//    private TracerProbeDescriptor descriptor2;
+    private TracerProbeDescriptor descriptor2;
 //    private TracerProbeDescriptor descriptor3;
     private TracerProbe probe1;
-//    private TracerProbe probe2;
+    private TracerProbe probe2;
 //    private TracerProbe probe3;
 
     private IdeSnapshot snapshot;
@@ -71,21 +71,21 @@ class TestPackage extends TracerPackage {
 
     
     public TracerProbeDescriptor[] getProbeDescriptors() {
-        descriptor1 = new TracerProbeDescriptor("Stack depth", "Reports the cummulative depth of all running threads", null, 1, true);
-//        descriptor2 = new TracerProbeDescriptor("Probe 2", "Probe 2 description", null, 1, true);
+        descriptor1 = new TracerProbeDescriptor("UI Actions", "Shows UI actions performed by the user in the IDE", null, 1, true);
+        descriptor2 = new TracerProbeDescriptor("Stack depth", "Reports the cummulative depth of all running threads", null, 2, true);
 //        descriptor3 = new TracerProbeDescriptor("Probe 3", "Probe 3 description", null, 1, true);
-        return new TracerProbeDescriptor[] { descriptor1, };
-//                                             descriptor2,
+        return new TracerProbeDescriptor[] { descriptor1,
+                                             descriptor2, };
 //                                             descriptor3 };
     }
 
     public TracerProbe getProbe(TracerProbeDescriptor descriptor) {
         if (descriptor == descriptor1) {
-            if (probe1 == null) probe1 = new TestProbe(snapshot);
+            if (probe1 == null) probe1 = new UiGesturesProbe(snapshot);
             return probe1;
-//        } else if (descriptor == descriptor2) {
-//            if (probe2 == null) probe2 = new TestProbe(1);
-//            return probe2;
+        } else if (descriptor == descriptor2) {
+            if (probe2 == null) probe2 = new TestProbe(snapshot);
+            return probe2;
 //        } else if (descriptor == descriptor3) {
 //            if (probe3 == null) probe3 = new TestProbe(3);
 //            return probe3;

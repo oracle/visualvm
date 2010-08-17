@@ -70,6 +70,7 @@ public final class IdeSnapshot  {
         xmlLogs.load();
         recordsMap = new HashMap();
         valuesMap = new HashMap();
+        messagesMap = new HashMap();
     }
 
     int getSamplesCount() {
@@ -96,8 +97,8 @@ public final class IdeSnapshot  {
         return 0;
     }
 
-    public String getMessageForValue(int loggerValue) {
-        return messagesMap.get(Integer.valueOf(loggerValue));
+    public String getMessageForValue(long loggerValue) {
+        return messagesMap.get(Integer.valueOf((int)loggerValue));
     }
     
     private Integer getLogRecordValue(int sampleIndex) throws IOException {
