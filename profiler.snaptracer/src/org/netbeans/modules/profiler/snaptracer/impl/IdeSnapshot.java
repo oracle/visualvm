@@ -60,13 +60,16 @@ public final class IdeSnapshot  {
     SampledCPUSnapshot cpuSnapshot;
     LogReader xmlLogs;
     LogRecord lastRecord;
-    Map<Long,LogRecord> recordsMap;
+    Map<Integer,LogRecord> recordsMap;
+    Map<String,Integer> valuesMap;
+    Map<Integer,String> messagesMap;
 
     IdeSnapshot(File npssFile, File uigestureFile) throws IOException {
         cpuSnapshot = new SampledCPUSnapshot((npssFile));
         xmlLogs = new LogReader(uigestureFile);
         xmlLogs.load();
         recordsMap = new HashMap();
+        valuesMap = new HashMap();
     }
 
     int getSamplesCount() {
@@ -84,13 +87,20 @@ public final class IdeSnapshot  {
     public long getValue(int sampleIndex, int valIndex) throws IOException {
         if (valIndex == 0) {
             return cpuSnapshot.getValue(sampleIndex, valIndex);
-        } else if (getLogRecord(sampleIndex) != null) {
-            return 1;
+        } else {
+            Integer val = getLogRecordValue(sampleIndex);
+            if (val != null) {
+                return val.intValue();
+            }
         }
         return 0;
     }
 
-    private LogRecord getLogRecord(int sampleIndex) throws IOException {
+    public String getMessageForValue(int loggerValue) {
+        return messagesMap.get(Integer.valueOf(loggerValue));
+    }
+    
+    private Integer getLogRecordValue(int sampleIndex) throws IOException {
         long timestamp = getTimestamp(sampleIndex);
         LogRecord rec = xmlLogs.getRecordFor(timestamp / 1000000);
         if (rec != null) {
@@ -100,8 +110,8 @@ public final class IdeSnapshot  {
             if (recTime > startTime && recTime < endTime) {
                 if (rec != lastRecord) {
                     lastRecord = rec;
-                    recordsMap.put(new Long(sampleIndex), rec);
-                    return rec;
+                    recordsMap.put(new Integer(sampleIndex), rec);
+                    return getValueForRecord(rec);
                 }
             }
         }
@@ -110,5 +120,17 @@ public final class IdeSnapshot  {
 
     String getThreadDump(int sampleIndex) throws IOException {
         return cpuSnapshot.getThreadDump(sampleIndex);
+    }
+
+    private Integer getValueForRecord(LogRecord rec) {
+        String message = rec.getMessage();
+        Integer val = valuesMap.get(message);
+        
+        if (val == null) {
+            val = Integer.valueOf(valuesMap.size()+1);
+            valuesMap.put(message,val);
+            messagesMap.put(val,message);
+        }
+        return val;
     }
 }
