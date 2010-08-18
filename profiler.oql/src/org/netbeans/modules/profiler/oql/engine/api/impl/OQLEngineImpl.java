@@ -225,7 +225,7 @@ public class OQLEngineImpl {
             }
         }
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("function __select__("); // NOI18N
         if (q.identifier != null) {
             buf.append(q.identifier);
@@ -233,7 +233,7 @@ public class OQLEngineImpl {
         buf.append(") { return "); // NOI18N
         buf.append(q.selectExpr.replace('\n', ' ')); // NOI18N
         buf.append("; }\n"); // NOI18N
-        buf.append("__select__(" + q.identifier + ")"); // NOI18N
+        buf.append("__select__(").append(q.identifier).append(")"); // NOI18N
 
         String selectCode = buf.toString();
 
@@ -324,7 +324,6 @@ public class OQLEngineImpl {
             }
             return false;
         } else {
-
             Object object = unwrapJavaObject(jsObject, true);
             if (object instanceof Object[]) {
                 for (Object obj1 : (Object[]) object) {

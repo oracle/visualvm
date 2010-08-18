@@ -121,4 +121,12 @@ final public class OQLEngine {
     public void cancelQuery() throws OQLException {
         delegate.cancelQuery();
     }
+
+    public Object unwrapJavaObject(Object object) {
+        return delegate.unwrapJavaObject(object);
+    }
+
+    public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
+        return delegate.unwrapJavaObject(object, tryAssociativeArray);
+    }
 }
