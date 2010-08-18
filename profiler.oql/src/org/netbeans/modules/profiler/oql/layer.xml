@@ -30,6 +30,7 @@
                     </file>
                 </folder>
                 <folder name="permgen">
+                    <attr name="position" intvalue="200"/>
                     <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen"/>
                     <file name="BootstrapCount.oql" url="repository/permgen/resources/BootstrapCount.oql">
                         <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#BootstrapCount.desc"/>
