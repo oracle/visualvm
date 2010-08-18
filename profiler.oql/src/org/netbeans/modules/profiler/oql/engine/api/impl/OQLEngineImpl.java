@@ -44,6 +44,7 @@ package org.netbeans.modules.profiler.oql.engine.api.impl;
 import org.netbeans.modules.profiler.oql.engine.api.OQLException;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Bindings;
@@ -204,8 +205,14 @@ public class OQLEngineImpl {
         return new OQLQueryImpl(selectExpr, isInstanceOf, className, identifier, whereExpr);
     }
 
+    public void cancelQuery() throws OQLException {
+        cancelled.set(true);
+    }
+
     private void executeQuery(OQLQueryImpl q, ObjectVisitor visitor)
             throws OQLException {
+
+        cancelled.set(false);
         visitor = visitor != null ? visitor : ObjectVisitor.DEFAULT;
 
         JavaClass clazz = null;
@@ -333,6 +340,7 @@ public class OQLEngineImpl {
     }
 
     public Object evalScript(String script) throws Exception {
+        cancelled.set(false);
         CompiledScript cs = ((Compilable)engine).compile(script);
         return cs.eval();
     }
@@ -370,6 +378,7 @@ public class OQLEngineImpl {
         return null;
     }
 
+    final private AtomicBoolean cancelled = new AtomicBoolean(false);
     private void init(Snapshot snapshot) throws RuntimeException {
         this.snapshot = snapshot;
         try {
@@ -380,6 +389,7 @@ public class OQLEngineImpl {
             cs.eval();
             Object heap = ((Invocable)engine).invokeFunction("wrapHeapSnapshot", snapshot); // NOI18N
             engine.put("heap", heap); // NOI18N
+            engine.put("cancelled", cancelled); // NOI18N
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Error initializing snapshot", ex); // NOI18N
             throw new RuntimeException(ex);

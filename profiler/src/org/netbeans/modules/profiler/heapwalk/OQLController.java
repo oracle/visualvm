@@ -133,6 +133,11 @@ public class OQLController extends AbstractTopLevelController
     }
 
     public void cancelQuery() {
+        try {
+            engine.cancelQuery();
+        } catch (OQLException e) {
+
+        }
         finalizeQuery();
     }
 
