@@ -136,6 +136,7 @@ import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
+import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
@@ -1549,6 +1550,21 @@ public final class NetBeansProfiler extends Profiler {
                 displayInfoAndWait(INITIAL_CALIBRATION_MSG);
                 result = targetAppRunner.calibrateInstrumentationCode();
             }
+
+            boolean shouldCalibrate = false;
+            targetAppRunner.getProfilingSessionStatus().beginTrans(false);
+            try {
+                // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
+                // ---> recalibrate <---
+                shouldCalibrate = Platform.isLinux() &&
+                                  Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
+                                  targetAppRunner.getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
+            } finally {
+                targetAppRunner.getProfilingSessionStatus().endTrans();
+            }
+            if (shouldCalibrate) {
+                result = targetAppRunner.calibrateInstrumentationCode();
+            }
         } else {
             result = targetAppRunner.calibrateInstrumentationCode();
         }
@@ -1627,13 +1643,14 @@ public final class NetBeansProfiler extends Profiler {
     @Override
     public boolean prepareInstrumentation(ProfilingSettings profilingSettings) {
         final boolean retValue;
-        teardownDispatcher();
-        setupDispatcher(profilingSettings);
 
         ClientUtils.SourceCodeSelection[] marks = MarkingEngine.getDefault().getMarkerMethods();
         profilingSettings.setInstrumentationMarkerMethods(marks);
 
         retValue = super.prepareInstrumentation(profilingSettings);
+
+        teardownDispatcher();
+        setupDispatcher(profilingSettings);
 
         return retValue;
     }

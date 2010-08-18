@@ -215,7 +215,10 @@ made subject to such option by the copyright holder.
     </antcall>
  </target>
 
-  <target name="profiler-server-common-unix" depends="profiler-server-common">
+  <target name="profiler-server-calibration-linux" if="isLinux">
+      <copy tofile="${build.dir}/bin/calibrate-${jdk-version}.sh" file="calibrate-${jdk-version}.sh" />
+  </target>
+  <target name="profiler-server-common-unix" depends="profiler-server-common" unless="isLinux">
      <copy tofile="${build.dir}/bin/calibrate.sh" file="calibrate${calibrate-suffix}.sh" />
   </target>
 
@@ -231,6 +234,13 @@ made subject to such option by the copyright holder.
   </target>
 
   <target name="profiler-server-jdkspecific-unix" depends="profiler-server-jdkspecific">
+    <condition property="isLinux">
+        <or>
+            <equals arg1="${os-version}" arg2="linux"/>
+            <equals arg1="${os-version}" arg2="linuxamd64"/>
+        </or>
+    </condition>
+    <antcall target="profiler-server-calibration-linux"/>
     <copy tofile="${build.dir}/bin/profile-${jdk-version}.sh" file="profile-${os-version}-${jdk-version}.sh" />
   </target>
 
