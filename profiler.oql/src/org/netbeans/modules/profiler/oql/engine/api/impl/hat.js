@@ -648,7 +648,7 @@ function wrapHeapSnapshot(heap) {
         forEachClass: function(callback) {
             if (callback == undefined) callback = print;
             var classes = this.snapshot.classes;
-            while (classes.hasNext()) {
+            while (classes.hasNext() && !cancelled.get()) {
                 var wrapped = wrapJavaObject(classes.next());
 
                 if (wrapped != null && callback(wrapped))
@@ -690,7 +690,7 @@ function wrapHeapSnapshot(heap) {
             if (clazz) {
                 //                var instances = clazz.getInstances(includeSubtypes); // TODO
                 var instances = snapshot.getInstances(clazz, includeSubtypes);
-                while (instances.hasNext()) {
+                while (instances.hasNext() && !cancelled.get()) {
                     if (callback(wrapJavaObject(instances.next())))
                         return;
                 }
@@ -860,6 +860,7 @@ function wrapHeapSnapshot(heap) {
             var paths = new Array(refChains.length);
             for (var i in refChains) {
                 paths[i] = wrapRefChain(refChains[i]);
+                if (cancelled.get()) break;
             }
             return paths;
         },
