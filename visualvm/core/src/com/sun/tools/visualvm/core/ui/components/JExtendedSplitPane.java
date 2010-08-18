@@ -206,7 +206,9 @@ class JExtendedSplitPane extends JSplitPane {
         }
 
         public void hierarchyChanged(HierarchyEvent e) {
-            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 ||
+                (e.getChangeFlags() & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0) {
+                
                 boolean visible = c.isVisible();
                 if (wasVisible == visible) return;
 
