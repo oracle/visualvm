@@ -47,7 +47,6 @@ import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsDisplayer;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.openide.filesystems.FileObject;
@@ -56,7 +55,7 @@ import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
+import org.netbeans.lib.profiler.TargetAppRunner;
 
 
 /**
@@ -69,7 +68,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
     public static class CPUContents implements SettingsContainerPanel.Contents, ChangeListener {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static final boolean ENABLE_THREAD_CPU_TIMER = Boolean.getBoolean("org.netbeans.lib.profiler.enableThreadCPUTimer"); // NOI18N
+//        private static final boolean ENABLE_THREAD_CPU_TIMER = Boolean.getBoolean("org.netbeans.lib.profiler.enableThreadCPUTimer"); // NOI18N
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -85,7 +84,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
         private boolean isAttach;
         private boolean isModify;
         private boolean isPreset;
-        private boolean useCPUTimer;
+        final private boolean useCPUTimer = true; // always enabled
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -115,8 +114,6 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
             this.enableOverride = enableOverride;
             this.isAttach = isAttach;
             this.isModify = isModify;
-
-            useCPUTimer = ENABLE_THREAD_CPU_TIMER || isAttach || Platform.isSolaris();
         }
 
         public float getProfilingOverhead() {
@@ -244,7 +241,6 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
             isAttach = false;
             isModify = false;
             isPreset = false;
-            useCPUTimer = false;
         }
 
         public void stateChanged(ChangeEvent e) {
