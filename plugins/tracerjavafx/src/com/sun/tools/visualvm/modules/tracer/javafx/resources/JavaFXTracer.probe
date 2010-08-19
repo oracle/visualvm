@@ -43,13 +43,6 @@ import com.sun.javafx.runtime.sequence.Sequence;
 @BTrace(name="FxBtraceTracker", unsafe=true) public class FxBtraceTracker {
 
     // @Property exposes this field as MBean attribute
-    // double buffer
-    private static Map<String, Integer> histo1 = newHashMap();
-    private static Map<String, Integer> histo2 = newHashMap();
-    private static int bufferIndex = 1;
-
-    @Property
-    private static Map<String, Integer> histo = histo1;
 
     // <fragment name="metrics">
     @Property private static long invalidationRate = 0;
@@ -147,16 +140,6 @@ import com.sun.javafx.runtime.sequence.Sequence;
     )
     public static void onNewFXObject(@Self Object obj, boolean dummy) {
         fxObjectCountRunning++;
-        //track(obj, fxObjectCount, fxObjectShallowSize);
-
-        String cn = name(classOf(obj));
-        Integer i = get(histo, cn);
-        if (i == null) {
-            i = box(1);
-        } else {
-            i = box(unbox(i) + 1);
-        }
-        put(histo, cn, i);
     }
     // </fragment>
 
@@ -188,7 +171,7 @@ import com.sun.javafx.runtime.sequence.Sequence;
         // <fragment name="fps">
         if (startTime == 0)
             startTime = timeNanos();
-        pulses++;
+            pulses++;
         // </fragment>
 
         // <fragment name="sgNode">
@@ -372,16 +355,6 @@ import com.sun.javafx.runtime.sequence.Sequence;
         // <fragment name="objects">
         fxObjectCreationRate = fxObjectCountRunning;
         fxObjectCountRunning = 0;
-
-        if (bufferIndex == 1) {
-            bufferIndex = 2;
-            histo = histo2;
-            clear(histo1);
-        } else {
-            bufferIndex = 1;
-            histo = histo1;
-            clear(histo2);
-        }
         // </fragment>
 
         // <fragment name="fps">
