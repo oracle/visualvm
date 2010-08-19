@@ -296,22 +296,22 @@ import static com.sun.btrace.BTraceUtils.*;
     // <fragment name="map_search">
     @Property(name="mapSearchProfiler") private static Profiler mapSearchProfiler = Profiling.newProfiler(3);
 
-    //@OnMethod(
-    //    clazz="+java.util.Map",
-    //    method="get"
-    //)
-    //public static void mapGetBefore() {
-    //    Profiling.recordEntry(mapSearchProfiler, "Map.get");
-    //}
+    @OnMethod(
+        clazz="+java.util.Map",
+        method="get"
+    )
+    public static void mapGetBefore() {
+        Profiling.recordEntry(mapSearchProfiler, "Map.get");
+    }
 
-    //@OnMethod(
-    //    clazz="+java.util.Map",
-    //    method="get",
-    //    location=@Location(Kind.RETURN)
-    //)
-    //public static void mapGetAfter(@Duration long time) {
-    //    Profiling.recordExit(mapSearchProfiler, "Map.get", time);
-    //}
+    @OnMethod(
+        clazz="+java.util.Map",
+        method="get",
+        location=@Location(Kind.RETURN)
+    )
+    public static void mapGetAfter(@Duration long time) {
+        Profiling.recordExit(mapSearchProfiler, "Map.get", time);
+    }
 
     @OnMethod(
         clazz="+java.util.Map",

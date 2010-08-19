@@ -28,21 +28,10 @@ var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BT
                         Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 
 function SelfTimePercentAcc(mbean, blockName) {
+    var valAcc = mbean.get("data").get(blockName).get("selfTime.percent");
     this.value = function (ts) {
-        if (this.lastTs == undefined) {
-            this.lastTs = mbean.get("startTime").getValue(ts);
-        }
-
-        var curTs = mbean.get("lastRefresh").getValue(ts);
-        if (curTs > this.lastTs) {
-            this.duration = curTs - this.lastTs;
-        }
-        if (this.duration == undefined || this.duration == 0) return 0; // shortcut
-
-        var val = mbean.get("data").get(blockName).get("selfTime.total").getValue(ts);
-//        var val = mbean.get("data").get(blockName).get("selfTime").getValue(ts);
-        this.lastTs = curTs;
-        return  val / (this.duration * 1000);
+        var val = valAcc.getValue(ts);
+        return  val * 10;
     }
 }
 
@@ -424,12 +413,12 @@ VisualVM.Tracer.addPackages([{
                     fragment: "map_search"
                 },
                 properties: [
-//                    {
-//                        name: "Map.get",
-//                        desc: "Invocations count of Map.get().",
-//                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.get")
-//
-//                    },
+                    {
+                        name: "Map.get",
+                        desc: "Invocations count of Map.get().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.get")
+
+                    },
                     {
                         name: "Map.containsKey",
                         desc: "Invocations count of Map.containsKey().",
@@ -456,15 +445,15 @@ VisualVM.Tracer.addPackages([{
                     fragment: "map_search"
                 },
                 properties: [
-//                    {
-//                        name: "Map.get",
-//                        desc: "Relative time spent in Map.get().",
-//                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.get"),
-//                        presenter: {
-//                            format: ItemValueFormatter.DEFAULT_PERCENT,
-//                            max: 1000
-//                        }
-//                    },
+                    {
+                        name: "Map.get",
+                        desc: "Relative time spent in Map.get().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "mapSearchProfiler"), "Map.get"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
                     {
                         name: "Map.containsKey",
                         desc: "Relative time spent in Map.containsKey().",
