@@ -33,8 +33,9 @@ import java.util.Map;
  *
  * @author Jaroslav Bachorik
  */
-public interface DeployerImpl {
-    void applyConfig(Application app, Map<String, Object> config);
-    boolean deploy(Application app, TracerProgressObject progress, int availableSteps);
-    void undeploy(Application app);
+abstract public class DeployerImpl {
+    abstract public void applyConfig(Application app, Map<String, Object> config);
+    abstract public boolean isApplicable(Application app);
+    abstract public boolean deploy(Application app, TracerProgressObject progress, int availableSteps);
+    abstract public void undeploy(Application app);
 }

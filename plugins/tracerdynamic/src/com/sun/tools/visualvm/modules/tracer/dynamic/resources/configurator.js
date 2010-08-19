@@ -320,11 +320,16 @@ function processPackage(pkg) {
                     }
                     var pEnabled = enabled;
                     desc = probe.desc != undefined ? probe.desc : "";
-                    if (pEnabled && probe.validator != undefined) {
-                        pEnabled = probe.validator();
-                        if (!pEnabled) {
-                            desc = desc.concat(getReqDesc(probe));
+                    if (pEnabled) {
+                        if (probe.validator != undefined) {
+                            pEnabled = probe.validator();
                         }
+                        if (probe.deployment != undefined && probe.deployment.deployer != undefined) {
+                            pEnabled = probe.deployment.deployer.isApplicable(application);
+                        }
+                    }
+                    if (!pEnabled && enabled) {
+                        desc = desc.concat(getReqDesc(probe));
                     }
                     dProbe.setProbeDescriptor(new TracerProbeDescriptor(
                         probe.name,
