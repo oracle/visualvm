@@ -66,11 +66,13 @@ public final class IdeSnapshot  {
 
     IdeSnapshot(File npssFile, File uigestureFile) throws IOException {
         cpuSnapshot = new SampledCPUSnapshot((npssFile));
-        xmlLogs = new LogReader(uigestureFile);
-        xmlLogs.load();
-        recordsMap = new HashMap();
-        valuesMap = new HashMap();
-        messagesMap = new HashMap();
+        if (uigestureFile != null && uigestureFile.exists()) {
+            xmlLogs = new LogReader(uigestureFile);
+            xmlLogs.load();
+            recordsMap = new HashMap();
+            valuesMap = new HashMap();
+            messagesMap = new HashMap();
+        }
     }
 
     int getSamplesCount() {
@@ -88,7 +90,7 @@ public final class IdeSnapshot  {
     public long getValue(int sampleIndex, int valIndex) throws IOException {
         if (valIndex == 0) {
             return cpuSnapshot.getValue(sampleIndex, valIndex);
-        } else {
+        } else if (xmlLogs != null) {
             Integer val = getLogRecordValue(sampleIndex);
             if (val != null) {
                 return val.intValue();
@@ -98,6 +100,7 @@ public final class IdeSnapshot  {
     }
 
     public String getMessageForValue(long loggerValue) {
+        if (xmlLogs == null) return null;
         return messagesMap.get(Integer.valueOf((int)loggerValue));
     }
     
