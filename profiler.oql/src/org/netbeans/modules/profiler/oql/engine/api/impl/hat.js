@@ -76,7 +76,7 @@ function filterEnumeration(e, func, wrap) {
 
     function findNext() {
         var tmp;
-        while (e.hasMoreElements()) {
+        while (e.hasMoreElements() && !cancelled.get()) {
             tmp = e.nextElement();
             index++;
             if (wrap) {
@@ -121,7 +121,7 @@ function filterIterator(e, func, wrap) {
 
     function findNext() {
         var tmp;
-        while (e.hasNext()) {
+        while (e.hasNext() && !cancelled.get()) {
             tmp = e.next();
             index++;
             if (wrap) {
@@ -648,7 +648,7 @@ function wrapHeapSnapshot(heap) {
         forEachClass: function(callback) {
             if (callback == undefined) callback = print;
             var classes = this.snapshot.classes;
-            while (classes.hasNext()) {
+            while (classes.hasNext() && !cancelled.get()) {
                 var wrapped = wrapJavaObject(classes.next());
 
                 if (wrapped != null && callback(wrapped))
@@ -690,7 +690,7 @@ function wrapHeapSnapshot(heap) {
             if (clazz) {
                 //                var instances = clazz.getInstances(includeSubtypes); // TODO
                 var instances = snapshot.getInstances(clazz, includeSubtypes);
-                while (instances.hasNext()) {
+                while (instances.hasNext() && !cancelled.get()) {
                     if (callback(wrapJavaObject(instances.next())))
                         return;
                 }
@@ -788,7 +788,7 @@ function wrapHeapSnapshot(heap) {
 
                 // compute path array from refChain
                 var tmp = refChain;
-                while (tmp != null) {
+                while (tmp != null && !cancelled.get()) {
                     var obj = tmp.obj;
                     path[path.length] = wrapJavaValue(obj);
                     tmp = tmp.next;
@@ -804,7 +804,7 @@ function wrapHeapSnapshot(heap) {
                     }
                     desc += '->';
                     var tmp = refChain;
-                    while (tmp != null) {
+                    while (tmp != null && !cancelled.get()) {
                         var next = tmp.next;
                         var obj = tmp.obj;
                         desc += html? toHtml(obj) : obj.toString();
@@ -860,6 +860,7 @@ function wrapHeapSnapshot(heap) {
             var paths = new Array(refChains.length);
             for (var i in refChains) {
                 paths[i] = wrapRefChain(refChains[i]);
+                if (cancelled.get()) break;
             }
             return paths;
         },
@@ -919,7 +920,7 @@ function classof(jobject) {
 function forEachReferrer(callback, jobject) {
     //    jobject = unwrapJavaObject(jobject);
     var refs = referrers(jobject);
-    while (refs.hasMoreElements()) {
+    while (refs.hasMoreElements() && !cancelled.get()) {
         var referrer = refs.nextElement();
         if (callback(wrapJavaValue(referrer))) {
             return;
@@ -929,7 +930,7 @@ function forEachReferrer(callback, jobject) {
 
 function forEachReferee(callback, jobject) {
     var refs = referees(jobject);
-    while (refs.hasMoreElements()) {
+    while (refs.hasMoreElements() && !cancelled.get()) {
         var referrer = refs.nextElement();
         if (callback(wrapJavaValue(referrer))) {
             return;
@@ -1035,7 +1036,7 @@ function reachables(jobject, excludes) {
     } else if (typeof(excludes) == 'string') {
         var st = new java.util.StringTokenizer(excludes, ",");
         var excludedFields = new Array();
-        while (st.hasMoreTokens()) {
+        while (st.hasMoreTokens() && !cancelled.get()) {
             excludedFields[excludedFields.length] = st.nextToken().trim();
         }
         if (excludedFields.length > 0) { 
@@ -1164,7 +1165,7 @@ function toHtml(obj) {
             // special case for enumeration
             if (obj instanceof java.util.Enumeration) {
                 var res = "[ ";
-                while (obj.hasMoreElements()) {
+                while (obj.hasMoreElements() && !cancelled.get()) {
                     res += toHtml(obj.nextElement()) + ", ";
                 }
                 res += "]";
@@ -1180,6 +1181,7 @@ function toHtml(obj) {
                 if (i != obj.length - 1) {
                     res += ", ";
                 }
+                if (cancelled.get()) break;
             } 
             res += " ]";
             return res;
@@ -1218,7 +1220,7 @@ function wrapIterator(itr, wrap) {
     } else if (itr instanceof java.util.Iterator) {
         return new java.util.Enumeration() {
             hasMoreElements: function() {
-                return itr.hasNext();
+                return itr.hasNext() && !cancelled.get();
             },
             nextElement: function() {
                 return wrap? wrapJavaValue(itr.next()) : itr.next();
@@ -1248,7 +1250,7 @@ function toArray(obj) {
     obj = wrapIterator(obj);
     if (obj instanceof java.util.Enumeration) {
         var res = new Array();
-        while (obj.hasMoreElements()) {
+        while (obj.hasMoreElements() && !cancelled.get()) {
             res[res.length] = obj.nextElement();
         }
         return res;
@@ -1258,6 +1260,7 @@ function toArray(obj) {
         var res = new Array();
         for (var index in obj) {
             res[res.length] = obj[index];
+            if (cancelled.get()) break;
         }
         return res;
     }
@@ -1286,7 +1289,7 @@ function top(array, code, num) {
     if (array instanceof java.util.Enumeration) {
         var sorted = new Array();
 
-        while(array.hasMoreElements()) {
+        while(array.hasMoreElements() && !cancelled.get()) {
             var element = array.nextElement();
             if (sorted.length > 0) {
                 if (sorted.length >= num && func(element, sorted[num -1]) >=0 ) continue;
@@ -1447,6 +1450,7 @@ function filter(array, code) {
             if (func(wrapJavaObject(it), index, array, result)) {
                 result[result.length] = it;
             }
+            if (cancelled.get()) break;
         }
         return result;
     }
@@ -1521,12 +1525,13 @@ function map(array, code) {
             var it = array[index];
             if (it instanceof java.util.Enumeration) {
                 var counter = 0;
-                while(it.hasMoreElements()) {
+                while(it.hasMoreElements() && !cancelled.get()) {
                     result[result.length] = func(wrapJavaObject(it.nextElement()), counter++, it, result);
                 }
             } else {
                 result[result.length] = func(wrapJavaObject(it), index, array, result);
             }
+            if (cancelled.get()) break;
         }
         return result;
     }
@@ -1543,7 +1548,7 @@ function minmax(array, code) {
             return undefined;
         }
         var res = array.nextElement();
-        while (array.hasMoreElements()) {
+        while (array.hasMoreElements() && !cancelled.get()) {
             var next = array.nextElement();
             if (code(next, res)) {
                 res = next;
@@ -1559,6 +1564,7 @@ function minmax(array, code) {
             if (code(array[index], res)) {
                 res = array[index];
             }
+            if (cancelled.get()) break;
         } 
         return res;
     }
@@ -1641,12 +1647,13 @@ function sum(array, code) {
     }
     var result = 0;
     if (array instanceof java.util.Enumeration) {
-        while (array.hasMoreElements()) {
+        while (array.hasMoreElements() && !cancelled.get()) {
             result += Number(array.nextElement());
         }
     } else {
         for (var index in array) {
             result += Number(array[index]);
+            if (cancelled.get()) break;
         }
     }
     return result;
@@ -1670,7 +1677,7 @@ function unique(array, code) {
     }
     var tmp = new Object();
     if (array instanceof java.util.Enumeration) {
-        while (array.hasMoreElements()) {
+        while (array.hasMoreElements() && !cancelled.get()) {
             var it = array.nextElement();
             tmp[code(it)] = it;
         }
@@ -1678,11 +1685,13 @@ function unique(array, code) {
         for (var index in array) {
             var it = array[index];
             tmp[code(it)] = it;
+            if (cancelled.get()) break;
         }
     }
     var res = new Array();
     for (var index in tmp) {
         res[res.length] = tmp[index];
+        if (cancelled.get()) break;
     }
     return res;
 }
@@ -1705,8 +1714,10 @@ function isJsArray(obj) {
 
 function search(a, v, i, func){
     var h = a.length, l = -1, m;
-    while(h - l > 1)
+    while(h - l > 1) {
         if(func(a[m = h + l >> 1], v) < 0) l = m;
         else h = m;
+        if (cancelled.get()) return -1;
+    }
     return a[h] != v ? i ? h : -1 : h;
 }

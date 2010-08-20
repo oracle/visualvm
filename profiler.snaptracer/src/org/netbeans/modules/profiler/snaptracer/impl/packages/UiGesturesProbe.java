@@ -54,14 +54,13 @@ import org.openide.util.Exceptions;
  *
  * @author Jiri Sedlacek
  */
-class TestProbe extends TracerProbe {
-    
-//    private int items;
+class UiGesturesProbe extends TracerProbe {
+
     private IdeSnapshot snapshot;
-    
-    
-    public TestProbe(IdeSnapshot snapshot) {
-        super(descriptors(1));
+
+
+    public UiGesturesProbe(IdeSnapshot snapshot) {
+        super(descriptors(1, snapshot));
         this.snapshot = snapshot;
 //        this.items = items;
     }
@@ -69,28 +68,59 @@ class TestProbe extends TracerProbe {
     public long[] getItemValues(int sampleIndex) {
         return values(sampleIndex);
     }
-    
-    
-    private static ProbeItemDescriptor[] descriptors(int items) {
+
+
+    private static ProbeItemDescriptor[] descriptors(int items, IdeSnapshot snapshot) {
         ProbeItemDescriptor[] descriptors = new ProbeItemDescriptor[items];
-        descriptors[0] = ProbeItemDescriptor.continuousLineItem("Cummulative stack depth",
-                             "Reports the cummulative depth of all running threads", ItemValueFormatter.DEFAULT_DECIMAL);
+        descriptors[0] = ProbeItemDescriptor.discreteLineItem("UI Gesture",
+                             "Shows UI actions performed by the user in the IDE",
+                             new UiGesturesFormatter(snapshot), 1d, 0, 1);
 //        for (int i = 0; i < descriptors.length; i++)
 //            descriptors[i] = ProbeItemDescriptor.continuousLineItem("Item " + i,
 //                             "Description " + i, ItemValueFormatter.SIMPLE);
         return descriptors;
     }
-    
+
     private long[] values(int sampleIndex) {
         long[] values = new long[1];
         try {
-            values[0] = snapshot.getValue(sampleIndex, 0);
+            values[0] = snapshot.getValue(sampleIndex, 1);
+            if (values[0] != 0) System.err.println(">>> Message at " + sampleIndex + " is: " + snapshot.getMessageForValue(values[0]));
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
 //        for (int i = 0; i < values.length; i++)
 //            values[i] = (long)(Math.random() * 10000);
         return values;
+    }
+
+
+    private static class UiGesturesFormatter extends ItemValueFormatter {
+
+        private IdeSnapshot snapshot;
+
+        UiGesturesFormatter(IdeSnapshot snapshot) {
+            this.snapshot = snapshot;
+        }
+
+        public String formatValue(long value, int format) {
+            switch (format) {
+                case FORMAT_TOOLTIP:
+                case FORMAT_DETAILS:
+                case FORMAT_EXPORT:
+                    String message = snapshot.getMessageForValue(value);
+                    return message != null ? message : "<none>";
+                case FORMAT_UNITS:
+                    return "";
+                default:
+                    return null;
+            }
+        }
+
+        public String getUnits(int format) {
+            return "";
+        }
+
     }
 
 }

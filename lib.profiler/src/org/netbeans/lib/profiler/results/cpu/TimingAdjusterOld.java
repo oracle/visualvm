@@ -207,14 +207,15 @@ public class TimingAdjusterOld {
                 timingData.methodEntryExitOuterTime0 = status.methodEntryExitOuterTime[0] * safetyMargin0;
                 timingData.timerCountsInSecond0 = status.timerCountsInSecond[0];
             } else {
-                // Thread CPU only timer used. On Windows and Linux, with extremely low (10 ms or even worse) resolution of
+                // Thread CPU only timer used. On Windows (and till NB6.10 also Linux), with extremely low
+                // (10 ms or even worse) resolution of
                 // this timer, it doesn't make sense to use cleansing - it introduces negative figures for short-running
                 // methods, for which I didn't find any graceful way to deal with.
                 // Also, cleansing is needed to make results sensible for short-running methods - but here for such methods
                 // they are already non-sensible, with 0 as a most typical result.
                 String targetMachineOSName = status.targetMachineOSName;
 
-                if (Platform.isWindows(targetMachineOSName) || Platform.isLinux(targetMachineOSName)) {
+                if (Platform.isWindows(targetMachineOSName) && status.targetJDKVersionString.equals(Platform.JDK_16_STRING)) {
                     safetyMargin1 = 0;
                 }
 
