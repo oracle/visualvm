@@ -559,86 +559,83 @@ public class CPUCCTContainer {
         compactData[curPos++] = (byte) ((data) & 0xFF);
     }
 
-    private void addChild(TimedCPUCCTNode node, TimedCPUCCTNode parent) {
-        if ((node == null) || (parent == null)) {
+    private void addChild(AddChildLocalVars locals) {
+        if ((locals.node == null) || (locals.parent == null)) {
             return;
         }
 
-        TimedCPUCCTNode compParent = null;
-        TimedCPUCCTNode newChild = null;
+        locals.filterStatus = locals.node.getFilteredStatus();
 
-        int filterStatus = node.getFilteredStatus();
-
-        if (!(node instanceof MethodCPUCCTNode)) {
-            filterStatus = TimedCPUCCTNode.FILTERED_YES;
+        if (!(locals.node instanceof MethodCPUCCTNode)) {
+            locals.filterStatus = TimedCPUCCTNode.FILTERED_YES;
         }
 
-        switch (filterStatus) {
+        switch (locals.filterStatus) {
             case TimedCPUCCTNode.FILTERED_YES: {
-                compParent = parent;
+                locals.compParent = locals.parent;
 
                 break;
             }
             case TimedCPUCCTNode.FILTERED_MAYBE: {
-                if (node instanceof MethodCPUCCTNode) {
+                if (locals.node instanceof MethodCPUCCTNode) {
                     methodInfoMapper.lock(false);
                     try {
-                        String className = methodInfoMapper.getInstrMethodClass(((MethodCPUCCTNode) node).getMethodId()).replace('.', '/'); // NOI18N
-                        if (!filter.passesFilter(className)) {
-                            compParent = parent;
+                        locals.className = methodInfoMapper.getInstrMethodClass(((MethodCPUCCTNode) locals.node).getMethodId()).replace('.', '/'); // NOI18N
+                        if (!filter.passesFilter(locals.className)) {
+                            locals.compParent = locals.parent;
                         } else {
-                            newChild = (TimedCPUCCTNode) node.clone();
-                            compParent = newChild;
+                            locals.newChild = (TimedCPUCCTNode) locals.node.clone();
+                            locals.compParent = locals.newChild;
                         }
                     } finally {
                         methodInfoMapper.unlock();
                     }
                 } else {
-                    compParent = parent;
+                    locals.compParent = locals.parent;
                 }
 
                 break;
             }
             case TimedCPUCCTNode.FILTERED_NO: {
-                MethodCPUCCTNode existingChild = MethodCPUCCTNode.Locator.locate(((MethodCPUCCTNode) node).getMethodId(),
-                                                                                 parent.getChildren());
+                locals.existingChild = MethodCPUCCTNode.Locator.locate(((MethodCPUCCTNode) locals.node).getMethodId(),
+                                                                                 locals.parent.getChildren());
 
-                if (existingChild == null) {
-                    newChild = (TimedCPUCCTNode) node.clone();
-                    compParent = newChild;
+                if (locals.existingChild == null) {
+                    locals.newChild = (TimedCPUCCTNode) locals.node.clone();
+                    locals.compParent = locals.newChild;
                 } else {
-                    newChild = null;
-                    existingChild.addNCalls(node.getNCalls());
-                    existingChild.addNCallsDiff(node.getNCallsDiff());
-                    existingChild.addNetTime0(node.getNetTime0());
-                    existingChild.addNetTime1(node.getNetTime1());
-                    existingChild.addSleepTime0(node.getSleepTime0());
-                    existingChild.addWaitTime0(node.getWaitTime0());
-                    compParent = existingChild;
+                    locals.newChild = null;
+                    locals.existingChild.addNCalls(locals.node.getNCalls());
+                    locals.existingChild.addNCallsDiff(locals.node.getNCallsDiff());
+                    locals.existingChild.addNetTime0(locals.node.getNetTime0());
+                    locals.existingChild.addNetTime1(locals.node.getNetTime1());
+                    locals.existingChild.addSleepTime0(locals.node.getSleepTime0());
+                    locals.existingChild.addWaitTime0(locals.node.getWaitTime0());
+                    locals.compParent = locals.existingChild;
                 }
 
                 break;
             }
-            default:ProfilerLogger.warning("Unknown filtered status (" + filterStatus + ") for " + node); // NOI18N
+            default:ProfilerLogger.warning("Unknown filtered status (" + locals.filterStatus + ") for " + locals.node); // NOI18N
         }
 
-        int nChildren = (node.getChildren() != null) ? node.getChildren().size() : 0;
+        locals.nChildren = (locals.node.getChildren() != null) ? locals.node.getChildren().size() : 0;
 
-        for (int i = 0; i < nChildren; i++) {
-            addChild((TimedCPUCCTNode) node.getChildren().getChildAt(i), compParent);
+        for (int i = 0; i < locals.nChildren; i++) {
+            addChild(new AddChildLocalVars((TimedCPUCCTNode) locals.node.getChildren().getChildAt(i), locals.compParent));
         }
 
-        if (newChild != null) {
-            parent.attachNodeAsChild(newChild);
-        } else if (compParent == parent) { // filtered-out node
-            if (!parent.isRoot()) { // no propagation of filtered-out data to the Thread level node
-                parent.addNetTime0(node.getNetTime0());
-                parent.addSleepTime0(node.getSleepTime0());
-                parent.addWaitTime0(node.getWaitTime0());
-                parent.addNCallsDiff(node.getNCalls());
+        if (locals.newChild != null) {
+            locals.parent.attachNodeAsChild(locals.newChild);
+        } else if (locals.compParent == locals.parent) { // filtered-out node
+            if (!locals.parent.isRoot()) { // no propagation of filtered-out data to the Thread level node
+                locals.parent.addNetTime0(locals.node.getNetTime0());
+                locals.parent.addSleepTime0(locals.node.getSleepTime0());
+                locals.parent.addWaitTime0(locals.node.getWaitTime0());
+                locals.parent.addNCallsDiff(locals.node.getNCalls());
 
                 if (collectingTwoTimeStamps) {
-                    parent.addNetTime1(node.getNetTime1());
+                    locals.parent.addNetTime1(locals.node.getNetTime1());
                 }
             } else {
                 //        threadTimeCompensation0 += node.getNetTime0();
@@ -646,6 +643,22 @@ public class CPUCCTContainer {
                 //          threadTimeCompensation1 += node.getNetTime1();
                 //        }
             }
+        }
+    }
+    
+    private static final class AddChildLocalVars {
+        private final TimedCPUCCTNode node;
+        private final TimedCPUCCTNode parent;
+        private TimedCPUCCTNode compParent;
+        private TimedCPUCCTNode newChild;
+        private int filterStatus;
+        private int nChildren;
+        private MethodCPUCCTNode existingChild;
+        private String className;
+        
+        AddChildLocalVars(TimedCPUCCTNode n, TimedCPUCCTNode p) {
+            node = n;
+            parent = p;
         }
     }
 
@@ -801,7 +814,7 @@ public class CPUCCTContainer {
         int nChildren = (rootNode.getChildren() != null) ? rootNode.getChildren().size() : 0;
 
         for (int i = 0; i < nChildren; i++) {
-            addChild((TimedCPUCCTNode) rootNode.getChildren().getChildAt(i), newRoot);
+            addChild(new AddChildLocalVars((TimedCPUCCTNode) rootNode.getChildren().getChildAt(i), newRoot));
         }
 
         //    long time0, time1;
@@ -837,54 +850,48 @@ public class CPUCCTContainer {
         compactData = new byte[arraySize];
 
         rootNode = filterCCT(rootNode);
-
-        generateMirrorNode(rootNode, 0);
+        generateMirrorNode(new GenerateMirrorNodeLocalVars(rootNode, 0));
     }
 
     /**
      * Generates an equivalent of rtNode in the compact data. Returns the offset right after the last generated node, which
      * is this node if it has no children, or the last recursive child of this node.
      */
-    private int generateMirrorNode(final TimedCPUCCTNode rtNode, final int dataOfs) {
+    private int generateMirrorNode(GenerateMirrorNodeLocalVars locals) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("Generate mirror node for ofs: " + dataOfs + ", node: " + rtNode); // NOI18N
+            LOGGER.finest("Generate mirror node for ofs: " + locals.dataOfs + ", node: " + locals.rtNode); // NOI18N
         }
 
-        long thisNodeTotalTime0InTimerUnits = 0;
-        long thisNodeTotalTime1InTimerUnits = 0;
-        int nCallsFromThisNode = 0;
-        int totalNCallsFromThisNode = 0;
+        generateNodeBase(locals.rtNode, locals.dataOfs);
 
-        generateNodeBase(rtNode, dataOfs);
+        totalInvNo += locals.rtNode.getNCalls();
 
-        totalInvNo += rtNode.getNCalls();
+        locals.nodeChildren = locals.rtNode.getChildren();
 
-        RuntimeCPUCCTNode.Children nodeChildren = rtNode.getChildren();
+        locals.nChildren = (locals.nodeChildren != null) ? locals.nodeChildren.size() : 0;
+        locals.nextNodeOfs = locals.dataOfs + nodeSize + (locals.nChildren * childOfsSize);
 
-        int nChildren = (nodeChildren != null) ? nodeChildren.size() : 0;
-        int nextNodeOfs = dataOfs + nodeSize + (nChildren * childOfsSize);
+        locals.nCallsFromThisNode += locals.rtNode.getNCallsDiff();
 
-        nCallsFromThisNode += rtNode.getNCallsDiff();
+        if (locals.nChildren > 0) {
+            locals.childCounter = 0;
 
-        if (nChildren > 0) {
-            int childCounter = 0;
+            for (locals.i = 0; locals.i < locals.nChildren; locals.i++) {
+                locals.aNode = locals.nodeChildren.getChildAt(locals.i);
 
-            for (int i = 0; i < nChildren; i++) {
-                RuntimeCPUCCTNode aNode = nodeChildren.getChildAt(i);
+                if (locals.aNode instanceof MethodCPUCCTNode) { // TODO replace "instanceof" by a visitor implementation
+                    setChildOfsForNodeOfs(locals.dataOfs, locals.childCounter, locals.nextNodeOfs);
+                    locals.nextNodeOfs = generateMirrorNode(new GenerateMirrorNodeLocalVars((MethodCPUCCTNode) locals.aNode, locals.nextNodeOfs));
 
-                if (aNode instanceof MethodCPUCCTNode) { // TODO replace "instanceof" by a visitor implementation
-                    setChildOfsForNodeOfs(dataOfs, childCounter, nextNodeOfs);
-                    nextNodeOfs = generateMirrorNode((MethodCPUCCTNode) aNode, nextNodeOfs);
-
-                    thisNodeTotalTime0InTimerUnits += childTotalTime0InTimerUnits; // Completely uncleansed time
+                    locals.thisNodeTotalTime0InTimerUnits += childTotalTime0InTimerUnits; // Completely uncleansed time
 
                     if (collectingTwoTimeStamps) {
-                        thisNodeTotalTime1InTimerUnits += childTotalTime1InTimerUnits; // Ditto
+                        locals.thisNodeTotalTime1InTimerUnits += childTotalTime1InTimerUnits; // Ditto
                     }
 
-                    nCallsFromThisNode += ((MethodCPUCCTNode) aNode).getNCalls();
-                    totalNCallsFromThisNode += childTotalNCalls;
-                    childCounter++;
+                    locals.nCallsFromThisNode += ((MethodCPUCCTNode) locals.aNode).getNCalls();
+                    locals.totalNCallsFromThisNode += childTotalNCalls;
+                    locals.childCounter++;
                 }
             }
         }
@@ -893,12 +900,12 @@ public class CPUCCTContainer {
         /* PROTOTYPE [wait]
            long time = (long) (((double) rtNode.netTime0 - rtNode.waitTime0 - rtNode.nCalls * timingData.methodEntryExitInnerTime0 - nCallsFromThisNode * timingData.methodEntryExitOuterTime0) * 1000000 / timingData.timerCountsInSecond0);
          */
-        long time = (long) timingAdjuster.adjustTime(rtNode.getNetTime0(), rtNode.getNCalls()+rtNode.getNCallsDiff(), nCallsFromThisNode, false);
+        locals.time = (long) timingAdjuster.adjustTime(locals.rtNode.getNetTime0(), locals.rtNode.getNCalls()+locals.rtNode.getNCallsDiff(), locals.nCallsFromThisNode, false);
 
         //    (long) (((double) rtNode.getNetTime0() - rtNode.getNCalls() * timingData.methodEntryExitInnerTime0
         //      - nCallsFromThisNode * timingData.methodEntryExitOuterTime0) * 1000000 / timingData
         //      .timerCountsInSecond0);
-        if (time < 0) {
+        if (locals.time < 0) {
             // It may happen that for some very short methods the resulting time, after subtracting the instrumentation time, gets negative.
             // When I calculated some concrete results using the (now-commented) code below, it appeared that for such methods the net
             // time per call, in timer counts, is in the order of -0.1.. -0.2. In other words, it's a very small error caused by the
@@ -910,65 +917,86 @@ public class CPUCCTContainer {
             //double ntpc = ((double)cgNode.netTime - thisNode.nCalls * methodEntryExitInnerTime - nCallsFromThisNode * methodEntryExitOuterTime) / thisNode.nCalls;
             //System.out.println("*** N: id= " + thisNode.methodId + ", cls= " + thisNode.nCalls + ", netTime= " + cgNode.netTime + ", nCFrom= " + nCallsFromThisNode + ", res = " + thisNode.netTime + ", ntpc = " + ntpc);
             //}
-            time = 0;
+            locals.time = 0;
         }
 
-        setSelfTime0ForNodeOfs(dataOfs, time);
-        setWaitTime0ForNodeOfs(dataOfs, rtNode.getWaitTime0());
-        setSleepTime0ForNodeOfs(dataOfs, rtNode.getSleepTime0());
+        setSelfTime0ForNodeOfs(locals.dataOfs, locals.time);
+        setWaitTime0ForNodeOfs(locals.dataOfs, locals.rtNode.getWaitTime0());
+        setSleepTime0ForNodeOfs(locals.dataOfs, locals.rtNode.getSleepTime0());
 
-        thisNodeTotalTime0InTimerUnits += rtNode.getNetTime0(); // Uncleansed time for this node and all its children
-        childTotalTime0InTimerUnits = thisNodeTotalTime0InTimerUnits; // It will be effectively returned by this method
+        locals.thisNodeTotalTime0InTimerUnits += locals.rtNode.getNetTime0(); // Uncleansed time for this node and all its children
+        childTotalTime0InTimerUnits = locals.thisNodeTotalTime0InTimerUnits; // It will be effectively returned by this method
                                                                       // Calculate cleansed total time
 
-        time = (long) timingAdjuster.adjustTime(thisNodeTotalTime0InTimerUnits, rtNode.getNCalls()+totalNCallsFromThisNode, totalNCallsFromThisNode,
+        locals.time = (long) timingAdjuster.adjustTime(locals.thisNodeTotalTime0InTimerUnits, locals.rtNode.getNCalls()+locals.totalNCallsFromThisNode, locals.totalNCallsFromThisNode,
                                                    false);
 
         //    time = (long) (((double) thisNodeTotalTime0InTimerUnits - rtNode.getNCalls()* timingData.methodEntryExitInnerTime0
         //      - totalNCallsFromThisNode * timingData.methodEntryExitCallTime0) * 1000000 / timingData
         //      .timerCountsInSecond0);
-        if (time < 0) {
+        if (locals.time < 0) {
             //System.out.println("*** Negative: " + thisNode.totalTime0 + ", thisNCalls = " + thisNode.nCalls + ", fromNCalls = " + totalNCallsFromThisNode);
-            time = 0;
+            locals.time = 0;
         }
 
-        setTotalTime0ForNodeOfs(dataOfs, time);
+        setTotalTime0ForNodeOfs(locals.dataOfs, locals.time);
 
         if (collectingTwoTimeStamps) {
             // Calculate cleansed self time
-            time = (long) timingAdjuster.adjustTime(rtNode.getNetTime1(), rtNode.getNCalls()+rtNode.getNCallsDiff(), nCallsFromThisNode, true);
+            locals.time = (long) timingAdjuster.adjustTime(locals.rtNode.getNetTime1(), locals.rtNode.getNCalls()+locals.rtNode.getNCallsDiff(), locals.nCallsFromThisNode, true);
 
             //      time = (long) (((double) rtNode.getNetTime1()
             //        - rtNode.getNCalls() * timingData.methodEntryExitInnerTime1
             //        - nCallsFromThisNode * timingData.methodEntryExitOuterTime1) * 1000000 / timingData
             //        .timerCountsInSecond1);
-            if (time < 0) {
-                time = 0;
+            if (locals.time < 0) {
+                locals.time = 0;
             }
 
-            setSelfTime1ForNodeOfs(dataOfs, time);
-            thisNodeTotalTime1InTimerUnits += rtNode.getNetTime1();
-            childTotalTime1InTimerUnits = thisNodeTotalTime1InTimerUnits; // It will be effectively returned by this method
+            setSelfTime1ForNodeOfs(locals.dataOfs, locals.time);
+            locals.thisNodeTotalTime1InTimerUnits += locals.rtNode.getNetTime1();
+            childTotalTime1InTimerUnits = locals.thisNodeTotalTime1InTimerUnits; // It will be effectively returned by this method
                                                                           // Calculate cleansed total time
 
-            time = (long) timingAdjuster.adjustTime(thisNodeTotalTime1InTimerUnits, rtNode.getNCalls()+totalNCallsFromThisNode,
-                                                       totalNCallsFromThisNode, true);
+            locals.time = (long) timingAdjuster.adjustTime(locals.thisNodeTotalTime1InTimerUnits, locals.rtNode.getNCalls()+locals.totalNCallsFromThisNode,
+                                                       locals.totalNCallsFromThisNode, true);
 
             //      time = (long) (((double) thisNodeTotalTime1InTimerUnits - rtNode.getNCalls() * timingData.methodEntryExitInnerTime0
             //        - totalNCallsFromThisNode * timingData.methodEntryExitCallTime1) * 1000000 / timingData
             //        .timerCountsInSecond1);
-            if (time < 0) {
-                time = 0;
+            if (locals.time < 0) {
+                locals.time = 0;
             }
 
-            setTotalTime1ForNodeOfs(dataOfs, time);
+            setTotalTime1ForNodeOfs(locals.dataOfs, locals.time);
         }
 
-        childTotalNCalls = totalNCallsFromThisNode + rtNode.getNCalls(); // It will be effectively returned by this method
+        childTotalNCalls = locals.totalNCallsFromThisNode + locals.rtNode.getNCalls(); // It will be effectively returned by this method
 
-        return nextNodeOfs;
+        return locals.nextNodeOfs;
     }
 
+    private static class GenerateMirrorNodeLocalVars {
+        private final TimedCPUCCTNode rtNode;
+        private final int dataOfs;
+        private long thisNodeTotalTime0InTimerUnits;
+        private long thisNodeTotalTime1InTimerUnits;
+        private int nCallsFromThisNode;
+        private int totalNCallsFromThisNode;
+        private RuntimeCPUCCTNode.Children nodeChildren;
+        private int nChildren;
+        private int nextNodeOfs;
+        private int childCounter;
+        private int i;
+        private RuntimeCPUCCTNode aNode;
+        private long time;
+        
+        private GenerateMirrorNodeLocalVars(TimedCPUCCTNode node, int off) {
+            rtNode = node;
+            dataOfs = off;
+        } 
+    }
+    
     private void generateNodeBase(TimedCPUCCTNode rtNode, int nodeDataOfs) {
         int methodId = (rtNode instanceof MethodCPUCCTNode) ? ((MethodCPUCCTNode) rtNode).getMethodId() : 0;
         int nCalls = rtNode.getNCalls();

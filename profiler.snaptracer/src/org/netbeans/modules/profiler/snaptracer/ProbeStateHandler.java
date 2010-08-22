@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.snaptracer;
 
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 
 
 /**
@@ -59,14 +59,14 @@ public interface ProbeStateHandler {
      *
      * @param snapshot profiler snapshot
      */
-    public void probeAdded(SampledCPUSnapshot snapshot);
+    public void probeAdded(IdeSnapshot snapshot);
 
     /**
      * Invoked when the probe is removed from the Timeline view.
      *
      * @param snapshot profiler snapshot
      */
-    public void probeRemoved(SampledCPUSnapshot snapshot);
+    public void probeRemoved(IdeSnapshot snapshot);
 
 
     /**
@@ -80,7 +80,7 @@ public interface ProbeStateHandler {
      * @param refresh session refresh rate in miliseconds
      * @return TracerProgressObject to track initialization progress
      */
-    public TracerProgressObject sessionInitializing(SampledCPUSnapshot snapshot, int refresh);
+    public TracerProgressObject sessionInitializing(IdeSnapshot snapshot, int refresh);
 
     /**
      * Invoked when starting a new Tracer session. Any probe initialization
@@ -96,7 +96,7 @@ public interface ProbeStateHandler {
      * @param snapshot profiler snapshot
      * @throws SessionInitializationException in case of initialization failure
      */
-    public void sessionStarting(SampledCPUSnapshot snapshot)
+    public void sessionStarting(IdeSnapshot snapshot)
             throws SessionInitializationException;
 
     /**
@@ -105,7 +105,7 @@ public interface ProbeStateHandler {
      *
      * @param snapshot profiler snapshot
      */
-    public void sessionRunning(SampledCPUSnapshot snapshot);
+    public void sessionRunning(IdeSnapshot snapshot);
 
     /**
      * Invoked when stopping the Tracer session. Any probe cleanup should be
@@ -116,14 +116,14 @@ public interface ProbeStateHandler {
      *
      * @param snapshot profiler snapshot
      */
-    public void sessionStopping(SampledCPUSnapshot snapshot);
+    public void sessionStopping(IdeSnapshot snapshot);
 
     /**
      * Invoked when the Tracer session has finished.
      *
      * @param snapshot profiler snapshot
      */
-    public void sessionFinished(SampledCPUSnapshot snapshot);
+    public void sessionFinished(IdeSnapshot snapshot);
 
     /**
      * Invoked when refresh rate of the Tracer session has been changed.
@@ -131,7 +131,7 @@ public interface ProbeStateHandler {
      * @param snapshot profiler snapshot
      * @param refresh session refresh rate in miliseconds
      */
-    public void refreshRateChanged(SampledCPUSnapshot snapshot, int refresh);
+    public void refreshRateChanged(IdeSnapshot snapshot, int refresh);
 
 
     /**
@@ -139,9 +139,9 @@ public interface ProbeStateHandler {
      */
     public abstract class Adapter implements ProbeStateHandler {
 
-        public void probeAdded(SampledCPUSnapshot snapshot) {}
+        public void probeAdded(IdeSnapshot snapshot) {}
 
-        public void probeRemoved(SampledCPUSnapshot snapshot) {}
+        public void probeRemoved(IdeSnapshot snapshot) {}
 
         /**
          * Invoked when setting up a new Tracer session. This method allows a
@@ -154,20 +154,20 @@ public interface ProbeStateHandler {
          * @param refresh session refresh rate in miliseconds
          * @return TracerProgressObject null in default implementation
          */
-        public TracerProgressObject sessionInitializing(SampledCPUSnapshot snapshot, int refresh) {
+        public TracerProgressObject sessionInitializing(IdeSnapshot snapshot, int refresh) {
             return null;
         }
 
-        public void sessionStarting(SampledCPUSnapshot snapshot)
+        public void sessionStarting(IdeSnapshot snapshot)
                 throws SessionInitializationException {}
 
-        public void sessionRunning(SampledCPUSnapshot snapshot) {}
+        public void sessionRunning(IdeSnapshot snapshot) {}
 
-        public void sessionStopping(SampledCPUSnapshot snapshot) {}
+        public void sessionStopping(IdeSnapshot snapshot) {}
 
-        public void sessionFinished(SampledCPUSnapshot snapshot) {}
+        public void sessionFinished(IdeSnapshot snapshot) {}
 
-        public void refreshRateChanged(SampledCPUSnapshot snapshot, int refresh) {}
+        public void refreshRateChanged(IdeSnapshot snapshot, int refresh) {}
 
     }
 

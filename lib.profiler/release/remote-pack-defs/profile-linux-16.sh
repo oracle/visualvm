@@ -14,4 +14,4 @@ cd $INSTALL_DIR
 INSTALL_DIR=`pwd`
 cd $ORIG_DIR
 
-$JAVA_HOME/bin/java -agentpath:$INSTALL_DIR/../lib/deployed/jdk16/linux/libprofilerinterface.so=$INSTALL_DIR/../lib/,5140 $@
+$JAVA_HOME/bin/java -XX:+UseLinuxPosixThreadCPUClocks -agentpath:$INSTALL_DIR/../lib/deployed/jdk16/linux/libprofilerinterface.so=$INSTALL_DIR/../lib/,5140 $@

@@ -53,7 +53,6 @@ import java.util.List;
 import java.util.Set;
 import org.netbeans.modules.profiler.snaptracer.Positionable;
 import org.netbeans.modules.profiler.snaptracer.impl.packages.TestPackageProvider;
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
 
 /**
  *
@@ -88,7 +87,7 @@ public final class TracerSupportImpl {
         return false;
     }
 
-    public synchronized List<TracerPackage> getPackages(SampledCPUSnapshot snapshot) {
+    public synchronized List<TracerPackage> getPackages(IdeSnapshot snapshot) {
         List<TracerPackage> packages = new ArrayList();
         for (TracerPackageProvider provider : providers)
 //            if (snapshot == null || provider.getScope().isInstance(snapshot))
