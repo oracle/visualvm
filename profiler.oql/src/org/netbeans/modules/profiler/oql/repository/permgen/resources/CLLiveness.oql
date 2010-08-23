@@ -1,0 +1,2 @@
+select { loader: cl, liveness: heap.livepaths(cl) }
+    from instanceof java.lang.ClassLoader cl
