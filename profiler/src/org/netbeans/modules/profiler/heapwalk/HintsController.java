@@ -110,34 +110,27 @@ public class HintsController extends AbstractController {
             urls = urls.substring(INSTANCE_URL_PREFIX.length());
             
             String[] id = urls.split("/"); // NOI18N
-            JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByName(id[0]);
-            
-            if (c != null) {
-                List<Instance> instances = c.getInstances();
-                Instance i = null;
-                int instanceNumber = Integer.parseInt(id[1]);
-                if (instanceNumber <= instances.size()) i = instances.get(instanceNumber - 1);
-                
-                if (i != null) {
-                    heapFragmentWalker.getClassesController().showInstance(i);
-                } else {
-                    NetBeansProfiler.getDefaultNB()
-                            .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
-                            new Object[] { id[1], c.getName() }));
-                }
+            long instanceId = Long.parseLong(id[2]);
+            Instance i = heapFragmentWalker.getHeapFragment().getInstanceByID(instanceId);
+                            
+            if (i != null) {
+                heapFragmentWalker.getClassesController().showInstance(i);
             } else {
                 NetBeansProfiler.getDefaultNB()
-                        .displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+                        .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
+                        new Object[] { id[1], id[0] }));
             }
         } else if (urls.startsWith(CLASS_URL_PREFIX)) {
             urls = urls.substring(CLASS_URL_PREFIX.length());
             
-            JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByName(urls);
+            String[] id = urls.split("/"); // NOI18N
+            long jclsId = Long.parseLong(id[1]);
+            JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByID(jclsId);
             
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
+                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
             }
         }
     }
@@ -222,12 +215,12 @@ public class HintsController extends AbstractController {
     
     private String printInstance(Instance in) {
         String className = in.getJavaClass().getName();
-        return "<a href='" + INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
+        return "<a href='" + INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
     }
     
     private String printClass(JavaClass jcls) {
         String className = jcls.getName();
-        return "<a href='" + CLASS_URL_PREFIX + className + "'>class " + className + "</a>"; // NOI18N
+        return "<a href='" + CLASS_URL_PREFIX + className + "/" + jcls.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
     }
     
     

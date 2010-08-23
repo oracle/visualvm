@@ -73,9 +73,10 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.openide.util.Utilities;
 
 
 /**
@@ -98,6 +99,7 @@ public final class AntActions {
                                                                                                 "AntActions_IncorrectJavaSpecVersionDialogCaption"); // NOI18N
     private static final String INCORRECT_JAVA_SPECVERSION_DIALOG_MSG = NbBundle.getMessage(AntActions.class,
                                                                                             "AntActions_IncorrectJavaSpecVersionDialogMsg"); // NOI18N
+    private static final String LINUX_THREAD_TIMER_KEY = "-XX:+UseLinuxPosixThreadCPUClocks"; // NOI18N
     private static final String UNSUPPORTED_PROJECT_TYPE_MSG = NbBundle.getMessage(AntActions.class,
                                                                                    "AntActions_UnsupportedProjectTypeMsg"); // NOI18N                                                                                                                            
     private static final String INVALID_JAVAPLATFORM_MSG = NbBundle.getMessage(AntActions.class,
@@ -435,12 +437,19 @@ public final class AntActions {
         return null;
     }
 
+    private static void activateLinuxPosixThreadTime(ProfilingSettings ps, Properties props, Project project) {
+        if (ps.getThreadCPUTimerOn()) {
+            props.setProperty("profiler.info.jvmargs", LINUX_THREAD_TIMER_KEY + " " + props.getProperty("profiler.info.jvmargs")); // NOI18N
+            ProfilerLogger.log("Profiler.UseLinuxPosixThreadCPUClocks: Enabled"); // NOI18N
+        }
+    }
+
     private static void activateOOMProtection(ProfilerIDESettings gps, Properties props, Project project) {
         if (gps.isOOMDetectionEnabled()) {
             String oldArgs = props.getProperty("profiler.info.jvmargs");
             oldArgs = (oldArgs != null) ? oldArgs : "";
 
-            StringBuffer oomArgsBuffer = new StringBuffer(oldArgs);
+            StringBuilder oomArgsBuffer = new StringBuilder(oldArgs);
             String heapDumpPath = getHeapDumpPath(gps, project);
 
             if ((heapDumpPath != null) && (heapDumpPath.length() > 0)) {
@@ -583,7 +592,6 @@ public final class AntActions {
                                 
                                 if (javaPlatformName != null) {
                                     usedJavaExecutable = Profiler.getDefault().getPlatformJavaFile(javaPlatformName);
-
                                     jp = IDEUtils.getJavaPlatformByName(javaPlatformName);
 
                                     if (jp == null) {
@@ -639,6 +647,10 @@ public final class AntActions {
                                 activateOOMProtection(gps, props, project);
                             } else {
                                 throw new IllegalArgumentException("Unsupported JDK " + javaVersion); // NOI18N
+                            }
+
+                            if (Platform.isLinux() && javaVersion.equals(CommonConstants.JDK_16_STRING)) {
+                                activateLinuxPosixThreadTime(pSettings, props, project);
                             }
                             
                             if (!ptp.startProfilingSession(project, profiledClassFile, isTest, props)) { // Used for Maven - ProjectTypeProfiler itself controls starting profiling session
