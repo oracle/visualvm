@@ -133,6 +133,11 @@ public class OQLController extends AbstractTopLevelController
     }
 
     public void cancelQuery() {
+        try {
+            engine.cancelQuery();
+        } catch (OQLException e) {
+
+        }
         finalizeQuery();
     }
 
@@ -291,27 +296,48 @@ public class OQLController extends AbstractTopLevelController
             sb.append(printClass(c));
         } else if (o instanceof ReferenceChain) {
             ReferenceChain rc = (ReferenceChain) o;
-            sb.append("<h4>Reference Chain</h4>");
+            boolean first = true;
             while (rc != null) {
-                sb.append(printInstance(rc.getObj())).append("&gt;"); // NOI18N
+                if (!first) {
+                    sb.append("-&gt;"); // NOI18N
+                } else {
+                    first = false;
+                }
+                sb.append(printInstance(rc.getObj()));
                 rc = rc.getNext();
             }
-            sb.delete(sb.length() - 5, sb.length());
         } else if (o instanceof Map) {
             Set<Map.Entry> entries = ((Map)o).entrySet();
-            sb.append("<span>{<br/>"); // NOI18N
+            sb.append("<span><b>{</b><br/>"); // NOI18N
             boolean first = true;
             for(Map.Entry entry : entries) {
                 if (!first) {
                     sb.append(",<br/>"); // NOI18N
+                } else {
+                    first = false;
                 }
-                first = false;
-                sb.append(entry.getKey().toString().replace("<", "&lt;").replace(">", "&gt;"));
+                sb.append(entry.getKey().toString().replace("<", "&lt;").replace(">", "&gt;")); // NOI18N
                 sb.append(" = "); // NOI18N
                 dump(entry.getValue(), sb);
             }
-            sb.delete(sb.length() - 2, sb.length());
-            sb.append("<br/>}</span>"); // NOI18N
+            sb.append("<br/><b>}</b></span>"); // NOI18N
+        } else if (o instanceof Object[]) {
+            sb.append("<span><b>[</b>&nbsp;"); // NOI18N
+            boolean first = true;
+            for (Object obj1 : (Object[]) o) {
+                if (!first) {
+                    sb.append(", "); // NOI18N
+                } else {
+                    first = false;
+                }
+                Object obj2 = engine.unwrapJavaObject(obj1,true);
+                if (obj2 != null) {
+                    dump(obj2, sb);
+                } else {
+                    dump(obj1, sb);
+                }
+            }
+            sb.append("&nbsp;<b>]</b></span>"); // NOI18N
         } else {
             sb.append(o.toString());
         }
