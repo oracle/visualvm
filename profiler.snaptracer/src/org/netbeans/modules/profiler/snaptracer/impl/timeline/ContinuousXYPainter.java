@@ -102,16 +102,23 @@ final class ContinuousXYPainter extends TimelineXYPainter {
                          List<ItemSelection> selected, Graphics2D g,
                          Rectangle dirtyArea, SynchronousXYChartContext context) {
 
+//        g.setColor(new Color((int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)));
+//        g.fill(dirtyArea);
+
         int valuesCount = item.getValuesCount();
         int extraTrailing = fillColor != null ? 2 : 0;
-        int[][] idxs = computer.getVisible(dirtyArea, valuesCount, context, 1,
+
+        Rectangle dirtyExtended = new Rectangle(dirtyArea);
+        dirtyExtended.x -= lineWidth;
+        dirtyExtended.width += lineWidth * 2;
+        int[][] idxs = computer.getVisible(dirtyExtended, valuesCount, context, 1,
                                            extraTrailing);
         if (idxs == null) return;
         int[] visibleIndexes = idxs[0];
         int npoints = idxs[1][0];
         int[][] points = computer.createPoints(visibleIndexes, npoints, item,
                                                dataFactor, context);
-        
+
         if (fillColor != null) {
             points[0][npoints - 2] = points[0][npoints - 3];
             points[1][npoints - 2] = computer.getZeroY(context);

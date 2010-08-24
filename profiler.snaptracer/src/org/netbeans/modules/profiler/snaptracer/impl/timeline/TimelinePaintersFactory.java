@@ -49,6 +49,7 @@ import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.ValueItemDes
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.XYItemDescriptor;
 import java.awt.Color;
 import org.netbeans.modules.profiler.snaptracer.ProbeItemDescriptor;
+import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.IconItemDescriptor;
 
 /**
  *
@@ -76,6 +77,10 @@ final class TimelinePaintersFactory {
         // --- BarItem ---------------------------------------------------------
         if (descriptor instanceof DiscreteXYItemDescriptor)
             return createDiscretePainter((DiscreteXYItemDescriptor)descriptor, itemIndex, c);
+
+        // --- IconItem --------------------------------------------------------
+        if (descriptor instanceof IconItemDescriptor)
+            return createIconPainter((IconItemDescriptor)descriptor, itemIndex);
 
         return null;
     }
@@ -128,6 +133,16 @@ final class TimelinePaintersFactory {
         return new DiscreteXYPainter(lineWidth, lineColor, fillColor, descriptor.getWidth(),
                                      descriptor.isFixedWidth(), descriptor.isTopLineOnly(),
                                      descriptor.isOutlineOnly(), dataFactor, c);
+    }
+
+    private static TimelineIconPainter createIconPainter(
+            IconItemDescriptor descriptor, int itemIndex) {
+
+        Color color = descriptor.getColor();
+        if (color == ProbeItemDescriptor.DEFAULT_COLOR)
+            color = TimelineColorFactory.getColor(itemIndex);
+
+        return new TimelineIconPainter(color);
     }
 
 }

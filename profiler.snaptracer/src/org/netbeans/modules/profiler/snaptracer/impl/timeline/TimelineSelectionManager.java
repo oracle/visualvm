@@ -470,9 +470,9 @@ class TimelineSelectionManager implements ChartSelectionModel {
         }
 
         public void mouseClicked(final MouseEvent e) {
+            if (!enabled || !SwingUtilities.isLeftMouseButton(e)) return;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (!enabled || !SwingUtilities.isLeftMouseButton(e)) return;
                     if (selectionMode != SELECTION_NONE)
                         setSelectionBounds(e.getX(), e.getY(), 0, 0);
                 }

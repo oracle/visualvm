@@ -64,8 +64,13 @@ public final class IdeSnapshot  {
     Map<String,Integer> valuesMap;
     Map<Integer,String> messagesMap;
 
+    private final File npssFile;
+    private final File uigestureFile;
+
     IdeSnapshot(File npssFile, File uigestureFile) throws IOException {
         cpuSnapshot = new SampledCPUSnapshot((npssFile));
+        this.npssFile = npssFile;
+        this.uigestureFile = uigestureFile;
         if (uigestureFile != null && uigestureFile.exists()) {
             xmlLogs = new LogReader(uigestureFile);
             xmlLogs.load();
@@ -81,6 +86,18 @@ public final class IdeSnapshot  {
 
     long getTimestamp(int sampleIndex) throws IOException {
         return cpuSnapshot.getTimestamp(sampleIndex);
+    }
+
+    File getNpssFile() {
+        return npssFile;
+    }
+
+    File getUiGestureFile() {
+        return uigestureFile;
+    }
+
+    public boolean hasUiGestures() {
+        return xmlLogs != null;
     }
 
     LoadedSnapshot getCPUSnapshot(int startIndex, int endIndex) throws IOException {

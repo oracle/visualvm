@@ -175,7 +175,6 @@ public final class TimelinePanel extends JPanel {
         public void mousePressed(MouseEvent e) {
             if (!SwingUtilities.isLeftMouseButton(e)) return;
             updateRowState(e, SwingUtilities.isLeftMouseButton(e));
-//            if (draggingRow != null) chart.updateSelection(false, this);
             chart.updateSelection(false, this);
             selection.setEnabled(draggingRow == null);
             updateCursor();
@@ -183,20 +182,20 @@ public final class TimelinePanel extends JPanel {
 
         public void mouseReleased(MouseEvent e) {
             if (!SwingUtilities.isLeftMouseButton(e)) return;
-//            if (draggingRow != null) chart.updateSelection(true, this);
             chart.updateSelection(true, this);
-            selection.setEnabled(true);
+            
             updateRowState(e, false);
             updateCursor();
-            if (e.getSource() == chart)
+            if (draggingRow == null && e.getSource() == chart)
                 support.indexSelectionChanged(selection.getStartIndex(),
                                               selection.getEndIndex());
-        }
 
-//        public void mouseClicked(MouseEvent e) {
-//            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
-//                if (e.getSource() == chart) ; // TODO: select row in Details
-//        }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    selection.setEnabled(true);
+                }
+            });
+        }
 
         public void mouseMoved(MouseEvent e) {
             updateRowState(e, false);
