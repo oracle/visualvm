@@ -93,10 +93,6 @@ public class Snapshot {
             }
         }
     }
-    
-    public int getMinimumObjectSize() {
-        return 4;
-    }
 
     public JavaClass findClass(String name) {
         try {

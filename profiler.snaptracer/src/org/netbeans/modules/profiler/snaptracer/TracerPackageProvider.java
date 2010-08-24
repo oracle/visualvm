@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.snaptracer;
 
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 
 
 /**
@@ -77,6 +77,6 @@ public abstract class TracerPackageProvider {
      *
      * @return TracerPackages for the provided target
      */
-    public abstract TracerPackage[] getPackages(SampledCPUSnapshot snapshot);
+    public abstract TracerPackage[] getPackages(IdeSnapshot snapshot);
 
 }

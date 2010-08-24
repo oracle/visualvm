@@ -50,9 +50,9 @@ import org.netbeans.modules.profiler.oql.engine.api.impl.Snapshot;
 /**
  * This is Object Query Language Interpreter
  *
- * @authoe J. Bachorik
+ * @author J. Bachorik
  */
-public class OQLEngine {
+final public class OQLEngine {
     final private static Logger LOGGER = Logger.getLogger(OQLEngine.class.getName());
     final private OQLEngineImpl delegate;
     final private Heap heap;
@@ -116,5 +116,17 @@ public class OQLEngine {
 
     public OQLQuery parseQuery(String query) throws OQLException {
         return delegate.parseQuery(query);
+    }
+
+    public void cancelQuery() throws OQLException {
+        delegate.cancelQuery();
+    }
+
+    public Object unwrapJavaObject(Object object) {
+        return delegate.unwrapJavaObject(object);
+    }
+
+    public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
+        return delegate.unwrapJavaObject(object, tryAssociativeArray);
     }
 }
