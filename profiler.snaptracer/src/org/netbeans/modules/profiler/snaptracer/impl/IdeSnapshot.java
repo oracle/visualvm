@@ -40,30 +40,35 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.snaptracer.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.LogRecord;
+import javax.swing.Icon;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.netbeans.modules.profiler.snaptracer.logs.LogReader;
+import org.openide.util.Exceptions;
+import org.openide.util.ImageUtilities;
+import org.openide.util.Lookup;
 
 /** Reads xml log and npss snapshot from file.
  *
  * @author Tomas Hurka
  */
-public final class IdeSnapshot  {
-    SampledCPUSnapshot cpuSnapshot;
-    LogReader xmlLogs;
-    LogRecord lastRecord;
-    Map<Integer,LogRecord> recordsMap;
-    Map<String,Integer> valuesMap;
-    Map<Integer,String> messagesMap;
+public final class IdeSnapshot {
 
+    private SampledCPUSnapshot cpuSnapshot;
+    private LogReader xmlLogs;
+    private LogRecord lastRecord;
+    private Map<Integer, LogRecord> recordsMap;
     private final File npssFile;
     private final File uigestureFile;
 
@@ -75,8 +80,6 @@ public final class IdeSnapshot  {
             xmlLogs = new LogReader(uigestureFile);
             xmlLogs.load();
             recordsMap = new HashMap();
-            valuesMap = new HashMap();
-            messagesMap = new HashMap();
         }
     }
 
@@ -116,11 +119,19 @@ public final class IdeSnapshot  {
         return 0;
     }
 
-    public String getMessageForValue(long loggerValue) {
-        if (xmlLogs == null) return null;
-        return messagesMap.get(Integer.valueOf((int)loggerValue));
+    public LogRecordInfo getLogInfoForValue(long loggerVaue) {
+        if (xmlLogs == null) {
+            return null;
+        }
+        LogRecord rec = recordsMap.get(new Integer((int) loggerVaue));
+        if (rec == null) {
+            return null;
+        }
+        LogRecordInfo info = new LogRecordInfo((rec));
+        LogRecordDecorator.decorate(info);
+        return info;
     }
-    
+
     private Integer getLogRecordValue(int sampleIndex) throws IOException {
         long timestamp = getTimestamp(sampleIndex);
         LogRecord rec = xmlLogs.getRecordFor(timestamp / 1000000);
@@ -130,9 +141,10 @@ public final class IdeSnapshot  {
             long recTime = rec.getMillis() * 1000000;
             if (recTime > startTime && recTime < endTime) {
                 if (rec != lastRecord) {
+                    Integer index = new Integer(sampleIndex+1);
                     lastRecord = rec;
-                    recordsMap.put(new Integer(sampleIndex), rec);
-                    return getValueForRecord(rec);
+                    recordsMap.put(index, rec);
+                    return index;
                 }
             }
         }
@@ -143,15 +155,112 @@ public final class IdeSnapshot  {
         return cpuSnapshot.getThreadDump(sampleIndex);
     }
 
-    private Integer getValueForRecord(LogRecord rec) {
-        String message = rec.getMessage();
-        Integer val = valuesMap.get(message);
-        
-        if (val == null) {
-            val = Integer.valueOf(valuesMap.size()+1);
-            valuesMap.put(message,val);
-            messagesMap.put(val,message);
+    public static final class LogRecordInfo {
+
+        private String name;
+        private String displayName;
+        private String toolTip;
+        private Icon icon;
+        private LogRecord record;
+
+        LogRecordInfo(LogRecord rec) {
+            record = rec;
         }
-        return val;
+
+        void setName(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        void setDisplayName(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        void setToolTip(String toolTip) {
+            this.toolTip = toolTip;
+        }
+
+        public String getToolTip() {
+            return toolTip;
+        }
+
+        void setIcon(Icon icon) {
+            this.icon = icon;
+        }
+
+        public Icon getIcon() {
+            return icon;
+        }
+    }
+
+    private static final class LogRecordDecorator implements InvocationHandler {
+
+        private static final String DECORATIONS_CLASS = "org.netbeans.lib.uihandler.Decorations";
+        private static final String DECORABLE_CLASS = "org.netbeans.lib.uihandler.Decorable";
+        private static final String DECORATE_METHOD = "decorate";
+        private static final String DECORABLE_SETNAME_METHOD = "setName";
+        private static final String DECORABLE_SETDISPLAYNAME_METHOD = "setDisplayName";
+        private static final String DECORABLE_SETICONBASE_METHOD = "setIconBaseWithExtension";
+        private static final String DECORABLE_SETSHORTDESCRIPTOR_METHOD = "setShortDescription";
+        private LogRecordInfo recInfo;
+        private LogRecord rec;
+
+        LogRecordDecorator(LogRecordInfo info) {
+            recInfo = info;
+            rec = info.record;
+        }
+
+        private void decorateRecord() {
+            try {
+                ClassLoader c = Lookup.getDefault().lookup(ClassLoader.class);
+                Class decorationClass = Class.forName(DECORATIONS_CLASS, true, c);
+                Class decorableClass = Class.forName(DECORABLE_CLASS, true, c);
+                Object decorable = Proxy.newProxyInstance(c, new Class[]{decorableClass}, this);
+                Method decorate = decorationClass.getDeclaredMethod(DECORATE_METHOD, LogRecord.class, decorableClass);
+                decorate.invoke(null, rec, decorable);
+            } catch (IllegalAccessException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IllegalArgumentException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (InvocationTargetException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (NoSuchMethodException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (SecurityException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (ClassNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            String methodName = method.getName();
+            if (DECORABLE_SETNAME_METHOD.equals(methodName)) {
+                recInfo.setName((String) args[0]);
+            }
+            if (DECORABLE_SETDISPLAYNAME_METHOD.equals(methodName)) {
+                recInfo.setDisplayName((String) args[0]);
+            }
+            if (DECORABLE_SETSHORTDESCRIPTOR_METHOD.equals(methodName)) {
+                recInfo.setToolTip((String) args[0]);
+            }
+            if (DECORABLE_SETICONBASE_METHOD.equals(methodName)) {
+                String iconBase = (String) args[0];
+                recInfo.setIcon(ImageUtilities.loadImageIcon(iconBase, true));
+            }
+            return null;
+        }
+
+        static void decorate(LogRecordInfo info) {
+            new LogRecordDecorator(info).decorateRecord();
+        }
     }
 }

@@ -110,7 +110,11 @@ class UiGesturesProbe extends TracerProbe {
                 case FORMAT_TOOLTIP:
                 case FORMAT_DETAILS:
                 case FORMAT_EXPORT:
-                    String message = snapshot.getMessageForValue(value);
+                    IdeSnapshot.LogRecordInfo info = snapshot.getLogInfoForValue(value);
+                    String message = null;
+                    if (info != null) {
+                        message = info.getDisplayName();
+                    }
                     return message != null ? message : "<none>";
                 case FORMAT_UNITS:
                     return "";
