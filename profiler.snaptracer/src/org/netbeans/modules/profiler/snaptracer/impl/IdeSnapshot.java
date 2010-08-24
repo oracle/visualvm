@@ -69,6 +69,7 @@ public final class IdeSnapshot {
     private LogReader xmlLogs;
     private LogRecord lastRecord;
     private Map<Integer, LogRecord> recordsMap;
+    private Map<Integer, LogRecordInfo> infosMap;
     private final File npssFile;
     private final File uigestureFile;
 
@@ -80,6 +81,7 @@ public final class IdeSnapshot {
             xmlLogs = new LogReader(uigestureFile);
             xmlLogs.load();
             recordsMap = new HashMap();
+            infosMap = new HashMap();
         }
     }
 
@@ -119,16 +121,21 @@ public final class IdeSnapshot {
         return 0;
     }
 
-    public LogRecordInfo getLogInfoForValue(long loggerVaue) {
-        if (xmlLogs == null) {
+    public LogRecordInfo getLogInfoForValue(long loggerValue) {
+        if (xmlLogs == null || loggerValue == 0) {
             return null;
         }
-        LogRecord rec = recordsMap.get(new Integer((int) loggerVaue));
-        if (rec == null) {
-            return null;
+        Integer index = new Integer((int) loggerValue);
+        LogRecordInfo info = infosMap.get(index);
+
+        if (info == null) {
+            LogRecord rec = recordsMap.get(index);
+
+            assert rec != null : "Null record for value "+index;
+            info = new LogRecordInfo(rec);
+            LogRecordDecorator.decorate(info);
+            infosMap.put(index, info);
         }
-        LogRecordInfo info = new LogRecordInfo((rec));
-        LogRecordDecorator.decorate(info);
         return info;
     }
 
