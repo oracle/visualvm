@@ -49,7 +49,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.List;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import org.netbeans.lib.profiler.charts.ChartContext;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.ChartItemChange;
@@ -60,6 +59,7 @@ import org.netbeans.lib.profiler.charts.xy.XYItemChange;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChartContext;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 import org.openide.util.ImageUtilities;
 
 /**
@@ -69,19 +69,21 @@ import org.openide.util.ImageUtilities;
 class TimelineIconPainter extends TimelineXYPainter {
 
     private static final String IMAGE_PATH =
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/tracer24.png"; // NOI18N
-    private static final Icon ICON = new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH));
+            "org/netbeans/modules/profiler/snaptracer/impl/resources/genericAction.png"; // NOI18N
+    private static final Icon ICON = ImageUtilities.loadImageIcon(IMAGE_PATH, true);
 
-    private static final int ICON_EXTENT = ICON.getIconWidth() / 2;
+    private static final int ICON_EXTENT = 8;
 
     protected final Color color;
+    protected final IdeSnapshot snapshot;
 
 
     // --- Constructor ---------------------------------------------------------
 
-    TimelineIconPainter(Color color) {
+    TimelineIconPainter(Color color, IdeSnapshot snapshot) {
         super(ICON_EXTENT, true, 1);
         this.color = color;
+        this.snapshot = snapshot;
     }
 
 
@@ -93,29 +95,27 @@ class TimelineIconPainter extends TimelineXYPainter {
                          context) {
 
         if (context.getViewWidth() == 0) return;
-//
-//        System.err.println(">>> Paint: " + dirtyArea);
-//        g.setColor(new Color((int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)));
-//        g.fill(dirtyArea);
-
-        Rectangle dirtyExtended = new Rectangle(dirtyArea);
-        dirtyExtended.x -= ICON_EXTENT;
-        dirtyExtended.width += ICON_EXTENT * 2;
-//
-        int[][] visibleBounds = context.getVisibleBounds(dirtyExtended);
+        
+        int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
 
         int firstFirst = visibleBounds[0][0];
         int firstIndex = firstFirst;
         if (firstIndex == -1) firstIndex = visibleBounds[0][1];
         if (firstIndex == -1) return;
 
+        int minX = dirtyArea.x - ICON_EXTENT;
+        while (context.getViewX(item.getXValue(firstIndex)) > minX && firstIndex > 0) firstIndex--;
+
+        int endIndex = item.getValuesCount() - 1;
         int lastFirst = visibleBounds[1][0];
         int lastIndex = lastFirst;
         if (lastIndex == -1) lastIndex = visibleBounds[1][1];
-        if (lastIndex == -1) lastIndex = item.getValuesCount() - 1;
+        if (lastIndex == -1) lastIndex = endIndex;
+
+        int maxX = dirtyArea.x + dirtyArea.width + ICON_EXTENT;
+        while (context.getViewX(item.getXValue(lastIndex)) < maxX && lastIndex < endIndex) lastIndex++;
 
         g.setColor(color);
-        int viewY = context.getViewportHeight() / 2 - ICON_EXTENT;
 
         for (int index = firstIndex; index <= lastIndex; index++) {
             long dataY = item.getYValue(index);
@@ -123,7 +123,11 @@ class TimelineIconPainter extends TimelineXYPainter {
 
             long dataX = item.getXValue(index);
             int  viewX = Utils.checkedInt(context.getViewX(dataX));
-            ICON.paintIcon(null, g, viewX - ICON_EXTENT, viewY);
+            Icon icon = snapshot.getLogInfoForValue(dataY).getIcon();
+            if (icon == null) icon = ICON;
+            int iconWidth = icon.getIconWidth();
+            int iconHeight = icon.getIconHeight();
+            icon.paintIcon(null, g, viewX - iconWidth / 2, (context.getViewportHeight() - iconHeight) / 2);
         }
     }
 
@@ -190,15 +194,17 @@ class TimelineIconPainter extends TimelineXYPainter {
                                                int viewY, ChartContext context) {
 
         SynchronousXYChartContext contx = (SynchronousXYChartContext)context;
+        SynchronousXYItem xyItem = (SynchronousXYItem)item;
 
         int nearestTimestampIndex = contx.getNearestTimestampIndex(viewX, viewY);
-        if (nearestTimestampIndex == -1) return null;
+        if (nearestTimestampIndex == -1) return new XYItemSelection.Default(xyItem,
+                nearestTimestampIndex, ItemSelection.DISTANCE_UNKNOWN);
 
-        SynchronousXYItem xyItem = (SynchronousXYItem)item;
         int minX = viewX - ICON_EXTENT;
         int maxX = viewX + ICON_EXTENT;
         int itemX = Utils.checkedInt(contx.getViewX(xyItem.getXValue(nearestTimestampIndex)));
-        if (itemX > maxX || itemX < minX) return null;
+        if (itemX > maxX || itemX < minX) return new XYItemSelection.Default(xyItem,
+                nearestTimestampIndex, ItemSelection.DISTANCE_UNKNOWN);
 
         int closest = -1;
         int index = nearestTimestampIndex;
@@ -272,11 +278,19 @@ class TimelineIconPainter extends TimelineXYPainter {
     private LongRect getViewBounds(LongRect itemBounds, ChartContext context) {
 //        LongRect dataBounds = getDataBounds(itemBounds);
 
-        LongRect viewBounds = context.getViewRect(itemBounds);
-        viewBounds.y = context.getViewportHeight() / 2;
-        viewBounds.height = 1;
-        LongRect.addBorder(viewBounds, ICON_EXTENT);
+        boolean isData = itemBounds.height != 0;
 
+        LongRect viewBounds = context.getViewRect(itemBounds);
+
+        if (isData) {
+            viewBounds.y = Utils.checkedInt(context.getViewY(context.getDataHeight() / 2));
+            viewBounds.height = 0;
+            LongRect.addBorder(viewBounds, ICON_EXTENT);
+        } else {
+            LongRect.clear(viewBounds);
+        }
+        
+//        System.err.println(">>> viewBounds: " + viewBounds);
         return viewBounds;
     }
 
@@ -287,7 +301,9 @@ class TimelineIconPainter extends TimelineXYPainter {
         long xValue = item.getXValue(valueIndex);
         LongRect viewBounds = new LongRect(Utils.checkedInt(context.getViewX(xValue)),
                                            Utils.checkedInt(context.getViewY(context.
-                                           getDataHeight() / 2)), 1, 1);
+                                           getDataHeight() / 2)), 0, 0);
+
+//        System.err.println(">>> viewBounds: " + viewBounds);
 
         return viewBounds;
     }

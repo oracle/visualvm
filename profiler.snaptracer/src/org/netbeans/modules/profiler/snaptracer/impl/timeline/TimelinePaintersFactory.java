@@ -49,6 +49,7 @@ import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.ValueItemDes
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.XYItemDescriptor;
 import java.awt.Color;
 import org.netbeans.modules.profiler.snaptracer.ProbeItemDescriptor;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.IconItemDescriptor;
 
 /**
@@ -58,17 +59,19 @@ import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.IconItemDesc
 final class TimelinePaintersFactory {
 
     static TimelineXYPainter createPainter(ProbeItemDescriptor descriptor,
-                                           int itemIndex, PointsComputer c) {
+                                           int itemIndex, PointsComputer c,
+                                           IdeSnapshot snapshot) {
 
         // --- ValueItem -------------------------------------------------------
         if (descriptor instanceof ValueItemDescriptor)
-            return createValuePainter((ValueItemDescriptor)descriptor, itemIndex, c);
+            return createValuePainter((ValueItemDescriptor)descriptor, itemIndex, c, snapshot);
 
         return null;
     }
 
     private static TimelineXYPainter createValuePainter(
-            ValueItemDescriptor descriptor, int itemIndex, PointsComputer c) {
+            ValueItemDescriptor descriptor, int itemIndex, PointsComputer c,
+            IdeSnapshot snapshot) {
 
         // --- XYItem ----------------------------------------------------------
         if (descriptor instanceof ContinuousXYItemDescriptor)
@@ -80,7 +83,7 @@ final class TimelinePaintersFactory {
 
         // --- IconItem --------------------------------------------------------
         if (descriptor instanceof IconItemDescriptor)
-            return createIconPainter((IconItemDescriptor)descriptor, itemIndex);
+            return createIconPainter((IconItemDescriptor)descriptor, itemIndex, snapshot);
 
         return null;
     }
@@ -136,13 +139,13 @@ final class TimelinePaintersFactory {
     }
 
     private static TimelineIconPainter createIconPainter(
-            IconItemDescriptor descriptor, int itemIndex) {
+            IconItemDescriptor descriptor, int itemIndex, IdeSnapshot snapshot) {
 
         Color color = descriptor.getColor();
         if (color == ProbeItemDescriptor.DEFAULT_COLOR)
             color = TimelineColorFactory.getColor(itemIndex);
 
-        return new TimelineIconPainter(color);
+        return new TimelineIconPainter(color, snapshot);
     }
 
 }

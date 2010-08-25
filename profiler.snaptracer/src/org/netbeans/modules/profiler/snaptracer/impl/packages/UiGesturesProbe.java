@@ -114,6 +114,8 @@ class UiGesturesProbe extends TracerProbe {
                     String message = null;
                     if (info != null) {
                         message = info.getDisplayName();
+                        if (message == null) message = info.getName();
+                        if (message == null) message = "<unknown>";
                     }
                     return message != null ? message : "<none>";
                 case FORMAT_UNITS:

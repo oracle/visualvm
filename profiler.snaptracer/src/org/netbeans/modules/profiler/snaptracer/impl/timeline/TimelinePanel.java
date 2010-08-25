@@ -95,6 +95,10 @@ public final class TimelinePanel extends JPanel {
 //        if (chartPanel.resetSelection()) mouseHandler.updateSelection();
     }
 
+    public void updateActions() {
+        chartPanel.updateActions();
+    }
+
     public Action zoomInAction() {
         return chartPanel.zoomInAction();
     }
@@ -183,12 +187,13 @@ public final class TimelinePanel extends JPanel {
         public void mouseReleased(MouseEvent e) {
             if (!SwingUtilities.isLeftMouseButton(e)) return;
             chart.updateSelection(true, this);
-            
-            updateRowState(e, false);
-            updateCursor();
+
             if (draggingRow == null && e.getSource() == chart)
                 support.indexSelectionChanged(selection.getStartIndex(),
                                               selection.getEndIndex());
+            
+            updateRowState(e, false);
+            updateCursor();
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

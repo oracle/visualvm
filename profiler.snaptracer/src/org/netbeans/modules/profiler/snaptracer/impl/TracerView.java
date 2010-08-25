@@ -107,6 +107,9 @@ final class TracerView /*extends DataSourceView*/ {
     private static final String IMAGE_PATH =
             "org/netbeans/modules/profiler/snaptracer/impl/resources/tracer.png"; // NOI18N
 
+    private static final RequestProcessor PROCESSOR =
+            new RequestProcessor("NPSS Selection Processor"); // NOI18N
+
     private final TracerModel model;
     private final TracerController controller;
 
@@ -266,7 +269,11 @@ final class TracerView /*extends DataSourceView*/ {
                             public void run() {
                                 TimelineSupport support = model.getTimelineSupport();
                                 support.dataLoadingFinished();
-//                                support.selectAll();
+                                support.selectAll();
+
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() { timelineView.updateActions(); }
+                                });
 
                                 int lastSample = model.getSamplesCount() - 1;
                                 displaySnapshot(component, 0, lastSample);
@@ -291,7 +298,7 @@ final class TracerView /*extends DataSourceView*/ {
                 JLabel progress = new JLabel("Processing selection...", JLabel.CENTER);
                 addContents(component, progress);
 
-                RequestProcessor.getDefault().post(new Runnable() {
+                PROCESSOR.post(new Runnable() {
                     public void run() {
 //                        long start = System.currentTimeMillis();
                         if (startIndex == endIndex) displayThreadDump(component, startIndex);

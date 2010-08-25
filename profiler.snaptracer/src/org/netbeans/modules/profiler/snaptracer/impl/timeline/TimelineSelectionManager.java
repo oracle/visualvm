@@ -229,6 +229,7 @@ class TimelineSelectionManager implements ChartSelectionModel {
         if (bounds.width == 0) return;
 
         sel = getClosestSelection(bounds.x + bounds.width, bounds.y + bounds.height);
+        if (!(sel instanceof XYItemSelection)) return;
 
         xySel = (XYItemSelection)sel;
         item = xySel.getItem();
