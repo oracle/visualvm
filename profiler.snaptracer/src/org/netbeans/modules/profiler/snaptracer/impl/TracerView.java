@@ -266,7 +266,7 @@ final class TracerView /*extends DataSourceView*/ {
                             public void run() {
                                 TimelineSupport support = model.getTimelineSupport();
                                 support.dataLoadingFinished();
-                                support.selectAll();
+//                                support.selectAll();
 
                                 int lastSample = model.getSamplesCount() - 1;
                                 displaySnapshot(component, 0, lastSample);
