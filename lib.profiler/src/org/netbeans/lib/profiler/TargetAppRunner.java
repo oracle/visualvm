@@ -746,6 +746,9 @@ public class TargetAppRunner implements CommonConstants {
             commands.add("-XX:+ShowMessageBoxOnError"); // NOI18N
         }
 
+        if (Platform.isLinux() && settings.getTargetJDKVersionString().equals(Platform.JDK_16_STRING)) {
+            commands.add("-XX:+UseLinuxPosixThreadCPUClocks"); // NOI18N
+        }
         for (int i = 0; i < newJVMArgs.length; i++) {
             commands.add(newJVMArgs[i]);
         }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -41,41 +41,73 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.heap;
+package org.netbeans.modules.profiler.snaptracer.logs;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-/**
+/** Reads log records from file.
  *
  * @author Tomas Hurka
  */
-class ClassLoaderFieldValue extends HprofFieldObjectValue {
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-    
-    ClassLoaderFieldValue(ClassDump cls, long offset) {
-        super(cls, offset);
+public final class LogReader {
+ 
+    private static final Logger LOG = Logger.getLogger(LogRecords.class.getName());
+
+    private File logFile;
+//    private int records;
+//    private long startTime;
+    private NavigableMap<Long,LogRecord> recordList;
+
+    public LogReader(File f) {
+        logFile = f;
+        recordList = new TreeMap();
     }
-    
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-    
-    public String getName() {
-        return "<classLoader>";  // NOI18N
+
+
+    public void load() throws IOException {
+        InputStream is = new FileInputStream(logFile);
+        try {
+            LogRecords.scan(is, new LogHandler());
+        } finally {
+            is.close();
+        }
     }
-    
-    byte getValueType() {
-        return (byte)HprofHeap.OBJECT;
+
+    public LogRecord getRecordFor(long time) {
+        return recordList.ceilingEntry(new Long(time)).getValue();
     }
-    
-    public Instance getInstance() {
-        return classDump.getClassLoader();
+    class LogHandler extends Handler {
+
+        @Override
+        public void publish(LogRecord record) {
+//            System.out.println("Record "+ records++);
+//            if (startTime == 0) {
+//                startTime = record.getMillis();
+//                System.out.println("Start date: "+new Date(startTime));
+//            } else {
+//                System.out.println("Time: "+(record.getMillis()-startTime));
+//            }
+//            System.out.println(record.getMessage());
+            recordList.put(new Long(record.getMillis()), record);
+        }
+
+        @Override
+        public void flush() {
+//            System.out.println("Flush");
+        }
+
+        @Override
+        public void close() throws SecurityException {
+//           System.out.println("Close");
+        }
+
     }
-    
-    long getInstanceID() {
-        return classDump.getClassLoaderId();
-    }
-    
-    Object getTypeValue() {
-        return Long.valueOf(getInstanceID());
-    }
-    
-    
 }

@@ -1,0 +1,3 @@
+select map(sort(map(heap.objects('java.lang.ClassLoader'),
+   '{loader: it, count: it.classes.elementCount }'), 'lhs.count < rhs.count'),
+   'toHtml(it) + "<br>"')

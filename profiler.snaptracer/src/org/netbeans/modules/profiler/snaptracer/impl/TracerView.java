@@ -195,7 +195,7 @@ final class TracerView /*extends DataSourceView*/ {
 //////
 //////
 //////        try {
-//////            SampledCPUSnapshot ss = new SampledCPUSnapshot(new File("C:\\Users\\JiS\\Documents\\snapshot_tracer_test.npss"));
+//////            IdeSnapshot ss = new IdeSnapshot(new File("C:\\Users\\JiS\\Documents\\snapshot_tracer_test.npss"));
 //////            LoadedSnapshot ls = ss.getCPUSnapshot(0, ss.getSamplesCount() - 1);
 //////            SnapshotResultsWindow sw = new SnapshotResultsWindow(ls, 1, false);
 //////            masterContainer.add(sw, BorderLayout.CENTER);

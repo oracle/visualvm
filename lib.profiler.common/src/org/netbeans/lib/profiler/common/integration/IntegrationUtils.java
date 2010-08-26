@@ -131,6 +131,13 @@ public class IntegrationUtils {
     }
 
     // Returns batch file extension bat / sh according to current / selected OS
+    public static String getBatchExtensionString(String targetPlatform, String customExt) {
+        if (isWindowsPlatform(targetPlatform)) {
+            return customExt + ".bat"; //NOI18N
+        }
+        return customExt + ".sh"; //NOI18N
+    }
+
     public static String getBatchExtensionString(String targetPlatform) {
         if (isWindowsPlatform(targetPlatform)) {
             return ".bat"; //NOI18N
@@ -355,7 +362,7 @@ public class IntegrationUtils {
     }
 
     public static String getManualRemoteStep2(String targetOS, String targetJVM) {
-        return MessageFormat.format(MANUAL_REMOTE_STEP2_MESSAGE, new Object[] { getRemoteCalibrateCommandString(targetOS) }); //NOI18N
+        return MessageFormat.format(MANUAL_REMOTE_STEP2_MESSAGE, new Object[] { getRemoteCalibrateCommandString(targetOS, targetJVM) }); //NOI18N
     }
 
     // Returns getLibsDir()/deployed/jdk<15>/<OS> appropriate for current / selected OS
@@ -442,9 +449,14 @@ public class IntegrationUtils {
     // Returns extra command line arguments without additional quotes required when attaching on startup
     public static String getProfilerAgentCommandLineArgsWithoutQuotes(String targetPlatform, String targetJVM, boolean isRemote,
                                                                       int portNumber) {
-        return "-agentpath:" + getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)
-               + getDirectorySeparator(targetPlatform) + getProfilerAgentLibraryFile(targetPlatform) + "=" //NOI18N
-               + getLibsDir(targetPlatform, isRemote) + "," + portNumber; //NOI18N
+        StringBuilder args = new StringBuilder();
+        if (targetJVM.equals(PLATFORM_JAVA_60) && (targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS))) {
+            args.append(" -XX:+UseLinuxPosixThreadCPUClocks "); // NOI18N
+        }
+        args.append("-agentpath:").append(getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)). // NOI18N
+               append(getDirectorySeparator(targetPlatform)).append(getProfilerAgentLibraryFile(targetPlatform)).append("="). //NOI18N
+               append(getLibsDir(targetPlatform, isRemote)).append(",").append(portNumber); //NOI18N
+        return args.toString();
     }
 
     // Returns filename of profiler agent library
@@ -463,7 +475,7 @@ public class IntegrationUtils {
     }
 
     public static String getProfilerModifiedReplaceFileHeader(String targetPlatform) {
-        return getProfilerModifiedFileHeader(targetPlatform) + getSilentScriptCommentSign(targetPlatform) + " "
+        return getProfilerModifiedFileHeader(targetPlatform) + getSilentScriptCommentSign(targetPlatform) + " " // NOI18N
                + ORIGINAL_BACKUP_LOCATION_STRING + getLineBreak(targetPlatform); //NOI18N
     }
 
@@ -472,15 +484,17 @@ public class IntegrationUtils {
     }
 
     // Returns calibration batch filename
-    public static String getRemoteCalibrateCommandString(String targetPlatform) {
-        return HTML_REMOTE_STRING + getDirectorySeparator(targetPlatform) + "bin" + getDirectorySeparator(targetPlatform)
-               + "calibrate" + getBatchExtensionString(targetPlatform); //NOI18N
+    public static String getRemoteCalibrateCommandString(String targetPlatform, String targetJava) {
+        String customExt = isLinuxPlatform(targetPlatform) ? (PLATFORM_JAVA_60.equals(targetJava) ? "-16" : "-15") : ""; // NOI18N
+        return HTML_REMOTE_STRING + getDirectorySeparator(targetPlatform) + "bin" + getDirectorySeparator(targetPlatform) // NOI18N
+               + "calibrate" + getBatchExtensionString(targetPlatform,  customExt); //NOI18N
     }
 
     // Returns profile batch filename
-    public static String getRemoteProfileCommandString(String targetPlatform) {
-        return HTML_REMOTE_STRING + getDirectorySeparator(targetPlatform) + "bin" + getDirectorySeparator(targetPlatform)
-               + "profile" + getBatchExtensionString(targetPlatform); //NOI18N
+    public static String getRemoteProfileCommandString(String targetPlatform, String targetJava) {
+        String customExt = PLATFORM_JAVA_50.equals(targetJava) ? "-15" : "-16"; // NOI18N
+        return HTML_REMOTE_STRING + getDirectorySeparator(targetPlatform) + "bin" + getDirectorySeparator(targetPlatform) // NOI18N
+               + "profile" + getBatchExtensionString(targetPlatform, customExt); //NOI18N
     }
 
     // returns "rem" or "#" according to provided platform
@@ -507,6 +521,10 @@ public class IntegrationUtils {
 
     public static boolean isWindowsPlatform(String targetPlatform) {
         return targetPlatform.equals(PLATFORM_WINDOWS_OS) || targetPlatform.equals(PLATFORM_WINDOWS_AMD64_OS);
+    }
+
+    public static boolean isLinuxPlatform(String targetPlatform) {
+        return targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS);
     }
 
     public static String getXMLCommendEndSign() {
