@@ -201,6 +201,12 @@ final class ChartPanel extends JPanel {
     }
 
 
+    void updateActions() {
+        if (zoomInAction != null) zoomInAction.updateAction();
+        if (zoomOutAction != null) zoomOutAction.updateAction();
+        if (toggleViewAction != null) toggleViewAction.updateAction();
+    }
+
     Action zoomInAction() {
         if (zoomInAction == null) zoomInAction = new ZoomInAction();
         return zoomInAction;
@@ -345,6 +351,7 @@ final class ChartPanel extends JPanel {
             Timeline timeline = ((SynchronousXYItemsModel)chart.getItemsModel()).getTimeline();
             setEnabled(timeline.getTimestampsCount() > 1 && !chart.fitsWidth() &&
                        chart.viewWidth(1000) < ONE_SECOND_WIDTH_THRESHOLD);
+//            System.err.println(">>> Update, enabled: " + isEnabled() + ", getTimestampsCount: " + timeline.getTimestampsCount() + ", fitsWidth: " + chart.fitsWidth() + ", viewWidth thr: " + (chart.viewWidth(1000) < ONE_SECOND_WIDTH_THRESHOLD));
         }
 
     }

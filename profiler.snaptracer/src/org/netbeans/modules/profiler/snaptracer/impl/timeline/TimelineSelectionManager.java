@@ -229,6 +229,7 @@ class TimelineSelectionManager implements ChartSelectionModel {
         if (bounds.width == 0) return;
 
         sel = getClosestSelection(bounds.x + bounds.width, bounds.y + bounds.height);
+        if (!(sel instanceof XYItemSelection)) return;
 
         xySel = (XYItemSelection)sel;
         item = xySel.getItem();
@@ -470,9 +471,9 @@ class TimelineSelectionManager implements ChartSelectionModel {
         }
 
         public void mouseClicked(final MouseEvent e) {
+            if (!enabled || !SwingUtilities.isLeftMouseButton(e)) return;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (!enabled || !SwingUtilities.isLeftMouseButton(e)) return;
                     if (selectionMode != SELECTION_NONE)
                         setSelectionBounds(e.getX(), e.getY(), 0, 0);
                 }

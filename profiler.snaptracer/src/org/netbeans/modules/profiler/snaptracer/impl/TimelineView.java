@@ -43,11 +43,15 @@
 
 package org.netbeans.modules.profiler.snaptracer.impl;
 
+import java.awt.BorderLayout;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.VisibilityHandler;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelinePanel;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
 /**
  *
@@ -76,6 +80,10 @@ final class TimelineView {
 
     void resetSelection() {
         if (panel != null) panel.resetSelection();
+    }
+
+    void updateActions() {
+        if (panel != null) panel.updateActions();
     }
 
     Action zoomInAction() {
@@ -131,8 +139,29 @@ final class TimelineView {
             viewHandler.handle(panel);
             viewHandler = null;
         }
+        
+        JToolBar toolbar = new JToolBar();
+        toolbar.setFloatable(false);
+        toolbar.setBorderPainted(false);
 
-        return panel;
+        toolbar.add(panel.zoomInAction());
+        toolbar.add(panel.zoomOutAction());
+        toolbar.add(panel.toggleViewAction());
+        toolbar.addSeparator();
+
+        ButtonGroup bg = new ButtonGroup();
+        AbstractButton mz = panel.mouseZoom();
+        bg.add(mz);
+        toolbar.add(mz);
+        AbstractButton mh = panel.mouseHScroll();
+        bg.add(mh);
+        toolbar.add(mh);
+
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(toolbar, BorderLayout.NORTH);
+        container.add(panel, BorderLayout.CENTER);
+
+        return container;
     }
 
 }

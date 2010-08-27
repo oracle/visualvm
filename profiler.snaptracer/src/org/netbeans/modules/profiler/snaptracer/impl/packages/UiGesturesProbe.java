@@ -72,9 +72,12 @@ class UiGesturesProbe extends TracerProbe {
 
     private static ProbeItemDescriptor[] descriptors(int items, IdeSnapshot snapshot) {
         ProbeItemDescriptor[] descriptors = new ProbeItemDescriptor[items];
-        descriptors[0] = ProbeItemDescriptor.discreteLineItem("UI Gesture",
+//        descriptors[0] = ProbeItemDescriptor.discreteLineItem("UI Gesture",
+//                             "Shows UI actions performed by the user in the IDE",
+//                             new UiGesturesFormatter(snapshot), 1d, 0, 1);
+        descriptors[0] = ProbeItemDescriptor.iconItem("UI Gesture",
                              "Shows UI actions performed by the user in the IDE",
-                             new UiGesturesFormatter(snapshot), 1d, 0, 1);
+                             new UiGesturesFormatter(snapshot));
 //        for (int i = 0; i < descriptors.length; i++)
 //            descriptors[i] = ProbeItemDescriptor.continuousLineItem("Item " + i,
 //                             "Description " + i, ItemValueFormatter.SIMPLE);
@@ -85,7 +88,6 @@ class UiGesturesProbe extends TracerProbe {
         long[] values = new long[1];
         try {
             values[0] = snapshot.getValue(sampleIndex, 1);
-            if (values[0] != 0) System.err.println(">>> Message at " + sampleIndex + " is: " + snapshot.getMessageForValue(values[0]));
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -108,7 +110,13 @@ class UiGesturesProbe extends TracerProbe {
                 case FORMAT_TOOLTIP:
                 case FORMAT_DETAILS:
                 case FORMAT_EXPORT:
-                    String message = snapshot.getMessageForValue(value);
+                    IdeSnapshot.LogRecordInfo info = snapshot.getLogInfoForValue(value);
+                    String message = null;
+                    if (info != null) {
+                        message = info.getDisplayName();
+                        if (message == null) message = info.getName();
+                        if (message == null) message = "<unknown>";
+                    }
                     return message != null ? message : "<none>";
                 case FORMAT_UNITS:
                     return "";
