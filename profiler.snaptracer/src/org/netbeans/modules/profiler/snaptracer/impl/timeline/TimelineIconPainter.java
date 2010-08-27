@@ -303,6 +303,8 @@ class TimelineIconPainter extends TimelineXYPainter {
                                            Utils.checkedInt(context.getViewY(context.
                                            getDataHeight() / 2)), 0, 0);
 
+        if (item.getYValue(valueIndex) != 0) LongRect.addBorder(viewBounds, ICON_EXTENT);
+
 //        System.err.println(">>> viewBounds: " + viewBounds);
 
         return viewBounds;

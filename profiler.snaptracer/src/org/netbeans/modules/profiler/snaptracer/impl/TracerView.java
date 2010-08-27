@@ -277,8 +277,6 @@ final class TracerView /*extends DataSourceView*/ {
 
                                 int lastSample = model.getSamplesCount() - 1;
                                 displaySnapshot(component, 0, lastSample);
-
-//                                displayThreadDump(component, 10);
                             }
                         });
                     }
@@ -369,11 +367,11 @@ final class TracerView /*extends DataSourceView*/ {
                         if (url == null) return;
                         String urls = url.toString();
                         TracerView.this.showURL(urls);
-                    }                    
+                    }
                 };
                 a.setCaretPosition(0);
                 JScrollPane sp = new JScrollPane(a);
-                
+
                 JLabel l = new JLabel("Thread dump for sample #" + s + ", time " +
                                       SimpleDateFormat.getDateTimeInstance().format
                                       (new Date(tF)) + ":");

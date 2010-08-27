@@ -179,6 +179,8 @@ final class TimelineSelectionOverlay extends ChartOverlay {
             int x = p.x;
             int y = p.y;
 
+            if (y == -1) continue;
+
             if (!paintedLines.contains(x)) {
                 g2.setPaint(sEvenPerfPaint);
                 g2.setStroke(evenPerfStroke);
@@ -204,6 +206,8 @@ final class TimelineSelectionOverlay extends ChartOverlay {
             Point p = it.next();
             int x = p.x;
             int y = p.y;
+
+            if (y == -1) continue;
 
             if (!paintedLines.contains(x)) {
                 g2.setPaint(hEvenPerfPaint);

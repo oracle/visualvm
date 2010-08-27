@@ -851,8 +851,7 @@ public final class TimelineSupport {
     private int endIndex = -1;
 
     public void selectAll() {
-        Rectangle r = new Rectangle(new Point(0, 0), chart.getSize());
-        chart.getSelectionModel().setSelectionBounds(r);
+        ((TimelineSelectionManager)chart.getSelectionModel()).selectAll();
     }
 
     public int getStartIndex() { return startIndex; }

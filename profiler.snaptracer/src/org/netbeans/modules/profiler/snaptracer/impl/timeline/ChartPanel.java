@@ -45,6 +45,7 @@ package org.netbeans.modules.profiler.snaptracer.impl.timeline;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
@@ -129,7 +130,7 @@ final class ChartPanel extends JPanel {
         chart.addOverlayComponent(selectionOverlay);
         selectionOverlay.registerChart(support);
 
-        XChartSelectionOverlay xOverlay = new XChartSelectionOverlay();
+        XChartSelectionOverlay xOverlay = new XChartSelectionOverlay(support);
 //        xOverlay.setLineMode(false, true, false, true);
         xOverlay.setLineMode(false, false, false, false);
         chart.addOverlayComponent(xOverlay);
@@ -155,7 +156,13 @@ final class ChartPanel extends JPanel {
         });
         chart.attachHorizontalScrollBar(hScrollBar);
 
-        vScrollBar = new ScrollBar(JScrollBar.VERTICAL);
+        vScrollBar = new ScrollBar(JScrollBar.VERTICAL) {
+            public Dimension getPreferredSize() {
+                Dimension dim = super.getPreferredSize();
+                dim.height = 1;
+                return dim;
+            }
+        };
         vScrollBar.addAdjustmentListener(new AdjustmentListener() {
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 if (vScrollBar.getValueIsAdjusting())
