@@ -15,7 +15,7 @@
     
     <folder name="Menu">
         <folder name="Profile">
-            <file name="org-netbeans-lib-profiler-snaptracer-impl-IdeSnapshotAction.shadow" url="org-netbeans-lib-profiler-snaptracer-impl-IdeSnapshotAction.shadow">
+            <file name="org-netbeans-lib-profiler-snaptracer-impl-IdeSnapshotAction.shadow">
                 <attr name="ergonomics" boolvalue="true"/>
                 <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-lib-profiler-snaptracer-impl-IdeSnapshotAction.instance"/>
                 <attr name="position" intvalue="1450"/>
