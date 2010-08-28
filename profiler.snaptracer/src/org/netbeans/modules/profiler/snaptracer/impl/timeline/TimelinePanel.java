@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.snaptracer.impl.timeline;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Toolkit;

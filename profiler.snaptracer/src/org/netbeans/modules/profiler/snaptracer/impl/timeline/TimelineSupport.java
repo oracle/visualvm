@@ -851,7 +851,19 @@ public final class TimelineSupport {
     private int endIndex = -1;
 
     public void selectAll() {
-        ((TimelineSelectionManager)chart.getSelectionModel()).selectAll();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                TimelineSelectionManager selection = (TimelineSelectionManager)chart.getSelectionModel();
+                selection.selectAll();
+                startIndex = selection.getStartIndex();
+                endIndex = selection.getEndIndex();
+                notifyIndexSelectionChanged();
+            }
+        });
+    }
+
+    public boolean isSelectAll() {
+        return endIndex - startIndex == model.getTimestampsCount() - 1;
     }
 
     public int getStartIndex() { return startIndex; }
