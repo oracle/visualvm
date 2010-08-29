@@ -59,11 +59,12 @@ import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -77,6 +78,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -107,6 +109,9 @@ final class TracerView /*extends DataSourceView*/ {
     private static final String IMAGE_PATH =
             "org/netbeans/modules/profiler/snaptracer/impl/resources/tracer.png"; // NOI18N
 
+//    private static final RequestProcessor PROCESSOR =
+//            new RequestProcessor("NPSS Selection Processor"); // NOI18N
+
     private final TracerModel model;
     private final TracerController controller;
 
@@ -124,7 +129,7 @@ final class TracerView /*extends DataSourceView*/ {
 
 
     // --- DataSourceView implementation ---------------------------------------
-
+    
     protected JComponent createComponent() {
         
         final JPanel component = new JPanel(new BorderLayout());
@@ -132,7 +137,34 @@ final class TracerView /*extends DataSourceView*/ {
         // create timeline support
         timelineView = new TimelineView(model);
         // add the timeline component to the UI
-        component.add(timelineView.getView(), BorderLayout.NORTH);
+        final JPanel container = new JPanel(null) {
+            public void doLayout() {
+                Component[] components = getComponents();
+                for (Component component : components)
+                    component.setBounds(0, 0, getWidth(), getHeight());
+            }
+            public Dimension getPreferredSize() {
+                return getComponent(getComponentCount() - 1).getPreferredSize();
+            }
+            public Dimension getMinimumSize() {
+                return getComponent(getComponentCount() - 1).getMinimumSize();
+            }
+            public Dimension getMaximumSize() {
+                return getComponent(getComponentCount() - 1).getMaximumSize();
+            }
+            public boolean isOptimizedDrawingEnabled() {
+                return false;
+            }
+        };
+        JPanel glass = new JPanel(null);
+        glass.setOpaque(false);
+        glass.addMouseListener(new MouseAdapter() {});
+        glass.addMouseMotionListener(new MouseMotionAdapter() {});
+        glass.addKeyListener(new KeyAdapter() {});
+        container.add(glass); // Consumes event
+        container.add(timelineView.getView());
+        
+        component.add(container, BorderLayout.NORTH);
 
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -141,7 +173,7 @@ final class TracerView /*extends DataSourceView*/ {
                 // setup the timeline - zoom according to snapshot data
                 initTimeline();
                 // load the probes data
-                initData(component);
+                initData(component, container);
                 // init required listeners - timeline selection
                 initListeners(component);
             }
@@ -253,7 +285,7 @@ final class TracerView /*extends DataSourceView*/ {
         support.dataLoadingStarted(end - start);
     }
 
-    private void initData(final JPanel component) {
+    private void initData(final JPanel component, final JPanel container) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JLabel progress = new JLabel("Loading snapshot...", JLabel.CENTER);
@@ -268,10 +300,17 @@ final class TracerView /*extends DataSourceView*/ {
                                 support.dataLoadingFinished();
                                 support.selectAll();
 
-                                int lastSample = model.getSamplesCount() - 1;
-                                displaySnapshot(component, 0, lastSample);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        timelineView.updateActions();
+                                    }
+                                });
 
-//                                displayThreadDump(component, 10);
+                                 // Enable events for timeline
+                                component.remove(container);
+                                component.add(container.getComponent(1), BorderLayout.NORTH);
+                                component.revalidate();
+                                component.repaint();
                             }
                         });
                     }
@@ -287,11 +326,10 @@ final class TracerView /*extends DataSourceView*/ {
             public void indexSelectionChanged() {
                 final int startIndex = Math.min(support.getStartIndex(), support.getEndIndex());
                 final int endIndex = Math.max(support.getStartIndex(), support.getEndIndex());
-                
                 JLabel progress = new JLabel("Processing selection...", JLabel.CENTER);
                 addContents(component, progress);
 
-                RequestProcessor.getDefault().post(new Runnable() {
+                controller.performAfterSession(new Runnable() {
                     public void run() {
 //                        long start = System.currentTimeMillis();
                         if (startIndex == endIndex) displayThreadDump(component, startIndex);
@@ -308,35 +346,35 @@ final class TracerView /*extends DataSourceView*/ {
     
     private void displaySnapshot(final JPanel p, final int s1, final int s2) {
         LoadedSnapshot ls = null;
-        long t1 = -1;
-        long t2 = -1;
+//        long t1 = -1;
+//        long t2 = -1;
         try {
             ls = model.getSnapshot().getCPUSnapshot(s1, s2);
-            t1 = model.getTimelineSupport().getTimestamp(s1);
-            t2 = model.getTimelineSupport().getTimestamp(s2);
+//            t1 = model.getTimelineSupport().getTimestamp(s1);
+//            t2 = model.getTimelineSupport().getTimestamp(s2);
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
 
         final LoadedSnapshot lsF = ls;
-        final long t1F = t1;
-        final long t2F = t2;
+//        final long t1F = t1;
+//        final long t2F = t2;
 
         if (lsF != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 SnapshotResultsWindow w = new SnapshotResultsWindow(lsF, 1, false);
 
-                JLabel l = new JLabel("Snapshot from sample #" + s1 + ", time " +
-                                      SimpleDateFormat.getDateTimeInstance().format
-                                      (new Date(t1F)) + " to sample #" + s2 + ", time " +
-                                      SimpleDateFormat.getDateTimeInstance().format
-                                      (new Date(t2F)) + ":");
-
+//                JLabel l = new JLabel("Snapshot from sample #" + s1 + ", time " +
+//                                      SimpleDateFormat.getDateTimeInstance().format
+//                                      (new Date(t1F)) + " to sample #" + s2 + ", time " +
+//                                      SimpleDateFormat.getDateTimeInstance().format
+//                                      (new Date(t2F)) + ":");
+//
                 JPanel c = new JPanel(new BorderLayout(0, 3));
-                c.setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
-                c.add(l, BorderLayout.NORTH);
+                c.setBorder(BorderFactory.createEmptyBorder(8, 5, 5, 5));
+                c.add(new JSeparator(), BorderLayout.NORTH);
                 c.add(w, BorderLayout.CENTER);
-
+//                w.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
                 addContents(p, c);
             }
         });
@@ -344,16 +382,16 @@ final class TracerView /*extends DataSourceView*/ {
 
     private void displayThreadDump(final JPanel p, final int s) {
         String td = null;
-        long t = -1;
+//        long t = -1;
         try {
             td = model.getSnapshot().getThreadDump(s);
-            t = model.getTimelineSupport().getTimestamp(s);
+//            t = model.getTimelineSupport().getTimestamp(s);
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
 
         final String tdF = td;
-        final long tF = t;
+//        final long tF = t;
 
         if (tdF != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -362,18 +400,19 @@ final class TracerView /*extends DataSourceView*/ {
                         if (url == null) return;
                         String urls = url.toString();
                         TracerView.this.showURL(urls);
-                    }                    
+                    }
                 };
                 a.setCaretPosition(0);
                 JScrollPane sp = new JScrollPane(a);
-                
-                JLabel l = new JLabel("Thread dump for sample #" + s + ", time " +
-                                      SimpleDateFormat.getDateTimeInstance().format
-                                      (new Date(tF)) + ":");
 
-                JPanel c = new JPanel(new BorderLayout(0, 3));
-                c.setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
-                c.add(l, BorderLayout.NORTH);
+//                JLabel l = new JLabel("Thread dump for sample #" + s + ", time " +
+//                                      SimpleDateFormat.getDateTimeInstance().format
+//                                      (new Date(tF)) + ":");
+
+                JPanel c = new JPanel(new BorderLayout(0, 6));
+                c.setBorder(BorderFactory.createEmptyBorder(8, 5, 5, 5));
+//                c.add(l, BorderLayout.NORTH);
+                c.add(new JSeparator(), BorderLayout.NORTH);
                 c.add(sp, BorderLayout.CENTER);
 
                 addContents(p, c);

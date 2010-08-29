@@ -57,6 +57,9 @@ import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.util.List;
+import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
+import org.netbeans.lib.profiler.charts.ChartContext;
 
 /**
  *
@@ -65,13 +68,15 @@ import java.util.List;
 public class XChartSelectionOverlay extends ChartOverlay {
 
     private static final boolean FORCE_SPEED = Utils.forceSpeed();
-    private static int REPAINT_COLLAPSE_LIMIT = 20;
+//    private static int REPAINT_COLLAPSE_LIMIT = 20;
 
     private ChartComponent chart;
     private int selectionMode;
     private Rectangle selectionBounds;
+    private Rectangle oldSelectionBounds;
 
     private SelectionListener selectionListener;
+    private ConfigurationListener configurationListener;
 
     private boolean renderingOptimized;
 
@@ -89,9 +94,13 @@ public class XChartSelectionOverlay extends ChartOverlay {
     private boolean drawLeft;
     private boolean drawRight;
 
+    private final TimelineSupport support;
 
-    public XChartSelectionOverlay() {
+
+    public XChartSelectionOverlay(TimelineSupport support) {
+        this.support = support;
         selectionListener = new SelectionListener();
+        configurationListener = new ConfigurationListener();
         initDefaultValues();
     }
     
@@ -159,11 +168,13 @@ public class XChartSelectionOverlay extends ChartOverlay {
     private void registerListener() {
         if (chart == null) return;
         chart.getSelectionModel().addSelectionListener(selectionListener);
+        chart.addConfigurationListener(configurationListener);
     }
 
     private void unregisterListener() {
         if (chart == null) return;
         chart.getSelectionModel().removeSelectionListener(selectionListener);
+        chart.removeConfigurationListener(configurationListener);
     }
 
     private void initDefaultValues() {
@@ -218,7 +229,6 @@ public class XChartSelectionOverlay extends ChartOverlay {
 
 
     public void paint(Graphics g) {
-//        System.err.println(">>> " + System.currentTimeMillis() + " paint clip: " + g.getClipBounds());
         if (selectionBounds == null) return;
         
         Graphics2D g2 = (Graphics2D)g;
@@ -257,9 +267,10 @@ public class XChartSelectionOverlay extends ChartOverlay {
 
 //        if (selectionMode == ChartSelectionModel.SELECTION_RECT) {
         Rectangle bounds = normalizeRect(new Rectangle(selectionBounds), 0);
+//        Rectangle bounds = new Rectangle(selectionBounds);
 
         if (selectionBounds.width != 0 /*|| selectionBounds.height != 0*/) {
-//System.err.println(">>> rect... " + g2.getClipBounds());
+
             if (bounds.width == 0 || bounds.height == 0 ||
                 chart.fitsWidth() && chart.fitsHeight()) return;
 
@@ -285,7 +296,9 @@ public class XChartSelectionOverlay extends ChartOverlay {
             }
         } else {
             if (!FORCE_SPEED) {
-                g2.setPaint(linePaint != null ? linePaint : fillPaint);
+                g2.setPaint(selectionMode == ChartSelectionModel.SELECTION_RECT ?
+                    fillPaint : linePaint);
+//                g2.setPaint(linePaint != null ? linePaint : fillPaint);
                 g2.setStroke(lineStroke);
                 g.drawLine(bounds.x, bounds.y, bounds.x, bounds.y + bounds.height - 1);
             } else if (FORCE_SPEED) {
@@ -308,46 +321,148 @@ public class XChartSelectionOverlay extends ChartOverlay {
     }
 
 
+    private void updateSelection() {
+        oldSelectionBounds = selectionBounds;
+        selectionBounds = getCurrentBounds();
+        if (selectionMode == ChartSelectionModel.SELECTION_RECT)
+            rectBoundsChanged(selectionBounds, oldSelectionBounds, getLineWidth());
+    }
+
+    private Rectangle getCurrentBounds() {
+        TimelineSelectionManager manager = (TimelineSelectionManager)chart.getSelectionModel();
+        int startIndex = manager.getStartIndex();
+        int endIndex   = manager.getEndIndex();
+
+        if (startIndex > endIndex) {
+            endIndex = startIndex;
+            startIndex = manager.getEndIndex();
+        }
+
+        if (startIndex == -1) {
+            return null;
+        } else if (startIndex == endIndex) {
+            ChartContext context = chart.getChartContext();
+            long timestamp = support.getTimestamp(startIndex);
+            int x = Utils.checkedInt(context.getViewX(timestamp));
+            return new Rectangle(x, 0, 0, chart.getHeight());
+        } else {
+            ChartContext context = chart.getChartContext();
+            long startTimestamp = support.getTimestamp(startIndex);
+            long endTimestamp = support.getTimestamp(endIndex);
+            int startX = Utils.checkedInt(context.getViewX(startTimestamp));
+            int endX = Utils.checkedInt(context.getViewX(endTimestamp));
+            return new Rectangle(startX, 0, endX - startX, chart.getHeight());
+        }
+    }
+
+    private void rectBoundsChanged(Rectangle newBounds, Rectangle oldBounds, int lineW) {
+        if (newBounds != null && oldBounds != null) {
+            int x = newBounds.x + newBounds.width;
+            int y = newBounds.y + newBounds.height;
+
+            if (renderingOptimized) { // Painting just selection changes
+                int selX = newBounds.x;
+                int selY = newBounds.y;
+
+                int oldX = oldBounds.x + oldBounds.width;
+                int oldY = oldBounds.y + oldBounds.height;
+
+                int dx = Math.min(x, oldX);
+                int dwidth = Math.max(x, oldX) - dx;
+                int dy = Math.min(y, oldY);
+                int dheight = Math.max(y, oldY) - dy;
+
+                boolean crossX = oldBounds.width * newBounds.width < 0;
+                boolean crossY = oldBounds.height * newBounds.height < 0;
+
+                if (crossX || crossY) {
+                    // Cross-quadrant move
+                    if (crossX && !crossY) {
+                        int cheight = oldBounds.height < 0 ?
+                              Math.min(oldBounds.height, newBounds.height) :
+                              Math.max(oldBounds.height, newBounds.height);
+                        paintRect(dx, selY, dwidth, cheight, lineW);
+                    } else if (!crossX && crossY) {
+                        int cwidth = oldBounds.width < 0 ?
+                                Math.min(oldBounds.width, newBounds.width) :
+                                Math.max(oldBounds.width, newBounds.width);
+                        paintRect(selX, dy, cwidth, dheight, lineW);
+                    } else {
+                        paintRect(dx, dy, dwidth, dheight, lineW);
+                    }
+                } else {
+                    // Move within the same quadrant
+                    if (selX <= x) {
+                        if (selY <= y) {
+                            paintRect(dx, selY, dwidth, dy - selY + dheight, lineW);
+                            paintRect(selX, dy, dx - selX + dwidth, dheight, lineW);
+                        } else {
+                            paintRect(dx, dy, dwidth, selY - dy, lineW);
+                            paintRect(selX, dy, dx - selX, dheight, lineW);
+                        }
+                    } else {
+                        if (selY <= y) {
+                            paintRect(dx, selY, dwidth, dy - selY + dheight, lineW);
+                            paintRect(dx + dwidth, dy, selX - dx, dheight, lineW);
+                        } else {
+                            paintRect(dx, dy, dwidth, selY - dy, lineW);
+                            paintRect(dx + dwidth, dy, selX - dx - dwidth, dheight, lineW);
+                        }
+                    }
+                }
+            } else { // Painting whole selection area
+                Rectangle oldB = normalizeRect(oldBounds, lineW);
+                Rectangle newB = normalizeRect(new Rectangle(newBounds), lineW);
+                repaint(oldB.union(newB));
+            }
+            return;
+        }
+
+        if (oldBounds != null)
+            paintImmediately(normalizeRect(new Rectangle(oldBounds), lineW));
+        else if (newBounds != null)
+            paintImmediately(normalizeRect(new Rectangle(newBounds), lineW));
+    }
+
+    private void paintRect(int x, int y, int w, int h, int t) {
+        paintImmediately(normalizeRect(new Rectangle(x, y, w, h), t));
+    }
+
+
     private class SelectionListener implements ChartSelectionListener {
+
+        private boolean modeChanged = false;
 
         public void selectionModeChanged(int newMode, int oldMode) {
             selectionMode = newMode;
-            if (selectionBounds == null) return;
-            int lineW = getLineWidth();
-
-//            if (oldMode == ChartSelectionModel.SELECTION_LINE_V ||
-//                oldMode == ChartSelectionModel.SELECTION_CROSS)
-//                paintImmediately(selectionBounds.x - lineW / 2, 0, lineW, getHeight());
-//            if (oldMode == ChartSelectionModel.SELECTION_LINE_H ||
-//                oldMode == ChartSelectionModel.SELECTION_CROSS)
-//                paintImmediately(0, selectionBounds.y - lineW / 2, getWidth(), lineW);
-            if (oldMode == ChartSelectionModel.SELECTION_RECT)
-                paintImmediately(normalizeRect(new Rectangle(selectionBounds), lineW));
-
-//            if (newMode == ChartSelectionModel.SELECTION_LINE_V ||
-//                newMode == ChartSelectionModel.SELECTION_CROSS)
-//                paintImmediately(selectionBounds.x - lineW / 2, 0, lineW, getHeight());
-//            if (newMode == ChartSelectionModel.SELECTION_LINE_H ||
-//                newMode == ChartSelectionModel.SELECTION_CROSS)
-//                paintImmediately(0, selectionBounds.y - lineW / 2, getWidth(), lineW);
-            if (newMode == ChartSelectionModel.SELECTION_RECT)
-                paintImmediately(normalizeRect(new Rectangle(selectionBounds), lineW));
+            modeChanged = true;
         }
 
         public void selectionBoundsChanged(Rectangle newBounds, Rectangle oldBounds) {
-            selectionBounds = newBounds;
-            int lineW = getLineWidth();
+            if (modeChanged) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        modeChanged = false;
+                        
+                        oldSelectionBounds = selectionBounds;
+                        selectionBounds = getCurrentBounds();
 
-//            if (selectionMode == ChartSelectionModel.SELECTION_LINE_V ||
-//                selectionMode == ChartSelectionModel.SELECTION_CROSS)
-//                vLineBoundsChanged(newBounds, oldBounds, lineW);
-//
-//            if (selectionMode == ChartSelectionModel.SELECTION_LINE_H ||
-//                selectionMode == ChartSelectionModel.SELECTION_CROSS)
-//                hLineBoundsChanged(newBounds, oldBounds, lineW);
+                        int lineWidth = getLineWidth();
 
-            if (selectionMode == ChartSelectionModel.SELECTION_RECT)
-                rectBoundsChanged(newBounds, oldBounds, lineW);
+                        Rectangle rect = normalizeRect(new Rectangle(oldSelectionBounds == null ?
+                            getBounds() : oldSelectionBounds), lineWidth);
+                        paintImmediately(rect);
+
+                        if (selectionBounds != null) {
+                            rect = normalizeRect(new Rectangle(selectionBounds), lineWidth);
+                            paintImmediately(rect);
+                        }
+                    }
+                });
+            } else {
+                updateSelection();
+            }
+            
         }
 
         public void highlightedItemsChanged(List<ItemSelection> currentItems,
@@ -356,105 +471,14 @@ public class XChartSelectionOverlay extends ChartOverlay {
         public void selectedItemsChanged(List<ItemSelection> currentItems,
               List<ItemSelection> addedItems, List<ItemSelection> removedItems) {}
 
-//        private void vLineBoundsChanged(Rectangle newBounds, Rectangle oldBounds, int lineW) {
-//            if (newBounds != null && oldBounds != null) {
-//                int dirtyWidth = Math.abs(oldBounds.x - newBounds.x);
-//                if (dirtyWidth - lineW <= REPAINT_COLLAPSE_LIMIT) {
-//                    paintImmediately(Math.min(oldBounds.x, newBounds.x) - lineW / 2, 0, dirtyWidth + lineW, getHeight());
-//                    return;
-//                }
-//            }
-//
-//            if (newBounds != null) paintImmediately(newBounds.x - lineW / 2, 0, lineW, getHeight());
-//            if (oldBounds != null) paintImmediately(oldBounds.x - lineW / 2, 0, lineW, getHeight());
-//        }
-//
-//        private void hLineBoundsChanged(Rectangle newBounds, Rectangle oldBounds, int lineW) {
-//            if (newBounds != null && oldBounds != null) {
-//                int dirtyHeight = Math.abs(oldBounds.y - newBounds.y);
-//                if (dirtyHeight - lineW <= REPAINT_COLLAPSE_LIMIT) {
-//                    paintImmediately(0, Math.min(oldBounds.y, newBounds.y) - lineW / 2, getWidth(), dirtyHeight + lineW);
-//                    return;
-//                }
-//            }
-//
-//            if (newBounds != null) paintImmediately(0, newBounds.y - lineW / 2, getWidth(), lineW);
-//            if (oldBounds != null) paintImmediately(0, oldBounds.y - lineW / 2, getWidth(), lineW);
-//        }
+    }
 
-        private void rectBoundsChanged(Rectangle newBounds, Rectangle oldBounds, int lineW) {
-            if (newBounds != null && oldBounds != null) {
-                int x = newBounds.x + newBounds.width;
-                int y = newBounds.y + newBounds.height;
 
-                if (renderingOptimized) { // Painting just selection changes
-                    int selX = newBounds.x;
-                    int selY = newBounds.y;
-
-                    int oldX = oldBounds.x + oldBounds.width;
-                    int oldY = oldBounds.y + oldBounds.height;
-
-                    int dx = Math.min(x, oldX);
-                    int dwidth = Math.max(x, oldX) - dx;
-                    int dy = Math.min(y, oldY);
-                    int dheight = Math.max(y, oldY) - dy;
-
-                    boolean crossX = oldBounds.width * newBounds.width < 0;
-                    boolean crossY = oldBounds.height * newBounds.height < 0;
-
-                    if (crossX || crossY) {
-                        // Cross-quadrant move
-                        if (crossX && !crossY) {
-                            int cheight = oldBounds.height < 0 ?
-                                  Math.min(oldBounds.height, newBounds.height) :
-                                  Math.max(oldBounds.height, newBounds.height);
-                            paintRect(dx, selY, dwidth, cheight, lineW);
-                        } else if (!crossX && crossY) {
-                            int cwidth = oldBounds.width < 0 ?
-                                    Math.min(oldBounds.width, newBounds.width) :
-                                    Math.max(oldBounds.width, newBounds.width);
-                            paintRect(selX, dy, cwidth, dheight, lineW);
-                        } else {
-                            paintRect(dx, dy, dwidth, dheight, lineW);
-                        }
-                    } else {
-                        // Move within the same quadrant
-                        if (selX <= x) {
-                            if (selY <= y) {
-                                paintRect(dx, selY, dwidth, dy - selY + dheight, lineW);
-                                paintRect(selX, dy, dx - selX + dwidth, dheight, lineW);
-                            } else {
-                                paintRect(dx, dy, dwidth, selY - dy, lineW);
-                                paintRect(selX, dy, dx - selX, dheight, lineW);
-                            }
-                        } else {
-                            if (selY <= y) {
-                                paintRect(dx, selY, dwidth, dy - selY + dheight, lineW);
-                                paintRect(dx + dwidth, dy, selX - dx, dheight, lineW);
-                            } else {
-                                paintRect(dx, dy, dwidth, selY - dy, lineW);
-                                paintRect(dx + dwidth, dy, selX - dx - dwidth, dheight, lineW);
-                            }
-                        }
-                    }
-                } else { // Painting whole selection area
-                    Rectangle oldB = normalizeRect(oldBounds, lineW);
-                    Rectangle newB = normalizeRect(new Rectangle(newBounds), lineW);
-                    repaint(oldB.union(newB));
-                }
-                return;
-            }
-
-            if (oldBounds != null)
-                paintImmediately(normalizeRect(new Rectangle(oldBounds), lineW));
-            else if (newBounds != null)
-                paintImmediately(normalizeRect(new Rectangle(newBounds), lineW));
+    private class ConfigurationListener extends ChartConfigurationListener.Adapter {
+        public void contentsUpdated(long offsetX, long offsetY, double scaleX, double scaleY, long lastOffsetX, long lastOffsetY, double lastScaleX, double lastScaleY, int shiftX, int shiftY) {
+            if (lastOffsetX != offsetX || lastScaleX != scaleX || lastScaleY != scaleY)
+                updateSelection();
         }
-
-        private void paintRect(int x, int y, int w, int h, int t) {
-            paintImmediately(normalizeRect(new Rectangle(x, y, w, h), t));
-        }
-
     }
 
 }
