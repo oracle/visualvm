@@ -47,6 +47,7 @@ import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.ContinuousXY
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.DiscreteXYItemDescriptor;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
+import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.IconItemDescriptor;
 
 /**
  * ProbeItemDescriptor describes a TracerProbe item appearance in the UI.
@@ -161,6 +162,14 @@ public abstract class ProbeItemDescriptor {
 
 
     // === Public factory methods ==============================================
+
+    // --- Icon items ----------------------------------------------------------
+
+    public static ProbeItemDescriptor iconItem(String name, String description,
+                                               ItemValueFormatter formatter) {
+        return new IconItemDescriptor(name, description, formatter, DEFAULT_COLOR);
+    }
+
 
     // --- Continuous items ----------------------------------------------------
 
