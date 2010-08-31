@@ -75,7 +75,7 @@ public final class IdeSnapshotAction implements ActionListener {
                 final TracerController controller = new TracerController(model);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        TopComponent ui = ui(model, controller);
+                        TopComponent ui = ui(model, controller, snapshot.getNpssFile());
                         ui.open();
                         ui.requestActive();
                     }
@@ -85,8 +85,8 @@ public final class IdeSnapshotAction implements ActionListener {
     }
 
 
-    private TopComponent ui(TracerModel model, TracerController controller) {
-        TopComponent tc = new IdeSnapshotComponent();
+    private TopComponent ui(TracerModel model, TracerController controller, File npssFile) {
+        TopComponent tc = new IdeSnapshotComponent(npssFile);
         TracerView tracer = new TracerView(model, controller);
         tc.add(tracer.createComponent(), BorderLayout.CENTER);
         return tc;
@@ -137,8 +137,8 @@ public final class IdeSnapshotAction implements ActionListener {
     
     private static class IdeSnapshotComponent extends TopComponent {
 
-        IdeSnapshotComponent() {
-            setDisplayName("IDE Snapshot");
+        IdeSnapshotComponent(File npssFile) {
+            setDisplayName(npssFile.getName());
             setLayout(new BorderLayout());
         }
 
