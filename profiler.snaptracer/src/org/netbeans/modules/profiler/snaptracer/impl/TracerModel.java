@@ -93,7 +93,7 @@ final class TracerModel {
             public TracerProbeDescriptor getDescriptor(TracerProbe p) {
                 return TracerModel.this.getDescriptor(p);
             }
-        });
+        }, snapshot);
     }
 
 
