@@ -598,7 +598,7 @@ public class LoadedSnapshot {
             is.read(idarr);
             id = new String(idarr);
             if (!ID.equals(id)) {
-                new IOException("Invalid header "+id); // NOI18N
+                throw new IOException("Invalid header "+id); // NOI18N
             }
             version = is.read();
         }
