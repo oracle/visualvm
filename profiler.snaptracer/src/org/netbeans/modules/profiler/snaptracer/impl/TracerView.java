@@ -54,6 +54,7 @@ import org.netbeans.modules.profiler.snaptracer.impl.swing.VisibilityHandler;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
 import java.awt.CardLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
@@ -158,6 +159,7 @@ final class TracerView /*extends DataSourceView*/ {
         };
         JPanel glass = new JPanel(null);
         glass.setOpaque(false);
+        glass.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         glass.addMouseListener(new MouseAdapter() {});
         glass.addMouseMotionListener(new MouseMotionAdapter() {});
         glass.addKeyListener(new KeyAdapter() {});
@@ -289,6 +291,7 @@ final class TracerView /*extends DataSourceView*/ {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JLabel progress = new JLabel("Loading snapshot...", JLabel.CENTER);
+                progress.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 addContents(component, progress);
 
                 RequestProcessor.getDefault().post(new Runnable() {
