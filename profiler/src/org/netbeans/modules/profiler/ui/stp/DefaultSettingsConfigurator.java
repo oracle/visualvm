@@ -164,6 +164,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
             advancedSettingsPanel.setProfileFramework(settings.getProfileUnderlyingFramework());
 
             advancedSettingsPanel.setThreadsMonitoring(settings.getThreadsMonitoringEnabled());
+            advancedSettingsPanel.setThreadsSampling(settings.getThreadsSamplingEnabled());
             advancedSettingsPanel.setOverrideAvailable(enableOverride);
             advancedSettingsPanel.setOverrideSettings(settings.getOverrideGlobalSettings());
             advancedSettingsPanel.setWorkingDirectory(settings.getWorkingDir());
@@ -211,6 +212,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
             finalSettings.setNProfiledThreadsLimit(advancedSettingsPanel.getProfiledThreadsLimit());
 
             finalSettings.setThreadsMonitoringEnabled(advancedSettingsPanel.getThreadsMonitoring());
+            finalSettings.setThreadsSamplingEnabled(advancedSettingsPanel.getThreadsSampling());
             finalSettings.setOverrideGlobalSettings(advancedSettingsPanel.getOverrideSettings());
             finalSettings.setWorkingDir(advancedSettingsPanel.getWorkingDirectory());
             finalSettings.setJavaPlatformName(advancedSettingsPanel.getJavaPlatformName());
@@ -282,6 +284,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
             settings.setNProfiledThreadsLimit(advancedSettingsPanel.getProfiledThreadsLimit());
 
             settings.setThreadsMonitoringEnabled(advancedSettingsPanel.getThreadsMonitoring());
+            settings.setThreadsSamplingEnabled(advancedSettingsPanel.getThreadsSampling());
             settings.setOverrideGlobalSettings(advancedSettingsPanel.getOverrideSettings());
             settings.setWorkingDir(advancedSettingsPanel.getWorkingDirectory());
             settings.setJavaPlatformName(advancedSettingsPanel.getJavaPlatformName());
@@ -383,6 +386,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
             advancedSettingsPanel.setRunGC(settings.getRunGCOnGetResultsInMemoryProfiling());
 
             advancedSettingsPanel.setThreadsMonitoring(settings.getThreadsMonitoringEnabled());
+            advancedSettingsPanel.setThreadsSampling(settings.getThreadsSamplingEnabled());
             advancedSettingsPanel.setOverrideAvailable(enableOverride);
             advancedSettingsPanel.setOverrideSettings(settings.getOverrideGlobalSettings());
             advancedSettingsPanel.setWorkingDirectory(settings.getWorkingDir());
@@ -421,6 +425,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
             finalSettings.setRunGCOnGetResultsInMemoryProfiling(advancedSettingsPanel.getRunGC());
 
             finalSettings.setThreadsMonitoringEnabled(advancedSettingsPanel.getThreadsMonitoring());
+            finalSettings.setThreadsSamplingEnabled(advancedSettingsPanel.getThreadsSampling());
             finalSettings.setOverrideGlobalSettings(advancedSettingsPanel.getOverrideSettings());
             finalSettings.setWorkingDir(advancedSettingsPanel.getWorkingDirectory());
             finalSettings.setJavaPlatformName(advancedSettingsPanel.getJavaPlatformName());
@@ -469,6 +474,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
             settings.setRunGCOnGetResultsInMemoryProfiling(advancedSettingsPanel.getRunGC());
 
             settings.setThreadsMonitoringEnabled(advancedSettingsPanel.getThreadsMonitoring());
+            settings.setThreadsSamplingEnabled(advancedSettingsPanel.getThreadsSampling());
             settings.setOverrideGlobalSettings(advancedSettingsPanel.getOverrideSettings());
             settings.setWorkingDir(advancedSettingsPanel.getWorkingDirectory());
             settings.setJavaPlatformName(advancedSettingsPanel.getJavaPlatformName());
@@ -551,6 +557,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
 
             // basicSettingsPanel
             basicSettingsPanel.setThreadsMonitoring(settings.getThreadsMonitoringEnabled());
+            basicSettingsPanel.setThreadsSampling(settings.getThreadsSamplingEnabled());
 
             // advancedSettingsPanel
             if (!settings.isPreset()) {
@@ -586,6 +593,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
 
             // basicSettingsPanel
             finalSettings.setThreadsMonitoringEnabled(basicSettingsPanel.getThreadsMonitoring());
+            finalSettings.setThreadsSamplingEnabled(basicSettingsPanel.getThreadsSampling());
 
             // advancedSettingsPanel
             finalSettings.setOverrideGlobalSettings(advancedSettingsPanel.getOverrideSettings());
@@ -623,6 +631,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
 
             // basicSettingsPanel
             settings.setThreadsMonitoringEnabled(basicSettingsPanel.getThreadsMonitoring());
+            settings.setThreadsSamplingEnabled(basicSettingsPanel.getThreadsSampling());
 
             // advancedSettingsPanel
             settings.setOverrideGlobalSettings(advancedSettingsPanel.getOverrideSettings());
