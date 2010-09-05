@@ -96,6 +96,7 @@ public class ProfilingSettings {
     public static final String PROP_SETTINGS_NAME = "profiler.settings.settings.name"; //NOI18N
     public static final String PROP_PROFILING_TYPE = "profiler.settings.profiling.type"; //NOI18N
     public static final String PROP_THREADS_MONITORING_ENABLED = "profiler.settings.threads.monitoring.enabled"; //NOI18N
+    public static final String PROP_THREADS_SAMPLING_ENABLED = "profiler.settings.threads.sampling.enabled"; //NOI18N
     public static final String PROP_CPU_PROFILING_TYPE = "profiler.settings.cpu.profiling.type"; //NOI18N
     public static final String PROP_EXCLUDE_WAIT_TIME = "profiler.settings.cpu.exclude.wait.time"; // NOI18N
     public static final String PROP_INSTR_SCHEME = "profiler.settings.instr.scheme"; //NOI18N
@@ -159,6 +160,7 @@ public class ProfilingSettings {
     private boolean sortResultsByThreadCPUTime = false;
     private boolean threadCPUTimerOn = false;
     private boolean threadsMonitoringEnabled = false;
+    private boolean threadsSamplingEnabled = true;
 
     // General CPU Profiling settings
     private boolean useProfilingPoints = true;
@@ -455,6 +457,14 @@ public class ProfilingSettings {
     public boolean getThreadsMonitoringEnabled() {
         return threadsMonitoringEnabled;
     }
+    
+    public void setThreadsSamplingEnabled(final boolean enabled) {
+        threadsSamplingEnabled = enabled;
+    }
+
+    public boolean getThreadsSamplingEnabled() {
+        return threadsSamplingEnabled;
+    }
 
     public void setUseProfilingPoints(boolean enabled) {
         useProfilingPoints = enabled;
@@ -622,6 +632,7 @@ public class ProfilingSettings {
         settings.setJVMArgs(getJVMArgs());
         settings.setJavaPlatformName(getJavaPlatformName());
         settings.setThreadsMonitoringEnabled(getThreadsMonitoringEnabled());
+        settings.setThreadsSamplingEnabled(getThreadsSamplingEnabled());
         settings.setUseProfilingPoints(useProfilingPoints());
 
         settings.setExcludeWaitTime(getExcludeWaitTime());
@@ -668,6 +679,8 @@ public class ProfilingSettings {
         sb.append("javaPlatform: " + ((getJavaPlatformName() == null) ? "<project>" : getJavaPlatformName())); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("threadsMonitoringEnabled: " + getThreadsMonitoringEnabled()); //NOI18N
+        sb.append('\n'); //NOI18N
+        sb.append("threadsSamplingEnabled: " + getThreadsSamplingEnabled()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("useProfilingPoints: " + useProfilingPoints()); // NOI18N
         sb.append('\n'); //NOI18N
@@ -729,8 +742,11 @@ public class ProfilingSettings {
 
         setJavaPlatformName(getProperty(props, prefix + PROP_JAVA_PLATFORM, null));
 
-        setThreadsMonitoringEnabled(Boolean.valueOf(getProperty(props, prefix + PROP_THREADS_MONITORING_ENABLED, "false"))
-                                           .booleanValue()); //NOI18N
+        setThreadsMonitoringEnabled(Boolean.valueOf(getProperty(props, prefix + PROP_THREADS_MONITORING_ENABLED, "false")) //NOI18N
+                                           .booleanValue());
+        
+        setThreadsSamplingEnabled(Boolean.valueOf(getProperty(props, prefix + PROP_THREADS_SAMPLING_ENABLED, "true")) //NOI18N
+                                           .booleanValue());
 
         // CPU and Code Fragment common
         // default for exclude wait time is false, to reflect the setting stored in snapshots before the wait time
@@ -852,6 +868,7 @@ public class ProfilingSettings {
         }
 
         props.put(prefix + PROP_THREADS_MONITORING_ENABLED, Boolean.toString(getThreadsMonitoringEnabled()));
+        props.put(prefix + PROP_THREADS_SAMPLING_ENABLED, Boolean.toString(getThreadsSamplingEnabled()));
 
         // CPU and Code Fragment common
         props.put(prefix + PROP_EXCLUDE_WAIT_TIME, Boolean.toString(getExcludeWaitTime()));
