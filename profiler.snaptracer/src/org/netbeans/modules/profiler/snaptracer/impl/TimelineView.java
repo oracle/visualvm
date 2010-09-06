@@ -43,11 +43,27 @@
 
 package org.netbeans.modules.profiler.snaptracer.impl;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.VisibilityHandler;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelinePanel;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
+import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -55,8 +71,17 @@ import javax.swing.JComponent;
  */
 final class TimelineView {
 
+    private static final String SELALL_IMAGE_PATH =
+            "org/netbeans/modules/profiler/snaptracer/impl/resources/selectAll.png"; // NOI18N
+    private static final String CLMARK_IMAGE_PATH =
+            "org/netbeans/modules/profiler/snaptracer/impl/resources/markClear.png"; // NOI18N
+
     private final TracerModel model;
     private TimelinePanel panel;
+
+    private JButton selectAllButton;
+    private JButton clearTimestampSelectionButton;
+    private JLabel selectionLabel;
 
     private VisibilityHandler viewHandler;
 
@@ -76,6 +101,10 @@ final class TimelineView {
 
     void resetSelection() {
         if (panel != null) panel.resetSelection();
+    }
+
+    void updateActions() {
+        if (panel != null) panel.updateActions();
     }
 
     Action zoomInAction() {
@@ -125,14 +154,109 @@ final class TimelineView {
     // --- UI implementation ---------------------------------------------------
 
     JComponent getView() {
-        panel = new TimelinePanel(model.getTimelineSupport());
+        final TimelineSupport support = model.getTimelineSupport();
+        panel = new TimelinePanel(support);
 
         if (viewHandler != null) {
             viewHandler.handle(panel);
             viewHandler = null;
         }
+        
+        JToolBar toolbar = new JToolBar();
+        toolbar.setFloatable(false);
+        toolbar.setRollover(true);
+        toolbar.setBorderPainted(false);
 
-        return panel;
+        toolbar.add(panel.zoomInAction());
+        toolbar.add(panel.zoomOutAction());
+        toolbar.add(panel.toggleViewAction());
+        toolbar.addSeparator();
+
+        ButtonGroup bg = new ButtonGroup();
+        AbstractButton mz = panel.mouseZoom();
+        bg.add(mz);
+        toolbar.add(mz);
+        AbstractButton mh = panel.mouseHScroll();
+        bg.add(mh);
+        toolbar.add(mh);
+        toolbar.addSeparator();
+
+        selectAllButton = new JButton(new ImageIcon(
+                ImageUtilities.loadImage(SELALL_IMAGE_PATH))) {
+            protected void fireActionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { support.selectAll(); }
+                });
+            }
+        };
+        selectAllButton.setToolTipText("Select all");
+        toolbar.add(selectAllButton);
+        
+        clearTimestampSelectionButton = new JButton(new ImageIcon(
+                ImageUtilities.loadImage(CLMARK_IMAGE_PATH))) {
+            protected void fireActionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { support.resetSelectedTimestamps(); }
+                });
+            }
+        };
+        clearTimestampSelectionButton.setToolTipText("Clear marks");
+        toolbar.add(clearTimestampSelectionButton);
+
+        toolbar.addSeparator();
+        selectionLabel = new JLabel();
+        toolbar.add(selectionLabel);
+
+        JPanel container = new JPanel(new BorderLayout());
+
+        JPanel toolbarContainer = new JPanel(new BorderLayout());
+        toolbarContainer.add(toolbar, BorderLayout.CENTER);
+        toolbarContainer.setBorder(BorderFactory.createEmptyBorder(2, 1, 2, 1));
+
+        container.add(toolbarContainer, BorderLayout.NORTH);
+        container.add(panel, BorderLayout.CENTER);
+
+        support.addSelectionListener( new TimelineSupport.SelectionListener() {
+            public void indexSelectionChanged() {
+                updateSelectionToolbar();
+            }
+            public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {
+                updateSelectionToolbar();
+            }
+        });
+
+        updateSelectionToolbar();
+
+        return container;
+    }
+
+//    private static final Format nf = NumberFormat.getInstance();
+    private static final Format df = new SimpleDateFormat(TimeAxisUtils.TIME_MSEC);
+
+    private void updateSelectionToolbar() {
+        TimelineSupport support = model.getTimelineSupport();
+        selectAllButton.setEnabled(!support.isSelectAll());
+        clearTimestampSelectionButton.setEnabled(support.isTimestampSelection(false));
+        
+        int startIndex = support.getStartIndex();
+        int endIndex = support.getEndIndex();
+        String selection = " Selection: ";
+        if (startIndex == -1) {
+            selection += "<none>";
+        }  else if (startIndex == endIndex) {
+            selection += df.format(support.getTimestamp(startIndex)) + ", sample #" + startIndex;
+        }  else {
+            long startTime = support.getTimestamp(startIndex);
+            long endTime = support.getTimestamp(endIndex);
+            selection += df.format(startTime) + " to " + df.format(endTime);
+//            selection += " (" + nf.format(endTime - startTime) + " ms)";
+            selection += " (" + (endTime - startTime) + " ms)";
+            selection += ", samples #" + startIndex + " to #" + endIndex;
+        }
+
+        if (support.isSelectAll())
+            selection += ", entire snapshot";
+        selectionLabel.setText(selection);
     }
 
 }

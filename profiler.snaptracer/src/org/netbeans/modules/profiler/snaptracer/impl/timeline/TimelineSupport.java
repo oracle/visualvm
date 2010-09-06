@@ -76,6 +76,7 @@ import org.netbeans.modules.profiler.snaptracer.ItemValueFormatter;
 import org.netbeans.modules.profiler.snaptracer.ProbeItemDescriptor;
 import org.netbeans.modules.profiler.snaptracer.TracerProbe;
 import org.netbeans.modules.profiler.snaptracer.TracerProbeDescriptor;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 import org.netbeans.modules.profiler.snaptracer.impl.details.DetailsPanel;
 import org.netbeans.modules.profiler.snaptracer.impl.details.DetailsTableModel;
 import org.netbeans.modules.profiler.snaptracer.impl.export.DataExport;
@@ -109,11 +110,14 @@ public final class TimelineSupport {
     private final Set<Integer> selectedTimestamps = new HashSet();
     private final Set<SelectionListener> selectionListeners = new HashSet();
 
+    private final IdeSnapshot snapshot;
+
 
     // --- Constructor ---------------------------------------------------------
 
-    public TimelineSupport(DescriptorResolver descriptorResolver) {
+    public TimelineSupport(DescriptorResolver descriptorResolver, IdeSnapshot snapshot) {
         this.descriptorResolver = descriptorResolver;
+        this.snapshot = snapshot;
         
         // TODO: must be called in EDT!
         model = new TimelineModel();
@@ -232,7 +236,7 @@ public final class TimelineSupport {
                 XYItemPainter[] painters  = new XYItemPainter[items.length];
                 for (int i = 0; i < painters.length; i++)
                     painters[i] = TimelinePaintersFactory.createPainter(
-                            itemDescriptors[i], i, pointsComputer);
+                            itemDescriptors[i], i, pointsComputer, snapshot);
                 
                 row.addItems(items, painters);
 
@@ -847,8 +851,19 @@ public final class TimelineSupport {
     private int endIndex = -1;
 
     public void selectAll() {
-        Rectangle r = new Rectangle(new Point(0, 0), chart.getSize());
-        chart.getSelectionModel().setSelectionBounds(r);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                TimelineSelectionManager selection = (TimelineSelectionManager)chart.getSelectionModel();
+                selection.selectAll();
+                startIndex = selection.getStartIndex();
+                endIndex = selection.getEndIndex();
+                notifyIndexSelectionChanged();
+            }
+        });
+    }
+
+    public boolean isSelectAll() {
+        return endIndex - startIndex == model.getTimestampsCount() - 1;
     }
 
     public int getStartIndex() { return startIndex; }

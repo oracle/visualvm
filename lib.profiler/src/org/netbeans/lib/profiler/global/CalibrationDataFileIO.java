@@ -109,8 +109,9 @@ public class CalibrationDataFileIO {
             return -1;
         }
 
+        FileInputStream fiStream = null;
         try {
-            FileInputStream fiStream = new FileInputStream(savedDataFile);
+            fiStream = new FileInputStream(savedDataFile);
             ObjectInputStream oiStream = new ObjectInputStream(fiStream);
 
             status.methodEntryExitCallTime = (double[]) oiStream.readObject();
@@ -120,7 +121,7 @@ public class CalibrationDataFileIO {
 
             fiStream.close();
         } catch (Exception e) {
-            String errorMessage = e.getMessage();
+            errorMessage = e.getMessage();
             String prefix = CALIBRATION_DATA_CORRUPTED_PREFIX;
 
             if (errorMessage == null) {
@@ -134,6 +135,12 @@ public class CalibrationDataFileIO {
             errorMessage += ("\n" + RERUN_CALIBRATION_MSG + "\n"); // NOI18N
 
             return -2;
+        } finally {
+            if (fiStream != null) {
+                try {
+                    fiStream.close();
+                } catch (IOException e) {}
+            }
         }
 
         return 0;
@@ -151,7 +158,7 @@ public class CalibrationDataFileIO {
 
             foStream.close();
         } catch (IOException e) {
-            String errorMessage = e.getMessage();
+            errorMessage = e.getMessage();
             String prefix = ERROR_WRITING_CALIBRATION_FILE_PREFIX;
             errorMessage = prefix + "\n" + ORIGINAL_MESSAGE_STRING + "\n" + errorMessage; // NOI18N
                                                                                           // status.remoteProfiling below means that we actually perform off-line calibration on the remote target machine.

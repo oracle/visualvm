@@ -53,24 +53,29 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.logs.LogReader;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+/**
+ *
+ * @author Jiri Sedlacek
+ */
 public final class IdeSnapshotAction implements ActionListener {
     
     public void actionPerformed(ActionEvent e) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                final SampledCPUSnapshot snapshot = snapshot();
+                final IdeSnapshot snapshot = snapshot();
                 if (snapshot == null) return;
 
                 final TracerModel model = new TracerModel(snapshot);
                 final TracerController controller = new TracerController(model);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        TopComponent ui = ui(model, controller);
+                        TopComponent ui = ui(model, controller, snapshot.getNpssFile());
                         ui.open();
                         ui.requestActive();
                     }
@@ -80,19 +85,19 @@ public final class IdeSnapshotAction implements ActionListener {
     }
 
 
-    private TopComponent ui(TracerModel model, TracerController controller) {
-        TopComponent tc = new IdeSnapshotComponent();
+    private TopComponent ui(TracerModel model, TracerController controller, File npssFile) {
+        TopComponent tc = new IdeSnapshotComponent(npssFile);
         TracerView tracer = new TracerView(model, controller);
         tc.add(tracer.createComponent(), BorderLayout.CENTER);
         return tc;
     }
 
-    private SampledCPUSnapshot snapshot() {
+    private IdeSnapshot snapshot() {
         File file = snapshotFile();
         if (file == null) return null;
-
-        try { return new SampledCPUSnapshot(file); }
-        catch (Throwable t) { Exceptions.printStackTrace(t); return null; }
+        try {
+            return new IdeSnapshot(file, new File(file.getCanonicalPath() + ".xml"));
+        } catch (Throwable t) { Exceptions.printStackTrace(t); return null; }
     }
 
     private File snapshotFile() {
@@ -132,8 +137,8 @@ public final class IdeSnapshotAction implements ActionListener {
     
     private static class IdeSnapshotComponent extends TopComponent {
 
-        IdeSnapshotComponent() {
-            setDisplayName("IDE Snapshot");
+        IdeSnapshotComponent(File npssFile) {
+            setDisplayName(npssFile.getName());
             setLayout(new BorderLayout());
         }
 
