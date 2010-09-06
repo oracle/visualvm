@@ -1452,15 +1452,22 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
                 break;
             case Command.SET_CHANGEABLE_INSTR_PARAMS:
-
+                boolean threadSampling;
+                boolean waitTracking;
+                boolean sleepTracking;
                 SetChangeableInstrParamsCommand scipCmd = (SetChangeableInstrParamsCommand) cmd;
                 ProfilerRuntimeCPU.setNProfiledThreadsLimit(scipCmd.getNProfiledThreadsLimit());
                 ProfilerRuntimeCPUSampledInstr.setSamplingInterval(scipCmd.getSamplingInterval());
                 ProfilerRuntimeMemory.setSamplingInterval((short) scipCmd.getObjAllocStackSamplingInterval());
                 ProfilerRuntimeMemory.setSamplingDepth(scipCmd.getObjAllocStackSamplingDepth());
                 ProfilerRuntimeObjLiveness.setRunGCOnGetResults(scipCmd.getRunGCOnGetResultsInMemoryProfiling());
-                Classes.setWaitTrackingEnabled(scipCmd.getWaitTrackingEnabled());
-                Classes.setSleepTrackingEnabled(scipCmd.getSleepTrackingEnabled());
+                threadSampling = scipCmd.isThreadsSamplingEnabled();
+                waitTracking = scipCmd.isWaitTrackingEnabled();
+                sleepTracking = scipCmd.isSleepTrackingEnabled();
+                Monitors.setThreadsSamplingEnabled(threadSampling);
+                ProfilerRuntimeCPU.setWaitAndSleepTracking(waitTracking,sleepTracking);
+                Classes.setWaitTrackingEnabled(threadSampling || waitTracking);
+                Classes.setSleepTrackingEnabled(threadSampling || sleepTracking);
                 sendSimpleResponseToClient(true, null);
 
                 break;

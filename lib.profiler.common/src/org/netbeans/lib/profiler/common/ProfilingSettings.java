@@ -515,6 +515,8 @@ public class ProfilingSettings {
         settings.setInstrumentEmptyMethods(getInstrumentEmptyMethods());
         settings.setInstrumentMethodInvoke(getInstrumentMethodInvoke());
         settings.setInstrumentSpawnedThreads(getInstrumentSpawnedThreads());
+        settings.setThreadsMonitoringEnabled(getThreadsMonitoringEnabled());
+        settings.setThreadsSamplingEnabled(getThreadsSamplingEnabled());
 
         if (getNProfiledThreadsLimit() > 0) {
             settings.setNProfiledThreadsLimit(getNProfiledThreadsLimit());

@@ -49,11 +49,7 @@ import org.netbeans.lib.profiler.server.system.Classes;
 import org.netbeans.lib.profiler.server.system.GC;
 import org.netbeans.lib.profiler.server.system.Threads;
 import org.netbeans.lib.profiler.server.system.Timers;
-import org.netbeans.lib.profiler.wireprotocol.MethodNamesResponse;
 import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
-import org.netbeans.lib.profiler.wireprotocol.Response;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 
@@ -160,6 +156,10 @@ public class Monitors implements CommonConstants {
             time = 0;
 
             return ret;
+        }
+
+        public synchronized void addThreadStateChange(Thread thread, byte state, long timeStamp, Object monitor) {
+            if (started && !terminated) threadTable.addExactState (thread, -1, state, timeStamp);
         }
 
         public void run() {
@@ -290,7 +290,7 @@ public class Monitors implements CommonConstants {
 
                     threadTable.put(thread, allThreadStatusRough[i]);
                 }
-
+                threadTable.findDeathThreads();
                 threadTable.incStatusIdx();
             }
 
@@ -330,6 +330,10 @@ public class Monitors implements CommonConstants {
         private int nThreads;
         private int size;
         private int threshold;
+        private int explPos;
+        private byte[] explicitStates;
+        private int[] explicitThreads;
+        private long[] explicitTimeStamps;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -352,34 +356,55 @@ public class Monitors implements CommonConstants {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void getThreadsData(MonitoredNumbersResponse mresp) {
-            if (nThreads > packedThreadIds.length) {
-                packedThreadIds = new int[nThreads];
-            }
-
-            if (curStateIdx > packedStateTimestamps.length) {
-                packedStateTimestamps = new long[curStateIdx];
-            }
-
-            int totalStates = nThreads * curStateIdx;
-
-            if (totalStates > packedThreadStates.length) {
-                packedThreadStates = new byte[totalStates];
-            }
-
-            int idx0 = 0;
-            int idx1 = 0;
-
-            for (int i = 0; i < size; i++) {
-                if ((threads[i] != null) && (threads[i] != dummyObj)) {
-                    packedThreadIds[idx0++] = threadIds[i];
-                    System.arraycopy(threadStates[i], 0, packedThreadStates, idx1, curStateIdx);
-                    idx1 += curStateIdx;
+            if (explicitThreads != null) {
+                // pass the collected explicit thread state changes
+                int[] msgExplicitThreads = new int[explPos];
+                System.arraycopy(explicitThreads, 0, msgExplicitThreads, 0, explPos);
+                byte[] msgExplicitStates = new byte[explPos];
+                System.arraycopy(explicitStates, 0, msgExplicitStates, 0, explPos);
+                long[] msgExplicitTimeStamps = new long[explPos];
+                System.arraycopy(explicitTimeStamps, 0, msgExplicitTimeStamps, 0, explPos);
+                
+                mresp.setExplicitDataOnThreads(msgExplicitThreads, msgExplicitStates, msgExplicitTimeStamps);
+                
+                // and reset the arrays/pos
+                if (explPos > 0) {
+                    explicitStates = new byte[explPos];
+                    explicitThreads = new int[explPos];
+                    explicitTimeStamps = new long[explPos];
                 }
+                explPos = 0;
+            } else {
+                // explicit Threads states not supported
+                if (nThreads > packedThreadIds.length) {
+                    packedThreadIds = new int[nThreads];
+                }
+                
+                if (curStateIdx > packedStateTimestamps.length) {
+                    packedStateTimestamps = new long[curStateIdx];
+                }
+                
+                int totalStates = nThreads * curStateIdx;
+                
+                if (totalStates > packedThreadStates.length) {
+                    packedThreadStates = new byte[totalStates];
+                }
+                
+                int idx0 = 0;
+                int idx1 = 0;
+                
+                for (int i = 0; i < size; i++) {
+                    if ((threads[i] != null) && (threads[i] != dummyObj)) {
+                        packedThreadIds[idx0++] = threadIds[i];
+                        System.arraycopy(threadStates[i], 0, packedThreadStates, idx1, curStateIdx);
+                        idx1 += curStateIdx;
+                    }
+                }
+                
+                System.arraycopy(stateSampleTimestamps, 0, packedStateTimestamps, 0, curStateIdx);
+                
+                mresp.setDataOnThreads(nThreads, curStateIdx, packedThreadIds, packedStateTimestamps, packedThreadStates);
             }
-
-            System.arraycopy(stateSampleTimestamps, 0, packedStateTimestamps, 0, curStateIdx);
-
-            mresp.setDataOnThreads(nThreads, curStateIdx, packedThreadIds, packedStateTimestamps, packedThreadStates);
 
             if (nNewThreads > 0) {
                 if (nNewThreads > newThreadIds.length) {
@@ -444,12 +469,8 @@ public class Monitors implements CommonConstants {
             System.err.println();
         }
 
-        public void put(Thread thread, int status) {
-            int pos = (thread.hashCode() & 0x7FFFFFFF) % size;
-
-            while ((threads[pos] != thread) && (threads[pos] != null)) {
-                pos = (pos + 1) % size;
-            }
+        void put(Thread thread, int status) {
+            int pos = getPosIndex(thread);
 
             if (threads[pos] == null) {
                 threadNew[pos] = true;
@@ -460,6 +481,17 @@ public class Monitors implements CommonConstants {
                 nFilledSlots++;
             }
 
+            if (explicitThreads != null) {
+                // we are actually using exact thread states tracking, so make use of zombie state that we otherwise do
+                // not get
+                if (status == CommonConstants.THREAD_STATUS_ZOMBIE) {
+                    addExactState(null, threadIds[pos], CommonConstants.THREAD_STATUS_ZOMBIE, stateSampleTimestamps[curStateIdx]);
+                }
+                
+                // just an optimization, if we use exact timings, the sampling data will only contain state running
+                status = CommonConstants.THREAD_STATUS_RUNNING;
+            }
+            
             threadStates[pos][curStateIdx] = (byte) status;
 
             if (nFilledSlots > threshold) {
@@ -467,6 +499,29 @@ public class Monitors implements CommonConstants {
             }
         }
 
+        private int getPosIndex(final Thread thread) {
+            int pos = (thread.hashCode() & 0x7FFFFFFF) % size;
+
+            while ((threads[pos] != thread) && (threads[pos] != null)) {
+                pos = (pos + 1) % size;
+            }
+            return pos;
+        }
+
+        private void findDeathThreads() {
+            if (explicitThreads == null) return;
+            // we are actually using exact thread states tracking, so make use zombie state that we otherwise do
+            for (int i = 0; i < size; i++) {
+                if ((threads[i] == null) || (threads[i] == dummyObj)) {
+                    continue;
+                }
+
+                if (threadStates[i][curStateIdx] == 0) { // Thread is dead
+                    addExactState(null,threadIds[i],CommonConstants.THREAD_STATUS_ZOMBIE,stateSampleTimestamps[curStateIdx]);
+                }
+            }
+        }
+        
         public void resetStates() {
             nNewThreads = 0;
 
@@ -554,17 +609,67 @@ public class Monitors implements CommonConstants {
 
             nFilledSlots = nThreads;
         }
+
+        void addExactState(Thread thread, int threadId, byte state, long timeStamp) {
+            int id = threadId;
+            if (id == -1) {
+                id = findThreadId(thread);
+            }
+            if (id == -1) {
+                // thread not found, forget about it
+                return;
+            }
+            
+            if (explicitThreads == null) {
+                explicitStates = new byte[20];
+                explicitThreads = new int [20];
+                explicitTimeStamps = new long[20];
+            }
+            
+            if (explicitStates.length == explPos) {
+                byte[] newExplicitStates = new byte[explPos * 2];
+                System.arraycopy(explicitStates, 0, newExplicitStates, 0, explicitStates.length);
+                explicitStates = newExplicitStates;
+                
+                int[] newExplicitThreads = new int[explPos * 2];
+                System.arraycopy(explicitThreads, 0, newExplicitThreads, 0, explicitThreads.length);
+                explicitThreads = newExplicitThreads;
+                
+                long[] newExplicitTimeStamps = new long[explPos * 2];
+                System.arraycopy(explicitTimeStamps, 0, newExplicitTimeStamps, 0, explicitTimeStamps.length);
+                explicitTimeStamps = newExplicitTimeStamps;
+            }
+            
+            explicitStates[explPos] = state;
+            explicitThreads[explPos] = id;
+            explicitTimeStamps[explPos] = timeStamp;
+            explPos++;
+        }
+
+        private int findThreadId(Thread thread) {
+            int pos = getPosIndex(thread);
+            
+            if (threads[pos] == thread) {
+                return threadIds[pos];
+            }
+            return -1; // not found
+        }
+
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = Boolean.getBoolean("org.netbeans.lib.profiler.server.Monitors");
     protected static Runtime runtime;
     protected static SurvGenAndThreadsMonitor stMonitor;
     protected static long[] generalMNums;
     protected static long[] gcRelTime;
     protected static long[] gcStartTimes;
     protected static long[] gcFinishTimes;
+    private static long startTimeMilis;
+    private static long startTimeCounts;
+    private static boolean threadsSamplingEnabled;
+
     protected static long time; // Used just for estimating the overhead
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -626,7 +731,44 @@ public class Monitors implements CommonConstants {
         GC.activateGCEpochCounter(true);
         stMonitor = new SurvGenAndThreadsMonitor();
         ThreadInfo.addProfilerServerThread(stMonitor);
+        startTimeMilis = System.currentTimeMillis();
+        startTimeCounts = Timers.getCurrentTimeInCounts();
         stMonitor.start();
+    }
+
+    static void setThreadsSamplingEnabled(boolean b) {
+        threadsSamplingEnabled = b;
+    }
+
+    static void recordThreadStateChange(Thread thread, byte state, long timeStamp, Object monitor) {
+        if (threadsSamplingEnabled) return;
+        if (timeStamp == -1) {
+            timeStamp = Timers.getCurrentTimeInCounts();
+        }
+        // convert to 
+        long diff = timeStamp - startTimeCounts;
+        diff /= Timers.getNoOfCountsInSecond() / 1000;
+        timeStamp = startTimeMilis + diff;
+        if (DEBUG) {
+              switch (state) {
+                case CommonConstants.THREAD_STATUS_MONITOR:
+                    System.err.println("Thread state change: "+thread.getName()+", Monitor: "+timeStamp+", monitor: "+System.identityHashCode(monitor));
+                    break;
+                case CommonConstants.THREAD_STATUS_WAIT:
+                    System.err.println("Thread state change: "+thread.getName()+", Wait: "+timeStamp);
+                    break;
+                case CommonConstants.THREAD_STATUS_SLEEPING:
+                    System.err.println("Thread state change: "+thread.getName()+", Sleep: "+timeStamp);
+                    break;
+                case CommonConstants.THREAD_STATUS_RUNNING:
+                    System.err.println("Thread state change: "+thread.getName()+", Run: "+timeStamp);
+                    break;
+            }
+        }
+
+        if (stMonitor != null) {
+            stMonitor.addThreadStateChange(thread, state, timeStamp, monitor);
+        }
     }
 
     /** Check if all monitor threads have been started */
