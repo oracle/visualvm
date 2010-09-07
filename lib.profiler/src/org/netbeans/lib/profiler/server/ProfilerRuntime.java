@@ -49,7 +49,6 @@ import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import java.lang.reflect.Method;
 import java.util.*;
 
-
 /**
  * This is a base class, containing common functionality for classes that contain instrumentation methods.
  *
@@ -149,6 +148,12 @@ public class ProfilerRuntime implements CommonConstants {
             // nothing done for profiler own threads or if in instrumentation
             return;
         }
+        long timeStamp = -1;
+        ThreadInfo ti = ThreadInfo.getThreadInfo(t);
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+        ti.inProfilingRuntimeMethod++;
 
         ProfilingSessionStatus status = ProfilerServer.getProfilingSessionStatus();
 
@@ -156,7 +161,7 @@ public class ProfilerRuntime implements CommonConstants {
             switch (status.currentInstrType) {
                 case INSTR_RECURSIVE_FULL:
                 case INSTR_RECURSIVE_SAMPLED:
-                    ProfilerRuntimeCPU.monitorEntryCPU(t, monitor);
+                    timeStamp = ProfilerRuntimeCPU.monitorEntryCPU(ti, monitor);
 
                     break;
                 case INSTR_CODE_REGION:
@@ -166,7 +171,8 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        // TODO: use for thread monitoring
+        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_MONITOR, timeStamp, monitor);
+        ti.inProfilingRuntimeMethod--;
     }
 
     public static void monitorExit(Thread t, Object monitor) {
@@ -174,6 +180,12 @@ public class ProfilerRuntime implements CommonConstants {
             // nothing done for profiler own threads or if in instrumentation
             return;
         }
+        long timeStamp = -1;
+        ThreadInfo ti = ThreadInfo.getThreadInfo(t);
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+        ti.inProfilingRuntimeMethod++;
 
         ProfilingSessionStatus status = ProfilerServer.getProfilingSessionStatus();
 
@@ -181,7 +193,7 @@ public class ProfilerRuntime implements CommonConstants {
             switch (status.currentInstrType) {
                 case INSTR_RECURSIVE_FULL:
                 case INSTR_RECURSIVE_SAMPLED:
-                    ProfilerRuntimeCPU.monitorExitCPU(t, monitor);
+                    timeStamp = ProfilerRuntimeCPU.monitorExitCPU(ti, monitor);
 
                     break;
                 case INSTR_CODE_REGION:
@@ -191,7 +203,8 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        // TODO: use for thread monitoring
+        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_RUNNING, timeStamp, null);
+        ti.inProfilingRuntimeMethod--;
     }
 
     public static void profilePointHit(char id) {
@@ -247,6 +260,12 @@ public class ProfilerRuntime implements CommonConstants {
             // nothing done for profiler own threads or if in instrumentation
             return;
         }
+        long timeStamp = -1;
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+        ti.inProfilingRuntimeMethod++;
 
         ProfilingSessionStatus status = ProfilerServer.getProfilingSessionStatus();
 
@@ -254,7 +273,7 @@ public class ProfilerRuntime implements CommonConstants {
             switch (status.currentInstrType) {
                 case INSTR_RECURSIVE_FULL:
                 case INSTR_RECURSIVE_SAMPLED:
-                    ProfilerRuntimeCPU.sleepEntryCPU();
+                    timeStamp = ProfilerRuntimeCPU.sleepEntryCPU(ti);
 
                     break;
                 case INSTR_CODE_REGION:
@@ -264,7 +283,8 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        // TODO: use for thread monitoring
+        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_SLEEPING, timeStamp, null);
+        ti.inProfilingRuntimeMethod--;
     }
 
     public static void sleepExit() {
@@ -272,6 +292,12 @@ public class ProfilerRuntime implements CommonConstants {
             // nothing done for profiler own threads or if in instrumentation
             return;
         }
+        long timeStamp = -1;
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+        ti.inProfilingRuntimeMethod++;
 
         ProfilingSessionStatus status = ProfilerServer.getProfilingSessionStatus();
 
@@ -279,7 +305,7 @@ public class ProfilerRuntime implements CommonConstants {
             switch (status.currentInstrType) {
                 case INSTR_RECURSIVE_FULL:
                 case INSTR_RECURSIVE_SAMPLED:
-                    ProfilerRuntimeCPU.sleepExitCPU();
+                    timeStamp = ProfilerRuntimeCPU.sleepExitCPU(ti);
 
                     break;
                 case INSTR_CODE_REGION:
@@ -289,7 +315,8 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        // TODO: use for thread monitoring
+        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_RUNNING, timeStamp, null);
+        ti.inProfilingRuntimeMethod--;
     }
 
     public static void waitEntry() {
@@ -297,6 +324,12 @@ public class ProfilerRuntime implements CommonConstants {
             // nothing done for profiler own threads or if in instrumentation
             return;
         }
+        long timeStamp = -1;
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+        ti.inProfilingRuntimeMethod++;
 
         ProfilingSessionStatus status = ProfilerServer.getProfilingSessionStatus();
 
@@ -304,7 +337,7 @@ public class ProfilerRuntime implements CommonConstants {
             switch (status.currentInstrType) {
                 case INSTR_RECURSIVE_FULL:
                 case INSTR_RECURSIVE_SAMPLED:
-                    ProfilerRuntimeCPU.waitEntryCPU();
+                    timeStamp = ProfilerRuntimeCPU.waitEntryCPU(ti);
 
                     break;
                 case INSTR_CODE_REGION:
@@ -314,7 +347,8 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        // TODO: use for thread monitoring
+        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_WAIT, timeStamp, null);
+        ti.inProfilingRuntimeMethod--;
     }
 
     public static void waitExit() {
@@ -322,6 +356,12 @@ public class ProfilerRuntime implements CommonConstants {
             // nothing done for profiler own threads or if in instrumentation
             return;
         }
+        long timeStamp = -1;
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+        ti.inProfilingRuntimeMethod++;
 
         ProfilingSessionStatus status = ProfilerServer.getProfilingSessionStatus();
 
@@ -329,7 +369,7 @@ public class ProfilerRuntime implements CommonConstants {
             switch (status.currentInstrType) {
                 case INSTR_RECURSIVE_FULL:
                 case INSTR_RECURSIVE_SAMPLED:
-                    ProfilerRuntimeCPU.waitExitCPU();
+                    timeStamp = ProfilerRuntimeCPU.waitExitCPU(ti);
 
                     break;
                 case INSTR_CODE_REGION:
@@ -339,7 +379,8 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        // TODO: use for thread monitoring
+        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_RUNNING, timeStamp, null);
+        ti.inProfilingRuntimeMethod--;
     }
 
     public static void writeProfilingPointHitEvent(int id, long absTimeStamp) {

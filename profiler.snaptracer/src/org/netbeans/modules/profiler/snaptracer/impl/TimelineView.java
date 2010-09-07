@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.snaptracer.impl;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.text.Format;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.VisibilityHandler;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelinePanel;
@@ -64,6 +63,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -189,7 +189,8 @@ final class TimelineView {
                 });
             }
         };
-        selectAllButton.setToolTipText("Select all");
+        selectAllButton.setToolTipText(NbBundle.getMessage(TimelineView.class,
+                "TOOLTIP_SelectAll")); //NOI18N
         toolbar.add(selectAllButton);
         
         clearTimestampSelectionButton = new JButton(new ImageIcon(
@@ -200,7 +201,8 @@ final class TimelineView {
                 });
             }
         };
-        clearTimestampSelectionButton.setToolTipText("Clear marks");
+        clearTimestampSelectionButton.setToolTipText(NbBundle.getMessage(
+                TimelineView.class, "TOOLTIP_ClearMarks")); // NOI18N
         toolbar.add(clearTimestampSelectionButton);
 
         toolbar.addSeparator();
@@ -240,22 +242,26 @@ final class TimelineView {
         
         int startIndex = support.getStartIndex();
         int endIndex = support.getEndIndex();
-        String selection = " Selection: ";
+        String selection = " " + NbBundle.getMessage(TimelineView.class, // NOI18N
+                "LBL_Selection") + " "; // NOI18N
         if (startIndex == -1) {
-            selection += "<none>";
+            selection += NbBundle.getMessage(TimelineView.class, "LBL_None"); // NOI18N
         }  else if (startIndex == endIndex) {
-            selection += df.format(support.getTimestamp(startIndex)) + ", sample #" + startIndex;
+            selection += df.format(support.getTimestamp(startIndex)) + ", " + // NOI18N
+                    NbBundle.getMessage(TimelineView.class, "LBL_SingleSample", startIndex); // NOI18N
         }  else {
             long startTime = support.getTimestamp(startIndex);
             long endTime = support.getTimestamp(endIndex);
-            selection += df.format(startTime) + " to " + df.format(endTime);
+            selection += NbBundle.getMessage(TimelineView.class, "LBL_TwoTimes", // NOI18N
+                    df.format(startTime), df.format(endTime));
 //            selection += " (" + nf.format(endTime - startTime) + " ms)";
             selection += " (" + (endTime - startTime) + " ms)";
-            selection += ", samples #" + startIndex + " to #" + endIndex;
+            selection += ", " + NbBundle.getMessage(TimelineView.class, "LBL_TwoSamples", // NOI18N
+                    startIndex, endIndex);
         }
 
         if (support.isSelectAll())
-            selection += ", entire snapshot";
+            selection += ", " + NbBundle.getMessage(TimelineView.class, "LBL_EntireSnapshot"); // NOI18N
         selectionLabel.setText(selection);
     }
 
