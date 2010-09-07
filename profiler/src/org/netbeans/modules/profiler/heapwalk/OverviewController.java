@@ -120,6 +120,10 @@ public class OverviewController extends AbstractController {
             "OverviewController_ArchitectureItemString"); // NOI18N
     private static final String JAVA_HOME_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
             "OverviewController_JavaHomeItemString"); // NOI18N
+    private static final String JAVA_VERSION_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
+            "OverviewController_JavaVersionItemString"); // NOI18N
+    private static final String JAVA_VENDOR_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
+            "OverviewController_JavaVendorItemString"); // NOI18N
     private static final String JVM_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
             "OverviewController_JvmItemString"); // NOI18N
     private static final String SHOW_SYSPROPS_LINK_STRING = NbBundle.getMessage(OverviewController.class,
@@ -266,6 +270,10 @@ public class OverviewController extends AbstractController {
         String jdk = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                 + MessageFormat.format(JAVA_HOME_ITEM_STRING,
                 new Object[] { sysprops.getProperty("java.home", NOT_AVAILABLE_MSG) }); // NOI18N
+
+        String version = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+                + MessageFormat.format(JAVA_VERSION_ITEM_STRING,
+                new Object[] { sysprops.getProperty("java.version", NOT_AVAILABLE_MSG) }); // NOI18N
         
         String jvm = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                 + MessageFormat.format(JVM_ITEM_STRING,
@@ -274,9 +282,13 @@ public class OverviewController extends AbstractController {
             sysprops.getProperty("java.vm.version", ""), // NOI18N
             sysprops.getProperty("java.vm.info", "") // NOI18N
         });
+
+        String vendor = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+                + MessageFormat.format(JAVA_VENDOR_ITEM_STRING,
+                new Object[] { sysprops.getProperty("java.vendor", NOT_AVAILABLE_MSG) }); // NOI18N
         
         return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/sysinfo.png'>&nbsp;&nbsp;" // NOI18N
-                + ENVIRONMENT_STRING + "</b><br><hr>" + os + "<br>" + arch + "<br>" + jdk + "<br>" + jvm; // NOI18N
+                + ENVIRONMENT_STRING + "</b><br><hr>" + os + "<br>" + arch + "<br>" + jdk + "<br>" + version + "<br>" + jvm + "<br>" + vendor; // NOI18N
     }
     
     public String computeSystemProperties(boolean showSystemProperties) {

@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import org.netbeans.lib.profiler.global.CommonConstants;
 
 
 /**
@@ -86,6 +87,11 @@ public class MonitoredNumbersResponse extends Response {
     private int nThreadStates;
     private int nThreads;
 
+    private int[] exactThreadIds;
+    private byte[] exactThreadStates;
+    private long[] exactTimeStamps;
+    private int mode = CommonConstants.MODE_THREADS_NONE;
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public MonitoredNumbersResponse(long[] generalNumbers) {
@@ -109,11 +115,20 @@ public class MonitoredNumbersResponse extends Response {
     }
 
     public void setDataOnThreads(int nThreads, int nThreadStates, int[] threadIds, long[] stateTimestamps, byte[] threadStates) {
+        this.mode = CommonConstants.MODE_THREADS_SAMPLING;
         this.nThreads = nThreads;
         this.nThreadStates = nThreadStates;
         this.threadIds = threadIds;
         this.stateTimestamps = stateTimestamps;
         this.threadStates = threadStates;
+    }
+
+    public void setExplicitDataOnThreads(int[] explicitThreads, byte[] explicitStates, long[] explicitTimeStamps) {
+        assert (explicitStates.length == explicitThreads.length && explicitThreads.length == explicitTimeStamps.length);
+        this.mode = CommonConstants.MODE_THREADS_EXACT;
+        this.exactThreadIds = explicitThreads;
+        this.exactThreadStates = explicitStates;
+        this.exactTimeStamps = explicitTimeStamps;
     }
 
     public long[] getGCFinishs() {
@@ -168,45 +183,70 @@ public class MonitoredNumbersResponse extends Response {
     public byte[] getThreadStates() {
         return threadStates;
     }
+  
+    public int getThreadsDataMode(){
+        return mode;
+    }
+
+    // sampling-based data, to be used in case mode=MODE_THREADS_EXACT
+    public int[] getExactThreadIds() {
+        return exactThreadIds;
+    }
+    public byte[] getExactThreadStates() {
+        return exactThreadStates;
+    }
+    public long[] getExactStateTimestamps() {
+        return exactTimeStamps;
+    }
+
 
     // For debugging
     public String toString() {
-        return "MonitoredNumbersResponse, " + super.toString(); // NOI18N
+        return "MonitoredNumbersResponse, mode "+ mode + " " + super.toString(); // NOI18N
     }
 
     void readObject(ObjectInputStream in) throws IOException {
         int arrSize;
 
+        mode = in.readInt();
         for (int i = 0; i < generalNumbers.length; i++) {
             generalNumbers[i] = in.readLong();
         }
 
-        nThreads = in.readInt();
-        nThreadStates = in.readInt();
-
-        if (threadIds.length < nThreads) {
-            threadIds = new int[nThreads];
+        if (mode == CommonConstants.MODE_THREADS_SAMPLING) {
+            nThreads = in.readInt();
+            nThreadStates = in.readInt();
+            if (threadIds.length < nThreads) {
+                threadIds = new int[nThreads];
+            }
+            if (stateTimestamps.length < nThreadStates) {
+                stateTimestamps = new long[nThreadStates];
+            }
+            
+            int len = nThreads * nThreadStates;
+            
+            if (threadStates.length < len) {
+                threadStates = new byte[len];
+            }
+            for (int i = 0; i < nThreads; i++) {
+                threadIds[i] = in.readInt();
+            }
+            for (int i = 0; i < nThreadStates; i++) {
+                stateTimestamps[i] = in.readLong();
+            }
+            in.readFully(threadStates, 0, len);
+        }  else if (mode == CommonConstants.MODE_THREADS_EXACT) {
+            int exactLen = in.readInt();
+            exactThreadIds = new int[exactLen];
+            exactThreadStates = new byte[exactLen];
+            exactTimeStamps = new long[exactLen];
+            
+            for (int i = 0; i < exactLen; i++) {
+                exactThreadIds[i] = in.readInt();
+                exactThreadStates[i] = in.readByte();
+                exactTimeStamps[i] = in.readLong();
+            }
         }
-
-        if (stateTimestamps.length < nThreadStates) {
-            stateTimestamps = new long[nThreadStates];
-        }
-
-        int len = nThreads * nThreadStates;
-
-        if (threadStates.length < len) {
-            threadStates = new byte[len];
-        }
-
-        for (int i = 0; i < nThreads; i++) {
-            threadIds[i] = in.readInt();
-        }
-
-        for (int i = 0; i < nThreadStates; i++) {
-            stateTimestamps[i] = in.readLong();
-        }
-
-        in.readFully(threadStates, 0, len);
 
         nNewThreads = in.readInt();
 
@@ -243,23 +283,30 @@ public class MonitoredNumbersResponse extends Response {
     }
 
     void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(mode);
         for (int i = 0; i < generalNumbers.length; i++) {
             out.writeLong(generalNumbers[i]);
         }
 
-        out.writeInt(nThreads);
-        out.writeInt(nThreadStates);
-
-        for (int i = 0; i < nThreads; i++) {
-            out.writeInt(threadIds[i]);
+        if (mode == CommonConstants.MODE_THREADS_SAMPLING) {
+            out.writeInt(nThreads);
+            out.writeInt(nThreadStates);
+            for (int i = 0; i < nThreads; i++) {
+                out.writeInt(threadIds[i]);
+            }
+            for (int i = 0; i < nThreadStates; i++) {
+                out.writeLong(stateTimestamps[i]);
+            }
+            int len = nThreads * nThreadStates;
+            out.write(threadStates, 0, len);
+        } else if (mode == CommonConstants.MODE_THREADS_EXACT) {
+            out.writeInt(exactThreadStates.length);
+            for (int i = 0; i < exactThreadIds.length; i++) {
+                out.writeInt(exactThreadIds[i]);
+                out.writeByte(exactThreadStates[i]);
+                out.writeLong(exactTimeStamps[i]);
+            }
         }
-
-        for (int i = 0; i < nThreadStates; i++) {
-            out.writeLong(stateTimestamps[i]);
-        }
-
-        int len = nThreads * nThreadStates;
-        out.write(threadStates, 0, len);
 
         if (nNewThreads == 0) {
             out.writeInt(0);

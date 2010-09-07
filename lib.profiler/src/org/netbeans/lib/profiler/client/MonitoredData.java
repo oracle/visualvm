@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.client;
 
 import org.netbeans.lib.profiler.TargetAppRunner;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
 
@@ -75,6 +76,11 @@ public class MonitoredData {
     private int[] threadIds;
     private byte[][] threadStates = new byte[20][20];
 
+    private int[] exThreadIds;
+    private long[] exStateTimestamps;
+    private byte[] exThreadStates;
+    private int mode = CommonConstants.MODE_THREADS_NONE;
+
     // Data on new threads. Any thread that has been created between the previous and the current use of this object
     // shows up on the list below, but just once. nNewThreads is the real number of threads, which may be shorter than
     // the size of the following arrays.
@@ -94,19 +100,30 @@ public class MonitoredData {
         long[] gn = mresp.getGeneralMonitoredNumbers();
         generalMNumbers = new long[gn.length];
         System.arraycopy(gn, 0, generalMNumbers, 0, gn.length);
-
-        nThreads = mresp.getNThreads();
-        nThreadStates = mresp.getNThreadStates();
-
-        int[] ids = mresp.getThreadIds();
-        threadIds = new int[nThreads];
-        System.arraycopy(ids, 0, threadIds, 0, nThreads);
-
-        long[] ts = mresp.getStateTimestamps();
-        stateTimestamps = new long[nThreadStates];
-        System.arraycopy(ts, 0, stateTimestamps, 0, nThreadStates);
-
-        setThreadStates(mresp.getThreadStates());
+        mode = mresp.getThreadsDataMode();
+        
+        if (mode == CommonConstants.MODE_THREADS_SAMPLING) {
+            nThreads = mresp.getNThreads();
+            nThreadStates = mresp.getNThreadStates();
+            
+            int[] ids = mresp.getThreadIds();
+            threadIds = new int[nThreads];
+            System.arraycopy(ids, 0, threadIds, 0, nThreads);
+            
+            long[] ts = mresp.getStateTimestamps();
+            stateTimestamps = new long[nThreadStates];
+            System.arraycopy(ts, 0, stateTimestamps, 0, nThreadStates);
+            
+            setThreadStates(mresp.getThreadStates());
+        } else if (mode == CommonConstants.MODE_THREADS_EXACT) {
+            int expLen = mresp.getExactThreadIds().length;
+            exThreadIds = new int[expLen];
+            System.arraycopy(mresp.getExactThreadIds(), 0, exThreadIds, 0, expLen);
+            exThreadStates = new byte[expLen];
+            System.arraycopy(mresp.getExactThreadStates(), 0, exThreadStates, 0, expLen);
+            exStateTimestamps = new long[expLen];
+            System.arraycopy(mresp.getExactStateTimestamps(), 0, exStateTimestamps, 0, expLen);
+        }
 
         nNewThreads = mresp.getNNewThreads();
 
@@ -190,6 +207,20 @@ public class MonitoredData {
 
     public String[] getNewThreadNames() {
         return newThreadNames;
+    }
+
+    public int getThreadsDataMode() {
+        return mode; 
+    }
+
+    public int[] getExplicitThreadIds() {
+        return exThreadIds;
+    }
+    public long[] getExplicitStateTimestamps() {
+        return exStateTimestamps;
+    }
+    public byte[] getExplicitThreadStates() {
+        return exThreadStates;
     }
 
     public long getRelativeGCTimeInPerMil() {
