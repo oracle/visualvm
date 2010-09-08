@@ -6,7 +6,7 @@
         <folder name="Profile">
             <file name="org-netbeans-lib-profiler-snaptracer-impl-IdeSnapshotAction.instance">
                 <attr name="delegate" newvalue="org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshotAction"/>
-                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.snaptracer.impl.Bundle#CTL_IdeSnapshotAction"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.snaptracer.impl.Bundle#ACTION_IdeSnapshot_name"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
             </file>

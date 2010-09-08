@@ -885,6 +885,27 @@ public class ProfilerClient implements CommonConstants {
         }
     }
 
+    public void initiateMonitoring()  throws ClientUtils.TargetAppOrVMTerminated, InstrumentationException {
+         synchronized (instrumentationLock) {
+            removeAllInstrumentation();
+            InitiateInstrumentationCommand cmd = new InitiateInstrumentationCommand(INSTR_NONE, null);
+            commandOnStartup = cmd;
+            // just to be consistent, since removeAllInstrumentation()
+            // sets instrumentation type to INSTR_NONE
+            setCurrentInstrType(INSTR_NONE);
+
+            if (status.targetAppRunning) {
+                sendSetInstrumentationParamsCmd(false);
+
+                String errorMessage = sendCommandAndGetResponse(commandOnStartup);
+
+                if (errorMessage != null) {
+                    appStatusHandler.displayWarning(errorMessage);
+                }
+            }            
+         }
+    }
+
     /**
      * This should be called to initiate memory profiling instrumentation of specified type (object allocation or
      * object liveness).
@@ -1092,7 +1113,8 @@ public class ProfilerClient implements CommonConstants {
                                                                                   settings.getAllocStackTraceLimit(),
                                                                                   settings.getRunGCOnGetResultsInMemoryProfiling(),
                                                                                   settings.getExcludeWaitTime(),
-                                                                                  settings.getExcludeWaitTime());
+                                                                                  settings.getExcludeWaitTime(),
+                                                                                  settings.isThreadsSamplingEnabled());
 
         String errorMessage = sendCommandAndGetResponse(cmd);
 

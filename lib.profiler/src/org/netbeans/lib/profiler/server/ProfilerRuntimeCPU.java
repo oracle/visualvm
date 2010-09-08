@@ -75,6 +75,9 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     // ------------------------------------------ Timers -----------------------------------------------
     protected static boolean threadCPUTimerOn;
 
+    protected static boolean waitTrackingEnabled;
+    protected static boolean sleepTrackingEnabled;
+    
     // ---------------------------------- Profile Data Acquisition --------------------------------------
     protected static boolean[] instrMethodInvoked;
     private static boolean javaLangReflectMethodInvokeInterceptEnabled = false;
@@ -104,6 +107,11 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         nProfiledThreadsLimit = nProfiledThreadsAllowed = num;
     }
 
+    public static void setWaitAndSleepTracking(boolean waitTracking, boolean sleepTracking) {
+        waitTrackingEnabled = waitTracking;
+        sleepTrackingEnabled = sleepTracking;
+    }
+    
     public static void setTimerTypes(boolean absolute, boolean threadCPU) {
         if (threadCPU != threadCPUTimerOn && Platform.isSolaris()) {
             Timers.enableMicrostateAccounting(threadCPU);
@@ -289,118 +297,75 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     }
 
     // ---------------------------------- Handling wait/sleep/monitor times ----------------------------
-    protected static void monitorEntryCPU(Thread t, Object monitor) {
-        if (recursiveInstrumentationDisabled) {
-            return; // See the comment at the recursiveInstrumentationDisabled variable declaration
+    protected static long monitorEntryCPU(ThreadInfo ti, Object monitor) {
+        if (recursiveInstrumentationDisabled || !waitTrackingEnabled) {
+            return -1; // See the comment at the recursiveInstrumentationDisabled variable declaration
         }
 
-        ThreadInfo ti = ThreadInfo.getThreadInfo(t);
-
         if (ti.isInitialized() && ti.inCallGraph) {
-            if (ti.inProfilingRuntimeMethod > 0) {
-                return;
-            }
-
-            ti.inProfilingRuntimeMethod++;
             //System.out.println("++++++monitorEntry, depth = " + ti.stackDepth);
-            writeWaitTimeEvent(METHOD_ENTRY_MONITOR, ti);
-            ti.inProfilingRuntimeMethod--;
+            return writeWaitTimeEvent(METHOD_ENTRY_MONITOR, ti);
         }
+        return -1;
     }
 
-    protected static void monitorExitCPU(Thread t, Object monitor) {
-        if (recursiveInstrumentationDisabled) {
-            return; // See the comment at the recursiveInstrumentationDisabled variable declaration
+    protected static long monitorExitCPU(ThreadInfo ti, Object monitor) {
+        if (recursiveInstrumentationDisabled || !waitTrackingEnabled) {
+            return -1; // See the comment at the recursiveInstrumentationDisabled variable declaration
         }
 
-        ThreadInfo ti = ThreadInfo.getThreadInfo(t);
-
         if (ti.isInitialized() && ti.inCallGraph) {
-            if (ti.inProfilingRuntimeMethod > 0) {
-                return;
-            }
-
-            ti.inProfilingRuntimeMethod++;
             //System.out.println("++++++monitorExit, depth = " + ti.stackDepth);
-            writeWaitTimeEvent(METHOD_EXIT_MONITOR, ti);
-            ti.inProfilingRuntimeMethod--;
+            return writeWaitTimeEvent(METHOD_EXIT_MONITOR, ti);
         }
+        return -1;
     }
 
-    protected static void sleepEntryCPU() {
-        if (recursiveInstrumentationDisabled) {
-            return; // See the comment at the recursiveInstrumentationDisabled variable declaration
+    protected static long sleepEntryCPU(ThreadInfo ti) {
+        if (recursiveInstrumentationDisabled || !sleepTrackingEnabled) {
+            return -1; // See the comment at the recursiveInstrumentationDisabled variable declaration
         }
-
-        ThreadInfo ti = ThreadInfo.getThreadInfo();
-
         if (ti.isInitialized() && ti.inCallGraph) {
-            if (ti.inProfilingRuntimeMethod > 0) {
-                return;
-            }
-
-            ti.inProfilingRuntimeMethod++;
             //System.out.println("++++++sleepEntry, depth = " + ti.stackDepth);
-            writeWaitTimeEvent(METHOD_ENTRY_SLEEP, ti);
-            ti.inProfilingRuntimeMethod--;
+            return writeWaitTimeEvent(METHOD_ENTRY_SLEEP, ti);
         }
+        return -1;
     }
 
-    protected static void sleepExitCPU() {
-        if (recursiveInstrumentationDisabled) {
-            return; // See the comment at the recursiveInstrumentationDisabled variable declaration
+    protected static long sleepExitCPU(ThreadInfo ti) {
+        if (recursiveInstrumentationDisabled || !sleepTrackingEnabled) {
+            return -1; // See the comment at the recursiveInstrumentationDisabled variable declaration
         }
 
-        ThreadInfo ti = ThreadInfo.getThreadInfo();
-
         if (ti.isInitialized() && ti.inCallGraph) {
-            if (ti.inProfilingRuntimeMethod > 0) {
-                return;
-            }
-
-            ti.inProfilingRuntimeMethod++;
             //System.out.println("++++++sleepExit, depth = " + ti.stackDepth);
-            writeWaitTimeEvent(METHOD_EXIT_SLEEP, ti);
-            ti.inProfilingRuntimeMethod--;
+            return writeWaitTimeEvent(METHOD_EXIT_SLEEP, ti);
         }
+        return -1;
     }
 
-    protected static void waitEntryCPU() {
-        if (recursiveInstrumentationDisabled) {
-            return; // See the comment at the recursiveInstrumentationDisabled variable declaration
+    protected static long waitEntryCPU(ThreadInfo ti) {
+        if (recursiveInstrumentationDisabled || !waitTrackingEnabled) {
+            return -1; // See the comment at the recursiveInstrumentationDisabled variable declaration
         }
 
-        ThreadInfo ti = ThreadInfo.getThreadInfo();
-
         if (ti.isInitialized() && ti.inCallGraph) {
-            if (ti.inProfilingRuntimeMethod > 0) {
-                return;
-            }
-
-            ti.inProfilingRuntimeMethod++;
             //System.out.println("++++++waitEntry, depth = " + ti.stackDepth);
-            writeWaitTimeEvent(METHOD_ENTRY_WAIT, ti);
-            ti.inProfilingRuntimeMethod--;
+            return writeWaitTimeEvent(METHOD_ENTRY_WAIT, ti);
         }
+        return -1;
     }
 
-    protected static void waitExitCPU() {
-        if (recursiveInstrumentationDisabled) {
-            return; // See the comment at the recursiveInstrumentationDisabled variable declaration
+    protected static long waitExitCPU(ThreadInfo ti) {
+        if (recursiveInstrumentationDisabled || !waitTrackingEnabled) {
+            return -1; // See the comment at the recursiveInstrumentationDisabled variable declaration
         }
-
-        ThreadInfo ti = ThreadInfo.getThreadInfo();
 
         if (ti.isInitialized() && ti.inCallGraph) {
-            if (ti.inProfilingRuntimeMethod > 0) {
-                return;
-            }
-
-            ti.inProfilingRuntimeMethod++;
             //System.out.println("++++++waitExit, depth = " + ti.stackDepth);
-            writeWaitTimeEvent(METHOD_EXIT_WAIT, ti);
-            ti.inProfilingRuntimeMethod--;
+            return writeWaitTimeEvent(METHOD_EXIT_WAIT, ti);
         }
+        return -1;
     }
 
     protected static void firstTimeMethodInvoke(final ThreadInfo ti, final char methodId) {
@@ -610,7 +575,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         ti.evBufPos = curPos;
     }
 
-    static void writeWaitTimeEvent(byte eventType, ThreadInfo ti) {
+    static long writeWaitTimeEvent(byte eventType, ThreadInfo ti) {
         // if (printEvents) System.out.println("*** Writing event " + eventType + ", metodId = " + (int)methodId);
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
@@ -642,6 +607,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         evBuf[curPos++] = (byte) ((absTimeStamp) & 0xFF);
 
         ti.evBufPos = curPos;
+        return absTimeStamp;
     }
 
     private static void servletDoMethodHook(ThreadInfo ti, Object request) {
