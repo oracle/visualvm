@@ -113,6 +113,8 @@ class OverviewViewSupport {
                 String ARGS = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Arguments");  // NOI18N
                 String JVM = NbBundle.getMessage(OverviewViewSupport.class, "LBL_JVM"); // NOI18N
                 String JAVA_HOME = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Java_Home"); // NOI18N
+                String JAVA_VERSION = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Java_Version"); // NOI18N
+                String JAVA_VENDOR = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Java_Vendor"); // NOI18N
                 String JVM_FLAGS = NbBundle.getMessage(OverviewViewSupport.class, "LBL_JVM_Flags"); // NOI18N
                 String HEAP_DUMP_OOME = NbBundle.getMessage(OverviewViewSupport.class, "LBL_Heap_dump_on_OOME");    // NOI18N
                 data.append("<b>"+MAIN_CLASS+":</b> " + model.getMainClass() + "<br>"); // NOI18N
@@ -121,6 +123,12 @@ class OverviewViewSupport {
                 data.append("<br>");    // NOI18N
                 data.append("<b>"+JVM+":</b> " + model.getVmId() + "<br>"); // NOI18N
                 data.append("<b>"+JAVA_HOME+":</b> " + model.getJavaHome() + "<br>");   // NOI18N
+                if (model.getJavaVersion() != null) {
+                    data.append("<b>"+JAVA_VERSION+":</b> " + model.getJavaVersion() + "<br>");   // NOI18N
+                }
+                if (model.getJavaVendor() != null) {
+                    data.append("<b>"+JAVA_VENDOR+":</b> " + model.getJavaVendor() + "<br>");   // NOI18N
+                }
                 data.append("<b>"+JVM_FLAGS+":</b> " + model.getJvmFlags() + "<br><br>");   // NOI18N
                 data.append("<b>"+HEAP_DUMP_OOME+":</b> " + model.oomeEnabled() + "<br>");  // NOI18N
             }

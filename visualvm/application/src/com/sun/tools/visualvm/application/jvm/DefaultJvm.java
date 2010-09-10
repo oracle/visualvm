@@ -84,6 +84,10 @@ class DefaultJvm extends Jvm {
         throw new UnsupportedOperationException();
     }
     
+    public String getJavaVersion() {
+        throw new UnsupportedOperationException();
+    }
+    
     public String getJavaHome() {
         throw new UnsupportedOperationException();
     }

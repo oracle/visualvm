@@ -123,11 +123,18 @@ public abstract class Jvm extends Model {
     public abstract String getMainClass();
 
     /**
-     * Return the VM version for the target Java application.
+     * Returns the VM version for the target Java application.
      * @return Returns the version of the target Java application
      */
     public abstract String getVmVersion();
 
+    /**
+     * Returns the Java version for the target Java application.
+     * @return Returns the Java version of the target Java application
+     * @since 1.3.1
+     */
+    public abstract String getJavaVersion();
+    
     /**
      * Returns the java.home property for the target Java application.
      * "java.home" property specify the directory

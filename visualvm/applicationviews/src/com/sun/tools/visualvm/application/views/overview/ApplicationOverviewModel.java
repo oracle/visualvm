@@ -65,6 +65,8 @@ final class ApplicationOverviewModel {
     public static final String PROP_MAIN_ARGS = PROP_PREFIX + "main_args";  // NOI18N
     public static final String PROP_VM_ID = PROP_PREFIX + "vm_id";  // NOI18N
     public static final String PROP_JAVA_HOME = PROP_PREFIX + "java_home";  // NOI18N
+    public static final String PROP_JAVA_VERSION = PROP_PREFIX + "java_version";  // NOI18N
+    public static final String PROP_JAVA_VENDOR = PROP_PREFIX + "java_vendor";  // NOI18N
     public static final String PROP_JVM_FLAGS = PROP_PREFIX + "jvm_flags";  // NOI18N
     public static final String PROP_OOME_ENABLED = PROP_PREFIX + "oome_enabled";    // NOI18N
     public static final String PROP_JVM_ARGS = PROP_PREFIX + "jvm_args";    // NOI18N
@@ -81,6 +83,8 @@ final class ApplicationOverviewModel {
     private String mainArgs;
     private String vmId;
     private String javaHome;
+    private String javaVersion;
+    private String javaVendor;
     private String jvmFlags;
     private String oomeEnabled;
     private String jvmArgs;
@@ -111,6 +115,8 @@ final class ApplicationOverviewModel {
     public String getMainArgs() { return mainArgs; }
     public String getVmId() { return vmId; }
     public String getJavaHome() { return javaHome; }
+    public String getJavaVersion() { return javaVersion; }
+    public String getJavaVendor() { return javaVendor; }
     public String getJvmFlags() { return jvmFlags; }
     public String oomeEnabled() {
         if (basicInfoSupported() && source instanceof Application) {
@@ -146,6 +152,8 @@ final class ApplicationOverviewModel {
         setProperty(storage, PROP_MAIN_ARGS, mainArgs);
         setProperty(storage, PROP_VM_ID, vmId);
         setProperty(storage, PROP_JAVA_HOME, javaHome);
+        setProperty(storage, PROP_JAVA_VERSION, javaVersion);
+        setProperty(storage, PROP_JAVA_VENDOR, javaVendor);
         setProperty(storage, PROP_JVM_FLAGS, jvmFlags);
         setProperty(storage, PROP_OOME_ENABLED, oomeEnabled);
         setProperty(storage, PROP_JVM_ARGS, jvmArgs);
@@ -165,6 +173,8 @@ final class ApplicationOverviewModel {
         mainArgs = getProperty(storage, PROP_MAIN_ARGS);
         vmId = getProperty(storage, PROP_VM_ID);
         javaHome = getProperty(storage, PROP_JAVA_HOME);
+        javaVersion = getProperty(storage, PROP_JAVA_VERSION);
+        javaVendor = getProperty(storage, PROP_JAVA_VENDOR);
         jvmFlags = getProperty(storage, PROP_JVM_FLAGS);
         oomeEnabled = getProperty(storage, PROP_OOME_ENABLED);
         jvmArgs = getProperty(storage, PROP_JVM_ARGS);
@@ -204,6 +214,8 @@ final class ApplicationOverviewModel {
             vmId = jvm.getVmName() + " (" + jvm.getVmVersion() + ", " + jvm.getVmInfo() + ")";  // NOI18N
 
             javaHome = jvm.getJavaHome();
+            javaVersion = jvm.getJavaVersion();
+            javaVendor = jvm.getVmVendor();
 
             jvmFlags = jvm.getJvmFlags();
             if (jvmFlags == null || jvmFlags.length() == 0) jvmFlags = NbBundle.getMessage(ApplicationOverviewModel.class, "LBL_none"); // NOI18N
@@ -272,7 +284,6 @@ final class ApplicationOverviewModel {
         }
         return text.toString();
     }
-
     
     private ApplicationOverviewModel() {}
 }
