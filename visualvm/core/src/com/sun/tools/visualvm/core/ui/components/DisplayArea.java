@@ -232,7 +232,7 @@ class DisplayArea extends JComponent {
         add(viewContainer, BorderLayout.CENTER);
     }
 
-    private String caption = "";
+    private String caption = ""; // NOI18N
     private Presenter presenter;
 
     private ViewArea viewContainer;
