@@ -200,7 +200,10 @@ class DisplayArea extends JComponent {
             public void hierarchyChanged(HierarchyEvent e) {
                 if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                     boolean isShowing = isShowing();
-                    presenter.setToolTipText(isShowing ? "Hide " + caption : "Show " + caption);
+                    presenter.setToolTipText(isShowing ? NbBundle.getMessage(
+                            DisplayArea.class, "ToolTip_HideSection", caption) : // NOI18N
+                            NbBundle.getMessage(DisplayArea.class,
+                            "ToolTip_ShowSection", caption)); // NOI18N
                     if (!internalChange[0]) presenter.setSelected(isShowing);
                 }
             }
