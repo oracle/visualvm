@@ -70,6 +70,7 @@ import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderButton;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderLabel;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.ScrollBar;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -142,7 +143,8 @@ final class ProbesPanel extends JPanel {
                                          getMenuShortcutKeyMask()) == 0);
             }
         };
-        increaseB.setToolTipText("Increase rows height");
+        increaseB.setToolTipText(NbBundle.getMessage(ProbesPanel.class,
+                "TOOLTIP_IncreaseRowsHeight")); // NOI18N
         bottomPanel.add(increaseB);
 
         decreaseB = new HeaderButton(null, new ImageIcon(ImageUtilities.loadImage(
@@ -152,7 +154,8 @@ final class ProbesPanel extends JPanel {
                                          getMenuShortcutKeyMask()) == 0);
             }
         };
-        decreaseB.setToolTipText("Decrease rows height");
+        decreaseB.setToolTipText(NbBundle.getMessage(ProbesPanel.class,
+                "TOOLTIP_DecreaseRowsHeight")); // NOI18N
         bottomPanel.add(decreaseB);
 
         resetB = new HeaderButton(null, new ImageIcon(ImageUtilities.loadImage(
@@ -161,12 +164,14 @@ final class ProbesPanel extends JPanel {
                 chart.resetRowHeights();
             }
         };
-        resetB.setToolTipText("Reset rows height");
+        resetB.setToolTipText(NbBundle.getMessage(ProbesPanel.class,
+                "TOOLTIP_ResetRowsHeight")); // NOI18N
         bottomPanel.add(resetB);
         
         setOpaque(false);
         setLayout(new BorderLayout());
-        add(new HeaderLabel("Probes"), BorderLayout.NORTH);
+        add(new HeaderLabel(NbBundle.getMessage(ProbesPanel.class,
+                "LBL_Probes")), BorderLayout.NORTH); // NOI18N
         add(viewport, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 

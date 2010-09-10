@@ -106,9 +106,9 @@ abstract class TimelineXYPainter extends XYItemPainter.Abstract {
 
     // --- Protected interface -------------------------------------------------
 
-    protected final int getViewExtent() {
-        return viewExtent;
-    }
+//    protected final int getViewExtent() {
+//        return viewExtent;
+//    }
     
 
     // --- ItemPainter implementation ------------------------------------------
@@ -134,6 +134,7 @@ abstract class TimelineXYPainter extends XYItemPainter.Abstract {
         XYItemChange change = (XYItemChange)itemChange;
         LongRect dirtyBounds = change.getDirtyValuesBounds();
         return dirtyBounds.width != 0 || dirtyBounds.height != 0;
+//        return false;
     }
 
     public LongRect getDirtyBounds(ChartItemChange itemChange, ChartContext context) {
@@ -231,6 +232,11 @@ abstract class TimelineXYPainter extends XYItemPainter.Abstract {
 
         LongRect viewBounds = context.getViewRect(dataBounds);
         LongRect.addBorder(viewBounds, viewExtent);
+
+//        viewBounds.height = 50;
+//        viewBounds.y = context.getViewportOffsetY();
+//        viewBounds.height = context.getViewportHeight();
+//        System.err.println(">>> Here...");
 
         return viewBounds;
     }

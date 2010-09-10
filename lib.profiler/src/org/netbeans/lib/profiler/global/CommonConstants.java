@@ -233,6 +233,11 @@ public interface CommonConstants {
     // Thread state description constants.
     // see I18N String constants at the top of this file
 
+    // Modes for obtaining Thread states data
+    public static final int MODE_THREADS_NONE = 0;
+    public static final int MODE_THREADS_SAMPLING = 1;
+    public static final int MODE_THREADS_EXACT = 2;
+    
     // Constants for results filter types
     public static final int FILTER_NONE = 0;
     public static final int FILTER_STARTS_WITH = 10;
@@ -259,5 +264,6 @@ public interface CommonConstants {
     public static final int AGENT_VERSION_60_BETA1 = 8;
     public static final int AGENT_VERSION_67_BETA = 9;
     public static final int AGENT_VERSION_69 = 10;
-    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_69;
+    public static final int AGENT_VERSION_610_M2 = 11;
+    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_610_M2;
 }

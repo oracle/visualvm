@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.snaptracer;
 
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 
 
 /**
@@ -60,7 +60,7 @@ public interface PackageStateHandler {
      * @param probe added probe
      * @param snapshot profiler snapshot
      */
-    public void probeAdded(TracerProbe probe, SampledCPUSnapshot snapshot);
+    public void probeAdded(TracerProbe probe, IdeSnapshot snapshot);
 
     /**
      * Invoked when a probe is removed from the Timeline view.
@@ -68,7 +68,7 @@ public interface PackageStateHandler {
      * @param probe removed probe
      * @param snapshot profiler snapshot
      */
-    public void probeRemoved(TracerProbe probe, SampledCPUSnapshot snapshot);
+    public void probeRemoved(TracerProbe probe, IdeSnapshot snapshot);
 
 
     /**
@@ -84,7 +84,7 @@ public interface PackageStateHandler {
      * @return TracerProgressObject to track initialization progress
      */
     public TracerProgressObject sessionInitializing(TracerProbe[] probes,
-            SampledCPUSnapshot snapshot, int refresh);
+            IdeSnapshot snapshot, int refresh);
 
     /**
      * Invoked when starting a new Tracer session. Any package/probes
@@ -101,7 +101,7 @@ public interface PackageStateHandler {
      * @param snapshot profiler snapshot
      * @throws SessionInitializationException in case of initialization failure
      */
-    public void sessionStarting(TracerProbe[] probes, SampledCPUSnapshot snapshot)
+    public void sessionStarting(TracerProbe[] probes, IdeSnapshot snapshot)
             throws SessionInitializationException;
 
     /**
@@ -111,7 +111,7 @@ public interface PackageStateHandler {
      * @param probes probes defined for the Tracer session
      * @param snapshot profiler snapshot
      */
-    public void sessionRunning(TracerProbe[] probes, SampledCPUSnapshot snapshot);
+    public void sessionRunning(TracerProbe[] probes, IdeSnapshot snapshot);
 
     /**
      * Invoked when stopping the Tracer session. Any package/probes cleanup
@@ -123,7 +123,7 @@ public interface PackageStateHandler {
      * @param probes probes defined for the Tracer session
      * @param snapshot profiler snapshot
      */
-    public void sessionStopping(TracerProbe[] probes, SampledCPUSnapshot snapshot);
+    public void sessionStopping(TracerProbe[] probes, IdeSnapshot snapshot);
 
     /**
      * Invoked when the Tracer session has finished.
@@ -131,7 +131,7 @@ public interface PackageStateHandler {
      * @param probes probes defined for the Tracer session
      * @param snapshot profiler snapshot
      */
-    public void sessionFinished(TracerProbe[] probes, SampledCPUSnapshot snapshot);
+    public void sessionFinished(TracerProbe[] probes, IdeSnapshot snapshot);
 
     /**
      * Invoked when refresh rate of the Tracer session has been changed.
@@ -140,7 +140,7 @@ public interface PackageStateHandler {
      * @param snapshot profiler snapshot
      * @param refresh session refresh rate in miliseconds
      */
-    public void refreshRateChanged(TracerProbe[] probes, SampledCPUSnapshot snapshot, int refresh);
+    public void refreshRateChanged(TracerProbe[] probes, IdeSnapshot snapshot, int refresh);
 
 
     /**
@@ -148,9 +148,9 @@ public interface PackageStateHandler {
      */
     public abstract class Adapter implements PackageStateHandler {
 
-        public void probeAdded(TracerProbe probe, SampledCPUSnapshot snapshot) {}
+        public void probeAdded(TracerProbe probe, IdeSnapshot snapshot) {}
 
-        public void probeRemoved(TracerProbe probe, SampledCPUSnapshot snapshot) {}
+        public void probeRemoved(TracerProbe probe, IdeSnapshot snapshot) {}
 
         /**
          * Invoked when setting up a new Tracer session. This method allows a
@@ -165,18 +165,18 @@ public interface PackageStateHandler {
          * @return TracerProgressObject null in default implementation
          */
         public TracerProgressObject sessionInitializing(TracerProbe[] probes,
-                SampledCPUSnapshot snapshot, int refresh) { return null; }
+                IdeSnapshot snapshot, int refresh) { return null; }
 
-        public void sessionStarting(TracerProbe[] probes, SampledCPUSnapshot snapshot)
+        public void sessionStarting(TracerProbe[] probes, IdeSnapshot snapshot)
                 throws SessionInitializationException {}
 
-        public void sessionRunning(TracerProbe[] probes, SampledCPUSnapshot snapshot) {}
+        public void sessionRunning(TracerProbe[] probes, IdeSnapshot snapshot) {}
 
-        public void sessionStopping(TracerProbe[] probes, SampledCPUSnapshot snapshot) {}
+        public void sessionStopping(TracerProbe[] probes, IdeSnapshot snapshot) {}
 
-        public void sessionFinished(TracerProbe[] probes, SampledCPUSnapshot snapshot) {}
+        public void sessionFinished(TracerProbe[] probes, IdeSnapshot snapshot) {}
 
-        public void refreshRateChanged(TracerProbe[] probes, SampledCPUSnapshot snapshot,
+        public void refreshRateChanged(TracerProbe[] probes, IdeSnapshot snapshot,
                 int refresh) {}
 
     }
