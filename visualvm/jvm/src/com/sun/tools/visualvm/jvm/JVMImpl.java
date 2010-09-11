@@ -143,6 +143,14 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         initStaticData();
         return vmVersion;
     }
+
+    public String getJavaVersion() {
+        initStaticData();
+        if (javaVersion != null) {
+            return javaVersion;
+        }
+        return vmVersion;
+    }
     
     public String getJavaHome() {
         initStaticData();
@@ -174,9 +182,6 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is15() {
         String ver = getJavaVersion();
-        if (ver == null) {
-           ver = getVmVersion();
-        }
         if (ver != null && ver.startsWith("1.5.")) {    // NOI18N
             return true;
         }
@@ -185,9 +190,6 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is16() {
         String ver = getJavaVersion();
-        if (ver == null) {
-           ver = getVmVersion();
-        }
         if (ver != null && (ver.startsWith("1.6.") || ver.startsWith("10.") || ver.startsWith("11."))) {    // NOI18N
             return true;
         }
@@ -196,9 +198,6 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is17() {
         String ver = getJavaVersion();
-        if (ver == null) {
-           ver = getVmVersion();
-        }
         if (ver != null && (ver.startsWith("1.7.") || ver.startsWith("12.") || ver.startsWith("13.") || ver.startsWith("14."))) {  // NOI18N
             return true;
         }
@@ -497,11 +496,6 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             }
         }
         return args;
-    }
-
-    private String getJavaVersion() {
-        initStaticData();
-        return javaVersion;
     }
     
     public void dataChanged(JvmstatModel stat) {
