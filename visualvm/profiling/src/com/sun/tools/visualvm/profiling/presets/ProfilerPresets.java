@@ -208,8 +208,8 @@ public final class ProfilerPresets {
         } else if (mainClass.endsWith(JAR_SUFFIX)) {
             // application is launched with -jar and uses relative path, try to find jar
             mainClass = ""; // NOI18N
-            Properties sysProp = jvm.getSystemProperties();
-            if (sysProp != null) {
+            if (jvm.isGetSystemPropertiesSupported()) {
+                Properties sysProp = jvm.getSystemProperties();
                 String userdir = sysProp.getProperty("user.dir");     // NOI18N
                 if (userdir != null) {
                     String args = jvm.getCommandLine();
