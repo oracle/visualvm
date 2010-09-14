@@ -115,9 +115,13 @@ final class DiscreteXYPainter extends TimelineXYPainter {
                            Math.max(1, (width > 0 ? 2 : 1) * lineWidth - 1);
         int valuesCount = item.getValuesCount();
 
+        Rectangle dirtyExt = new Rectangle(dirtyArea);
+        dirtyExt.x -= lineWidth;
+        dirtyExt.width += lineWidth * 2;
+
         if (width > 0 || lineColor == null || topLineOnly) {
 
-            int[][] idxs = computer.getVisible(dirtyArea, valuesCount, context,
+            int[][] idxs = computer.getVisible(dirtyExt, valuesCount, context,
                                                1, 0);
             if (idxs == null) return;
             int[] visibleIndexes = idxs[0];
@@ -188,7 +192,7 @@ final class DiscreteXYPainter extends TimelineXYPainter {
         } else {
 
             int extraPoints = fillColor != null ? 2 : 0;
-            int[][] idxs = computer.getVisible(dirtyArea, valuesCount, context,
+            int[][] idxs = computer.getVisible(dirtyExt, valuesCount, context,
                                                2, extraPoints);
             if (idxs == null) return;
             int[] visibleIndexes = idxs[0];

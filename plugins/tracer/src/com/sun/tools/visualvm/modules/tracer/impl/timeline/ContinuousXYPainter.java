@@ -86,7 +86,12 @@ final class ContinuousXYPainter extends TimelineXYPainter {
 
         int valuesCount = item.getValuesCount();
         int extraTrailing = fillColor != null ? 2 : 0;
-        int[][] idxs = computer.getVisible(dirtyArea, valuesCount, context, 1,
+
+        Rectangle dirtyExt = new Rectangle(dirtyArea);
+        dirtyExt.x -= lineWidth;
+        dirtyExt.width += lineWidth * 2;
+
+        int[][] idxs = computer.getVisible(dirtyExt, valuesCount, context, 1,
                                            extraTrailing);
         if (idxs == null) return;
         int[] visibleIndexes = idxs[0];
