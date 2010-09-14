@@ -48,6 +48,8 @@ import java.io.IOException;
 import java.lang.management.LockInfo;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
@@ -76,6 +78,9 @@ public final class SampledCPUSnapshot {
         npssFile = file;
         samples = samplesStream.getSamples();
         lastTimestamp = samplesStream.getLastTimestamp();
+        if (samples == 0) {
+            initSamples();
+        }
         currentIndex = -1;
     }
 
@@ -83,6 +88,10 @@ public final class SampledCPUSnapshot {
         return samples;
     }
 
+    public long getStartTime() {
+        return startTime;
+    }
+    
     public long getTimestamp(int sampleIndex) throws IOException {
         long timestamp;
 
@@ -277,5 +286,21 @@ public final class SampledCPUSnapshot {
     
     private static String htmlize(String value) {
             return value.replace(">", "&gt;").replace("<", "&lt;");     // NOI18N
+    }
+
+    private void initSamples() throws IOException {
+        SamplesInputStream stream = new SamplesInputStream(npssFile);
+        int samplesGuess = (int)(npssFile.length()/130);
+        ProgressHandle ph = ProgressHandleFactory.createSystemHandle("Computing snapshot samples");
+        ph.start(samplesGuess);
+        
+        for(ThreadsSample s = stream.readSample(); s != null; s = stream.readSample()) {
+            samples++;
+            lastTimestamp = s.getTime();
+            if (samples < samplesGuess) {
+                ph.progress(samples);
+            }
+        }
+        ph.finish();
     }
 }

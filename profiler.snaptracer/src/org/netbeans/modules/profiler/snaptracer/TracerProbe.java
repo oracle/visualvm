@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.snaptracer;
 
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 
 
 /**
@@ -140,29 +140,29 @@ public abstract class TracerProbe {
          */
         public synchronized final ProbeStateHandler getStateHandler() {
             if (stateHandler == null) stateHandler = new ProbeStateHandler() {
-                public void probeAdded(SampledCPUSnapshot snapshot) {
+                public void probeAdded(IdeSnapshot snapshot) {
                     SessionAware.this.probeAdded(snapshot);
                 }
-                public void probeRemoved(SampledCPUSnapshot snapshot) {
+                public void probeRemoved(IdeSnapshot snapshot) {
                     SessionAware.this.probeRemoved(snapshot);
                 }
-                public TracerProgressObject sessionInitializing(SampledCPUSnapshot snapshot, int refresh) {
+                public TracerProgressObject sessionInitializing(IdeSnapshot snapshot, int refresh) {
                     return SessionAware.this.sessionInitializing(snapshot, refresh);
                 }
-                public void sessionStarting(SampledCPUSnapshot snapshot)
+                public void sessionStarting(IdeSnapshot snapshot)
                         throws SessionInitializationException {
                     SessionAware.this.sessionStarting(snapshot);
                 }
-                public void sessionRunning(SampledCPUSnapshot snapshot) {
+                public void sessionRunning(IdeSnapshot snapshot) {
                     SessionAware.this.sessionRunning(snapshot);
                 }
-                public void sessionStopping(SampledCPUSnapshot snapshot) {
+                public void sessionStopping(IdeSnapshot snapshot) {
                     SessionAware.this.sessionStopping(snapshot);
                 }
-                public void sessionFinished(SampledCPUSnapshot snapshot) {
+                public void sessionFinished(IdeSnapshot snapshot) {
                     SessionAware.this.sessionFinished(snapshot);
                 }
-                public void refreshRateChanged(SampledCPUSnapshot snapshot, int refresh) {
+                public void refreshRateChanged(IdeSnapshot snapshot, int refresh) {
                     SessionAware.this.refreshRateChanged(snapshot, refresh);
                 }
             };
@@ -175,14 +175,14 @@ public abstract class TracerProbe {
          *
          * @param snapshot profiler snapshot
          */
-        protected void probeAdded(SampledCPUSnapshot snapshot) {}
+        protected void probeAdded(IdeSnapshot snapshot) {}
 
         /**
          * Invoked when the probe is removed from the Timeline view.
          *
          * @param snapshot profiler snapshot
          */
-        protected void probeRemoved(SampledCPUSnapshot snapshot) {}
+        protected void probeRemoved(IdeSnapshot snapshot) {}
 
 
         /**
@@ -196,7 +196,7 @@ public abstract class TracerProbe {
          * @param refresh session refresh rate in miliseconds
          * @return TracerProgressObject to track initialization progress
          */
-        protected TracerProgressObject sessionInitializing(SampledCPUSnapshot snapshot, int refresh) {
+        protected TracerProgressObject sessionInitializing(IdeSnapshot snapshot, int refresh) {
             return null;
         }
 
@@ -214,7 +214,7 @@ public abstract class TracerProbe {
          * @param snapshot profiler snapshot
          * @throws SessionInitializationException in case of initialization failure
          */
-        protected void sessionStarting(SampledCPUSnapshot snapshot)
+        protected void sessionStarting(IdeSnapshot snapshot)
                 throws SessionInitializationException {}
 
         /**
@@ -223,7 +223,7 @@ public abstract class TracerProbe {
          *
          * @param snapshot profiler snapshot
          */
-        protected void sessionRunning(SampledCPUSnapshot snapshot) {}
+        protected void sessionRunning(IdeSnapshot snapshot) {}
 
         /**
          * Invoked when stopping the Tracer session. Any probe cleanup should be
@@ -234,14 +234,14 @@ public abstract class TracerProbe {
          *
          * @param snapshot profiler snapshot
          */
-        protected void sessionStopping(SampledCPUSnapshot snapshot) {}
+        protected void sessionStopping(IdeSnapshot snapshot) {}
 
         /**
          * Invoked when the Tracer session has finished.
          *
          * @param snapshot profiler snapshot
          */
-        protected void sessionFinished(SampledCPUSnapshot snapshot) {}
+        protected void sessionFinished(IdeSnapshot snapshot) {}
 
         /**
          * Invoked when refresh rate of the Tracer session has been changed.
@@ -249,7 +249,7 @@ public abstract class TracerProbe {
          * @param snapshot profiler snapshot
          * @param refresh session refresh rate in miliseconds
          */
-        protected void refreshRateChanged(SampledCPUSnapshot snapshot, int refresh) {}
+        protected void refreshRateChanged(IdeSnapshot snapshot, int refresh) {}
 
     }
 

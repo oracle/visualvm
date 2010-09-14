@@ -294,7 +294,7 @@ final class TimelineAxis extends JPanel {
             timeRenderer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             timeFormat = new SimpleDateFormat(TimeAxisUtils.getFormatString(1, 1, 1));
 
-            setToolTipText("Click a mark to select or unselect it");
+//            setToolTipText("Click a mark to select or unselect it");
 
             setOpaque(false);
         }

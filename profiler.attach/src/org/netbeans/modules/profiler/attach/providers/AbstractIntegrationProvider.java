@@ -162,6 +162,6 @@ public abstract class AbstractIntegrationProvider implements WizardIntegrationPr
 
     protected final String getManualRemoteStep2(final String targetOS) {
         return MessageFormat.format(NbBundle.getMessage(AbstractIntegrationProvider.class, "ManualRemoteStep2Message"),
-                new Object[]{IntegrationUtils.getRemoteCalibrateCommandString(targetOS)}); // NOI18N
+                new Object[]{IntegrationUtils.getRemoteCalibrateCommandString(targetOS, getTargetJava())}); // NOI18N
     }
 }
