@@ -248,7 +248,7 @@ public abstract class Profiler {
 
             switch (profilingSettings.getProfilingType()) {
                 case ProfilingSettings.PROFILE_MONITOR:
-                    client.removeAllInstrumentation();
+                    client.initiateMonitoring();
 
                     break;
                 case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:

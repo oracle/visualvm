@@ -53,8 +53,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 
 /**
@@ -68,7 +66,10 @@ public class MonitorSettingsBasicPanel extends DefaultSettingsPanel implements H
     // I18N String constants
     private static final String ENABLE_THREADS_CHECKBOX_TEXT = NbBundle.getMessage(MonitorSettingsBasicPanel.class,
                                                                                    "MonitorSettingsBasicPanel_EnableThreadsCheckboxText"); // NOI18N
+    private static final String ENABLE_SAMPLING_CHECKBOX_TEXT = NbBundle.getMessage(MonitorSettingsBasicPanel.class,
+                                                                                   "MonitorSettingsBasicPanel_EnableSamplingCheckboxText"); // NOI18N
     private static final String STP_MONITOR_TOOLTIP = NbBundle.getMessage(MonitorSettingsBasicPanel.class, "StpMonitorTooltip"); // NOI18N
+    private static final String STP_SAMPLING_TOOLTIP = NbBundle.getMessage(MonitorSettingsBasicPanel.class, "StpSamplingTooltip"); // NOI18N
                                                                                                                                  // -----
     private static final String HELP_CTX_KEY = "MonitorSettings.Basic.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
@@ -77,6 +78,7 @@ public class MonitorSettingsBasicPanel extends DefaultSettingsPanel implements H
 
     // --- UI components declaration ---------------------------------------------
     private JCheckBox threadsMonitoringCheckbox;
+    private JCheckBox threadsSamplingCheckbox;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -98,6 +100,14 @@ public class MonitorSettingsBasicPanel extends DefaultSettingsPanel implements H
 
     public boolean getThreadsMonitoring() {
         return threadsMonitoringCheckbox.isSelected();
+    }
+
+    public void setThreadsSampling(boolean enabled) {
+        threadsSamplingCheckbox.setSelected(enabled);
+    }
+
+    public boolean getThreadsSampling() {
+        return threadsSamplingCheckbox.isSelected();
     }
 
     // --- Static tester frame ---------------------------------------------------
@@ -148,10 +158,25 @@ public class MonitorSettingsBasicPanel extends DefaultSettingsPanel implements H
         add(threadsMonitoringCheckbox, constraints);
         threadsMonitoringCheckbox.addActionListener(getSettingsChangeListener());
 
-        // fillerPanel
+        // threadsSamplingCheckbox
+        threadsSamplingCheckbox = new JCheckBox();
+        org.openide.awt.Mnemonics.setLocalizedText(threadsSamplingCheckbox, ENABLE_SAMPLING_CHECKBOX_TEXT);
+        threadsSamplingCheckbox.setToolTipText(STP_SAMPLING_TOOLTIP);
+        threadsSamplingCheckbox.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(3, 30, 0, 0);
+        add(threadsSamplingCheckbox, constraints);
+        threadsSamplingCheckbox.addActionListener(getSettingsChangeListener());
+
+        // fillerPanel
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 2;
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.gridwidth = GridBagConstraints.REMAINDER;

@@ -130,6 +130,8 @@ public class CPUSettingsAdvancedPanel extends DefaultSettingsPanel implements He
                                                                       "CPUSettingsAdvancedPanel_ThreadsCaption"); // NOI18N
     private static final String ENABLE_THREADS_CHECKBOX_TEXT = NbBundle.getMessage(CPUSettingsAdvancedPanel.class,
                                                                                    "CPUSettingsAdvancedPanel_EnableThreadsCheckboxText"); // NOI18N
+    private static final String ENABLE_SAMPLING_CHECKBOX_TEXT = NbBundle.getMessage(CPUSettingsAdvancedPanel.class,
+                                                                                   "CPUSettingsAdvancedPanel_EnableSamplingCheckboxText"); // NOI18N
     private static final String GLOBAL_SETTINGS_CAPTION = NbBundle.getMessage(CPUSettingsAdvancedPanel.class,
                                                                               "CPUSettingsAdvancedPanel_GlobalSettingsCaption"); // NOI18N
     private static final String OVERRIDE_SETTINGS_CHECKBOX_TEXT = NbBundle.getMessage(CPUSettingsAdvancedPanel.class,
@@ -143,6 +145,7 @@ public class CPUSettingsAdvancedPanel extends DefaultSettingsPanel implements He
     private static final String JVM_ARGUMENTS_LABEL_TEXT = NbBundle.getMessage(CPUSettingsAdvancedPanel.class,
                                                                                "CPUSettingsAdvancedPanel_JvmArgumentsLabelText"); // NOI18N
     private static final String STP_MONITOR_TOOLTIP = NbBundle.getMessage(CPUSettingsAdvancedPanel.class, "StpMonitorTooltip"); // NOI18N
+    private static final String STP_SAMPLING_TOOLTIP = NbBundle.getMessage(CPUSettingsAdvancedPanel.class, "StpSamplingTooltip"); // NOI18N
     private static final String STP_OVERRIDE_TOOLTIP = NbBundle.getMessage(CPUSettingsAdvancedPanel.class, "StpOverrideTooltip"); // NOI18N
     private static final String STP_WORKDIR_TOOLTIP = NbBundle.getMessage(CPUSettingsAdvancedPanel.class, "StpWorkDirTooltip"); // NOI18N
     private static final String STP_JPLATFORM_TOOLTIP = NbBundle.getMessage(CPUSettingsAdvancedPanel.class, "StpJPlatformTooltip"); // NOI18N
@@ -181,6 +184,7 @@ public class CPUSettingsAdvancedPanel extends DefaultSettingsPanel implements He
     private JCheckBox profileFrameworkCheckbox;
     private JCheckBox profileSpawnedThreadsCheckbox;
     private JCheckBox threadsMonitoringCheckbox;
+    private JCheckBox threadsSamplingCheckbox;
     private JCheckBox useCPUTimerCheckbox;
     private JComboBox instrumentationSchemeCombo;
     private JComboBox javaPlatformCombo;
@@ -397,6 +401,14 @@ public class CPUSettingsAdvancedPanel extends DefaultSettingsPanel implements He
         return threadsMonitoringCheckbox.isSelected();
     }
 
+    public void setThreadsSampling(boolean enabled) {
+        threadsSamplingCheckbox.setSelected(enabled);
+    }
+
+    public boolean getThreadsSampling() {
+        return threadsSamplingCheckbox.isSelected();
+    }
+
     public void setUseCPUTimer(boolean use, boolean available) {
         useCPUTimerCheckbox.setSelected(use);
         useCPUTimerCheckbox.setEnabled(available);
@@ -443,6 +455,7 @@ public class CPUSettingsAdvancedPanel extends DefaultSettingsPanel implements He
 
         threadsSettingsPanel.setEnabled(false);
         threadsMonitoringCheckbox.setEnabled(false);
+        threadsSamplingCheckbox.setEnabled(false);
 
         globalSettingsPanel.setEnabled(false);
         overrideSettingsCheckbox.setEnabled(false);
@@ -476,6 +489,7 @@ public class CPUSettingsAdvancedPanel extends DefaultSettingsPanel implements He
 
         threadsSettingsPanel.setEnabled(true);
         threadsMonitoringCheckbox.setEnabled(true);
+        threadsSamplingCheckbox.setEnabled(true);
 
         globalSettingsPanel.setEnabled(true);
         overrideSettingsCheckbox.setEnabled(true);
@@ -907,8 +921,24 @@ public class CPUSettingsAdvancedPanel extends DefaultSettingsPanel implements He
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.fill = GridBagConstraints.NONE;
         constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(2, 7, 3, 0);
+        constraints.insets = new Insets(2, 7, 1, 0);
         threadsSettingsPanel.add(threadsMonitoringCheckbox, constraints);
+
+        // threadsSamplingCheckbox
+        threadsSamplingCheckbox = new JCheckBox();
+        org.openide.awt.Mnemonics.setLocalizedText(threadsSamplingCheckbox, ENABLE_SAMPLING_CHECKBOX_TEXT);
+        threadsSamplingCheckbox.setToolTipText(STP_SAMPLING_TOOLTIP);
+        threadsSamplingCheckbox.addActionListener(getSettingsChangeListener());
+        threadsSamplingCheckbox.setOpaque(false);
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.weightx = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(0, 7, 3, 0);
+        threadsSettingsPanel.add(threadsSamplingCheckbox, constraints);
 
         // globalSettingsPanel
         globalSettingsPanel = new JPanel(new GridBagLayout());

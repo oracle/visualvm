@@ -100,6 +100,8 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
     private boolean suspendTargetApp = false;
     private boolean targetWindowRemains = false;
     private boolean threadCPUTimerOn = false;
+    private boolean threadsMonitoringEnabled;
+    private boolean threadsSamplingEnabled;
     private int allocStackTraceLimit = -5; // Negative number means full (unlimited) depth actually used, although the limit is preserved
     private int allocTrackEvery = 10;
     private int architecture; // system architecture 32bit/64bit
@@ -398,6 +400,22 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
 
     public boolean getThreadCPUTimerOn() {
         return threadCPUTimerOn;
+    }
+
+    public void setThreadsMonitoringEnabled(boolean b) {
+        threadsMonitoringEnabled = b;
+    }
+
+    public boolean isThreadsMonitoringEnabled() {
+        return threadsMonitoringEnabled;
+    }
+
+    public void setThreadsSamplingEnabled(boolean b) {
+        threadsSamplingEnabled = b;
+    }
+
+    public boolean isThreadsSamplingEnabled() {
+        return threadsSamplingEnabled;
     }
 
     public void setVMClassPaths(String javaClassPath, String javaExtDirs, String bootClassPath) {
