@@ -44,7 +44,7 @@
 package org.netbeans.modules.profiler.snaptracer;
 
 import javax.swing.Icon;
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 
 /**
  * TracerPackage is a container for a set of TracerProbes distributed as a single
@@ -176,30 +176,30 @@ public abstract class TracerPackage implements Positionable {
          */
         public synchronized final PackageStateHandler getStateHandler() {
             if (stateHandler == null) stateHandler = new PackageStateHandler() {
-                public void probeAdded(TracerProbe probe, SampledCPUSnapshot snapshot) {
+                public void probeAdded(TracerProbe probe, IdeSnapshot snapshot) {
                     SessionAware.this.probeAdded(probe, snapshot);
                 }
-                public void probeRemoved(TracerProbe probe, SampledCPUSnapshot snapshot) {
+                public void probeRemoved(TracerProbe probe, IdeSnapshot snapshot) {
                     SessionAware.this.probeRemoved(probe, snapshot);
                 }
                 public TracerProgressObject sessionInitializing(TracerProbe[] probes,
-                    SampledCPUSnapshot snapshot, int refresh) {
+                    IdeSnapshot snapshot, int refresh) {
                     return SessionAware.this.sessionInitializing(probes, snapshot, refresh);
                 }
-                public void sessionStarting(TracerProbe[] probes, SampledCPUSnapshot snapshot)
+                public void sessionStarting(TracerProbe[] probes, IdeSnapshot snapshot)
                         throws SessionInitializationException {
                     SessionAware.this.sessionStarting(probes, snapshot);
                 }
-                public void sessionRunning(TracerProbe[] probes, SampledCPUSnapshot snapshot) {
+                public void sessionRunning(TracerProbe[] probes, IdeSnapshot snapshot) {
                     SessionAware.this.sessionRunning(probes, snapshot);
                 }
-                public void sessionStopping(TracerProbe[] probes, SampledCPUSnapshot snapshot) {
+                public void sessionStopping(TracerProbe[] probes, IdeSnapshot snapshot) {
                     SessionAware.this.sessionStopping(probes, snapshot);
                 }
-                public void sessionFinished(TracerProbe[] probes, SampledCPUSnapshot snapshot) {
+                public void sessionFinished(TracerProbe[] probes, IdeSnapshot snapshot) {
                     SessionAware.this.sessionFinished(probes, snapshot);
                 }
-                public void refreshRateChanged(TracerProbe[] probes, SampledCPUSnapshot snapshot,
+                public void refreshRateChanged(TracerProbe[] probes, IdeSnapshot snapshot,
                         int refresh) {
                     SessionAware.this.refreshRateChanged(probes, snapshot, refresh);
                 }
@@ -214,7 +214,7 @@ public abstract class TracerPackage implements Positionable {
          * @param probe added probe
          * @param snapshot profiler snapshot
          */
-        protected void probeAdded(TracerProbe probe, SampledCPUSnapshot snapshot) {}
+        protected void probeAdded(TracerProbe probe, IdeSnapshot snapshot) {}
 
         /**
          * Invoked when a probe is removed from the Timeline view.
@@ -222,7 +222,7 @@ public abstract class TracerPackage implements Positionable {
          * @param probe removed probe
          * @param snapshot profiler snapshot
          */
-        protected void probeRemoved(TracerProbe probe, SampledCPUSnapshot snapshot) {}
+        protected void probeRemoved(TracerProbe probe, IdeSnapshot snapshot) {}
 
 
         /**
@@ -238,7 +238,7 @@ public abstract class TracerPackage implements Positionable {
          * @return TracerProgressObject to track initialization progress
          */
         protected TracerProgressObject sessionInitializing(TracerProbe[] probes,
-                SampledCPUSnapshot snapshot, int refresh) { return null; }
+                IdeSnapshot snapshot, int refresh) { return null; }
 
         /**
          * Invoked when starting a new Tracer session. Any package/probes
@@ -255,7 +255,7 @@ public abstract class TracerPackage implements Positionable {
          * @param snapshot profiler snapshot
          * @throws SessionInitializationException in case of initialization failure
          */
-        protected void sessionStarting(TracerProbe[] probes, SampledCPUSnapshot snapshot)
+        protected void sessionStarting(TracerProbe[] probes, IdeSnapshot snapshot)
                 throws SessionInitializationException {}
 
         /**
@@ -265,7 +265,7 @@ public abstract class TracerPackage implements Positionable {
          * @param probes probes defined for the Tracer session
          * @param snapshot profiler snapshot
          */
-        protected void sessionRunning(TracerProbe[] probes, SampledCPUSnapshot snapshot) {}
+        protected void sessionRunning(TracerProbe[] probes, IdeSnapshot snapshot) {}
 
         /**
          * Invoked when stopping the Tracer session. Any package/probes cleanup
@@ -277,7 +277,7 @@ public abstract class TracerPackage implements Positionable {
          * @param probes probes defined for the Tracer session
          * @param snapshot profiler snapshot
          */
-        protected void sessionStopping(TracerProbe[] probes, SampledCPUSnapshot snapshot) {}
+        protected void sessionStopping(TracerProbe[] probes, IdeSnapshot snapshot) {}
 
         /**
          * Invoked when the Tracer session has finished.
@@ -285,7 +285,7 @@ public abstract class TracerPackage implements Positionable {
          * @param probes probes defined for the Tracer session
          * @param snapshot profiler snapshot
          */
-        protected void sessionFinished(TracerProbe[] probes, SampledCPUSnapshot snapshot) {}
+        protected void sessionFinished(TracerProbe[] probes, IdeSnapshot snapshot) {}
 
         /**
          * Invoked when refresh rate of the Tracer session has been changed.
@@ -294,7 +294,7 @@ public abstract class TracerPackage implements Positionable {
          * @param snapshot profiler snapshot
          * @param refresh session refresh rate in miliseconds
          */
-        protected void refreshRateChanged(TracerProbe[] probes, SampledCPUSnapshot snapshot,
+        protected void refreshRateChanged(TracerProbe[] probes, IdeSnapshot snapshot,
                 int refresh) {}
 
     }

@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.snaptracer.impl.timeline;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -184,6 +185,18 @@ class TimelineSelectionManager implements ChartSelectionModel {
         setSelectionBounds(new Rectangle(x, y, w, h));
     }
 
+    public void selectAll() {
+        Rectangle oldSelectionBounds = this.selectionBounds == null ? null :
+                                       new Rectangle(this.selectionBounds);
+
+        selectionBounds = new Rectangle(new Point(0, 0), chart.getSize());
+        startIndex = 0;
+        ChartItem item = chart.getItemsModel().getItem(0);
+        endIndex = ((XYItem)item).getValuesCount() - 1;
+
+        fireSelectionBoundsChanged(this.selectionBounds, oldSelectionBounds);
+    }
+
     public final void setSelectionBounds(Rectangle selectionBounds) {
         if (selectionBounds == null && this.selectionBounds == null) return;
 
@@ -229,6 +242,7 @@ class TimelineSelectionManager implements ChartSelectionModel {
         if (bounds.width == 0) return;
 
         sel = getClosestSelection(bounds.x + bounds.width, bounds.y + bounds.height);
+        if (!(sel instanceof XYItemSelection)) return;
 
         xySel = (XYItemSelection)sel;
         item = xySel.getItem();
@@ -382,12 +396,21 @@ class TimelineSelectionManager implements ChartSelectionModel {
 
     private ItemSelection getClosestSelection(int x, int y) {
         ItemsModel itemsModel = chart.getItemsModel();
-        if (itemsModel.getItemsCount() == 0) return null;
+        int itemsCount = itemsModel.getItemsCount();
+        if (itemsCount == 0) return null;
 
         PaintersModel paintersModel = chart.getPaintersModel();
+        int itemIndex = 0;
+        while (itemIndex < itemsCount) {
+            ChartItem item = itemsModel.getItem(itemIndex);
+            ItemPainter painter = paintersModel.getPainter(item);
+            if (!(painter instanceof TimelineIconPainter))
+                return painter.getClosestSelection(item, x, y, chart.getChartContext());
+            itemIndex++;
+        }
+
         ChartItem item = itemsModel.getItem(0);
         ItemPainter painter = paintersModel.getPainter(item);
-
         return painter.getClosestSelection(item, x, y, chart.getChartContext());
     }
 
@@ -470,9 +493,9 @@ class TimelineSelectionManager implements ChartSelectionModel {
         }
 
         public void mouseClicked(final MouseEvent e) {
+            if (!enabled || !SwingUtilities.isLeftMouseButton(e)) return;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (!enabled || !SwingUtilities.isLeftMouseButton(e)) return;
                     if (selectionMode != SELECTION_NONE)
                         setSelectionBounds(e.getX(), e.getY(), 0, 0);
                 }

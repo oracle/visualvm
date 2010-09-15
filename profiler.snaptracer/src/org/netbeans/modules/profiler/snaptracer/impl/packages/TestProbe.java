@@ -47,7 +47,7 @@ import java.io.IOException;
 import org.netbeans.modules.profiler.snaptracer.ItemValueFormatter;
 import org.netbeans.modules.profiler.snaptracer.ProbeItemDescriptor;
 import org.netbeans.modules.profiler.snaptracer.TracerProbe;
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 import org.openide.util.Exceptions;
 
 /**
@@ -57,10 +57,10 @@ import org.openide.util.Exceptions;
 class TestProbe extends TracerProbe {
     
 //    private int items;
-    private SampledCPUSnapshot snapshot;
+    private IdeSnapshot snapshot;
     
     
-    public TestProbe(SampledCPUSnapshot snapshot) {
+    public TestProbe(IdeSnapshot snapshot) {
         super(descriptors(1));
         this.snapshot = snapshot;
 //        this.items = items;

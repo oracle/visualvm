@@ -58,7 +58,7 @@ class ClassLoaderFieldValue extends HprofFieldObjectValue {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
     public String getName() {
-        return "$classLoader$";  // NOI18N
+        return "<classLoader>";  // NOI18N
     }
     
     byte getValueType() {

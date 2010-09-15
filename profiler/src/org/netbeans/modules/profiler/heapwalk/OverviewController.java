@@ -120,6 +120,10 @@ public class OverviewController extends AbstractController {
             "OverviewController_ArchitectureItemString"); // NOI18N
     private static final String JAVA_HOME_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
             "OverviewController_JavaHomeItemString"); // NOI18N
+    private static final String JAVA_VERSION_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
+            "OverviewController_JavaVersionItemString"); // NOI18N
+    private static final String JAVA_VENDOR_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
+            "OverviewController_JavaVendorItemString"); // NOI18N
     private static final String JVM_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
             "OverviewController_JvmItemString"); // NOI18N
     private static final String SHOW_SYSPROPS_LINK_STRING = NbBundle.getMessage(OverviewController.class,
@@ -266,6 +270,10 @@ public class OverviewController extends AbstractController {
         String jdk = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                 + MessageFormat.format(JAVA_HOME_ITEM_STRING,
                 new Object[] { sysprops.getProperty("java.home", NOT_AVAILABLE_MSG) }); // NOI18N
+
+        String version = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+                + MessageFormat.format(JAVA_VERSION_ITEM_STRING,
+                new Object[] { sysprops.getProperty("java.version", NOT_AVAILABLE_MSG) }); // NOI18N
         
         String jvm = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                 + MessageFormat.format(JVM_ITEM_STRING,
@@ -274,9 +282,13 @@ public class OverviewController extends AbstractController {
             sysprops.getProperty("java.vm.version", ""), // NOI18N
             sysprops.getProperty("java.vm.info", "") // NOI18N
         });
+
+        String vendor = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+                + MessageFormat.format(JAVA_VENDOR_ITEM_STRING,
+                new Object[] { sysprops.getProperty("java.vendor", NOT_AVAILABLE_MSG) }); // NOI18N
         
         return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/sysinfo.png'>&nbsp;&nbsp;" // NOI18N
-                + ENVIRONMENT_STRING + "</b><br><hr>" + os + "<br>" + arch + "<br>" + jdk + "<br>" + jvm; // NOI18N
+                + ENVIRONMENT_STRING + "</b><br><hr>" + os + "<br>" + arch + "<br>" + jdk + "<br>" + version + "<br>" + jvm + "<br>" + vendor; // NOI18N
     }
     
     public String computeSystemProperties(boolean showSystemProperties) {
@@ -313,34 +325,27 @@ public class OverviewController extends AbstractController {
             urls = urls.substring(INSTANCE_URL_PREFIX.length());
 
             String[] id = urls.split("/"); // NOI18N
-            JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByName(id[0]);
+            long instanceId = Long.parseLong(id[2]);
+            Instance i = heapFragmentWalker.getHeapFragment().getInstanceByID(instanceId);
 
-            if (c != null) {
-                List<Instance> instances = c.getInstances();
-                Instance i = null;
-                int instanceNumber = Integer.parseInt(id[1]);
-                if (instanceNumber <= instances.size()) i = instances.get(instanceNumber - 1);
-
-                if (i != null) {
-                    heapFragmentWalker.getClassesController().showInstance(i);
-                } else {
-                    NetBeansProfiler.getDefaultNB()
-                            .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
-                            new Object[] { id[1], c.getName() }));
-                }
+            if (i != null) {
+                heapFragmentWalker.getClassesController().showInstance(i);
             } else {
                 NetBeansProfiler.getDefaultNB()
-                        .displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+                        .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
+                        new Object[] { id[1], id[0] }));
             }
         } else if (urls.startsWith(CLASS_URL_PREFIX)) {
             urls = urls.substring(CLASS_URL_PREFIX.length());
+            String[] id = urls.split("/"); // NOI18N
+            long jclsid = Long.parseLong(id[1]);
 
-            JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByName(urls);
+            JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByID(jclsid);
 
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
+                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
             }
         } 
     }
@@ -529,10 +534,10 @@ public class OverviewController extends AbstractController {
         if (jcls.equals(java_lang_Class)) {
             JavaClass javaClass = heapFragmentWalker.getHeapFragment().getJavaClassByID(in.getInstanceId());
             className = javaClass.getName();
-            return "<a href='"+ CLASS_URL_PREFIX + className + "' name='" + javaClass.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
+            return "<a href='"+ CLASS_URL_PREFIX + className + "/" + javaClass.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
         }
         className = jcls.getName();
-        return "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "' name='" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
+        return "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
     }
 
     private static String htmlize(String value) {

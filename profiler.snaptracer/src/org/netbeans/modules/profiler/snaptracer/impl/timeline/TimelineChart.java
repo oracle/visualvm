@@ -75,7 +75,7 @@ final class TimelineChart extends SynchronousXYChart {
 
     static final int MIN_ROW_HEIGHT = 20;
     static final int MAX_ROW_HEIGHT = 500;
-    static final int DEF_ROW_HEIGHT = 60;
+    static final int DEF_ROW_HEIGHT = 40;
     static final int ROW_RESIZE_STEP = MIN_ROW_HEIGHT;
 
     private static final int ROW_MARGIN_TOP = 3;

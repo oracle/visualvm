@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.results.threads;
 
 import org.netbeans.lib.profiler.client.MonitoredData;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.DataManager;
 import java.util.Hashtable;
 
@@ -147,17 +148,8 @@ public class ThreadsDataManager extends DataManager {
      */
     public synchronized void processData(MonitoredData monitoredData) {
         //debugData ();
-        if (monitoredData.getNThreads() == 0) {
-            return;
-        }
-
         int max = threadData.length;
         int newThreadsNum = monitoredData.getNNewThreads();
-
-        // Set the timestamp of first data
-        if (max == 0) {
-            startTime = monitoredData.getStateTimestamps()[0];
-        }
 
         // 1. process newly created threads
         if (newThreadsNum > 0) {
@@ -172,35 +164,61 @@ public class ThreadsDataManager extends DataManager {
 
         // 2. process all threads data
         if (threadsMonitoringEnabled) {
-            int[] threadIds = monitoredData.getThreadIds();
-            long[] timestamps = monitoredData.getStateTimestamps();
-            byte[][] states = monitoredData.getThreadStates();
-            int nThreads = monitoredData.getNThreads();
-            int nStates = monitoredData.getNThreadStates();
-
-            if (nStates == 0) {
-                return;
-            }
-
-            for (int threadIdx = 0; threadIdx < nThreads; threadIdx++) {
-                Integer intIndex = (Integer) idToIndex.get(new Integer(threadIds[threadIdx]));
-                int index = intIndex.intValue();
-                byte[] threadStates = states[threadIdx];
-                ThreadData tData = threadData[index];
-
-                for (int stampIdx = 0; stampIdx < nStates; stampIdx++) {
-                    long timeStamp = timestamps[stampIdx];
-                    byte state = threadStates[stampIdx];
-                    byte lastState = tData.getLastState();
-
-                    if ((lastState == ThreadData.NO_STATE) || (lastState != state)) {
-                        tData.add(timeStamp, state);
+            if (monitoredData.getThreadsDataMode() == CommonConstants.MODE_THREADS_EXACT) {
+                int[] exThreadIds = monitoredData.getExplicitThreadIds();
+                long[] exTimestamps = monitoredData.getExplicitStateTimestamps();
+                byte[] exStates = monitoredData.getExplicitThreadStates();
+                
+                if (exTimestamps.length == 0) {
+                    return;
+                }
+                if (startTime == 0) {
+                    startTime = exTimestamps[0];
+                }
+                // precise states timers
+                for (int i = 0; i < exThreadIds.length; i++) {
+                    Integer intIndex = (Integer) idToIndex.get(new Integer(exThreadIds[i]));
+                    int index = intIndex.intValue();
+                    ThreadData tData = threadData[index];
+                    tData.add(exTimestamps[i], exStates[i]);
+                }
+                
+                endTime = exTimestamps[exTimestamps.length - 1];
+                fireDataChanged(); // all listeners are notified about threadData change */
+            } else if (monitoredData.getThreadsDataMode() == CommonConstants.MODE_THREADS_SAMPLING) {
+                int[] threadIds = monitoredData.getThreadIds();
+                long[] timestamps = monitoredData.getStateTimestamps();
+                byte[][] states = monitoredData.getThreadStates();
+                int nThreads = monitoredData.getNThreads();
+                int nStates = monitoredData.getNThreadStates();
+                
+                if (nStates == 0 || nThreads == 0) {
+                    return;
+                }                
+                // Set the timestamp of first data
+                if (startTime == 0) {
+                    startTime = monitoredData.getStateTimestamps()[0];
+                }
+                for (int threadIdx = 0; threadIdx < nThreads; threadIdx++) {
+                    Integer intIndex = (Integer) idToIndex.get(new Integer(threadIds[threadIdx]));
+                    int index = intIndex.intValue();
+                    byte[] threadStates = states[threadIdx];
+                    ThreadData tData = threadData[index];
+                    
+                    for (int stampIdx = 0; stampIdx < nStates; stampIdx++) {
+                        long timeStamp = timestamps[stampIdx];
+                        byte state = threadStates[stampIdx];
+                        byte lastState = tData.getLastState();
+                        
+                        if ((lastState == ThreadData.NO_STATE) || (lastState != state)) {
+                            tData.add(timeStamp, state);
+                        }
                     }
                 }
+                
+                endTime = timestamps[nStates - 1]; // end timestamp is updated
+                fireDataChanged(); // all listeners are notified about threadData change */
             }
-
-            endTime = timestamps[nStates - 1]; // end timestamp is updated
-            fireDataChanged(); // all listeners are notified about threadData change */
         } else {
             // in this mode we are only tracking thread ids and names, not thread states
         }

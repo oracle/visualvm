@@ -29,6 +29,45 @@
                         <attr name="position" intvalue="40"/>
                     </file>
                 </folder>
+                <folder name="permgen">
+                    <attr name="position" intvalue="200"/>
+                    <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen"/>
+                    <file name="BootstrapCount.oql" url="repository/permgen/resources/BootstrapCount.oql">
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#BootstrapCount.desc"/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/BootstrapCount.oql"/>
+                        <attr name="position" intvalue="100"/>
+                    </file>
+                    <file name="CLHisto.oql" url="repository/permgen/resources/CLHisto.oql">
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLHisto.desc"/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLHisto.oql"/>
+                        <attr name="position" intvalue="250"/>
+                    </file>
+                    <file name="CLChildParent.oql" url="repository/permgen/resources/CLChildParent.oql">
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLChildParent.desc"/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLChildParent.oql"/>
+                        <attr name="position" intvalue="300"/>
+                    </file>
+                    <file name="CLLoadedClasses.oql" url="repository/permgen/resources/CLLoadedClasses.oql">
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLLoadedClasses.desc"/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLLoadedClasses.oql"/>
+                        <attr name="position" intvalue="200"/>
+                    </file>
+                    <file name="CLTypes.oql" url="repository/permgen/resources/CLTypes.oql">
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLTypes.desc"/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLTypes.oql"/>
+                        <attr name="position" intvalue="0"/>
+                    </file>
+                    <file name="CLReflection.oql" url="repository/permgen/resources/CLReflection.oql">
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLReflection.desc"/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLReflection.oql"/>
+                        <attr name="position" intvalue="600"/>
+                    </file>
+                    <file name="CLLiveness.oql" url="repository/permgen/resources/CLLiveness.oql">
+                        <attr name="desc" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#CLLiveness.desc"/>
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.oql.repository.permgen.resources.Bundle#NBProfiler/Config/OQL/permgen/CLLiveness.oql"/>
+                        <attr name="position" intvalue="500"/>
+                    </file>
+                </folder>
             </folder>
         </folder>
     </folder>

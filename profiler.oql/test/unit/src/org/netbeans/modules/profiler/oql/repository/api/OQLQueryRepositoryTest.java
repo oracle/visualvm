@@ -122,7 +122,7 @@ public class OQLQueryRepositoryTest {
     public void testListAllQueries() {
         System.out.println("listAllQueries");
         List result = instance.listQueries();
-        assertEquals(4, result.size());
+        assertEquals(11, result.size());
     }
 
     /**
