@@ -128,10 +128,29 @@ class CoreDumpOverviewView extends DataSourceView {
             // JVM information
             String jvmFlags = saAgent.getJvmFlags();
             String jvmLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_JVM"); // NOI18N
+            String jLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java"); // NOI18N
+            String verLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Version"); // NOI18N
+            String vendorLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Vendor"); // NOI18N
             String jhLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Home");    // NOI18N
             String flagsLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_JVM_Flags"); // NOI18N
             data.append("<br>");    // NOI18N
             data.append("<b>"+jvmLbl+":</b> " + saAgent.getVmName() + " (" + saAgent.getVmVersion() + ", " + saAgent.getVmInfo() + ")<br>");    // NOI18N
+            Properties props = saAgent.getSystemProperties();
+            if (props != null) {
+                String javaVersion = props.getProperty("java.version"); // NOI18N
+                 String javaVendor = props.getProperty("java.vendor"); // NOI18N
+                if (javaVersion != null || javaVendor != null) {
+                    data.append("<b>"+jLbl+":</b>");
+                    if (javaVersion != null) {
+                        data.append(" "+verLbl+" " + javaVersion);   // NOI18N
+                    }
+                    if (javaVendor != null) {
+                        if (javaVersion != null) data.append(",");
+                        data.append(" "+vendorLbl+" " + javaVendor);   // NOI18N
+                    }
+                    data.append("<br>");
+                }
+            }
             data.append("<b>"+jhLbl+":</b> " + saAgent.getJavaHome() + "<br>"); // NOI18N
             data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
             
