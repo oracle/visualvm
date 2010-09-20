@@ -42,7 +42,7 @@
         <folder name="MIMEResolver">
             <file name="NpssResolver.xml" url="NpssResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.snaptracer.impl.Bundle"/>
-                <attr name="position" intvalue="99000"/>
+                <attr name="position" intvalue="99010"/>
             </file>
         </folder>
     </folder>
