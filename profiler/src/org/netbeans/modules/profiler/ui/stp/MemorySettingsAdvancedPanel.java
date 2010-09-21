@@ -106,6 +106,8 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
                                                                       "MemorySettingsAdvancedPanel_ThreadsCaption"); // NOI18N
     private static final String ENABLE_THREADS_CHECKBOX_TEXT = NbBundle.getMessage(MemorySettingsAdvancedPanel.class,
                                                                                    "MemorySettingsAdvancedPanel_EnableThreadsCheckboxText"); // NOI18N
+    private static final String ENABLE_SAMPLING_CHECKBOX_TEXT = NbBundle.getMessage(MemorySettingsAdvancedPanel.class,
+                                                                                   "MemorySettingsAdvancedPanel_EnableSamplingCheckboxText"); // NOI18N
     private static final String GLOBAL_SETTINGS_CAPTION = NbBundle.getMessage(MemorySettingsAdvancedPanel.class,
                                                                               "MemorySettingsAdvancedPanel_GlobalSettingsCaption"); // NOI18N
     private static final String OVERRIDE_SETTINGS_CHECKBOX_TEXT = NbBundle.getMessage(MemorySettingsAdvancedPanel.class,
@@ -139,6 +141,7 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
     private JCheckBox overrideSettingsCheckbox;
     private JCheckBox runGCCheckbox;
     private JCheckBox threadsMonitoringCheckbox;
+    private JCheckBox threadsSamplingCheckbox;
     private JComboBox javaPlatformCombo;
     private JLabel defineDepthLabel;
     private JLabel javaPlatformLabel;
@@ -265,6 +268,14 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
         return threadsMonitoringCheckbox.isSelected();
     }
 
+    public void setThreadsSampling(boolean enabled) {
+        threadsSamplingCheckbox.setSelected(enabled);
+    }
+
+    public boolean getThreadsSampling() {
+        return threadsSamplingCheckbox.isSelected();
+    }
+
     public void setVMArguments(String vmArguments) {
         vmArgumentsTextField.setText(vmArguments);
     }
@@ -291,6 +302,7 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
 
         threadsSettingsPanel.setEnabled(false);
         threadsMonitoringCheckbox.setEnabled(false);
+        threadsSamplingCheckbox.setEnabled(false);
 
         globalSettingsPanel.setEnabled(false);
         overrideSettingsCheckbox.setEnabled(false);
@@ -313,6 +325,7 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
 
         threadsSettingsPanel.setEnabled(true);
         threadsMonitoringCheckbox.setEnabled(true);
+        threadsSamplingCheckbox.setEnabled(true);
 
         globalSettingsPanel.setEnabled(true);
         overrideSettingsCheckbox.setEnabled(true);
@@ -532,8 +545,24 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.fill = GridBagConstraints.NONE;
         constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(2, 7, 3, 0);
+        constraints.insets = new Insets(2, 7, 1, 0);
         threadsSettingsPanel.add(threadsMonitoringCheckbox, constraints);
+
+        // threadsSamplingCheckbox
+        threadsSamplingCheckbox = new JCheckBox();
+        org.openide.awt.Mnemonics.setLocalizedText(threadsSamplingCheckbox, ENABLE_SAMPLING_CHECKBOX_TEXT);
+        threadsSamplingCheckbox.setToolTipText(STP_MONITOR_TOOLTIP);
+        threadsSamplingCheckbox.setOpaque(false);
+        threadsSamplingCheckbox.addActionListener(getSettingsChangeListener());
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.weightx = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(0, 7, 3, 0);
+        threadsSettingsPanel.add(threadsSamplingCheckbox, constraints);
 
         // globalSettingsPanel
         globalSettingsPanel = new JPanel(new GridBagLayout());

@@ -40,7 +40,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.snaptracer.impl;
 
 import java.awt.BorderLayout;
@@ -48,13 +47,11 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import org.netbeans.modules.profiler.SampledCPUSnapshot;
-import org.netbeans.modules.profiler.snaptracer.logs.LogReader;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -64,28 +61,32 @@ import org.openide.windows.WindowManager;
  * @author Jiri Sedlacek
  */
 public final class IdeSnapshotAction implements ActionListener {
-    
+
     public void actionPerformed(ActionEvent e) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 final IdeSnapshot snapshot = snapshot();
-                if (snapshot == null) return;
-
-                final TracerModel model = new TracerModel(snapshot);
-                final TracerController controller = new TracerController(model);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        TopComponent ui = ui(model, controller, snapshot.getNpssFile());
-                        ui.open();
-                        ui.requestActive();
-                    }
-                });
+                if (snapshot == null) {
+                    return;
+                }
+                openSnapshot(snapshot);
             }
         });
     }
 
+    static void openSnapshot(final IdeSnapshot snapshot) {
+        final TracerModel model = new TracerModel(snapshot);
+        final TracerController controller = new TracerController(model);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                TopComponent ui = ui(model, controller, snapshot.getNpssFile());
+                ui.open();
+                ui.requestActive();
+            }
+        });
+    }
 
-    private TopComponent ui(TracerModel model, TracerController controller, File npssFile) {
+    private static TopComponent ui(TracerModel model, TracerController controller, File npssFile) {
         TopComponent tc = new IdeSnapshotComponent(npssFile);
         TracerView tracer = new TracerView(model, controller);
         tc.add(tracer.createComponent(), BorderLayout.CENTER);
@@ -123,18 +124,19 @@ public final class IdeSnapshotAction implements ActionListener {
     private static JFileChooser createFileChooser() {
         JFileChooser chooser = new JFileChooser();
 
-        chooser.setDialogTitle("Load IDE Snapshot");
+        chooser.setDialogTitle(NbBundle.getMessage(IdeSnapshotAction.class,
+                "ACTION_IdeSnapshot_dialog")); // NOI18N
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         chooser.setAcceptAllFileFilterUsed(false);
 
-        chooser.addChoosableFileFilter(Filter.create("IDE Snapshots", ".npss"));
+        chooser.addChoosableFileFilter(Filter.create(NbBundle.getMessage(
+                IdeSnapshotAction.class, "ACTION_IdeSnapshot_filter"), ".npss")); // NOI18N
 
         return chooser;
     }
 
-    
     private static class IdeSnapshotComponent extends TopComponent {
 
         IdeSnapshotComponent(File npssFile) {
