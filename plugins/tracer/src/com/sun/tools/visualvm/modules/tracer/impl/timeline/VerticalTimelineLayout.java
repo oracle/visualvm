@@ -73,7 +73,7 @@ final class VerticalTimelineLayout implements LayoutManager2 {
     public void layoutContainer(Container parent) {
 //        synchronized (parent.getTreeLock()) {
             int width = parent.getWidth();
-            int rowsCount = chart.getRowsCount();
+            int rowsCount = Math.min(chart.getRowsCount(), parent.getComponentCount());
             for (int i = 0; i < rowsCount; i++) {
                 ChartContext context = chart.getRow(i).getContext();
                 parent.getComponent(i).setBounds(0, Utils.checkedInt(context.getViewportOffsetY() + chart.getOffsetY()),
