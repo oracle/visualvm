@@ -195,7 +195,6 @@ class TreeObject {
     }
     
     private long checkInstance(long instanceId, Instance refInstance) throws IOException {
-        long retainedSize = 0;
         if (refInstance != null) {
             LongMap.Entry refEntry = heap.idToOffsetMap.get(refInstance.getInstanceId());
             
@@ -206,8 +205,8 @@ class TreeObject {
                 writeLong(instanceId);
                 return -1;
             }
-            retainedSize += refEntry.getRetainedSize();
+            return refEntry.getRetainedSize();
         }
-        return retainedSize;
+        return 0;
     }
 }
