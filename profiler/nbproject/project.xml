@@ -126,7 +126,7 @@ made subject to such option by the copyright holder.
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>3</release-version>
-                        <specification-version>1.41</specification-version>
+                        <specification-version>1.53</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -134,8 +134,8 @@ made subject to such option by the copyright holder.
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <release-version>2</release-version>
-                        <specification-version>2.1</specification-version>
+                        <release-version>3</release-version>
+                        <specification-version>3.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -471,6 +471,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.loadgen</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>
                 <friend>org.netbeans.modules.profiler.oql.language</friend>
+                <friend>org.netbeans.modules.profiler.snaptracer</friend>
                 <package>org.netbeans.modules.profiler</package>
                 <package>org.netbeans.modules.profiler.actions</package>
                 <package>org.netbeans.modules.profiler.categories</package>

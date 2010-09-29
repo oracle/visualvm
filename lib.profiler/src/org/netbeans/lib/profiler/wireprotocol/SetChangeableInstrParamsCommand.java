@@ -61,6 +61,7 @@ public class SetChangeableInstrParamsCommand extends Command {
     private boolean runGCOnGetResultsInMemoryProfiling;
     private boolean sleepTrackingEnabled;
     private boolean waitTrackingEnabled;
+    private boolean threadsSamplingEnabled;
     private int nProfiledThreadsLimit;
     private int objAllocStackSamplingDepth;
     private int objAllocStackSamplingInterval;
@@ -70,7 +71,7 @@ public class SetChangeableInstrParamsCommand extends Command {
 
     public SetChangeableInstrParamsCommand(int nProfiledThreadsLimit, int samplingInterval, int objAllocStackSamplingInterval,
                                            int objAllocStackSamplingDepth, boolean runGCOnGetResults,
-                                           boolean waitTrackingEnabled, boolean sleepTrackingEnabled) {
+                                           boolean waitTrackingEnabled, boolean sleepTrackingEnabled, boolean threadsSamplingEnabled) {
         super(SET_CHANGEABLE_INSTR_PARAMS);
         this.nProfiledThreadsLimit = nProfiledThreadsLimit;
         this.samplingInterval = samplingInterval;
@@ -79,6 +80,7 @@ public class SetChangeableInstrParamsCommand extends Command {
         this.runGCOnGetResultsInMemoryProfiling = runGCOnGetResults;
         this.waitTrackingEnabled = waitTrackingEnabled;
         this.sleepTrackingEnabled = sleepTrackingEnabled;
+        this.threadsSamplingEnabled = threadsSamplingEnabled;
     }
 
     // Custom serialization support
@@ -108,12 +110,16 @@ public class SetChangeableInstrParamsCommand extends Command {
         return samplingInterval;
     }
 
-    public boolean getSleepTrackingEnabled() {
+    public boolean isSleepTrackingEnabled() {
         return sleepTrackingEnabled;
     }
 
-    public boolean getWaitTrackingEnabled() {
+    public boolean isWaitTrackingEnabled() {
         return waitTrackingEnabled;
+    }
+
+    public boolean isThreadsSamplingEnabled() {
+        return threadsSamplingEnabled;
     }
 
     // For debugging
@@ -124,7 +130,8 @@ public class SetChangeableInstrParamsCommand extends Command {
                + ", objAllocStackSamplingDepth: " + objAllocStackSamplingDepth // NOI18N
                + ", runGCOnGetResultsInMemoryProfiling: " + runGCOnGetResultsInMemoryProfiling // NOI18N
                + ", waitTrackingEnabled: " + waitTrackingEnabled // NOI18N
-               + ", sleepTrackingEnabled: " + sleepTrackingEnabled; // NOI18N
+               + ", sleepTrackingEnabled: " + sleepTrackingEnabled // NOI18N
+               + ", threadsSamplingEnabled: " + threadsSamplingEnabled; // NOI18N
     }
 
     void readObject(ObjectInputStream in) throws IOException {
@@ -135,6 +142,7 @@ public class SetChangeableInstrParamsCommand extends Command {
         runGCOnGetResultsInMemoryProfiling = in.readBoolean();
         waitTrackingEnabled = in.readBoolean();
         sleepTrackingEnabled = in.readBoolean();
+        threadsSamplingEnabled = in.readBoolean();
     }
 
     void writeObject(ObjectOutputStream out) throws IOException {
@@ -145,5 +153,6 @@ public class SetChangeableInstrParamsCommand extends Command {
         out.writeBoolean(runGCOnGetResultsInMemoryProfiling);
         out.writeBoolean(waitTrackingEnabled);
         out.writeBoolean(sleepTrackingEnabled);
+        out.writeBoolean(threadsSamplingEnabled);
     }
 }

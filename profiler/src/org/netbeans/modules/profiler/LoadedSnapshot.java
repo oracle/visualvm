@@ -522,8 +522,11 @@ public class LoadedSnapshot {
 
     static class SamplesInputStream {
         static final String ID = "NPSS"; // NetBeans Profiler samples stream, it must match org.netbeans.core.ui.sampler.SamplesOutputStream.ID
+        static final int MAX_SUPPORTED_VERSION = 2;
 
         int version;
+        int samples;
+        long lastTimestamp;
         ObjectInputStream in;
         Map<Long,ThreadInfo> threads;
         
@@ -534,9 +537,21 @@ public class LoadedSnapshot {
         SamplesInputStream(InputStream is) throws IOException {
             readHeader(is);
             in = new ObjectInputStream(new GZIPInputStream(is));
+            if (version > 1) {
+                samples = in.readInt();
+                lastTimestamp = in.readLong();
+            }
             threads = new HashMap(128);
         }
 
+        int getSamples() {
+            return samples;
+        }
+
+        long getLastTimestamp() {
+            return lastTimestamp;
+        }
+        
         ThreadsSample readSample() throws IOException {
             long time;
             ThreadInfo infos[];
@@ -584,9 +599,12 @@ public class LoadedSnapshot {
             is.read(idarr);
             id = new String(idarr);
             if (!ID.equals(id)) {
-                new IOException("Invalid header "+id); // NOI18N
+                throw new IOException("Invalid header "+id); // NOI18N
             }
             version = is.read();
+            if (version > MAX_SUPPORTED_VERSION) {
+                throw new IOException("NPSS file version "+version+" is not supported");    // NOI18N
+            }
         }
     }
 
