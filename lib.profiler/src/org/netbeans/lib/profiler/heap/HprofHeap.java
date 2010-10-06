@@ -495,7 +495,7 @@ class HprofHeap implements Heap {
                 
                 while(fit.hasNext()) {
                     HprofField field = (HprofField) fit.next();
-                    if (field.getVauleType() == HprofHeap.OBJECT) {
+                    if (field.getValueType() == HprofHeap.OBJECT) {
                         long outId = dumpBuffer.getID(inOff);
                         
                         if (outId != 0) {
