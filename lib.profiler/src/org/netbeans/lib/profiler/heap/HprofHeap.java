@@ -824,10 +824,8 @@ class HprofHeap implements Heap {
 
                     int dataSize = 0;
 
-                    if (DEBUG) {
-                        System.out.println("Obj ID " + objId + " Stack serial " + stackSerial + " Elements " + elements
+                    System.out.println("Obj ID " + objId + " Stack serial " + stackSerial + " Elements " + elements
                                            + " Type " + classId); // NOI18N
-                    }
 
                     for (int i = 0; i < elements; i++) {
                         dataSize += dumpBuffer.getIDSize();
