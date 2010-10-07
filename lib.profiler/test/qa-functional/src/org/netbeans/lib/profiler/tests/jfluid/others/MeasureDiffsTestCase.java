@@ -69,7 +69,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import org.netbeans.lib.profiler.results.EventBufferResultsProvider;
 
 
 /**
@@ -317,7 +316,7 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
 
         //get results with alone run
         try {
-            outFile = File.createTempFile("profiler", "test");
+            outFile = File.createTempFile("profiler", "test", getWorkDir());
             startAppAlone(settings);
             System.err.println(">>> startAppAlone");
         } catch (IOException ex) {
