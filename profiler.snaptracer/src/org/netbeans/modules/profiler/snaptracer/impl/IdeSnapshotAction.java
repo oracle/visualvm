@@ -40,7 +40,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.snaptracer.impl;
 
 import java.awt.BorderLayout;
@@ -62,28 +61,32 @@ import org.openide.windows.WindowManager;
  * @author Jiri Sedlacek
  */
 public final class IdeSnapshotAction implements ActionListener {
-    
+
     public void actionPerformed(ActionEvent e) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 final IdeSnapshot snapshot = snapshot();
-                if (snapshot == null) return;
-
-                final TracerModel model = new TracerModel(snapshot);
-                final TracerController controller = new TracerController(model);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        TopComponent ui = ui(model, controller, snapshot.getNpssFile());
-                        ui.open();
-                        ui.requestActive();
-                    }
-                });
+                if (snapshot == null) {
+                    return;
+                }
+                openSnapshot(snapshot);
             }
         });
     }
 
+    static void openSnapshot(final IdeSnapshot snapshot) {
+        final TracerModel model = new TracerModel(snapshot);
+        final TracerController controller = new TracerController(model);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                TopComponent ui = ui(model, controller, snapshot.getNpssFile());
+                ui.open();
+                ui.requestActive();
+            }
+        });
+    }
 
-    private TopComponent ui(TracerModel model, TracerController controller, File npssFile) {
+    private static TopComponent ui(TracerModel model, TracerController controller, File npssFile) {
         TopComponent tc = new IdeSnapshotComponent(npssFile);
         TracerView tracer = new TracerView(model, controller);
         tc.add(tracer.createComponent(), BorderLayout.CENTER);
@@ -134,7 +137,6 @@ public final class IdeSnapshotAction implements ActionListener {
         return chooser;
     }
 
-    
     private static class IdeSnapshotComponent extends TopComponent {
 
         IdeSnapshotComponent(File npssFile) {
