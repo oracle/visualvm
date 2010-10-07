@@ -481,6 +481,7 @@ class HprofHeap implements Heap {
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
         Map classIdToClassMap = classDumpBounds.getClassIdToClassMap();
 
+        computeInstances();
         for (long counter=0; offset[0] < allInstanceDumpBounds.endOffset; counter++) {
             long start = offset[0];
             int tag = readDumpTag(offset);
