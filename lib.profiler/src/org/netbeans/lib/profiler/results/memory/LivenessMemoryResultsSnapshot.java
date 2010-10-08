@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results.memory;
 
+import java.util.logging.Level;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils.TargetAppOrVMTerminated;
 import java.io.DataInputStream;
@@ -50,7 +51,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 
 
 /**
@@ -63,8 +63,7 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle"); // NOI18N
-    private static final String MEMORY_LIVENESS_MSG = messages.getString("LivenessMemoryResultsSnapshot_MemoryLivenessMsg"); // NOI18N
+    private static final String MEMORY_LIVENESS_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle").getString("LivenessMemoryResultsSnapshot_MemoryLivenessMsg"); // NOI18N
                                                                                                                              // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -345,21 +344,17 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
     void debugValues() {
         super.debugValues();
-        LOGGER.finest("nTrackedAllocObjects.length: " + debugLength(nTrackedAllocObjects) // NOI18N
-        );
-        LOGGER.finest("nTrackedLiveObjects.length: " + debugLength(nTrackedLiveObjects) // NOI18N
-        );
-        LOGGER.finest("maxSurvGen.length: " + debugLength(maxSurvGen)); // NOI18N
-        LOGGER.finest("trackedLiveObjectsSize.length: " + debugLength(trackedLiveObjectsSize) // NOI18N
-        );
-        LOGGER.finest("avgObjectAge.length: " + debugLength(avgObjectAge)); // NOI18N
-        LOGGER.finest("nInstrClasses: " + nInstrClasses); // NOI18N
-        LOGGER.finest("nTotalAllocObjects.length: " + debugLength(nTotalAllocObjects) // NOI18N
-        ); // NOI18N
-        LOGGER.finest("nTrackedItems: " + nTrackedItems); // NOI18N
-        LOGGER.finest("maxValue: " + maxValue); // NOI18N
-        LOGGER.finest("nTotalTrackedBytes: " + nTotalTrackedBytes); // NOI18N
-        LOGGER.finest("nTotalTracked: " + nTotalTracked); // NOI18N
-        LOGGER.finest("currentEpoch: " + currentEpoch); // NOI18N
+        LOGGER.log(Level.FINEST, "nTrackedAllocObjects.length: {0}", debugLength(nTrackedAllocObjects));
+        LOGGER.log(Level.FINEST, "nTrackedLiveObjects.length: {0}", debugLength(nTrackedLiveObjects));
+        LOGGER.log(Level.FINEST, "maxSurvGen.length: {0}", debugLength(maxSurvGen)); // NOI18N
+        LOGGER.log(Level.FINEST, "trackedLiveObjectsSize.length: {0}", debugLength(trackedLiveObjectsSize));
+        LOGGER.log(Level.FINEST, "avgObjectAge.length: {0}", debugLength(avgObjectAge)); // NOI18N
+        LOGGER.log(Level.FINEST, "nInstrClasses: {0}", nInstrClasses); // NOI18N
+        LOGGER.log(Level.FINEST, "nTotalAllocObjects.length: {0}", debugLength(nTotalAllocObjects)); // NOI18N
+        LOGGER.log(Level.FINEST, "nTrackedItems: {0}", nTrackedItems); // NOI18N
+        LOGGER.log(Level.FINEST, "maxValue: {0}", maxValue); // NOI18N
+        LOGGER.log(Level.FINEST, "nTotalTrackedBytes: {0}", nTotalTrackedBytes); // NOI18N
+        LOGGER.log(Level.FINEST, "nTotalTracked: {0}", nTotalTracked); // NOI18N
+        LOGGER.log(Level.FINEST, "currentEpoch: {0}", currentEpoch); // NOI18N
     }
 }

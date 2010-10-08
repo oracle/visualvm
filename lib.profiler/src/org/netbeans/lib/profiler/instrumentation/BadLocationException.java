@@ -56,10 +56,14 @@ public class BadLocationException extends Exception {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.instrumentation.Bundle"); // NOI18N
-    private static final String CANNOT_FIND_METHOD_CURSOR_MSG = messages.getString("BadLocationException_CannotFindMethodCursorMsg"); // NOI18N
-    private static final String CANNOT_FIND_METHOD_SELECTION_MSG = messages.getString("BadLocationException_CannotFindMethodSelectionMsg"); // NOI18N
-                                                                                                                                            // -----
+    private static final String CANNOT_FIND_METHOD_CURSOR_MSG;
+    private static final String CANNOT_FIND_METHOD_SELECTION_MSG;
+
+    static {
+        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.instrumentation.Bundle"); // NOI18N
+        CANNOT_FIND_METHOD_CURSOR_MSG = messages.getString("BadLocationException_CannotFindMethodCursorMsg"); // NOI18N
+        CANNOT_FIND_METHOD_SELECTION_MSG = messages.getString("BadLocationException_CannotFindMethodSelectionMsg"); // NOI18N
+    }
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

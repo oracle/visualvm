@@ -328,22 +328,39 @@ public class ProfilerClient implements CommonConstants {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.Bundle"); // NOI18N
-    private static final String CANNOT_OPEN_SERVER_TEMPFILE_MSG = messages.getString("ProfilerClient_CannotOpenServerTempFileMsg"); // NOI18N
-    private static final String PERFORMING_INSTRUMENTATION_STRING = messages.getString("ProfilerClient_PerformingInstrumentationString"); // NOI18N
-    private static final String INVALID_CODE_REGION_MSG = messages.getString("ProfilerClient_InvalidCodeRegionMsg"); // NOI18N
-    private static final String CLASS_NOT_FOUND_MSG = messages.getString("ProfilerClient_ClassNotFoundMsg"); // NOI18N
-    private static final String OUT_OF_MEMORY_MSG = messages.getString("ProfilerClient_OutOfMemoryMsg"); // NOI18N
-    private static final String INCORRECT_AGENT_VERSION_MSG = messages.getString("ProfilerClient_IncorrectAgentVersionMsg"); // NOI18N
-    private static final String ERROR_GETTING_CALIBRATION_DATA_MSG = messages.getString("ProfilerClient_ErrorGettingCalibrationDataMsg"); // NOI18N
-    private static final String MUST_CALIBRATE_FIRST_MSG = messages.getString("ProfilerClient_MustCalibrateFirstMsg"); // NOI18N
-    private static final String MUST_CALIBRATE_FIRST_SHORT_MSG = messages.getString("ProfilerClient_MustCalibrateFirstShortMsg"); // NOI18N
-    private static final String INSTRUMENTATION_LIMIT_REACHED_MSG = messages.getString("ProfilerClient_InstrumentationLimitReachedMsg"); // NOI18N
-    private static final String CORRUPTED_TARGET_CALIBRATION_DATA_MSG = messages.getString("ProfilerClient_CorruptedTargetCalibrationDataMsg"); // NOI18N
-    private static final String CONNECT_VM_MSG = messages.getString("ProfilerClient_ConnectVmMsg"); // NOI18N
-    private static final String TARGET_JVM_ERROR_MSG = messages.getString("ProfilerClient_TargetJvmErrorMsg"); // NOI18N
-    private static final String UNSUPPORTED_JVM_MSG = messages.getString("ProfilerClient_UnsupportedJvmMsg"); // NOI18N
+    private static final String CANNOT_OPEN_SERVER_TEMPFILE_MSG;
+    private static final String PERFORMING_INSTRUMENTATION_STRING;
+    private static final String INVALID_CODE_REGION_MSG;
+    private static final String CLASS_NOT_FOUND_MSG;
+    private static final String OUT_OF_MEMORY_MSG;
+    private static final String INCORRECT_AGENT_VERSION_MSG;
+    private static final String ERROR_GETTING_CALIBRATION_DATA_MSG;
+    private static final String MUST_CALIBRATE_FIRST_MSG;
+    private static final String MUST_CALIBRATE_FIRST_SHORT_MSG;
+    private static final String INSTRUMENTATION_LIMIT_REACHED_MSG;
+    private static final String CORRUPTED_TARGET_CALIBRATION_DATA_MSG;
+    private static final String CONNECT_VM_MSG;
+    private static final String TARGET_JVM_ERROR_MSG;
+    private static final String UNSUPPORTED_JVM_MSG;
 
+    static {
+        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.Bundle"); // NOI18N
+        CANNOT_OPEN_SERVER_TEMPFILE_MSG = messages.getString("ProfilerClient_CannotOpenServerTempFileMsg"); // NOI18N
+        PERFORMING_INSTRUMENTATION_STRING = messages.getString("ProfilerClient_PerformingInstrumentationString"); // NOI18N
+        INVALID_CODE_REGION_MSG = messages.getString("ProfilerClient_InvalidCodeRegionMsg"); // NOI18N
+        CLASS_NOT_FOUND_MSG = messages.getString("ProfilerClient_ClassNotFoundMsg"); // NOI18N
+        OUT_OF_MEMORY_MSG = messages.getString("ProfilerClient_OutOfMemoryMsg"); // NOI18N
+        INCORRECT_AGENT_VERSION_MSG = messages.getString("ProfilerClient_IncorrectAgentVersionMsg"); // NOI18N
+        ERROR_GETTING_CALIBRATION_DATA_MSG = messages.getString("ProfilerClient_ErrorGettingCalibrationDataMsg"); // NOI18N
+        MUST_CALIBRATE_FIRST_MSG = messages.getString("ProfilerClient_MustCalibrateFirstMsg"); // NOI18N
+        MUST_CALIBRATE_FIRST_SHORT_MSG = messages.getString("ProfilerClient_MustCalibrateFirstShortMsg"); // NOI18N
+        INSTRUMENTATION_LIMIT_REACHED_MSG = messages.getString("ProfilerClient_InstrumentationLimitReachedMsg"); // NOI18N
+        CORRUPTED_TARGET_CALIBRATION_DATA_MSG = messages.getString("ProfilerClient_CorruptedTargetCalibrationDataMsg"); // NOI18N
+        CONNECT_VM_MSG = messages.getString("ProfilerClient_ConnectVmMsg"); // NOI18N
+        TARGET_JVM_ERROR_MSG = messages.getString("ProfilerClient_TargetJvmErrorMsg"); // NOI18N
+        UNSUPPORTED_JVM_MSG = messages.getString("ProfilerClient_UnsupportedJvmMsg"); // NOI18N
+    }
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private AppStatusHandler.ServerCommandHandler serverCommandHandler;
@@ -355,7 +372,7 @@ public class ProfilerClient implements CommonConstants {
     private Instrumentor instrumentor;
     private MemoryCCTProvider memCctProvider;
     private Object execInSeparateThreadLock = new Object();
-    private Object forceObtainedResultsDumpLock = new Object(); // To make dump processing and other commands mutually
+    final private Object forceObtainedResultsDumpLock = new Object(); // To make dump processing and other commands mutually
                                                                 // exclusive
 
     /*instrMethodGroupFromRootComplete, */
