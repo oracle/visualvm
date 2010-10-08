@@ -1,5 +1,5 @@
 Heap Summary
-Time Fri Jun 16 13:46:11 CEST 2006
+Time Jun 16, 2006 11:46:11 AM
 Live instances 2208
 Live bytes 132489
 Total alloc instances -1
