@@ -127,7 +127,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
     private MethodInfoMapper methodInfoMapper = MethodInfoMapper.DEFAULT;
     private TimingAdjusterOld timingAdjuster = TimingAdjusterOld.getDefault();
-    private ThreadInfos threadInfos = new ThreadInfos();
+    final private ThreadInfos threadInfos = new ThreadInfos();
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -374,15 +374,17 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             return;
         }
 
-        LOGGER.finest("New thread creation for thread id = " + threadId // NOI18N
-                      + ", name = " + threadName // NOI18N
-                      );
+        LOGGER.log(Level.FINEST, "New thread creation for thread id = {0}, name = {1}", new Object[]{threadId, threadName});
 
         threadInfos.newThreadInfo(threadId, threadName, threadClassName);
         batchNotEmpty = true;
     }
 
     public void servletRequest(final int threadId, final int requestType, final String servletPath, final int sessionId) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
+            return;
+        }
+        
         ThreadInfo ti = threadInfos.threadInfos[threadId];
 
         if (ti == null) {
@@ -880,7 +882,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     private String debugMethod(int methodId) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         try {
             methodInfoMapper.lock(false);
 
@@ -898,7 +900,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     private String dumpStack(ThreadInfo ti) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("*** Thread stack dump:\n"); // NOI18N
 
         for (int i = ti.stackTopIdx; i >= 0; i--) {
@@ -916,11 +918,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         Mark mark = MarkingEngine.getDefault().markMethod(methodId, status);
 
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("MarkerMEntry" + ((!stamped) ? "(unstamped)" : "") + " for tId = " + (int) ti.threadId // NOI18N
-                          + ", time: " + timeStamp0 // NOI18N
-                          + ", method:  " + debugMethod(methodId) // NOI18N
-                          + ", inRoot: " + ti.rootMethodEntryTimeAbs // NOI18N
-                          + ", rootEntryTimeThread: " + ti.rootMethodEntryTimeThreadCPU);
+            LOGGER.log(Level.FINEST, "MarkerMEntry{0} for tId = {1}, time: {2}, method:  {3}, inRoot: {4}, rootEntryTimeThread: {5}", new Object[]{(!stamped) ? "(unstamped)" : "", (int) ti.threadId, timeStamp0, debugMethod(methodId), ti.rootMethodEntryTimeAbs, ti.rootMethodEntryTimeThreadCPU});
         }
 
         TimedCPUCCTNode curNode = ti.peek();
@@ -1051,11 +1049,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                                              boolean stamped) {
         if (LOGGER.isLoggable(Level.FINEST)) {
             if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("MethodEntry " + ((!stamped) ? "(unstamped)" : "") + " for tId = " + (int) ti.threadId // NOI18N
-                              + ", time: " + timeStamp0 // NOI18N
-                              + ", delta: " + (timeStamp0 - delta) // NOI18N
-                              + ", method:  " + debugMethod(methodId) // NOI18N
-                );
+                LOGGER.log(Level.FINEST, "MethodEntry {0} for tId = {1}, time: {2}, delta: {3}, method:  {4}", new Object[]{(!stamped) ? "(unstamped)" : "", (int) ti.threadId, timeStamp0, timeStamp0 - delta, debugMethod(methodId)});
             }
         }
 
@@ -1135,11 +1129,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     private TimedCPUCCTNode plainMethodExit(final int methodId, final ThreadInfo ti, long timeStamp0, long timeStamp1,
                                             boolean stamped) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("MethodExit" + ((!stamped) ? "(unstamped)" : "") + ": " + debugMethod(methodId) // NOI18N
-                          + ", time: " + timeStamp0 // NOI18N
-                          + ", delta: " + (timeStamp0 - delta) // NOI18N
-                          + ", ti: " + ti // NOI18N
-                          );
+            LOGGER.log(Level.FINEST, "MethodExit{0}: {1}, time: {2}, delta: {3}, ti: {4}", new Object[]{(!stamped) ? "(unstamped)" : "", debugMethod(methodId), timeStamp0, timeStamp0 - delta, ti});
             delta = timeStamp0;
         }
 
@@ -1162,7 +1152,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         MethodCPUCCTNode methodNode = (MethodCPUCCTNode) curNode;
 
         if (methodId != methodNode.getMethodId()) {
-            StringBuffer message = new StringBuffer();
+            StringBuilder message = new StringBuilder();
             message.append(CommonConstants.ENGINE_WARNING).append("critical: stack integrity violation on method exit.\n"); // NOI18N
             message.append("*** methodId on simulated stack top: ").append((int) methodNode.getMethodId()); // NOI18N
             message.append(", received methodId (should match) = ").append((int) methodId).append('\n'); // NOI18N
@@ -1230,10 +1220,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
     private TimedCPUCCTNode rootMethodEntry(final int methodId, final ThreadInfo ti, final long timeStamp0, final long timeStamp1) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("RootMEntry for tId = " + (int) ti.threadId // NOI18N
-                          + ", time: " + timeStamp0 // NOI18N
-                          + ", method:  " + debugMethod(methodId) // NOI18N
-            );
+            LOGGER.log(Level.FINEST, "RootMEntry for tId = {0}, time: {1}, method:  {2}", new Object[]{(int) ti.threadId, timeStamp0, debugMethod(methodId)});
         }
 
         Mark mark = MarkingEngine.getDefault().markMethod(methodId, status);
@@ -1241,14 +1228,14 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         TimedCPUCCTNode curNode = ti.peek();
 
         if (ti.isInRoot()) {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             buffer.append(CommonConstants.ENGINE_WARNING)
                   .append("critical: at root method entry thread stack is not at 0 - should not happen!\n"); // NOI18N
             buffer.append("*** thread = ").append(threadInfos.threadNames[ti.threadId]); // NOI18N
             buffer.append(", ti.stackTopIdx = ").append(ti.stackTopIdx); // NOI18N
 
             if (curNode != null) {
-                buffer.append(", curNode = " + curNode).append('\n'); // NOI18N
+                buffer.append(", curNode = ").append(curNode).append('\n'); // NOI18N
             }
 
             buffer.append(CommonConstants.PLEASE_REPORT_PROBLEM);
@@ -1321,11 +1308,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
     private TimedCPUCCTNode rootMethodExit(final int methodId, final ThreadInfo ti, long timeStamp0, long timeStamp1) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("RootMExit for tId = " + (int) ti.threadId // NOI18N
-                          + ", time: " + timeStamp0 // NOI18N
-                          + ", delta: " + (timeStamp0 - delta) // NOI18N
-                          + ", method: " + debugMethod(methodId) // NOI18N
-            );
+            LOGGER.log(Level.FINEST, "RootMExit for tId = {0}, time: {1}, delta: {2}, method: {3}", new Object[]{(int) ti.threadId, timeStamp0, timeStamp0 - delta, debugMethod(methodId)});
             delta = timeStamp0;
         }
 
@@ -1348,7 +1331,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         MethodCPUCCTNode methodNode = (MethodCPUCCTNode) curNode;
 
         if (methodId != methodNode.getMethodId()) {
-            StringBuffer message = new StringBuffer();
+            StringBuilder message = new StringBuilder();
             message.append(CommonConstants.ENGINE_WARNING).append("critical: stack integrity violation on root thod exit.\n"); // NOI18N
             message.append("*** methodId on simulated stack top: ").append((int) methodNode.getMethodId()).append('\n'); // NOI18N
             message.append(", received methodId (should match) = ").append((int) methodId).append('\n'); // NOI18N
