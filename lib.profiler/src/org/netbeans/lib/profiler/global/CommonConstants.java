@@ -57,14 +57,13 @@ public interface CommonConstants {
 
     // -----
     // I18N String constants
-    static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle"); // NOI18N
-    public static final String THREAD_STATUS_UNKNOWN_STRING = messages.getString("CommonConstants_ThreadStatusUnknownString"); // NOI18N  // TODO CHECK: unused method
-    public static final String THREAD_STATUS_ZOMBIE_STRING = messages.getString("CommonConstants_ThreadStatusZombieString"); // NOI18N
-    public static final String THREAD_STATUS_RUNNING_STRING = messages.getString("CommonConstants_ThreadStatusRunningString"); // NOI18N
-    public static final String THREAD_STATUS_SLEEPING_STRING = messages.getString("CommonConstants_ThreadStatusSleepingString"); // NOI18N;
-    public static final String THREAD_STATUS_MONITOR_STRING = messages.getString("CommonConstants_ThreadStatusMonitorString"); // NOI18N
-    public static final String THREAD_STATUS_WAIT_STRING = messages.getString("CommonConstants_ThreadStatusWaitString"); // NOI18N
-                                                                                                                         // -----
+    public static final String THREAD_STATUS_UNKNOWN_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusUnknownString"); // NOI18N  // TODO CHECK: unused method
+    public static final String THREAD_STATUS_ZOMBIE_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusZombieString"); // NOI18N
+    public static final String THREAD_STATUS_RUNNING_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusRunningString"); // NOI18N
+    public static final String THREAD_STATUS_SLEEPING_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusSleepingString"); // NOI18N;
+    public static final String THREAD_STATUS_MONITOR_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusMonitorString"); // NOI18N
+    public static final String THREAD_STATUS_WAIT_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusWaitString"); // NOI18N
+                                                                                        // -----
 
     /** Names of our own classes, in various forms */
     public static final String PROFILER_SERVER_SLASHED_CLASS_PREFIX = "org/netbeans/lib/profiler/server/"; // NOI18N

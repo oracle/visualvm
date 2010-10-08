@@ -87,12 +87,18 @@ public abstract class SwingWorker {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    /** Creates a new instance of SwingWorker */
+    /** 
+     * Creates a new instance of SwingWorker 
+     * @param forceEQ When set the corresponding {@linkplain SwingWorker#done() } method is executed on EDT
+     */
     public SwingWorker(boolean forceEQ) {
         sinit();
         this.useEQ = forceEQ;
     }
 
+    /**
+     * Creates a new instance of SwingWorker with <b>forceEQ=true</b>
+     */
     public SwingWorker() {
         this(true);
     }
@@ -169,11 +175,11 @@ public abstract class SwingWorker {
     static synchronized void sinit() {
         if (warmupService == null) {
             UIUtils.runInEventDispatchThreadAndWait(new Runnable() {
-                    public void run() {
-                        warmupService = Executors.newCachedThreadPool();
-                        taskService = Executors.newCachedThreadPool();
-                    }
-                });
+                public void run() {
+                    warmupService = Executors.newCachedThreadPool();
+                    taskService = Executors.newCachedThreadPool();
+                }
+            });
         }
     }
 

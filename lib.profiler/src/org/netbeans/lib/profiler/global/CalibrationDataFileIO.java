@@ -58,18 +58,29 @@ public class CalibrationDataFileIO {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle"); // NOI18N
-    private static final String CALIBRATION_FILE_NOT_EXIST_MSG = messages.getString("CalibrationDataFileIO_CalibrationFileNotExistMsg"); // NOI18N
-    private static final String CALIBRATION_FILE_NOT_READABLE_MSG = messages.getString("CalibrationDataFileIO_CalibrationFileNotReadableMsg"); // NOI18N
-    private static final String CALIBRATION_DATA_CORRUPTED_PREFIX = messages.getString("CalibrationDataFileIO_CalibrationDataCorruptedPrefix"); // NOI18N
-    private static final String SHORTER_THAN_EXPECTED_STRING = messages.getString("CalibrationDataFileIO_ShorterThanExpectedString"); // NOI18N
-    private static final String ORIGINAL_MESSAGE_STRING = messages.getString("CalibrationDataFileIO_OriginalMessageString"); // NOI18N
-    private static final String RERUN_CALIBRATION_MSG = messages.getString("CalibrationDataFileIO_ReRunCalibrationMsg"); // NOI18N
-    private static final String ERROR_WRITING_CALIBRATION_FILE_PREFIX = messages.getString("CalibrationDataFileIO_ErrorWritingCalibrationFilePrefix"); // NOI18N
-    private static final String REEXECUTE_CALIBRATION_MSG = messages.getString("CalibrationDataFileIO_ReExecuteCalibrationMsg"); // NOI18N
+    private static final String CALIBRATION_FILE_NOT_EXIST_MSG;
+    private static final String CALIBRATION_FILE_NOT_READABLE_MSG;
+    private static final String CALIBRATION_DATA_CORRUPTED_PREFIX;
+    private static final String SHORTER_THAN_EXPECTED_STRING;
+    private static final String ORIGINAL_MESSAGE_STRING;
+    private static final String RERUN_CALIBRATION_MSG;
+    private static final String ERROR_WRITING_CALIBRATION_FILE_PREFIX;
+    private static final String REEXECUTE_CALIBRATION_MSG;
                                                                                                                                  // -----
     private static String errorMessage;
 
+    static {
+        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle"); // NOI18N
+        CALIBRATION_FILE_NOT_EXIST_MSG = messages.getString("CalibrationDataFileIO_CalibrationFileNotExistMsg"); // NOI18N
+        CALIBRATION_FILE_NOT_READABLE_MSG = messages.getString("CalibrationDataFileIO_CalibrationFileNotReadableMsg"); // NOI18N
+        CALIBRATION_DATA_CORRUPTED_PREFIX = messages.getString("CalibrationDataFileIO_CalibrationDataCorruptedPrefix"); // NOI18N
+        SHORTER_THAN_EXPECTED_STRING = messages.getString("CalibrationDataFileIO_ShorterThanExpectedString"); // NOI18N
+        ORIGINAL_MESSAGE_STRING = messages.getString("CalibrationDataFileIO_OriginalMessageString"); // NOI18N
+        RERUN_CALIBRATION_MSG = messages.getString("CalibrationDataFileIO_ReRunCalibrationMsg"); // NOI18N
+        ERROR_WRITING_CALIBRATION_FILE_PREFIX = messages.getString("CalibrationDataFileIO_ErrorWritingCalibrationFilePrefix"); // NOI18N
+        REEXECUTE_CALIBRATION_MSG = messages.getString("CalibrationDataFileIO_ReExecuteCalibrationMsg"); // NOI18N
+    }
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static String getErrorMessage() {

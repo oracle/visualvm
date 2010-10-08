@@ -133,8 +133,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle"); // NOI18N
-    private static final String CPU_MSG = messages.getString("CPUResultsSnapshot_CpuMsg"); // NOI18N
+    private static final String CPU_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("CPUResultsSnapshot_CpuMsg"); // NOI18N
                                                                                            // -----
 
     // Views-related stuff
@@ -432,19 +431,16 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     }
 
     private void debugValues() {
-        LOGGER.finest("collectingTwoTimeStamps: " + collectingTwoTimeStamps); // NOI18N
-        LOGGER.finest("threadCCTContainers.length: " + debugLength(threadCCTContainers)); // NOI18N
-        LOGGER.finest("allThreadsMergedCCTContainers.length: " + debugLength(allThreadsMergedCCTContainers) // NOI18N
-        );
-        LOGGER.finest("rootNode.length: " + debugLength(rootNode)); // NOI18N
-        LOGGER.finest("instrMethodClassesViews.length: " + debugLength(instrMethodClassesViews) // NOI18N
-        );
-        LOGGER.finest("instrMethodNames.length: " + debugLength(instrMethodNames)); // NOI18N
-        LOGGER.finest("instrMethodSignatures.length: " + debugLength(instrMethodSignatures) // NOI18N
-        );
-        LOGGER.finest("nInstrMethods: " + nInstrMethods); // NOI18N
-        LOGGER.finest("sortNodesBy: " + sortNodesBy); // NOI18N
-        LOGGER.finest("sortNodesOrder: " + sortNodesOrder); // NOI18N
+        LOGGER.log(Level.FINEST, "collectingTwoTimeStamps: {0}", collectingTwoTimeStamps); // NOI18N
+        LOGGER.log(Level.FINEST, "threadCCTContainers.length: {0}", debugLength(threadCCTContainers)); // NOI18N
+        LOGGER.log(Level.FINEST, "allThreadsMergedCCTContainers.length: {0}", debugLength(allThreadsMergedCCTContainers));
+        LOGGER.log(Level.FINEST, "rootNode.length: {0}", debugLength(rootNode)); // NOI18N
+        LOGGER.log(Level.FINEST, "instrMethodClassesViews.length: {0}", debugLength(instrMethodClassesViews));
+        LOGGER.log(Level.FINEST, "instrMethodNames.length: {0}", debugLength(instrMethodNames)); // NOI18N
+        LOGGER.log(Level.FINEST, "instrMethodSignatures.length: {0}", debugLength(instrMethodSignatures));
+        LOGGER.log(Level.FINEST, "nInstrMethods: {0}", nInstrMethods); // NOI18N
+        LOGGER.log(Level.FINEST, "sortNodesBy: {0}", sortNodesBy); // NOI18N
+        LOGGER.log(Level.FINEST, "sortNodesOrder: {0}", sortNodesOrder); // NOI18N
     }
 
     /**
