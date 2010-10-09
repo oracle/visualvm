@@ -379,7 +379,7 @@ public final class UIUtils {
 
     public static long[] copyArray(long[] array) {
         if (array == null) {
-            return null;
+            return new long[0];
         }
 
         if (array.length == 0) {
@@ -394,7 +394,7 @@ public final class UIUtils {
 
     public static int[] copyArray(int[] array) {
         if (array == null) {
-            return null;
+            return new int[0];
         }
 
         if (array.length == 0) {
@@ -409,7 +409,7 @@ public final class UIUtils {
 
     public static float[] copyArray(float[] array) {
         if (array == null) {
-            return null;
+            return new float[0];
         }
 
         if (array.length == 0) {

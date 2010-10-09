@@ -321,6 +321,7 @@ public class HeapTest {
         }
         out.close();
         compareTextFiles(goledFile,outFile);
+        outFile.delete();
     }
 
     private void compareTextFiles(File goledFile, File outFile) throws IOException {
