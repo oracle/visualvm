@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,42 +34,58 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.profiler.snaptracer.impl;
 
-package org.netbeans.lib.profiler.instrumentation;
-
-import java.util.ResourceBundle;
-
+import java.io.File;
+import java.io.IOException;
+import org.openide.cookies.OpenCookie;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataNode;
+import org.openide.loaders.DataObjectExistsException;
+import org.openide.loaders.MultiDataObject;
+import org.openide.loaders.MultiFileLoader;
+import org.openide.nodes.Node;
+import org.openide.nodes.Children;
+import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
 /**
- * An exception thrown when begin line or end line are incorrect during Code Fragment profiling
  *
- * @author Ian Formanek
+ * @author Tomas Hurka
  */
-public class BadLocationException extends Exception {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+public class NpssDataObject extends MultiDataObject implements OpenCookie {
 
-    // -----
-    // I18N String constants
-    private static final String CANNOT_FIND_METHOD_CURSOR_MSG;
-    private static final String CANNOT_FIND_METHOD_SELECTION_MSG;
+    public NpssDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
+        super(pf, loader);
 
-    static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.instrumentation.Bundle"); // NOI18N
-        CANNOT_FIND_METHOD_CURSOR_MSG = messages.getString("BadLocationException_CannotFindMethodCursorMsg"); // NOI18N
-        CANNOT_FIND_METHOD_SELECTION_MSG = messages.getString("BadLocationException_CannotFindMethodSelectionMsg"); // NOI18N
     }
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public BadLocationException() {
+    @Override
+    protected Node createNodeDelegate() {
+        return new DataNode(this, Children.LEAF, getLookup());
     }
 
-    public BadLocationException(String message) {
-        super(message);
+    @Override
+    public Lookup getLookup() {
+        return getCookieSet().getLookup();
     }
 
-    public BadLocationException(int code) {
-        super((code == 1) ? CANNOT_FIND_METHOD_CURSOR_MSG : ((code == 2) ? CANNOT_FIND_METHOD_SELECTION_MSG : null));
+    @Override
+    public void open() {
+        File file = FileUtil.toFile(getPrimaryFile());
+        IdeSnapshot snapshot;
+        try {
+            snapshot = new IdeSnapshot(file, new File(file.getCanonicalPath() + ".xml"));
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+            return;
+        }
+        IdeSnapshotAction.openSnapshot(snapshot);
     }
 }
