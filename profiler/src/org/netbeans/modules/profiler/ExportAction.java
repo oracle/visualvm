@@ -376,7 +376,7 @@ public final class ExportAction extends AbstractAction {
                     public void run() {
                         ProgressHandle pHandle = null;
                         pHandle = ProgressHandleFactory.createHandle(EXPORTING_VIEW_MSG);
-                        pHandle.setInitialDelay(0);
+                        pHandle.setInitialDelay(500);
                         pHandle.start();
 
                         try {
