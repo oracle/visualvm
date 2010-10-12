@@ -389,9 +389,11 @@ public final class TimedTakeSnapshotProfilingPoint extends TimedGlobalProfilingP
     private boolean resetResults = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public TimedTakeSnapshotProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
-        super(name, project, factory);
+        this(name, project, factory, false);
+    }
+    public TimedTakeSnapshotProfilingPoint(String name, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, project, factory, existing);
         getChangeSupport().addPropertyChangeListener(this);
     }
 

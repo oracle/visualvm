@@ -68,7 +68,11 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         Paired(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory) {
-            super(name, project, factory);
+            this(name, startLocation, endLocation, project, factory, false);
+        }
+        
+        Paired(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory, boolean existing) {
+            super(name, project, factory, existing);
             this.startLocation = startLocation;
             this.endLocation = endLocation;
         }
@@ -201,7 +205,11 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         Single(String name, Location location, Project project, ProfilingPointFactory factory) {
-            super(name, project, factory);
+            this(name, location, project, factory, false);
+        }
+        
+        Single(String name, Location location, Project project, ProfilingPointFactory factory, boolean existing) {
+            super(name, project, factory, existing);
             this.location = location;
         }
 
@@ -388,9 +396,11 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
     static final String PROPERTY_ANNOTATION = "p_annotation"; // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     CodeProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
-        super(name, project, factory);
+        this(name, project, factory, false);
+    }
+    CodeProfilingPoint(String name, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, project, factory, existing);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

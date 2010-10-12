@@ -314,9 +314,11 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
     private WeakReference<Report> reportReference;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public ResetResultsProfilingPoint(String name, Location location, Project project, ProfilingPointFactory factory) {
-        super(name, location, project, factory);
+        this(name, location, project, factory, false);
+    }
+    public ResetResultsProfilingPoint(String name, Location location, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, location, project, factory, existing);
         getChangeSupport().addPropertyChangeListener(this);
     }
 

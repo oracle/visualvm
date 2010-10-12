@@ -434,9 +434,11 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
     private boolean resetResults = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public TakeSnapshotProfilingPoint(String name, Location location, Project project, ProfilingPointFactory factory) {
-        super(name, location, project, factory);
+        this(name, location, project, factory, false);
+    }
+    public TakeSnapshotProfilingPoint(String name, Location location, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, location, project, factory, existing);
         getChangeSupport().addPropertyChangeListener(this);
     }
 

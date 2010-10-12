@@ -172,7 +172,7 @@ public class StopwatchProfilingPointFactory extends CodeProfilingPointFactory {
         StopwatchProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new StopwatchProfilingPoint(name, startLocation, endLocation, project, this);
+            profilingPoint = new StopwatchProfilingPoint(name, startLocation, endLocation, project, this, true);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
         } catch (Exception e) {
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());

@@ -53,6 +53,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -125,13 +126,19 @@ public abstract class ProfilingPoint {
     private ResultsRenderer resultsRenderer;
     private String name; // Name of the Profiling Point, must be unique within a project
     private boolean enabled = true; // Defines if the Profiling Point is currently enabled
+    final private AtomicBoolean uninitialized;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     ProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
+        this(name, project, factory, false);
+    }
+    
+    ProfilingPoint(String name, Project project, ProfilingPointFactory factory, boolean existing) {
         this.name = name;
         this.project = project;
         this.factory = factory;
+        uninitialized = new AtomicBoolean(!existing);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -200,12 +207,19 @@ public abstract class ProfilingPoint {
     // Opens customizer for the Profiling Point
     public void customize() {
         final ValidityAwarePanel customizer = getCustomizer();
-        ProfilingPointsManager.getDefault().customize(customizer,
-                                                      new Runnable() {
+        if (!ProfilingPointsManager.getDefault().customize(customizer,
+            new Runnable() {
                 public void run() {
                     setValues(customizer);
                 }
-            });
+            })) 
+        {
+            if (uninitialized.compareAndSet(true, false)) {
+                ProfilingPointsManager.getDefault().removeProfilingPoint(this);
+            }
+        } else {
+            uninitialized.compareAndSet(true, false);
+        }
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {

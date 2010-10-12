@@ -194,9 +194,11 @@ public abstract class TimedGlobalProfilingPoint extends GlobalProfilingPoint {
     private TimeCondition condition;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     TimedGlobalProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
-        super(name, project, factory);
+        this(name, project, factory, false);
+    }
+    TimedGlobalProfilingPoint(String name, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, project, factory, existing);
         condition = new TimeCondition();
     }
 
