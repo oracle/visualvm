@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -119,6 +120,7 @@ class NearestGCRoot {
         referentFiled = computeReferentFiled();
         heap.computeReferences(); // make sure references are computed first
         allInstances = heap.getSummary().getTotalLiveInstances();
+        Set processedClasses = new HashSet(heap.getAllClasses().size()*4/3);
         
         try {
             createBuffers();
@@ -126,7 +128,7 @@ class NearestGCRoot {
 
             do {
                 switchBuffers();
-                computeOneLevel();
+                computeOneLevel(processedClasses);
             } while (hasMoreLevels());
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -138,7 +140,7 @@ class NearestGCRoot {
         gcRootsComputed = true;
     }
 
-    private void computeOneLevel() throws IOException {
+    private void computeOneLevel(Set processedClasses) throws IOException {
         int idSize = heap.dumpBuffer.getIDSize();
         for (;;) {
             long instanceId = readLong();
@@ -204,6 +206,9 @@ class NearestGCRoot {
                     }
                 }
             }
+            if (writeClassConnection(processedClasses, instanceId, instance.getJavaClass())) {
+                hasValues = true;
+            }
             if (!hasValues) {
                 writeLeaf(instanceId,instance.getSize());
             }
@@ -265,20 +270,61 @@ class NearestGCRoot {
         writeBuffer.reset();
     }
 
+    private boolean writeClassConnection(final Set processedClasses, final long instanceId, final JavaClass jcls) throws IOException {
+        if (!processedClasses.contains(jcls)) {
+            long jclsId = jcls.getJavaClassId();
+            
+            processedClasses.add(jcls);
+            if (writeConnection(instanceId, jclsId, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean writeConnection(long instanceId, long refInstanceId)
+                          throws IOException {
+        return writeConnection(instanceId, refInstanceId, false);
+    }
+    
+    private boolean writeConnection(long instanceId, long refInstanceId, boolean addRefInstanceId)
                           throws IOException {
         if (refInstanceId != 0) {
             LongMap.Entry entry = heap.idToOffsetMap.get(refInstanceId);
 
             if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.getGCRoot(refInstanceId) == null) {
                 writeLong(refInstanceId);
+                if (addRefInstanceId) {
+                    if (!checkReferences(refInstanceId, instanceId)) {
+                        entry.addReference(instanceId);
+                    }
+                }
                 entry.setNearestGCRootPointer(instanceId);
                 if (!entry.hasOnlyOneReference()) {
                     multipleParents.writeLong(refInstanceId);
 //multiParentsCount++;
                 }
+                return true;
             }
-            return entry != null;
+            return !addRefInstanceId && entry != null;
+        }
+        return false;
+    }
+
+    private boolean checkReferences(final long refInstanceId, final long instanceId) {
+        Instance instance = heap.getInstanceByID(instanceId);        
+        Iterator fieldIt = instance.getFieldValues().iterator();
+        
+        while (fieldIt.hasNext()) {
+            Object field = fieldIt.next();
+
+            if (field instanceof HprofInstanceObjectValue) {
+                HprofInstanceObjectValue objectValue = (HprofInstanceObjectValue) field;
+
+                if (objectValue.getInstanceId() == refInstanceId) {
+                    return true;
+                }
+            }
         }
         return false;
     }
