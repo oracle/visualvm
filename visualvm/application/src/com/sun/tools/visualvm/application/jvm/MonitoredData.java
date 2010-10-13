@@ -168,7 +168,7 @@ public abstract class MonitoredData {
      *
      */
     public long[] getGenCapacity() {
-        return genCapacity;
+        return genCapacity.clone();
     }
     
     /**
@@ -179,7 +179,7 @@ public abstract class MonitoredData {
      *
      */
     public long[] getGenUsed() {
-        return genUsed;
+        return genUsed.clone();
     }
     
     /**
@@ -191,7 +191,7 @@ public abstract class MonitoredData {
      *
      */
     public long[] getGenMaxCapacity() {
-        return genMaxCapacity;
+        return genMaxCapacity.clone();
     }
     
     /**

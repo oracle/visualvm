@@ -416,7 +416,7 @@ public abstract class JvmJvmstatModel extends Model {
      *         long[1] - the maximum amount of Perm Gen memory in bytes;
      */
     public long[] getGenMaxCapacity() {
-        return genMaxCapacity;
+        return genMaxCapacity.clone();
     }
     
     /**

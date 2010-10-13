@@ -100,7 +100,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         }
 
         cpuView.initSession();
-        return detailsViews;
+        return detailsViews.clone();
     }
 
     public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {

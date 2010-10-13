@@ -85,7 +85,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         }
         heapView.initSession();
         permgenView.initSession();
-        return detailsViews;
+        return detailsViews.clone();
     }
     
     public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {

@@ -194,7 +194,7 @@ public final class SimpleXYChartDescriptor {
     // --- Details definition --------------------------------------------------
 
     public void setDetailsItems(String[] detailNames) {
-        this.detailNames = detailNames;
+        this.detailNames = detailNames != null ? detailNames.clone() : null;
     }
 
 

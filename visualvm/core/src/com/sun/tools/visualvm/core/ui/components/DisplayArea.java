@@ -282,8 +282,8 @@ class DisplayArea extends JComponent {
         public void setView(JComponent view) { this.view = view; }
         public JComponent getView() { return view; }
 
-        public void setOptions(JComponent[] options) { this.options = options; }
-        public JComponent[] getOptions() { return options; }
+        public void setOptions(JComponent[] options) { this.options = options != null ? options.clone() : null; }
+        public JComponent[] getOptions() { return options != null ? options.clone() : null; }
 
     }
 

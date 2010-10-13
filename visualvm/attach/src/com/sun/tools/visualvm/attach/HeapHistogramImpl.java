@@ -127,7 +127,7 @@ public class HeapHistogramImpl extends HeapHistogram {
     }
     
     public Date getTime() {
-        return time;
+        return (Date) time.clone();
     }
     
     public Set<ClassInfo> getHeapHistogram() {
