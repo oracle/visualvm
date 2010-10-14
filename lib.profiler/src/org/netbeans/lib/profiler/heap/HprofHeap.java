@@ -449,6 +449,12 @@ class HprofHeap implements Heap {
                         }
                     }
                 }
+                if (refs.isEmpty() && classId == instanceId) {
+                    SyntheticClassField syntheticClassField = new SyntheticClassField(classDump);
+                    long fieldOffset = start + 1 + dumpBuffer.getIDSize() + 4;
+                    
+                    refs.add(new SyntheticClassObjectValue(instance,syntheticClassField,fieldOffset));
+                }
             } else if (tag == OBJECT_ARRAY_DUMP) {
                 int elements = dumpBuffer.getInt(start + 1 + idSize + 4);
                 int i;
