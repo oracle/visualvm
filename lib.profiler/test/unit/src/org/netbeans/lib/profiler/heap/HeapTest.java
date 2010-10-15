@@ -126,14 +126,28 @@ public class HeapTest {
         Collection result = heap.getGCRoots();
         assertEquals(404, result.size());
     }
-
+    
+    /**
+     * Test of getJavaClassByName method, of class Heap.
+     */
+    @Test
+    public void testGetJavaClassByName() {
+        System.out.println("getJavaClassByName");
+        String fqn = "java.io.PrintStream";
+        JavaClass result = heap.getJavaClassByName(fqn);
+        assertEquals(fqn, result.getName());
+    }
+    
     /**
      * Test of getInstanceByID method, of class Heap.
      */
     @Test
     public void testGetInstanceByID() {
         System.out.println("getInstanceByID");
-        long instanceId = 1684197112;
+        String fqn = "java.io.PrintStream";
+        JavaClass printStream = heap.getJavaClassByName(fqn);
+        Instance printStreamInstance = (Instance) printStream.getInstances().get(0);
+        long instanceId = printStreamInstance.getInstanceId();
         Instance result = heap.getInstanceByID(instanceId);
         assertEquals(instanceId, result.getInstanceId());
     }
@@ -144,20 +158,11 @@ public class HeapTest {
     @Test
     public void testGetJavaClassByID() {
         System.out.println("getJavaClassByID");
-        long javaclassId = 1822158616;
+        String fqn = "java.io.PrintStream";
+        JavaClass printStream = heap.getJavaClassByName(fqn);
+        long javaclassId = printStream.getJavaClassId();
         JavaClass result = heap.getJavaClassByID(javaclassId);
         assertEquals(javaclassId, result.getJavaClassId());
-    }
-
-    /**
-     * Test of getJavaClassByName method, of class Heap.
-     */
-    @Test
-    public void testGetJavaClassByName() {
-        System.out.println("getJavaClassByName");
-        String fqn = "java.io.PrintStream";
-        JavaClass result = heap.getJavaClassByName(fqn);
-        assertEquals(fqn, result.getName());
     }
 
     /**
