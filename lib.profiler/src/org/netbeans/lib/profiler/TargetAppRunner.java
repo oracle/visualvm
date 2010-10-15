@@ -78,35 +78,66 @@ public class TargetAppRunner implements CommonConstants {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.Bundle"); // NOI18N
-    private static final String CLASSPATH_SETTINGS_IGNORED_MSG = messages.getString("TargetAppRunner_ClasspathSettingsIgnoredMsg"); // NOI18N
-    private static final String ERROR_STARTING_JVM_MSG = messages.getString("TargetAppRunner_ErrorStartingJvmMsg"); // NOI18N
-    private static final String CALIBRATION_SUMMARY_SHORT_MSG = messages.getString("TargetAppRunner_CalibrationSummaryShortMsg"); // NOI18N
-    private static final String CALIBRATION_SUMMARY_DETAILS_MSG = messages.getString("TargetAppRunner_CalibrationSummaryDetailsMsg"); // NOI18N
-    private static final String FAILED_ESTABLISH_CONN_MSG = messages.getString("TargetAppRunner_FailedEstablishConnMsg"); // NOI18N
-    private static final String UNEXPECTED_PROBLEM_STARTING_APP_MSG = messages.getString("TargetAppRunner_UnexpectedProblemStartingAppMsg"); // NOI18N
-    private static final String JVM_TERMINATED_NOTRESPOND_STRING = messages.getString("TargetAppRunner_JvmTerminatedNotRespondString"); // NOI18N
-    private static final String INTERNAL_PROBLEM_STRING = messages.getString("TargetAppRunner_InternalProblemString"); // NOI18N
-    private static final String FAILED_START_APP_CAUSE_MSG = messages.getString("TargetAppRunner_FailedStartAppCauseMsg"); // NOI18N
-    private static final String CALIBRATION_RESULTS_MSG = messages.getString("TargetAppRunner_CalibrationResultsMsg"); // NOI18N
-    private static final String CALIBRATION_ERROR_MSG = messages.getString("TargetAppRunner_CalibrationErrorMsg"); // NOI18N
-    private static final String INTERNAL_STATISTICS_ONLY_MSG = messages.getString("TargetAppRunner_InternalStatisticsOnlyMsg"); // NOI18N
-    private static final String INSTR_METHODS_COUNT_MSG = messages.getString("TargetAppRunner_InstrMethodsCountMsg"); // NOI18N
-    private static final String CLASSLOAD_FIRSTINV_COUNT_MSG = messages.getString("TargetAppRunner_ClassLoadFirstInvCountMsg"); // NOI18N
-    private static final String NON_EMPTY_IMG_COUNT_MSG = messages.getString("TargetAppRunner_NonEmptyImgCountMsg"); // NOI18N
-    private static final String EMPTY_IMG_COUNT_MSG = messages.getString("TargetAppRunner_EmptyImgCountMsg"); // NOI18N
-    private static final String SINGLE_IMG_COUNT_MSG = messages.getString("TargetAppRunner_SingleImgCountMsg"); // NOI18N
-    private static final String AVG_METHOD_TIME_MSG = messages.getString("TargetAppRunner_AvgMethodTimeMsg"); // NOI18N
-    private static final String MIN_METHOD_TIME_MSG = messages.getString("TargetAppRunner_MinMethodTimeMsg"); // NOI18N
-    private static final String MAX_METHOD_TIME_MSG = messages.getString("TargetAppRunner_MaxMethodTimeMsg"); // NOI18N
-    private static final String TOTAL_RUN_TIME_MSG = messages.getString("TargetAppRunner_TotalRunTimeMsg"); // NOI18N
-    private static final String INJ_INSTR_TIME_MSG = messages.getString("TargetAppRunner_InjInstrTimeMsg"); // NOI18N
-    private static final String TOTAL_INSTR_HOTSWAP_TIME_MSG = messages.getString("TargetAppRunner_TotalInstrHotSwapTimeMsg"); // NOI18N
-    private static final String BYTECODE_COMM_TIME_MSG = messages.getString("TargetAppRunner_ByteCodeCommTimeMsg"); // NOI18N
-    private static final String CLIENT_BYTECODE_TIME_MSG = messages.getString("TargetAppRunner_ClientByteCodeTimeMsg"); // NOI18N
-    private static final String CLIENT_DISK_PROCESS_MSG = messages.getString("TargetAppRunner_ClientDiskProcessTimeMsg"); // NOI18N
-    private static final String CLIENT_RESULTS_PROCESS_MSG = messages.getString("TargetAppRunner_ClientResultsProcessTimeMsg"); // NOI18N
-    private static final String PERFORMING_CALIBRATION_MSG = messages.getString("TargetAppRunner_PerformingCalibrationMsg"); // NOI18N
+    private static final String CLASSPATH_SETTINGS_IGNORED_MSG;
+    private static final String ERROR_STARTING_JVM_MSG;
+    private static final String CALIBRATION_SUMMARY_SHORT_MSG;
+    private static final String CALIBRATION_SUMMARY_DETAILS_MSG;
+    private static final String FAILED_ESTABLISH_CONN_MSG;
+    private static final String UNEXPECTED_PROBLEM_STARTING_APP_MSG;
+    private static final String JVM_TERMINATED_NOTRESPOND_STRING;
+    private static final String INTERNAL_PROBLEM_STRING;
+    private static final String FAILED_START_APP_CAUSE_MSG;
+    private static final String CALIBRATION_RESULTS_MSG;
+    private static final String CALIBRATION_ERROR_MSG;
+    private static final String INTERNAL_STATISTICS_ONLY_MSG;
+    private static final String INSTR_METHODS_COUNT_MSG;
+    private static final String CLASSLOAD_FIRSTINV_COUNT_MSG;
+    private static final String NON_EMPTY_IMG_COUNT_MSG;
+    private static final String EMPTY_IMG_COUNT_MSG;
+    private static final String SINGLE_IMG_COUNT_MSG;
+    private static final String AVG_METHOD_TIME_MSG;
+    private static final String MIN_METHOD_TIME_MSG;
+    private static final String MAX_METHOD_TIME_MSG;
+    private static final String TOTAL_RUN_TIME_MSG;
+    private static final String INJ_INSTR_TIME_MSG;
+    private static final String TOTAL_INSTR_HOTSWAP_TIME_MSG;
+    private static final String BYTECODE_COMM_TIME_MSG;
+    private static final String CLIENT_BYTECODE_TIME_MSG;
+    private static final String CLIENT_DISK_PROCESS_MSG;
+    private static final String CLIENT_RESULTS_PROCESS_MSG;
+    private static final String PERFORMING_CALIBRATION_MSG;
+    
+    static {
+        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.Bundle"); // NOI18N
+        CLASSPATH_SETTINGS_IGNORED_MSG = messages.getString("TargetAppRunner_ClasspathSettingsIgnoredMsg"); // NOI18N
+        ERROR_STARTING_JVM_MSG = messages.getString("TargetAppRunner_ErrorStartingJvmMsg"); // NOI18N
+        CALIBRATION_SUMMARY_SHORT_MSG = messages.getString("TargetAppRunner_CalibrationSummaryShortMsg"); // NOI18N
+        CALIBRATION_SUMMARY_DETAILS_MSG = messages.getString("TargetAppRunner_CalibrationSummaryDetailsMsg"); // NOI18N
+        FAILED_ESTABLISH_CONN_MSG = messages.getString("TargetAppRunner_FailedEstablishConnMsg"); // NOI18N
+        UNEXPECTED_PROBLEM_STARTING_APP_MSG = messages.getString("TargetAppRunner_UnexpectedProblemStartingAppMsg"); // NOI18N
+        JVM_TERMINATED_NOTRESPOND_STRING = messages.getString("TargetAppRunner_JvmTerminatedNotRespondString"); // NOI18N
+        INTERNAL_PROBLEM_STRING = messages.getString("TargetAppRunner_InternalProblemString"); // NOI18N
+        FAILED_START_APP_CAUSE_MSG = messages.getString("TargetAppRunner_FailedStartAppCauseMsg"); // NOI18N
+        CALIBRATION_RESULTS_MSG = messages.getString("TargetAppRunner_CalibrationResultsMsg"); // NOI18N
+        CALIBRATION_ERROR_MSG = messages.getString("TargetAppRunner_CalibrationErrorMsg"); // NOI18N
+        INTERNAL_STATISTICS_ONLY_MSG = messages.getString("TargetAppRunner_InternalStatisticsOnlyMsg"); // NOI18N
+        INSTR_METHODS_COUNT_MSG = messages.getString("TargetAppRunner_InstrMethodsCountMsg"); // NOI18N
+        CLASSLOAD_FIRSTINV_COUNT_MSG = messages.getString("TargetAppRunner_ClassLoadFirstInvCountMsg"); // NOI18N
+        NON_EMPTY_IMG_COUNT_MSG = messages.getString("TargetAppRunner_NonEmptyImgCountMsg"); // NOI18N
+        EMPTY_IMG_COUNT_MSG = messages.getString("TargetAppRunner_EmptyImgCountMsg"); // NOI18N
+        SINGLE_IMG_COUNT_MSG = messages.getString("TargetAppRunner_SingleImgCountMsg"); // NOI18N
+        AVG_METHOD_TIME_MSG = messages.getString("TargetAppRunner_AvgMethodTimeMsg"); // NOI18N
+        MIN_METHOD_TIME_MSG = messages.getString("TargetAppRunner_MinMethodTimeMsg"); // NOI18N
+        MAX_METHOD_TIME_MSG = messages.getString("TargetAppRunner_MaxMethodTimeMsg"); // NOI18N
+        TOTAL_RUN_TIME_MSG = messages.getString("TargetAppRunner_TotalRunTimeMsg"); // NOI18N
+        INJ_INSTR_TIME_MSG = messages.getString("TargetAppRunner_InjInstrTimeMsg"); // NOI18N
+        TOTAL_INSTR_HOTSWAP_TIME_MSG = messages.getString("TargetAppRunner_TotalInstrHotSwapTimeMsg"); // NOI18N
+        BYTECODE_COMM_TIME_MSG = messages.getString("TargetAppRunner_ByteCodeCommTimeMsg"); // NOI18N
+        CLIENT_BYTECODE_TIME_MSG = messages.getString("TargetAppRunner_ClientByteCodeTimeMsg"); // NOI18N
+        CLIENT_DISK_PROCESS_MSG = messages.getString("TargetAppRunner_ClientDiskProcessTimeMsg"); // NOI18N
+        CLIENT_RESULTS_PROCESS_MSG = messages.getString("TargetAppRunner_ClientResultsProcessTimeMsg"); // NOI18N
+        PERFORMING_CALIBRATION_MSG = messages.getString("TargetAppRunner_PerformingCalibrationMsg"); // NOI18N
+    }
                                                                                                                              // -----
     private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.TargetAppRunner") != null; // NOI18N
     private static TargetAppRunner defaultTAR; // Ok only while we don't have multiple profiling sessions

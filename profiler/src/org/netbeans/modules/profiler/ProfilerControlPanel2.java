@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler;
 
+import java.util.Arrays;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
@@ -69,12 +70,12 @@ import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.SharedClassObject;
-import org.openide.util.Utilities;
 import org.openide.util.actions.SystemAction;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
@@ -90,9 +91,9 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -936,96 +937,99 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             setBackground(list.getBackground());
                         }
 
-                        // FileObject
-                        FileObject fo = (FileObject) value;
+                        if (value instanceof FileObject) {
+                            // FileObject
+                            FileObject fo = (FileObject) value;
 
-                        if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
-                            // Heap Dump
-                            c.setIcon(memoryIcon);
+                            if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
+                                // Heap Dump
+                                c.setIcon(memoryIcon);
 
-                            String fileName = fo.getName();
-
-                            if (HeapWalkerManager.getDefault().isHeapWalkerOpened(FileUtil.toFile(fo))) {
-                                c.setFont(c.getFont().deriveFont(Font.BOLD));
-                            }
-
-                            if (fileName.startsWith("heapdump-")) { // NOI18N
-
-                                String time = fileName.substring("heapdump-".length(), fileName.length()); // NOI18N
-
-                                try {
-                                    long timeStamp = Long.parseLong(time);
-                                    c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME,
-                                                                   new Object[] { StringUtils.formatUserDate(new Date(timeStamp)) }));
-                                } catch (NumberFormatException e) {
-                                    // file name is probably customized
-                                    c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
-                                }
-                            } else {
-                                c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
-                            }
-                        } else {
-                            // Profiler snapshot
-                            LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
-
-                            if (ls != null) {
-                                ResultsSnapshot rs = ls.getSnapshot();
-                                c.setFont(c.getFont().deriveFont(Font.BOLD));
-                                c.setText(StringUtils.formatUserDate(new Date(rs.getTimeTaken())));
-
-                                switch (ls.getType()) {
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                                        c.setIcon(cpuIcon);
-
-                                        break;
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                                        c.setIcon(fragmentIcon);
-
-                                        break;
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                                        c.setIcon(memoryIcon);
-
-                                        break;
-                                }
-                            } else {
                                 String fileName = fo.getName();
 
-                                if (fileName.startsWith("snapshot-")) { // NOI18N
+                                if (HeapWalkerManager.getDefault().isHeapWalkerOpened(FileUtil.toFile(fo))) {
+                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
+                                }
 
-                                    String time = fileName.substring("snapshot-".length(), fileName.length()); // NOI18N
+                                if (fileName.startsWith("heapdump-")) { // NOI18N
+
+                                    String time = fileName.substring("heapdump-".length(), fileName.length()); // NOI18N
 
                                     try {
                                         long timeStamp = Long.parseLong(time);
-                                        c.setText(StringUtils.formatUserDate(new Date(timeStamp)));
+                                        c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME,
+                                                                       new Object[] { StringUtils.formatUserDate(new Date(timeStamp)) }));
                                     } catch (NumberFormatException e) {
                                         // file name is probably customized
-                                        c.setText(fileName);
+                                        c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
                                     }
                                 } else {
-                                    c.setText(fileName);
+                                    c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
                                 }
+                            } else {
+                                // Profiler snapshot
+                                LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
 
-                                int type = ResultsManager.getDefault().getSnapshotType(fo);
+                                if (ls != null) {
+                                    ResultsSnapshot rs = ls.getSnapshot();
+                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
+                                    c.setText(StringUtils.formatUserDate(new Date(rs.getTimeTaken())));
 
-                                switch (type) {
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                                        c.setIcon(cpuIcon);
+                                    switch (ls.getType()) {
+                                        case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                                            c.setIcon(cpuIcon);
 
-                                        break;
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                                        c.setIcon(fragmentIcon);
+                                            break;
+                                        case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
+                                            c.setIcon(fragmentIcon);
 
-                                        break;
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                                        c.setIcon(memoryIcon);
+                                            break;
+                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                                            c.setIcon(memoryIcon);
 
-                                        break;
+                                            break;
+                                    }
+                                } else {
+                                    String fileName = fo.getName();
+
+                                    if (fileName.startsWith("snapshot-")) { // NOI18N
+
+                                        String time = fileName.substring("snapshot-".length(), fileName.length()); // NOI18N
+
+                                        try {
+                                            long timeStamp = Long.parseLong(time);
+                                            c.setText(StringUtils.formatUserDate(new Date(timeStamp)));
+                                        } catch (NumberFormatException e) {
+                                            // file name is probably customized
+                                            c.setText(fileName);
+                                        }
+                                    } else {
+                                        c.setText(fileName);
+                                    }
+
+                                    int type = ResultsManager.getDefault().getSnapshotType(fo);
+
+                                    switch (type) {
+                                        case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                                            c.setIcon(cpuIcon);
+
+                                            break;
+                                        case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
+                                            c.setIcon(fragmentIcon);
+
+                                            break;
+                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                                            c.setIcon(memoryIcon);
+
+                                            break;
+                                    }
                                 }
                             }
+                        } else {
+                            c.setText(value.toString());
                         }
-
                         return c;
                     }
                 });
@@ -1289,34 +1293,53 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         }
 
         private void refreshList() {
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        int selIdx = list.getSelectedIndex();
-                        FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(displayedProject);
-                        listModel.removeAllElements();
+            final int[] selIdx = new int[] {-1};
 
-                        for (int i = 0; i < snapshotsOnDisk.length; i++) {
-                            listModel.addElement(snapshotsOnDisk[i]);
-                        }
+            
+            org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker() {
+                private final java.util.List modelElements = new ArrayList<Object>();
+                
+                @Override
+                protected void doInBackground() {
+                    listModel.removeAllElements();
+                    FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(displayedProject);
+                    modelElements.addAll(Arrays.asList(snapshotsOnDisk));
 
-                        FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject);
+                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject);
+                    modelElements.addAll(Arrays.asList(heapdumpsOnDisk));
 
-                        for (int i = 0; i < heapdumpsOnDisk.length; i++) {
-                            listModel.addElement(heapdumpsOnDisk[i]);
-                        }
+                    if (selIdx[0] != -1) { // keep selected index, if there was selection previously and there are remaining items
 
-                        if (selIdx != -1) { // keep selected index, if there was selection previously and there are remaining items
-
-                            if (selIdx >= listModel.size()) {
-                                selIdx = listModel.size() - 1;
-                            }
-
-                            if (selIdx != -1) {
-                                list.setSelectedIndex(selIdx);
-                            }
+                        if (selIdx[0] >= modelElements.size()) {
+                            selIdx[0] = modelElements.size() - 1;
                         }
                     }
-                });
+                }
+
+                @Override
+                protected void done() {
+                    listModel.removeAllElements();
+                    for(Object e : modelElements) {
+                        listModel.addElement(e);
+                    }
+                    list.setEnabled(true);
+                    if (selIdx[0] != -1) {
+                        list.setSelectedIndex(selIdx[0]);
+                    }
+                }
+
+                @Override
+                protected void nonResponding() {
+                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            list.setEnabled(false);
+                            listModel.addElement(NbBundle.getMessage(ProfilerControlPanel2.class, "MSG_Loading_Progress")); // NOI18N
+                        }
+                    });
+                }
+            };
+            worker.execute();
         }
 
         private void updateButtons() {
@@ -1347,8 +1370,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             } catch (Exception e) {
                 ErrorManager.getDefault().notify(ErrorManager.ERROR, e); // just in case ProjectUtils doesn't provide expected information
             }
-
-            ;
 
             items.add(0, GLOBAL_COMBO_ITEM_STRING);
 
