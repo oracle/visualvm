@@ -278,6 +278,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     private CardLayout contents;
     private ClassesListController classesListController;
     private final NumberFormat percentFormat = NumberFormat.getPercentInstance();
+    private final NumberFormat numberFormat = NumberFormat.getInstance();
     private ClassesListTableModel realClassesListTableModel = new ClassesListTableModel();
     private ExtendedTableModel classesListTableModel = new ExtendedTableModel(realClassesListTableModel);
     private FilterComponent filterComponent;
@@ -797,11 +798,11 @@ public class ClassesListControllerUI extends JTitledPanel {
                             displayCache2[i][0] = jClass.getName();
                             displayCache2[i][1] = new Double((double) instancesCount /
                                                  (double) totalLiveInstances * 100);
-                            displayCache2[i][2] = Integer.toString(instancesCount) + " (" // NOI18N
+                            displayCache2[i][2] = numberFormat.format(instancesCount) + " (" // NOI18N
                                                  + percentFormat.format((double) instancesCount /
                                                  (double) totalLiveInstances) + ")"; // NOI18N
                             displayCache2[i][3] = (allInstancesSize < 0) ? RESULT_NOT_AVAILABLE_STRING
-                                                  : (Long.toString(allInstancesSize) + " (" // NOI18N
+                                                  : (numberFormat.format(allInstancesSize) + " (" // NOI18N
                                                   + percentFormat.format((double) allInstancesSize /
                                                   (double) totalLiveBytes) + ")"); // NOI18N
                             displayCache2[i][4] = jClass;
