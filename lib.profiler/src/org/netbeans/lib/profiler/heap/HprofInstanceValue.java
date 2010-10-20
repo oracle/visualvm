@@ -77,7 +77,7 @@ class HprofInstanceValue extends HprofObject implements FieldValue {
     }
 
     Object getTypeValue() {
-        byte type = field.getVauleType();
+        byte type = field.getValueType();
         HprofByteBuffer dumpBuffer = instance.dumpClass.getHprofBuffer();
 
         return getTypeValue(dumpBuffer, fileOffset, type);
