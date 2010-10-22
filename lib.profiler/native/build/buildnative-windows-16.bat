@@ -18,11 +18,13 @@ cl /I%BUILD_JDK%\include /I%BUILD_JDK%\include\win32 ^
 %BUILD_SRC_15%\common_functions.c ^
 /D WIN32 /MD /Ox /c
 
+rc /fo version.res %BUILD_SRC_15%\windows\version.rc
+
 link /DLL /MAP:%BUILD_OUTPUT%\deployed\jdk16\windows\profilerinterface.map /OUT:%BUILD_OUTPUT%\deployed\jdk16\windows\profilerinterface.dll ^
-Classes.obj HeapDump.obj Timers.obj GC.obj Threads.obj Stacks.obj common_functions.obj class_file_cache.obj attach.obj
+Classes.obj HeapDump.obj Timers.obj GC.obj Threads.obj Stacks.obj common_functions.obj class_file_cache.obj attach.obj version.res
 
 del vc60.pdb
-del *.obj
+del *.obj *.res
 del %BUILD_OUTPUT%\deployed\jdk16\windows\*.lib %BUILD_OUTPUT%\deployed\jdk16\windows\*.exp %BUILD_OUTPUT%\deployed\jdk16\windows\*.ilk %BUILD_OUTPUT%\deployed\jdk16\windows\*.pdb
 
 copy %BUILD_OUTPUT%\deployed\jdk16\windows\*.dll %BUILD_DEPLOY%\deployed\jdk16\windows
