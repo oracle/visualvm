@@ -549,17 +549,18 @@ public final class ProjectUtilities {
             return ProjectTypeProfiler.DEFAULT; // global attach
         }
 
-        final Collection c = getAllProjectTypeProfilers();
-
-        for (Iterator i = c.iterator(); i.hasNext();) {
-            final ProjectTypeProfiler ptp = (ProjectTypeProfiler) i.next();
-
-            if (ptp.isProfilingSupported(project)) {
-                return ptp; // project type profiler for provided project
-            }
-        }
-
-        return ProjectTypeProfiler.DEFAULT; // unsupported project
+        ProjectTypeProfiler fromProject = project.getLookup().lookup(ProjectTypeProfiler.class);
+        
+        return fromProject != null ? (fromProject.isProfilingSupported(project) ? fromProject : ProjectTypeProfiler.DEFAULT) : ProjectTypeProfiler.DEFAULT;
+//        final Collection c = getAllProjectTypeProfilers();
+//
+//        for (Iterator i = c.iterator(); i.hasNext();) {
+//            final ProjectTypeProfiler ptp = (ProjectTypeProfiler) i.next();
+//
+//            if (ptp.isProfilingSupported(project)) {
+//                return ptp; // project type profiler for provided project
+//            }
+//        }
     }
 
     /**

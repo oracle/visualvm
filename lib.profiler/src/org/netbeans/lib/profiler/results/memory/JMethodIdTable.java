@@ -125,7 +125,7 @@ public class JMethodIdTable {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static JMethodIdTable getDefault() {
+    synchronized public static JMethodIdTable getDefault() {
         if (defaultTable == null) {
             defaultTable = new JMethodIdTable();
         }
@@ -133,11 +133,11 @@ public class JMethodIdTable {
         return defaultTable;
     }
 
-    public static void reset() {
+    synchronized public static void reset() {
         defaultTable = null;
     }
 
-    public String debug() {
+    synchronized public String debug() {
         if (entries == null) {
             return "Entries = null, size = " + size + ", nElements = " + nElements + ", threshold = " // NOI18N
                    + threshold + ", incompleteEntries = " + incompleteEntries; // NOI18N
@@ -147,7 +147,7 @@ public class JMethodIdTable {
         }
     }
 
-    public void readFromStream(DataInputStream in) throws IOException {
+    synchronized public void readFromStream(DataInputStream in) throws IOException {
         size = in.readInt();
         nElements = in.readInt();
         threshold = in.readInt();
@@ -166,7 +166,7 @@ public class JMethodIdTable {
         }
     }
 
-    public void writeToStream(DataOutputStream out) throws IOException {
+    synchronized public void writeToStream(DataOutputStream out) throws IOException {
         out.writeInt(size);
         out.writeInt(nElements);
         out.writeInt(threshold);
@@ -191,7 +191,7 @@ public class JMethodIdTable {
         }
     }
 
-    JMethodIdTableEntry getEntry(int methodId) {
+    synchronized JMethodIdTableEntry getEntry(int methodId) {
         int pos = hash(methodId) % size;
 
         while ((entries[pos] != null) && (entries[pos].methodId != methodId)) {
@@ -262,7 +262,7 @@ public class JMethodIdTable {
         }
     }
 
-    private void completeEntry(int methodId, String className, String methodName, String methodSig) {
+    synchronized private void completeEntry(int methodId, String className, String methodName, String methodSig) {
         int pos = hash(methodId) % size;
 
         while (entries[pos].methodId != methodId) {
