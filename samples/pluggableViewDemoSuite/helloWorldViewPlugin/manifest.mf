@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: org.netbeans.helloworldplugin
-OpenIDE-Module-Install: org/netbeans/helloworldplugin/Installer.class
-OpenIDE-Module-Layer: org/netbeans/helloworldplugin/layer.xml
-OpenIDE-Module-Localizing-Bundle: org/netbeans/helloworldplugin/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-
