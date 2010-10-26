@@ -1,7 +1,7 @@
 
 SET BUILD_SRC_15=..\src-jdk15
 SET BUILD_SRC=..\src
-SET BUILD_JDK=C:\PROGRA~1\java\jdk1.6.0_16
+SET BUILD_JDK=C:\PROGRA~1\java\jdk1.6.0_22
 SET BUILD_OUTPUT=dist
 SET BUILD_DEPLOY=..\..\release\lib
 
@@ -19,11 +19,13 @@ cl /I%BUILD_JDK%\include /I%BUILD_JDK%\include\win32 ^
 %BUILD_SRC_15%\common_functions.c ^
 /D WIN32 /MD /Ox /c
 
+rc /fo version.res %BUILD_SRC_15%\windows\version.rc
+
 link /DLL /MAP:%BUILD_OUTPUT%\deployed\jdk16\windows-amd64\profilerinterface.map /OUT:%BUILD_OUTPUT%\deployed\jdk16\windows-amd64\profilerinterface.dll ^
-Classes.obj HeapDump.obj Timers.obj GC.obj Threads.obj Stacks.obj common_functions.obj class_file_cache.obj attach.obj
+Classes.obj HeapDump.obj Timers.obj GC.obj Threads.obj Stacks.obj common_functions.obj class_file_cache.obj attach.obj version.res
 
 del vc60.pdb
-del *.obj
+del *.obj *.res
 del %BUILD_OUTPUT%\deployed\jdk16\windows-amd64\*.lib %BUILD_OUTPUT%\deployed\jdk16\windows-amd64\*.exp %BUILD_OUTPUT%\deployed\jdk16\windows-amd64\*.ilk %BUILD_OUTPUT%\deployed\jdk16\windows-amd64\*.pdb
 
 copy %BUILD_OUTPUT%\deployed\jdk16\windows-amd64\*.dll %BUILD_DEPLOY%\deployed\jdk16\windows-amd64
