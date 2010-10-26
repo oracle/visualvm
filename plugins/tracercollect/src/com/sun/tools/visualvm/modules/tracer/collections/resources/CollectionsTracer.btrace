@@ -348,6 +348,25 @@ import static com.sun.btrace.BTraceUtils.*;
     }
     // </fragment>
 
+    // <fragment name="coll_resize">
+    @Property(name="mapResizeProfiler") private static Profiler mapResizeProfiler = Profiling.newProfiler(3);
+    @OnMethod(
+        clazz="+java.util.Map",
+        method="resize"
+    )
+    public static void mapResizeBefore(@ProbeClassName String pcn, int newSize) {
+        Profiling.recordEntry(mapResizeProfiler, pcn);
+    }
+    @OnMethod(
+        clazz="+java.util.Map",
+        method="resize",
+        location=@Location(Kind.RETURN)
+    )
+    public static void mapResizeBefore(int newSize, @ProbeClassName String pcn, @Duration long time) {
+        Profiling.recordExit(mapResizeProfiler, pcn, time);
+    }
+    // </fragment>
+    
     @OnTimer(1000)
     public static void updateMBeans() {
         // <fragment name="sorting">
@@ -368,6 +387,10 @@ import static com.sun.btrace.BTraceUtils.*;
 
         // <fragment name="collections_search">
         Profiling.snapshotAndReset(collectionsSearchProfiler);
+        // </fragment>
+        
+        // <fragment name="map_resize">
+        Profiling.snapshotAndReset(mapResizeProfiler);
         // </fragment>
     }
 }

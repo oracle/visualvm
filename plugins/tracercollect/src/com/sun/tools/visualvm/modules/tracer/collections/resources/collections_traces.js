@@ -473,6 +473,81 @@ VisualVM.Tracer.addPackages([{
                         }
                     }
                 ]
+            },
+            {
+                name: "Map Resize Count",
+                desc: "Invocations count of resize() method in Map implementations.",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: scriptPath,
+                    fragment: "map_resize"
+                },
+                properties: [
+                    {
+                        name: "HashMap",
+                        desc: "Invocations count of resize().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "mapResizeProfiler"), "java.util.HashMap")
+
+                    },
+                    {
+                        name: "WeakHashMap",
+                        desc: "Invocations count of resize().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "mapResizeProfiler"), "java.util.WeakHashMap")
+
+                    },
+                    {
+                        name: "IdentityHashMap",
+                        desc: "Invocations count of resize().",
+                        value: invocations(mbeanAttribute("btrace:name=CollectionsStats", "mapResizeProfiler"), "java.util.IdentityHashMap")
+
+                    }
+                ]
+            },
+            {
+                name: "Map Resize Time",
+                desc: "Relative time spent in resize() method in Map implementations.",
+                reqs: "Requires BTrace Deployer plugin.",
+                validator: function() {
+                    return btraceDeployer != undefined;
+                },
+                deployment: {
+                    deployer: btraceDeployer,
+                    script: scriptPath,
+                    fragment: "map_resize"
+                },
+                properties: [
+                    {
+                        name: "HashMap",
+                        desc: "Relative time spent in resize().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "mapResizeProfiler"), "java.util.HashMap"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "WeakHashMap",
+                        desc: "Relative time spent in resize().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "mapResizeProfiler"), "java.util.WeakHashMap"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    },
+                    {
+                        name: "IdentityHashMap",
+                        desc: "Relative time spent in resize().",
+                        value: selfTimePercent(mbeanAttribute("btrace:name=CollectionsStats", "mapResizeProfiler"), "java.util.IdentityHashMap"),
+                        presenter: {
+                            format: ItemValueFormatter.DEFAULT_PERCENT,
+                            max: 1000
+                        }
+                    }
+                ]
             }
         ]
     }
