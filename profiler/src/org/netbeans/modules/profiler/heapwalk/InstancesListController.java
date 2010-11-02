@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.heapwalk;
 
 
+import java.text.NumberFormat;
 import org.netbeans.modules.profiler.heapwalk.model.AbstractHeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.model.ChildrenComputer;
@@ -401,7 +402,10 @@ public class InstancesListController extends AbstractController {
         }
     }
 
-    public class InstancesListInstanceNode implements HeapWalkerNode, InstancesListNode {
+    public static class InstancesListInstanceNode implements HeapWalkerNode, InstancesListNode {
+
+        private static final NumberFormat numberFormat = NumberFormat.getInstance();
+        
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private HeapWalkerNode parent;
@@ -419,7 +423,6 @@ public class InstancesListController extends AbstractController {
             this.instance = instance;
 
             this.name = "#" + instance.getInstanceNumber(); // NOI18N
-            this.size = String.valueOf(instance.getSize());
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -494,7 +497,7 @@ public class InstancesListController extends AbstractController {
 
         public String getRetainedSize() {
             if (retainedSize == null)
-                retainedSize = String.valueOf(instance.getRetainedSize());
+                retainedSize = numberFormat.format(instance.getRetainedSize());
             return retainedSize;
         }
 
@@ -507,6 +510,8 @@ public class InstancesListController extends AbstractController {
         }
 
         public String getSize() {
+            if (size == null)
+                size = numberFormat.format(instance.getSize());
             return size;
         }
 

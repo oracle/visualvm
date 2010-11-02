@@ -151,7 +151,6 @@ public class OverviewController extends AbstractController {
     public OverviewController(SummaryController summaryController) {
         this.summaryController = summaryController;
         heapFragmentWalker = summaryController.getHeapFragmentWalker();
-        java_lang_Class = heapFragmentWalker.getHeapFragment().getJavaClassByName(Class.class.getName());
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -531,13 +530,20 @@ public class OverviewController extends AbstractController {
         if (jcls == null) {
             return "unknown instance #"+in.getInstanceId(); // NOI18N
         }
-        if (jcls.equals(java_lang_Class)) {
+        if (jcls.equals(getJavaClass())) {
             JavaClass javaClass = heapFragmentWalker.getHeapFragment().getJavaClassByID(in.getInstanceId());
             className = javaClass.getName();
             return "<a href='"+ CLASS_URL_PREFIX + className + "/" + javaClass.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
         }
         className = jcls.getName();
-        return "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
+        return "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "' name='" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
+    }
+
+    private JavaClass getJavaClass() {
+        if (java_lang_Class == null) {
+            java_lang_Class = heapFragmentWalker.getHeapFragment().getJavaClassByName(Class.class.getName());
+        }
+        return java_lang_Class;
     }
 
     private static String htmlize(String value) {

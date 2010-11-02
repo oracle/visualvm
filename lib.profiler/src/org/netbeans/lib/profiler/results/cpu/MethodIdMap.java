@@ -45,7 +45,9 @@ package org.netbeans.lib.profiler.results.cpu;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -60,14 +62,13 @@ public class MethodIdMap {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle"); // NOI18N
-    private static final String ANONYMOUS_PACKAGE_STRING = messages.getString("MethodIdMap_AnonymousPackageString"); // NOI18N
+    private static final String ANONYMOUS_PACKAGE_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("MethodIdMap_AnonymousPackageString"); // NOI18N
                                                                                                                      // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ArrayList classOrPackageNames;
-    private Hashtable classIdCache; // Maps a class (package) name to its integer id
+    private Map classIdCache; // Maps a class (package) name to its integer id
     private int[] classIds;
     private int curClassId;
     private int newView;
@@ -84,7 +85,7 @@ public class MethodIdMap {
     public MethodIdMap(String[] methodLevelInstrClassNames, int nInstrMethods, int newView) {
         this.newView = newView;
         classIds = new int[nInstrMethods];
-        classIdCache = new Hashtable();
+        classIdCache = new ConcurrentHashMap();
         classOrPackageNames = new ArrayList();
         curClassId = 0;
         classOrPackageNames.add(methodLevelInstrClassNames[0]);
