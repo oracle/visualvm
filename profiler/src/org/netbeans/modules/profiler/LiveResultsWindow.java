@@ -1113,7 +1113,7 @@ public final class LiveResultsWindow extends TopComponent
                         return;
                     }
 
-                    RequestProcessor.getDefault().post(new Runnable() {
+                    IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                             public void run() {
                                 // send a command to server to generate the newest live data
                                 callForceObtainedResultsDump(runner.getProfilerClient());

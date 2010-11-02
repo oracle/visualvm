@@ -43,6 +43,10 @@
 
 package org.netbeans.modules.profiler;
 
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AgentLoadException;
+import com.sun.tools.attach.AttachNotSupportedException;
+import com.sun.tools.attach.VirtualMachine;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -118,8 +122,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.text.MessageFormat;
@@ -136,7 +138,6 @@ import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
-import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
 import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
@@ -923,16 +924,9 @@ public final class NetBeansProfiler extends Profiler {
                 }
 
                 private void loadAgentIntTargetJVM(final String jar, final String options, final String pid)
-                                            throws SecurityException, IllegalArgumentException, IllegalAccessException,
-                                                   NoSuchMethodException, ClassNotFoundException, InvocationTargetException {
-                    //VirtualMachine virtualMachine = VirtualMachine attach(String id);
-                    Class vmClass = Class.forName("com.sun.tools.attach.VirtualMachine"); // NOI18N
-                    Method attachMethod = vmClass.getMethod("attach", String.class); // NOI18N
-                    Object virtualMachine = attachMethod.invoke(null, pid);
-
-                    // virtualMachine.loadAgent(jar,options);
-                    Method loadAgentMethod = vmClass.getMethod("loadAgent", String.class, String.class); // NOI18N
-                    loadAgentMethod.invoke(virtualMachine, jar, options);
+                                            throws AttachNotSupportedException, IOException, AgentLoadException, AgentInitializationException  {
+                    VirtualMachine virtualMachine = VirtualMachine.attach(pid);
+                    virtualMachine.loadAgent(jar,options);
                 }
 
                 @Override

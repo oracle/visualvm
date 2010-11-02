@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.heapwalk.model;
 
 
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 import org.openide.util.NbBundle;
@@ -71,7 +72,7 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
     // I18N String constants
     private static final String LOOP_TO_STRING = NbBundle.getMessage(InstanceNode.class, "InstanceNode_LoopToString"); // NOI18N
     private static final String REFERENCES_STRING = NbBundle.getMessage(InstanceNode.class, "InstanceNode_References"); // NOI18N
-
+    private static final NumberFormat numberFormat = NumberFormat.getInstance();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -200,12 +201,12 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
     }
 
     protected String computeSize() {
-        if (hasInstance()) return String.valueOf(instance.getSize());
+        if (hasInstance()) return numberFormat.format(instance.getSize());
         else return "-"; // NOI18N
     }
 
     protected String computeRetainedSize() {
-        if (hasInstance()) return String.valueOf(instance.getRetainedSize());
+        if (hasInstance()) return numberFormat.format(instance.getRetainedSize());
         else return "-"; // NOI18N
     }
 
