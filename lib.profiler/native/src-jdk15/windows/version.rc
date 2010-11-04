@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,42 +34,53 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- */
-
-package org.netbeans.lib.profiler.instrumentation;
-
-import java.util.ResourceBundle;
-
-
-/**
- * An exception thrown when begin line or end line are incorrect during Code Fragment profiling
  *
- * @author Ian Formanek
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2010 Sun Microsystems, Inc.
  */
-public class BadLocationException extends Exception {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String CANNOT_FIND_METHOD_CURSOR_MSG;
-    private static final String CANNOT_FIND_METHOD_SELECTION_MSG;
+#include <winuser.h>
+#include <winver.h>
+#include "version.h"
 
-    static {
-        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.instrumentation.Bundle"); // NOI18N
-        CANNOT_FIND_METHOD_CURSOR_MSG = messages.getString("BadLocationException_CannotFindMethodCursorMsg"); // NOI18N
-        CANNOT_FIND_METHOD_SELECTION_MSG = messages.getString("BadLocationException_CannotFindMethodSelectionMsg"); // NOI18N
-    }
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public BadLocationException() {
-    }
-
-    public BadLocationException(String message) {
-        super(message);
-    }
-
-    public BadLocationException(int code) {
-        super((code == 1) ? CANNOT_FIND_METHOD_CURSOR_MSG : ((code == 2) ? CANNOT_FIND_METHOD_SELECTION_MSG : null));
-    }
-}
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION    FVER
+ PRODUCTVERSION FVER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ // FILEOS 0x4 is Win32, 0x40004 is Win32 NT only
+ FILEOS 0x4L
+ // FILETYPE should be 0x1 for .exe and 0x2 for .dll
+ FILETYPE 0x2L 
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName",      COMPANY       "\0"
+            VALUE "FileDescription",  COMPONENT     "\0"
+            VALUE "FileVersion",      VER           "\0"
+            VALUE "Full Version",     BUILD_ID      "\0"
+            VALUE "InternalName",     INTERNAL_NAME "\0"
+            VALUE "LegalCopyright",   COPYRIGHT     "\0"
+            VALUE "OriginalFilename", FNAME         "\0"
+            VALUE "ProductName",      NAME          "\0"
+            VALUE "ProductVersion",   VER           "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
