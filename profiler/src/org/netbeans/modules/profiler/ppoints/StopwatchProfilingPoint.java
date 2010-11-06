@@ -420,9 +420,11 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
     private WeakReference<Report> reportReference;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public StopwatchProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory) {
-        super(name, startLocation, endLocation, project, factory);
+        this(name, startLocation, endLocation, project, factory, false);
+    }
+    public StopwatchProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, startLocation, endLocation, project, factory, existing);
         getChangeSupport().addPropertyChangeListener(this);
     }
 
