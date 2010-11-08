@@ -449,6 +449,12 @@ class HprofHeap implements Heap {
                         }
                     }
                 }
+                if (refs.isEmpty() && classId == instanceId) {
+                    SyntheticClassField syntheticClassField = new SyntheticClassField(classDump);
+                    long fieldOffset = start + 1 + dumpBuffer.getIDSize() + 4;
+                    
+                    refs.add(new SyntheticClassObjectValue(instance,syntheticClassField,fieldOffset));
+                }
             } else if (tag == OBJECT_ARRAY_DUMP) {
                 int elements = dumpBuffer.getInt(start + 1 + idSize + 4);
                 int i;
@@ -481,6 +487,7 @@ class HprofHeap implements Heap {
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
         Map classIdToClassMap = classDumpBounds.getClassIdToClassMap();
 
+        computeInstances();
         for (long counter=0; offset[0] < allInstanceDumpBounds.endOffset; counter++) {
             long start = offset[0];
             int tag = readDumpTag(offset);
@@ -495,7 +502,7 @@ class HprofHeap implements Heap {
                 
                 while(fit.hasNext()) {
                     HprofField field = (HprofField) fit.next();
-                    if (field.getVauleType() == HprofHeap.OBJECT) {
+                    if (field.getValueType() == HprofHeap.OBJECT) {
                         long outId = dumpBuffer.getID(inOff);
                         
                         if (outId != 0) {
@@ -590,6 +597,7 @@ class HprofHeap implements Heap {
             
             if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || getGCRoot(new Long(instanceId)) != null)) {
                 int origSize = instanceEntry.getRetainedSize();
+                if (origSize < 0) origSize = 0;
                 instSize = getInstanceByID(instanceId).getSize();
                 instanceEntry.setRetainedSize(origSize + instSize);
             }
@@ -822,10 +830,8 @@ class HprofHeap implements Heap {
 
                     int dataSize = 0;
 
-                    if (DEBUG) {
-                        System.out.println("Obj ID " + objId + " Stack serial " + stackSerial + " Elements " + elements
+                    System.out.println("Obj ID " + objId + " Stack serial " + stackSerial + " Elements " + elements
                                            + " Type " + classId); // NOI18N
-                    }
 
                     for (int i = 0; i < elements; i++) {
                         dataSize += dumpBuffer.getIDSize();

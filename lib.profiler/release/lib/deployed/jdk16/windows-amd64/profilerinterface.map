@@ -1,6 +1,6 @@
  profilerinterface
 
- Timestamp is 4b2b949f (Fri Dec 18 15:41:35 2009)
+ Timestamp is 4cc1991a (Fri Oct 22 16:00:58 2010)
 
  Preferred load address is 0000000010000000
 
@@ -21,6 +21,8 @@
  0003:00000000 000016c4H .data                   DATA
  0003:000016d0 000002d8H .bss                    DATA
  0004:00000000 00000510H .pdata                  DATA
+ 0005:00000000 00000058H .rsrc$01                DATA
+ 0005:00000060 00000390H .rsrc$02                DATA
 
   Address         Publics by Value              Rva+Base             Lib:Object
 

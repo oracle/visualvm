@@ -72,7 +72,6 @@ import org.openide.text.Line;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.util.WeakListeners;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
@@ -250,7 +249,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             };
             
             if (SwingUtilities.isEventDispatchThread()) {
-                RequestProcessor.getDefault().post(processor);
+                IDEUtils.runInProfilerRequestProcessor(processor);
             } else {
                 processor.run();
             }
@@ -270,7 +269,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             };
             
             if (SwingUtilities.isEventDispatchThread()) {
-                RequestProcessor.getDefault().post(processor);
+                IDEUtils.runInProfilerRequestProcessor(processor);
             } else {
                 processor.run();
             }
@@ -335,7 +334,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     private ProfilingPointsManager() {
         refreshProfilingPointFactories();
-        RequestProcessor.getDefault().post(new Runnable() {
+        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     processOpenedProjectsChanged(); // will subsequently invoke projectOpened on all open projects
                     NetBeansProfiler.getDefaultNB().addProfilingStateListener(ProfilingPointsManager.this);
@@ -532,7 +531,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     public void profilingStateChanged(final ProfilingStateEvent profilingStateEvent) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
             public void run() {
                 boolean wasProfilingInProgress = profilingInProgress;
                 boolean wasProfilingSessionInProgres = profilingSessionInProgress;
@@ -572,7 +571,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof Line && Line.PROP_LINE_NUMBER.equals(evt.getPropertyName())) {
             final Line line = (Line) evt.getSource();
-            RequestProcessor.getDefault().post(new Runnable() {
+            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         for (ProfilingPoint pp : profilingPoints) {
                             if (pp instanceof CodeProfilingPoint) {
@@ -613,7 +612,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                 firePropertyChanged(PROPERTY_PROFILING_POINTS_CHANGED);
             }
         } else if (OpenProjects.PROPERTY_OPEN_PROJECTS.equals(evt.getPropertyName())) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         processOpenedProjectsChanged();
                     }
@@ -968,7 +967,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     private void annotate(final CodeProfilingPoint profilingPoint, final CodeProfilingPoint.Annotation[] annotations) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     for (CodeProfilingPoint.Annotation cppa : annotations) {
                         // --- Code for saving dirty profiling points on document save instead of IDE closing ----------------

@@ -61,10 +61,15 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle"); // NOI18N
-    private static final String SELF_TIME_STRING = messages.getString("PrestimeCPUCCTNode_SelfTimeString"); // NOI18N
-    private static final String FROM_MSG = messages.getString("PrestimeCPUCCTNode_FromMsg"); // NOI18N
-                                                                                             // -----
+    private static final String SELF_TIME_STRING;
+    private static final String FROM_MSG;
+
+    static {
+        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle"); // NOI18N
+        SELF_TIME_STRING = messages.getString("PrestimeCPUCCTNode_SelfTimeString"); // NOI18N
+        FROM_MSG = messages.getString("PrestimeCPUCCTNode_FromMsg"); // NOI18N
+    }
+    
     protected static final char MASK_SELF_TIME_NODE = 0x1;
     protected static final char MASK_CONTEXT_CALLS_NODE = 0x2;
     protected static final char MASK_THREAD_NODE = 0x4;

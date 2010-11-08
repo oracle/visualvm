@@ -403,6 +403,12 @@ public class CPUCCTContainer {
     } // TODO [wait should be stored separately in future versions]
 
     protected void addFlatProfTimeForNode(int dataOfs) {
+        int methodId = getMethodIdForNodeOfs(dataOfs);
+        
+        if (methodId >= invPerMethodId.length) {
+            LOGGER.log(Level.WARNING, "Method ID ({0}) out of bounds ({1})", new Object[]{methodId, invPerMethodId.length});
+            return;
+        }
         int nChildren = getNChildrenForNodeOfs(dataOfs);
 
         if (nChildren > 0) {
@@ -412,7 +418,6 @@ public class CPUCCTContainer {
             }
         }
 
-        int methodId = getMethodIdForNodeOfs(dataOfs);
         timePerMethodId0[methodId] += getSelfTime0ForNodeOfs(dataOfs);
 
         if (collectingTwoTimeStamps) {
@@ -841,10 +846,10 @@ public class CPUCCTContainer {
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("generateCompact data: nNodes " + nNodes); // NOI18N
-            LOGGER.finest("generateCompact data: node size " + nodeSize); // NOI18N
-            LOGGER.finest("generateCompact data: array size " + arraySize); // NOI18N
-            LOGGER.finest("generateCompact data: child offset " + childOfsSize); // NOI18N
+            LOGGER.log(Level.FINEST, "generateCompact data: nNodes {0}", nNodes); // NOI18N
+            LOGGER.log(Level.FINEST, "generateCompact data: node size {0}", nodeSize); // NOI18N
+            LOGGER.log(Level.FINEST, "generateCompact data: array size {0}", arraySize); // NOI18N
+            LOGGER.log(Level.FINEST, "generateCompact data: child offset {0}", childOfsSize); // NOI18N
         }
 
         compactData = new byte[arraySize];
@@ -859,7 +864,7 @@ public class CPUCCTContainer {
      */
     private int generateMirrorNode(GenerateMirrorNodeLocalVars locals) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("Generate mirror node for ofs: " + locals.dataOfs + ", node: " + locals.rtNode); // NOI18N
+            LOGGER.log(Level.FINEST, "Generate mirror node for ofs: {0}, node: {1}", new Object[]{locals.dataOfs, locals.rtNode}); // NOI18N
         }
 
         generateNodeBase(locals.rtNode, locals.dataOfs);
