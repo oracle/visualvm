@@ -121,9 +121,11 @@ void set_system_loader(JNIEnv *env, jvmtiEnv *jvmti_env) {
         
         _system_loader = (*env)->CallStaticObjectMethod(env, class_loader_clazz, get_system_loader_method);
         ex = (*env)->ExceptionOccurred(env);
-        if (ex != NULL) {            
+        if (ex != NULL) {
+            jclass ise_cls;
+            
             (*env)->ExceptionClear(env);
-            jclass ise_cls = (*env)->FindClass(env, "java/lang/IllegalStateException");
+            ise_cls = (*env)->FindClass(env, "java/lang/IllegalStateException");
             if (!(*env)->IsInstanceOf(env, ex, ise_cls)) {
                 fprintf(stderr, "Profiler Agent Error: Exception from ClassLoader.getSystemClassLoader()\n");
             }
