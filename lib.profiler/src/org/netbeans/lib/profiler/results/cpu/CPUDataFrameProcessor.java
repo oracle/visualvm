@@ -46,14 +46,11 @@ package org.netbeans.lib.profiler.results.cpu;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.AbstractDataFrameProcessor;
 import org.netbeans.lib.profiler.results.ProfilingResultListener;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.logging.Level;
 
 
 /**
- * This class' main purpose is to parse a chunk of CPU related data received from
+ * This class main purpose is to parse a chunk of CPU related data received from
  * the JFluid server agent and dispatch the resulting events to all interested parties
  * @author Jaroslav Bachorik
  */
@@ -126,7 +123,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                 switch (eventType) {
                     case CommonConstants.MARKER_ENTRY_UNSTAMPED: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Marker entry unstamped, tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Marker entry unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER);
@@ -135,7 +132,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_ENTRY_UNSTAMPED: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Method entry unstamped, tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Method entry unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL);
@@ -144,7 +141,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.MARKER_EXIT_UNSTAMPED: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Marker exit unstamped, tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Marker exit unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodExitUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER);
@@ -153,7 +150,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_EXIT_UNSTAMPED: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Method exit unstamped, tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Method exit unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodExitUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL);
@@ -162,7 +159,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.MARKER_ENTRY: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Marker entry , tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Marker entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, timeStamp0,
@@ -172,7 +169,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.ROOT_ENTRY: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Root entry , tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Root entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_ROOT, timeStamp0,
@@ -182,7 +179,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_ENTRY: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Method entry , tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Method entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL, timeStamp0,
@@ -192,7 +189,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.MARKER_EXIT: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Marker exit , tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Marker exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, timeStamp0,
@@ -202,7 +199,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.ROOT_EXIT: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Root exit , tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Root exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_ROOT, timeStamp0,
@@ -212,7 +209,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_EXIT: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Method exit , tId=" + currentThreadId + ", mId=" + methodId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Method exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                         }
 
                         fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL, timeStamp0,
@@ -222,7 +219,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.ADJUST_TIME: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Adjust time , tId=" + currentThreadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Adjust time , tId={0}", currentThreadId); // NOI18N
                         }
 
                         fireAdjustTime(currentThreadId, timeStamp0, timeStamp1);
@@ -231,7 +228,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_ENTRY_MONITOR: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Monitor entry , tId=" + currentThreadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Monitor entry , tId={0}", currentThreadId); // NOI18N
                         }
 
                         fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1);
@@ -240,7 +237,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_EXIT_MONITOR: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Monitor exit , tId=" + currentThreadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Monitor exit , tId={0}", currentThreadId); // NOI18N
                         }
 
                         fireMonitorExit(currentThreadId, timeStamp0, timeStamp1);
@@ -249,7 +246,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_ENTRY_SLEEP: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Sleep entry , tId=" + currentThreadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Sleep entry , tId={0}", currentThreadId); // NOI18N
                         }
 
                         fireSleepEntry(currentThreadId, timeStamp0, timeStamp1);
@@ -258,7 +255,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_EXIT_SLEEP: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Sleep exit , tId=" + currentThreadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Sleep exit , tId={0}", currentThreadId); // NOI18N
                         }
 
                         fireSleepExit(currentThreadId, timeStamp0, timeStamp1);
@@ -267,7 +264,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_ENTRY_WAIT: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Wait entry , tId=" + currentThreadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Wait entry , tId={0}", currentThreadId); // NOI18N
                         }
 
                         fireWaitEntry(currentThreadId, timeStamp0, timeStamp1);
@@ -276,7 +273,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.METHOD_EXIT_WAIT: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Wait exit , tId=" + currentThreadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Wait exit , tId={0}", currentThreadId); // NOI18N
                         }
 
                         fireWaitExit(currentThreadId, timeStamp0, timeStamp1);
@@ -302,10 +299,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                         break;
                     }
                     default: {
-                        LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in CPUDataFrameProcessor: "
-                                      + (int) eventType // NOI18N
-                                      + " at " + position // NOI18N
-                                      );
+                        LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CPUDataFrameProcessor: {0} at {1}", new Object[]{(int) eventType, position});
 
                         break; // NOI18N
                     }
@@ -326,7 +320,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.SET_FOLLOWING_EVENTS_THREAD: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Change current thread , tId=" + currentThreadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Change current thread , tId={0}", currentThreadId); // NOI18N
                         }
 
                         currentThreadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
@@ -344,7 +338,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                         position += strLen;
 
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Creating new thread , tId=" + threadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Creating new thread , tId={0}", threadId); // NOI18N
                         }
 
                         fireNewThread(threadId, threadName, threadClassName);
@@ -354,7 +348,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     case CommonConstants.SERVLET_DO_METHOD: {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Servlet track start , tId=" + currentThreadId); // NOI18N
+                            LOGGER.log(Level.FINEST, "Servlet track start , tId={0}", currentThreadId); // NOI18N
                         }
 
                         byte requestType = buffer[position++];
@@ -378,10 +372,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                         break;
                     }
                     default: {
-                        LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in CallGraphBuilder: "
-                                      + (int) eventType // NOI18N
-                                      + " at " + position // NOI18N
-                                      );
+                        LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CallGraphBuilder: {0} at {1}", new Object[]{(int) eventType, position});
 
                         break; // NOI18N
                     }

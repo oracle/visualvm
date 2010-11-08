@@ -71,14 +71,24 @@ public class MiscUtils implements CommonConstants {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.utils.Bundle"); // NOI18N
-    private static final String NOT_DIRECTORY_MSG = messages.getString("MiscUtils_NotDirectoryMsg"); // NOI18N
-    private static final String NOT_FILE_MSG = messages.getString("MiscUtils_NotFileMsg"); // NOI18N
-    private static final String FILE_NOT_READABLE_MSG = messages.getString("MiscUtils_FileNotReadableMsg"); // NOI18N
-    private static final String FILE_NOT_EXIST_MSG = messages.getString("MiscUtils_FileNotExistMsg"); // NOI18N
-    private static final String VM_VERSION_MSG = messages.getString("MiscUtils_VmVersionMsg"); // NOI18N
-    private static final String VM_UNKNOWN_MSG = messages.getString("MiscUtils_VmUnknownMsg"); // NOI18N
-    private static final String VM_INCOMPATIBLE_MSG = messages.getString("MiscUtils_VmIncompatibleMsg"); // NOI18N
+    private static final String NOT_DIRECTORY_MSG;
+    private static final String NOT_FILE_MSG;
+    private static final String FILE_NOT_READABLE_MSG;
+    private static final String FILE_NOT_EXIST_MSG;
+    private static final String VM_VERSION_MSG;
+    private static final String VM_UNKNOWN_MSG;
+    private static final String VM_INCOMPATIBLE_MSG;
+    
+    static {
+        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.utils.Bundle"); // NOI18N
+        NOT_DIRECTORY_MSG = messages.getString("MiscUtils_NotDirectoryMsg"); // NOI18N
+        NOT_FILE_MSG = messages.getString("MiscUtils_NotFileMsg"); // NOI18N
+        FILE_NOT_READABLE_MSG = messages.getString("MiscUtils_FileNotReadableMsg"); // NOI18N
+        FILE_NOT_EXIST_MSG = messages.getString("MiscUtils_FileNotExistMsg"); // NOI18N
+        VM_VERSION_MSG = messages.getString("MiscUtils_VmVersionMsg"); // NOI18N
+        VM_UNKNOWN_MSG = messages.getString("MiscUtils_VmUnknownMsg"); // NOI18N
+        VM_INCOMPATIBLE_MSG = messages.getString("MiscUtils_VmIncompatibleMsg"); // NOI18N
+    }
 
     // ------------------------------------------------------------------------------------------------
     //    Printing/logging management

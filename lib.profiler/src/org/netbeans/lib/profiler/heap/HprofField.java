@@ -77,14 +77,14 @@ class HprofField extends HprofObject implements Field {
     }
 
     public Type getType() {
-        return ObjectType.getType(getVauleType());
+        return ObjectType.getType(getValueType());
     }
 
     int getValueSize() {
-        return classDump.getHprof().getValueSize(getVauleType());
+        return classDump.getHprof().getValueSize(getValueType());
     }
 
-    byte getVauleType() {
+    byte getValueType() {
         HprofByteBuffer buffer = classDump.getHprofBuffer();
 
         return buffer.get(fileOffset + buffer.getIDSize());
