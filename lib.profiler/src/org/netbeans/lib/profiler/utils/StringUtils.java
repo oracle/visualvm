@@ -61,13 +61,22 @@ public class StringUtils {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.utils.Bundle"); // NOI18N
-    private static final String THIS_WEEK_FORMAT = messages.getString("StringUtils_ThisWeekFormat"); // NOI18N
-    private static final String LAST_WEEK_FORMAT = messages.getString("StringUtils_LastWeekFormat"); // NOI18N
-    private static final String YESTERDAY_FORMAT = messages.getString("StringUtils_YesterdayFormat"); // NOI18N
-    private static final String TODAY_FORMAT = messages.getString("StringUtils_TodayFormat"); // NOI18N
-    private static final String OTHER_DAY_FORMAT = messages.getString("StringUtils_OtherDayFormat"); // NOI18N
-    private static final String FULL_FORMAT = messages.getString("StringUtils_FullFormat"); // NOI18N
+    private static final String THIS_WEEK_FORMAT;
+    private static final String LAST_WEEK_FORMAT;
+    private static final String YESTERDAY_FORMAT;
+    private static final String TODAY_FORMAT;
+    private static final String OTHER_DAY_FORMAT;
+    private static final String FULL_FORMAT;
+    
+    static {
+        ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.utils.Bundle"); // NOI18N
+        THIS_WEEK_FORMAT = messages.getString("StringUtils_ThisWeekFormat"); // NOI18N
+        LAST_WEEK_FORMAT = messages.getString("StringUtils_LastWeekFormat"); // NOI18N
+        YESTERDAY_FORMAT = messages.getString("StringUtils_YesterdayFormat"); // NOI18N
+        TODAY_FORMAT = messages.getString("StringUtils_TodayFormat"); // NOI18N
+        OTHER_DAY_FORMAT = messages.getString("StringUtils_OtherDayFormat"); // NOI18N
+        FULL_FORMAT = messages.getString("StringUtils_FullFormat"); // NOI18N
+    }
                                                                                             // -----
     private static SimpleDateFormat thisWeekFormat = new SimpleDateFormat(THIS_WEEK_FORMAT);
     private static SimpleDateFormat lastWeekFormat = new SimpleDateFormat(LAST_WEEK_FORMAT);

@@ -76,7 +76,7 @@ class InstanceDump extends HprofObject implements Instance {
         while (fit.hasNext()) {
             HprofField field = (HprofField) fit.next();
 
-            if (field.getVauleType() == HprofHeap.OBJECT) {
+            if (field.getValueType() == HprofHeap.OBJECT) {
                 values.add(new HprofInstanceObjectValue(this, field, offset));
             } else {
                 values.add(new HprofInstanceValue(this, field, offset));

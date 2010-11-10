@@ -119,12 +119,12 @@ class ClassDumpSegment extends TagBounds {
         if (classObjectID == 0) {
             return null;
         }
-
+        List allClasses = createClassCollection();
         LongMap.Entry entry = hprofHeap.idToOffsetMap.get(classObjectID);
 
         if (entry != null) {
             try {
-                ClassDump dump = (ClassDump) createClassCollection().get(entry.getIndex() - 1);
+                ClassDump dump = (ClassDump) allClasses.get(entry.getIndex() - 1);
                 if (dump.fileOffset == entry.getOffset()) {
                     return dump;
                 }
