@@ -115,6 +115,8 @@ public class OverviewController extends AbstractController {
             "OverviewController_GcRootsItemString"); // NOI18N
     private static final String FINALIZERS_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
             "OverviewController_FinalizersItemString"); // NOI18N
+    private static final String OOME_LABEL_STRING = NbBundle.getMessage(OverviewController.class,
+            "OverviewController_OOMELabelString"); // NOI18N
     private static final String OOME_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
             "OverviewController_OOMEItemString"); // NOI18N
     private static final String OS_ITEM_STRING = NbBundle.getMessage(OverviewController.class, 
@@ -248,7 +250,8 @@ public class OverviewController extends AbstractController {
             Instance thread = oome.getInstance();
             String threadName = htmlize(getThreadName(thread));
             String threadUrl = "<a href='"+ THREAD_URL_PREFIX + thread.getJavaClass().getName() + "/" + thread.getInstanceId() + "'>" + threadName + "</a>"; // NOI18N
-            oomeString = "<br>&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+            oomeString = "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+                + OOME_LABEL_STRING + "<br>&nbsp;&nbsp;&nbsp;&nbsp;"
                 + MessageFormat.format(OOME_ITEM_STRING,
                 new Object[] {  threadUrl });
         }
