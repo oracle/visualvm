@@ -89,6 +89,7 @@
             <!-- models -->
             <file name="templateModelProvider.java" url="models/templateVisualVMModelProvider.javx"/>
             <file name="templateModel.java" url="models/templateVisualVMModel.javx"/>
+            <file name="templateModelFactory.java" url="models/templateVisualVMModelFactory.javx"/>
             <!-- #models -->
         </folder>
     </folder>

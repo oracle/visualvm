@@ -52,6 +52,7 @@ final class NewProjectIterator extends BasicWizardIterator {
         private String displayName;
         private String category;
         private CreatedModifiedFiles files;
+        private boolean generateFactory;
 
         DataModel(WizardDescriptor wiz) {
             super(wiz);
@@ -104,6 +105,14 @@ final class NewProjectIterator extends BasicWizardIterator {
         public void setFiles(CreatedModifiedFiles files) {
             this.files = files;
         }
+
+        public boolean isGenerateFactory() {
+            return generateFactory;
+        }
+
+        public void setGenerateFactory(boolean generateFactory) {
+            this.generateFactory = generateFactory;
+        }
     }
 
     public static void generateFileChanges(DataModel model) {
@@ -147,6 +156,15 @@ final class NewProjectIterator extends BasicWizardIterator {
         template = CreatedModifiedFiles.getTemplate("templateModel.java");//NOI18N
 
         fileChanges.add(fileChanges.createFileWithSubstitutions(iteratorName, template, replaceTokens));
+        
+        if (model.isGenerateFactory()) {
+            iteratorName = getRelativePath(moduleInfo.getSourceDirectoryPath(), packageName,
+                name, "ModelFactory.java"); //NOI18N
+
+            template = CreatedModifiedFiles.getTemplate("templateModelFactory.java");//NOI18N
+
+            fileChanges.add(fileChanges.createFileWithSubstitutions(iteratorName, template, replaceTokens));
+        }
 
         model.setCreatedModifiedFiles(fileChanges);
     }
