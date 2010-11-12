@@ -52,7 +52,11 @@ import org.openide.util.NbBundle;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
 
-@OptionsPanelController.SubRegistration(displayName="#ProfilerOptionsCategory_Title")
+@OptionsPanelController.SubRegistration(
+    id="Profiler",
+    displayName="#ProfilerOptionsCategory_Title",
+    keywords="#KW_ProfilerOptions",
+    keywordsCategory="Advanced/Profiler")
 public class ProfilerOptionsCategory extends OptionsPanelController {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 

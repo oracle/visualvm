@@ -62,8 +62,7 @@ public final class CodeRegionResultsSnapshot extends ResultsSnapshot {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.coderegion.Bundle"); // NOI18N
-    private static final String CODE_FRAGMENT_MSG = messages.getString("CodeRegionResultsSnapshot_CodeFragmentMsg"); // NOI18N
+    private static final String CODE_FRAGMENT_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.coderegion.Bundle").getString("CodeRegionResultsSnapshot_CodeFragmentMsg"); // NOI18N
                                                                                                                      // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

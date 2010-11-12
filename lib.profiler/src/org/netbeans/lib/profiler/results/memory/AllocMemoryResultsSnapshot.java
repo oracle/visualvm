@@ -63,8 +63,7 @@ public class AllocMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle"); // NOI18N
-    private static final String MEMORY_ALLOC_MSG = messages.getString("AllocMemoryResultsSnapshot_MemoryAllocMsg"); // NOI18N
+    private static final String MEMORY_ALLOC_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle").getString("AllocMemoryResultsSnapshot_MemoryAllocMsg"); // NOI18N
                                                                                                                     // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
