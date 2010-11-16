@@ -134,7 +134,7 @@ void initializeJVMTI(JavaVM *jvm) {
 /* The VM calls this function when the native library is loaded (for example, through System.loadLibrary). */
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     if (_jvmti == NULL) {
-        fprintf(stderr, "Profiler Agent: JNI On Load Initializing...\n");
+        fprintf(stderr, "Profiler Agent: JNI OnLoad Initializing...\n");
 
         initializeJVMTI(jvm);
     
