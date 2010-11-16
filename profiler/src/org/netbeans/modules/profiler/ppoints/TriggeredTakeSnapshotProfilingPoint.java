@@ -415,9 +415,11 @@ public final class TriggeredTakeSnapshotProfilingPoint extends TriggeredGlobalPr
     private boolean resetResults = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public TriggeredTakeSnapshotProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
-        super(name, project, factory);
+        this(name, project, factory, false);
+    }
+    public TriggeredTakeSnapshotProfilingPoint(String name, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, project, factory, existing);
         getChangeSupport().addPropertyChangeListener(this);
     }
 

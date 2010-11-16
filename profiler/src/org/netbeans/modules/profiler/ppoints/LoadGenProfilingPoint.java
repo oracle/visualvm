@@ -431,7 +431,10 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
 
     /** Creates a new instance of LoadGenProfilingPoint */
     public LoadGenProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory) {
-        super(name, startLocation, endLocation, project, factory);
+        this(name, startLocation, endLocation, project, factory, false);
+    }
+    public LoadGenProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, startLocation, endLocation, project, factory, existing);
         getChangeSupport().addPropertyChangeListener(this);
     }
 
