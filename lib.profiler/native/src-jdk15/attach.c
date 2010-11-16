@@ -149,6 +149,10 @@ jint setupAndCallProfilerRuntimeActivate(JNIEnv *env, jint activateCode) {
 
     (*env)->DeleteLocalRef(env, jfluidDir);
     (*env)->DeleteLocalRef(env, profilerServerClass);
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+        return -1;
+    }
 
     return 0;
 }

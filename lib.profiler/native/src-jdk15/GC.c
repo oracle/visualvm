@@ -74,7 +74,7 @@
 
 #define OBSERVED_PERIODS   10  /* must match OBSERVED_PERIODS in GC.java */
 #define OBJECT_INT_SIZE 2
-#define OBJECT_SIZE (sizeof(int)*OBJECT_INT_SIZE)
+#define OBJECT_SIZE (sizeof(void *)*OBJECT_INT_SIZE)
 
 static int gc_epoch_counter, start_index, end_index;
 static jlong gc_start_timestamp, gc_finish_timestamp;
