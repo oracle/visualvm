@@ -85,6 +85,7 @@ public class OverviewController extends AbstractController {
     private static final String OPEN_THREADS_URL = "file:/stackframe/";     // NOI18N
     private static final String CLASS_URL_PREFIX = "file://class/"; // NOI18N
     private static final String INSTANCE_URL_PREFIX = "file://instance/";   // NOI18N
+    private static final String THREAD_URL_PREFIX = "file://thread/";   // NOI18N
 
     // -----
     // I18N String constants
@@ -114,6 +115,10 @@ public class OverviewController extends AbstractController {
             "OverviewController_GcRootsItemString"); // NOI18N
     private static final String FINALIZERS_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
             "OverviewController_FinalizersItemString"); // NOI18N
+    private static final String OOME_LABEL_STRING = NbBundle.getMessage(OverviewController.class,
+            "OverviewController_OOMELabelString"); // NOI18N
+    private static final String OOME_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
+            "OverviewController_OOMEItemString"); // NOI18N
     private static final String OS_ITEM_STRING = NbBundle.getMessage(OverviewController.class, 
             "OverviewController_OsItemString"); // NOI18N
     private static final String ARCHITECTURE_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
@@ -145,7 +150,8 @@ public class OverviewController extends AbstractController {
     private Properties systemProperties;
     private String stackTrace;
     private JavaClass java_lang_Class;
-
+    private ThreadObjectGCRoot oome;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public OverviewController(SummaryController summaryController) {
@@ -182,7 +188,10 @@ public class OverviewController extends AbstractController {
         long finalizers = computeFinalizers(heap);
         int nclassloaders = 0;
         JavaClass cl = heap.getJavaClassByName("java.lang.ClassLoader"); // NOI18N
+        NumberFormat numberFormat = (NumberFormat)NumberFormat.getInstance().clone();
+        numberFormat.setMaximumFractionDigits(1);
         
+        oome = getOOMEThread(heap);
         if (cl != null) {
             nclassloaders = cl.getInstancesCount();
             
@@ -192,8 +201,6 @@ public class OverviewController extends AbstractController {
                 nclassloaders += jc.getInstancesCount();
             }
         }
-        NumberFormat numberFormat = (NumberFormat)NumberFormat.getInstance().clone();
-        numberFormat.setMaximumFractionDigits(1);
         
         String filename = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                 + MessageFormat.format(FILE_ITEM_STRING,
@@ -237,10 +244,20 @@ public class OverviewController extends AbstractController {
         String finalizersInfo = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
                 + MessageFormat.format(FINALIZERS_ITEM_STRING,
                 new Object[] { numberFormat.format(finalizers) });
-        
+
+        String oomeString = "";
+        if (oome != null) {
+            Instance thread = oome.getInstance();
+            String threadName = htmlize(getThreadName(thread));
+            String threadUrl = "<a href='"+ THREAD_URL_PREFIX + thread.getJavaClass().getName() + "/" + thread.getInstanceId() + "'>" + threadName + "</a>"; // NOI18N
+            oomeString = "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+                + OOME_LABEL_STRING + "<br>&nbsp;&nbsp;&nbsp;&nbsp;"
+                + MessageFormat.format(OOME_ITEM_STRING,
+                new Object[] {  threadUrl });
+        }
         return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/resources/memory.png'>&nbsp;&nbsp;" // NOI18N
                 + SUMMARY_STRING + "</b><br><hr>" + dateTaken + "<br>" + filename + "<br>" + filesize + "<br><br>" + liveBytes // NOI18N
-                + "<br>" + liveClasses + "<br>" + liveInstances + "<br>" + classloaders + "<br>" + gcroots + "<br>" + finalizersInfo; // NOI18N
+                + "<br>" + liveClasses + "<br>" + liveInstances + "<br>" + classloaders + "<br>" + gcroots + "<br>" + finalizersInfo + oomeString; // NOI18N
     }
     
     public String computeEnvironment() {
@@ -346,7 +363,14 @@ public class OverviewController extends AbstractController {
             } else {
                 NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
             }
+        }   else if (urls.startsWith(THREAD_URL_PREFIX)) {
+            urls = urls.substring(THREAD_URL_PREFIX.length());
+            String[] id = urls.split("/"); // NOI18N
+            long threadid = Long.parseLong(id[1]);
+            
+            showInThreads(heapFragmentWalker.getHeapFragment().getInstanceByID(threadid));
         } 
+ 
     }
             
     private long computeFinalizers(Heap heap) {
@@ -361,6 +385,26 @@ public class OverviewController extends AbstractController {
             }
         }
         return -1;
+    }
+    
+    private ThreadObjectGCRoot getOOMEThread(Heap heap) {
+        Collection<GCRoot> roots = heap.getGCRoots();
+
+        for (GCRoot root : roots) {
+            if(root.getKind().equals(GCRoot.THREAD_OBJECT)) {
+                ThreadObjectGCRoot threadRoot = (ThreadObjectGCRoot)root;
+                StackTraceElement[] stackTrace = threadRoot.getStackTrace();
+                
+                if (stackTrace.length>=1) {
+                    StackTraceElement ste = stackTrace[0];
+                    
+                    if (OutOfMemoryError.class.getName().equals(ste.getClassName()) && "<init>".equals(ste.getMethodName())) {
+                        return threadRoot;
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     private Properties getSystemProperties() {
@@ -417,25 +461,23 @@ public class OverviewController extends AbstractController {
                     ThreadObjectGCRoot threadRoot = (ThreadObjectGCRoot)root;
                     Instance threadInstance = threadRoot.getInstance();
                     if (threadInstance != null) {
-                        PrimitiveArrayInstance chars = (PrimitiveArrayInstance)threadInstance.getValueOfField("name");  // NOI18N
-                        List<String> charsList = chars.getValues();
-                        char charArr[] = new char[charsList.size()];
-                        int j = 0;
-                        for(String ch: charsList) {
-                            charArr[j++] = ch.charAt(0);
-                        }
-                        String threadName = new String(charArr);
+                        String threadName = getThreadName(threadInstance);
                         Boolean daemon = (Boolean)threadInstance.getValueOfField("daemon"); // NOI18N
                         Integer priority = (Integer)threadInstance.getValueOfField("priority"); // NOI18N
                         Long threadId = (Long)threadInstance.getValueOfField("tid");    // NOI18N
                         Integer threadStatus = (Integer)threadInstance.getValueOfField("threadStatus"); // NOI18N
                         StackTraceElement stack[] = threadRoot.getStackTrace();
                         Map<Integer,List<JavaFrameGCRoot>> localsMap = javaFrameMap.get(threadRoot);
+                        String style="";
+
+                        if (threadRoot.equals(oome)) {
+                            style="style=\"color: #FF0000\"";
+                        }                        
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
                         // sw.append("&nbsp;&nbsp;<span style=\"color: #0033CC\">"); // NOI18N
-                        sb.append("&nbsp;&nbsp;<b>");   // NOI18N
+                        sb.append("&nbsp;&nbsp;<a name="+threadInstance.getInstanceId()+"></a><b "+style+">");   // NOI18N
                         // -------------------------------------------------------------------
-                        sb.append("\""+threadName+"\""+(daemon.booleanValue() ? " daemon" : "")+" prio="+priority);   // NOI18N
+                        sb.append("\""+htmlize(threadName)+"\""+(daemon.booleanValue() ? " daemon" : "")+" prio="+priority);   // NOI18N
                         if (threadId != null) {
                             sb.append(" tid="+threadId);    // NOI18N
                         }
@@ -494,6 +536,18 @@ public class OverviewController extends AbstractController {
             stackTrace = sb.toString();
         }
         return stackTrace;
+    }
+
+    private String getThreadName(final Instance threadInstance) {
+        PrimitiveArrayInstance chars = (PrimitiveArrayInstance)threadInstance.getValueOfField("name");  // NOI18N
+        List<String> charsList = chars.getValues();
+        char charArr[] = new char[charsList.size()];
+        int j = 0;
+        
+        for(String ch: charsList) {
+            charArr[j++] = ch.charAt(0);
+        }
+        return new String(charArr);
     }
 
 
