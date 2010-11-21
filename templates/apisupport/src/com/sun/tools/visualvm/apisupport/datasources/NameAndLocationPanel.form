@@ -17,28 +17,14 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="lblProjectName" pref="121" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="lblPackageName" pref="121" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="createdFiles" pref="121" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="modifiedFiles" pref="121" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="lblName" pref="121" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="lblProjectName" min="-2" pref="121" max="-2" attributes="0"/>
+                  <Component id="lblPackageName" min="-2" pref="121" max="-2" attributes="0"/>
+                  <Component id="createdFiles" min="-2" pref="121" max="-2" attributes="0"/>
+                  <Component id="modifiedFiles" min="-2" pref="121" max="-2" attributes="0"/>
+                  <Component id="lblName" min="-2" pref="121" max="-2" attributes="0"/>
               </Group>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="comPackageName" alignment="0" pref="293" max="32767" attributes="0"/>
                   <Component id="createdFilesValue" alignment="0" pref="293" max="32767" attributes="0"/>

@@ -17,15 +17,15 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="lblName" pref="64" max="32767" attributes="0"/>
-                      <EmptySpace min="54" pref="54" max="54" attributes="0"/>
+                      <Component id="lblName" min="-2" pref="64" max="-2" attributes="0"/>
+                      <EmptySpace pref="54" max="32767" attributes="3"/>
                   </Group>
-                  <Component id="lblProjectName" pref="118" max="32767" attributes="0"/>
-                  <Component id="lblPackageName" pref="118" max="32767" attributes="0"/>
-                  <Component id="createdFiles" pref="118" max="32767" attributes="0"/>
-                  <Component id="modifiedFiles" pref="118" max="32767" attributes="0"/>
+                  <Component id="lblProjectName" min="-2" pref="118" max="-2" attributes="0"/>
+                  <Component id="lblPackageName" min="-2" pref="118" max="-2" attributes="0"/>
+                  <Component id="createdFiles" min="-2" pref="118" max="-2" attributes="0"/>
+                  <Component id="modifiedFiles" min="-2" pref="118" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -39,8 +39,8 @@
           </Group>
           <Component id="filler" min="-2" pref="400" max="-2" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
-              <Component id="lblDisplayName" pref="103" max="32767" attributes="0"/>
-              <EmptySpace min="323" pref="323" max="323" attributes="0"/>
+              <Component id="lblDisplayName" min="-2" pref="103" max="-2" attributes="0"/>
+              <EmptySpace pref="323" max="32767" attributes="3"/>
           </Group>
       </Group>
     </DimensionLayout>
