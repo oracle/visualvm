@@ -626,7 +626,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     //----------------------------------------- Private implementation -----------------------------------
 
     /** Given the table at the specified index, return the specified entry */
-    private static final long intAt(byte[] codeBytes, int tbl, int entry) { // TODO CHECK: unused method
+    private static long intAt(byte[] codeBytes, int tbl, int entry) { // TODO CHECK: unused method
 
         int base = tbl + (entry << 2);
 
