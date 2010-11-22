@@ -271,7 +271,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         super("", 0); // NOI18N
 
         try {
-            (new ClassFileParser()).parseClassFile(buf, this);
+            new ClassFileParser().parseClassFile(buf, this);
         } catch (ClassFileParser.ClassFileReadException ex) {
             throw new ClassFormatError(ex.getMessage());
         }
