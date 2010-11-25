@@ -80,12 +80,19 @@ public final class ResetResultsProfilingPoint extends CodeProfilingPoint.Single 
     private class Annotation extends CodeProfilingPoint.Annotation {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
         public String getAnnotationType() {
             return ResetResultsProfilingPoint.this.isEnabled() ? ANNOTATION_ENABLED : ANNOTATION_DISABLED;
         }
 
+        @Override
         public String getShortDescription() {
             return getName();
+        }
+
+        @Override
+        public CodeProfilingPoint profilingPoint() {
+            return ResetResultsProfilingPoint.this;
         }
     }
 
