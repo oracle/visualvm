@@ -97,7 +97,7 @@ public class DynamicClassInfo extends ClassInfo {
         byte[] classFileBytes = getClassFileBytes();
 
         try {
-            (new ClassFileParser()).parseClassFile(classFileBytes, this);
+            new ClassFileParser().parseClassFile(classFileBytes, this);
 
             if (!className.equals(name)) {
                 throw new ClassFormatError("Mismatch between name in .class file and location for " + className // NOI18N
