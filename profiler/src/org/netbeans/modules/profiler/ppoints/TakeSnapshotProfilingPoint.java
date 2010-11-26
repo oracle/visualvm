@@ -97,12 +97,19 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
     private class Annotation extends CodeProfilingPoint.Annotation {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
         public String getAnnotationType() {
             return TakeSnapshotProfilingPoint.this.isEnabled() ? ANNOTATION_ENABLED : ANNOTATION_DISABLED;
         }
 
+        @Override
         public String getShortDescription() {
             return getName();
+        }
+
+        @Override
+        public CodeProfilingPoint profilingPoint() {
+            return TakeSnapshotProfilingPoint.this;
         }
     }
 
