@@ -131,7 +131,7 @@ public final class IdeSnapshot {
         if (info == null) {
             LogRecord rec = recordsMap.get(index);
 
-            assert rec != null : "Null record for value "+index;
+            assert rec != null : "Null record for value "+index;        // NOI18N
             info = new LogRecordInfo(rec);
             LogRecordDecorator.decorate(info);
             infosMap.put(index, info);
@@ -209,13 +209,13 @@ public final class IdeSnapshot {
 
     private static final class LogRecordDecorator implements InvocationHandler {
 
-        private static final String DECORATIONS_CLASS = "org.netbeans.lib.uihandler.Decorations";
-        private static final String DECORABLE_CLASS = "org.netbeans.lib.uihandler.Decorable";
-        private static final String DECORATE_METHOD = "decorate";
-        private static final String DECORABLE_SETNAME_METHOD = "setName";
-        private static final String DECORABLE_SETDISPLAYNAME_METHOD = "setDisplayName";
-        private static final String DECORABLE_SETICONBASE_METHOD = "setIconBaseWithExtension";
-        private static final String DECORABLE_SETSHORTDESCRIPTOR_METHOD = "setShortDescription";
+        private static final String DECORATIONS_CLASS = "org.netbeans.lib.uihandler.Decorations";   // NOI18N
+        private static final String DECORABLE_CLASS = "org.netbeans.lib.uihandler.Decorable";       // NOI18N
+        private static final String DECORATE_METHOD = "decorate";                                   // NOI18N
+        private static final String DECORABLE_SETNAME_METHOD = "setName";                           // NOI18N
+        private static final String DECORABLE_SETDISPLAYNAME_METHOD = "setDisplayName";             // NOI18N
+        private static final String DECORABLE_SETICONBASE_METHOD = "setIconBaseWithExtension";      // NOI18N
+        private static final String DECORABLE_SETSHORTDESCRIPTOR_METHOD = "setShortDescription";    // NOI18N
         private LogRecordInfo recInfo;
         private LogRecord rec;
 
