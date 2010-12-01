@@ -377,9 +377,7 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
     public abstract static class Annotation extends org.openide.text.Annotation {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public abstract String getAnnotationType();
-
-        public abstract String getShortDescription();
+        public abstract CodeProfilingPoint profilingPoint();
 
         void fireDescriptionChanged() {
             firePropertyChange(PROP_SHORT_DESCRIPTION, false, true);
