@@ -46,11 +46,20 @@ package org.netbeans.modules.profiler.ppoints.ui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.LayoutManager;
 import java.awt.Rectangle;
-import java.util.Vector;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -60,19 +69,21 @@ import javax.swing.Scrollable;
 public abstract class ValidityAwarePanel extends JPanel implements Scrollable {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Vector<ValidityListener> listeners = new Vector();
+    private List<ValidityListener> listeners = new ArrayList<ValidityListener>();
     private boolean isValid;
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Component getInitialFocusTarget() {
         return null;
     }
 
+    @Override
     public Dimension getPreferredScrollableViewportSize() {
         return null;
     }
 
+    @Override
     public Dimension getPreferredSize() {
         if (getParent() instanceof JViewport) {
             return getMinimumSize();
@@ -81,14 +92,17 @@ public abstract class ValidityAwarePanel extends JPanel implements Scrollable {
         }
     }
 
+    @Override
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
         return 50;
     }
 
+    @Override
     public boolean getScrollableTracksViewportHeight() {
         return false;
     }
 
+    @Override
     public boolean getScrollableTracksViewportWidth() {
         Container parent = getParent();
 
@@ -99,6 +113,7 @@ public abstract class ValidityAwarePanel extends JPanel implements Scrollable {
         return getMinimumSize().width < ((JViewport) parent).getWidth();
     }
 
+    @Override
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
         return 10;
     }

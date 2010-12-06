@@ -67,9 +67,45 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     public static class LineNumberTables {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        char[][] lineNumbers;
-        char[][] startPCs;
+        private char[][] lineNumbers;
+        private char[][] startPCs;
+        private boolean hasTable;
 
+        //~ Constructors -------------------------------------------------------------------------------------------------------------
+
+        public LineNumberTables(ClassInfo ci) {
+            byte[] classBuf = null;
+
+            try {
+                classBuf = ci.getClassFileBytes();
+            } catch (IOException ex1) { // Should not happen - class file already loaded once by this time
+            } catch (ClassNotFoundException ex2) {
+            } // Ditto
+
+            int nMethods = ci.getMethodNames().length;
+            startPCs = new char[nMethods][];
+            lineNumbers = new char[nMethods][];
+
+            for (int i = 0; i < nMethods; i++) {
+                int ofs = ci.methodInfoOffsets[i] + ci.lineNumberTablesOffsets[i];
+
+                if (ofs == -1) {
+                    continue; // Abstract or native method, or no line number tables in this class
+                }
+
+                hasTable = true;
+
+                int tableLen = ci.lineNumberTablesLengths[i];
+                char[] startPC = startPCs[i] = new char[tableLen];
+                char[] lineNumber = lineNumbers[i] = new char[tableLen];
+
+                for (int j = 0; j < tableLen; j++) {
+                    startPC[j] = (char) (((classBuf[ofs++] & 255) << 8) + (classBuf[ofs++] & 255));
+                    lineNumber[j] = (char) (((classBuf[ofs++] & 255) << 8) + (classBuf[ofs++] & 255));
+                }
+            }
+        }
+        
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public char[][] getStartPCs() {
@@ -180,6 +216,10 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
             return bestLine;
         }
+
+        private boolean hasTable() {
+            return hasTable;
+        }
     }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -214,7 +254,6 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     int intermediateDataStartOfs; // Ditto for intermediate data (class flags, name, super, etc.)
     int methodsStartOfs; // Ditto for methods
     int origCPoolCount; // The number of entries in the original cpool of this class
-    short lineNumberTablesInitStatus; // 0 : not yet initialized, 1 : OK, -1 : no tables exist
     private LineNumberTables lineNumberTables;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -232,7 +271,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         super("", 0); // NOI18N
 
         try {
-            (new ClassFileParser()).parseClassFile(buf, this);
+            new ClassFileParser().parseClassFile(buf, this);
         } catch (ClassFileParser.ClassFileReadException ex) {
             throw new ClassFormatError(ex.getMessage());
         }
@@ -259,9 +298,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     }
 
     public LineNumberTables getLineNumberTables() {
-        if (lineNumberTables == null) {
-            initLineNumberTables();
-        }
+        initLineNumberTables();
 
         return lineNumberTables;
     }
@@ -361,9 +398,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     }
 
     public int[] getMinAndMaxLinesForMethod(int methodIdx) {
-        if (lineNumberTables == null) {
-            initLineNumberTables();
-        }
+        initLineNumberTables();
 
         return lineNumberTables.getMinAndMaxLinesForMethod(methodIdx);
     }
@@ -421,9 +456,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     }
 
     public int bciForMethodAndLineNo(int methodIdx, int lineNo) {
-        if (lineNumberTables == null) {
-            initLineNumberTables();
-        }
+        initLineNumberTables();
 
         return lineNumberTables.bciForLineNo(methodIdx, lineNo);
     }
@@ -500,10 +533,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     }
 
     public int lineNoForMethodAndBci(int methodIdx, int bci) { // TODO CHECK: unused method
-
-        if (lineNumberTables == null) {
-            initLineNumberTables();
-        }
+        initLineNumberTables();
 
         return lineNumberTables.lineNoForBci(methodIdx, bci);
     }
@@ -514,11 +544,9 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
      * it was compiled without tables), returns {-2, -2}.
      */
     public int[] methodIdxAndBestBCIForLineNo(int lineNo) {
-        if (lineNumberTablesInitStatus == 0) {
-            initLineNumberTables();
-        }
+        initLineNumberTables();
 
-        if (lineNumberTablesInitStatus == -1) {
+        if (lineNumberTables.hasTable()) {
             return new int[] { -2, -2 };
         }
 
@@ -598,7 +626,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     //----------------------------------------- Private implementation -----------------------------------
 
     /** Given the table at the specified index, return the specified entry */
-    private static final long intAt(byte[] codeBytes, int tbl, int entry) { // TODO CHECK: unused method
+    private static long intAt(byte[] codeBytes, int tbl, int entry) { // TODO CHECK: unused method
 
         int base = tbl + (entry << 2);
 
@@ -606,48 +634,9 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                | (codeBytes[base + 3] & 0xFF);
     }
 
-    private void initLineNumberTables() {
-        byte[] classBuf = null;
-
-        try {
-            classBuf = getClassFileBytes();
-        } catch (IOException ex1) { // Should not happen - class file already loaded once by this time
-        } catch (ClassNotFoundException ex2) {
-        } // Ditto
-
-        int nMethods = methodNames.length;
-        char[][] startPCs = new char[nMethods][];
-        char[][] lineNumbers = new char[nMethods][];
-        boolean lineNumberTablesExist = false;
-
-        for (int i = 0; i < nMethods; i++) {
-            int ofs = methodInfoOffsets[i] + lineNumberTablesOffsets[i];
-
-            if (ofs == -1) {
-                continue; // Abstract or native method, or no line number tables in this class
-            }
-
-            lineNumberTablesExist = true;
-
-            int tableLen = lineNumberTablesLengths[i];
-            char[] startPC = startPCs[i] = new char[tableLen];
-            char[] lineNumber = lineNumbers[i] = new char[tableLen];
-
-            for (int j = 0; j < tableLen; j++) {
-                startPC[j] = (char) (((classBuf[ofs++] & 255) << 8) + (classBuf[ofs++] & 255));
-                lineNumber[j] = (char) (((classBuf[ofs++] & 255) << 8) + (classBuf[ofs++] & 255));
-            }
-        }
-
-        // Let's init this data anyway, to avoid NullPointerExceptions etc.
-        lineNumberTables = new LineNumberTables();
-        lineNumberTables.startPCs = startPCs;
-        lineNumberTables.lineNumbers = lineNumbers;
-
-        if (lineNumberTablesExist) {
-            lineNumberTablesInitStatus = 1;
-        } else {
-            lineNumberTablesInitStatus = -1;
+    private synchronized void initLineNumberTables() {
+        if (lineNumberTables == null) {
+            lineNumberTables = new LineNumberTables(this);
         }
     }
 }
