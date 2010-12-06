@@ -618,7 +618,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     public int[] methodIdxAndBestBCIForLineNo(int lineNo) {
         initLineNumberTables();
 
-        if (lineNumberTables.hasTable()) {
+        if (!lineNumberTables.hasTable()) {
             return new int[] { -2, -2 };
         }
 
