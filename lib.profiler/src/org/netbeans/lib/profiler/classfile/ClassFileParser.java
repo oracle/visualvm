@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.classfile;
 
+import org.netbeans.lib.profiler.classfile.ClassInfo.LocalVariableTables;
 import org.netbeans.lib.profiler.instrumentation.JavaClassConstants;
 import org.netbeans.lib.profiler.utils.StringUtils;
 
@@ -431,6 +432,8 @@ public class ClassFileParser implements JavaClassConstants {
         int[] exceptionTableStartOffsets = new int[methodCount];
         int[] lineNumberTableOffsets = new int[methodCount];
         char[] lineNumberTableLengths = new char[methodCount];
+        int[] localVariableTableOffsets = new int[methodCount];
+        char[] localVariableTableLengths = new char[methodCount];
 
         for (int i = 0; i < methodCount; i++) {
             methodInfoOffsets[i] = curBufPos;
@@ -439,7 +442,8 @@ public class ClassFileParser implements JavaClassConstants {
             signatures[i] = signatureAtCPIndex(nextChar());
             bytecodeOffsets[i] = 0;
             lineNumberTableOffsets[i] = 0;
-
+            localVariableTableOffsets[i] = 0;
+            
             int attrCount = nextChar();
 
             for (int j = 0; j < attrCount; j++) {
@@ -463,10 +467,13 @@ public class ClassFileParser implements JavaClassConstants {
                         attrLen = nextInt();
 
                         if (utf8AtCPIndex(attrNameIdx).equals("LineNumberTable")) { // NOI18N
-
                             char tableLen = lineNumberTableLengths[i] = nextChar();
                             lineNumberTableOffsets[i] = curBufPos - methodInfoOffsets[i];
                             curBufPos += (4 * tableLen);
+                        } else if (utf8AtCPIndex(attrNameIdx).equals("LocalVariableTable")){    // NOI18N
+                            char tableLen = localVariableTableLengths[i] = nextChar();
+                            localVariableTableOffsets[i] = curBufPos - methodInfoOffsets[i];
+                            curBufPos += LocalVariableTables.ATTR_SIZE * tableLen;
                         } else {
                             curBufPos += attrLen;
                         }
@@ -489,6 +496,8 @@ public class ClassFileParser implements JavaClassConstants {
         classInfo.exceptionTableStartOffsets = exceptionTableStartOffsets;
         classInfo.lineNumberTablesOffsets = lineNumberTableOffsets;
         classInfo.lineNumberTablesLengths = lineNumberTableLengths;
+        classInfo.localVariableTablesOffsets = localVariableTableOffsets;
+        classInfo.localVariableTablesLengths = localVariableTableLengths;
     }
 
     private void readPreamble() {
