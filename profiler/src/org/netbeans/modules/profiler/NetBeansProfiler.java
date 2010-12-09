@@ -627,6 +627,8 @@ public final class NetBeansProfiler extends Profiler {
 
     // ---------------------------------------------------------------------------
     public static boolean isInitialized() {
+        // make sure that the profiler is initialized
+        getDefaultNB();
         return initialized;
     }
 
