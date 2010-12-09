@@ -76,7 +76,6 @@ import javax.swing.Action;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
-import org.openide.util.Utilities;
 
 
 /**
