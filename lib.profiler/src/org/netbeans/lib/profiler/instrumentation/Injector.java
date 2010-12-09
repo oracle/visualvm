@@ -514,7 +514,7 @@ public abstract class Injector extends SingleMethodScaner {
 
     private void initExceptionTable() {
         int startOfs = clazz.getExceptionTableStartOffsetInMethodInfo(methodIdx);
-        excTableEntryCount = getU2(origMethodInfo, startOfs);
+        excTableEntryCount = clazz.getExceptionTableCount(methodIdx);
 
         int len = excTableEntryCount * 8;
 

@@ -299,6 +299,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     String[] interfaces;
     char[] lineNumberTablesLengths;
     int[] lineNumberTablesOffsets; // Relative offsets within a MethodInfo
+    int localVaribaleTableCPindex;
     char[] localVariableTablesLengths;
     int[] localVariableTablesOffsets; // Relative offsets within a MethodInfo
     char[] methodAccessFlags;
@@ -352,6 +353,13 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         return exceptionTableStartOffsets[i];
     }
 
+    public int getExceptionTableCount(int i) {
+        int startOfs = getExceptionTableStartOffsetInMethodInfo(i);
+        byte[] methodInfo = getMethodInfo(i);
+        
+        return ((methodInfo[startOfs] & 0xFF) << 8) + (methodInfo[startOfs + 1] & 0xFF);
+    }
+    
     public int getLocalVariableTableStartOffsetInMethodInfo(int i) {
         return localVariableTablesOffsets[i];
     }

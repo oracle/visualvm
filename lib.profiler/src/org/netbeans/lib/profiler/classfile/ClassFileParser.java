@@ -434,7 +434,8 @@ public class ClassFileParser implements JavaClassConstants {
         char[] lineNumberTableLengths = new char[methodCount];
         int[] localVariableTableOffsets = new int[methodCount];
         char[] localVariableTableLengths = new char[methodCount];
-
+        int localVaribaleTableCPindex = 0;
+        
         for (int i = 0; i < methodCount; i++) {
             methodInfoOffsets[i] = curBufPos;
             accessFlags[i] = nextChar();
@@ -474,6 +475,11 @@ public class ClassFileParser implements JavaClassConstants {
                             char tableLen = localVariableTableLengths[i] = nextChar();
                             localVariableTableOffsets[i] = curBufPos - methodInfoOffsets[i];
                             curBufPos += LocalVariableTables.ATTR_SIZE * tableLen;
+                            if (localVaribaleTableCPindex == 0) {
+                                localVaribaleTableCPindex = attrNameIdx;
+                            } else {
+                                assert localVaribaleTableCPindex == attrNameIdx;
+                            }
                         } else {
                             curBufPos += attrLen;
                         }
@@ -498,6 +504,7 @@ public class ClassFileParser implements JavaClassConstants {
         classInfo.lineNumberTablesLengths = lineNumberTableLengths;
         classInfo.localVariableTablesOffsets = localVariableTableOffsets;
         classInfo.localVariableTablesLengths = localVariableTableLengths;
+        classInfo.localVaribaleTableCPindex = localVaribaleTableCPindex;
     }
 
     private void readPreamble() {
