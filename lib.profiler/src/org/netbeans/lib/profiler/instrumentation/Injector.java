@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.instrumentation;
 import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import java.util.Stack;
+import org.netbeans.lib.profiler.classfile.ClassInfo.LocalVariableTables;
 
 
 /**
@@ -54,6 +55,7 @@ import java.util.Stack;
  * supports appending bytecodes to the existing bytecodes, and extending the method's exception table.
  *
  * @author Misha Dmitriev
+ * @author Tomas Hurka
  */
 public abstract class Injector extends SingleMethodScaner {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -220,7 +222,23 @@ public abstract class Injector extends SingleMethodScaner {
 
         System.arraycopy(exceptionTable, 0, ret, excTableNewStart + 2, excTableNewLen);
 
-        // FIXME: need to update linenumber table and localvariable table as well
+        ClassInfo.LocalVariableTables localVarTable = clazz.getLocalVariableTables();
+        
+        if (localVarTable.hasTable()) {
+            int locVarTableOldStart = clazz.getLocalVariableTableStartOffsetInMethodInfo(methodIdx);
+            int locVarTablePtr = locVarTableOldStart + (bytecodesLength - origBytecodesLength) + (excTableNewLen - excTableOldLen);
+            char[] startPC = localVarTable.getStartPCs()[methodIdx];
+            char[] lengths = localVarTable.getLengts()[methodIdx];
+
+            if (startPC != null) {
+                for (int i = 0; i < startPC.length; i++, locVarTablePtr+=LocalVariableTables.ATTR_SIZE) {
+                    putU2(ret, locVarTablePtr, startPC[i]);
+                    putU2(ret, locVarTablePtr + 2, lengths[i]);
+                }
+            }
+        }
+
+        // FIXME: need to update linenumber table as well
         putU2(ret, bytecodesStartIdx - 8, maxStack + STACK_INCREMENT);
         putU2(ret, bytecodesStartIdx - 6, maxLocals);
 
@@ -584,10 +602,10 @@ public abstract class Injector extends SingleMethodScaner {
         bytecodesLength += delta;
 
         updateExceptionTable(bci, delta);
+        updateLocalVariableTable(bci, delta);
 
         // We currently don't support the following updates - they are used only by debuggers.
         // updateLineNumberTable(injectionPos, delta);
-        // updateLocalVariableTable(injectionPos, delta);
         // updateLocalVariableTypeTable(injectionPos, delta);
 
         // Relocate the bcis of changes in the pending change stack
@@ -621,6 +639,29 @@ public abstract class Injector extends SingleMethodScaner {
             }
 
             pos += 8;
+        }
+    }
+
+    private void updateLocalVariableTable(int injectionPos, int injectedBytesCount) {
+        ClassInfo.LocalVariableTables localVarTable = clazz.getLocalVariableTables();
+
+        if (localVarTable.hasTable()) {
+            char[] startPC = localVarTable.getStartPCs()[methodIdx];
+            char[] lengths = localVarTable.getLengts()[methodIdx];
+
+            if (startPC != null) {
+                for (int i = 0; i < startPC.length; i++) {
+                    char currentBCI = startPC[i];
+                    if (currentBCI >= injectionPos) {
+                        startPC[i] = (char)(currentBCI + injectedBytesCount);
+                    } else {
+                        char currentLength = lengths[i];
+                        if (currentBCI + currentLength > injectionPos) {
+                             lengths[i] = (char)(currentLength + injectedBytesCount);
+                        }
+                    }
+                }
+            }
         }
     }
 }
