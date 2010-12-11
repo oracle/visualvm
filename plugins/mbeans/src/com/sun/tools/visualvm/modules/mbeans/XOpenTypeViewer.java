@@ -123,7 +123,7 @@ class XOpenTypeViewer extends JPanel implements ActionListener {
         }
 
         public String getToolTip(int row, int col) {
-            if(col == 1) {
+            if(col == XTable.VALUE_COLUMN) {
                 Object value = getModel().getValueAt(row, col);
                 if (value != null) {
                     if(isClickableElement(value))
@@ -388,6 +388,15 @@ class XOpenTypeViewer extends JPanel implements ActionListener {
 
         protected Object formatKey(String key) {
             return key;
+        }
+
+        public String getToolTip(int row, int col) {
+            if (col == XTable.NAME_COLUMN && composite != null) {
+                String val = getModel().getValueAt(row,col).toString();
+                
+                return composite.getCompositeType().getDescription(val);
+            }
+            return super.getToolTip(row, col);
         }
 
         private void load(CompositeData data) {
