@@ -153,7 +153,7 @@ public class ResetResultsProfilingPointFactory extends CodeProfilingPointFactory
         ResetResultsProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new ResetResultsProfilingPoint(name, location, project, this);
+            profilingPoint = new ResetResultsProfilingPoint(name, location, project, this, true);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
         } catch (Exception e) {
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
