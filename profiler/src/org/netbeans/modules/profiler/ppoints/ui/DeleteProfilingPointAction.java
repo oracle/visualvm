@@ -43,20 +43,25 @@
 
 package org.netbeans.modules.profiler.ppoints.ui;
 
+import java.awt.event.ActionEvent;
+import java.util.Collection;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import org.netbeans.modules.profiler.ppoints.CodeProfilingPoint;
 import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
-import org.netbeans.modules.profiler.ppoints.Utils;
-import org.openide.nodes.Node;
+import org.openide.util.ContextAwareAction;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.NodeAction;
+import org.openide.util.actions.SystemAction;
 
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public class DeleteProfilingPointAction extends NodeAction {
+public class DeleteProfilingPointAction extends SystemAction implements ContextAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
@@ -70,47 +75,40 @@ public class DeleteProfilingPointAction extends NodeAction {
     public DeleteProfilingPointAction() {
         setIcon(null);
         putValue("noIconInMenu", Boolean.TRUE); // NOI18N
+        setEnabled(false);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    @Override
     public HelpCtx getHelpCtx() {
         return new HelpCtx(DeleteProfilingPointAction.class);
     }
 
+    @Override
     public String getName() {
         return ACTION_NAME;
     }
 
-    protected boolean asynchronous() {
-        return false;
+    @Override
+    public void actionPerformed(ActionEvent ae) {
     }
 
-    protected boolean enable(Node[] node) {
-        if (ProfilingPointsManager.getDefault().isProfilingSessionInProgress()) {
-            return false;
+    @Override
+    public Action createContextAwareInstance(Lookup actionContext) {
+        if (!ProfilingPointsManager.getDefault().isProfilingSessionInProgress()) {
+            Collection<? extends CodeProfilingPoint.Annotation> anns = actionContext.lookupAll(CodeProfilingPoint.Annotation.class);
+            if (anns.size() == 1) {
+                final CodeProfilingPoint pp = anns.iterator().next().profilingPoint();
+                return new AbstractAction(getName()) {
+
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        ProfilingPointsManager.getDefault().removeProfilingPoint(pp);
+                    }
+                };
+            }
         }
-
-        return getCurrentProfilingPoint() != null;
-    }
-
-    protected void performAction(Node[] node) {
-        CodeProfilingPoint profilingPoint = getCurrentProfilingPoint();
-
-        if (profilingPoint == null) {
-            return; // should never happen!
-        }
-
-        ProfilingPointsManager.getDefault().removeProfilingPoint(profilingPoint);
-    }
-
-    private CodeProfilingPoint getCurrentProfilingPoint() {
-        CodeProfilingPoint[] profilingPointsOnLine = Utils.getProfilingPointsOnLine(Utils.getCurrentLocation(0));
-
-        if (profilingPointsOnLine.length == 0) {
-            return null;
-        }
-
-        return profilingPointsOnLine[0];
+        return this;
     }
 }
