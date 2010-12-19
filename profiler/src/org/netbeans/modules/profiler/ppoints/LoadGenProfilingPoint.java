@@ -95,10 +95,12 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
         public String getAnnotationType() {
             return LoadGenProfilingPoint.this.isEnabled() ? ANNOTATION_ENABLED : ANNOTATION_DISABLED;
         }
 
+        @Override
         public String getShortDescription() {
             if (!usesEndLocation()) {
                 return getName();
@@ -106,6 +108,11 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
 
             return isStartAnnotation ? MessageFormat.format(ANNOTATION_START_STRING, new Object[] { getName() })
                                      : MessageFormat.format(ANNOTATION_END_STRING, new Object[] { getName() });
+        }
+
+        @Override
+        public CodeProfilingPoint profilingPoint() {
+            return LoadGenProfilingPoint.this;
         }
     }
 
@@ -431,7 +438,10 @@ public class LoadGenProfilingPoint extends CodeProfilingPoint.Paired implements 
 
     /** Creates a new instance of LoadGenProfilingPoint */
     public LoadGenProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory) {
-        super(name, startLocation, endLocation, project, factory);
+        this(name, startLocation, endLocation, project, factory, false);
+    }
+    public LoadGenProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, startLocation, endLocation, project, factory, existing);
         getChangeSupport().addPropertyChangeListener(this);
     }
 
