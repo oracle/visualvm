@@ -149,7 +149,7 @@ public class TimedTakeSnapshotProfilingPointFactory extends CodeProfilingPointFa
         TimedTakeSnapshotProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new TimedTakeSnapshotProfilingPoint(name, project, this);
+            profilingPoint = new TimedTakeSnapshotProfilingPoint(name, project, this, true);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
             profilingPoint.setSnapshotType(type);
             profilingPoint.setSnapshotTarget(target);
