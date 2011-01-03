@@ -115,10 +115,23 @@ void set_system_loader(JNIEnv *env, jvmtiEnv *jvmti_env) {
   
     (*jvmti_env)->GetPhase(jvmti_env, &phase);
     if (phase >= JVMTI_PHASE_LIVE) {  /* Call ClassLoader.getSystemClassLoader() */
+        jthrowable ex;
         jclass class_loader_clazz = (*env)->FindClass(env, "java/lang/ClassLoader");
         jmethodID get_system_loader_method = (*env)->GetStaticMethodID(env, class_loader_clazz, "getSystemClassLoader", "()Ljava/lang/ClassLoader;");
         
         _system_loader = (*env)->CallStaticObjectMethod(env, class_loader_clazz, get_system_loader_method);
+        ex = (*env)->ExceptionOccurred(env);
+        if (ex != NULL) {
+            jclass ise_cls;
+            
+            (*env)->ExceptionClear(env);
+            ise_cls = (*env)->FindClass(env, "java/lang/IllegalStateException");
+            if (!(*env)->IsInstanceOf(env, ex, ise_cls)) {
+                fprintf(stderr, "Profiler Agent Error: Exception from ClassLoader.getSystemClassLoader()\n");
+            }
+            _system_loader = NULL;
+            return;
+        }
         _system_loader = (*env)->NewGlobalRef(env, _system_loader);
         
         /* Create a lock object used to synchronize access to _ctable */
@@ -138,7 +151,7 @@ int loader_is_system_loader(JNIEnv *jni_env, jvmtiEnv *jvmti_env, jobject loader
         set_system_loader(jni_env, jvmti_env);
     }
     if (_system_loader == NULL) {
-        return 0;
+        return 1;
     }
     if ((*jni_env)->IsSameObject(jni_env, loader, _system_loader)) {
         return 1;

@@ -160,8 +160,7 @@ public class HintsController extends AbstractController {
         StringBuffer output = new StringBuffer();
         JavaClass java_lang_Class = heap.getJavaClassByName(Class.class.getName());
         NumberFormat formatter =  NumberFormat.getInstance();
-
-        final boolean[] oddRow = new boolean[1];
+        boolean oddRow = false;
         Color oddRowBackground = UIUtils.getDarker(
                         UIUtils.getProfilerResultsBackground());
         final String oddRowBackgroundString =
@@ -176,7 +175,7 @@ public class HintsController extends AbstractController {
         addHeading(output, RETAINED_SIZE_MSG);
         output.append("</tr>"); // NOI18N
         for(Instance in : bigObjects) {
-            output.append(oddRow[0] ? "<tr style='background-color: " + // NOI18N
+            output.append(oddRow ? "<tr style='background-color: " + // NOI18N
                                       oddRowBackgroundString + ";'>" :  // NOI18N
                                       "<tr>");  // NOI18N
             if (in.getJavaClass().equals(java_lang_Class)) {
@@ -187,7 +186,7 @@ public class HintsController extends AbstractController {
             }
             addCell(output,formatter.format(in.getRetainedSize()), true);
             output.append("</tr>");   // NOI18N
-            oddRow[0] = !oddRow[0];
+            oddRow = !oddRow;
         }
         output.append("</table>");   // NOI18N
         return output.toString();
