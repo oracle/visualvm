@@ -74,7 +74,6 @@ public class CategoryBuilder {
     private static final String CATEGORY_ATTRIB_TYPE = "type"; // NOI18N
     private static final String CATEGORY_ATTRIB_PACKAGE = "package"; // NOI18N
     private static final String SHADOW_SUFFIX = "shadow";// NOI18N
-    private static final String CATEGORY_ATTRIB_LINK  = "link";// NOI18N
     private String projectType;
     private CategoryContainer rootCategory = null;
     private Project project;
@@ -113,16 +112,10 @@ public class CategoryBuilder {
                     processCategories(container, refNode);
                 }
             } catch (FileStateInvalidException e) {
-                LOGGER.severe("Can not process " + node.getPath()); // NOI18N
+                LOGGER.log(Level.SEVERE, "Can not process {0}", node.getPath()); // NOI18N
                 LOGGER.throwing(CategoryBuilder.class.getName(), "processCategories", e); // NOI18N
             }
         } else if (node.isFolder()) {
-            String link = (String)node.getAttribute(CATEGORY_ATTRIB_LINK);
-            if ( link != null){
-                FileObject linkedCategory = FileUtil.getConfigFile(link); 
-                processCategories(container, linkedCategory);
-                return;
-            }
             String bundleName = (String) node.getAttribute("SystemFileSystem.localizingBundle"); // NOI18N
             String label = bundleName != null ? NbBundle.getBundle(bundleName).getString(node.getPath()) : node.getName();
 

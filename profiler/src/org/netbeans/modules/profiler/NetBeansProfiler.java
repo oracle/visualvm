@@ -627,6 +627,8 @@ public final class NetBeansProfiler extends Profiler {
 
     // ---------------------------------------------------------------------------
     public static boolean isInitialized() {
+        // make sure that the profiler is initialized
+        getDefaultNB();
         return initialized;
     }
 
@@ -1638,13 +1640,13 @@ public final class NetBeansProfiler extends Profiler {
     public boolean prepareInstrumentation(ProfilingSettings profilingSettings) {
         final boolean retValue;
 
+        teardownDispatcher();
+        setupDispatcher(profilingSettings);
+
         ClientUtils.SourceCodeSelection[] marks = MarkingEngine.getDefault().getMarkerMethods();
         profilingSettings.setInstrumentationMarkerMethods(marks);
 
         retValue = super.prepareInstrumentation(profilingSettings);
-
-        teardownDispatcher();
-        setupDispatcher(profilingSettings);
 
         return retValue;
     }

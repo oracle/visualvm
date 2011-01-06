@@ -190,6 +190,9 @@ static jmethodID classLoadHookMethod = NULL;
 
 void JNICALL register_class_prepare(jvmtiEnv *jvmti_env, JNIEnv* env, jthread thread, jclass clazz) {
     (*env)->CallStaticVoidMethod(env, profilerInterfaceClazz, classLoadHookMethod, clazz);
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+    }
 }
 
 
