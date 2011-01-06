@@ -92,10 +92,12 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
         public String getAnnotationType() {
             return StopwatchProfilingPoint.this.isEnabled() ? ANNOTATION_ENABLED : ANNOTATION_DISABLED;
         }
 
+        @Override
         public String getShortDescription() {
             if (!usesEndLocation()) {
                 return getName();
@@ -103,6 +105,11 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
 
             return isStartAnnotation ? MessageFormat.format(ANNOTATION_START_STRING, new Object[] { getName() })
                                      : MessageFormat.format(ANNOTATION_END_STRING, new Object[] { getName() });
+        }
+
+        @Override
+        public CodeProfilingPoint profilingPoint() {
+            return StopwatchProfilingPoint.this;
         }
     }
 
@@ -420,9 +427,11 @@ public final class StopwatchProfilingPoint extends CodeProfilingPoint.Paired imp
     private WeakReference<Report> reportReference;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public StopwatchProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory) {
-        super(name, startLocation, endLocation, project, factory);
+        this(name, startLocation, endLocation, project, factory, false);
+    }
+    public StopwatchProfilingPoint(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, startLocation, endLocation, project, factory, existing);
         getChangeSupport().addPropertyChangeListener(this);
     }
 
