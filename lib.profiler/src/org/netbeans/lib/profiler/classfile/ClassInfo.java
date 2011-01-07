@@ -236,6 +236,10 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         //~ Constructors -------------------------------------------------------------------------------------------------------------
 
         LocalVariableTables(ClassInfo ci) {
+            this(ci, ci.localVariableTablesOffsets, ci.localVariableTablesLengths);
+        }
+        
+        private LocalVariableTables(ClassInfo ci, int[] tablesOffsets, char[] tablesLengths) {
             byte[] classBuf = null;
 
             try {
@@ -249,12 +253,12 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             lengths = new char[nMethods][];
 
             for (int i = 0; i < nMethods; i++) {
-                int tableLen = ci.localVariableTablesLengths[i];
+                int tableLen = tablesLengths[i];
 
                 if (tableLen == 0) {
                     continue;
                 }
-                int ofs = ci.methodInfoOffsets[i] + ci.localVariableTablesOffsets[i];
+                int ofs = ci.methodInfoOffsets[i] + tablesOffsets[i];
                 char[] startPC = startPCs[i] = new char[tableLen];
                 char[] length = lengths[i] = new char[tableLen];
 
@@ -269,19 +273,59 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public char[][] getStartPCs() {
+        char[][] getStartPCs() {
             return startPCs;
         }
 
-        public char[][] getLengts() {
+        char[][] getLengts() {
             return lengths;
         }
 
         public boolean hasTable() {
             return hasTable;
         }
-    }
+        
+        public void updateTable(int injectionPos, int injectedBytesCount, int methodIdx) {
+            if (hasTable()) {
+                char[] startPC = getStartPCs()[methodIdx];
+                char[] lengths = getLengts()[methodIdx];
 
+                if (startPC != null) {
+                    for (int i = 0; i < startPC.length; i++) {
+                        char currentBCI = startPC[i];
+                        if (currentBCI >= injectionPos) {
+                            startPC[i] = (char)(currentBCI + injectedBytesCount);
+                        } else {
+                            char currentLength = lengths[i];
+                            if (currentBCI + currentLength > injectionPos) {
+                                 lengths[i] = (char)(currentLength + injectedBytesCount);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    
+        public void writeTable(final byte[] buffer, int locVarTablePtr, int methodIdx) {
+            char[] startPC = getStartPCs()[methodIdx];
+            char[] lengths = getLengts()[methodIdx];
+
+            if (startPC != null) {
+                for (int i = 0; i < startPC.length; i++, locVarTablePtr+=ATTR_SIZE) {
+                    putU2(buffer, locVarTablePtr, startPC[i]);
+                    putU2(buffer, locVarTablePtr + 2, lengths[i]);
+                }
+            }
+        }  
+    }
+        
+    public static class LocalVariableTypeTables extends LocalVariableTables {
+
+        LocalVariableTypeTables(ClassInfo ci) {
+            super(ci, ci.localVariableTypeTablesOffsets, ci.localVariableTypeTablesLengths);
+        }
+    }
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     String packageName;
@@ -302,6 +346,9 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     int localVaribaleTableCPindex;
     char[] localVariableTablesLengths;
     int[] localVariableTablesOffsets; // Relative offsets within a MethodInfo
+    int localVaribaleTypeTableCPindex;
+    char[] localVariableTypeTablesLengths;
+    int[] localVariableTypeTablesOffsets; // Relative offsets within a MethodInfo
     char[] methodAccessFlags;
     char[] methodBytecodesLengths;
     int[] methodBytecodesOffsets; // Relative offsets within a MethodInfo
@@ -319,6 +366,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     int origCPoolCount; // The number of entries in the original cpool of this class
     private LineNumberTables lineNumberTables;
     private LocalVariableTables localVariableTables;
+    private LocalVariableTypeTables localVariableTypeTables;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -364,6 +412,10 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         return localVariableTablesOffsets[i];
     }
 
+    public int getLocalVariableTypeTableStartOffsetInMethodInfo(int i) {
+        return localVariableTypeTablesOffsets[i];
+    }
+
     public boolean isInterface() {
         return Modifier.isInterface(accessFlags);
     }
@@ -381,6 +433,11 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     public LocalVariableTables getLocalVariableTables() {
         initLocalVariableTables();
         return localVariableTables;
+    }
+
+    public LocalVariableTypeTables getLocalVariableTypeTables() {
+        initLocalVariableTypeTables();
+        return localVariableTypeTables;
     }
 
     public boolean isMethodAbstract(int i) {
@@ -703,16 +760,21 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         }
     }
 
-    //----------------------------------------- Private implementation -----------------------------------
-
     /** Given the table at the specified index, return the specified entry */
-    private static long intAt(byte[] codeBytes, int tbl, int entry) { // TODO CHECK: unused method
+    static long intAt(byte[] codeBytes, int tbl, int entry) { // TODO CHECK: unused method
 
         int base = tbl + (entry << 2);
 
         return (codeBytes[base] << 24) | ((codeBytes[base + 1] & 0xFF) << 16) | ((codeBytes[base + 2] & 0xFF) << 8)
                | (codeBytes[base + 3] & 0xFF);
     }
+
+    static void putU2(byte[] buf, int pos, int value) {
+        buf[pos] = (byte) ((value >> 8) & 0xFF);
+        buf[pos + 1] = (byte) (value & 0xFF);
+    }
+
+    //----------------------------------------- Private implementation -----------------------------------
 
     private synchronized void initLineNumberTables() {
         if (lineNumberTables == null) {
@@ -723,6 +785,12 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     private synchronized void initLocalVariableTables() {
         if (localVariableTables == null) {
             localVariableTables = new LocalVariableTables(this);
+        }
+    }
+
+    private synchronized void initLocalVariableTypeTables() {
+        if (localVariableTypeTables == null) {
+            localVariableTypeTables = new LocalVariableTypeTables(this);
         }
     }
 }
