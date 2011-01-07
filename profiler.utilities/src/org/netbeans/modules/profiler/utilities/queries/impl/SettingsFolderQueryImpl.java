@@ -57,7 +57,7 @@ public class SettingsFolderQueryImpl extends SettingsFolderQuery {
     private static final String SETTINGS_FOLDER = "Settings";   // NOI18N
     
     @Override
-    public FileObject getSettingsFolder(boolean create) throws IOException {
+    synchronized public FileObject getSettingsFolder(boolean create) throws IOException {
         final FileObject folder = FileUtil.getConfigFile(PROFILER_FOLDER);
         FileObject settingsFolder = folder.getFileObject(SETTINGS_FOLDER, null);
 
