@@ -229,7 +229,7 @@ public class Utils {
     private static class ProjectPresenterListRenderer extends DefaultListCellRenderer {
         //~ Inner Classes --------------------------------------------------------------------------------------------------------
 
-        private class Renderer extends DefaultListCellRenderer {
+        private static class Renderer extends DefaultListCellRenderer {
             //~ Methods ----------------------------------------------------------------------------------------------------------
 
             public void setFont(Font font) {

@@ -172,7 +172,7 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
 
     public void setAllocStackTraceLimit(int limit) {
         if (limit <= 0) {
-            defineDepthSpinner.setValue((limit < 0) ? new Integer(-limit) : new Integer(10));
+            defineDepthSpinner.setValue((limit < 0) ? Integer.valueOf(-limit) : Integer.valueOf(10));
             fullDepthRadio.setSelected(true);
         } else {
             defineDepthSpinner.setValue(new Integer(limit));

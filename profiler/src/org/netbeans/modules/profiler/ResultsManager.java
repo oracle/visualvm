@@ -243,7 +243,7 @@ public final class ResultsManager {
         Integer type = typeCache.get(fo);
 
         if (type == null) {
-            type = new Integer(readTypeFromFile(fo));
+            type = Integer.valueOf(readTypeFromFile(fo));
             typeCache.put(fo, type);
         }
 
