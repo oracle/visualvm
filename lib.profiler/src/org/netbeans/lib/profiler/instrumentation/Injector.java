@@ -227,15 +227,15 @@ public abstract class Injector extends SingleMethodScaner {
         if (localVarTable.hasTable()) {
             int locVarTableOldStart = clazz.getLocalVariableTableStartOffsetInMethodInfo(methodIdx);
             int locVarTablePtr = locVarTableOldStart + (bytecodesLength - origBytecodesLength) + (excTableNewLen - excTableOldLen);
-            char[] startPC = localVarTable.getStartPCs()[methodIdx];
-            char[] lengths = localVarTable.getLengts()[methodIdx];
+            localVarTable.writeTable(ret, locVarTablePtr, methodIdx);
+        }
 
-            if (startPC != null) {
-                for (int i = 0; i < startPC.length; i++, locVarTablePtr+=LocalVariableTables.ATTR_SIZE) {
-                    putU2(ret, locVarTablePtr, startPC[i]);
-                    putU2(ret, locVarTablePtr + 2, lengths[i]);
-                }
-            }
+        ClassInfo.LocalVariableTypeTables localVarTypeTable = clazz.getLocalVariableTypeTables();
+        
+        if (localVarTypeTable.hasTable()) {
+            int locVarTypeTableOldStart = clazz.getLocalVariableTypeTableStartOffsetInMethodInfo(methodIdx);
+            int locVarTypeTablePtr = locVarTypeTableOldStart + (bytecodesLength - origBytecodesLength) + (excTableNewLen - excTableOldLen);
+            localVarTypeTable.writeTable(ret, locVarTypeTablePtr, methodIdx);
         }
 
         // FIXME: need to update linenumber table as well
@@ -603,6 +603,7 @@ public abstract class Injector extends SingleMethodScaner {
 
         updateExceptionTable(bci, delta);
         updateLocalVariableTable(bci, delta);
+        updateLocalVariableTypeTable(bci, delta);
 
         // We currently don't support the following updates - they are used only by debuggers.
         // updateLineNumberTable(injectionPos, delta);
@@ -644,24 +645,14 @@ public abstract class Injector extends SingleMethodScaner {
 
     private void updateLocalVariableTable(int injectionPos, int injectedBytesCount) {
         ClassInfo.LocalVariableTables localVarTable = clazz.getLocalVariableTables();
-
-        if (localVarTable.hasTable()) {
-            char[] startPC = localVarTable.getStartPCs()[methodIdx];
-            char[] lengths = localVarTable.getLengts()[methodIdx];
-
-            if (startPC != null) {
-                for (int i = 0; i < startPC.length; i++) {
-                    char currentBCI = startPC[i];
-                    if (currentBCI >= injectionPos) {
-                        startPC[i] = (char)(currentBCI + injectedBytesCount);
-                    } else {
-                        char currentLength = lengths[i];
-                        if (currentBCI + currentLength > injectionPos) {
-                             lengths[i] = (char)(currentLength + injectedBytesCount);
-                        }
-                    }
-                }
-            }
-        }
+        
+        localVarTable.updateTable(injectionPos, injectedBytesCount, methodIdx);
     }
+
+    private void updateLocalVariableTypeTable(int injectionPos, int injectedBytesCount) {
+        ClassInfo.LocalVariableTypeTables localVarTypeTable = clazz.getLocalVariableTypeTables();
+        
+        localVarTypeTable.updateTable(injectionPos, injectedBytesCount, methodIdx);
+    }
+
 }

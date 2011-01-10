@@ -74,6 +74,7 @@ public class DynamicClassInfo extends ClassInfo {
     private byte[][] modifiedAndSavedMethodInfos;
     private int[] modifiedMethodBytecodesLength;
     private int[] modifiledLocalVariableTableOffsets;
+    private int[] modifiledLocalVariableTypeTableOffsets;
     private boolean allMethodsMarkers = false;
     private boolean allMethodsRoots = false;
     private boolean hasUninstrumentedMarkerMethods;
@@ -201,7 +202,32 @@ public class DynamicClassInfo extends ClassInfo {
             return super.getLocalVariableTableStartOffsetInMethodInfo(idx);
         }
     }
+    
+    public int getLocalVariableTypeTableStartOffsetInMethodInfo(int idx) {
+        if ((modifiedAndSavedMethodInfos != null) && (modifiedAndSavedMethodInfos[idx] != null)) {
+            if (modifiledLocalVariableTypeTableOffsets[idx] == 0) {
+                int newOffset = getExceptionTableStartOffsetInMethodInfo(idx)+getExceptionTableCount(idx)*8+2;
+                byte[] methodInfo = getMethodInfo(idx);
+                int attrCount = getU2(methodInfo, newOffset); newOffset+=2;// Attribute (or rather sub-attribute) count
 
+                for (int k = 0; k < attrCount; k++) {
+                    int attrNameIdx = getU2(methodInfo, newOffset); newOffset+=2;
+                    int attrLen = getU4(methodInfo, newOffset); newOffset+=4;
+
+                    if (attrNameIdx==localVaribaleTypeTableCPindex){
+                        modifiledLocalVariableTypeTableOffsets[idx] = newOffset+2;
+                        break;
+                    }
+                    newOffset += attrLen;
+                }
+            }
+            assert modifiledLocalVariableTypeTableOffsets[idx] != 0;
+            return modifiledLocalVariableTypeTableOffsets[idx];
+        } else {
+            return super.getLocalVariableTypeTableStartOffsetInMethodInfo(idx);
+        }
+    }
+    
     public void setHasUninstrumentedMarkerMethods(boolean v) {
         hasUninstrumentedMarkerMethods = v;
     }
