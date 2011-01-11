@@ -611,7 +611,7 @@ public class Utils {
 
     public static double getDurationInMicroSec(long startTimestamp, long endTimestamp) {
         ProfilingSessionStatus session = Profiler.getDefault().getTargetAppRunner().getProfilingSessionStatus();
-        double countsInMicroSec = session.timerCountsInSecond[0] / 1000000L;
+        double countsInMicroSec = session.timerCountsInSecond[0] / 1000000D;
 
         return (endTimestamp - startTimestamp) / countsInMicroSec;
     }

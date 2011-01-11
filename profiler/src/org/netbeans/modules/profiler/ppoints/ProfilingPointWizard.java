@@ -337,12 +337,12 @@ public class ProfilingPointWizard implements WizardDescriptor.Iterator {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    private static class Singleton {
+        final private static ProfilingPointWizard INSTANCE = new ProfilingPointWizard();
+    }
+    
     public static ProfilingPointWizard getDefault() {
-        if (defaultInstance == null) {
-            defaultInstance = new ProfilingPointWizard();
-        }
-
-        return defaultInstance;
+        return Singleton.INSTANCE;
     }
 
     public WizardDescriptor getWizardDescriptor() {

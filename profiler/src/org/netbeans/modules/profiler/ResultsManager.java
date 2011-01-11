@@ -119,7 +119,6 @@ public final class ResultsManager {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-    private static ResultsManager defaultResultsManager;
 
     // -----
     // I18N String constants
@@ -195,13 +194,14 @@ public final class ResultsManager {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     private ResultsManager() {}
 
+    private static class Singleton {
+        final private static ResultsManager INSTANCE = new ResultsManager();
+    }
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static ResultsManager getDefault() {
-        if (defaultResultsManager==null) {
-            defaultResultsManager=new ResultsManager();
-        }
-        return defaultResultsManager;
+        return Singleton.INSTANCE;
     }
 
     public String getDefaultSnapshotFileName(LoadedSnapshot ls) {
