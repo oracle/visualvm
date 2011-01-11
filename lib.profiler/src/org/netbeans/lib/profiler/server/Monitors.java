@@ -484,8 +484,8 @@ public class Monitors implements CommonConstants {
             if (explicitThreads != null) {
                 // we are actually using exact thread states tracking, so make use of zombie state that we otherwise do
                 // not get
-                if (status == CommonConstants.THREAD_STATUS_ZOMBIE) {
-                    addExactState(null, threadIds[pos], CommonConstants.THREAD_STATUS_ZOMBIE, stateSampleTimestamps[curStateIdx]);
+                if (status == CommonConstants.THREAD_STATUS_ZOMBIE || threadNew[pos]) {
+                    addExactState(null, threadIds[pos], (byte)status, stateSampleTimestamps[curStateIdx]);
                 }
                 
                 // just an optimization, if we use exact timings, the sampling data will only contain state running
