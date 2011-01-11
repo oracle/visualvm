@@ -87,7 +87,6 @@ public final class DrillDownWindow extends TopComponent {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private AbstractButton presenter;
-    private DrillDownListener ddListener;
     private DrillDownPanel ddPanel;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------

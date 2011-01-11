@@ -73,7 +73,6 @@ public class HeapWalkerManager {
     private static final String CANNOT_DELETE_HEAPDUMP_MSG = NbBundle.getMessage(HeapWalkerManager.class,
                                                                                  "HeapWalkerManager_CannotDeleteHeapDumpMsg"); // NOI18N
                                                                                                                                // -----
-    private static HeapWalkerManager defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -91,12 +90,12 @@ public class HeapWalkerManager {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    private static class Singleton {
+        final private static HeapWalkerManager INSTANCE = new HeapWalkerManager();
+    }
+    
     public static HeapWalkerManager getDefault() {
-        if (defaultInstance == null) {
-            defaultInstance = new HeapWalkerManager();
-        }
-
-        return defaultInstance;
+        return Singleton.INSTANCE;
     }
 
     public boolean isHeapWalkerOpened(File file) {
