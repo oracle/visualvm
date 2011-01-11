@@ -151,7 +151,7 @@ public class TriggeredTakeSnapshotProfilingPointFactory extends CodeProfilingPoi
         TriggeredTakeSnapshotProfilingPoint profilingPoint = null;
 
         try {
-            profilingPoint = new TriggeredTakeSnapshotProfilingPoint(name, project, this);
+            profilingPoint = new TriggeredTakeSnapshotProfilingPoint(name, project, this, true);
             profilingPoint.setEnabled(Boolean.parseBoolean(enabledStr));
             profilingPoint.setSnapshotType(type);
             profilingPoint.setSnapshotTarget(target);

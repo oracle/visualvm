@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -255,14 +256,10 @@ public class MarkerProcessor extends CategoryDefinitionProcessor implements Mark
         try {
             controller.toPhase(JavaSource.Phase.RESOLVED);
             // get all implementors of the superclass and add their marker methods
-            final Set<ClassIndex.SearchKind> kind = new HashSet<ClassIndex.SearchKind>(Arrays.asList(new ClassIndex.SearchKind[]{
-                        ClassIndex.SearchKind.IMPLEMENTORS
-                    }));
+            final Set<ClassIndex.SearchKind> kind = EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS);
 
             //    final Set<ClassIndex.SearchScope> scope = new HashSet<ClassIndex.SearchScope>(Arrays.asList(new ClassIndex.SearchScope[]{ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES}));
-            final Set<ClassIndex.SearchScope> scope = new HashSet<ClassIndex.SearchScope>(Arrays.asList(new ClassIndex.SearchScope[]{
-                        ClassIndex.SearchScope.SOURCE
-                    }));
+            final Set<ClassIndex.SearchScope> scope = EnumSet.allOf(ClassIndex.SearchScope.class);
 
             Set<String> adjustedRestrictors = new HashSet<String>();
 
