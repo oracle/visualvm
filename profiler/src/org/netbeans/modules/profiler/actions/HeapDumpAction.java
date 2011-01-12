@@ -93,7 +93,7 @@ import javax.swing.event.DocumentListener;
 public final class HeapDumpAction extends ProfilingAwareAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class ChooseHeapdumpTargetPanel extends JPanel {
+    private static class ChooseHeapdumpTargetPanel extends JPanel {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
         public static final int DESTINATION_DEFAULT = 0;

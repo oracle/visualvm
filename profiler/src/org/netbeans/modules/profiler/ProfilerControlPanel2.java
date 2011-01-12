@@ -352,7 +352,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                     case CommonConstants.INSTR_CODE_REGION:
                         instrStatusText = MessageFormat.format(NO_LINES_CODE_REGION_MSG,
                                                                new Object[] {
-                                                                   new Integer(targetAppRunner.getProfilingSessionStatus().instrEndLine
+                                                                   Integer.valueOf(targetAppRunner.getProfilingSessionStatus().instrEndLine
                                                                                - targetAppRunner.getProfilingSessionStatus().instrStartLine)
                                                                });
 
@@ -534,7 +534,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     private static final class ProjectNameRenderer extends DefaultListCellRenderer {
         //~ Inner Classes --------------------------------------------------------------------------------------------------------
 
-        private class Renderer extends DefaultListCellRenderer {
+        private static class Renderer extends DefaultListCellRenderer {
             //~ Methods ----------------------------------------------------------------------------------------------------------
 
             public void setFont(Font font) {
@@ -1549,13 +1549,13 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             } else {
                 // state stays the same: started -> show progress by adding dots
                 if (state == Profiler.PROFILING_STARTED) {
-                    String text = STARTING_LABEL_STRING;
+                    StringBuilder text = new StringBuilder(STARTING_LABEL_STRING);
 
                     for (int i = 0; i < count; i++) {
-                        text += "."; // NOI18N
+                        text.append('.'); // NOI18N
                     }
 
-                    statusValueLabel.setText(text);
+                    statusValueLabel.setText(text.toString());
                     count++;
 
                     if (count == 5) {
@@ -1762,7 +1762,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     private static final ImageIcon memoryIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memorySmall.png", false); // NOI18N
     private static final ImageIcon emptyIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/empty16.gif", false); // NOI18N
     private static final String ID = "profiler_cp"; // NOI18N // for winsys persistence
-    private static final Integer EXTERNALIZABLE_VERSION_WITH_SNAPSHOTS = new Integer(3);
+    private static final Integer EXTERNALIZABLE_VERSION_WITH_SNAPSHOTS = Integer.valueOf(3);
     
     private static final Color CP_BACKGROUND_COLOR = UIUtils.getProfilerResultsBackground();
 

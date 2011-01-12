@@ -167,7 +167,7 @@ public class TriggerCustomizer extends ValidityAwarePanel implements ActionListe
             condition.setValue(((Integer) triggerValueSpinner.getValue()).intValue());
         } else if (key == HEAP_SIZE_ABS_KEY) {
             condition.setMetric(TriggeredGlobalProfilingPoint.TriggerCondition.METRIC_HEAPSIZ);
-            condition.setValue(((Integer) triggerValueSpinner.getValue()).intValue() * (1024 * 1024));
+            condition.setValue(((Integer) triggerValueSpinner.getValue()).intValue() * (1024L * 1024L));
         } else if (key == SURVGEN_COUNT_KEY) {
             condition.setMetric(TriggeredGlobalProfilingPoint.TriggerCondition.METRIC_SURVGEN);
             condition.setValue(((Integer) triggerValueSpinner.getValue()).intValue());
