@@ -366,14 +366,14 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             nMethods--; // Because nInstrMethods is actually the array size where element 0 is always empty
                         }
 
-                        instrStatusText = MessageFormat.format(NO_METHODS_MSG, new Object[] { new Integer(nMethods) });
+                        instrStatusText = MessageFormat.format(NO_METHODS_MSG, new Object[] { Integer.valueOf(nMethods) });
 
                         break;
                     case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
                     case CommonConstants.INSTR_OBJECT_LIVENESS:
 
                         final int nClasses = targetAppRunner.getProfilingSessionStatus().getNInstrClasses();
-                        instrStatusText = MessageFormat.format(NO_CLASSES_MSG, new Object[] { new Integer(nClasses) });
+                        instrStatusText = MessageFormat.format(NO_CLASSES_MSG, new Object[] { Integer.valueOf(nClasses) });
                         ;
 
                         break;

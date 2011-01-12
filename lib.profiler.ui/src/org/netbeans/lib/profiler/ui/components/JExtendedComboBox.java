@@ -49,11 +49,9 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 
 /**
@@ -64,7 +62,7 @@ import javax.swing.UIManager;
 public class JExtendedComboBox extends JComboBox {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class ExtendedComboListRenderer extends DefaultListCellRenderer {
+    private static class ExtendedComboListRenderer extends DefaultListCellRenderer {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,

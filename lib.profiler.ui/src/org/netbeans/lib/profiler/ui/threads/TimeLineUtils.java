@@ -92,7 +92,7 @@ public class TimeLineUtils {
 
     static {
         for (int i = 0; i < timeUnitsGrid.length; i++) {
-            timeUnitsToIndex.put(new Integer(timeUnitsGrid[i]), new Integer(i));
+            timeUnitsToIndex.put(Integer.valueOf(timeUnitsGrid[i]), Integer.valueOf(i));
         }
     }
 
@@ -323,7 +323,7 @@ public class TimeLineUtils {
     }
 
     private static int getUnitsIndex(int optimalUnits) {
-        Object oTimeUnitsFormatIndex = timeUnitsToIndex.get(new Integer(optimalUnits));
+        Object oTimeUnitsFormatIndex = timeUnitsToIndex.get(Integer.valueOf(optimalUnits));
 
         if (oTimeUnitsFormatIndex == null) {
             return -1;

@@ -72,8 +72,10 @@ public interface PaintersModel {
         }
 
         public void removePaintersListener(PaintersListener listener) {
-            if (listeners != null) listeners.remove(listener);
-            if (listeners.isEmpty()) listeners = null;
+            if (listeners != null) {
+                listeners.remove(listener);
+                if (listeners.isEmpty()) listeners = null;
+            }
         }
 
 

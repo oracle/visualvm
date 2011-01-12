@@ -186,7 +186,7 @@ public class ProfilerGCXYItemPainter extends SynchronousXYItemPainter {
         if (lastIndex == -1) lastIndex = valuesCount - 1;
         if (lastFirst != -1 && lastIndex < valuesCount - 1) lastIndex += 1;
 
-        int itemsStep = (int)Math.ceil(valuesCount / context.getViewWidth());
+        int itemsStep = (int)Math.ceil((double)valuesCount / (double)context.getViewWidth());
         if (itemsStep == 0) itemsStep = 1;
 
         int visibleCount = lastIndex - index + 1;
