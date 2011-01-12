@@ -175,7 +175,7 @@ public class MemorySettingsAdvancedPanel extends DefaultSettingsPanel implements
             defineDepthSpinner.setValue((limit < 0) ? Integer.valueOf(-limit) : Integer.valueOf(10));
             fullDepthRadio.setSelected(true);
         } else {
-            defineDepthSpinner.setValue(new Integer(limit));
+            defineDepthSpinner.setValue(Integer.valueOf(limit));
             definedDepthRadio.setSelected(true);
         }
     }

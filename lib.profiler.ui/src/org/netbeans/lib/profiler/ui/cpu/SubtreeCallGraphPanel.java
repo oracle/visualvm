@@ -391,7 +391,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
                 }
 
                 private Integer getNodeInvocations(PrestimeCPUCCTNode pNode) {
-                    return new Integer(pNode.getNCalls());
+                    return Integer.valueOf(pNode.getNCalls());
                 }
 
                 public void sortByColumn(int column, boolean order) {
@@ -600,7 +600,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
         for (int i = 0; i < columnCount; i++) {
             menuItem = new JCheckBoxMenuItem(columnNames[i]);
-            menuItem.setActionCommand(new Integer(i).toString());
+            menuItem.setActionCommand(Integer.valueOf(i).toString());
             addMenuItemListener(menuItem);
 
             if (treeTable != null) {

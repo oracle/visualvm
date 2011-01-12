@@ -410,6 +410,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private WireIO wireIO;
     private boolean dynamic;
     private int agentId = -1;
+    final private Random r = new Random(System.currentTimeMillis()) ;
 
     //---------------------------------------------------------------------------------------
     // Communication management
@@ -1111,7 +1112,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             }
 
             if (agentId == -1) {
-                agentId = (int) (Math.random() * (float) Integer.MAX_VALUE);
+                agentId = r.nextInt(Integer.MAX_VALUE);
             }
         }
 

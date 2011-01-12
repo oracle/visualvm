@@ -225,7 +225,7 @@ abstract class AbstractLongMap {
         byte[] buf;
         boolean bufferModified;
         long offset;
-        final int BUFFER_SIZE = 128;
+        final static int BUFFER_SIZE = 128;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 

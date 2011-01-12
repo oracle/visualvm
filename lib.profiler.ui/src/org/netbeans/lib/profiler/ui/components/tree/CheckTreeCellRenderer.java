@@ -96,7 +96,7 @@ public class CheckTreeCellRenderer extends JPanel implements TreeCellRendererPer
             remove(treeRendererComponent);
         }
 
-        if ((treeNode != null) && treeRenderer instanceof DefaultTreeCellRenderer) {
+        if (treeNode != null) {
             checkBox.setVisible(!persistentRenderer);
             setupCellRendererIcon((DefaultTreeCellRenderer) treeRenderer, treeNode.getIcon());
         } else {

@@ -172,7 +172,7 @@ public class JTitledPanel extends JPanel {
         }
     }
 
-    private class ImageIconButton extends JButton implements MouseListener {
+    private static class ImageIconButton extends JButton implements MouseListener {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private Border emptyBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
