@@ -85,9 +85,6 @@ public class MarkingEngine {
     final private MarkMapper mapper;
 
     // @GuardedBy markGuard
-    private String[] labels;
-
-    // @GuardedBy markGuard
     private MarkMapping[] marks;
 
     private Set observers = new HashSet();
@@ -141,7 +138,7 @@ public class MarkingEngine {
 
     public int getNMarks() {
         synchronized (markGuard) {
-            return (labels != null) ? labels.length : 0;
+            return (marks != null) ? marks.length : 0;
         }
     }
 

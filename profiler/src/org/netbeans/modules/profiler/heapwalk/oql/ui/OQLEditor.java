@@ -79,7 +79,7 @@ public class OQLEditor extends JPanel {
                   UIManager.getLookAndFeel().getDefaults().getColor("desktop") : // NOI18N
                   UIManager.getColor("TextField.disabledBackground"); // NOI18N
 
-    final private Caret nullCaret = new Caret() {
+    final private transient Caret nullCaret = new Caret() {
 
         public void install(JTextComponent c) {
             //
