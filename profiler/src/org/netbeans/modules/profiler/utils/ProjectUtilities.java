@@ -241,21 +241,17 @@ public final class ProjectUtilities {
     public static ClasspathInfo getClasspathInfo(final Project project, final boolean includeSubprojects,
                                                  final boolean includeSources, final boolean includeLibraries) {
         FileObject[] sourceRoots = getSourceRoots(project, includeSubprojects);
-        Set<FileObject> srcRootSet = new HashSet<FileObject>(sourceRoots.length);
-        java.util.List<FileObject> compileRootList = new ArrayList<FileObject>(sourceRoots.length);
-        java.util.List<URL> urlList = new ArrayList<URL>();
-
-        srcRootSet.addAll(Arrays.asList(sourceRoots));
-
         if (((sourceRoots == null) || (sourceRoots.length == 0)) && !includeSubprojects) {
             sourceRoots = getSourceRoots(project, true);
         }
-
-        final ClassPath cpEmpty = ClassPathSupport.createClassPath(new FileObject[0]);
-
-        if (sourceRoots.length == 0) {
+        
+        if (sourceRoots == null || sourceRoots.length == 0) {
             return null; // fail early
         }
+        
+        java.util.List<URL> urlList = new ArrayList<URL>();
+
+        final ClassPath cpEmpty = ClassPathSupport.createClassPath(new FileObject[0]);
 
         ClassPath cpSource = ClassPathSupport.createClassPath(sourceRoots);
 
@@ -664,27 +660,31 @@ public final class ProjectUtilities {
         final FileObject buildFile = findBuildFile(project);
         final FileObject buildBackupFile = project.getProjectDirectory().getFileObject("build-before-profiler.xml"); //NOI18N
 
-        if (buildFile != null && buildBackupFile != null) {
+        if (buildFile != null) {
+            if (buildBackupFile != null) {
+                // clean up the old backup file
+                try {
+                    buildBackupFile.delete();
+                } catch (IOException e) {
+                    ProfilerLogger.log(e);
+
+                    return false;
+
+                    // cannot delete already existing backup
+                }
+            }
+            // copy over the new build file
             try {
-                buildBackupFile.delete();
-            } catch (IOException e) {
-                e.printStackTrace(System.err);
+                buildFile.copy(project.getProjectDirectory(), "build-before-profiler", "xml"); //NOI18N
+            } catch (IOException e1) {
+                ProfilerLogger.log(e1);
 
                 return false;
-
-                // cannot delete already existing backup
             }
+            return true;
         }
 
-        try {
-            buildFile.copy(project.getProjectDirectory(), "build-before-profiler", "xml"); //NOI18N
-        } catch (IOException e1) {
-            ProfilerLogger.log(e1);
-
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     public static SimpleFilter computeProjectOnlyInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,

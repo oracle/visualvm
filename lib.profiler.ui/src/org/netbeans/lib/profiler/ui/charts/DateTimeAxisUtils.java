@@ -115,7 +115,7 @@ public class DateTimeAxisUtils {
 
     static {
         for (int i = 0; i < timeUnitsGrid.length; i++) {
-            timeUnitsToIndex.put(new Long(timeUnitsGrid[i]), new Integer(i));
+            timeUnitsToIndex.put(new Long(timeUnitsGrid[i]), Integer.valueOf(i));
         }
     }
 

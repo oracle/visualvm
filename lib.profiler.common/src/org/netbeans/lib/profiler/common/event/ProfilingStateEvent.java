@@ -65,6 +65,7 @@ public final class ProfilingStateEvent {
     public ProfilingStateEvent(final int oldState, final int newState, final Profiler source) {
         this.oldState = oldState;
         this.newState = newState;
+        this.source = source;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
