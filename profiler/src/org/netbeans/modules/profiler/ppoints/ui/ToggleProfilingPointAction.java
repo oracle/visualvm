@@ -249,7 +249,7 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
 
     private ProfilingPointsSwitcher ppSwitcher;
     private ProfilingPointFactory[] ppFactories;
-    private boolean warningDialogOpened = false;
+    volatile private boolean warningDialogOpened = false;
     private int currentFactory;
 
     private KeyStroke acceleratorKeyStroke;
@@ -304,18 +304,28 @@ public class ToggleProfilingPointAction extends AbstractAction implements AWTEve
         }
         
         ProfilingPointsSwitcher chooserFrame = getChooserFrame();
-
-        if (chooserFrame.isVisible()) {
-            nextFactory();
-            chooserFrame.setProfilingPointFactory((currentFactory == ppFactories.length) ? null : ppFactories[currentFactory],
-                                                  currentFactory);
-        } else {
-            if (currentlyInEditor()) {
-                resetFactories();
+        
+        boolean toggleOff = false;
+        CodeProfilingPoint.Location location = Utils.getCurrentLocation(CodeProfilingPoint.Location.OFFSET_START);
+        for(CodeProfilingPoint pp : ProfilingPointsManager.getDefault().getProfilingPoints(CodeProfilingPoint.class, Utils.getCurrentProject(), false, false)) {
+            if (location.equals(pp.getLocation())) {
+                ProfilingPointsManager.getDefault().removeProfilingPoint(pp);
+                toggleOff = true;
+            }
+        }
+        if (!toggleOff) {
+            if (chooserFrame.isVisible()) {
+                nextFactory();
                 chooserFrame.setProfilingPointFactory((currentFactory == ppFactories.length) ? null : ppFactories[currentFactory],
                                                       currentFactory);
-                Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
-                chooserFrame.setVisible(true);
+            } else {
+                if (currentlyInEditor()) {
+                    resetFactories();
+                    chooserFrame.setProfilingPointFactory((currentFactory == ppFactories.length) ? null : ppFactories[currentFactory],
+                                                          currentFactory);
+                    Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
+                    chooserFrame.setVisible(true);
+                }
             }
         }
     }

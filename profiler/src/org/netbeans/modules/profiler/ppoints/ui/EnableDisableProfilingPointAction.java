@@ -43,19 +43,25 @@
 
 package org.netbeans.modules.profiler.ppoints.ui;
 
+import java.awt.event.ActionEvent;
+import java.util.Collection;
+import javax.swing.Action;
 import org.netbeans.modules.profiler.ppoints.CodeProfilingPoint;
 import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
-import org.netbeans.modules.profiler.ppoints.Utils;
+import org.openide.util.ContextAwareAction;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.BooleanStateAction;
+import org.openide.util.actions.SystemAction;
 
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public class EnableDisableProfilingPointAction extends BooleanStateAction {
+public class EnableDisableProfilingPointAction extends SystemAction implements ContextAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
@@ -63,57 +69,75 @@ public class EnableDisableProfilingPointAction extends BooleanStateAction {
     private static final String ACTION_NAME = NbBundle.getMessage(EnableDisableProfilingPointAction.class,
                                                                   "EnableDisableProfilingPointAction_ActionName"); // NOI18N
                                                                                                                    // -----
+    private ContextAwareAction action;
+
+    private class ContextAwareAction extends BooleanStateAction {
+
+        private CodeProfilingPoint profilingPoint;
+
+        ContextAwareAction() {
+            setIcon(null);
+            putValue("noIconInMenu", Boolean.TRUE); // NOI18N
+        }
+
+        void setProfilingPoint(CodeProfilingPoint pp) {
+            profilingPoint = pp;
+        }
+
+        @Override
+        public String getName() {
+            return EnableDisableProfilingPointAction.this.getName();
+        }
+
+        @Override
+        public HelpCtx getHelpCtx() {
+            return new HelpCtx(EnableDisableProfilingPointAction.class);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ev) {
+            super.actionPerformed(ev);
+            profilingPoint.setEnabled(getBooleanState());
+        }
+    }
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public EnableDisableProfilingPointAction() {
+        action = new ContextAwareAction();
         setIcon(null);
         putValue("noIconInMenu", Boolean.TRUE); // NOI18N
+        setEnabled(false);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public void setBooleanState(boolean value) {
-        CodeProfilingPoint profilingPoint = getCurrentProfilingPoint();
-
-        if (profilingPoint != null) { // should never be null!
-            profilingPoint.setEnabled(value);
-        }
-
-        super.setBooleanState(value);
-    }
-
-    public boolean isEnabled() {
-        if (ProfilingPointsManager.getDefault().isProfilingSessionInProgress()) {
-            return false;
-        }
-
-        CodeProfilingPoint profilingPoint = getCurrentProfilingPoint();
-
-        if (profilingPoint == null) {
-            return false; // shouldn't happen!
-        }
-
-        super.setBooleanState(profilingPoint.isEnabled());
-
-        return true;
-    }
-
+    @Override
     public HelpCtx getHelpCtx() {
         return new HelpCtx(EnableDisableProfilingPointAction.class);
     }
 
+    @Override
     public String getName() {
         return ACTION_NAME;
     }
 
-    private CodeProfilingPoint getCurrentProfilingPoint() {
-        CodeProfilingPoint[] profilingPointsOnLine = Utils.getProfilingPointsOnLine(Utils.getCurrentLocation(0));
+    @Override
+    public void actionPerformed(ActionEvent ev) {
+    }
 
-        if (profilingPointsOnLine.length == 0) {
-            return null;
+    @Override
+    public Action createContextAwareInstance(Lookup actionContext) {
+        if (!ProfilingPointsManager.getDefault().isProfilingSessionInProgress()) {
+            Collection<? extends CodeProfilingPoint.Annotation> anns = actionContext.lookupAll(CodeProfilingPoint.Annotation.class);
+            if (anns.size() == 1) {
+                CodeProfilingPoint pp = anns.iterator().next().profilingPoint();
+                
+                action.setProfilingPoint(pp);
+                action.setBooleanState(pp.isEnabled());
+                return action;
+            }
         }
-
-        return profilingPointsOnLine[0];
+        return this;
     }
 }
