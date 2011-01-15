@@ -207,7 +207,7 @@ public class ProjectSensitiveAction extends AbstractAction implements ContextAwa
         public static String formatName(final String namePattern, final int numberOfObjects, final String firstObjectName) {
             return MessageFormat.format(namePattern,
                                         new Object[] {
-                                            new Integer(numberOfObjects), (firstObjectName == null) ? "" : firstObjectName, //NOI18N
+                                            Integer.valueOf(numberOfObjects), (firstObjectName == null) ? "" : firstObjectName, //NOI18N
                                         });
         }
 

@@ -233,19 +233,19 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
                     int nTotalAllocObjects = ((Integer) nTotalAllocObjectsArr.get(classIndex)).intValue();
 
                     nTrackedAllocObjectsArr.set(classIndex, new Long(nTrackedAllocObjects - s1NTrackedAllocObjects[i]));
-                    nTrackedLiveObjectsArr.set(classIndex, new Integer(nTrackedLiveObjects - s1NTrackedLiveObjects[i]));
-                    maxSurvGenArr.set(classIndex, new Integer(maxSurvGen - s1MaxSurvGen[i]));
+                    nTrackedLiveObjectsArr.set(classIndex, Integer.valueOf(nTrackedLiveObjects - s1NTrackedLiveObjects[i]));
+                    maxSurvGenArr.set(classIndex, Integer.valueOf(maxSurvGen - s1MaxSurvGen[i]));
                     avgObjectAgeArr.set(classIndex, new Float(avgObjectAge - s1AvgObjectAge[i]));
                     trackedLiveObjectsSizeArr.set(classIndex, new Long(trackedLiveObjectsSize - s1TrackedLiveObjectsSize[i]));
-                    nTotalAllocObjectsArr.set(classIndex, new Integer(nTotalAllocObjects - s1NTotalAllocObjects[i]));
+                    nTotalAllocObjectsArr.set(classIndex, Integer.valueOf(nTotalAllocObjects - s1NTotalAllocObjects[i]));
                 } else {
-                    classNamesIdxMap.put(s1ClassNames[i], new Integer(idx));
+                    classNamesIdxMap.put(s1ClassNames[i], Integer.valueOf(idx));
                     nTrackedAllocObjectsArr.add(new Long(0 - s1NTrackedAllocObjects[i]));
-                    nTrackedLiveObjectsArr.add(new Integer(0 - s1NTrackedLiveObjects[i]));
-                    maxSurvGenArr.add(new Integer(0 - s1MaxSurvGen[i]));
+                    nTrackedLiveObjectsArr.add(Integer.valueOf(0 - s1NTrackedLiveObjects[i]));
+                    maxSurvGenArr.add(Integer.valueOf(0 - s1MaxSurvGen[i]));
                     avgObjectAgeArr.add(new Float(0 - s1AvgObjectAge[i]));
                     trackedLiveObjectsSizeArr.add(new Long(0 - s1TrackedLiveObjectsSize[i]));
-                    nTotalAllocObjectsArr.add(new Integer(0 - s1NTotalAllocObjects[i]));
+                    nTotalAllocObjectsArr.add(Integer.valueOf(0 - s1NTotalAllocObjects[i]));
                     idx++;
                 }
             }
@@ -280,25 +280,25 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
                                                 new Long(((Long) nTrackedAllocObjectsArr.get(classIndex)).longValue()
                                                          + nTrackedAllocObject));
                     nTrackedLiveObjectsArr.set(classIndex,
-                                               new Integer(((Integer) nTrackedLiveObjectsArr.get(classIndex)).intValue()
+                                               Integer.valueOf(((Integer) nTrackedLiveObjectsArr.get(classIndex)).intValue()
                                                            + nTrackedLiveObject));
-                    maxSurvGenArr.set(classIndex, new Integer(((Integer) maxSurvGenArr.get(classIndex)).intValue() + maxSGen));
+                    maxSurvGenArr.set(classIndex, Integer.valueOf(((Integer) maxSurvGenArr.get(classIndex)).intValue() + maxSGen));
                     avgObjectAgeArr.set(classIndex, new Float(((Float) avgObjectAgeArr.get(classIndex)).floatValue() + avtOAge));
                     trackedLiveObjectsSizeArr.set(classIndex,
                                                   new Long(((Long) trackedLiveObjectsSizeArr.get(classIndex)).longValue()
                                                            + trackedLiveObjectSize));
                     nTotalAllocObjectsArr.set(classIndex,
-                                              new Integer(((Integer) nTotalAllocObjectsArr.get(classIndex)).intValue()
+                                              Integer.valueOf(((Integer) nTotalAllocObjectsArr.get(classIndex)).intValue()
                                                           + nTotalAllocObject));
                 } else {
                     // class not present in snapshot1
-                    classNamesIdxMap.put(className, new Integer(nTrackedAllocObjectsArr.size()));
+                    classNamesIdxMap.put(className, Integer.valueOf(nTrackedAllocObjectsArr.size()));
                     nTrackedAllocObjectsArr.add(new Long(nTrackedAllocObject));
-                    nTrackedLiveObjectsArr.add(new Integer(nTrackedLiveObject));
-                    maxSurvGenArr.add(new Integer(maxSGen));
+                    nTrackedLiveObjectsArr.add(Integer.valueOf(nTrackedLiveObject));
+                    maxSurvGenArr.add(Integer.valueOf(maxSGen));
                     avgObjectAgeArr.add(new Float(avtOAge));
                     trackedLiveObjectsSizeArr.add(new Long(trackedLiveObjectSize));
-                    nTotalAllocObjectsArr.add(new Integer(nTotalAllocObject));
+                    nTotalAllocObjectsArr.add(Integer.valueOf(nTotalAllocObject));
                 }
             }
         }

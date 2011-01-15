@@ -416,7 +416,7 @@ public final class ProfilerOptionsPanel extends JPanel implements ActionListener
         updateJavaPlatformComboItems();
 
         // GlobalProfilingSettings
-        portNoSpinner.setValue(new Integer(pis.getPortNo()));
+        portNoSpinner.setValue(Integer.valueOf(pis.getPortNo()));
 
         if (pis.getJavaPlatformForProfiling() != null) {
             javaPlatformCombo.setSelectedItem(pis.getJavaPlatformForProfiling());

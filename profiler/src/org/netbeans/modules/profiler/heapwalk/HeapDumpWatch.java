@@ -85,7 +85,6 @@ public class HeapDumpWatch {
 
     private Collection<FileObject> watchedFolders;
     private HeapDumpFolderListener listener;
-    private Thread refreshThread;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

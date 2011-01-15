@@ -78,7 +78,7 @@ class HprofArrayValue implements ArrayItemValue {
         HprofByteBuffer dumpBuffer = heap.dumpBuffer;
         int idSize = dumpBuffer.getIDSize();
 
-        long instaceId = dumpBuffer.getID(instanceArrayOffset + 1 + idSize + 4 + 4 + idSize + (index * idSize));
+        long instaceId = dumpBuffer.getID(instanceArrayOffset + 1 + idSize + 4 + 4 + idSize + ((long)index * (long)idSize));
 
         return heap.getInstanceByID(instaceId);
     }

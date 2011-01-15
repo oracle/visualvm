@@ -154,7 +154,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
     }
 
-    private class CustomizerButton extends JButton implements ValidityListener {
+    private static class CustomizerButton extends JButton implements ValidityListener {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public CustomizerButton() {
@@ -202,7 +202,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
     }
 
-    private class RuntimeProfilingPointMapper {
+    private static class RuntimeProfilingPointMapper {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final CodeProfilingPoint owner;
@@ -226,7 +226,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
     }
     
-    private class FileWatch {
+    private static class FileWatch {
         private int references = 0;
         private LocationFileListener listener;
         

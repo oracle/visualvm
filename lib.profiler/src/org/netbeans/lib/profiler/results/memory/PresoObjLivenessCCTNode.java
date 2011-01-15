@@ -67,7 +67,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     public static final int SORT_BY_NAME = 6;
     public static final int SORT_BY_TOTAL_ALLOC_OBJ = 7;
     private static boolean dontShowZeroLiveObjNodes;
-    public static NumberFormat decimalFormat = NumberFormat.getInstance(Locale.ENGLISH);
+    public final NumberFormat decimalFormat = NumberFormat.getInstance(Locale.ENGLISH);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -349,13 +349,13 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         for (int i=0; i<depth; i++) {
             result.append(indent); // to simulate the tree structure in CSV
         }
-        result.append(((nodeName==null)?(className):(nodeName)) + quote + separator);
-        result.append(quote+totalObjSize+quote+separator);
-        result.append(quote+nLiveObjects+quote+separator);
-        result.append(quote+nCalls+quote+separator);
-        result.append(quote+decimalFormat.format(avgObjectAge)+quote+separator);
-        result.append(quote+survGen+quote+separator);
-        result.append(quote+((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+newLine); // NOI18N
+        result.append((nodeName==null)?(className):(nodeName)).append(quote).append(separator);
+        result.append(quote).append(totalObjSize).append(quote).append(separator);
+        StringBuffer append = result.append(quote).append(nLiveObjects).append(quote).append(separator);
+        result.append(quote).append(nCalls).append(quote).append(separator);
+        result.append(quote).append(decimalFormat.format(avgObjectAge)).append(quote).append(separator);
+        result.append(quote).append(survGen).append(quote).append(separator);
+        result.append(quote).append((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName())).append(newLine); // NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {

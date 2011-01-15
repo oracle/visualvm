@@ -170,7 +170,7 @@ public class HeapFragmentWalker {
         final Dialog progress = createProgressPanel(caption, message);
         progress.addHierarchyListener(new HierarchyListener() {
             public void hierarchyChanged(HierarchyEvent e) {
-                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) > 0) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                     latch.countDown(); // window has changed the state to "SHOWING" - can leave the "nonResponding()" method"
                 }
             }

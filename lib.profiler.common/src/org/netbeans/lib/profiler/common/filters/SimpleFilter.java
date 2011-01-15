@@ -136,6 +136,14 @@ public class SimpleFilter {
         return true;
     }
 
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.filterName != null ? this.filterName.hashCode() : 0);
+        hash = 29 * hash + (this.filterValue != null ? this.filterValue.hashCode() : 0);
+        hash = 29 * hash + this.filterType;
+        return hash;
+    }
+
     // TODO: just to keep backward compatibility, should be removed after code cleanup!!!
     public void load(final Map props) {
         load(props, ""); //NOI18N
