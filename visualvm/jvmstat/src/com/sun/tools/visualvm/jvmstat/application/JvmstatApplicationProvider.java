@@ -304,7 +304,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
     //    }
     
     // Checks broken jps according to http://www.netbeans.org/issues/show_bug.cgi?id=115490
-    // Checks broken jps according to https://visualvm.dev.java.net/issues/show_bug.cgi?id=311
+    // Checks broken jps according to http://visualvm.java.net/issues/show_bug.cgi?id=311
     private void checkForBrokenLocalJps(MonitoredHost monitoredHost) {
         try {
             if (monitoredHost.activeVms().size() != 0) {

@@ -41,7 +41,7 @@ class XTextFieldEditor extends XTextField implements TableCellEditor {
     private FocusListener editorFocusListener = new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
-            // https://visualvm.dev.java.net/issues/show_bug.cgi?id=167
+            // http://visualvm.java.net/issues/show_bug.cgi?id=167
             // must not call fireEditingStopped() here!
         }
     };
