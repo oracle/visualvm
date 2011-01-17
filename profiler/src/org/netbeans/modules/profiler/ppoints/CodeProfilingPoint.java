@@ -332,6 +332,15 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
                    && (line == location.line) && (offset == location.offset);
         }
 
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 79 * hash + (this.file != null ? this.file.hashCode() : 0);
+            hash = 79 * hash + this.line;
+            hash = 79 * hash + this.offset;
+            return hash;
+        }
+
         public static Location load(Project project, int index, Properties properties) {
             return load(project, index, null, properties);
         }

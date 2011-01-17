@@ -304,7 +304,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
 
         for (int i = 0; i < nInfoLines; i++) {
             if (passesFilters(i) && passesValueFilter(i)) {
-                filteredToFullIndexes.add(new Integer(i));
+                filteredToFullIndexes.add(Integer.valueOf(i));
             }
         }
 
@@ -315,9 +315,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
         String[] classNames = getClassNames();
 
         if ((sortedClassNames == null) || (sortedClassNames.length < classNames.length)) {
-            sortedClassNames = null;
             sortedClassNames = new String[classNames.length];
-            sortedClassIds = null;
             sortedClassIds = new int[classNames.length];
         }
 
@@ -582,10 +580,10 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
 
             len = head;
 
-            if ((secondaryIntData == null) || (secondaryIntData[0] == null) || (secondaryIntData.length == 0)
-                    || (secondaryIntData[0].length == 0)) {
-                System.out.println("break me"); // NOI18N
-            }
+//            if ((secondaryIntData == null) || (secondaryIntData[0] == null) || (secondaryIntData.length == 0)
+//                    || (secondaryIntData[0].length == 0)) {
+//                System.out.println("break me"); // NOI18N
+//            }
 
             if (secondaryIntData[0][len] != 0) {
                 len++;

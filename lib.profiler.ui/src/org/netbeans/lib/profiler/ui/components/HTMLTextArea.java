@@ -84,7 +84,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     /** Private Writer that extracts correctly formatted string from HTMLDocument */
-    private class ExtendedHTMLWriter extends HTMLWriter {
+    private static class ExtendedHTMLWriter extends HTMLWriter {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public ExtendedHTMLWriter(Writer w, HTMLDocument doc, int pos, int len) {

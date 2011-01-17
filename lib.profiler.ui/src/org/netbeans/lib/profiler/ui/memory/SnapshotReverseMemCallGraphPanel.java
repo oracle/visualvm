@@ -189,7 +189,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                         break;
             }
 
-        } else if (callGraphManager.getRootNode() instanceof PresoObjAllocCCTNode) {
+        } else {
             switch (exportedFileType) {
                 case 1: eDD.dumpData(getCSVHeader(",")); //NOI18N
                         ((PresoObjAllocCCTNode) callGraphManager.getRootNode()).exportCSVData(",", 0, eDD); //NOI18N

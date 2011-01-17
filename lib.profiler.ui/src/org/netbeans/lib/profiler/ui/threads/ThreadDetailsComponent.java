@@ -1267,14 +1267,14 @@ public class ThreadDetailsComponent extends JPanel {
                     detailsArea.setCaretPosition(1); // First text added, carret position can't be at the end ("tracking end" is not default)
                 }
             }
+            
+            lastThreadIndex = threadIndex;
+            lastStatesCount = threadData.size();
+            lastThreadDataEnd = viewManager.getDataEndTime();
+            lastThreadState = threadData.getLastState();
+
+            // Timeline
+            timeLine.updateData(threadData, viewManager.getDataStartTime(), viewManager.getDataEndTime());
         }
-
-        lastThreadIndex = threadIndex;
-        lastStatesCount = threadData.size();
-        lastThreadDataEnd = viewManager.getDataEndTime();
-        lastThreadState = threadData.getLastState();
-
-        // Timeline
-        timeLine.updateData(threadData, viewManager.getDataStartTime(), viewManager.getDataEndTime());
     }
 }

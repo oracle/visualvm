@@ -124,7 +124,7 @@ class HprofInstanceValue extends HprofObject implements FieldValue {
 
                 int i = dumpBuffer.getInt(position);
 
-                return new Integer(i);
+                return Integer.valueOf(i);
             case HprofHeap.LONG:
 
                 long lg = dumpBuffer.getLong(position);

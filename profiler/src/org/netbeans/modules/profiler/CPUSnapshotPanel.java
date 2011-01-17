@@ -255,7 +255,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
     }
 
-    private class CombinedViewTracker extends FocusAdapter {
+    private static class CombinedViewTracker extends FocusAdapter {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private Object lastFocusOwner;

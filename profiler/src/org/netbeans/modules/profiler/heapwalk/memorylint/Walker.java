@@ -69,7 +69,7 @@ public final class Walker {
         public String getName() { return "object"; }
     };
     
-    private class ArrayEntryValue implements ObjectFieldValue, Field {
+    private static class ArrayEntryValue implements ObjectFieldValue, Field {
         int idx;
         private Instance src;
         private Instance target;

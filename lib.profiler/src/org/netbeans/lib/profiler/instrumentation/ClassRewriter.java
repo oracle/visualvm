@@ -147,8 +147,11 @@ public class ClassRewriter {
             System.err.print("*** Gonna save bytecode " + name + " to disk... "); // NOI18N
 
             java.io.OutputStream out = new java.io.FileOutputStream(new java.io.File(name + ".class")); // NOI18N
-            out.write(classBytes);
-            out.close();
+            try {
+                out.write(classBytes);
+            } finally {
+                out.close();
+            }
             System.err.println("done"); // NOI18N
         } catch (Exception ex) {
             System.err.println("*** In RecursiveMethodInstrumentor.saveClassFileToDisk caught ex = " + ex); // NOI18N

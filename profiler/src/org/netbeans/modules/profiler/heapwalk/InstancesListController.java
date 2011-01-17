@@ -536,7 +536,7 @@ public class InstancesListController extends AbstractController {
         }
     }
 
-    private class InstancesComparator implements Comparator {
+    private static class InstancesComparator implements Comparator {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private boolean sortingOrder;
@@ -557,13 +557,13 @@ public class InstancesListController extends AbstractController {
 
             switch (sortingColumn) {
                 case 0:
-                    return new Integer(instance1.getInstanceNumber()).compareTo(new Integer(instance2.getInstanceNumber()));
+                    return Integer.valueOf(instance1.getInstanceNumber()).compareTo(Integer.valueOf(instance2.getInstanceNumber()));
                 case 1:
-                    return new Integer(instance1.getSize()).compareTo(new Integer(instance2.getSize()));
+                    return Integer.valueOf(instance1.getSize()).compareTo(Integer.valueOf(instance2.getSize()));
                 case 2:
-                    return new Integer(instance1.getRetainedSize()).compareTo(new Integer(instance2.getRetainedSize()));
+                    return Integer.valueOf(instance1.getRetainedSize()).compareTo(Integer.valueOf(instance2.getRetainedSize()));
                 case 3:
-                    return new Integer(instance1.getReachableSize()).compareTo(new Integer(instance2.getReachableSize()));
+                    return Integer.valueOf(instance1.getReachableSize()).compareTo(Integer.valueOf(instance2.getReachableSize()));
                 default:
                     throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N
             }
