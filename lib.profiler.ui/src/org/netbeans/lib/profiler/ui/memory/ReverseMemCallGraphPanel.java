@@ -223,7 +223,7 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
 
         for (int i = 0; i < columnCount; i++) {
             menuItem = new JCheckBoxMenuItem(columnNames[i]);
-            menuItem.setActionCommand(new Integer(i).toString());
+            menuItem.setActionCommand(Integer.valueOf(i).toString());
             addMenuItemListener(menuItem);
 
             if (treeTable != null) {

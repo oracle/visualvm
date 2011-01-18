@@ -282,11 +282,11 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
     }
 
     public String getThreadDescription(int index) {
-        String description = (String) descriptions.get(new Integer(index));
+        String description = (String) descriptions.get(Integer.valueOf(index));
 
         if (description == null) {
             description = createDescription(manager.getThreadName(index));
-            descriptions.put(new Integer(index), description);
+            descriptions.put(Integer.valueOf(index), description);
         }
 
         return description;
@@ -432,7 +432,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
     /** Called by the ThreadDetailsComponent when the Hide button has been clicked */
     public void hideThreadDetails(int index) {
         if (displayMode == DISPLAY_SELECTED) {
-            filteredThreads.remove(new Integer(index));
+            filteredThreads.remove(Integer.valueOf(index));
         } else {
             if (displayMode == DISPLAY_ALL) {
                 displayMode = DISPLAY_ALL_EX;
@@ -445,7 +445,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
                 updateCombo();
             }
 
-            excludedThreads.add(new Integer(index));
+            excludedThreads.add(Integer.valueOf(index));
             updateFilteredData();
         }
 
@@ -462,7 +462,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         excludedThreads.clear();
 
         for (int i = 0; i < indexes.length; i++) {
-            filteredThreads.add(new Integer(indexes[i]));
+            filteredThreads.add(Integer.valueOf(indexes[i]));
         }
 
         updateCombo();
@@ -475,7 +475,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
     }
 
     private ThreadDetailsComponent getPanel(int threadIndex) {
-        ThreadDetailsComponent tdcr = (ThreadDetailsComponent) unusedPanels.remove(new Integer(threadIndex));
+        ThreadDetailsComponent tdcr = (ThreadDetailsComponent) unusedPanels.remove(Integer.valueOf(threadIndex));
 
         if (tdcr == null) {
             if (unusedPanels.size() > 0) {
@@ -643,7 +643,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
 
             for (int i = filteredSize; i < displayedSize; i++) {
                 ThreadDetailsComponent tdc = (ThreadDetailsComponent) displayedPanels.remove(filteredSize);
-                unusedPanels.put(new Integer(tdc.getIndex()), tdc);
+                unusedPanels.put(Integer.valueOf(tdc.getIndex()), tdc);
                 content.remove(tdc);
             }
 
@@ -657,7 +657,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         for (Iterator it = filteredThreads.iterator(); it.hasNext();) {
             int indexToDisplay = ((Integer) it.next()).intValue();
             ((ThreadDetailsComponent) displayedPanels.get(count)).setIndex(indexToDisplay);
-            indexToDisplayedIndex.put(new Integer(indexToDisplay), new Integer(count));
+            indexToDisplayedIndex.put(Integer.valueOf(indexToDisplay), Integer.valueOf(count));
             count++;
         }
 
@@ -673,7 +673,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         // put all of them to unused map
         for (int i = displayedPanels.size() - 1; i >= 0; i--) {
             ThreadDetailsComponent tdcr = (ThreadDetailsComponent) displayedPanels.remove(i);
-            unusedPanels.put(new Integer(tdcr.getIndex()), tdcr);
+            unusedPanels.put(Integer.valueOf(tdcr.getIndex()), tdcr);
         }
 
         int count = 0;
@@ -683,7 +683,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
             ThreadDetailsComponent tdcr = getPanel(indexToDisplay);
             content.add(tdcr);
             displayedPanels.add(tdcr);
-            indexToDisplayedIndex.put(new Integer(indexToDisplay), new Integer(count++));
+            indexToDisplayedIndex.put(Integer.valueOf(indexToDisplay), Integer.valueOf(count++));
         }
 
         return true;
@@ -702,7 +702,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
 
         if ((displayMode == DISPLAY_ALL) || (displayMode == DISPLAY_ALL_EX)) {
             for (int i = 0; i < manager.getThreadsCount(); i++) {
-                filteredThreads.add(new Integer(i)); // thread with index "i" should be displayed
+                filteredThreads.add(Integer.valueOf(i)); // thread with index "i" should be displayed
             }
         }
 
@@ -715,7 +715,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
                     byte state = threadData.getLastState();
 
                     if (state != CommonConstants.THREAD_STATUS_ZOMBIE) {
-                        filteredThreads.add(new Integer(i)); // thread with index "i" should be displayed
+                        filteredThreads.add(Integer.valueOf(i)); // thread with index "i" should be displayed
                     }
                 }
             }
@@ -730,11 +730,11 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
                     byte state = threadData.getLastState();
 
                     if (state == CommonConstants.THREAD_STATUS_ZOMBIE) {
-                        filteredThreads.add(new Integer(i)); // thread with index "i" should be displayed
+                        filteredThreads.add(Integer.valueOf(i)); // thread with index "i" should be displayed
                     }
                 } else {
                     // No state defined -> THREAD_STATUS_ZOMBIE assumed (thread could finish when monitoring was disabled)
-                    filteredThreads.add(new Integer(i));
+                    filteredThreads.add(Integer.valueOf(i));
                 }
             }
         }

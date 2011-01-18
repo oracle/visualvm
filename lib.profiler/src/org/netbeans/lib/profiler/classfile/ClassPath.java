@@ -68,6 +68,8 @@ public class ClassPath {
         protected int hits; // This is done to avoid indexing of the JAR files too early and all at once
         protected int threshHits; // This is done to avoid indexing of the JAR files too early and all at once
 
+        final protected Random r = new Random(System.currentTimeMillis());
+        
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         abstract String getLocationForClassFile(String fileName);
@@ -82,7 +84,7 @@ public class ClassPath {
 
         Dir(File dirF) {
             dir = dirF;
-            threshHits = 100 + (int) (40 * Math.random());
+            threshHits = 100 + r.nextInt(40);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -123,7 +125,7 @@ public class ClassPath {
 
         Zip(String path) {
             zipFilePath = path;
-            threshHits = 50 + (int) (20 * Math.random());
+            threshHits = 50 + r.nextInt(20);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------

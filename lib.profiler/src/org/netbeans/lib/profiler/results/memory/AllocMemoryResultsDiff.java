@@ -166,11 +166,11 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
                 Integer objCount = (Integer) objCountsArr.get(index);
                 Long objSize = (Long) objSizesArr.get(index);
 
-                objCountsArr.set(index, new Integer(objCount.intValue() - s1ObjectsCount[i]));
+                objCountsArr.set(index, Integer.valueOf(objCount.intValue() - s1ObjectsCount[i]));
                 objSizesArr.set(index, new Long(objSize.longValue() - s1ObjectsSizes[i]));
             } else {
-                classNamesIdxMap.put(s1ClassNames[i], new Integer(objCountsArr.size()));
-                objCountsArr.add(new Integer(0 - s1ObjectsCount[i]));
+                classNamesIdxMap.put(s1ClassNames[i], Integer.valueOf(objCountsArr.size()));
+                objCountsArr.add(Integer.valueOf(0 - s1ObjectsCount[i]));
                 objSizesArr.add(new Long(0 - s1ObjectsSizes[i]));
             }
         }
@@ -193,7 +193,7 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
                 classIndex = classIdx.intValue();
 
                 if ((objectsCount != 0) || (((Integer) objCountsArr.get(classIndex)).intValue() != 0)) { // Do not add classes not displayed in compared snapshots (zero instances number)
-                    objCountsArr.set(classIndex, new Integer(((Integer) objCountsArr.get(classIndex)).intValue() + objectsCount));
+                    objCountsArr.set(classIndex, Integer.valueOf(((Integer) objCountsArr.get(classIndex)).intValue() + objectsCount));
                     objSizesArr.set(classIndex, new Long(((Long) objSizesArr.get(classIndex)).longValue() + objectsSize));
                 } else {
                     classNamesIdxMap.remove(className); // Remove classname that should not be displayed
@@ -201,8 +201,8 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
             } else {
                 // class not present in snapshot1
                 if (objectsCount != 0) { // Do not add classes not displayed in compared snapshots (zero instances number)
-                    classNamesIdxMap.put(className, new Integer(objCountsArr.size()));
-                    objCountsArr.add(new Integer(objectsCount));
+                    classNamesIdxMap.put(className, Integer.valueOf(objCountsArr.size()));
+                    objCountsArr.add(Integer.valueOf(objectsCount));
                     objSizesArr.add(new Long(objectsSize));
                 }
             }

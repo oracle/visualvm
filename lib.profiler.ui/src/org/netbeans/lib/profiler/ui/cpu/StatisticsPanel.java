@@ -211,7 +211,7 @@ public class StatisticsPanel extends JPanel {
         }
     }
 
-    private class ColorIcon implements Icon {
+    private static class ColorIcon implements Icon {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
         public static final int ICON_SIZE = 9;
@@ -260,7 +260,7 @@ public class StatisticsPanel extends JPanel {
         }
     }
 
-    private class Container extends JPanel implements Scrollable {
+    private static class Container extends JPanel implements Scrollable {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public Container() {

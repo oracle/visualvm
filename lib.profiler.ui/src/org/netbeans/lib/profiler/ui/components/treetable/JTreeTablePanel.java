@@ -70,7 +70,7 @@ public class JTreeTablePanel extends JPanel {
 
     //-----------------------------------------------------------------------
     // Custom TreeTable Viewport
-    private class CustomTreeTableViewport extends JViewport {
+    private static class CustomTreeTableViewport extends JViewport {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private JTableHeader tableHeader;

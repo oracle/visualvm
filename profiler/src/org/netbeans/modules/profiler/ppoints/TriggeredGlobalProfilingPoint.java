@@ -126,6 +126,15 @@ public abstract class TriggeredGlobalProfilingPoint extends GlobalProfilingPoint
             return (metric == condition.metric) && (value == condition.value) && (onetime == condition.onetime);
         }
 
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 61 * hash + (this.onetime ? 1 : 0);
+            hash = 61 * hash + this.metric;
+            hash = 61 * hash + (int) (this.value ^ (this.value >>> 32));
+            return hash;
+        }
+
         public static TriggerCondition load(Project project, int index, Properties properties) {
             return load(project, index, null, properties);
         }

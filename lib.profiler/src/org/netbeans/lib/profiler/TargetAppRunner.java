@@ -830,13 +830,13 @@ public class TargetAppRunner implements CommonConstants {
         try {
             runningAppProcess = Runtime.getRuntime().exec(cmdArray, null, dir);
         } catch (IOException ex) {
-            String s = ""; // NOI18N
+            StringBuilder sb = new StringBuilder(); // NOI18N
 
             for (int i = 0; i < cmdArray.length; i++) {
-                s = s + cmdArray[i] + "\n"; // NOI18N
+                sb.append(cmdArray[i]).append('\n'); // NOI18N
             }
 
-            appStatusHandler.displayError(MessageFormat.format(ERROR_STARTING_JVM_MSG, new Object[] { s, ex }));
+            appStatusHandler.displayError(MessageFormat.format(ERROR_STARTING_JVM_MSG, new Object[] { sb, ex }));
 
             return false;
         }

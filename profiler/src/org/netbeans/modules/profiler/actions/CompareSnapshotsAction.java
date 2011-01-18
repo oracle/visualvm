@@ -74,7 +74,7 @@ import javax.swing.filechooser.FileFilter;
 public class CompareSnapshotsAction extends AbstractAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class SelectExternalSnapshotsPanel extends JPanel {
+    private static class SelectExternalSnapshotsPanel extends JPanel {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private JButton okButton;
