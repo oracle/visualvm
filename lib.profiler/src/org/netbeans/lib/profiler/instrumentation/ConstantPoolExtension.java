@@ -235,24 +235,31 @@ public class ConstantPoolExtension implements JavaClassConstants {
 
             for (int i = 0; i < internalIndices.length; i++) {
                 int pos = internalIndices[i];
-                int value = (ret[pos] << 8) + ret[pos + 1];
+                int value = getU2(ret, pos);
                 value += intBaseIndex;
-                ret[pos] = (byte) ((value >> 8) & 0xFF);
-                ret[pos + 1] = (byte) ((value) & 0xFF);
+                putU2(ret, pos, value);
             }
 
             for (int i = 0; i < externalIndices.length; i++) {
                 int pos = externalIndices[i];
-                int value = (ret[pos] << 8) + ret[pos + 1];
+                int value = getU2(ret, pos);
                 value += extBaseIndex;
-                ret[pos] = (byte) ((value >> 8) & 0xFF);
-                ret[pos + 1] = (byte) ((value) & 0xFF);
+                putU2(ret, pos, value);
             }
 
             return ret;
         }
     }
 
+    private static int getU2(byte[] buf, int pos) {
+        return ((buf[pos] & 0xFF) << 8) + (buf[pos + 1] & 0xFF);
+    }
+    
+    private static void putU2(byte[] buf, int pos, int value) {
+        buf[pos] = (byte) ((value >> 8) & 0xFF);
+        buf[pos + 1] = (byte) (value & 0xFF);
+    }
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected byte[] addedCPContents;

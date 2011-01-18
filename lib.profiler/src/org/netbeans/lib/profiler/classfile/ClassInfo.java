@@ -225,7 +225,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
     public static class LocalVariableTables {
 
-        public static int ATTR_SIZE = 10;
+        public static final int ATTR_SIZE = 10;
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 

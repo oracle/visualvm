@@ -269,7 +269,7 @@ public class CPUCCTClassContainer extends CPUCCTContainer {
                 }
             } else { // A child node belongs to a different class
 
-                Integer key = new Integer(sourceChildClassOrPackageId);
+                Integer key = Integer.valueOf(sourceChildClassOrPackageId);
 
                 if (!uniqChildCache.containsKey(key)) {
                     uniqChildCache.put(key, key);

@@ -24,8 +24,6 @@ class ThreadInfo {
     int stackTopIdx;
     // Index of the stack top element
     final int threadId;
-    TimedCPUCCTNode comboNodeDst;
-    TimedCPUCCTNode comboNodeSrc;
     int totalNNodes;
     // total number of call tree nodes for this thread
     long rootGrossTimeAbs;

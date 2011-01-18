@@ -74,15 +74,15 @@ public final class AttachSettings {
     // for remote:
     private String host = ""; // NOI18N
     private String hostOS = ""; // NOI18N
-    private String hostOS_dbl = new String(hostOS);
-    private String host_dbl = new String(host);
+    private String hostOS_dbl = hostOS;
+    private String host_dbl = host;
     private String remoteHostOS = "";
     private String serverType = ""; // NOI18N
-    private String serverType_dbl = new String(serverType);
+    private String serverType_dbl = serverType;
 
     // for persistence only:
     private String targetType = ""; // NOI18N
-    private String targetType_dbl = new String(targetType);
+    private String targetType_dbl = targetType;
 
     // Direct is true means what we also call "attach on startup" - when the target VM is started with all necessary options
     // and waits for us to connect. It can be used both for local and remote profiling. In fact, currently remote profiling
@@ -240,7 +240,7 @@ public final class AttachSettings {
         //    }
         if ((host_dbl == null) || !host.equalsIgnoreCase(host_dbl)) {
             dirty = true;
-            host_dbl = new String(host);
+            host_dbl = host;
         }
 
         if (transientPort_dbl != transientPort) {
@@ -250,17 +250,17 @@ public final class AttachSettings {
 
         if ((targetType_dbl == null) || !targetType.equalsIgnoreCase(targetType_dbl)) {
             dirty = true;
-            targetType_dbl = new String(targetType);
+            targetType_dbl = targetType;
         }
 
         if ((serverType_dbl == null) || !serverType.equalsIgnoreCase(serverType_dbl)) {
             dirty = true;
-            serverType_dbl = new String(serverType);
+            serverType_dbl = serverType;
         }
 
         if ((hostOS_dbl == null) || !hostOS.equalsIgnoreCase(hostOS_dbl)) {
             dirty = true;
-            hostOS_dbl = new String(hostOS);
+            hostOS_dbl = hostOS;
         }
 
         return dirty;
@@ -312,23 +312,23 @@ public final class AttachSettings {
 
     public String toString() {
         final StringBuffer sb = new StringBuffer();
-        sb.append("target type =" + targetType); //NOI18N
+        sb.append("target type =").append(targetType); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("server type =" + serverType); //NOI18N
+        sb.append("server type =").append(serverType); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("remote =" + remote); //NOI18N
+        sb.append("remote =").append(remote); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("direct =" + direct); //NOI18N
+        sb.append("direct =").append(direct); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("dynamic JDK16 =" + dynamic16); //NOI18N
+        sb.append("dynamic JDK16 =").append(dynamic16); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("pid =" + pid); //NOI18N
+        sb.append("pid =").append(pid); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("host =" + host); //NOI18N
+        sb.append("host =").append(host); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("host os =" + hostOS); //NOI18N
+        sb.append("host os =").append(hostOS); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("transient port =" + transientPort); //NOI18N
+        sb.append("transient port =").append(transientPort); //NOI18N
         sb.append("\n"); //NOI18N
 
         return sb.toString();

@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.common.filters;
 
 
 //import org.openide.util.NbBundle;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
@@ -237,6 +238,14 @@ public final class FilterSet {
         return true;
     }
 
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.filterSetName != null ? this.filterSetName.hashCode() : 0);
+        hash = 97 * hash + Arrays.deepHashCode(this.activeGlobalFilters);
+        hash = 97 * hash + (this.filterSetType ? 1 : 0);
+        return hash;
+    }
+
     // TODO: just to keep backward compatibility, should be removed after code cleanup!!!
     public FilterSet load(final Map props, final int index) {
         return load(props, index, ""); //NOI18N
@@ -251,7 +260,7 @@ public final class FilterSet {
     }
 
     public FilterSet load(final Map props, final int index, final String prefix) {
-        final String itemPrefix = "FilterSet-" + ((index == -1) ? "" : (new Integer(index).toString() + "-")); //NOI18N
+        final String itemPrefix = "FilterSet-" + ((index == -1) ? "" : (Integer.valueOf(index).toString() + "-")); //NOI18N
 
         filterSetName = getProperty(props, prefix + itemPrefix + "name", DEFAULT_FILTERSET_NAME); //NOI18N
         filterSetType = Boolean.valueOf(getProperty(props, prefix + itemPrefix + "type", "false")).booleanValue(); //NOI18N
@@ -304,7 +313,7 @@ public final class FilterSet {
     }
 
     public void store(final Map props, final int index, final String prefix) {
-        final String itemPrefix = "FilterSet-" + ((index == -1) ? "" : (new Integer(index).toString() + "-")); //NOI18N
+        final String itemPrefix = "FilterSet-" + ((index == -1) ? "" : (Integer.valueOf(index).toString() + "-")); //NOI18N
         props.put(prefix + itemPrefix + "name", filterSetName); //NOI18N
         props.put(prefix + itemPrefix + "type", Boolean.toString(filterSetType)); //NOI18N
 

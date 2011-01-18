@@ -123,7 +123,7 @@ public class MethodIdMap {
         if (classId == null) {
             curClassId++;
             classOrPackageNames.add(name);
-            classIdCache.put(name, new Integer(curClassId));
+            classIdCache.put(name, Integer.valueOf(curClassId));
 
             return curClassId;
         } else {
