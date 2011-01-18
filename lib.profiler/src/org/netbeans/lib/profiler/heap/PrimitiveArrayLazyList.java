@@ -72,7 +72,7 @@ class PrimitiveArrayLazyList extends AbstractList {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Object get(int index) {
-        return HprofInstanceValue.getTypeValue(dumpBuffer, offset + (index * elSize), type).toString();
+        return HprofInstanceValue.getTypeValue(dumpBuffer, offset + ((long)index * (long)elSize), type).toString();
     }
 
     public int size() {

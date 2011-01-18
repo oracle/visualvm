@@ -169,8 +169,8 @@ public final class TelemetryWindow extends TopComponent {
             long[] col3 = new long[nItems];
             // TODO Issue #160475
             String col1Name = timestamp;
-            String col2Name = new String();
-            String col3Name = new String();
+            String col2Name = ""; // NOI18N
+            String col3Name = ""; // NOI18N
             System.arraycopy(data.timeStamps, 0, col1, 0, nItems);
             if (panel instanceof MemoryGraphPanel) {
                 System.arraycopy(data.totalMemory, 0, col2, 0, nItems);

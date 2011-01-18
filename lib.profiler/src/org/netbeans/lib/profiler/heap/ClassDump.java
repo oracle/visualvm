@@ -221,7 +221,7 @@ class ClassDump extends HprofObject implements JavaClass {
                 b = isSubClass(jcls, subclassesMap);
             }
 
-            if ((b == Boolean.TRUE) && (jcls != this)) {
+            if (b.booleanValue() && (jcls != this)) {
                 subclasses.add(jcls);
             }
         }

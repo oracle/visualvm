@@ -67,7 +67,7 @@ import org.openide.util.actions.SystemAction;
 public class ShowOppositeProfilingPointAction extends SystemAction implements ContextAwareAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class InvocationLocationDescriptor {
+    private static class InvocationLocationDescriptor {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private CodeProfilingPoint.Location location;

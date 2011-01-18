@@ -386,7 +386,7 @@ public class SynchronousXYItemPainter extends XYItemPainter.Abstract {
 //            Thread.dumpStack();
 //        }
 
-        int itemsStep = (int)Math.ceil(valuesCount / context.getViewWidth());
+        int itemsStep = (int)Math.ceil((double)valuesCount / (double)context.getViewWidth());
         if (itemsStep == 0) itemsStep = 1;
 
         int visibleCount = lastIndex - firstIndex + 1;
