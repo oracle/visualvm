@@ -97,12 +97,19 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
     private class Annotation extends CodeProfilingPoint.Annotation {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
         public String getAnnotationType() {
             return TakeSnapshotProfilingPoint.this.isEnabled() ? ANNOTATION_ENABLED : ANNOTATION_DISABLED;
         }
 
+        @Override
         public String getShortDescription() {
             return getName();
+        }
+
+        @Override
+        public CodeProfilingPoint profilingPoint() {
+            return TakeSnapshotProfilingPoint.this;
         }
     }
 
@@ -434,9 +441,11 @@ public final class TakeSnapshotProfilingPoint extends CodeProfilingPoint.Single 
     private boolean resetResults = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public TakeSnapshotProfilingPoint(String name, Location location, Project project, ProfilingPointFactory factory) {
-        super(name, location, project, factory);
+        this(name, location, project, factory, false);
+    }
+    public TakeSnapshotProfilingPoint(String name, Location location, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, location, project, factory, existing);
         getChangeSupport().addPropertyChangeListener(this);
     }
 

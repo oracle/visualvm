@@ -569,12 +569,17 @@ public class IntegrationUtils {
             target = new File(source.getAbsolutePath() + FILE_BACKUP_EXTENSION);
 
             FileChannel sourceChannel = new FileOutputStream(source).getChannel();
-            FileChannel targetChannel = new FileInputStream(target).getChannel();
-            targetChannel.transferTo(0, targetChannel.size(), sourceChannel);
-            targetChannel.close();
-            sourceChannel.close();
-
-            return true;
+            try {
+                FileChannel targetChannel = new FileInputStream(target).getChannel();
+                try {
+                    targetChannel.transferTo(0, targetChannel.size(), sourceChannel);
+                    return true;
+                } finally {
+                    targetChannel.close();
+                }
+            } finally {
+                sourceChannel.close();
+            }
         } catch (Exception ex) {
             ProfilerLogger.severe(MessageFormat.format(BACKUP_ERROR_COPY_FILE_MESSAGE,
                                                        new Object[] { target.getAbsolutePath(), source.getAbsolutePath(), ex })); //NOI18N
@@ -601,12 +606,17 @@ public class IntegrationUtils {
 
         try {
             FileChannel sourceChannel = new FileInputStream(sourceFile).getChannel();
-            FileChannel destinationChannel = new FileOutputStream(targetFile).getChannel();
-            sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
-            sourceChannel.close();
-            destinationChannel.close();
-
-            return true;
+            try {
+                FileChannel destinationChannel = new FileOutputStream(targetFile).getChannel();
+                try {
+                    sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
+                    return true;
+                } finally {
+                    destinationChannel.close();
+                }
+            } finally {
+                sourceChannel.close();                
+            }
         } catch (Exception ex) {
             ProfilerLogger.log(ex);
             ProfilerLogger.severe(MessageFormat.format(COPY_ERROR_MESSAGE,

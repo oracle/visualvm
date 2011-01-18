@@ -50,7 +50,10 @@ import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.marker.Marker;
 
 
@@ -59,6 +62,10 @@ import org.netbeans.lib.profiler.marker.Marker;
  * @author Jaroslav Bachorik
  */
 public class MarkingEngine {
+    private static String INVALID_MID = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("MSG_INVALID_METHODID"); // NOI18N
+    
+    private static Logger LOGGER = Logger.getLogger(MarkingEngine.class.getName());
+    
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
     public static interface StateObserver {
@@ -76,9 +83,6 @@ public class MarkingEngine {
     private final Object markGuard = new Object();
 
     final private MarkMapper mapper;
-
-    // @GuardedBy markGuard
-    private String[] labels;
 
     // @GuardedBy markGuard
     private MarkMapping[] marks;
@@ -134,7 +138,7 @@ public class MarkingEngine {
 
     public int getNMarks() {
         synchronized (markGuard) {
-            return (labels != null) ? labels.length : 0;
+            return (marks != null) ? marks.length : 0;
         }
     }
 
@@ -155,18 +159,29 @@ public class MarkingEngine {
             status.beginTrans(false);
 
             try {
-                method = new ClientUtils.SourceCodeSelection(status.getInstrMethodClasses()[methodId],
-                                                             status.getInstrMethodNames()[methodId],
-                                                             status.getInstrMethodSignatures()[methodId]);
+                String[] cNames = status.getInstrMethodClasses();
+                String[] mNames = status.getInstrMethodNames();
+                String[] sigs = status.getInstrMethodSignatures();
+                
+                if (mNames.length <= methodId || cNames.length <= methodId || sigs.length <= methodId) {
+                    int maxMid = Math.min(Math.min(mNames.length, cNames.length), sigs.length);
+                    LOGGER.log(Level.WARNING, INVALID_MID, new Object[]{methodId, maxMid});
+                } else {
+                    method = new ClientUtils.SourceCodeSelection(cNames[methodId],
+                                                                 mNames[methodId],
+                                                                 sigs[methodId]);
+                }
             } finally {
                 status.endTrans();
             }
 
-            String methodSig = method.toFlattened();
+            if (method != null) {
+                String methodSig = method.toFlattened();
 
-            for (int i = 0; i < marks.length; i++) {
-                if (methodSig.startsWith(marks[i].markSig)) {
-                    return marks[i].mark;
+                for (int i = 0; i < marks.length; i++) {
+                    if (methodSig.startsWith(marks[i].markSig)) {
+                        return marks[i].mark;
+                    }
                 }
             }
 
