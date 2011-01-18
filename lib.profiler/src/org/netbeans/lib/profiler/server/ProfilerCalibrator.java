@@ -469,8 +469,8 @@ class ProfilerCalibrator extends ProfilerRuntime {
                 curPos += suffixEls;
             }
 
-            innerTimeInCounts = ((double) innerTime) / (totalCalls / 2);
-            outerTimeInCounts = ((double) outerTime) / ((totalCalls / 2) - 1);
+            innerTimeInCounts = ((double) innerTime) / ((double)totalCalls / 2);
+            outerTimeInCounts = ((double) outerTime) / (((double)totalCalls / 2) - 1);
         } else {
             // Both on Windows and Solaris, thread-local time is extremely low-resolution (10 ms and 1 ms),
             // thus our standard high-precision method won't work. Rough calculation is used instead.

@@ -420,11 +420,11 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
                 }
 
                 private Integer getNodeInvocations(PrestimeCPUCCTNode pNode) {
-                    return new Integer(pNode.getNCalls());
+                    return Integer.valueOf(pNode.getNCalls());
                 }
 
                 private Integer getNodeMethodId(PrestimeCPUCCTNode pNode) {
-                    return new Integer(pNode.getMethodId());
+                    return Integer.valueOf(pNode.getMethodId());
                 }
 
                 public void sortByColumn(int column, boolean order) {
@@ -676,7 +676,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
 
         for (int i = 0; i < columnCount; i++) {
             menuItem = new JCheckBoxMenuItem(columnNames[i]);
-            menuItem.setActionCommand(new Integer(i).toString());
+            menuItem.setActionCommand(Integer.valueOf(i).toString());
             addMenuItemListener(menuItem);
 
             if (treeTable != null) {

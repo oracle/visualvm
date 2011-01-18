@@ -196,7 +196,6 @@ public class DynamicClassInfo extends ClassInfo {
                     newOffset += attrLen;
                 }
             }
-            assert modifiledLocalVariableTableOffsets[idx] != 0;
             return modifiledLocalVariableTableOffsets[idx];
         } else {
             return super.getLocalVariableTableStartOffsetInMethodInfo(idx);
@@ -221,7 +220,6 @@ public class DynamicClassInfo extends ClassInfo {
                     newOffset += attrLen;
                 }
             }
-            assert modifiledLocalVariableTypeTableOffsets[idx] != 0;
             return modifiledLocalVariableTypeTableOffsets[idx];
         } else {
             return super.getLocalVariableTypeTableStartOffsetInMethodInfo(idx);
@@ -491,6 +489,7 @@ public class DynamicClassInfo extends ClassInfo {
         modifiedAndSavedMethodInfos[idx] = methodInfo;
         modifiedMethodBytecodesLength = new int[methodNames.length];
         modifiledLocalVariableTableOffsets = new int[methodNames.length];
+        modifiledLocalVariableTypeTableOffsets = new int[methodNames.length];
     }
 
     public void unsetMethodInstrumented(int i) {

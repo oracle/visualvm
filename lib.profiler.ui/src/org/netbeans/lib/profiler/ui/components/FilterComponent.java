@@ -76,7 +76,7 @@ public class FilterComponent extends JPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     //--- Private classes -----
-    private class ArrowSignIcon implements Icon {
+    private static class ArrowSignIcon implements Icon {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final ImageIcon popupArrowIcon = new ImageIcon(getClass()
@@ -192,7 +192,7 @@ public class FilterComponent extends JPanel {
         }
     }
 
-    private class FilterStringComboRenderer extends DefaultListCellRenderer {
+    private static class FilterStringComboRenderer extends DefaultListCellRenderer {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private JSeparator separator;
@@ -537,7 +537,7 @@ public class FilterComponent extends JPanel {
         standardIcons.add(standardIcon);
         rolloverIcons.add(rolloverIcon);
         filterNames.add(filterName);
-        filterTypes.add(new Integer(filterType));
+        filterTypes.add(Integer.valueOf(filterType));
 
         //filterStringsBuffers.add(new Vector());
         JMenuItem menuItem = new JMenuItem();

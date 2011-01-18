@@ -988,7 +988,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         for (int i = 0; i < manager.getThreadsCount(); i++) {
             // view all threads
             if (threadsSelectionCombo.getSelectedItem().equals(VIEW_THREADS_ALL)) {
-                filteredDataToDataIndex.add(new Integer(i));
+                filteredDataToDataIndex.add(Integer.valueOf(i));
 
                 continue;
             }
@@ -1001,7 +1001,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
                     byte state = threadData.getLastState();
 
                     if (state != CommonConstants.THREAD_STATUS_ZOMBIE) {
-                        filteredDataToDataIndex.add(new Integer(i));
+                        filteredDataToDataIndex.add(Integer.valueOf(i));
                     }
                 }
 
@@ -1016,11 +1016,11 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
                     byte state = threadData.getLastState();
 
                     if (state == CommonConstants.THREAD_STATUS_ZOMBIE) {
-                        filteredDataToDataIndex.add(new Integer(i));
+                        filteredDataToDataIndex.add(Integer.valueOf(i));
                     }
                 } else {
                     // No state defined -> THREAD_STATUS_ZOMBIE assumed (thread could finish when monitoring was disabled)
-                    filteredDataToDataIndex.add(new Integer(i));
+                    filteredDataToDataIndex.add(Integer.valueOf(i));
                 }
 
                 continue;

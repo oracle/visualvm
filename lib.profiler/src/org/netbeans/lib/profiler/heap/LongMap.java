@@ -238,9 +238,26 @@ class LongMap extends AbstractLongMap {
             return diff;
         }
 
+        @Override
         public boolean equals(Object obj) {
-            RetainedSizeEntry other = (RetainedSizeEntry) obj;
-            return instanceId == other.instanceId;
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final RetainedSizeEntry other = (RetainedSizeEntry) obj;
+            if (this.instanceId != other.instanceId) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 31 * hash + (int) (this.instanceId ^ (this.instanceId >>> 32));
+            return hash;
         }
     }
     

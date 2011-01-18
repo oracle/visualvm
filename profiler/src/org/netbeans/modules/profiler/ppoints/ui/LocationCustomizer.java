@@ -91,7 +91,7 @@ public class LocationCustomizer extends ValidityAwarePanel implements ActionList
                                                                       HierarchyListener {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class HTMLButton extends JButton {
+    private static class HTMLButton extends JButton {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void setEnabled(boolean enabled) {

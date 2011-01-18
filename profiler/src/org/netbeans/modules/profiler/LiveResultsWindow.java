@@ -288,7 +288,7 @@ public final class LiveResultsWindow extends TopComponent
         }
     }
 
-    private final class MemoryActionsHandler implements MemoryResUserActionsHandler {
+    private static final class MemoryActionsHandler implements MemoryResUserActionsHandler {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {

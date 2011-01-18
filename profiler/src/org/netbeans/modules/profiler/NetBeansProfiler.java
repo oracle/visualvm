@@ -2089,10 +2089,10 @@ public final class NetBeansProfiler extends Profiler {
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
 
             CCTResultsFilter filter = Lookup.getDefault().lookup(CCTResultsFilter.class);
-            filter.setEvaluators(Lookup.getDefault().lookupAll(CCTResultsFilter.EvaluatorProvider.class));
 
             if (filter != null) {
                 filter.reset(); // clean up the filter before reusing it
+                filter.setEvaluators(Lookup.getDefault().lookupAll(CCTResultsFilter.EvaluatorProvider.class));
             }
 
             // init context aware instances

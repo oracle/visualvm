@@ -395,7 +395,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
 
         for (int i = 0; i < columnCount; i++) {
             menuItem = new JCheckBoxMenuItem(columnNames[i]);
-            menuItem.setActionCommand(new Integer(i).toString());
+            menuItem.setActionCommand(Integer.valueOf(i).toString());
             addMenuItemListener(menuItem);
 
             if (resTable != null) {

@@ -177,7 +177,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
             int newClassId = externalActionsHandler.handleFirstTimeVMObjectAlloc(className, classLoaderId);
 
             if (newClassId != -1) {
-                classIdInt = new Integer(newClassId);
+                classIdInt = Integer.valueOf(newClassId);
                 classIdMap.put(classNameId, classIdInt);
             } else {
                 // System.err.println("*** JFluid warning: Invalid classId for class:"+classNameId);
