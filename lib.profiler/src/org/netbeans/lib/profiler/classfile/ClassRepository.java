@@ -590,7 +590,7 @@ public abstract class ClassRepository implements CommonConstants {
             // Don't bother about reporting an exception - somebody will do that later
         }
 
-        definingClassLoaderMap.put(classId, new Integer(loader));
+        definingClassLoaderMap.put(classId, Integer.valueOf(loader));
 
         return loader;
     }

@@ -85,9 +85,9 @@ public class HeapWalkerNodeFactory {
     private static final String ARRAY_CONTAINER_VALUE_STRING = NbBundle.getMessage(HeapWalkerNodeFactory.class,
                                                                                    "HeapWalkerNodeFactory_ArrayContainerValueString"); // NOI18N
                                                                                                                                        // -----
-    public static int ITEMS_COLLAPSE_UNIT_SIZE = 500;
-    public static int ITEMS_COLLAPSE_THRESHOLD = 2000;
-    public static int ITEMS_COLLAPSE_UNIT_THRESHOLD = 5000;
+    public static final int ITEMS_COLLAPSE_UNIT_SIZE = 500;
+    public static final int ITEMS_COLLAPSE_THRESHOLD = 2000;
+    public static final int ITEMS_COLLAPSE_UNIT_THRESHOLD = 5000;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 

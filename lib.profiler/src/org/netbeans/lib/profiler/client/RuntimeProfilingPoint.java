@@ -234,7 +234,31 @@ public class RuntimeProfilingPoint implements Comparable {
     }
 
     public int compareTo(Object o) {
-       return getId() - ((RuntimeProfilingPoint)o).getId();
+        if (!(o instanceof RuntimeProfilingPoint)) return -1;
+        if (o == null) return -1;
+        return getId() - ((RuntimeProfilingPoint)o).getId();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RuntimeProfilingPoint other = (RuntimeProfilingPoint) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + this.id;
+        return hash;
     }
 
     private boolean resolveLineNumber(ClassInfo classInfo) {
