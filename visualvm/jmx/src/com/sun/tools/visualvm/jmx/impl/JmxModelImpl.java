@@ -62,6 +62,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.Notification;
 import javax.management.NotificationListener;
@@ -520,16 +521,14 @@ class JmxModelImpl extends JmxModel {
             // Close MBeanServer connection
             if (jmxc != null) {
                 try {
+                    jmxc.removeConnectionNotificationListener(this);
                     if (sendClose) jmxc.close();
                 } catch (IOException e) {
                     // Ignore...
-                } finally {
-                    try {
-                        jmxc.removeConnectionNotificationListener(this);
-                    } catch (Exception e) {
-                        // Ignore...
-                    }
+                } catch (ListenerNotFoundException e) {
+                     LOGGER.log(Level.INFO, "disconnectImpl", e); // NOI18N                   
                 }
+                jmxc = null;
             }
             // Set connection state to DISCONNECTED
             if (!isDead) {
