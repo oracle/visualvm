@@ -55,6 +55,7 @@ final class ProfilerSupport {
     private static final String HOTSPOT_VM_NAME_PREFIX = "Java HotSpot";    // NOI18N
     private static final String OPENJDK_VM_NAME_PREFIX = "OpenJDK ";    // NOI18N
     private static final String SUN_VM_VENDOR_PREFIX = "Sun ";  // NOI18N
+    private static final String ORACLE_VM_VENDOR_PREFIX = "Oracle ";  // NOI18N
     private static final String APPLE_VM_VENDOR_PREFIX = "Apple ";  // NOI18N
     private static final String HP_VM_VENDOR_PREFIX = "\"Hewlett-Packard "; // NOI18N
     
@@ -104,10 +105,10 @@ final class ProfilerSupport {
         String vmName = jvm.getVmName();
         String vmVendor = jvm.getVmVendor();
         
-        // VM has to be a HotSpot VM or OpenJDK by Sun Microsystems Inc. or Apple Inc. or Hewlett-Packard Co.
+        // VM has to be a HotSpot VM or OpenJDK by Sun Microsystems Inc. or Oracle Co. or Apple Inc. or Hewlett-Packard Co.
         return vmName != null && (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) || vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) && 
-               vmVendor != null && (vmVendor.startsWith(SUN_VM_VENDOR_PREFIX) || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX) ||
-                                    vmVendor.startsWith(HP_VM_VENDOR_PREFIX));
+               vmVendor != null && (vmVendor.startsWith(ORACLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(SUN_VM_VENDOR_PREFIX) 
+                                 || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(HP_VM_VENDOR_PREFIX));
     }
     
     boolean classSharingBreaksProfiling(Application application) {
