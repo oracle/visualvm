@@ -229,7 +229,7 @@ public class Utils {
     private static class ProjectPresenterListRenderer extends DefaultListCellRenderer {
         //~ Inner Classes --------------------------------------------------------------------------------------------------------
 
-        private class Renderer extends DefaultListCellRenderer {
+        private static class Renderer extends DefaultListCellRenderer {
             //~ Methods ----------------------------------------------------------------------------------------------------------
 
             public void setFont(Font font) {
@@ -611,7 +611,7 @@ public class Utils {
 
     public static double getDurationInMicroSec(long startTimestamp, long endTimestamp) {
         ProfilingSessionStatus session = Profiler.getDefault().getTargetAppRunner().getProfilingSessionStatus();
-        double countsInMicroSec = session.timerCountsInSecond[0] / 1000000L;
+        double countsInMicroSec = session.timerCountsInSecond[0] / 1000000D;
 
         return (endTimestamp - startTimestamp) / countsInMicroSec;
     }
