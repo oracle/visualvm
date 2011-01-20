@@ -133,7 +133,7 @@ public class TransactionalSupport {
                 int counter = roCounter.intValue();
 
                 if (counter > 1) {
-                    lockRead.set(new Integer(counter - 1));
+                    lockRead.set(Integer.valueOf(counter - 1));
                 } else {
                     lockRead.set(null);
                     unlockShared();
@@ -155,7 +155,7 @@ public class TransactionalSupport {
                 int counter = rwCounter.intValue();
 
                 if (counter > 1) {
-                    lockWrite.set(new Integer(counter - 1));
+                    lockWrite.set(Integer.valueOf(counter - 1));
                 } else {
                     lockWrite.set(null);
 
@@ -186,7 +186,7 @@ public class TransactionalSupport {
             }
 
             lockedExclusively = true;
-            lockWrite.set(new Integer(1));
+            lockWrite.set(Integer.valueOf(1));
 
             return true;
         }
@@ -207,10 +207,10 @@ public class TransactionalSupport {
             Integer counter = (Integer) lockRead.get();
 
             if (counter == null) {
-                lockRead.set(new Integer(1));
+                lockRead.set(Integer.valueOf(1));
                 sharedLockCount++; // turn the lock counter only if the current thread doesn't own the sahred lock already
             } else {
-                lockRead.set(new Integer(counter.intValue() + 1));
+                lockRead.set(Integer.valueOf(counter.intValue() + 1));
             }
 
             result = true;
@@ -240,7 +240,7 @@ public class TransactionalSupport {
             lockedShared = false;
             sharedLockCount = 0;
             lockedExclusively = true;
-            lockWrite.set(new Integer(counter.intValue() + 1));
+            lockWrite.set(Integer.valueOf(counter.intValue() + 1));
             lockRead.set(null);
             result = true;
         } else {
@@ -265,7 +265,7 @@ public class TransactionalSupport {
                                    + "] Relocking a previously owned exclusive lock"); // NOI18N
             }
 
-            lockWrite.set(new Integer(counter.intValue() + 1));
+            lockWrite.set(Integer.valueOf(counter.intValue() + 1));
             result = true;
         } else {
             if (DEBUG) {

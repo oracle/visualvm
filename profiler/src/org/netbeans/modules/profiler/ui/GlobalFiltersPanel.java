@@ -296,7 +296,7 @@ public final class GlobalFiltersPanel extends JPanel implements HelpCtx.Provider
         }
     }
 
-    private final class FilterTableViewport extends JViewport implements TableColumnModelListener {
+    private static final class FilterTableViewport extends JViewport implements TableColumnModelListener {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final JTableHeader tableHeader;

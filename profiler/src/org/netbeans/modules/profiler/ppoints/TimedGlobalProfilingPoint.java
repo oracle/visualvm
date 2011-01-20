@@ -137,6 +137,16 @@ public abstract class TimedGlobalProfilingPoint extends GlobalProfilingPoint {
                    && (periodUnits == condition.periodUnits);
         }
 
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 53 * hash + (this.repeats ? 1 : 0);
+            hash = 53 * hash + this.periodTime;
+            hash = 53 * hash + this.periodUnits;
+            hash = 53 * hash + (int) (this.startTime ^ (this.startTime >>> 32));
+            return hash;
+        }
+
         public static TimeCondition load(Project project, int index, Properties properties) {
             return load(project, index, null, properties);
         }
@@ -194,9 +204,11 @@ public abstract class TimedGlobalProfilingPoint extends GlobalProfilingPoint {
     private TimeCondition condition;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     TimedGlobalProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
-        super(name, project, factory);
+        this(name, project, factory, false);
+    }
+    TimedGlobalProfilingPoint(String name, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, project, factory, existing);
         condition = new TimeCondition();
     }
 

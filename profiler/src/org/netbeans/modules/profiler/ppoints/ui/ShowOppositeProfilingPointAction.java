@@ -43,65 +43,59 @@
 
 package org.netbeans.modules.profiler.ppoints.ui;
 
+import java.awt.event.ActionEvent;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ppoints.CodeProfilingPoint;
-import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
 import org.netbeans.modules.profiler.ppoints.Utils;
-import org.openide.nodes.Node;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.NodeAction;
 import java.io.File;
+import java.util.Collection;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
+import org.openide.util.ContextAwareAction;
+import org.openide.util.Lookup;
+import org.openide.util.actions.SystemAction;
 
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public class ShowOppositeProfilingPointAction extends NodeAction {
+public class ShowOppositeProfilingPointAction extends SystemAction implements ContextAwareAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class InvocationLocationDescriptor {
+    private static class InvocationLocationDescriptor {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private CodeProfilingPoint.Location location;
         private CodeProfilingPoint.Location oppositeLocation;
-        private CodeProfilingPoint.Paired profilingPoint;
         private boolean isStartLocation;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public InvocationLocationDescriptor(CodeProfilingPoint.Paired profilingPoint, CodeProfilingPoint.Location location) {
-            this.profilingPoint = profilingPoint;
+        InvocationLocationDescriptor(CodeProfilingPoint.Paired profilingPoint, CodeProfilingPoint.Location location) {
             this.location = location;
-            computeOppositeLocation();
+            computeOppositeLocation(profilingPoint);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public CodeProfilingPoint.Location getLocation() {
+        CodeProfilingPoint.Location getLocation() {
             return location;
         }
 
-        public CodeProfilingPoint.Location getOppositeLocation() {
+        CodeProfilingPoint.Location getOppositeLocation() {
             return oppositeLocation;
         }
 
-        public CodeProfilingPoint.Paired getProfilingPoint() {
-            return profilingPoint;
-        }
-
-        public boolean isStartLocation() {
+        boolean isStartLocation() {
             return isStartLocation;
         }
 
-        private void computeOppositeLocation() {
-            CodeProfilingPoint.Paired profilingPoint = getProfilingPoint();
-
-            if (profilingPoint == null) {
-                return;
-            }
-
+        private void computeOppositeLocation(CodeProfilingPoint.Paired profilingPoint) {
             CodeProfilingPoint.Location startLocation = profilingPoint.getStartLocation();
 
             if (new File(startLocation.getFile()).equals(new File(location.getFile()))
@@ -134,64 +128,60 @@ public class ShowOppositeProfilingPointAction extends NodeAction {
     public ShowOppositeProfilingPointAction() {
         setIcon(null);
         putValue("noIconInMenu", Boolean.TRUE); // NOI18N
+        setEnabled(false);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    @Override
     public HelpCtx getHelpCtx() {
         return new HelpCtx(ShowOppositeProfilingPointAction.class);
     }
 
+    @Override
     public String getName() {
-        InvocationLocationDescriptor locationDescriptor = getCurrentLocationDescriptor();
-
-        if (locationDescriptor.getProfilingPoint() == null) {
-            return NO_DATA_STRING; // should never happen!
-        }
-
-        return locationDescriptor.isStartLocation() ? END_ACTION_NAME : START_ACTION_NAME;
+        return NO_DATA_STRING;
     }
 
-    protected boolean asynchronous() {
-        return false;
+    @Override
+    public void actionPerformed(ActionEvent ae) {
     }
 
-    protected boolean enable(Node[] node) {
-        if (ProfilingPointsManager.getDefault().isProfilingSessionInProgress()) {
-            return false;
-        }
+    @Override
+    public Action createContextAwareInstance(Lookup actionContext) {
+        if (!ProfilingPointsManager.getDefault().isProfilingSessionInProgress()) {
+            Collection<? extends CodeProfilingPoint.Annotation> anns = actionContext.lookupAll(CodeProfilingPoint.Annotation.class);
+            final InvocationLocationDescriptor desc = getCurrentLocationDescriptor(anns);
+            if (desc != null) {
+                String name = desc.isStartLocation() ? END_ACTION_NAME : START_ACTION_NAME;
 
-        return getCurrentLocationDescriptor().getProfilingPoint() != null;
-    }
+                return new AbstractAction(name) {
 
-    protected void performAction(Node[] node) {
-        InvocationLocationDescriptor locationDescriptor = getCurrentLocationDescriptor();
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        CodeProfilingPoint.Location oppositeLocation = desc.getOppositeLocation();
 
-        if (locationDescriptor.getProfilingPoint() == null) {
-            return; // should never happen!
-        }
-
-        CodeProfilingPoint.Location oppositeLocation = locationDescriptor.getOppositeLocation();
-
-        if (oppositeLocation != null) {
-            Utils.openLocation(oppositeLocation);
-        } else {
-            NetBeansProfiler.getDefaultNB().displayWarning(NO_END_DEFINED_MSG);
-        }
-    }
-
-    private InvocationLocationDescriptor getCurrentLocationDescriptor() {
-        CodeProfilingPoint.Location currentLocation = Utils.getCurrentLocation(0);
-        CodeProfilingPoint[] profilingPointsOnLine = Utils.getProfilingPointsOnLine(currentLocation);
-
-        if (profilingPointsOnLine.length > 0) {
-            for (CodeProfilingPoint profilingPoint : profilingPointsOnLine) {
-                if (profilingPoint instanceof CodeProfilingPoint.Paired) {
-                    return new InvocationLocationDescriptor((CodeProfilingPoint.Paired) profilingPoint, currentLocation);
-                }
+                        if (oppositeLocation != null) {
+                            Utils.openLocation(oppositeLocation);
+                        } else {
+                            NetBeansProfiler.getDefaultNB().displayWarning(NO_END_DEFINED_MSG);
+                        }
+                    }
+                };
             }
         }
+        return this;
+    }
 
-        return new InvocationLocationDescriptor(null, currentLocation);
+    private InvocationLocationDescriptor getCurrentLocationDescriptor(Collection<? extends CodeProfilingPoint.Annotation> anns) {
+        if (anns.size() == 1) {
+            CodeProfilingPoint pp = anns.iterator().next().profilingPoint();
+            CodeProfilingPoint.Location currentLocation = Utils.getCurrentLocation(0);
+
+            if (pp instanceof CodeProfilingPoint.Paired) {
+                return new InvocationLocationDescriptor((CodeProfilingPoint.Paired)pp, currentLocation);
+            }
+        }
+        return null;
     }
 }

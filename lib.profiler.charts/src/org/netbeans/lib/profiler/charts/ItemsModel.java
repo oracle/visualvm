@@ -72,8 +72,10 @@ public interface ItemsModel {
         }
 
         public void removeItemsListener(ItemsListener listener) {
-            if (listeners != null) listeners.remove(listener);
-            if (listeners.isEmpty()) listeners = null;
+            if (listeners != null) {
+                listeners.remove(listener);
+                if (listeners.isEmpty()) listeners = null;
+            }
         }
 
 

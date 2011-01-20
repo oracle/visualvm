@@ -64,6 +64,7 @@ import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 
 
@@ -819,20 +820,38 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         factory = new CPUCCTNodeFactory(isCollectingTwoTimeStamps());
         
         setMethodInfoMapper(new MethodInfoMapper() {
-
+            final private String INVALID_MID=ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("MSG_INVALID_METHODID"); // NOI18N
             @Override
             public String getInstrMethodClass(int methodId) {
-                return profilerClient.getStatus().getInstrMethodClasses()[methodId];
+                String[] cNames = profilerClient.getStatus().getInstrMethodClasses();
+                if (methodId < cNames.length) {
+                    return cNames[methodId];
+                } else {
+                    LOGGER.log(Level.WARNING, INVALID_MID, new Object[]{methodId, cNames.length - 1});
+                    return null;
+                }
             }
 
             @Override
             public String getInstrMethodName(int methodId) {
-                return profilerClient.getStatus().getInstrMethodNames()[methodId];
+                String[] mNames = profilerClient.getStatus().getInstrMethodNames();
+                if (methodId < mNames.length) {
+                    return mNames[methodId];
+                } else {
+                    LOGGER.log(Level.WARNING, INVALID_MID, new Object[]{methodId, mNames.length - 1});
+                    return null;
+                }
             }
 
             @Override
             public String getInstrMethodSignature(int methodId) {
-                return profilerClient.getStatus().getInstrMethodSignatures()[methodId];
+                String[] sNames = profilerClient.getStatus().getInstrMethodSignatures();
+                if (methodId < sNames.length) {
+                    return sNames[methodId];
+                } else {
+                    LOGGER.log(Level.WARNING, INVALID_MID, new Object[]{methodId, sNames.length - 1});
+                    return null;
+                }
             }
 
             @Override

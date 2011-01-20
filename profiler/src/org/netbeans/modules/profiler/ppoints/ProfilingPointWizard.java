@@ -337,12 +337,12 @@ public class ProfilingPointWizard implements WizardDescriptor.Iterator {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    private static class Singleton {
+        final private static ProfilingPointWizard INSTANCE = new ProfilingPointWizard();
+    }
+    
     public static ProfilingPointWizard getDefault() {
-        if (defaultInstance == null) {
-            defaultInstance = new ProfilingPointWizard();
-        }
-
-        return defaultInstance;
+        return Singleton.INSTANCE;
     }
 
     public WizardDescriptor getWizardDescriptor() {
@@ -417,13 +417,13 @@ public class ProfilingPointWizard implements WizardDescriptor.Iterator {
 
     public void nextPanel() {
         getCurrentWizardPanel().hiding(false);
-        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(++currentPanel)); // NOI18N
+        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, Integer.valueOf(++currentPanel)); // NOI18N
         getCurrentWizardPanel().showing();
     }
 
     public void previousPanel() {
         getCurrentWizardPanel().hiding(false);
-        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(--currentPanel)); // NOI18N
+        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, Integer.valueOf(--currentPanel)); // NOI18N
         getCurrentWizardPanel().showing();
     }
 
@@ -442,7 +442,7 @@ public class ProfilingPointWizard implements WizardDescriptor.Iterator {
         wizardDescriptor.putProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, Boolean.TRUE); // NOI18N
         wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, Boolean.TRUE); // NOI18N
         wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, Boolean.TRUE); // NOI18N
-        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(0)); // NOI18N
+        wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, Integer.valueOf(0)); // NOI18N
     }
 
     private void initWizardPanels() {

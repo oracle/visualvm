@@ -68,7 +68,11 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         Paired(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory) {
-            super(name, project, factory);
+            this(name, startLocation, endLocation, project, factory, false);
+        }
+        
+        Paired(String name, Location startLocation, Location endLocation, Project project, ProfilingPointFactory factory, boolean existing) {
+            super(name, project, factory, existing);
             this.startLocation = startLocation;
             this.endLocation = endLocation;
         }
@@ -201,7 +205,11 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         Single(String name, Location location, Project project, ProfilingPointFactory factory) {
-            super(name, project, factory);
+            this(name, location, project, factory, false);
+        }
+        
+        Single(String name, Location location, Project project, ProfilingPointFactory factory, boolean existing) {
+            super(name, project, factory, existing);
             this.location = location;
         }
 
@@ -324,6 +332,15 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
                    && (line == location.line) && (offset == location.offset);
         }
 
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 79 * hash + (this.file != null ? this.file.hashCode() : 0);
+            hash = 79 * hash + this.line;
+            hash = 79 * hash + this.offset;
+            return hash;
+        }
+
         public static Location load(Project project, int index, Properties properties) {
             return load(project, index, null, properties);
         }
@@ -369,9 +386,7 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
     public abstract static class Annotation extends org.openide.text.Annotation {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public abstract String getAnnotationType();
-
-        public abstract String getShortDescription();
+        public abstract CodeProfilingPoint profilingPoint();
 
         void fireDescriptionChanged() {
             firePropertyChange(PROP_SHORT_DESCRIPTION, false, true);
@@ -388,9 +403,11 @@ public abstract class CodeProfilingPoint extends ProfilingPoint {
     static final String PROPERTY_ANNOTATION = "p_annotation"; // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     CodeProfilingPoint(String name, Project project, ProfilingPointFactory factory) {
-        super(name, project, factory);
+        this(name, project, factory, false);
+    }
+    CodeProfilingPoint(String name, Project project, ProfilingPointFactory factory, boolean existing) {
+        super(name, project, factory, existing);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
