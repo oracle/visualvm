@@ -84,7 +84,7 @@ public class DefaultSettingsConfigurator implements SelectProfilingTask.Settings
         private boolean isAttach;
         private boolean isModify;
         private boolean isPreset;
-        final private boolean useCPUTimer = true; // always enabled
+        final private static boolean useCPUTimer = true; // always enabled
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 

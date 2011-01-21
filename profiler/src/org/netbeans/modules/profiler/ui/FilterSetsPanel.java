@@ -198,7 +198,7 @@ public final class FilterSetsPanel extends JPanel implements ActionListener, Hel
         }
     }
 
-    private final class ActiveFiltersTableViewport extends JViewport implements TableColumnModelListener {
+    private static final class ActiveFiltersTableViewport extends JViewport implements TableColumnModelListener {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final JTableHeader tableHeader;

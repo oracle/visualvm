@@ -114,9 +114,11 @@ public class FilterUtils {
     }
 
     public static Object loadFilter(Map props, String prefix) {
+        if (props == null) return null;
+        
         Object filterType = props.get(prefix + PROP_FILTER_TYPE);
 
-        if ((props == null) || (filterType == null)) {
+        if (filterType == null) {
             return null;
         }
 

@@ -72,7 +72,7 @@ class ObjectArrayLazyList extends AbstractList {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Object get(int index) {
-        return heap.getInstanceByID(dumpBuffer.getID(offset + (index * idSize)));
+        return heap.getInstanceByID(dumpBuffer.getID(offset + ((long)index * (long)idSize)));
     }
 
     public int size() {

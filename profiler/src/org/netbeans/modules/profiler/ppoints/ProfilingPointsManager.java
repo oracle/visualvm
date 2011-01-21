@@ -75,6 +75,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -152,7 +154,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
     }
 
-    private class CustomizerButton extends JButton implements ValidityListener {
+    private static class CustomizerButton extends JButton implements ValidityListener {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public CustomizerButton() {
@@ -200,7 +202,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
     }
 
-    private class RuntimeProfilingPointMapper {
+    private static class RuntimeProfilingPointMapper {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final CodeProfilingPoint owner;
@@ -224,7 +226,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
         }
     }
     
-    private class FileWatch {
+    private static class FileWatch {
         private int references = 0;
         private LocationFileListener listener;
         
@@ -702,7 +704,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     // Returns true if customizer was opened and then submitted by OK button
-    void customize(final ValidityAwarePanel customizer, Runnable updater) {
+    boolean customize(final ValidityAwarePanel customizer, Runnable updater) {
         ValidityAwarePanel showingCustomizer = getShowingCustomizer();
 
         if (showingCustomizer != null) {
@@ -732,16 +734,23 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                                                        cb, 0, helpCtx, null);
             final Dialog d = ProfilerDialogs.createDialog(dd);
             d.addWindowListener(new CustomizerListener(d, dd, updater));
+            d.setModal(true);
+            // give focus to the initial focus target
+            d.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    if (customizer.getInitialFocusTarget() != null) {
+                        customizer.getInitialFocusTarget().requestFocusInWindow();
+                    }
+                }
+            });
             d.setVisible(true);
-
-            if (customizer.getInitialFocusTarget() != null) {
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            customizer.getInitialFocusTarget().requestFocusInWindow();
-                        }
-                    });
+            
+            if (dd.getValue() == cb) {
+                return true;
             }
         }
+        return false;
     }
 
     void documentOpened(Line.Set lineSet, FileObject fileObject) {

@@ -72,6 +72,9 @@ public class DynamicClassInfo extends ClassInfo {
     // same class are instrumented one-by-one and redefineClasses is used for each of them, we don't have to regenerate the
     // code for each previously instrumented method over and over again.
     private byte[][] modifiedAndSavedMethodInfos;
+    private int[] modifiedMethodBytecodesLength;
+    private int[] modifiledLocalVariableTableOffsets;
+    private int[] modifiledLocalVariableTypeTableOffsets;
     private boolean allMethodsMarkers = false;
     private boolean allMethodsRoots = false;
     private boolean hasUninstrumentedMarkerMethods;
@@ -97,7 +100,7 @@ public class DynamicClassInfo extends ClassInfo {
         byte[] classFileBytes = getClassFileBytes();
 
         try {
-            (new ClassFileParser()).parseClassFile(classFileBytes, this);
+            new ClassFileParser().parseClassFile(classFileBytes, this);
 
             if (!className.equals(name)) {
                 throw new ClassFormatError("Mismatch between name in .class file and location for " + className // NOI18N
@@ -175,6 +178,54 @@ public class DynamicClassInfo extends ClassInfo {
         }
     }
 
+    public int getLocalVariableTableStartOffsetInMethodInfo(int idx) {
+        if ((modifiedAndSavedMethodInfos != null) && (modifiedAndSavedMethodInfos[idx] != null)) {
+            if (modifiledLocalVariableTableOffsets[idx] == 0) {
+                int newOffset = getExceptionTableStartOffsetInMethodInfo(idx)+getExceptionTableCount(idx)*8+2;
+                byte[] methodInfo = getMethodInfo(idx);
+                int attrCount = getU2(methodInfo, newOffset); newOffset+=2;// Attribute (or rather sub-attribute) count
+
+                for (int k = 0; k < attrCount; k++) {
+                    int attrNameIdx = getU2(methodInfo, newOffset); newOffset+=2;
+                    int attrLen = getU4(methodInfo, newOffset); newOffset+=4;
+
+                    if (attrNameIdx==localVaribaleTableCPindex){
+                        modifiledLocalVariableTableOffsets[idx] = newOffset+2;
+                        break;
+                    }
+                    newOffset += attrLen;
+                }
+            }
+            return modifiledLocalVariableTableOffsets[idx];
+        } else {
+            return super.getLocalVariableTableStartOffsetInMethodInfo(idx);
+        }
+    }
+    
+    public int getLocalVariableTypeTableStartOffsetInMethodInfo(int idx) {
+        if ((modifiedAndSavedMethodInfos != null) && (modifiedAndSavedMethodInfos[idx] != null)) {
+            if (modifiledLocalVariableTypeTableOffsets[idx] == 0) {
+                int newOffset = getExceptionTableStartOffsetInMethodInfo(idx)+getExceptionTableCount(idx)*8+2;
+                byte[] methodInfo = getMethodInfo(idx);
+                int attrCount = getU2(methodInfo, newOffset); newOffset+=2;// Attribute (or rather sub-attribute) count
+
+                for (int k = 0; k < attrCount; k++) {
+                    int attrNameIdx = getU2(methodInfo, newOffset); newOffset+=2;
+                    int attrLen = getU4(methodInfo, newOffset); newOffset+=4;
+
+                    if (attrNameIdx==localVaribaleTypeTableCPindex){
+                        modifiledLocalVariableTypeTableOffsets[idx] = newOffset+2;
+                        break;
+                    }
+                    newOffset += attrLen;
+                }
+            }
+            return modifiledLocalVariableTypeTableOffsets[idx];
+        } else {
+            return super.getLocalVariableTypeTableStartOffsetInMethodInfo(idx);
+        }
+    }
+    
     public void setHasUninstrumentedMarkerMethods(boolean v) {
         hasUninstrumentedMarkerMethods = v;
     }
@@ -436,6 +487,9 @@ public class DynamicClassInfo extends ClassInfo {
         }
 
         modifiedAndSavedMethodInfos[idx] = methodInfo;
+        modifiedMethodBytecodesLength = new int[methodNames.length];
+        modifiledLocalVariableTableOffsets = new int[methodNames.length];
+        modifiledLocalVariableTypeTableOffsets = new int[methodNames.length];
     }
 
     public void unsetMethodInstrumented(int i) {
@@ -448,10 +502,21 @@ public class DynamicClassInfo extends ClassInfo {
     }
 
     private int getBCLenForModifiedAndSavedMethodInfo(int idx) {
-        byte[] methodInfo = modifiedAndSavedMethodInfos[idx];
-        int bcLenPos = methodBytecodesOffsets[idx] - 4;
+        if (modifiedMethodBytecodesLength[idx] == 0) {
+            byte[] methodInfo = modifiedAndSavedMethodInfos[idx];
+            int bcLenPos = methodBytecodesOffsets[idx] - 4;
 
-        return (((methodInfo[bcLenPos++] & 255) << 24) + ((methodInfo[bcLenPos++] & 255) << 16)
-               + ((methodInfo[bcLenPos++] & 255) << 8) + (methodInfo[bcLenPos++] & 255));
+            modifiedMethodBytecodesLength[idx] =  getU4(methodInfo,bcLenPos);
+        }
+        return modifiedMethodBytecodesLength[idx];
+    }
+
+    static int getU2(byte[] bytecodes, int pos) {
+        return ((bytecodes[pos] & 0xFF) << 8) + (bytecodes[pos + 1] & 0xFF);
+    }
+
+    static int getU4(byte[] bytecodes, int pos) {
+        return ((bytecodes[pos] & 0xFF) << 24) + ((bytecodes[pos + 1] & 0xFF) << 16) + ((bytecodes[pos + 2] & 0xFF) << 8)
+               + (bytecodes[pos + 3] & 0xFF);
     }
 }
