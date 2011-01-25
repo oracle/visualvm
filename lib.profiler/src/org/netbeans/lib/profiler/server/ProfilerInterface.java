@@ -458,8 +458,6 @@ public class ProfilerInterface implements CommonConstants {
                 // Give WeakReference collector thread a chance to register some (hopefully most of) object GCs
             } catch (Exception ex) {
             }
-
-            ;
         }
 
         ProfilerRuntime.dumpEventBuffer();
@@ -493,8 +491,6 @@ public class ProfilerInterface implements CommonConstants {
                 Thread.sleep(50);
             } catch (Exception ex) {
             }
-
-            ;
         }
 
         if (status.runningInAttachedMode) {

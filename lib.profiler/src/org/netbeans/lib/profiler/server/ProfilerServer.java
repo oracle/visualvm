@@ -766,7 +766,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             }
         }
 
-        ; // cannot find jfluid-server.jar or Bundle.properties not found
+        // cannot find jfluid-server.jar or Bundle.properties not found
 
         if (messages != null) {
             return messages; // ResourceBundle successfuly loaded using custom classloader
@@ -778,8 +778,6 @@ public class ProfilerServer extends Thread implements CommonConstants {
         } catch (Exception e) {
             System.err.println("Profiler Server: Problem with default initializing localized messages...\n" + e.getMessage()); // NOI18N
         }
-
-        ;
 
         return messages;
     }
