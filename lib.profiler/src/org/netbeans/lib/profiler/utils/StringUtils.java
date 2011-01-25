@@ -294,15 +294,15 @@ public class StringUtils {
         while (pos0 < len) {
             int pos1 = pos0;
 
-            while ((pos1 < len) && (args.charAt(pos1) != ' ') && (args.charAt(pos1) != 8)) {
-                pos1++; // NOI18N
+            while ((pos1 < len) && (args.charAt(pos1) != ' ') && (args.charAt(pos1) != 8)) { // NOI18N
+                pos1++;
             }
 
             listRes.add(args.substring(pos0, pos1));
             pos0 = pos1 + 1;
 
-            while ((pos0 < len) && ((args.charAt(pos0) == ' ') || (args.charAt(pos0) == 8))) {
-                pos0++; // NOI18N
+            while ((pos0 < len) && ((args.charAt(pos0) == ' ') || (args.charAt(pos0) == 8))) { // NOI18N
+                pos0++;
             }
         }
 
@@ -325,37 +325,29 @@ public class StringUtils {
 
                 switch (className.charAt(lastBrackPos + 1)) {
                     case 'C':
-                        elemType = "char";
-
-                        break; // NOI18N
+                        elemType = "char"; // NOI18N
+                        break;
                     case 'B':
-                        elemType = "byte";
-
-                        break; // NOI18N
+                        elemType = "byte"; // NOI18N
+                        break;
                     case 'I':
-                        elemType = "int";
-
-                        break; // NOI18N
+                        elemType = "int"; // NOI18N
+                        break;
                     case 'Z':
-                        elemType = "boolean";
-
-                        break; // NOI18N
+                        elemType = "boolean"; // NOI18N
+                        break;
                     case 'F':
-                        elemType = "float";
-
-                        break; // NOI18N
+                        elemType = "float"; // NOI18N
+                        break;
                     case 'D':
-                        elemType = "double";
-
-                        break; // NOI18N
+                        elemType = "double"; // NOI18N
+                        break;
                     case 'S':
-                        elemType = "short";
-
-                        break; // NOI18N
+                        elemType = "short"; // NOI18N
+                        break;
                     case 'J':
-                        elemType = "long";
-
-                        break; // NOI18N
+                        elemType = "long"; // NOI18N
+                        break;
                 }
             } else {
                 elemType = className.substring(lastBrackPos + 1);

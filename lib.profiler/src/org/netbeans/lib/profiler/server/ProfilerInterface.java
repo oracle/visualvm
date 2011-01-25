@@ -948,7 +948,7 @@ public class ProfilerInterface implements CommonConstants {
                         AsyncMessageCommand cmd = null;
 
                         if (excMessage == null) {
-                            cmd = new AsyncMessageCommand(true, INSTRUMENTATION_SUCCESSFUL_MSG); // NOI18N
+                            cmd = new AsyncMessageCommand(true, INSTRUMENTATION_SUCCESSFUL_MSG);
                         } else {
                             cmd = new AsyncMessageCommand(false, excMessage);
                         }

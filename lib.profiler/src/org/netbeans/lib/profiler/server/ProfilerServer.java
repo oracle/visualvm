@@ -288,7 +288,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                     try {
                         execInSeparateThreadLock.wait();
                     } catch (InterruptedException ex) {
-                        System.err.println(THREAD_WAIT_EXCEPTION_MSG); // NOI18N
+                        System.err.println(THREAD_WAIT_EXCEPTION_MSG);
                     }
 
                     if (stopped) {
@@ -362,8 +362,8 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static String INCORRECT_AGENT_ID_MSG = "Profiler Agent Warning: Wrong agentId specified: {0}"; // NOI18N
     private static String THREAD_EXCEPTION_MSG = "Profiler Agent Error: Exception in executeInSeparateThread()"; // NOI18N
     private static String THREAD_WAIT_EXCEPTION_MSG = "Profiler Agent Error: Exception in wait in SeparateCmdExecutionThread"; // NOI18N
-    private static String LOCAL_SESSION_MSG = "Profiler Agent: Local accelerated session";
-    private static String REMOTE_SESSION_MSG = "Profiler Agent: Standard session";
+    private static String LOCAL_SESSION_MSG = "Profiler Agent: Local accelerated session"; // NOI18N
+    private static String REMOTE_SESSION_MSG = "Profiler Agent: Standard session"; // NOI18N
     
     public static final int ATTACH_DYNAMIC = 0;
     public static final int ATTACH_DIRECT = 1;
@@ -762,8 +762,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             try {
                 messages = getProfilerServerResourceBundle(_fullJFluidPath);
             } catch (Exception e) {
-                System.err.println("Profiler Server: Problem with customized initializing localized messages...\n"
-                                   + e.getMessage()); // NOI18N
+                System.err.println("Profiler Server: Problem with customized initializing localized messages...\n" + e.getMessage()); // NOI18N
             }
         }
 
@@ -833,7 +832,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static File getInfoFile(int port) throws IOException {
         String dirName = Platform.getProfilerUserDir();
 
-        return new File(dirName + File.separator + port); // NOI18N
+        return new File(dirName + File.separator + port);
     }
 
     private static void setShutdownOK() {
@@ -980,7 +979,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             // ignore
         }
 
-        System.out.println(ENTER_TO_SHUTDOWN_MSG); // NOI18N
+        System.out.println(ENTER_TO_SHUTDOWN_MSG);
 
         try {
             System.in.read();
@@ -1006,8 +1005,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         // can not access a member of class Test with modifiers "public static"". Thus we have to run the below preemptive check. Hope this is not
         // a problem for the majority of our users...
         if (!Modifier.isPublic(targetMainClass.getModifiers())) {
-            startupException = new IllegalAccessException(MessageFormat.format(MAIN_CLASS_NOT_PUBLIC_MSG,
-                                                                               new Object[] { targetMainClass })); // NOI18N
+            startupException = new IllegalAccessException(MessageFormat.format(MAIN_CLASS_NOT_PUBLIC_MSG, new Object[] { targetMainClass }));
             System.err.println(startupException);
 
             return;
@@ -1029,8 +1027,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         int mod = targetMainMethod.getModifiers();
 
         if (!(Modifier.isPublic(mod) && Modifier.isStatic(mod)) || Modifier.isAbstract(mod) || Modifier.isInterface(mod)) {
-            startupException = new IllegalAccessException(MessageFormat.format(INCORRECT_MAIN_MODIFIERS_MSG,
-                                                                               new Object[] { targetMainClass })); // NOI18N
+            startupException = new IllegalAccessException(MessageFormat.format(INCORRECT_MAIN_MODIFIERS_MSG, new Object[] { targetMainClass }));
             System.err.println(startupException);
 
             return;
@@ -1064,7 +1061,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             }
         } catch (Throwable ex) {
             ProfilerInterface.disableProfilerHooks();
-            internalError(MessageFormat.format(UNEXPECTED_EXCEPTION_MSG, new Object[] { ex }), false); // NOI18N
+            internalError(MessageFormat.format(UNEXPECTED_EXCEPTION_MSG, new Object[] { ex }), false);
             ex.printStackTrace(System.err);
         } finally {
             int elapsedTime = (int) (((Timers.getCurrentTimeInCounts() - startTime) * 1000) / Timers.getNoOfCountsInSecond());
@@ -1106,7 +1103,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 try {
                     agentId = Integer.parseInt(id);
                 } catch (NumberFormatException e) {
-                    System.err.println(MessageFormat.format(INCORRECT_AGENT_ID_MSG, new Object[] { id })); // NOI18N
+                    System.err.println(MessageFormat.format(INCORRECT_AGENT_ID_MSG, new Object[] { id }));
                                                                                                            // ignore, the agentId will be generated randomly
                 }
             }
@@ -1203,7 +1200,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         }
 
         try {
-            if (!jfluidServerJar.startsWith("/")) {
+            if (!jfluidServerJar.startsWith("/")) { // NOI18N
                 jfluidServerJar = "/" + jfluidServerJar; // NOI18N
             }
 
@@ -1211,9 +1208,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             URLClassLoader loader = new URLClassLoader(new URL[] { new URL(bundleJarURLPath) });
             bundle = ResourceBundle.getBundle("org.netbeans.lib.profiler.server.Bundle", Locale.getDefault(), loader); // NOI18N
         } catch (Exception e2) {
-            throw new RuntimeException("ProfilerServer: Unable to initialize ResourceBundle for ProfilerServer\n"
-                                       + e2.getMessage() // NOI18N
-            );
+            throw new RuntimeException("ProfilerServer: Unable to initialize ResourceBundle for ProfilerServer\n" + e2.getMessage()); // NOI18N
         }
 
         if (bundle == null) {
@@ -1248,18 +1243,15 @@ public class ProfilerServer extends Thread implements CommonConstants {
         try {
             if (serverTimeout == 0) {
                 System.out.println(MessageFormat.format(WAITING_ON_PORT_MSG,
-                                                        new Object[] {
-                                                            "" + serverPort, // NOI18N
-                "" + CommonConstants.CURRENT_AGENT_VERSION // NOI18N
+                                                        new Object[] { "" + serverPort, // NOI18N
+                                                                       "" + CommonConstants.CURRENT_AGENT_VERSION // NOI18N
                                                         }));
             } else {
                 System.out.println(MessageFormat.format(WAITING_ON_PORT_TIMEOUT_MSG,
-                                                        new Object[] {
-                                                            "" + serverPort, // NOI18N
-                "" + serverTimeout, // NOI18N
-                "" + CommonConstants.CURRENT_AGENT_VERSION
-                                                        } // NOI18N
-                )); // NOI18N
+                                                        new Object[] { "" + serverPort, // NOI18N
+                                                                       "" + serverTimeout, // NOI18N
+                                                                       "" + CommonConstants.CURRENT_AGENT_VERSION // NOI18N
+                                                        }));
             }
 
             serverSocket = new ServerSocket(serverPort);
@@ -1274,10 +1266,10 @@ public class ProfilerServer extends Thread implements CommonConstants {
             System.out.println(CONNECTION_MSG);
             return true;
         } catch (SocketTimeoutException ex) {
-            System.err.println(CONNECTION_TIMEOUT_MSG); // NOI18N
+            System.err.println(CONNECTION_TIMEOUT_MSG);
             connectionFailed = true;
         } catch (IOException ex) {
-            System.err.println(MessageFormat.format(CONNECTION_EXCEPTION_MSG, new Object[] { ex })); // NOI18N
+            System.err.println(MessageFormat.format(CONNECTION_EXCEPTION_MSG, new Object[] { ex }));
             connectionFailed = true;
         } finally {
             //removeInfoFile ();
@@ -1307,7 +1299,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
             bos.close();
         } catch (IOException e) {
-            System.err.println(MessageFormat.format(AGENT_ERROR_MSG, new Object[] { e.getMessage() })); // NOI18N
+            System.err.println(MessageFormat.format(AGENT_ERROR_MSG, new Object[] { e.getMessage() }));
         } finally {
             if (bos != null) {
                 try {
@@ -1332,7 +1324,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             try {
                 execInSeparateThreadLock.notify();
             } catch (IllegalMonitorStateException ex) {
-                System.err.println(THREAD_EXCEPTION_MSG); // NOI18N
+                System.err.println(THREAD_EXCEPTION_MSG);
             }
         }
     }
@@ -1372,8 +1364,8 @@ public class ProfilerServer extends Thread implements CommonConstants {
                         try {
                             targetAppRunningLock.wait();
                         } catch (InterruptedException ex) {
-                            internalError("START_TARGET_APP");
-                        } // NOI18N
+                            internalError("START_TARGET_APP"); // NOI18N
+                        }
                     }
 
                     if (startupException != null) {
@@ -1592,8 +1584,8 @@ public class ProfilerServer extends Thread implements CommonConstants {
                                                                      System.getProperty("os.name"), // NOI18N
                                                                      Runtime.getRuntime().maxMemory(),
                                                                      System.currentTimeMillis(), Timers.getCurrentTimeInCounts(),
-                                                                     getAgentId() // NOI18N
-                ); // NOI18N
+                                                                     getAgentId()
+                );
                 sendComplexResponseToClient(resp);
 
                 break;
@@ -1682,7 +1674,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
     }
 
     private void handleIOExceptionOnSend(IOException ex) {
-        System.err.println(MessageFormat.format(RESPONSE_EXCEPTION_MSG, new Object[] { ex })); // NOI18N
+        System.err.println(MessageFormat.format(RESPONSE_EXCEPTION_MSG, new Object[] { ex }));
         ex.printStackTrace(System.err);
         closeConnection();
     }
@@ -1711,7 +1703,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 Object o = wireIO.receiveCommandOrResponse();
 
                 if (o == null) {
-                    System.err.println(CONNECTION_INTERRUPTED_MSG); // NOI18N
+                    System.err.println(CONNECTION_INTERRUPTED_MSG);
 
                     break; // end of connection
                 }
@@ -1724,7 +1716,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 }
             } catch (IOException ex) {
                 if (connectionOpen && !detachCommandReceived) { // It is not an asynchronous connection shutdown
-                    System.err.println(MessageFormat.format(COMMAND_EXCEPTION_MSG, new Object[] { ex })); // NOI18N
+                    System.err.println(MessageFormat.format(COMMAND_EXCEPTION_MSG, new Object[] { ex }));
                 }
 
                 break;
@@ -1738,7 +1730,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         try {
             getInfoFile(serverPort).delete();
         } catch (IOException e) {
-            System.err.println(MessageFormat.format(AGENT_ERROR_MSG, new Object[] { e.getMessage() })); // NOI18N
+            System.err.println(MessageFormat.format(AGENT_ERROR_MSG, new Object[] { e.getMessage() }));
         }
     }
 

@@ -258,9 +258,7 @@ public class WireIO {
 
                         break;
                     default:
-                        throw new IOException("JFluid wire protocol error: received unknown response type. Value: "
-                                              + respType // NOI18N
-                                              );
+                        throw new IOException("JFluid wire protocol error: received unknown response type. Value: " + respType); // NOI18N
                 }
 
                 resp.setYes(in.readBoolean());
@@ -284,9 +282,7 @@ public class WireIO {
                     System.out.println("WireIO.DEBUG: received unknown code: " + code); // NOI18N
                 }
 
-                throw new IOException("JFluid wire protocol error: code does not correspond to command or response. Value "
-                                      + code // NOI18N
-                                      );
+                throw new IOException("JFluid wire protocol error: code does not correspond to command or response. Value " + code); // NOI18N
         }
     }
 
