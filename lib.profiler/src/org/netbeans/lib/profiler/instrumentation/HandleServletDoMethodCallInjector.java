@@ -43,7 +43,7 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
-import org.netbeans.lib.profiler.classfile.ClassInfo;
+import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 
 
 /**
@@ -65,7 +65,7 @@ class HandleServletDoMethodCallInjector extends SpecialCallInjector {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    HandleServletDoMethodCallInjector(ClassInfo clazz, int baseCPoolCount, int methodIdx) {
+    HandleServletDoMethodCallInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx) {
         super(clazz, baseCPoolCount, methodIdx);
         targetMethodIdx = CPExtensionsRepository.miContents_HandleServletDoMethodIdx + baseCPoolCount;
         initializeInjectedCode();
