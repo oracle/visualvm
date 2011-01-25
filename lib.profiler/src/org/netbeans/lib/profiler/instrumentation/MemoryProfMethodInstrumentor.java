@@ -153,8 +153,8 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
         storeClassFileBytesForCustomLoaderClasses(loadedClasses, loadedClassLoaderIds, cachedClassFileBytes);
 
         for (int i = 0; i < loadedClasses.length; i++) {
-            if (loadedClasses[i].equals("java.lang.Object")) {
-                continue; // NOI18N
+            if (loadedClasses[i].equals("java.lang.Object")) { // NOI18N
+                continue;
             }
 
             findAndMarkMethodsToInstrumentInClass(loadedClasses[i], loadedClassLoaderIds[i]);

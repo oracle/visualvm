@@ -185,8 +185,7 @@ public class PlainFormattableMethodName implements Formattable {
                         returnType = returnType.substring(curPos, returnType.length() - 1); //strip "L" at the beginning
                                                                                             // and ";" at end
 
-                        if (returnType.startsWith("java/lang/") && (returnType.indexOf('/', 10) == -1)) {
-                            // NOI18N
+                        if (returnType.startsWith("java/lang/") && (returnType.indexOf('/', 10) == -1)) { // NOI18N
                             returnType = returnType.substring(10);
                         }
 
@@ -243,8 +242,7 @@ public class PlainFormattableMethodName implements Formattable {
 
                             String typeName = paramsString.substring(startPos, curPos); //strip "L" at the beginning and ";" at end
 
-                            if (typeName.startsWith("java/lang/") && (typeName.indexOf('/', 10) == -1)) {
-                                // NOI18N
+                            if (typeName.startsWith("java/lang/") && (typeName.indexOf('/', 10) == -1)) { // NOI18N
                                 typeName = typeName.substring(10); // NOI18N
                             }
 

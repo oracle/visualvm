@@ -190,8 +190,8 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 findAndMarkOverridingMethodsReachable(superClass, addedClassInfo);
             }
 
-            if (superClassName != "java/lang/Object") {
-                addToSubclassList(superClass, addedClassInfo); // NOI18N
+            if (superClassName != "java/lang/Object") { // NOI18N
+                addToSubclassList(superClass, addedClassInfo);
             }
         }
 
