@@ -104,9 +104,9 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
             String[] methods = status.getInstrMethodNames();
             String[] signatures = status.getInstrMethodSignatures();
 
-            return formatter.formatMethodName((classes != null) ? classes[methodId] : null,
-                                              (methods != null) ? methods[methodId] : null,
-                                              (signatures != null) ? signatures[methodId] : null).toFormatted();
+            return formatter.formatMethodName((classes != null && classes.length > methodId) ? classes[methodId] : null,
+                                              (methods != null && methods.length > methodId) ? methods[methodId] : null,
+                                              (signatures != null && signatures.length > methodId) ? signatures[methodId] : null).toFormatted();
         } finally {
             status.endTrans();
         }
