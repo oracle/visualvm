@@ -148,8 +148,8 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
         }
 
         // So that class loading is measured correctly from the beginning
-        checkAndScanMethod(javaClassForName("java/lang/ClassLoader", 0), "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;",
-                           true, false, true); // NOI18N
+        checkAndScanMethod(javaClassForName("java/lang/ClassLoader", 0), "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;", // NOI18N
+                           true, false, true);
 
         return createInstrumentedMethodPack();
     }
