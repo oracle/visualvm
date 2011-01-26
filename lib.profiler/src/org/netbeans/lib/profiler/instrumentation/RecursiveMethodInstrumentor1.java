@@ -148,7 +148,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             }
         }
 
-        locateAndMarkMethodReachable(javaClassForName("java/lang/ClassLoader", 0), "loadClass",
+        locateAndMarkMethodReachable(javaClassForName("java/lang/ClassLoader", 0), "loadClass",   // NOI18N
                                      "(Ljava/lang/String;)Ljava/lang/Class;", true, false, true); // NOI18N
 
         return createInstrumentedMethodPack();
