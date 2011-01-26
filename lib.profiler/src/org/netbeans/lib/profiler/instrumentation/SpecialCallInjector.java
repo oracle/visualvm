@@ -43,7 +43,7 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
-import org.netbeans.lib.profiler.classfile.ClassInfo;
+import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.CommonConstants;
 
 
@@ -63,7 +63,7 @@ abstract class SpecialCallInjector extends Injector implements CommonConstants {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    SpecialCallInjector(ClassInfo clazz, int baseCPoolCount, int methodIdx) {
+    SpecialCallInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx) {
         super(clazz, methodIdx);
         this.baseCPoolCount = baseCPoolCount;
     }

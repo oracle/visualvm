@@ -102,17 +102,17 @@ public class MiscUtils implements CommonConstants {
         boolean local = false;
 
         // If the name is in the local form, convert it into an absolute form
-        if (fileName.startsWith(".")) {
-            local = true; // NOI18N
+        if (fileName.startsWith(".")) { // NOI18N
+            local = true;
         } else {
             if (Platform.isWindows()) {
-                if (!((fileName.charAt(0) == '\\') || (fileName.charAt(0) == '/')
-                        || ((fileName.length() > 1) && (fileName.charAt(1) == ':')))) {
-                    local = true; // NOI18N
+                if (!((fileName.charAt(0) == '\\') || (fileName.charAt(0) == '/') // NOI18N
+                        || ((fileName.length() > 1) && (fileName.charAt(1) == ':')))) { // NOI18N
+                    local = true;
                 }
             } else {
-                if (!((fileName.charAt(0) == '/') || (fileName.charAt(0) == '~'))) {
-                    local = true; // NOI18N
+                if (!((fileName.charAt(0) == '/') || (fileName.charAt(0) == '~'))) { // NOI18N
+                    local = true;
                 }
             }
         }

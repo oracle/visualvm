@@ -237,8 +237,8 @@ public class ClassFileParser implements JavaClassConstants {
 
                             int count = nonMemberClassCount + 1;
 
-                            if (!nestedClassFullName.equals(classInfo.name + "$" + count + "$" + nestedClassSimpleName)) {
-                                continue; // NOI18N
+                            if (!nestedClassFullName.equals(classInfo.name + "$" + count + "$" + nestedClassSimpleName)) { // NOI18N
+                                continue;
                             } else {
                                 nonMemberClassCount = count;
                             }
@@ -246,8 +246,8 @@ public class ClassFileParser implements JavaClassConstants {
                     } else {
                         nonMemberClassCount++;
 
-                        if (!nestedClassFullName.equals(classInfo.name + "$" + nonMemberClassCount)) {
-                            continue; // NOI18N
+                        if (!nestedClassFullName.equals(classInfo.name + "$" + nonMemberClassCount)) { // NOI18N
+                            continue;
                         }
                     }
 

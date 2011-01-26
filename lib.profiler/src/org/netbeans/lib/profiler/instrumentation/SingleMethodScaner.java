@@ -106,8 +106,8 @@ public class SingleMethodScaner implements JavaClassConstants {
             ret = opc_length[opcode];
         } catch (ArrayIndexOutOfBoundsException ex) {
             System.err.println("*** JFluid warning: unknown opcode: " + opcode + " detected at offset " + bci // NOI18N
-                               + "in class/method " + clazz.getName() + "." + clazz.getMethodName(methodIdx)
-                               + clazz.getMethodSignature(methodIdx)); // NOI18N
+                               + "in class/method " + clazz.getName() + "." + clazz.getMethodName(methodIdx) // NOI18N
+                               + clazz.getMethodSignature(methodIdx));
 
             ClassRewriter.saveToDisk(clazz.getName(), bytecodes);
 

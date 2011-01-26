@@ -97,7 +97,7 @@ public class ProfilerClient implements CommonConstants {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void run() {
-            setName(PROFILER_SEPARATE_EXEC_THREAD_NAME); // NOI18N
+            setName(PROFILER_SEPARATE_EXEC_THREAD_NAME);
 
             synchronized (execInSeparateThreadLock) {
                 while (true) {
@@ -447,8 +447,7 @@ public class ProfilerClient implements CommonConstants {
         checkForTargetVMAlive();
         sendSimpleCmdToServer(Command.GET_OBJECT_ALLOCATION_RESULTS);
 
-        ObjectAllocationResultsResponse resp = (ObjectAllocationResultsResponse) getAndCheckLastResponse("Unknown problem when trying to get allocated object count results." // NOI18N
-        ); // NOI18N
+        ObjectAllocationResultsResponse resp = (ObjectAllocationResultsResponse) getAndCheckLastResponse("Unknown problem when trying to get allocated object count results."); // NOI18N
 
         return resp.getResults();
     }
@@ -514,8 +513,7 @@ public class ProfilerClient implements CommonConstants {
         checkForTargetVMAlive();
         sendSimpleCmdToServer(Command.GET_CODE_REGION_CPU_RESULTS);
 
-        CodeRegionCPUResultsResponse resp = (CodeRegionCPUResultsResponse) getAndCheckLastResponse("Unknown problem when trying to get code region CPU results." // NOI18N
-        ); // NOI18N
+        CodeRegionCPUResultsResponse resp = (CodeRegionCPUResultsResponse) getAndCheckLastResponse("Unknown problem when trying to get code region CPU results."); // NOI18N
 
         return new CodeRegionResultsSnapshot(resultsStart, System.currentTimeMillis(), resp.getResults(),
                                              status.timerCountsInSecond[0]);
@@ -542,8 +540,7 @@ public class ProfilerClient implements CommonConstants {
             checkForTargetVMAlive();
             sendSimpleCmdToServer(Command.GET_THREAD_LIVENESS_STATUS);
 
-            ThreadLivenessStatusResponse resp = (ThreadLivenessStatusResponse) getAndCheckLastResponse("Unknown problem when trying to get thread liveness information." // NOI18N
-            ); // NOI18N
+            ThreadLivenessStatusResponse resp = (ThreadLivenessStatusResponse) getAndCheckLastResponse("Unknown problem when trying to get thread liveness information."); // NOI18N
 
             return resp.getStatus();
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {
@@ -566,8 +563,7 @@ public class ProfilerClient implements CommonConstants {
         GetDefiningClassLoaderCommand cmd = new GetDefiningClassLoaderCommand(className, initiatingLoaderId);
         sendComplexCmdToServer(cmd);
 
-        DefiningLoaderResponse resp = (DefiningLoaderResponse) getAndCheckLastResponse("Unknown problem when trying to get a defining loader for class" // NOI18N
-        ); // NOI18N
+        DefiningLoaderResponse resp = (DefiningLoaderResponse) getAndCheckLastResponse("Unknown problem when trying to get a defining loader for class"); // NOI18N
 
         return resp.getLoaderId();
     }
@@ -662,8 +658,7 @@ public class ProfilerClient implements CommonConstants {
         GetMethodNamesForJMethodIdsCommand cmd = new GetMethodNamesForJMethodIdsCommand(methodIds);
         sendComplexCmdToServer(cmd);
 
-        MethodNamesResponse resp = (MethodNamesResponse) getAndCheckLastResponse("Unknown problem when trying to get method names for jmethodIds" // NOI18N
-        ); // NOI18N
+        MethodNamesResponse resp = (MethodNamesResponse) getAndCheckLastResponse("Unknown problem when trying to get method names for jmethodIds"); // NOI18N
 
         return StringUtils.convertPackedStringsIntoStringArrays(resp.getPackedData(), resp.getPackedArrayOffsets(), 3);
     }
@@ -723,8 +718,7 @@ public class ProfilerClient implements CommonConstants {
         checkForTargetVMAlive();
         sendSimpleCmdToServer(Command.CPU_RESULTS_EXIST);
 
-        Response resp = getAndCheckLastResponse("Unknown problem when trying to check for CPU profiling results." // NOI18N
-        ); // NOI18N
+        Response resp = getAndCheckLastResponse("Unknown problem when trying to check for CPU profiling results."); // NOI18N
 
         return resp.yes();
     }
@@ -846,7 +840,7 @@ public class ProfilerClient implements CommonConstants {
                 forceObtainedResultsDumpCalled = true;
                 sendSimpleCmdToServer(liveResults ? Command.DUMP_EXISTING_RESULTS_LIVE : Command.DUMP_EXISTING_RESULTS);
 
-                DumpResultsResponse resp = (DumpResultsResponse) getLastResponse(); // NOI18N
+                DumpResultsResponse resp = (DumpResultsResponse) getLastResponse();
 
                 if (resp.yes()) {
                     status.dumpAbsTimeStamp = resp.getDumpAbsTimeStamp();
@@ -1310,7 +1304,7 @@ public class ProfilerClient implements CommonConstants {
         if (!resp.isOK()) {
             MiscUtils.printErrorMessage("error in getAndCheckLastResponse: for " + resp + " got error message: " // NOI18N
                                         + resp.getErrorMessage() + " and context message " + errMessage // NOI18N
-                                        ); // NOI18N
+                                        );
         }
 
         return resp;
@@ -1677,8 +1671,8 @@ public class ProfilerClient implements CommonConstants {
                 Response aResponse = getLastResponse();
 
                 if (!(aResponse instanceof VMPropertiesResponse)) {
-                    System.err.println("SEVERE: Received " + aResponse.getClass().getName() + "(" + aResponse.toString()
-                                       + ") instead of VMPropertiesResponse");
+                    System.err.println("SEVERE: Received " + aResponse.getClass().getName() + "(" + aResponse.toString() // NOI18N
+                                       + ") instead of VMPropertiesResponse"); // NOI18N
                 }
 
                 if (!setVMProperties((VMPropertiesResponse) aResponse, terminateOnError)) {
@@ -1693,7 +1687,7 @@ public class ProfilerClient implements CommonConstants {
             // real data.
             error = sendCommandAndGetResponse(new InitiateInstrumentationCommand(INSTR_RECURSIVE_FULL,
                                                                                  "*FAKE_CLASS_FOR_INTERNAL_TEST*") // NOI18N
-            ); // NOI18N
+            );
 
             if (error != null) {
                 MiscUtils.printErrorMessage("got error message from agent:" + error); // NOI18N

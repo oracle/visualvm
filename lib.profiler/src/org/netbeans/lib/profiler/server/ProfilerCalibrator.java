@@ -164,12 +164,12 @@ class ProfilerCalibrator extends ProfilerRuntime {
         if (!inDevelMode) {
             if (!CalibrationDataFileIO.saveCalibrationData(status)) {
                 System.err.println(MessageFormat.format(CANNOT_SAVE_CALIBRATION_DATA_MSG,
-                                                        new Object[] { CalibrationDataFileIO.getErrorMessage() })); // NOI18N
+                                                        new Object[] { CalibrationDataFileIO.getErrorMessage() }));
                 System.exit(-1);
             }
 
-            System.out.println(CALIBRATION_SUCCESS_MSG); // NOI18N
-            System.out.println(CALIBRATION_RESULTS_PREFIX); // NOI18N
+            System.out.println(CALIBRATION_SUCCESS_MSG);
+            System.out.println(CALIBRATION_RESULTS_PREFIX);
 
             NumberFormat nf = NumberFormat.getInstance();
             nf.setMaximumFractionDigits(4);
@@ -418,9 +418,9 @@ class ProfilerCalibrator extends ProfilerRuntime {
 
             printResults(MessageFormat.format(MINIMUM_TIME_MSG,
                                               new Object[] {
-                                                  "" + minTimePerMethodEntryExitCallInCounts,
-                                                  "" + minTimePerMethodEntryExitCallInMCS
-                                              })); // NOI18N
+                                                  "" + minTimePerMethodEntryExitCallInCounts, // NOI18N
+                                                  "" + minTimePerMethodEntryExitCallInMCS // NOI18N
+                                              }));
         }
 
         // Now calculate the ratio of time spent in the inner part of methodEntry-methodExit pair to the time
@@ -534,9 +534,9 @@ class ProfilerCalibrator extends ProfilerRuntime {
 
     private static void measureTimerCall(boolean absolute) {
         if (absolute) {
-            printResults(TIME_getCurrentTimeInCounts_MSG); // NOI18N
+            printResults(TIME_getCurrentTimeInCounts_MSG);
         } else {
-            printResults(TIME_getThreadCPUTimeInNanos_MSG); // NOI18N
+            printResults(TIME_getThreadCPUTimeInNanos_MSG);
         }
 
         int noOfInnerIterations = 1000;
