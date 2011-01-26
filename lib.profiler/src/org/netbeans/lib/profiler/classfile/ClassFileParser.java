@@ -386,7 +386,7 @@ public class ClassFileParser implements JavaClassConstants {
         superClassIdx = nextChar();
 
         if (cpTags[superClassIdx] != CONSTANT_Class) {
-            if ((superClassIdx == 0) && classInfo.name.equals("java/lang/Object")) {
+            if ((superClassIdx == 0) && classInfo.name.equals("java/lang/Object")) {  // NOI18N
                 classInfo.superName = "java/lang/Object"; // NOI18N
             } else {
                 throw classFileReadException("Bad reference to super class name"); // NOI18N
