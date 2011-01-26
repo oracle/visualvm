@@ -237,8 +237,8 @@ public class ClassFileParser implements JavaClassConstants {
 
                             int count = nonMemberClassCount + 1;
 
-                            if (!nestedClassFullName.equals(classInfo.name + "$" + count + "$" + nestedClassSimpleName)) {
-                                continue; // NOI18N
+                            if (!nestedClassFullName.equals(classInfo.name + "$" + count + "$" + nestedClassSimpleName)) { // NOI18N
+                                continue;
                             } else {
                                 nonMemberClassCount = count;
                             }
@@ -246,8 +246,8 @@ public class ClassFileParser implements JavaClassConstants {
                     } else {
                         nonMemberClassCount++;
 
-                        if (!nestedClassFullName.equals(classInfo.name + "$" + nonMemberClassCount)) {
-                            continue; // NOI18N
+                        if (!nestedClassFullName.equals(classInfo.name + "$" + nonMemberClassCount)) { // NOI18N
+                            continue;
                         }
                     }
 
@@ -386,7 +386,7 @@ public class ClassFileParser implements JavaClassConstants {
         superClassIdx = nextChar();
 
         if (cpTags[superClassIdx] != CONSTANT_Class) {
-            if ((superClassIdx == 0) && classInfo.name.equals("java/lang/Object")) {
+            if ((superClassIdx == 0) && classInfo.name.equals("java/lang/Object")) {  // NOI18N
                 classInfo.superName = "java/lang/Object"; // NOI18N
             } else {
                 throw classFileReadException("Bad reference to super class name"); // NOI18N

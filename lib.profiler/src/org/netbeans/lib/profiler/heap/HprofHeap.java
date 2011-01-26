@@ -830,13 +830,13 @@ class HprofHeap implements Heap {
 
                     int dataSize = 0;
 
-                    System.out.println("Obj ID " + objId + " Stack serial " + stackSerial + " Elements " + elements
+                    System.out.println("Obj ID " + objId + " Stack serial " + stackSerial + " Elements " + elements // NOI18N
                                            + " Type " + classId); // NOI18N
 
                     for (int i = 0; i < elements; i++) {
                         dataSize += dumpBuffer.getIDSize();
-                        System.out.println("Instance ID " + dumpBuffer.getID(position));
-                        position += idSize; // NOI18N
+                        System.out.println("Instance ID " + dumpBuffer.getID(position)); // NOI18N
+                        position += idSize;
                     }
                 } else {
                     elements = dumpBuffer.getInt(position + idSize + 4);
@@ -863,8 +863,7 @@ class HprofHeap implements Heap {
                     type = dumpBuffer.get(position++);
 
                     int dataSize = 0;
-                    System.out.println("Obj ID " + objId + " Stack serial " + stackSerial + " Elements " + elements + " Type "
-                                       + type); // NOI18N
+                    System.out.println("Obj ID " + objId + " Stack serial " + stackSerial + " Elements " + elements + " Type " + type); // NOI18N
 
                     for (int i = 0; i < elements; i++) {
                         dataSize += getValueSize(type);

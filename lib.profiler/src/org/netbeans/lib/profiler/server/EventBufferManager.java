@@ -155,8 +155,7 @@ public class EventBufferManager implements CommonConstants {
                 try {
                     Runtime.getRuntime().exec(new String[] { "chmod", "666", bufFileName }); // NOI18N
                 } catch (Exception e) {
-                    System.err.println("*** JFluid Warning: Failed to set access permissions on temporary buffer file, you may not be able to attach as a different user: "
-                                       + e.getMessage()); // NOI18N
+                    System.err.println("*** JFluid Warning: Failed to set access permissions on temporary buffer file, you may not be able to attach as a different user: " + e.getMessage()); // NOI18N
                 }
             }
 

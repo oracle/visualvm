@@ -375,8 +375,7 @@ public abstract class ClassRepository implements CommonConstants {
 
         if (!className.equals(expectedClassName)) {
             throw new ClassNotFoundException("Mismatch between name in .class file and location for " + fileName // NOI18N
-                                             + "\nYour class path setting may be incorrect." // NOI18N
-                                             ); // NOI18N
+                                             + "\nYour class path setting may be incorrect."); // NOI18N
         }
 
         return clazz;

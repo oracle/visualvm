@@ -418,8 +418,8 @@ public class DynamicClassInfo extends ClassInfo {
 
     public void addSubclass(DynamicClassInfo subclass) {
         if (subclasses == null) {
-            if (name == "java/lang/Object") {
-                subclasses = new ArrayList(500); // NOI18N
+            if (name == "java/lang/Object") {  // NOI18N
+                subclasses = new ArrayList(500);
             } else {
                 subclasses = new ArrayList();
             }
@@ -474,8 +474,8 @@ public class DynamicClassInfo extends ClassInfo {
 
         DynamicClassInfo superClass = getSuperClass();
 
-        if ((superClass == null) || (superClass.getName() == "java/lang/Object")) {
-            return false; // NOI18N
+        if ((superClass == null) || (superClass.getName() == "java/lang/Object")) {  // NOI18N
+            return false;
         }
 
         return superClass.implementsInterface(intfName);

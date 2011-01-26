@@ -43,8 +43,7 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
-import org.netbeans.lib.profiler.classfile.ClassInfo;
-import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 
 
 /**
@@ -56,7 +55,7 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 class HandleReflectInvokeCallInjector extends SpecialCallInjector {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    HandleReflectInvokeCallInjector(ClassInfo clazz, int baseCPoolCount, int methodIdx) {
+    HandleReflectInvokeCallInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx) {
         super(clazz, baseCPoolCount, methodIdx);
         targetMethodIdx = CPExtensionsRepository.miContents_HandleReflectInvokeMethodIdx + baseCPoolCount;
         initializeInjectedCode();

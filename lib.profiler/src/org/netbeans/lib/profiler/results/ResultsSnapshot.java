@@ -63,8 +63,7 @@ public class ResultsSnapshot {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    //  protected static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.results.ResultsSnapshot")
-    //                                         != null; // NOI18N // TODO [release] set tp TRUE at release
+    //  protected static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.results.ResultsSnapshot") != null; // NOI18N // TODO [release] set to TRUE at release
     protected long beginTime;
     protected long timeTaken;
 

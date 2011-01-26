@@ -695,8 +695,8 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         // initializers, we may well get a constructor as the "best match" for the given line. Thus, we first
         // search normal methods, and only if this fails - constructors and class initializer.
         for (int i = 0; i < nMethods; i++) {
-            if ((methodNames[i] == "<init>") || (methodNames[i] == "<clinit>")) {
-                continue; // NOI18N
+            if ((methodNames[i] == "<init>") || (methodNames[i] == "<clinit>")) { // NOI18N
+                continue;
             }
 
             int bestBCI = lineNumberTables.bciForLineNo(i, lineNo);
@@ -708,8 +708,8 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
         // No success with ordinary methods - try constructors now
         for (int i = 0; i < nMethods; i++) {
-            if ((methodNames[i] != "<init>") && (methodNames[i] != "<clinit>")) {
-                continue; // NOI18N
+            if ((methodNames[i] != "<init>") && (methodNames[i] != "<clinit>")) { // NOI18N
+                continue;
             }
 
             int bestBCI = lineNumberTables.bciForLineNo(i, lineNo);

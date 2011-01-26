@@ -309,7 +309,7 @@ public class Platform implements CommonConstants {
      */
     public static int getJDKVersionNumber() {
         if (jdkVersion == 0) {
-            jdkVersion = getJDKVersionNumber(getJavaVersionString()); // NOI18N
+            jdkVersion = getJDKVersionNumber(getJavaVersionString());
         }
         return jdkVersion;
     }
