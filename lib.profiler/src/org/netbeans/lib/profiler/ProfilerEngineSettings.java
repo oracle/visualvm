@@ -427,8 +427,8 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
         try {
             setMainClassPath(vmClassPaths[0]);
         } catch (Exception ex) {
-            throw new InternalError("Should not happen");
-        } // NOI18N
+            throw new InternalError("Should not happen"); // NOI18N
+        }
     }
 
     public String[] getVMClassPaths() {
@@ -441,10 +441,10 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
     public void setWorkingDir(String name) {
         workingDir = name;
 
-        if ((workingDir == null) || "".equals(workingDir)) {
-            workingDir = System.getProperty("user.dir");
+        if ((workingDir == null) || "".equals(workingDir)) { // NOI18N
+            workingDir = System.getProperty("user.dir"); // NOI18N
         }
-    } // NOI18N
+    }
 
     public String getWorkingDir() {
         return workingDir;

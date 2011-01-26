@@ -735,35 +735,29 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             //System.err.println("*** Adjusted rootGrossTimeAbs = " + rootGrossTimeAbs); // NOI18N
         }
 
-        //System.err.println("*** rootGrossTimeAbs in ms = "
-        // + ((double) rootGrossTimeAbs) * 1000 / status.timerCountsInSecond[0]); // NOI18N
+        //System.err.println("*** rootGrossTimeAbs in ms = " + ((double) rootGrossTimeAbs) * 1000 / status.timerCountsInSecond[0]); // NOI18N
         long rootGrossTimeCPU = ti.rootGrossTimeThreadCPU;
 
-        //System.err.println("*** ti.rootGrossTimeThreadCPU = "
-        // + ti.rootGrossTimeThreadCPU + ", totalNInv = " + ti.totalNInv); // NOI18N
+        //System.err.println("*** ti.rootGrossTimeThreadCPU = " + ti.rootGrossTimeThreadCPU + ", totalNInv = " + ti.totalNInv); // NOI18N
         if (ti.stackTopIdx != -1) {
             if (isCollectingTwoTimeStamps()) {
                 rootGrossTimeCPU += (ti.topMethodEntryTime1 - ti.rootMethodEntryTimeThreadCPU);
 
-                //System.err.println("*** ti.topMethodEntryTime1 = " + ti.topMethodEntryTime1
-                // + ", ti.rootMethodEntryTimeThreadCPU = " + ti.rootMethodEntryTimeThreadCPU);
-                //System.err.println("*** adjustment for CPU time = "
-                // + (ti.topMethodEntryTime1 - ti.rootMethodEntryTimeThreadCPU)); // NOI18N
+                //System.err.println("*** ti.topMethodEntryTime1 = " + ti.topMethodEntryTime1 + ", ti.rootMethodEntryTimeThreadCPU = " + ti.rootMethodEntryTimeThreadCPU);
+                //System.err.println("*** adjustment for CPU time = " + (ti.topMethodEntryTime1 - ti.rootMethodEntryTimeThreadCPU)); // NOI18N
             } else {
                 rootGrossTimeCPU = -1;
             }
         }
 
-        //System.err.println("*** Adjusted rootGrossTimeCPU = " + rootGrossTimeCPU + ", in ms = "
-        // + ((double) rootGrossTimeCPU) * 1000 / status.timerCountsInSecond[1]); // NOI18N
+        //System.err.println("*** Adjusted rootGrossTimeCPU = " + rootGrossTimeCPU + ", in ms = " + ((double) rootGrossTimeCPU) * 1000 / status.timerCountsInSecond[1]); // NOI18N
         int nRootInv = rootNode.getNCalls();
         double timeInInjectedCodeInAbsCounts;
         double timeInInjectedCodeInThreadCPUCounts = 0;
         // Calculate timeInInjectedCodeInAbsCounts.
         timeInInjectedCodeInAbsCounts = timingAdjuster.delta(nRootInv, (int) (ti.totalNInv - nRootInv), false);
 
-        //System.err.println("*** timeInInjectedCodeInAbsCounts = " + timeInInjectedCodeInAbsCounts + ", in ms = "
-        // + ((double) timeInInjectedCodeInAbsCounts) * 1000 / status.timerCountsInSecond[0]); // NOI18N
+        //System.err.println("*** timeInInjectedCodeInAbsCounts = " + timeInInjectedCodeInAbsCounts + ", in ms = " + ((double) timeInInjectedCodeInAbsCounts) * 1000 / status.timerCountsInSecond[0]); // NOI18N
 
         // Now calculate timeInInjectedCodeInThreadCPUCounts
         if (isCollectingTwoTimeStamps()) {
