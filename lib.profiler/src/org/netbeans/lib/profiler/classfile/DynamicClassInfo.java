@@ -419,7 +419,7 @@ public class DynamicClassInfo extends ClassInfo {
     public void addSubclass(DynamicClassInfo subclass) {
         if (subclasses == null) {
             if (name == "java/lang/Object") {  // NOI18N
-                subclasses = new ArrayList(500); // NOI18N
+                subclasses = new ArrayList(500);
             } else {
                 subclasses = new ArrayList();
             }

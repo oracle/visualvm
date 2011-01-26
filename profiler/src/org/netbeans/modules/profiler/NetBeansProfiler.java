@@ -881,7 +881,7 @@ public final class NetBeansProfiler extends Profiler {
                         boolean success = false;
 
                         try {
-                            loadAgentIntTargetJVM(jar, options, pid);
+                            loadAgentIntoTargetJVM(jar, options, pid);
 
                             if (prepareInstrumentation(profilingSettings)) {
                                 success = targetAppRunner.initiateSession(2, false) && targetAppRunner.attachToTargetVM();
@@ -925,7 +925,7 @@ public final class NetBeansProfiler extends Profiler {
                     }
                 }
 
-                private void loadAgentIntTargetJVM(final String jar, final String options, final String pid)
+                private void loadAgentIntoTargetJVM(final String jar, final String options, final String pid)
                                             throws AttachNotSupportedException, IOException, AgentLoadException, AgentInitializationException  {
                     VirtualMachine virtualMachine = VirtualMachine.attach(pid);
                     virtualMachine.loadAgent(jar,options);

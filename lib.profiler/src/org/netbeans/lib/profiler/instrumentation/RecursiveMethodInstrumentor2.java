@@ -379,8 +379,8 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
                 clazz.setMethodReachable(idx);
 
                 if (!clazz.isMethodStatic(idx) && !clazz.isMethodPrivate(idx) && !clazz.isMethodFinal(idx)
-                        && (methodName != "<init>")) {
-                    clazz.setMethodVirtual(idx); // NOI18N
+                        && (methodName != "<init>")) { //NOI18N
+                    clazz.setMethodVirtual(idx);
                 }
 
                 if (clazz.isMethodNative(idx) || clazz.isMethodAbstract(idx)

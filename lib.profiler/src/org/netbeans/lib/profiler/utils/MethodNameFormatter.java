@@ -103,7 +103,7 @@ public class MethodNameFormatter {
         if (cname != null) {
             this.className = cname.replace('/', '.'); // NOI18N
         } else {
-            // can be null in case formatter is only interested in method formatting // NOI18N
+            // can be null in case formatter is only interested in method formatting
             this.className = "<unknown class>"; // NOI18N
         }
 
@@ -218,7 +218,7 @@ public class MethodNameFormatter {
                             String typeName = paramsString.substring(startPos, curPos); //strip "L" at the beginning and ";" at end
 
                             if (typeName.startsWith("java/lang/") && (typeName.indexOf('/', 10) == -1)) { // NOI18N
-                                typeName = typeName.substring(10); // NOI18N
+                                typeName = typeName.substring(10);
                             }
 
                             typeName = typeName.replace('$', '.'); // NOI18N

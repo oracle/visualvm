@@ -46,7 +46,8 @@ package org.netbeans.lib.profiler.instrumentation;
 import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import java.util.Stack;
-import org.netbeans.lib.profiler.classfile.ClassInfo.LocalVariableTables;
+import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
+import org.netbeans.lib.profiler.global.CommonConstants;
 
 
 /**
@@ -166,7 +167,7 @@ public abstract class Injector extends SingleMethodScaner {
      * Creates a new Injector for the specified method. Subsequently one can call injectCodeAndRewrite() and other
      * methods below as many times as needed.
      */
-    protected Injector(ClassInfo clazz, int methodIdx) {
+    protected Injector(DynamicClassInfo clazz, int methodIdx) {
         super(clazz, methodIdx);
         origBytecodesLength = bytecodesLength;
         maxStack = getU2(origMethodInfo, bytecodesStartIdx - 8);

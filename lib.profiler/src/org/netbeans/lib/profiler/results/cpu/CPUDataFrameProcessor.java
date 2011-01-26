@@ -299,9 +299,10 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                         break;
                     }
                     default: {
-                        LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CPUDataFrameProcessor: {0} at {1}", new Object[]{(int) eventType, position});
+                        LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CPUDataFrameProcessor: {0} at {1}", // NOI18N
+                                                new Object[]{(int) eventType, position});
 
-                        break; // NOI18N
+                        break;
                     }
                 }
             } else {
@@ -372,9 +373,10 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                         break;
                     }
                     default: {
-                        LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CallGraphBuilder: {0} at {1}", new Object[]{(int) eventType, position});
+                        LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CallGraphBuilder: {0} at {1}", // NOI18N
+                                                  new Object[]{(int) eventType, position});
 
-                        break; // NOI18N
+                        break;
                     }
                 }
             }

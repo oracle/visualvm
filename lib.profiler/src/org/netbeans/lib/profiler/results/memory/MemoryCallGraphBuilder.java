@@ -631,9 +631,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
      */
     private RuntimeMemoryCCTNode processStackTrace(char classId, int[] methodIds, boolean live) {
         if (classId >= stacksForClasses.length) {
-            ProfilerLogger.severe("Received stack for non existent class Id: " + (int) classId + ", current length: "
-                                  + stacksForClasses.length // NOI18N
-            );
+            ProfilerLogger.severe("Received stack for non existent class Id: " + (int) classId + ", current length: " + stacksForClasses.length); // NOI18N
             updateNumberOfClasses();
             ProfilerLogger.severe("Received stack for non existent class Id: " + (int) classId
                                   + ", current length after updateNumberOfClasses: " // NOI18N

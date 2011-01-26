@@ -43,7 +43,7 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
-import org.netbeans.lib.profiler.classfile.ClassInfo;
+import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.CommonConstants;
 
@@ -61,7 +61,7 @@ class ProfilePointHitCallInjector extends Injector implements CommonConstants {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    ProfilePointHitCallInjector(ClassInfo clazz, int baseCPoolCount, int methodIdx, RuntimeProfilingPoint[] pps, int cPMethodIdx) {
+    ProfilePointHitCallInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx, RuntimeProfilingPoint[] pps, int cPMethodIdx) {
         super(clazz, methodIdx);
         profilePoints = pps;
         ppHitCPMethodIdx = cPMethodIdx;
