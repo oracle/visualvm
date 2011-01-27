@@ -127,8 +127,8 @@ public class InstrumentationFilter implements Cloneable {
         for (int i = 0; i < instrFilterStrings.length; i++) {
             instrFilterString = instrFilterStrings[i];
 
-            if (instrFilterString.endsWith("*")) {
-                instrFilterStrings[i] = instrFilterString.substring(0, instrFilterString.length() - 1); // NOI18N
+            if (instrFilterString.endsWith("*")) { // NOI18N
+                instrFilterStrings[i] = instrFilterString.substring(0, instrFilterString.length() - 1);
             }
         }
     }
@@ -155,17 +155,14 @@ public class InstrumentationFilter implements Cloneable {
 
         switch (instrFilterType) {
             case INSTR_FILTER_NONE:
-                filterStringsBuffer.append("  Filter type: None\n");
-
-                break; // NOI18N
+                filterStringsBuffer.append("  Filter type: None\n"); // NOI18N
+                break;
             case INSTR_FILTER_EXCLUSIVE:
-                filterStringsBuffer.append("  Filter type: Exclusive\n");
-
-                break; // NOI18N
+                filterStringsBuffer.append("  Filter type: Exclusive\n"); // NOI18N
+                break;
             case INSTR_FILTER_INCLUSIVE:
-                filterStringsBuffer.append("  Filter type: Inclusive\n");
-
-                break; // NOI18N
+                filterStringsBuffer.append("  Filter type: Inclusive\n"); // NOI18N
+                break;
         }
 
         filterStringsBuffer.append("  Filter value: "); // NOI18N
@@ -186,17 +183,14 @@ public class InstrumentationFilter implements Cloneable {
 
         switch (instrFilterType) {
             case INSTR_FILTER_NONE:
-                System.err.println("  Filter type: None");
-
-                break; // NOI18N
+                System.err.println("  Filter type: None"); // NOI18N
+                break;
             case INSTR_FILTER_EXCLUSIVE:
-                System.err.println("  Filter type: Exclusive");
-
-                break; // NOI18N
+                System.err.println("  Filter type: Exclusive"); // NOI18N
+                break;
             case INSTR_FILTER_INCLUSIVE:
-                System.err.println("  Filter type: Inclusive");
-
-                break; // NOI18N
+                System.err.println("  Filter type: Inclusive"); // NOI18N
+                break;
         }
 
         StringBuffer filterStringsBuffer = new StringBuffer();

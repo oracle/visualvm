@@ -662,9 +662,7 @@ public class TargetAppRunner implements CommonConstants {
 
     //-------------------------- Calibration-related routines ----------------------------------
     private boolean runJVMToCalibrateInstrumentation() {
-        boolean result = startTargetVM(new String[] {  }, CALIBRATION_PSEUDO_CLASS_NAME, new String[] {  }, ".",
-                                       settings.getSeparateConsole() // NOI18N
-        );
+        boolean result = startTargetVM(new String[] {  }, CALIBRATION_PSEUDO_CLASS_NAME, new String[] {  }, ".", settings.getSeparateConsole()); // NOI18N
 
         if (!result) {
             return false;
@@ -830,7 +828,7 @@ public class TargetAppRunner implements CommonConstants {
         try {
             runningAppProcess = Runtime.getRuntime().exec(cmdArray, null, dir);
         } catch (IOException ex) {
-            StringBuilder sb = new StringBuilder(); // NOI18N
+            StringBuilder sb = new StringBuilder();
 
             for (int i = 0; i < cmdArray.length; i++) {
                 sb.append(cmdArray[i]).append('\n'); // NOI18N

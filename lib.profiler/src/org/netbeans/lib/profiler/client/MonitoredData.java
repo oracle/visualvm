@@ -271,8 +271,8 @@ public class MonitoredData {
     /** Debugging support */
     private void print() {
         for (int i = 0; i < nThreads; i++) {
-            System.err.print("id = ");
-            System.err.print(threadIds[i]); // NOI18N
+            System.err.print("id = "); // NOI18N
+            System.err.print(threadIds[i]);
             System.err.print(", states = "); // NOI18N
 
             for (int j = 0; j < nThreadStates; j++) {
@@ -286,8 +286,8 @@ public class MonitoredData {
             System.err.println("New threads added: " + nNewThreads); // NOI18N
 
             for (int i = 0; i < nNewThreads; i++) {
-                System.err.println("  id = " + newThreadIds[i] + ", name = " + newThreadNames[i] + ", classname = "
-                                   + newThreadClassNames[i]); // NOI18N
+                System.err.println("  id = " + newThreadIds[i] + ", name = " + newThreadNames[i] + ", classname = " // NOI18N
+                                   + newThreadClassNames[i]);
             }
         }
 

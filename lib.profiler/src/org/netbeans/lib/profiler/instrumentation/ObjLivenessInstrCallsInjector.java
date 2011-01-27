@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.instrumentation;
 
 import org.netbeans.lib.profiler.classfile.BaseClassInfo;
-import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -78,7 +77,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public ObjLivenessInstrCallsInjector(ClassInfo clazz, int baseCPoolCount, int methodIdx,
+    public ObjLivenessInstrCallsInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx,
                                          boolean[] allUnprofiledClassStatusArray) {
         super(clazz, methodIdx);
         this.baseCPoolCount = baseCPoolCount;

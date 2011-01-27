@@ -74,8 +74,7 @@ public class MemoryDataFrameProcessor extends AbstractDataFrameProcessor {
                                 | (((int) buffer[curPos++]) & 0xFF);
 
                     if (LOGGER.isLoggable(Level.FINEST)) {
-                        LOGGER.finest("Allocation stack trace: classId=" + (int) classId + ", objSize=" + objSize + ", depth="
-                                      + depth); // NOI18N
+                        LOGGER.finest("Allocation stack trace: classId=" + (int) classId + ", objSize=" + objSize + ", depth=" + depth); // NOI18N
                     }
 
                     int[] methodIds = new int[depth];
@@ -108,7 +107,7 @@ public class MemoryDataFrameProcessor extends AbstractDataFrameProcessor {
                                 | (((int) buffer[curPos++]) & 0xFF);
 
                     if (LOGGER.isLoggable(Level.FINEST)) {
-                        LOGGER.finest("Liveness stack trace: classId=" + (int) classId + ", objectId=" + objectId + ", objEpoch="
+                        LOGGER.finest("Liveness stack trace: classId=" + (int) classId + ", objectId=" + objectId + ", objEpoch=" //NOI18N
                                       + objEpoch + ", objSize=" + objSize + ", depth=" + depth); // NOI18N
                     }
 
@@ -136,8 +135,7 @@ public class MemoryDataFrameProcessor extends AbstractDataFrameProcessor {
                                     | (((long) buffer[curPos++] & 0xFF) << 8) | ((long) buffer[curPos++] & 0xFF);
 
                     if (LOGGER.isLoggable(Level.FINEST)) {
-                        LOGGER.finest("GC Performed: classId=" + (int) classId + ", objectId=" + objectId + ", objEpoch="
-                                      + objEpoch); // NOI18N
+                        LOGGER.finest("GC Performed: classId=" + (int) classId + ", objectId=" + objectId + ", objEpoch=" + objEpoch); // NOI18N
                     }
 
                     fireGCPerformed(classId, objectId, objEpoch);
@@ -166,12 +164,12 @@ public class MemoryDataFrameProcessor extends AbstractDataFrameProcessor {
                     break;
                 }
                 default: {
-                    LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in MemoryDataFrameProcessor: "
-                                  + (int) eventType // NOI18N
+                    LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in MemoryDataFrameProcessor: " // NOI18N
+                                  + (int) eventType
                                   + " at " + curPos // NOI18N
                                   );
 
-                    break; // NOI18N
+                    break;
                 }
             }
         } while (curPos < bufSize);
