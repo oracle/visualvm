@@ -43,7 +43,7 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
-import org.netbeans.lib.profiler.classfile.ClassInfo;
+import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.CommonConstants;
 
 
@@ -72,7 +72,7 @@ class CodeRegionEntryExitCallsInjector extends Injector implements CommonConstan
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    CodeRegionEntryExitCallsInjector(ClassInfo clazz, int baseCPoolCount, int methodIdx, int bci0, int bci1) {
+    CodeRegionEntryExitCallsInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx, int bci0, int bci1) {
         super(clazz, methodIdx);
         this.baseCPoolCount = baseCPoolCount;
         this.bci0 = bci0;

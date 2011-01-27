@@ -113,7 +113,7 @@ public class PlainFormattableMethodName implements Formattable {
         if (cname != null) {
             this.className = cname.replace('/', '.'); // NOI18N
         } else {
-            // can be null in case formatter is only interested in method formatting // NOI18N
+            // can be null in case formatter is only interested in method formatting
             this.className = "<unknown class>"; // NOI18N
         }
 
@@ -122,7 +122,7 @@ public class PlainFormattableMethodName implements Formattable {
         }
 
         if (this.className.endsWith(".")) { // slightly different wildcard notation; for the backward compatibility sake we keep it
-            this.className = this.className + "*";
+            this.className = this.className + "*";  // NOI18N
         }
 
         if (mname == null) {
@@ -130,29 +130,25 @@ public class PlainFormattableMethodName implements Formattable {
             params = ""; // NOI18N
             returnType = ""; // NOI18N
         } else {
-            if ("".equals(mname) && !this.className.contains("*")) {
-                // NOI18N
+            if ("".equals(mname) && !this.className.contains("*")) { // NOI18N
                 this.methodName = "<init>"; // NOI18N
             } else {
                 this.methodName = mname;
             }
 
-            if ("<clinit>".equals(methodName) || Wildcards.isMethodWildcard(methodName)) {
-                // NOI18N
+            if ("<clinit>".equals(methodName) || Wildcards.isMethodWildcard(methodName)) { // NOI18N
                 params = ""; // NOI18N
                 returnType = ""; // NOI18N
             } else {
                 idx1 = sig.lastIndexOf(')') + 1; // NOI18N
 
-                if ((idx1 > 0) && !"<init>".equals(methodName)) {
-                    // NOI18N
+                if ((idx1 > 0) && !"<init>".equals(methodName)) { // NOI18N
                     // For e.g. the "Thread" root node it may be zero; there was a bug with it when this method
                     // was hit for "Thread" in results export
                     returnType = sig.substring(idx1);
                     curPos = 0;
 
-                    while (returnType.charAt(curPos) == '[') {
-                        // NOI18N
+                    while (returnType.charAt(curPos) == '[') { // NOI18N
                         arrayIndicator.append("[]"); // NOI18N
                         curPos++;
                     }
@@ -185,8 +181,7 @@ public class PlainFormattableMethodName implements Formattable {
                         returnType = returnType.substring(curPos, returnType.length() - 1); //strip "L" at the beginning
                                                                                             // and ";" at end
 
-                        if (returnType.startsWith("java/lang/") && (returnType.indexOf('/', 10) == -1)) {
-                            // NOI18N
+                        if (returnType.startsWith("java/lang/") && (returnType.indexOf('/', 10) == -1)) { // NOI18N
                             returnType = returnType.substring(10);
                         }
 
@@ -208,8 +203,7 @@ public class PlainFormattableMethodName implements Formattable {
                     curPos = 0;
 
                     while (curPos < paramsString.length()) {
-                        while (paramsString.charAt(curPos) == '[') {
-                            // NOI18N
+                        while (paramsString.charAt(curPos) == '[') { // NOI18N
                             arrayIndicator.append("[]"); // NOI18N
                             curPos++;
                         }
@@ -236,16 +230,14 @@ public class PlainFormattableMethodName implements Formattable {
                             // it's a class
                             int startPos = curPos;
 
-                            while (paramsString.charAt(curPos) != ';') {
-                                // NOI18N
+                            while (paramsString.charAt(curPos) != ';') { // NOI18N
                                 curPos++;
                             }
 
                             String typeName = paramsString.substring(startPos, curPos); //strip "L" at the beginning and ";" at end
 
-                            if (typeName.startsWith("java/lang/") && (typeName.indexOf('/', 10) == -1)) {
-                                // NOI18N
-                                typeName = typeName.substring(10); // NOI18N
+                            if (typeName.startsWith("java/lang/") && (typeName.indexOf('/', 10) == -1)) { // NOI18N
+                                typeName = typeName.substring(10);
                             }
 
                             typeName = typeName.replace('$', '.'); // NOI18N
@@ -273,11 +265,11 @@ public class PlainFormattableMethodName implements Formattable {
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("Formattable method name for:");
-            LOGGER.finest("Class: " + this.className);
-            LOGGER.finest("Method: " + this.methodName);
-            LOGGER.finest("Return type: " + this.returnType);
-            LOGGER.finest("Parameters: " + this.params);
+            LOGGER.finest("Formattable method name for:"); // NOI18N
+            LOGGER.finest("Class: " + this.className); // NOI18N
+            LOGGER.finest("Method: " + this.methodName); // NOI18N
+            LOGGER.finest("Return type: " + this.returnType); // NOI18N
+            LOGGER.finest("Parameters: " + this.params); // NOI18N
         }
     }
 
@@ -308,13 +300,12 @@ public class PlainFormattableMethodName implements Formattable {
      */
     public String getFormattedMethod() {
         if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer("Getting formatted method name for " + methodName);
+            LOGGER.finer("Getting formatted method name for " + methodName); // NOI18N
         }
 
         if ((methodName == null) || (methodName.length() == 0)) {
             return ""; // NOI18N  // Understanding is that class-level view is used
-        } else if ("<clinit>".equals(methodName)) {
-            // NOI18N
+        } else if ("<clinit>".equals(methodName)) { // NOI18N
             return methodName;
         } else {
             return methodName + "(" + getParamsString() + ")"; // NOI18N
@@ -339,19 +330,16 @@ public class PlainFormattableMethodName implements Formattable {
      */
     public String getFullFormattedMethod() {
         if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer("Getting full formatted method name for " + methodName);
+            LOGGER.finer("Getting full formatted method name for " + methodName); // NOI18N
         }
 
         if ((methodName == null) || (methodName.length() == 0)) {
             return ""; // NOI18N  // Understanding is that class-level view is used
-        } else if ("<clinit>".equals(methodName)) {
-            // NOI18N
+        } else if ("<clinit>".equals(methodName)) { // NOI18N
             return methodName;
-        } else if ("<init>".equals(methodName)) {
-            // NOI18N
+        } else if ("<init>".equals(methodName)) { // NOI18N
             return methodName + "(" + getParamsString() + ")"; // NOI18N
-        } else if ("*".equals(methodName)) {
-            // NOI18N
+        } else if ("*".equals(methodName)) { // NOI18N
             return methodName;
         } else {
             return methodName + "(" + getParamsString() + ") : " + getReturnTypeX(); // NOI18N

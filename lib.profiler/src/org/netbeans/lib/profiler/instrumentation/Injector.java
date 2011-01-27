@@ -46,6 +46,8 @@ package org.netbeans.lib.profiler.instrumentation;
 import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import java.util.Stack;
+import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
+import org.netbeans.lib.profiler.global.CommonConstants;
 
 
 /**
@@ -54,6 +56,7 @@ import java.util.Stack;
  * supports appending bytecodes to the existing bytecodes, and extending the method's exception table.
  *
  * @author Misha Dmitriev
+ * @author Tomas Hurka
  */
 public abstract class Injector extends SingleMethodScaner {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -164,7 +167,7 @@ public abstract class Injector extends SingleMethodScaner {
      * Creates a new Injector for the specified method. Subsequently one can call injectCodeAndRewrite() and other
      * methods below as many times as needed.
      */
-    protected Injector(ClassInfo clazz, int methodIdx) {
+    protected Injector(DynamicClassInfo clazz, int methodIdx) {
         super(clazz, methodIdx);
         origBytecodesLength = bytecodesLength;
         maxStack = getU2(origMethodInfo, bytecodesStartIdx - 8);
@@ -220,7 +223,23 @@ public abstract class Injector extends SingleMethodScaner {
 
         System.arraycopy(exceptionTable, 0, ret, excTableNewStart + 2, excTableNewLen);
 
-        // FIXME: need to update linenumber table and localvariable table as well
+        ClassInfo.LocalVariableTables localVarTable = clazz.getLocalVariableTables();
+        
+        if (localVarTable.hasTable()) {
+            int locVarTableOldStart = clazz.getLocalVariableTableStartOffsetInMethodInfo(methodIdx);
+            int locVarTablePtr = locVarTableOldStart + (bytecodesLength - origBytecodesLength) + (excTableNewLen - excTableOldLen);
+            localVarTable.writeTable(ret, locVarTablePtr, methodIdx);
+        }
+
+        ClassInfo.LocalVariableTypeTables localVarTypeTable = clazz.getLocalVariableTypeTables();
+        
+        if (localVarTypeTable.hasTable()) {
+            int locVarTypeTableOldStart = clazz.getLocalVariableTypeTableStartOffsetInMethodInfo(methodIdx);
+            int locVarTypeTablePtr = locVarTypeTableOldStart + (bytecodesLength - origBytecodesLength) + (excTableNewLen - excTableOldLen);
+            localVarTypeTable.writeTable(ret, locVarTypeTablePtr, methodIdx);
+        }
+
+        // FIXME: need to update linenumber table as well
         putU2(ret, bytecodesStartIdx - 8, maxStack + STACK_INCREMENT);
         putU2(ret, bytecodesStartIdx - 6, maxLocals);
 
@@ -496,7 +515,7 @@ public abstract class Injector extends SingleMethodScaner {
 
     private void initExceptionTable() {
         int startOfs = clazz.getExceptionTableStartOffsetInMethodInfo(methodIdx);
-        excTableEntryCount = getU2(origMethodInfo, startOfs);
+        excTableEntryCount = clazz.getExceptionTableCount(methodIdx);
 
         int len = excTableEntryCount * 8;
 
@@ -584,10 +603,11 @@ public abstract class Injector extends SingleMethodScaner {
         bytecodesLength += delta;
 
         updateExceptionTable(bci, delta);
+        updateLocalVariableTable(bci, delta);
+        updateLocalVariableTypeTable(bci, delta);
 
         // We currently don't support the following updates - they are used only by debuggers.
         // updateLineNumberTable(injectionPos, delta);
-        // updateLocalVariableTable(injectionPos, delta);
         // updateLocalVariableTypeTable(injectionPos, delta);
 
         // Relocate the bcis of changes in the pending change stack
@@ -623,4 +643,17 @@ public abstract class Injector extends SingleMethodScaner {
             pos += 8;
         }
     }
+
+    private void updateLocalVariableTable(int injectionPos, int injectedBytesCount) {
+        ClassInfo.LocalVariableTables localVarTable = clazz.getLocalVariableTables();
+        
+        localVarTable.updateTable(injectionPos, injectedBytesCount, methodIdx);
+    }
+
+    private void updateLocalVariableTypeTable(int injectionPos, int injectedBytesCount) {
+        ClassInfo.LocalVariableTypeTables localVarTypeTable = clazz.getLocalVariableTypeTables();
+        
+        localVarTypeTable.updateTable(injectionPos, injectedBytesCount, methodIdx);
+    }
+
 }

@@ -106,15 +106,13 @@ public class ClassBytesLoader {
                 return null;
             }
         } catch (IOException ex) {
-            System.err.println("*** Profiler agent critical error: caught IOException in ClassBytesLoadergetClassFileBytes: "
-                               + ex); // NOI18N
+            System.err.println("*** Profiler agent critical error: caught IOException in ClassBytesLoadergetClassFileBytes: " + ex); // NOI18N
             ex.printStackTrace();
             System.err.println("*** End Profiler agent critical error message ---------------------------"); // NOI18N
 
             return null;
         } catch (URISyntaxException ex) {
-            System.err.println("*** Profiler agent critical error: caught URISyntaxException in ClassBytesLoadergetClassFileBytes: "
-                               + ex); // NOI18N
+            System.err.println("*** Profiler agent critical error: caught URISyntaxException in ClassBytesLoadergetClassFileBytes: " + ex); // NOI18N
             ex.printStackTrace();
             System.err.println("*** End Profiler agent critical error message ---------------------------"); // NOI18N
 

@@ -498,12 +498,12 @@ public class BarChart extends JComponent implements ComponentListener, AncestorL
                 int height = (int) ((drawableHeight * yItems[i]) / (float) maxHeight);
                 int horizLegendX = ((i == 0) ? Math.max(currentX - (xSpacing / 2), vertAxisWidth) : (currentX - (xSpacing / 2)));
                 drawBar(g2, currentX, drawHeight - horizAxisHeight - height - outlineStrokeWidth, width, height);
-                horizAxisXes.add(new Integer(horizLegendX));
+                horizAxisXes.add(Integer.valueOf(horizLegendX));
                 currentX += (width + xSpacing);
                 drawnWidth += width;
             }
 
-            horizAxisXes.add(new Integer(Math.min(currentX - (xSpacing / 2), drawWidth)));
+            horizAxisXes.add(Integer.valueOf(Math.min(currentX - (xSpacing / 2), drawWidth)));
 
             // draw horizontal chart axis
             drawHorizontalAxis(g2, horizAxisXes, xItems);

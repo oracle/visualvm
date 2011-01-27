@@ -43,7 +43,7 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
-import org.netbeans.lib.profiler.classfile.ClassInfo;
+import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.CommonConstants;
 
 
@@ -82,7 +82,7 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    MethodEntryExitCallsInjector(ClassInfo clazz, int normalInstrBaseCPoolCount, int rootInstrBaseCPoolCount, int methodIdx,
+    MethodEntryExitCallsInjector(DynamicClassInfo clazz, int normalInstrBaseCPoolCount, int rootInstrBaseCPoolCount, int methodIdx,
                                  int injType, int methodId) {
         super(clazz, methodIdx);
         this.injType = injType;

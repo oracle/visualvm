@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler.classfile;
 
+import org.netbeans.lib.profiler.classfile.ClassInfo.LocalVariableTables;
+import org.netbeans.lib.profiler.classfile.ClassInfo.LocalVariableTypeTables;
 import org.netbeans.lib.profiler.instrumentation.JavaClassConstants;
 import org.netbeans.lib.profiler.utils.StringUtils;
 
@@ -235,8 +237,8 @@ public class ClassFileParser implements JavaClassConstants {
 
                             int count = nonMemberClassCount + 1;
 
-                            if (!nestedClassFullName.equals(classInfo.name + "$" + count + "$" + nestedClassSimpleName)) {
-                                continue; // NOI18N
+                            if (!nestedClassFullName.equals(classInfo.name + "$" + count + "$" + nestedClassSimpleName)) { // NOI18N
+                                continue;
                             } else {
                                 nonMemberClassCount = count;
                             }
@@ -244,8 +246,8 @@ public class ClassFileParser implements JavaClassConstants {
                     } else {
                         nonMemberClassCount++;
 
-                        if (!nestedClassFullName.equals(classInfo.name + "$" + nonMemberClassCount)) {
-                            continue; // NOI18N
+                        if (!nestedClassFullName.equals(classInfo.name + "$" + nonMemberClassCount)) { // NOI18N
+                            continue;
                         }
                     }
 
@@ -384,7 +386,7 @@ public class ClassFileParser implements JavaClassConstants {
         superClassIdx = nextChar();
 
         if (cpTags[superClassIdx] != CONSTANT_Class) {
-            if ((superClassIdx == 0) && classInfo.name.equals("java/lang/Object")) {
+            if ((superClassIdx == 0) && classInfo.name.equals("java/lang/Object")) {  // NOI18N
                 classInfo.superName = "java/lang/Object"; // NOI18N
             } else {
                 throw classFileReadException("Bad reference to super class name"); // NOI18N
@@ -431,7 +433,13 @@ public class ClassFileParser implements JavaClassConstants {
         int[] exceptionTableStartOffsets = new int[methodCount];
         int[] lineNumberTableOffsets = new int[methodCount];
         char[] lineNumberTableLengths = new char[methodCount];
-
+        int[] localVariableTableOffsets = new int[methodCount];
+        char[] localVariableTableLengths = new char[methodCount];
+        int localVaribaleTableCPindex = 0;
+        int[] localVariableTypeTableOffsets = new int[methodCount];
+        char[] localVariableTypeTableLengths = new char[methodCount];
+        int localVaribaleTypeTableCPindex = 0;
+        
         for (int i = 0; i < methodCount; i++) {
             methodInfoOffsets[i] = curBufPos;
             accessFlags[i] = nextChar();
@@ -439,7 +447,9 @@ public class ClassFileParser implements JavaClassConstants {
             signatures[i] = signatureAtCPIndex(nextChar());
             bytecodeOffsets[i] = 0;
             lineNumberTableOffsets[i] = 0;
-
+            localVariableTableOffsets[i] = 0;
+            localVariableTypeTableOffsets[i] = 0;
+            
             int attrCount = nextChar();
 
             for (int j = 0; j < attrCount; j++) {
@@ -463,10 +473,27 @@ public class ClassFileParser implements JavaClassConstants {
                         attrLen = nextInt();
 
                         if (utf8AtCPIndex(attrNameIdx).equals("LineNumberTable")) { // NOI18N
-
                             char tableLen = lineNumberTableLengths[i] = nextChar();
                             lineNumberTableOffsets[i] = curBufPos - methodInfoOffsets[i];
                             curBufPos += (4 * tableLen);
+                        } else if (utf8AtCPIndex(attrNameIdx).equals("LocalVariableTable")){    // NOI18N
+                            char tableLen = localVariableTableLengths[i] = nextChar();
+                            localVariableTableOffsets[i] = curBufPos - methodInfoOffsets[i];
+                            curBufPos += LocalVariableTables.ATTR_SIZE * tableLen;
+                            if (localVaribaleTableCPindex == 0) {
+                                localVaribaleTableCPindex = attrNameIdx;
+                            } else {
+                                assert localVaribaleTableCPindex == attrNameIdx;
+                            }
+                        } else if (utf8AtCPIndex(attrNameIdx).equals("LocalVariableTypeTable")){    // NOI18N
+                            char tableLen = localVariableTypeTableLengths[i] = nextChar();
+                            localVariableTypeTableOffsets[i] = curBufPos - methodInfoOffsets[i];
+                            curBufPos += LocalVariableTypeTables.ATTR_SIZE * tableLen;
+                            if (localVaribaleTypeTableCPindex == 0) {
+                                localVaribaleTypeTableCPindex = attrNameIdx;
+                            } else {
+                                assert localVaribaleTypeTableCPindex == attrNameIdx;
+                            }
                         } else {
                             curBufPos += attrLen;
                         }
@@ -489,6 +516,12 @@ public class ClassFileParser implements JavaClassConstants {
         classInfo.exceptionTableStartOffsets = exceptionTableStartOffsets;
         classInfo.lineNumberTablesOffsets = lineNumberTableOffsets;
         classInfo.lineNumberTablesLengths = lineNumberTableLengths;
+        classInfo.localVariableTablesOffsets = localVariableTableOffsets;
+        classInfo.localVariableTablesLengths = localVariableTableLengths;
+        classInfo.localVaribaleTableCPindex = localVaribaleTableCPindex;
+        classInfo.localVariableTypeTablesOffsets = localVariableTypeTableOffsets;
+        classInfo.localVariableTypeTablesLengths = localVariableTypeTableLengths;
+        classInfo.localVaribaleTypeTableCPindex = localVaribaleTypeTableCPindex;
     }
 
     private void readPreamble() {

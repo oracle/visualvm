@@ -139,8 +139,7 @@ public class ClassFileCache {
     int hasVMSuppliedClassFile(String name, int classLoaderId) {
         do {
             // we are trying the whole classloader hierarchy up to the root system classloader with id=0
-            boolean res = (vmSuppliedClassCache.containsKey((name + "#" + ClassRepository.LOCATION_VMSUPPLIED + classLoaderId)
-                                                                                                                                            .intern())); // NOI18N
+            boolean res = (vmSuppliedClassCache.containsKey((name + "#" + ClassRepository.LOCATION_VMSUPPLIED + classLoaderId).intern())); // NOI18N
 
             if (res) {
                 return classLoaderId;

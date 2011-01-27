@@ -262,7 +262,7 @@ public class ProfilerInterface implements CommonConstants {
     private static final boolean INSTRUMENT_JFLUID_CLASSES = Boolean.getBoolean("org.netbeans.lib.profiler.server.instrumentJFluidClasses"); // NOI18N
 
     // The lock used to serialize requests from server to client. May be used outside this class.
-    public static TransactionalSupport serialClientOperationsLock = new TransactionalSupport();
+    public static final TransactionalSupport serialClientOperationsLock = new TransactionalSupport();
     private static ProfilerServer profilerServer;
     private static ProfilingSessionStatus status;
     private static EventBufferManager evBufManager;
@@ -458,8 +458,6 @@ public class ProfilerInterface implements CommonConstants {
                 // Give WeakReference collector thread a chance to register some (hopefully most of) object GCs
             } catch (Exception ex) {
             }
-
-            ;
         }
 
         ProfilerRuntime.dumpEventBuffer();
@@ -493,8 +491,6 @@ public class ProfilerInterface implements CommonConstants {
                 Thread.sleep(50);
             } catch (Exception ex) {
             }
-
-            ;
         }
 
         if (status.runningInAttachedMode) {
@@ -948,7 +944,7 @@ public class ProfilerInterface implements CommonConstants {
                         AsyncMessageCommand cmd = null;
 
                         if (excMessage == null) {
-                            cmd = new AsyncMessageCommand(true, INSTRUMENTATION_SUCCESSFUL_MSG); // NOI18N
+                            cmd = new AsyncMessageCommand(true, INSTRUMENTATION_SUCCESSFUL_MSG);
                         } else {
                             cmd = new AsyncMessageCommand(false, excMessage);
                         }

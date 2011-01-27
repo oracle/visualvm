@@ -64,7 +64,7 @@ import java.util.logging.Logger;
 public final class ProfilingResultsDispatcher implements ProfilingResultsProvider.Dispatcher {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final Logger LOGGER = Logger.getLogger(ProfilingResultsDispatcher.class.getName()); // NOI18N
+    private static final Logger LOGGER = Logger.getLogger(ProfilingResultsDispatcher.class.getName());
     private static final int QLengthLowerBound = 13;
     private static final int QLengthUpperBound = 15;
     private static ProfilingResultsDispatcher instance;

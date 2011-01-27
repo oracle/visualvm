@@ -627,6 +627,8 @@ public final class NetBeansProfiler extends Profiler {
 
     // ---------------------------------------------------------------------------
     public static boolean isInitialized() {
+        // make sure that the profiler is initialized
+        getDefaultNB();
         return initialized;
     }
 
@@ -879,7 +881,7 @@ public final class NetBeansProfiler extends Profiler {
                         boolean success = false;
 
                         try {
-                            loadAgentIntTargetJVM(jar, options, pid);
+                            loadAgentIntoTargetJVM(jar, options, pid);
 
                             if (prepareInstrumentation(profilingSettings)) {
                                 success = targetAppRunner.initiateSession(2, false) && targetAppRunner.attachToTargetVM();
@@ -923,7 +925,7 @@ public final class NetBeansProfiler extends Profiler {
                     }
                 }
 
-                private void loadAgentIntTargetJVM(final String jar, final String options, final String pid)
+                private void loadAgentIntoTargetJVM(final String jar, final String options, final String pid)
                                             throws AttachNotSupportedException, IOException, AgentLoadException, AgentInitializationException  {
                     VirtualMachine virtualMachine = VirtualMachine.attach(pid);
                     virtualMachine.loadAgent(jar,options);
@@ -1638,13 +1640,13 @@ public final class NetBeansProfiler extends Profiler {
     public boolean prepareInstrumentation(ProfilingSettings profilingSettings) {
         final boolean retValue;
 
+        teardownDispatcher();
+        setupDispatcher(profilingSettings);
+
         ClientUtils.SourceCodeSelection[] marks = MarkingEngine.getDefault().getMarkerMethods();
         profilingSettings.setInstrumentationMarkerMethods(marks);
 
         retValue = super.prepareInstrumentation(profilingSettings);
-
-        teardownDispatcher();
-        setupDispatcher(profilingSettings);
 
         return retValue;
     }
@@ -2087,10 +2089,10 @@ public final class NetBeansProfiler extends Profiler {
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
 
             CCTResultsFilter filter = Lookup.getDefault().lookup(CCTResultsFilter.class);
-            filter.setEvaluators(Lookup.getDefault().lookupAll(CCTResultsFilter.EvaluatorProvider.class));
 
             if (filter != null) {
                 filter.reset(); // clean up the filter before reusing it
+                filter.setEvaluators(Lookup.getDefault().lookupAll(CCTResultsFilter.EvaluatorProvider.class));
             }
 
             // init context aware instances

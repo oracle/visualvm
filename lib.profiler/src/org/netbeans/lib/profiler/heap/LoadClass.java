@@ -91,7 +91,6 @@ class LoadClass extends HprofObject {
 
         for (i = 0; i < name.length(); i++) {
             if (name.charAt(i) != '[') { // NOI18N    // arrays
-
                 break;
             }
         }
@@ -106,37 +105,29 @@ class LoadClass extends HprofObject {
             } else {
                 switch (firstChar) {
                     case 'C':
-                        name = "char";
-
-                        break; // NOI18N
+                        name = "char"; // NOI18N
+                        break;
                     case 'B':
-                        name = "byte";
-
-                        break; // NOI18N
+                        name = "byte"; // NOI18N
+                        break;
                     case 'I':
-                        name = "int";
-
-                        break; // NOI18N
+                        name = "int"; // NOI18N
+                        break;
                     case 'Z':
-                        name = "boolean";
-
-                        break; // NOI18N
+                        name = "boolean"; // NOI18N
+                        break;
                     case 'F':
-                        name = "float";
-
-                        break; // NOI18N
+                        name = "float"; // NOI18N
+                        break;
                     case 'D':
-                        name = "double";
-
-                        break; // NOI18N
+                        name = "double"; // NOI18N
+                        break;
                     case 'S':
-                        name = "short";
-
-                        break; // NOI18N
+                        name = "short"; // NOI18N
+                        break;
                     case 'J':
-                        name = "long";
-
-                        break; // NOI18N
+                        name = "long"; // NOI18N
+                        break;
                 }
             }
 

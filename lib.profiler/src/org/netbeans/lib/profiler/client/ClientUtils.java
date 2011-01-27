@@ -337,7 +337,7 @@ public class ClientUtils implements CommonConstants {
             return LINES_PREFIX + selection.getClassName() + "," + selection.getStartLine() + "," + selection.getEndLine(); //NOI18N
         } else {
             if (selection.getMethodName() == null) {
-                return selection.getClassName(); //NOI18N
+                return selection.getClassName();
             } else if (selection.getMethodSignature() == null) {
                 return selection.getClassName() + "," + selection.getMethodName(); //NOI18N
             } else {
@@ -347,7 +347,7 @@ public class ClientUtils implements CommonConstants {
     }
 
     public static ClientUtils.SourceCodeSelection stringToSelection(String str) {
-        if ((str == null) || (str.length() == 0)) { // NOI18N
+        if ((str == null) || (str.length() == 0)) {
 
             return null;
         }

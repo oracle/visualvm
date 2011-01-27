@@ -594,8 +594,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         long absTimeStamp = Timers.getCurrentTimeInCounts();
 
         if (DEBUG) {
-            System.out.println("ProfilerRuntimeCPU.DEBUG: Writing waitTime event type = " + eventType + ", timestamp: "
-                               + absTimeStamp); // NOI18N
+            System.out.println("ProfilerRuntimeCPU.DEBUG: Writing waitTime event type = " + eventType + ", timestamp: " + absTimeStamp); // NOI18N
         }
 
         evBuf[curPos++] = (byte) ((absTimeStamp >> 48) & 0xFF);

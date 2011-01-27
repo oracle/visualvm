@@ -71,7 +71,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class HeaderRenderer extends JLabel {
+    private static class HeaderRenderer extends JLabel {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public Dimension getMinimumSize() {
