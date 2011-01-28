@@ -184,7 +184,7 @@ public abstract class JvmJvmstatModel extends Model {
     
     /**
      * Tests if target JVM supports
-     * <a href=http://java.sun.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a>
+     * <a href=http://download.oracle.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a>
      * and that support is enabled in target JVM.
      * @return <CODE>true</CODE> if JVM supports Attach API, <CODE>false</CODE> otherwise
      */

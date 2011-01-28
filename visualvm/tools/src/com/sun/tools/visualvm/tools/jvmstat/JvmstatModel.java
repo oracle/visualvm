@@ -33,8 +33,8 @@ import java.util.List;
  * (http://java.sun.com/performance/jvmstat/)
  * to obtatin various information from JVM. Note that
  * Jvmstat is available in JDK 1.4.2 and up. It is also available for
- * remote Java applications if jstatd daemon 
- * (http://java.sun.com/j2se/1.5.0/docs/tooldocs/share/jstatd.html)
+ * remote Java applications if  
+ * <a href=http://download.oracle.com/javase/1.5.0/docs/tooldocs/share/jstatd.html>jstatd daemon</a>
  * is running on remote host.
  * 
  * @author Tomas Hurka

@@ -180,7 +180,7 @@
                 <exclude name="com/sun/tools/visualvm/tools/*.java"/>
             </fileset>
 
-            <link href="http://java.sun.com/javase/6/docs/api/"/>
+            <link href="http://download.oracle.com/javase/6/docs/api/"/>
 
 
             <doctitle><![CDATA[<h1>${app.title} API Specification</h1><p align="left">This document is the API specification for ${app.title}. See the <a href="http://visualvm.java.net/api-quickstart.html">Getting Started Extending VisualVM</a> document for information about developing plugins for VisualVM.</p><br/>]]></doctitle>
