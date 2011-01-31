@@ -61,6 +61,7 @@ public class DynamicClassInfo extends ClassInfo {
     private DynamicClassInfo superClass; // Superclass as a DynamicClassInfo (just name is inconvenient when multiple classloaders are used)
     private String classFileLocation; // Directory or .jar file where the .class file is located.
     private int[] baseCPoolCount;
+    private int java_lang_ThowableCPIndex; // constant pool index for java.lang.Throwable
     private char[] instrMethodIds; // Ids assigned to instrumented methods, 0 for uninstrumented methods
     private DynamicClassInfo[] interfacesDCI; // Ditto for superinterfaces
 
@@ -75,6 +76,7 @@ public class DynamicClassInfo extends ClassInfo {
     private int[] modifiedMethodBytecodesLength;
     private int[] modifiledLocalVariableTableOffsets;
     private int[] modifiledLocalVariableTypeTableOffsets;
+    private int[] modifiledStackMapTableOffsets;
     private boolean allMethodsMarkers = false;
     private boolean allMethodsRoots = false;
     private boolean hasUninstrumentedMarkerMethods;
@@ -223,6 +225,30 @@ public class DynamicClassInfo extends ClassInfo {
             return modifiledLocalVariableTypeTableOffsets[idx];
         } else {
             return super.getLocalVariableTypeTableStartOffsetInMethodInfo(idx);
+        }
+    }
+    
+    public int getStackMapTableStartOffsetInMethodInfo(int idx) {
+        if ((modifiedAndSavedMethodInfos != null) && (modifiedAndSavedMethodInfos[idx] != null)) {
+            if (modifiledStackMapTableOffsets[idx] == 0) {
+                int newOffset = getExceptionTableStartOffsetInMethodInfo(idx)+getExceptionTableCount(idx)*8+2;
+                byte[] methodInfo = getMethodInfo(idx);
+                int attrCount = getU2(methodInfo, newOffset); newOffset+=2;// Attribute (or rather sub-attribute) count
+
+                for (int k = 0; k < attrCount; k++) {
+                    int attrNameIdx = getU2(methodInfo, newOffset); newOffset+=2;
+                    int attrLen = getU4(methodInfo, newOffset); newOffset+=4;
+
+                    if (attrNameIdx==stackMapTableCPindex){
+                        modifiledStackMapTableOffsets[idx] = newOffset+2;
+                        break;
+                    }
+                    newOffset += attrLen;
+                }
+            }
+            return modifiledStackMapTableOffsets[idx];
+        } else {
+            return super.getStackMapTableStartOffsetInMethodInfo(idx);
         }
     }
     
@@ -499,6 +525,37 @@ public class DynamicClassInfo extends ClassInfo {
 
     public void unsetMethodSpecial(int i) {
         methodScanStatus[i] &= (~128);
+    }
+
+    public void addGlobalCatchStackMapTableEntry(int methodIdx, int endPC) {
+        if (majorVersion >= 50) {
+            boolean isStatic = isMethodStatic(methodIdx);
+            boolean constructor = "<init>".equals(getMethodName(methodIdx));    // NOI18N
+            int[] localsCPIdx = new int[0];
+            int[] stacksCPIdx;
+            StackMapTables tables = getStackMapTables();
+            
+//            LOG.finer("Adding global catch for " + getName() + " method " + getMethodName(methodIdx));   // NOI18N
+            if (stackMapTableCPindex == 0) {
+                stackMapTableCPindex = getBaseCPoolCount(INJ_STACKMAP);
+            }
+            if (java_lang_ThowableCPIndex == 0) {
+                java_lang_ThowableCPIndex = getCPIndexOfClass("java/lang/Throwable");   // NOI18N
+                if (java_lang_ThowableCPIndex == -1) {
+//                    LOG.finer("java/lang/Thowable not found in " + getName());   // NOI18N
+                    java_lang_ThowableCPIndex = getBaseCPoolCount(INJ_THROWABLE);
+                }
+            }
+            stacksCPIdx = new int[] {java_lang_ThowableCPIndex};
+            if (!isStatic) {
+                if (constructor) {
+                    localsCPIdx = new int[] {0};
+                } else {
+                    localsCPIdx = new int[] {classIndex};
+                }
+            }
+            getStackMapTables().addFullStackMapFrameEntry(methodIdx, endPC, localsCPIdx, stacksCPIdx);
+        }
     }
 
     private int getBCLenForModifiedAndSavedMethodInfo(int idx) {

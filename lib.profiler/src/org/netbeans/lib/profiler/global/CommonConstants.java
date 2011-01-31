@@ -196,7 +196,9 @@ public interface CommonConstants {
     public static final int INJ_CODE_REGION = 8;
     public static final int INJ_OBJECT_ALLOCATIONS = 9;
     public static final int INJ_OBJECT_LIVENESS = 10;
-    public static final int INJ_MAXNUMBER = 11;
+    public static final int INJ_STACKMAP = 11;
+    public static final int INJ_THROWABLE = 12;
+    public static final int INJ_MAXNUMBER = 13;
 
     // Thread state constants. We currently use what is provided in JVMDI, and will probably have to change that once
     // we switch to JVMTI in JDK 5.0
