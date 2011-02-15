@@ -516,6 +516,7 @@ public class DynamicClassInfo extends ClassInfo {
         modifiedMethodBytecodesLength = new int[methodNames.length];
         modifiledLocalVariableTableOffsets = new int[methodNames.length];
         modifiledLocalVariableTypeTableOffsets = new int[methodNames.length];
+        modifiledStackMapTableOffsets = new int[methodNames.length];
     }
 
     public void unsetMethodInstrumented(int i) {
