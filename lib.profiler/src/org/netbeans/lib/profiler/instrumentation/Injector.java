@@ -279,10 +279,11 @@ public abstract class Injector extends SingleMethodScaner {
 //                    ClassInfo.LOG.finer("Adding StackMapTable for "+clazz.getName()+" method "+clazz.getMethodName(methodIdx));
                     // add whole StackMapTable attribute
                     byte[] header = stackMapTable.getAttributeHeader(methodIdx);
+                    int insertOffset = bytecodesStartIdx - 8 + attrLength; // end of Code attribute
                     
                     stackMapDiff = header.length + stackMapData.length;
-                    stackMapTablePtr = ret.length + header.length;
-                    ret = insertBytes(ret, ret.length, stackMapDiff);
+                    stackMapTablePtr = insertOffset + header.length;
+                    ret = insertBytes(ret, insertOffset, stackMapDiff);
                     System.arraycopy(header, 0, ret, stackMapTablePtr-header.length , header.length);
                     System.arraycopy(stackMapData, 0, ret, stackMapTablePtr, stackMapData.length);
                     int arrtCountPrt = excTableNewStart+2+excTableNewLen;
