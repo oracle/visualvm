@@ -75,10 +75,10 @@ public final class IdeSnapshotAction implements ActionListener {
     }
 
     static void openSnapshot(final IdeSnapshot snapshot) {
-        final TracerModel model = new TracerModel(snapshot);
-        final TracerController controller = new TracerController(model);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                TracerModel model = new TracerModel(snapshot);
+                TracerController controller = new TracerController(model);
                 TopComponent ui = ui(model, controller, snapshot.getNpssFile());
                 ui.open();
                 ui.requestActive();
