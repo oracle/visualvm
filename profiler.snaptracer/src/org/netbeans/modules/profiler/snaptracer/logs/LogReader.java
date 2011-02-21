@@ -82,7 +82,7 @@ public final class LogReader {
     }
 
     public LogRecord getRecordFor(long time) {
-        Map.Entry<Long,LogRecord> entry = recordList.ceilingEntry(new Long(time));
+        Map.Entry<Long,LogRecord> entry = recordList.floorEntry(new Long(time));
         
         if (entry != null) {
             return entry.getValue();
