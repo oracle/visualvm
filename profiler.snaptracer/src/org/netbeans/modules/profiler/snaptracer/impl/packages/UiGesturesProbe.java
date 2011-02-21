@@ -62,7 +62,6 @@ class UiGesturesProbe extends TracerProbe {
     public UiGesturesProbe(IdeSnapshot snapshot) {
         super(descriptors(1, snapshot));
         this.snapshot = snapshot;
-//        this.items = items;
     }
 
     public long[] getItemValues(int sampleIndex) {
@@ -72,15 +71,9 @@ class UiGesturesProbe extends TracerProbe {
 
     private static ProbeItemDescriptor[] descriptors(int items, IdeSnapshot snapshot) {
         ProbeItemDescriptor[] descriptors = new ProbeItemDescriptor[items];
-//        descriptors[0] = ProbeItemDescriptor.discreteLineItem("UI Gesture",
-//                             "Shows UI actions performed by the user in the IDE",
-//                             new UiGesturesFormatter(snapshot), 1d, 0, 1);
         descriptors[0] = ProbeItemDescriptor.iconItem("UI Gesture",
                              "Shows UI actions performed by the user in the IDE",
                              new UiGesturesFormatter(snapshot));
-//        for (int i = 0; i < descriptors.length; i++)
-//            descriptors[i] = ProbeItemDescriptor.continuousLineItem("Item " + i,
-//                             "Description " + i, ItemValueFormatter.SIMPLE);
         return descriptors;
     }
 
@@ -91,8 +84,6 @@ class UiGesturesProbe extends TracerProbe {
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-//        for (int i = 0; i < values.length; i++)
-//            values[i] = (long)(Math.random() * 10000);
         return values;
     }
 
