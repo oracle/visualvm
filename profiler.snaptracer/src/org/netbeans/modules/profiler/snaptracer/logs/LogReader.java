@@ -82,8 +82,14 @@ public final class LogReader {
     }
 
     public LogRecord getRecordFor(long time) {
-        return recordList.ceilingEntry(new Long(time)).getValue();
+        Map.Entry<Long,LogRecord> entry = recordList.ceilingEntry(new Long(time));
+        
+        if (entry != null) {
+            return entry.getValue();
+        }
+        return null;
     }
+    
     class LogHandler extends Handler {
 
         @Override
