@@ -67,16 +67,6 @@ final class TimelineColorFactory {
     };
     
 
-//    /**
-//     * Returns number of colors predefined for VisualVM charts.
-//     * Always contains at least 4 colors.
-//     *
-//     * @return number of colors predefined for VisualVM charts
-//     */
-//    private static int getPredefinedColorsCount() {
-//        return PREDEFINED_COLORS.length;
-//    }
-
     /**
      * Returns a color predefined for VisualVM charts.
      *
@@ -101,16 +91,6 @@ final class TimelineColorFactory {
         return color;
     }
 
-
-//    /**
-//     * Returns number of color pairs predefined for VisualVM charts gradients.
-//     * Always contains at least 4 color pairs.
-//     *
-//     * @return number of color pairs predefined for VisualVM charts gradients
-//     */
-//    private static int getPredefinedGradientsCount() {
-//        return PREDEFINED_GRADIENTS.length;
-//    }
 
     /**
      * Returns a color pair predefined for VisualVM charts gradients.

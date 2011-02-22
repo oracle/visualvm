@@ -184,6 +184,18 @@ function wrapRoot(root) {
     }
 }
 
+function wrapField(javaField) {
+    if (javaField) {
+        return {
+            name: javaField.name,
+            signature: javaField.type.name,
+            wrapped: javaField
+        };
+    } else {
+        return null;
+    }
+}
+
 function JavaClassProto() {    
     function jclass(obj) {
         return obj['wrapped-object'];
@@ -280,6 +292,8 @@ function wrapJavaValue(thing) {
         }
     } else if (thing instanceof Packages.org.netbeans.lib.profiler.heap.GCRoot) {
         return wrapRoot(thing);
+    } else if (thing instanceof Packages.org.netbeans.lib.profiler.heap.Field) {
+        return wrapField(thing);
     } else {
         return wrapJavaObject(thing);
     }
@@ -384,23 +398,23 @@ function wrapJavaObject(thing) {
 
     // return wrapper for Java Class objects
     function JavaClassWrapper(jclass) {
-        var fields = jclass.staticFieldValues;
+        var static_fields = jclass.staticFieldValues;
         var fldValueCache = new Array();
 
         // to access static fields of given Class cl, use 
         // cl.statics.<static-field-name> syntax
         this.statics = new JSAdapter() {
             __getIds__ : function() {
-                var res = new Array(fields.size());
-                for (var i=0;i<fields.size();i++) {
-                    res[i] = fields.get(i).field.name;
+                var res = new Array(static_fields.size());
+                for (var i=0;i<static_fields.size();i++) {
+                    res[i] = static_fields.get(i).field.name;
                 }
 
                 return res;
             },
             __has__ : function(name) {
-                for (var i=0;i<fields.size();i++) {
-                    if (name == fields.get(i).field.name) {
+                for (var i=0;i<static_fields.size();i++) {
+                    if (name == static_fields.get(i).field.name) {
                         return true;
                     }					
                 }
@@ -436,7 +450,7 @@ function wrapJavaObject(thing) {
         this.loader = wrapJavaObject(jclass.classLoader);
         this.signers = undefined; //TODO wrapJavaValue(jclass.getSigners());
         this.protectionDomain = undefined; //TODO wrapJavaValue(jclass.getProtectionDomain());
-        this.fields = wrapIterator(fields.iterator());
+        this.fields = wrapIterator(jclass.fields.iterator(), true);
         this.instanceSize = jclass.instanceSize;
         this.name = jclass.name; 
         this['wrapped-object'] = jclass;
