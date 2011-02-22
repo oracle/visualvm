@@ -118,7 +118,6 @@ public final class IdeSnapshotAction implements ActionListener {
         } else {
             return null;
         }
-//        return new File("C:\\Users\\JiS\\Documents\\snapshot_tracer_test.npss");
     }
 
     private static JFileChooser createFileChooser() {
