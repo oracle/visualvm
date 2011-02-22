@@ -824,10 +824,6 @@ final class TracerOptionsPanel extends JPanel {
             public Dimension getMinimumSize() {
                 return getPreferredSize();
             }
-//            protected void selectedItemChanged() {
-//                TracerOptionsPanel.this.update();
-//                super.selectedItemChanged();
-//            }
         };
         minMaxValsLabel.setLabelFor(minMaxValsCombo);
         minMaxValsCombo.setRenderer(new CustomComboRenderer.Boolean(minMaxValsCombo));
@@ -868,10 +864,6 @@ final class TracerOptionsPanel extends JPanel {
             public Dimension getMinimumSize() {
                 return getPreferredSize();
             }
-//            protected void selectedItemChanged() {
-//                TracerOptionsPanel.this.update();
-//                super.selectedItemChanged();
-//            }
         };
         rowLegendLabel.setLabelFor(rowLegendCombo);
         rowLegendCombo.setRenderer(new CustomComboRenderer.Boolean(rowLegendCombo));
@@ -912,10 +904,6 @@ final class TracerOptionsPanel extends JPanel {
             public Dimension getMinimumSize() {
                 return getPreferredSize();
             }
-//            protected void selectedItemChanged() {
-//                TracerOptionsPanel.this.update();
-//                super.selectedItemChanged();
-//            }
         };
         rowsDecorationLabel.setLabelFor(rowsDecorationCombo);
         rowsDecorationCombo.setRenderer(new CustomComboRenderer.Boolean(rowsDecorationCombo));
@@ -945,13 +933,8 @@ final class TracerOptionsPanel extends JPanel {
             public Dimension getMinimumSize() {
                 return getPreferredSize();
             }
-//            protected void selectedItemChanged() {
-//                TracerOptionsPanel.this.update();
-//                super.selectedItemChanged();
-//            }
         };
         rowsSelectionLabel.setLabelFor(rowsSelectionCombo);
-//        rowsSelectionCombo.setRenderer(new CustomComboRenderer.Boolean(rowsSelectionCombo));
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 10;
@@ -1084,7 +1067,6 @@ final class TracerOptionsPanel extends JPanel {
         add(viewsBehaviorSeparator, c);
 
         // viewsBehaviorPanel
-//        JPanel viewsBehaviorPanel = new JPanel(new GridLayout(1, 3));
         JPanel viewsBehaviorPanel = new JPanel(new BorderLayout(0, 0));
         viewsBehaviorPanel.setOpaque(false);
         c = new GridBagConstraints();
@@ -1092,7 +1074,6 @@ final class TracerOptionsPanel extends JPanel {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.HORIZONTAL;
-//        c.insets = new Insets(3, 15, 0, 0);
         c.insets = new Insets(8, 15, 0, 0);
         add(viewsBehaviorPanel, c);
 
@@ -1139,7 +1120,7 @@ final class TracerOptionsPanel extends JPanel {
         viewsBehaviorPanel.add(viewsSettingsContainer, BorderLayout.CENTER);
 
 
-//        // initiallyOpenedPanel
+        // initiallyOpenedPanel
         initiallyOpenedPanel = new JPanel(new VerticalLayout(false));
         initiallyOpenedPanel.setBorder(titledBorder("Select the views to open:"));
         initiallyOpenedPanel.setOpaque(false);
@@ -1157,10 +1138,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         initiallyOpenedPanel.add(initialTimelineCheckBox);
-//        // initialSettingsCheckBox
-//        JCheckBox initialSettingsCheckBox = new JCheckBox("Settings");
-//        initiallyOpenedPanel.add(initialSettingsCheckBox);
-//        initialSettingsCheckBox.setEnabled(false);
         // initialDetailsCheckBox
         initialDetailsCheckBox = new JCheckBox("Details") {
             protected void fireActionPerformed(ActionEvent e) {
@@ -1168,7 +1145,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         initiallyOpenedPanel.add(initialDetailsCheckBox);
-//        viewsBehaviorPanel.add(initiallyOpenedPanel);
         viewsSettingsContainer.add(initiallyOpenedPanel, INITIALLY_OPEN);
 
         // onProbeAddedPanel
@@ -1189,10 +1165,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onProbeAddedPanel.add(onProbeAddedTimelineCheckBox);
-//        // initialSettingsCheckBox
-//        JCheckBox onProbeAddedSettingsCheckBox = new JCheckBox("Settings");
-//        onProbeAddedPanel.add(onProbeAddedSettingsCheckBox);
-//        onProbeAddedSettingsCheckBox.setEnabled(false);
         // initialDetailsCheckBox
         onProbeAddedDetailsCheckBox = new JCheckBox("Details") {
             protected void fireActionPerformed(ActionEvent e) {
@@ -1207,7 +1179,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onProbeAddedPanel.add(onProbeAddedNothingCheckBox);
-//        viewsBehaviorPanel.add(onProbeAddedPanel);
 
 
         // onProbeAddedPanel2
@@ -1228,10 +1199,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onProbeAddedPanel2.add(onProbeAddedTimelineCheckBox2);
-//        // onProbeAddedSettingsCheckBox2
-//        JCheckBox onProbeAddedSettingsCheckBox2 = new JCheckBox("Settings");
-//        onProbeAddedPanel2.add(onProbeAddedSettingsCheckBox2);
-//        onProbeAddedSettingsCheckBox2.setEnabled(false);
         // onProbeAddedDetailsCheckBox2
         onProbeAddedDetailsCheckBox2 = new JCheckBox("Details") {
             protected void fireActionPerformed(ActionEvent e) {
@@ -1246,7 +1213,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onProbeAddedPanel2.add(onProbeAddedNothingCheckBox2);
-//        viewsBehaviorPanel.add(onProbeAddedPanel2);
 
         JPanel onProbeAddedContainer = new JPanel(new GridLayout(1, 2));
         onProbeAddedContainer.add(onProbeAddedPanel);
@@ -1271,10 +1237,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onStartOpenedPanel.add(onStartTimelineCheckBox);
-//        // initialSettingsCheckBox
-//        JCheckBox onStartSettingsCheckBox = new JCheckBox("Settings");
-//        onStartOpenedPanel.add(onStartSettingsCheckBox);
-//        onStartSettingsCheckBox.setEnabled(false);
         // initialDetailsCheckBox
         onStartDetailsCheckBox = new JCheckBox("Details") {
             protected void fireActionPerformed(ActionEvent e) {
@@ -1289,7 +1251,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onStartOpenedPanel.add(onStartNothingCheckBox);
-//        viewsBehaviorPanel.add(onStartOpenedPanel);
         viewsSettingsContainer.add(onStartOpenedPanel, OPEN_SESSION_STARTS);
 
         // onRowSelectedPanel
@@ -1310,10 +1271,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onRowSelectedPanel.add(onRowSelectedTimelineCheckBox);
-//        // initialSettingsCheckBox
-//        JCheckBox onProbeAddedSettingsCheckBox = new JCheckBox("Settings");
-//        onProbeAddedPanel.add(onProbeAddedSettingsCheckBox);
-//        onProbeAddedSettingsCheckBox.setEnabled(false);
         // initialDetailsCheckBox
         onRowSelectedDetailsCheckBox = new JCheckBox("Details") {
             protected void fireActionPerformed(ActionEvent e) {
@@ -1328,7 +1285,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onRowSelectedPanel.add(onRowSelectedNothingCheckBox);
-//        viewsBehaviorPanel.add(onProbeAddedPanel);
 
 
         // onRowSelectedPanel2
@@ -1349,10 +1305,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onRowSelectedPanel2.add(onRowSelectedTimelineCheckBox2);
-//        // onProbeAddedSettingsCheckBox2
-//        JCheckBox onProbeAddedSettingsCheckBox2 = new JCheckBox("Settings");
-//        onProbeAddedPanel2.add(onProbeAddedSettingsCheckBox2);
-//        onProbeAddedSettingsCheckBox2.setEnabled(false);
         // onProbeAddedDetailsCheckBox2
         onRowSelectedDetailsCheckBox2 = new JCheckBox("Details") {
             protected void fireActionPerformed(ActionEvent e) {
@@ -1367,7 +1319,6 @@ final class TracerOptionsPanel extends JPanel {
             }
         };
         onRowSelectedPanel2.add(onRowSelectedNothingCheckBox2);
-//        viewsBehaviorPanel.add(onProbeAddedPanel2);
 
         JPanel onRowSelectedContainer = new JPanel(new GridLayout(1, 2));
         onRowSelectedContainer.add(onRowSelectedPanel);
