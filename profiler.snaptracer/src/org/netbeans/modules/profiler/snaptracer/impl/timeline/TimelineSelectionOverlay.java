@@ -319,7 +319,6 @@ final class TimelineSelectionOverlay extends ChartOverlay {
         public void selectionModeChanged(int newMode, int oldMode) {}
 
         public void selectionBoundsChanged(Rectangle newBounds, Rectangle oldBounds) {
-//            System.err.println(">>> Bounds: " + newBounds);
         }
 
         public void selectedItemsChanged(List<ItemSelection> currentItems,
@@ -336,8 +335,6 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     }
 
     private class TimeSelectionListener implements TimelineSupport.SelectionListener {
-
-//        public void rowSelectionChanged(boolean rowsSelected) {}
 
         public void indexSelectionChanged() {}
 

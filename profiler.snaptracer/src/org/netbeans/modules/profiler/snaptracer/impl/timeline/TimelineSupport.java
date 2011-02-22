@@ -149,10 +149,6 @@ public final class TimelineSupport {
         return chart;
     }
 
-//    public ChartSelectionModel getChartSelectionModel() {
-//        return chart.getSelectionModel();
-//    }
-
 
     // --- Indexes computer access ---------------------------------------------
 
@@ -172,7 +168,6 @@ public final class TimelineSupport {
                 chartResizeHandler = new ComponentAdapter() {
                     public void componentResized(ComponentEvent e) {
                         chart.setScale(chart.getWidth() / (double)range, 1);
-//                        chart.setScale(3d, 1);
                     }
                 };
                 chart.addComponentListener(chartResizeHandler);
@@ -596,11 +591,6 @@ public final class TimelineSupport {
 
     private DetailsTableModel detailsModel;
 
-//    void rowSelectionChanged() {
-//        updateSelectedItems();
-//        notifyRowSelectionChanged();
-//    }
-
     public boolean isRowSelection() {
         return chart.isRowSelection();
     }
@@ -770,19 +760,6 @@ public final class TimelineSupport {
     }
 
     private void highlightTimestamp(int selectedIndex) {
-//        List<SynchronousXYItem> selectedItems = new ArrayList();
-//        if (selectedIndex != -1) {
-//            int rowsCount = chart.getRowsCount();
-//            for (int i = 0; i < rowsCount; i++)
-//                selectedItems.addAll(Arrays.asList(chart.getRow(i).getItems()));
-//        }
-//        List<ItemSelection> selections = new ArrayList(selectedItems.size());
-//        if (selectedIndex != -1) {
-//            for (SynchronousXYItem selectedItem : selectedItems)
-//                selections.add(new XYItemSelection.Default(selectedItem,
-//                               selectedIndex, XYItemSelection.DISTANCE_UNKNOWN));
-//        }
-//
         ChartSelectionModel selectionModel = chart.getSelectionModel();
         List<ItemSelection> oldSelection = selectionModel.getHighlightedItems();
         int oldSelectedIndex = -1;
@@ -790,7 +767,6 @@ public final class TimelineSupport {
             XYItemSelection sel = (XYItemSelection)oldSelection.get(0);
             oldSelectedIndex = sel.getValueIndex();
         }
-//        selectionModel.setHighlightedItems(selections);
 
         if (selectedIndex != -1)
             scrollChartToSelection(oldSelectedIndex, selectedIndex);
@@ -888,12 +864,6 @@ public final class TimelineSupport {
         selectionListeners.remove(listener);
     }
 
-//    private void notifyRowSelectionChanged() {
-//        boolean rowsSelected = chart.isRowSelection();
-//        for (SelectionListener selectionListener : selectionListeners)
-//            selectionListener.rowSelectionChanged(rowsSelected);
-//    }
-
     private void notifyIndexSelectionChanged() {
         for (SelectionListener selectionListener : selectionListeners)
             selectionListener.indexSelectionChanged();
@@ -908,8 +878,6 @@ public final class TimelineSupport {
 
 
     public static interface SelectionListener {
-
-//        public void rowSelectionChanged(boolean rowsSelected);
 
         public void indexSelectionChanged();
 
