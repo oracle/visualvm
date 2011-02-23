@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.logging.Handler;
@@ -82,8 +83,14 @@ public final class LogReader {
     }
 
     public LogRecord getRecordFor(long time) {
-        return recordList.ceilingEntry(new Long(time)).getValue();
+        Map.Entry<Long,LogRecord> entry = recordList.floorEntry(new Long(time));
+        
+        if (entry != null) {
+            return entry.getValue();
+        }
+        return null;
     }
+    
     class LogHandler extends Handler {
 
         @Override
