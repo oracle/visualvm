@@ -115,7 +115,6 @@ final class PackagesView {
         JComponent view = createComponents();
         initListeners(view);
         refreshState(view);
-//        return new ScrollableContainer(view);
         return view;
     }
 

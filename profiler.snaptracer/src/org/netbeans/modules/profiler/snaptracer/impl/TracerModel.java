@@ -155,17 +155,11 @@ final class TracerModel {
     
     void addDescriptors(final TracerPackage p,
                        final TracerProbeDescriptor[] da) {
-//        RequestProcessor.getDefault().post(new Runnable() {
-//            public void run() { for (TracerProbeDescriptor d : da) addProbe(p, d); }
-//        });
         for (TracerProbeDescriptor d : da) addProbe(p, d);
     }
 
     void removeDescriptors(final TracerPackage p,
                           final TracerProbeDescriptor[] da) {
-//        RequestProcessor.getDefault().post(new Runnable() {
-//            public void run() { for (TracerProbeDescriptor d : da) removeProbe(p, d); }
-//        });
         for (TracerProbeDescriptor d : da) removeProbe(p, d);
     }
 

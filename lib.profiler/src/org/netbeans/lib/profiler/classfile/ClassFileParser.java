@@ -53,8 +53,10 @@ import org.netbeans.lib.profiler.utils.StringUtils;
  * This class implements parsing a byte array representing a class file, generating a ClassInfo object.
  *
  * @author Misha Dmitirev
+ * @author Tomas Hurka
  */
 public class ClassFileParser implements JavaClassConstants {
+
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static class ClassFileReadException extends Exception {
@@ -376,7 +378,7 @@ public class ClassFileParser implements JavaClassConstants {
 
         classInfo.intermediateDataStartOfs = curBufPos;
         classInfo.accessFlags = nextChar();
-        classIdx = nextChar();
+        classInfo.classIndex = classIdx = nextChar();
 
         if (cpTags[classIdx] != CONSTANT_Class) {
             throw classFileReadException("Bad reference to this class name"); // NOI18N
@@ -439,6 +441,9 @@ public class ClassFileParser implements JavaClassConstants {
         int[] localVariableTypeTableOffsets = new int[methodCount];
         char[] localVariableTypeTableLengths = new char[methodCount];
         int localVaribaleTypeTableCPindex = 0;
+        int[] stackMapTableOffsets = new int[methodCount];
+        char[] stackMapTableLengths = new char[methodCount];
+        int stackMapTableCPindex = 0;
         
         for (int i = 0; i < methodCount; i++) {
             methodInfoOffsets[i] = curBufPos;
@@ -494,6 +499,16 @@ public class ClassFileParser implements JavaClassConstants {
                             } else {
                                 assert localVaribaleTypeTableCPindex == attrNameIdx;
                             }
+                        } else if (utf8AtCPIndex(attrNameIdx).equals("StackMapTable")){    // NOI18N
+                            char tableLen = stackMapTableLengths[i] = nextChar();
+                            stackMapTableOffsets[i] = curBufPos - methodInfoOffsets[i];
+                            curBufPos += attrLen - 2;
+                            if (stackMapTableCPindex == 0) {
+                                stackMapTableCPindex = attrNameIdx;
+                            } else {
+                                assert stackMapTableCPindex == attrNameIdx;
+                            }
+//                            LOG.info("StackMapTable size:"+(tableLen+0)+" for class:"+classInfo.name+" method:"+ names[i]);
                         } else {
                             curBufPos += attrLen;
                         }
@@ -522,6 +537,9 @@ public class ClassFileParser implements JavaClassConstants {
         classInfo.localVariableTypeTablesOffsets = localVariableTypeTableOffsets;
         classInfo.localVariableTypeTablesLengths = localVariableTypeTableLengths;
         classInfo.localVaribaleTypeTableCPindex = localVaribaleTypeTableCPindex;
+        classInfo.stackMapTablesOffsets = stackMapTableOffsets;
+        classInfo.stackMapTablesLengths = stackMapTableLengths;
+        classInfo.stackMapTableCPindex = stackMapTableCPindex;
     }
 
     private void readPreamble() {
@@ -542,6 +560,7 @@ public class ClassFileParser implements JavaClassConstants {
                 throw classFileReadException(message);
             }
         }
+        classInfo.majorVersion = majorVersion;
     }
 
     private String signatureAtCPIndex(int idx) {
