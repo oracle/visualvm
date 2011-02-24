@@ -67,7 +67,7 @@ class JvmstatCountersPackage extends TracerPackage.SessionAware<Application> {
     }
 
     void addProbe(Monitor monitor, int pos, String probeName) {
-        String descName = "Counter: "+monitor.getName()+", Units: "+monitor.getUnits();
+        String descName = "Counter: "+monitor.getName()+", Units: "+Utils.getUnits(monitor);
         TracerProbeDescriptor desc = new TracerProbeDescriptor(probeName,descName,ICON,pos,true);
         probes.put(desc,new JvmstatCounterProbe(probeName, descName, monitor));
     }
