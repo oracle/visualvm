@@ -221,23 +221,7 @@ public class OQLController extends AbstractTopLevelController
                         try {
                             analysisRunning.compareAndSet(false, true);
                             queryController.queryStarted(progressModel);
-                            progressUpdater.submit(new Runnable() {
-
-                                public void run() {
-                                    while(analysisRunning.get()) {
-                                        int val = progressModel.getValue() + 10;
-                                        if (val > progressModel.getMaximum()) {
-                                            val = progressModel.getMinimum();
-                                        }
-                                        progressModel.setValue(val);
-                                        try {
-                                            Thread.sleep(200);
-                                        } catch (InterruptedException e) {
-                                            Thread.currentThread().interrupt();
-                                        }
-                                    }
-                                }
-                            });
+                            progressUpdater.submit(new ProgressUpdater(progressModel));
                             engine.executeQuery(oqlQuery, new ObjectVisitor() {
 
                                 public boolean visit(Object o) {
@@ -448,8 +432,12 @@ public class OQLController extends AbstractTopLevelController
             this.oqlController = oqlController;
         }
 
-        public void setResult(String result) {
-            ((OQLControllerUI.ResultsUI)getPanel()).setResult(result);
+        public void setResult(final String result) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ((OQLControllerUI.ResultsUI)getPanel()).setResult(result);
+                }
+            });
         }
 
         public void showURL(URL url) {
@@ -536,10 +524,7 @@ public class OQLController extends AbstractTopLevelController
             OQLSupport.saveModel(model);
         }
 
-
         
-        
-
         protected AbstractButton createControllerPresenter() {
             return ((OQLControllerUI.SavedUI)getPanel()).getPresenter();
         }
@@ -549,6 +534,37 @@ public class OQLController extends AbstractTopLevelController
             return ui;
         }
 
+    }
+
+    private class ProgressUpdater implements Runnable {
+
+        private final BoundedRangeModel progressModel;
+
+        ProgressUpdater(BoundedRangeModel model) {
+            progressModel = model;
+        }
+
+        public void run() {
+            while (analysisRunning.get()) {
+                final int newVal;
+                int val = progressModel.getValue() + 10;
+                
+                if (val > progressModel.getMaximum()) {
+                    val = progressModel.getMinimum();
+                }
+                newVal = val;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        progressModel.setValue(newVal);
+                    }
+                });
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
     }
 
 }
