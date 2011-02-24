@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: com.sun.tools.visualvm.modules.tracer.support/0
-OpenIDE-Module-Layer: com/sun/tools/visualvm/modules/tracer/support/layer.xml
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/tracer/support/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-
