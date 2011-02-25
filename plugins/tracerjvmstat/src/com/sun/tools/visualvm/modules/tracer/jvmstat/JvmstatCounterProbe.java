@@ -50,7 +50,7 @@ class JvmstatCounterProbe extends TracerProbe {
         counter = c;
         String u = Utils.getUnits(c).toString();
   
-        ticks = u.equals(Units_TICKS) || (u.equals(Units_EVENTS) && c.getVariability().toString().equals(Variability_MONOTONIC));
+        ticks = u.equals(Units_TICKS) || (u.equals(Units_EVENTS) && Utils.getVariability(c).toString().equals(Variability_MONOTONIC));
     }
     
     private static final ProbeItemDescriptor[] createItemDescriptors(String name, String desc, Monitor c) {
