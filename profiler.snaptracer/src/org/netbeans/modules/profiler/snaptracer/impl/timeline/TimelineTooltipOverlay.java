@@ -147,8 +147,6 @@ final class TimelineTooltipOverlay extends ChartOverlay implements ActionListene
 
         support.addSelectionListener(new TimelineSupport.SelectionListener() {
 
-//            public void rowSelectionChanged(boolean rowsSelected) {}
-
             public void indexSelectionChanged() {}
 
             public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {

@@ -232,7 +232,6 @@ final class TimelineView {
         return container;
     }
 
-//    private static final Format nf = NumberFormat.getInstance();
     private static final Format df = new SimpleDateFormat(TimeAxisUtils.TIME_MSEC);
 
     private void updateSelectionToolbar() {
@@ -254,7 +253,6 @@ final class TimelineView {
             long endTime = support.getTimestamp(endIndex);
             selection += NbBundle.getMessage(TimelineView.class, "LBL_TwoTimes", // NOI18N
                     df.format(startTime), df.format(endTime));
-//            selection += " (" + nf.format(endTime - startTime) + " ms)";
             selection += " (" + (endTime - startTime) + " ms)";
             selection += ", " + NbBundle.getMessage(TimelineView.class, "LBL_TwoSamples", // NOI18N
                     startIndex, endIndex);

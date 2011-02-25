@@ -756,7 +756,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                 int cpIndex = localsCPIdx[i];
                 
                 if (cpIndex == 0) {
-                   ret[offset++] = 0;  // ITEM_Unitialized, ITEM_Top
+                   ret[offset++] = 0;  // ITEM_Top
                 } else {
                     ret[offset++] = 7; // ITEM_Object
                     putU2(ret,offset,cpIndex);
