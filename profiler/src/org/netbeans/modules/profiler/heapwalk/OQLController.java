@@ -42,17 +42,10 @@
 package org.netbeans.modules.profiler.heapwalk;
 
 import java.awt.Color;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -61,11 +54,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultTreeModel;
-import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -77,11 +67,6 @@ import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
 import org.netbeans.modules.profiler.oql.engine.api.OQLException;
 import org.netbeans.modules.profiler.oql.engine.api.ReferenceChain;
-import org.netbeans.modules.profiler.oql.repository.api.OQLQueryDefinition;
-import org.netbeans.modules.profiler.oql.repository.api.OQLQueryRepository;
-import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.filesystems.FileLock;
-import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 
 /**
@@ -98,7 +83,9 @@ public class OQLController extends AbstractTopLevelController
             "AnalysisController_CannotResolveClassMsg"); // NOI18N
     private static final String CANNOT_RESOLVE_INSTANCE_MSG = NbBundle.getMessage(AnalysisController.class,
             "AnalysisController_CannotResolveInstanceMsg"); // NOI18N
-
+    
+        private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
+    
     private HeapFragmentWalker heapFragmentWalker;
 
     private ResultsController resultsController;
@@ -204,7 +191,7 @@ public class OQLController extends AbstractTopLevelController
             public void run() {
                 BrowserUtils.performTask(new Runnable() {
                     public void run() {
-                        final AtomicInteger counter = new AtomicInteger(100);
+                        final AtomicInteger counter = new AtomicInteger(RESULTS_LIMIT);
                         progressModel.setMaximum(100);
 
                         final StringBuilder sb = new StringBuilder();
@@ -247,13 +234,13 @@ public class OQLController extends AbstractTopLevelController
                                     oddRow[0] = !oddRow[0];
                                     dump(o, sb);
                                     sb.append("</td></tr>"); // NOI18N
-                                    return counter.decrementAndGet() == 0 || !analysisRunning.get(); // process all hits while the analysis is running
+                                    return counter.decrementAndGet() == 0 || (!analysisRunning.get() && !engine.isCancelled()); // process all hits while the analysis is running
                                 }
                             });
 
                             if (counter.get() == 0) {
                                 sb.append("<tr><td><h4>Too many results. Please, refine your query.</h4></td></tr>" );
-                            } else if (counter.get() == 100) {
+                            } else if (counter.get() == RESULTS_LIMIT) {
                                 sb.append("<tr><td><h4>"); // NOI18N
                                 sb.append(NbBundle.getMessage(OQLController.class, "OQL_NO_RESULTS_MSG")); // NOI18N
                                 sb.append("</h4></td></tr>" ); // NOI18N
@@ -303,7 +290,12 @@ public class OQLController extends AbstractTopLevelController
                 } else {
                     first = false;
                 }
-                sb.append(printInstance(rc.getObj()));
+                o = rc.getObj();
+                if (o instanceof Instance) {
+                    sb.append(printInstance((Instance)o));
+                } else if (o instanceof JavaClass) {
+                    sb.append(printClass((JavaClass)o));
+                }
                 rc = rc.getNext();
             }
         } else if (o instanceof Map) {
