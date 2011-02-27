@@ -56,7 +56,7 @@ final public class OQLEngine {
     final private static Logger LOGGER = Logger.getLogger(OQLEngine.class.getName());
     final private OQLEngineImpl delegate;
     final private Heap heap;
-
+    
     /**
      * This represents a parsed OQL query
      *
@@ -93,7 +93,7 @@ final public class OQLEngine {
     }
 
     public OQLEngine(Heap heap) {
-        delegate = new OQLEngineImpl(new Snapshot(heap));
+        delegate = new OQLEngineImpl(new Snapshot(heap, this));
         this.heap = heap;
     }
 
@@ -128,5 +128,9 @@ final public class OQLEngine {
 
     public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
         return delegate.unwrapJavaObject(object, tryAssociativeArray);
+    }
+
+    public boolean isCancelled() {
+        return delegate.isCancelled();
     }
 }
