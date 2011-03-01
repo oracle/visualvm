@@ -86,9 +86,7 @@ public final class HeaderLabel extends HeaderPanel {
 
 
     public Dimension getPreferredSize() {
-        Dimension dim = getPreferredSizeSuper();
-        dim.height = DEFAULT_HEIGHT;
-        return dim;
+        return new Dimension(0, DEFAULT_HEIGHT);
     }
 
     private Dimension getPreferredSizeSuper() {
