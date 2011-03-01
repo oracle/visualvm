@@ -802,7 +802,7 @@ function wrapHeapSnapshot(heap) {
 
                 // compute path array from refChain
                 var tmp = refChain;
-                while (tmp != null && !cancelled.get()) {
+                while (tmp != null) {
                     var obj = tmp.obj;
                     path[path.length] = wrapJavaValue(obj);
                     tmp = tmp.next;
@@ -818,7 +818,7 @@ function wrapHeapSnapshot(heap) {
                     }
                     desc += '->';
                     var tmp = refChain;
-                    while (tmp != null && !cancelled.get()) {
+                    while (tmp != null) {
                         var next = tmp.next;
                         var obj = tmp.obj;
                         desc += html? toHtml(obj) : obj.toString();
@@ -871,10 +871,15 @@ function wrapHeapSnapshot(heap) {
 
             jobject = unwrapJavaObject(jobject);
             var refChains = this.snapshot.rootsetReferencesTo(jobject, weak);
-            var paths = new Array(refChains.length);
-            for (var i in refChains) {
-                paths[i] = wrapRefChain(refChains[i]);
-                if (cancelled.get()) break;
+
+            var paths = new java.util.Enumeration() {
+                counter: 0,
+                hasMoreElements: function() {
+                    return this.counter < refChains.length
+                },
+                nextElement: function() {
+                    return wrapRefChain(refChains[this.counter++])
+                }
             }
             return paths;
         },
@@ -1007,11 +1012,15 @@ function printAllocTrace(jobject) {
  * Returns an enumeration of referrers of the given Java object.
  *
  * @param jobject Java object whose referrers are returned.
+ * @param weak Boolean flag indicating whether to include weak references
  */
-function referrers(jobject) {
+function referrers(jobject, weak) {
     try {
+        if (weak == undefined) {
+            weak = false
+        }
         jobject = unwrapJavaObject(jobject);
-        return wrapIterator(this.snapshot.getReferrers(jobject));
+        return wrapIterator(this.snapshot.getReferrers(jobject, weak));
     } catch (e) {
         println("referrers: " + jobject + ", " + e);
         return emptyEnumeration;
@@ -1023,11 +1032,15 @@ function referrers(jobject) {
  * given Java object.
  *
  * @param jobject Java object whose referees are returned.
+ * @param weak Boolean flag indicating whether to include weak references
  */
-function referees(jobject) {
+function referees(jobject, weak) {
     try {
+        if (weak == undefined) {
+            weak = false;
+        }
         jobject = unwrapJavaObject(jobject);
-        return wrapIterator(this.snapshot.getReferees(jobject));
+        return wrapIterator(this.snapshot.getReferees(jobject, weak));
     } catch (e) {
         println("referees: " + jobject + ", " + e);
         return emptyEnumeration;
