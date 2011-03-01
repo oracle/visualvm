@@ -105,6 +105,7 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
 
     private JButton refreshButton;
     private JPanel threadsContainer;
+    private JPanel threadsContainerContainer;
     private CardLayout detailsLayout;
     private JPanel detailsContainer;
     private HTMLTextArea threadsDetails;
@@ -239,8 +240,12 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
 
                         selectedThreads.removeAll(selectedZombies);
 
-                        threadsContainer.revalidate();
-                        threadsContainer.repaint();
+                        // Workaround for JDK7 bug, JScrollPane doesn't layout
+                        // correctly when in a not-selected JTabPane and updated
+                        // lazily. Overriding isValidateRoot() on JScrollPane
+                        // to return false also works around this problem.
+                        threadsContainerContainer.invalidate();
+                        threadsContainerContainer.validate();
 
                         if (!toDisplay.isEmpty()) displayStackTraces(toDisplay);
                         else showDetails(""); // NOI18N
@@ -336,14 +341,14 @@ final class ThreadsInspector extends JPanel implements DataRemovedListener<Appli
         detailsContainer.add(threadsDetails, DATA);
         showDetails(""); // NOI18N
 
-        JPanel container = new JPanel(new BorderLayout(0, 5));
-        container.setOpaque(false);
-        container.add(new ScrollableContainer(threadsContainer), BorderLayout.CENTER);
-        container.add(refreshButton, BorderLayout.SOUTH);
+        threadsContainerContainer = new JPanel(new BorderLayout(0, 5));
+        threadsContainerContainer.setOpaque(false);
+        threadsContainerContainer.add(new ScrollableContainer(threadsContainer), BorderLayout.CENTER);
+        threadsContainerContainer.add(refreshButton, BorderLayout.SOUTH);
 
         final CustomizedSplitPaneUI detailsVerticalSplitterUI = new CustomizedSplitPaneUI();
         JExtendedSplitPane splitPane = new JExtendedSplitPane(JExtendedSplitPane.
-                HORIZONTAL_SPLIT, container, new ScrollableContainer(detailsContainer)) {
+                HORIZONTAL_SPLIT, threadsContainerContainer, new ScrollableContainer(detailsContainer)) {
             public void updateUI() {
                 if (getUI() != detailsVerticalSplitterUI)
                     setUI(detailsVerticalSplitterUI);
