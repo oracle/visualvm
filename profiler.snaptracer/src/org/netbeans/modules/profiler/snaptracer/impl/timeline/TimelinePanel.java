@@ -93,7 +93,6 @@ public final class TimelinePanel extends JPanel {
 
     public void resetSelection() {
         chartPanel.resetSelection();
-//        if (chartPanel.resetSelection()) mouseHandler.updateSelection();
     }
 
     public void updateActions() {
@@ -224,21 +223,7 @@ public final class TimelinePanel extends JPanel {
             if (draggingRow != null) {
                 baseHeight = draggingRow.getHeight();
             }
-//            } else if (updateSelection) {
-//                TimelineChart.Row row = chart.getRowAt(baseY);
-//                if ((e.getModifiers() & Toolkit.getDefaultToolkit().
-//                        getMenuShortcutKeyMask()) == 0) {
-//                    if (chart.setSelectedRow(row)) updateSelection();
-//                } else {
-//                    if (row != null && chart.toggleRowSelection(row)) updateSelection();
-//                }
-//            }
         }
-
-//        void updateSelection() {
-//            probesPanel.updateSelection();
-//            support.rowSelectionChanged();
-//        }
 
         private void updateCursor() {
             if (draggingRow != null) {

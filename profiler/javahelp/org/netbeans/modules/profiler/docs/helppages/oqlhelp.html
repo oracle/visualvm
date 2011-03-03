@@ -193,7 +193,7 @@ the result set of objects.
 <li><a name="finalizables"></a><b>heap.finalizables</b> -- returns an enumeration of Java objects that are
 pending to be finalized.
 </li>
-<li><b>heap.livepaths</b> -- return an array of paths by which a given object 
+<li><b>heap.livepaths</b> -- return an enumeration of paths by which a given object 
 is alive. This method accepts optional second parameter that is a boolean
 flag. This flag tells whether to include paths with weak reference(s) or not.
 By default, paths with weak reference(s) are not included.
@@ -255,8 +255,8 @@ Examples:
 <li><a href="#identical">identical(o1, o2)</a>
 <li><a href="#objectid">objectid(jobject)</a>
 <li><a href="#reachables">reachables(jobject, excludedFields)</a>
-<li><a href="#referrers">referrers(jobject)</a>
-<li><a href="#referees">referees(jobject)</a>
+<li><a href="#referrers">referrers(jobject, weak)</a>
+<li><a href="#referees">referees(jobject, weak)</a>
 <li><a href="#refers">refers(jobject)</a>
 <li><a href="#root">root(jobject)</a>
 <li><a href="#sizeof">sizeof(jobject)</a>
@@ -389,7 +389,9 @@ via the fields specified.
 <h5>referrers function</h5>
 <p>
 Returns an enumeration of Java objects that hold reference to a given Java
-object.
+object. This method accepts optional second parameter that is a boolean
+flag. This flag tells whether to include weak reference(s) or not.
+By default, weak reference(s) are not included.
 </p>
 Examples:
 <ul>
@@ -417,7 +419,9 @@ Examples:
 <h5>referees function</h5>
 <p>
 Returns an array of Java objects to which the given Java
-object directly refers to.
+object directly refers to. This method accepts optional second parameter 
+that is a boolean flag. This flag tells whether to include weak reference(s) or not.
+By default, weak reference(s) are not included.
 </p>
 Example: to print all static reference fields of java.io.File class
 <pre>
