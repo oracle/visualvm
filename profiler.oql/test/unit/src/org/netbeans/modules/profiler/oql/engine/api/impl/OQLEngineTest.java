@@ -136,9 +136,9 @@ public class OQLEngineTest {
     public void testClassFields() throws Exception {
         System.out.println("test class fields");
 
-        final String[] values = new String[] {"", "$assertionsDisabled = true"};
+        final String[] values = new String[] {"", "prefixLength = int"};
 
-        instance.executeQuery("select map(heap.findClass(\"java.io.File\").fields, 'toHtml(it.field.name) + \" = \" + toHtml(it.value)')", new ObjectVisitor() {
+        instance.executeQuery("select map(heap.findClass(\"java.io.File\").fields, 'toHtml(it.name) + \" = \" + toHtml(it.signature)')", new ObjectVisitor() {
 
             public boolean visit(Object o) {
                 values[0] = o.toString();

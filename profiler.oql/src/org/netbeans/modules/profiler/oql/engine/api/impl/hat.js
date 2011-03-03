@@ -184,6 +184,18 @@ function wrapRoot(root) {
     }
 }
 
+function wrapField(javaField) {
+    if (javaField) {
+        return {
+            name: javaField.name,
+            signature: javaField.type.name,
+            wrapped: javaField
+        };
+    } else {
+        return null;
+    }
+}
+
 function JavaClassProto() {    
     function jclass(obj) {
         return obj['wrapped-object'];
@@ -280,6 +292,8 @@ function wrapJavaValue(thing) {
         }
     } else if (thing instanceof Packages.org.netbeans.lib.profiler.heap.GCRoot) {
         return wrapRoot(thing);
+    } else if (thing instanceof Packages.org.netbeans.lib.profiler.heap.Field) {
+        return wrapField(thing);
     } else {
         return wrapJavaObject(thing);
     }
@@ -384,23 +398,23 @@ function wrapJavaObject(thing) {
 
     // return wrapper for Java Class objects
     function JavaClassWrapper(jclass) {
-        var fields = jclass.staticFieldValues;
+        var static_fields = jclass.staticFieldValues;
         var fldValueCache = new Array();
 
         // to access static fields of given Class cl, use 
         // cl.statics.<static-field-name> syntax
         this.statics = new JSAdapter() {
             __getIds__ : function() {
-                var res = new Array(fields.size());
-                for (var i=0;i<fields.size();i++) {
-                    res[i] = fields.get(i).field.name;
+                var res = new Array(static_fields.size());
+                for (var i=0;i<static_fields.size();i++) {
+                    res[i] = static_fields.get(i).field.name;
                 }
 
                 return res;
             },
             __has__ : function(name) {
-                for (var i=0;i<fields.size();i++) {
-                    if (name == fields.get(i).field.name) {
+                for (var i=0;i<static_fields.size();i++) {
+                    if (name == static_fields.get(i).field.name) {
                         return true;
                     }					
                 }
@@ -436,7 +450,7 @@ function wrapJavaObject(thing) {
         this.loader = wrapJavaObject(jclass.classLoader);
         this.signers = undefined; //TODO wrapJavaValue(jclass.getSigners());
         this.protectionDomain = undefined; //TODO wrapJavaValue(jclass.getProtectionDomain());
-        this.fields = wrapIterator(fields.iterator());
+        this.fields = wrapIterator(jclass.fields.iterator(), true);
         this.instanceSize = jclass.instanceSize;
         this.name = jclass.name; 
         this['wrapped-object'] = jclass;
@@ -788,7 +802,7 @@ function wrapHeapSnapshot(heap) {
 
                 // compute path array from refChain
                 var tmp = refChain;
-                while (tmp != null && !cancelled.get()) {
+                while (tmp != null) {
                     var obj = tmp.obj;
                     path[path.length] = wrapJavaValue(obj);
                     tmp = tmp.next;
@@ -804,7 +818,7 @@ function wrapHeapSnapshot(heap) {
                     }
                     desc += '->';
                     var tmp = refChain;
-                    while (tmp != null && !cancelled.get()) {
+                    while (tmp != null) {
                         var next = tmp.next;
                         var obj = tmp.obj;
                         desc += html? toHtml(obj) : obj.toString();
@@ -857,10 +871,15 @@ function wrapHeapSnapshot(heap) {
 
             jobject = unwrapJavaObject(jobject);
             var refChains = this.snapshot.rootsetReferencesTo(jobject, weak);
-            var paths = new Array(refChains.length);
-            for (var i in refChains) {
-                paths[i] = wrapRefChain(refChains[i]);
-                if (cancelled.get()) break;
+
+            var paths = new java.util.Enumeration() {
+                counter: 0,
+                hasMoreElements: function() {
+                    return this.counter < refChains.length
+                },
+                nextElement: function() {
+                    return wrapRefChain(refChains[this.counter++])
+                }
             }
             return paths;
         },
@@ -993,11 +1012,15 @@ function printAllocTrace(jobject) {
  * Returns an enumeration of referrers of the given Java object.
  *
  * @param jobject Java object whose referrers are returned.
+ * @param weak Boolean flag indicating whether to include weak references
  */
-function referrers(jobject) {
+function referrers(jobject, weak) {
     try {
+        if (weak == undefined) {
+            weak = false
+        }
         jobject = unwrapJavaObject(jobject);
-        return wrapIterator(this.snapshot.getReferrers(jobject));
+        return wrapIterator(this.snapshot.getReferrers(jobject, weak));
     } catch (e) {
         println("referrers: " + jobject + ", " + e);
         return emptyEnumeration;
@@ -1009,11 +1032,15 @@ function referrers(jobject) {
  * given Java object.
  *
  * @param jobject Java object whose referees are returned.
+ * @param weak Boolean flag indicating whether to include weak references
  */
-function referees(jobject) {
+function referees(jobject, weak) {
     try {
+        if (weak == undefined) {
+            weak = false;
+        }
         jobject = unwrapJavaObject(jobject);
-        return wrapIterator(this.snapshot.getReferees(jobject));
+        return wrapIterator(this.snapshot.getReferees(jobject, weak));
     } catch (e) {
         println("referees: " + jobject + ", " + e);
         return emptyEnumeration;
