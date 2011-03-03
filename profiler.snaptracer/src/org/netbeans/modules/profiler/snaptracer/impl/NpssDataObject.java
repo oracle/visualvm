@@ -41,11 +41,9 @@
  */
 package org.netbeans.modules.profiler.snaptracer.impl;
 
-import java.io.File;
 import java.io.IOException;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
@@ -78,10 +76,12 @@ public class NpssDataObject extends MultiDataObject implements OpenCookie {
 
     @Override
     public void open() {
-        File file = FileUtil.toFile(getPrimaryFile());
         IdeSnapshot snapshot;
+        FileObject primary = getPrimaryFile();
+        FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log");
+        
         try {
-            snapshot = new IdeSnapshot(file, new File(file.getCanonicalPath() + ".xml"));
+            snapshot = new IdeSnapshot(primary, uigestureFO);
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
             return;
