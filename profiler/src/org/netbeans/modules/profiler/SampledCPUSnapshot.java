@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.LockInfo;
 import java.lang.management.MonitorInfo;
@@ -56,6 +55,7 @@ import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableE
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.modules.profiler.LoadedSnapshot.SamplesInputStream;
 import org.netbeans.modules.profiler.LoadedSnapshot.ThreadsSample;
+import org.openide.filesystems.FileObject;
 
 /** SampledCPUSnapshot provides access to NPSS file
  *
@@ -64,7 +64,7 @@ import org.netbeans.modules.profiler.LoadedSnapshot.ThreadsSample;
 public final class SampledCPUSnapshot {
     public static final String OPEN_THREADS_URL = "file:/stackframe/";     // NOI18N
 
-    private File npssFile;
+    private FileObject npssFile;
     private SamplesInputStream samplesStream;
     private long lastTimestamp;
     private int samples;
@@ -73,8 +73,8 @@ public final class SampledCPUSnapshot {
     private StackTraceSnapshotBuilder builder;
     private long startTime;
 
-    public SampledCPUSnapshot(File file) throws IOException {
-        samplesStream = new SamplesInputStream(file);
+    public SampledCPUSnapshot(FileObject file) throws IOException {
+        samplesStream = new SamplesInputStream(file.getInputStream());
         npssFile = file;
         samples = samplesStream.getSamples();
         lastTimestamp = samplesStream.getLastTimestamp();
@@ -168,7 +168,7 @@ public final class SampledCPUSnapshot {
     }
 
     private SamplesInputStream seek(final int sampleIndex) throws IOException {
-        SamplesInputStream stream = new SamplesInputStream(npssFile);
+        SamplesInputStream stream = new SamplesInputStream(npssFile.getInputStream());
 //        ThreadsSample sample;
 
         for (int i = 0; i < sampleIndex; i++) {
@@ -289,8 +289,8 @@ public final class SampledCPUSnapshot {
     }
 
     private void initSamples() throws IOException {
-        SamplesInputStream stream = new SamplesInputStream(npssFile);
-        int samplesGuess = (int)(npssFile.length()/130);
+        SamplesInputStream stream = new SamplesInputStream(npssFile.getInputStream());
+        int samplesGuess = (int)(npssFile.getSize()/130);
         ProgressHandle ph = ProgressHandleFactory.createSystemHandle("Computing snapshot samples");
         ph.start(samplesGuess);
         

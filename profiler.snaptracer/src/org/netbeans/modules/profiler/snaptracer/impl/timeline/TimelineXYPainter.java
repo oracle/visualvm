@@ -103,14 +103,6 @@ abstract class TimelineXYPainter extends XYItemPainter.Abstract {
         return painting;
     }
 
-
-    // --- Protected interface -------------------------------------------------
-
-//    protected final int getViewExtent() {
-//        return viewExtent;
-//    }
-    
-
     // --- ItemPainter implementation ------------------------------------------
 
     public LongRect getItemBounds(ChartItem item) {
@@ -134,7 +126,6 @@ abstract class TimelineXYPainter extends XYItemPainter.Abstract {
         XYItemChange change = (XYItemChange)itemChange;
         LongRect dirtyBounds = change.getDirtyValuesBounds();
         return dirtyBounds.width != 0 || dirtyBounds.height != 0;
-//        return false;
     }
 
     public LongRect getDirtyBounds(ChartItemChange itemChange, ChartContext context) {
@@ -164,7 +155,6 @@ abstract class TimelineXYPainter extends XYItemPainter.Abstract {
                                 context.getViewportHeight());
         else
             return getViewBounds(item, selectedValueIndex, context);
-//            return getViewBounds(item, new int[] { selectedValueIndex }, context);
     }
 
     public XYItemSelection getClosestSelection(ChartItem item, int viewX,
@@ -233,11 +223,6 @@ abstract class TimelineXYPainter extends XYItemPainter.Abstract {
         LongRect viewBounds = context.getViewRect(dataBounds);
         LongRect.addBorder(viewBounds, viewExtent);
 
-//        viewBounds.height = 50;
-//        viewBounds.y = context.getViewportOffsetY();
-//        viewBounds.height = context.getViewportHeight();
-//        System.err.println(">>> Here...");
-
         return viewBounds;
     }
 
@@ -246,33 +231,5 @@ abstract class TimelineXYPainter extends XYItemPainter.Abstract {
         long yValue = (long)(item.getYValue(valueIndex) * dataFactor);
         return context.getViewRect(new LongRect(xValue, yValue, 0, 0));
     }
-
-//    private LongRect getViewBounds(XYItem item, int[] valuesIndexes, ChartContext context) {
-//
-//        LongRect dataBounds = new LongRect();
-//
-//        if (valuesIndexes == null) {
-//            LongRect.set(dataBounds, item.getBounds());
-//            dataBounds.y *= dataFactor;
-//            dataBounds.height *= dataFactor;
-//        } else {
-//            boolean firstPoint = true;
-//            for (int valueIndex : valuesIndexes) {
-//                if (valueIndex == -1) continue;
-//                long xValue = item.getXValue(valueIndex);
-//                long yValue = (long)(item.getYValue(valueIndex) * dataFactor);
-//                if (firstPoint) {
-//                    LongRect.set(dataBounds, xValue, yValue, 0, 0);
-//                    firstPoint = false;
-//                } else {
-//                    LongRect.add(dataBounds, xValue, yValue);
-//                }
-//            }
-//        }
-//
-//        LongRect viewBounds = context.getViewRect(dataBounds);
-//        LongRect.addBorder(viewBounds, viewExtent);
-//        return viewBounds;
-//    }
 
 }
