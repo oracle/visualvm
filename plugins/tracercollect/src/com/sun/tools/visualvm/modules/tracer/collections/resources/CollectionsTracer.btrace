@@ -348,7 +348,7 @@ import static com.sun.btrace.BTraceUtils.*;
     }
     // </fragment>
 
-    // <fragment name="coll_resize">
+    // <fragment name="map_resize">
     @Property(name="mapResizeProfiler") private static Profiler mapResizeProfiler = Profiling.newProfiler(3);
     @OnMethod(
         clazz="+java.util.Map",
