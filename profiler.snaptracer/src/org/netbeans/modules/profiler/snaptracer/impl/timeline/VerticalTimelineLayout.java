@@ -77,25 +77,21 @@ final class VerticalTimelineLayout implements LayoutManager2 {
     }
 
     public Dimension preferredLayoutSize(Container parent) {
-//        synchronized (parent.getTreeLock()) {
-            Dimension dim = new Dimension(0, Utils.checkedInt(chart.getChartContext().getViewHeight()));
+        Dimension dim = new Dimension(0, Utils.checkedInt(chart.getChartContext().getViewHeight()));
 
-            for (int i = 0; i < parent.getComponentCount(); i++)
-                dim.width = Math.max(dim.width, parent.getComponent(i).
+        for (int i = 0; i < parent.getComponentCount(); i++)
+            dim.width = Math.max(dim.width, parent.getComponent(i).
                                      getPreferredSize().width);
 
-            return dim;
-//        }
+        return dim;
     }
 
     public void layoutContainer(Container parent) {
-//        synchronized (parent.getTreeLock()) {
-            int width = parent.getWidth();
-            for (int i = 0; i < parent.getComponentCount(); i++) {
+        int width = parent.getWidth();
+        for (int i = 0; i < parent.getComponentCount(); i++) {
                 ChartContext context = chart.getRow(i).getContext();
                 parent.getComponent(i).setBounds(0, Utils.checkedInt(context.getViewportOffsetY() + chart.getOffsetY()),
                                                  width, context.getViewportHeight());
-//            }
         }
     }
 

@@ -108,8 +108,6 @@ final class TimelineChart extends SynchronousXYChart {
         setMouseZoomingEnabled(false);
         setMousePanningEnabled(false);
 
-//        setFitsWidth(true);
-
         setAccelerationPriority(1f);
     }
 
@@ -123,7 +121,6 @@ final class TimelineChart extends SynchronousXYChart {
         rows.add(row);
         row.setHeight(currentRowHeight, true);
         row.updateOffset();
-//        repaintRows(row.getIndex());
         updateChart();
         notifyRowsAdded(Collections.singletonList(row));
         return row;
@@ -136,7 +133,6 @@ final class TimelineChart extends SynchronousXYChart {
         row.setHeight(currentRowHeight, true);
         updateRowOffsets(rowIndex);
         updateRowIndexes(rowIndex + 1);
-//        repaintRows(rowIndex);
         updateChart();
         notifyRowsAdded(Collections.singletonList(row));
         return row;
@@ -152,7 +148,6 @@ final class TimelineChart extends SynchronousXYChart {
         int rowIndex = row.getIndex();
         updateRowIndexes(rowIndex);
         updateRowOffsets(rowIndex);
-//        repaintRows(row.getIndex());
         updateChart();
         notifyRowsRemoved(Collections.singletonList(row));
         return row;
@@ -376,12 +371,10 @@ final class TimelineChart extends SynchronousXYChart {
 
         if (selectionBlockers.isEmpty()) {
             selectionModel.setHoverMode(lastHoverMode);
-//            selectionModel.setMoveMode(lastMoveMode);
         } else {
             lastHoverMode = selectionModel.getHoverMode();
             lastMoveMode = selectionModel.getMoveMode();
             selectionModel.setHoverMode(ChartSelectionModel.HOVER_NONE);
-//            selectionModel.setMoveMode(ChartSelectionModel.SELECTION_NONE);
         }
     }
 
@@ -493,17 +486,13 @@ final class TimelineChart extends SynchronousXYChart {
     }
 
     private void repaintRows(final int startIndex) {
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-                for (int i = startIndex; i < rows.size(); i++) {
-                    ChartContext rowContext = rows.get(i).getContext();
-                    invalidateImage(new Rectangle(0, Utils.checkedInt(rowContext.
-                                   getViewportOffsetY()), getWidth(), rowContext.
-                                   getViewportHeight()));
-                }
-                repaintDirty();
-//            }
-//        });
+        for (int i = startIndex; i < rows.size(); i++) {
+            ChartContext rowContext = rows.get(i).getContext();
+            invalidateImage(new Rectangle(0, Utils.checkedInt(rowContext.
+                           getViewportOffsetY()), getWidth(), rowContext.
+                           getViewportHeight()));
+        }
+        repaintDirty();
     }
 
     private void updateRowBounds() {

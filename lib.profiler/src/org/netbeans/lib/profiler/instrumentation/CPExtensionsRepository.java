@@ -104,6 +104,7 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
     private static final String REFLECT_METHOD_VOID_SIGNATURE = "(Ljava/lang/reflect/Method;)V"; // NOI18N
     private static final String OBJECT_CHAR_BOOLEAN_VOID_SIGNATURE = "(Ljava/lang/Object;CZ)V"; // NOI18N
     private static final String JAVA_LANG_THROWABLE_NAME = "java/lang/Throwable"; // NOI18N
+    private static final String STACK_MAP_TABLE_ATTRIBUTE = "StackMapTable"; // NOI18N
 
     // Predefined constant pools for various kinds of instrumentation
     private static PackedCPFragment[] standardCPFragments;
@@ -397,5 +398,19 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
         standardCPFragments[INJ_OBJECT_LIVENESS] = new PackedCPFragment(entries);
 
         /*memoryProfContents_TraceObjAllocMethodIdx = objAllocTraceMethodRefIdx;  // Same as above */
+        
+        entries = new CPEntry[1];
+        i = -1;
+        entries[++i] = new CPEntry(STACK_MAP_TABLE_ATTRIBUTE);
+        standardCPFragments[INJ_STACKMAP] = new PackedCPFragment(entries);
+        
+        entries = new CPEntry[2];
+        i = -1;
+        entries[++i] = new CPEntry(CONSTANT_Class);
+        profilerRuntimeClassRefIdx = i;
+        entries[++i] = new CPEntry(JAVA_LANG_THROWABLE_NAME);
+        entries[profilerRuntimeClassRefIdx].setIndex1(i);
+        standardCPFragments[INJ_THROWABLE] = new PackedCPFragment(entries);
+
     }
 }

@@ -156,6 +156,7 @@ public abstract class Injector extends SingleMethodScaner {
     protected int origExcTableEntryCount;
     private boolean changeTypeIsInjectNewInstr;
     private boolean injectionBindsToFollowingInstruction;
+    private boolean classChecked;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -190,6 +191,20 @@ public abstract class Injector extends SingleMethodScaner {
         putU2(exceptionTable, pos + 4, handlerPC);
         putU2(exceptionTable, pos + 6, typeCPIndex);
         excTableEntryCount++;
+    }
+
+    protected void addGlobalCatchStackMapTableEntry(int endPC) {
+        DynamicClassInfo dynClass = (DynamicClassInfo)clazz;
+        if (!classChecked) {
+            classChecked = true;
+            if (!clazz.getStackMapTables().hasTable()) {
+                DynamicConstantPoolExtension.getCPFragment(dynClass, CommonConstants.INJ_STACKMAP);
+            }
+            if (clazz.getCPIndexOfClass("java/lang/Throwable") == -1) { // NOI18N
+                DynamicConstantPoolExtension.getCPFragment(dynClass, CommonConstants.INJ_THROWABLE);
+            }
+        }
+        dynClass.addGlobalCatchStackMapTableEntry(methodIdx, endPC);
     }
 
     protected void appendCode(byte[] appendedBytes, int appendedBytesCount) {
@@ -227,7 +242,7 @@ public abstract class Injector extends SingleMethodScaner {
         
         if (localVarTable.hasTable()) {
             int locVarTableOldStart = clazz.getLocalVariableTableStartOffsetInMethodInfo(methodIdx);
-            int locVarTablePtr = locVarTableOldStart + (bytecodesLength - origBytecodesLength) + (excTableNewLen - excTableOldLen);
+            int locVarTablePtr = locVarTableOldStart + diff;
             localVarTable.writeTable(ret, locVarTablePtr, methodIdx);
         }
 
@@ -235,15 +250,69 @@ public abstract class Injector extends SingleMethodScaner {
         
         if (localVarTypeTable.hasTable()) {
             int locVarTypeTableOldStart = clazz.getLocalVariableTypeTableStartOffsetInMethodInfo(methodIdx);
-            int locVarTypeTablePtr = locVarTypeTableOldStart + (bytecodesLength - origBytecodesLength) + (excTableNewLen - excTableOldLen);
+            int locVarTypeTablePtr = locVarTypeTableOldStart + diff;
             localVarTypeTable.writeTable(ret, locVarTypeTablePtr, methodIdx);
         }
 
+        ClassInfo.StackMapTables stackMapTable = clazz.getStackMapTables();
+        
+        if (stackMapTable.hasTable()) {
+            int stackMapTableOldStart = clazz.getStackMapTableStartOffsetInMethodInfo(methodIdx);
+            byte[] stackMapData = stackMapTable.writeTable(methodIdx);
+            
+            if (stackMapData != null) {
+                int stackMapDiff = 0;
+                int stackMapTablePtr;
+                
+                if (stackMapTableOldStart != 0) {
+//                    ClassInfo.LOG.finer("Updating StackMapTable for "+clazz.getName()+" method "+clazz.getMethodName(methodIdx));
+                    stackMapTablePtr = stackMapTableOldStart + diff;
+                    int originalSize = getU4(ret, stackMapTablePtr-6) - 2;
+//                    ClassInfo.LOG.finer("Original size "+originalSize);
+                    
+                    if (stackMapData.length > originalSize) {  // add space and copy original data
+                        stackMapDiff = stackMapData.length-originalSize;
+                        ret = insertBytes(ret, stackMapTablePtr+originalSize, stackMapDiff);
+                    }
+                    System.arraycopy(stackMapData,0,ret,stackMapTablePtr,stackMapData.length);
+                } else {
+//                    ClassInfo.LOG.finer("Adding StackMapTable for "+clazz.getName()+" method "+clazz.getMethodName(methodIdx));
+                    // add whole StackMapTable attribute
+                    byte[] header = stackMapTable.getAttributeHeader(methodIdx);
+                    int insertOffset = bytecodesStartIdx - 8 + attrLength; // end of Code attribute
+                    
+                    stackMapDiff = header.length + stackMapData.length;
+                    stackMapTablePtr = insertOffset + header.length;
+                    ret = insertBytes(ret, insertOffset, stackMapDiff);
+                    System.arraycopy(header, 0, ret, stackMapTablePtr-header.length , header.length);
+                    System.arraycopy(stackMapData, 0, ret, stackMapTablePtr, stackMapData.length);
+                    int arrtCountPrt = excTableNewStart+2+excTableNewLen;
+                    putU2(ret,arrtCountPrt,getU2(ret,arrtCountPrt)+1); // increment attributes_count item
+                }
+                if (stackMapDiff > 0) {
+                    putU4(ret, bytecodesStartIdx-12, attrLength + stackMapDiff);                  // update the attribute_length in Code attribute
+                    putU4(ret, stackMapTablePtr-6, stackMapData.length + 2);                          // update attribute size
+                    putU2(ret, stackMapTablePtr-2, stackMapTable.getNumberOfFrames(methodIdx));       // update no. of StackMap frames
+                }
+            }
+        }
+        
         // FIXME: need to update linenumber table as well
         putU2(ret, bytecodesStartIdx - 8, maxStack + STACK_INCREMENT);
         putU2(ret, bytecodesStartIdx - 6, maxLocals);
 
         return ret;
+    }
+
+    private byte[] insertBytes(final byte[] ret, final int insertionOffset, final int newBytes) {
+        byte[] newRet = new byte[ret.length+newBytes];
+        System.arraycopy(ret,0,newRet,0,insertionOffset);
+        if (insertionOffset < ret.length) {
+            System.arraycopy(ret, insertionOffset, 
+                             newRet, insertionOffset+newBytes,
+                             ret.length-insertionOffset);
+        }
+        return newRet;
     }
 
     /**
@@ -605,10 +674,10 @@ public abstract class Injector extends SingleMethodScaner {
         updateExceptionTable(bci, delta);
         updateLocalVariableTable(bci, delta);
         updateLocalVariableTypeTable(bci, delta);
+        updateStackMapTable(bci, delta);
 
         // We currently don't support the following updates - they are used only by debuggers.
         // updateLineNumberTable(injectionPos, delta);
-        // updateLocalVariableTypeTable(injectionPos, delta);
 
         // Relocate the bcis of changes in the pending change stack
         for (int j = 0; j < changes.size(); j++) {
@@ -656,4 +725,9 @@ public abstract class Injector extends SingleMethodScaner {
         localVarTypeTable.updateTable(injectionPos, injectedBytesCount, methodIdx);
     }
 
+    private void updateStackMapTable(int injectionPos, int injectedBytesCount) {
+        ClassInfo.StackMapTables stackMapTable = clazz.getStackMapTables();
+        
+        stackMapTable.updateTable(injectionPos, injectedBytesCount, methodIdx);
+    }
 }
