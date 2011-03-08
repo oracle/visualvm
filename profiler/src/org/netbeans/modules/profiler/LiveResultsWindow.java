@@ -472,9 +472,21 @@ public final class LiveResultsWindow extends TopComponent
     private volatile boolean profilerRunning = false;
     private volatile boolean resultsAvailable = false;
 
+    private static class Singleton {
+        final private static LiveResultsWindow INSTANCE = new LiveResultsWindow();
+    }
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LiveResultsWindow() {
+        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() {
+                initUI();
+            }
+        });
+    }
+    
+    private void initUI() {
         setName(NbBundle.getMessage(LiveResultsWindow.class, "LAB_ResultsWindowName")); // NOI18N
         setIcon(liveWindowIcon);
         getAccessibleContext().setAccessibleDescription(LIVE_RESULTS_ACCESS_DESCR);
@@ -581,13 +593,9 @@ public final class LiveResultsWindow extends TopComponent
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static synchronized LiveResultsWindow getDefault() {
+    public static LiveResultsWindow getDefault() {
         if (!hasDefault()) {
-            IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
-                    public void run() {
-                        defaultLiveInstance = new LiveResultsWindow();
-                    }
-                });
+            defaultLiveInstance = Singleton.INSTANCE;
         }
 
         return defaultLiveInstance;
