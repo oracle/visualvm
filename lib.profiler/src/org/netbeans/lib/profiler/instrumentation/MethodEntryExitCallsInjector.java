@@ -53,7 +53,7 @@ import org.netbeans.lib.profiler.global.CommonConstants;
  * in TA methods.
  *
  * @author Tomas Hurka
- *  @author Misha Dmitriev
+ * @author Misha Dmitriev
  */
 class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -181,6 +181,7 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
 
         appendCode(injCode2, injCodeLen2);
         addExceptionTableEntry(0, lastInstrBCI, origLen, 0);
+        addGlobalCatchStackMapTableEntry(lastInstrBCI);
 
         if (maxLocals < 2) {
             maxLocals = 2;
