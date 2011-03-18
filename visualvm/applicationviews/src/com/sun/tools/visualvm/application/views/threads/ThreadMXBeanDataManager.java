@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.client.MonitoredData;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
 import org.openide.util.RequestProcessor;
@@ -65,7 +66,7 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
         try {
             ThreadMonitoredDataResponse resp = new ThreadMonitoredDataResponse();
             resp.fillInThreadData();
-            processData(org.netbeans.lib.profiler.client.MonitoredData.getMonitoredData(resp));
+            processData(MonitoredData.getMonitoredData(resp));
         } catch (Exception ex) {
             LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "refreshThreads", ex); // NOI18N
         } finally {
