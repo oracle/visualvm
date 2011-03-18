@@ -54,10 +54,17 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
 
     // Non-blocking call for general usage
     void refreshThreadsAsync() {
-        if (refreshRunning) return;
-        refreshRunning = true;
+        synchronized (this) {
+            if (refreshRunning) return;
+            refreshRunning = true;
+        }
         RequestProcessor.getDefault().post(new Runnable() {
-            public void run() { refreshThreadsSync(); }
+            public void run() {
+                refreshThreadsSync();
+                synchronized (ThreadMXBeanDataManager.this) {
+                   refreshRunning = false; 
+                }
+            }
         });
     }
 
@@ -69,8 +76,6 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
             processData(MonitoredData.getMonitoredData(resp));
         } catch (Exception ex) {
             LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "refreshThreads", ex); // NOI18N
-        } finally {
-            refreshRunning = false;
         }
     }
 
