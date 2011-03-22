@@ -75,6 +75,8 @@ import javax.swing.*;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.Utils;
+import org.openide.util.ContextAwareAction;
+import org.openide.util.Lookup;
 
 
 /**
@@ -132,7 +134,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public MemoryDiffPanel(MemoryResultsSnapshot snapshot, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2, int sortingColumn,
+    public MemoryDiffPanel(Lookup context, MemoryResultsSnapshot snapshot, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2, int sortingColumn,
                            boolean sortingOrder, Project project) {
         this.project = project;
 
@@ -176,7 +178,8 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
 
         toolBar.addSeparator();
 
-        findActionPresenter = toolBar.add(SystemAction.get(FindAction.class));
+        ContextAwareAction a = SystemAction.get(FindAction.class);
+        findActionPresenter = toolBar.add(a.createContextAwareInstance(context));
         findPreviousPresenter = toolBar.add(new FindPreviousAction(this));
         findNextPresenter = toolBar.add(new FindNextAction(this));
         
