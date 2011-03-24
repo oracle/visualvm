@@ -113,17 +113,17 @@ class NetworkOptionsPanel extends JPanel {
             throw new IllegalArgumentException("Unknown proxy configuration"); // NOI18N
         }
 
-        model.setHttpHost(httpProxyField.getText());
+        model.setHttpHost(httpProxyField.getText().trim());
         model.setHttpPort(httpProxySpinnerModel.getValue().toString());
         
         model.setUseProxyAllProtocols(sameSettingsCheckBox.isSelected());
 
-        model.setHttpsHost(httpsProxyField.getText());
+        model.setHttpsHost(httpsProxyField.getText().trim());
         model.setHttpsPort(httpsProxySpinnerModel.getValue().toString());
-        model.setSocksHost(socksProxyField.getText());
+        model.setSocksHost(socksProxyField.getText().trim());
         model.setSocksPort(socksProxySpinnerModel.getValue().toString());
 
-        model.setNonProxyHosts(noProxyField.getText());
+        model.setNonProxyHosts(noProxyField.getText().trim());
 
         model.setUseAuthentication(authenticationCheckBox.isSelected());
         model.setAuthenticationUsername(usernameField.getText());
