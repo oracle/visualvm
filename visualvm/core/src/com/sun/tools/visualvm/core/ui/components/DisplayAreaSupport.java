@@ -82,7 +82,7 @@ class DisplayAreaSupport {
 
     static class TabButton extends JButton {
 
-        public TabButton(String text, String description) {
+        TabButton(String text, String description) {
             super(text);
             setModel(new DefaultButtonModel() {
                 public boolean isPressed() { return false; }
@@ -113,7 +113,7 @@ class DisplayAreaSupport {
 
         private TabButton tabButton;
 
-        public TabButtonContainer(TabButton tabButton) {
+        TabButtonContainer(TabButton tabButton) {
             this.tabButton = tabButton;
             setOpaque(true);
             setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
@@ -127,7 +127,7 @@ class DisplayAreaSupport {
             tabButton.setEnabled(enabled);
         }
 
-        public void updateTabButton(int index, int selectedIndex, int buttonsCount) {
+        void updateTabButton(int index, int selectedIndex, int buttonsCount) {
             if (buttonsCount == 1) {
                 tabButton.setFocusable(false);
                 tabButton.setCursor(Cursor.getDefaultCursor());
@@ -163,7 +163,7 @@ class DisplayAreaSupport {
         private Insets insets;
 
 
-        public static TabbedCaptionBorder get(Color colorTop, Color colorLeft, Color colorBottom, Color colorRight) {
+        static TabbedCaptionBorder get(Color colorTop, Color colorLeft, Color colorBottom, Color colorRight) {
             for (TabbedCaptionBorder border : borders)
                 // Note: identity must be used for the comparison!
                 if (border.COLOR_TOP == colorTop &&
@@ -226,7 +226,7 @@ class DisplayAreaSupport {
     private static class ThinBevelBorder extends BevelBorder {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ThinBevelBorder(int bevelType, Color highlight, Color shadow) {
+        private ThinBevelBorder(int bevelType, Color highlight, Color shadow) {
             super(bevelType, highlight.brighter(), highlight, shadow, shadow.brighter());
         }
 
@@ -300,7 +300,7 @@ class DisplayAreaSupport {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public ImageIconButton(ImageIcon icon) {
+        ImageIconButton(ImageIcon icon) {
             super();
 
             GrayFilter enabledFilter = new GrayFilter(true, 35);

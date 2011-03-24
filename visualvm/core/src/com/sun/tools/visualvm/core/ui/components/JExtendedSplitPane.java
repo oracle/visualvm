@@ -46,11 +46,11 @@ class JExtendedSplitPane extends JSplitPane {
     private double requestedDividerLocation = -1;
 
     
-    public JExtendedSplitPane(int newOrientation, Component newLeftComponent, Component newRightComponent) {
+    JExtendedSplitPane(int newOrientation, Component newLeftComponent, Component newRightComponent) {
         this(newOrientation, false, newLeftComponent, newRightComponent);
     }
 
-    public JExtendedSplitPane(int newOrientation, boolean newContinuousLayout, Component newLeftComponent,
+    JExtendedSplitPane(int newOrientation, boolean newContinuousLayout, Component newLeftComponent,
                               Component newRightComponent) {
         super(newOrientation, newContinuousLayout, newLeftComponent, newRightComponent);
 
