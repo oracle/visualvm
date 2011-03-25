@@ -58,39 +58,39 @@ class DisplayArea extends JComponent {
 
     private boolean ignoresContentsHeight = true;
 
-    public DisplayArea() {
+    DisplayArea() {
         initComponents();
         setClosable(true);
         setVisible(false); // No tabs added yet
     }
 
-    public void setCaption(String caption) {
+    void setCaption(String caption) {
         this.caption = caption;
         if (presenter != null) presenter.setCaption(caption);
     }
 
-    public String getCaption() {
+    String getCaption() {
         return caption;
     }
 
-    public void setClosable(boolean closable) {
+    void setClosable(boolean closable) {
         optionsContainer.setClosable(closable);
         updatePresenter();
     }
 
-    public boolean isClosable() {
+    boolean isClosable() {
         return optionsContainer.isClosable();
     }
 
-    public void setIgnoresContentsHeight(boolean ignoresContentsHeight) {
+    void setIgnoresContentsHeight(boolean ignoresContentsHeight) {
         this.ignoresContentsHeight = ignoresContentsHeight;
     }
 
-    public boolean ignoresContentsHeight() {
+    boolean ignoresContentsHeight() {
         return ignoresContentsHeight;
     }
 
-    public Presenter getPresenter() {
+    Presenter getPresenter() {
         if (presenter == null) {
             presenter = createPresenter();
             updatePresenter();
@@ -98,7 +98,7 @@ class DisplayArea extends JComponent {
         return presenter;
     }
 
-    public void addTab(Tab tab) {
+    void addTab(Tab tab) {
         final DisplayAreaSupport.TabButton tabButton = tabsContainer.addTab(tab);
         if (tabButton != null) {
             optionsContainer.addOptions(tab);
@@ -120,7 +120,7 @@ class DisplayArea extends JComponent {
         updatePresenter();
     }
 
-    public void removeTab(Tab tab) {
+    void removeTab(Tab tab) {
         Tab toSelect = null;
         boolean wasSelected = getSelectedTab() == tab;
         if (wasSelected) {
@@ -143,11 +143,11 @@ class DisplayArea extends JComponent {
         updatePresenter();
     }
 
-    public boolean containsTab(Tab tab) {
+    boolean containsTab(Tab tab) {
         return tabsContainer.containsTab(tab);
     }
 
-    public void setSelectedTab(Tab tab) {
+    void setSelectedTab(Tab tab) {
         if (tabsContainer.getSelectedTab() == tab) return;
 
         tabsContainer.setSelectedTab(tab);
@@ -155,7 +155,7 @@ class DisplayArea extends JComponent {
         viewContainer.setSelectedView(tab.getView());
     }
 
-    public Tab getSelectedTab() {
+    Tab getSelectedTab() {
         return tabsContainer.getSelectedTab();
     }
 
@@ -242,18 +242,18 @@ class DisplayArea extends JComponent {
     private OptionsContainer optionsContainer;
 
 
-    public static class Presenter extends JCheckBox {
+    static class Presenter extends JCheckBox {
 
-        public void setCaption(String caption) { setText(caption); }
-        public String getCaption() { return getText(); }
+        void setCaption(String caption) { setText(caption); }
+        String getCaption() { return getText(); }
 
-        public void setDescription(String description) { setToolTipText(description); }
-        public String getDescription() { return getToolTipText(); }
+        void setDescription(String description) { setToolTipText(description); }
+        String getDescription() { return getToolTipText(); }
 
     }
 
 
-    public static class Tab implements Positionable {
+    static class Tab implements Positionable {
 
         private String name;
         private String description;
@@ -261,8 +261,8 @@ class DisplayArea extends JComponent {
         private JComponent view;
         private JComponent[] options;
 
-        public Tab(String name, JComponent view) { this(name, null, POSITION_AT_THE_END, view, null); }
-        public Tab(String name, String description, int preferredPosition, JComponent view, JComponent[] options) {
+        Tab(String name, JComponent view) { this(name, null, POSITION_AT_THE_END, view, null); }
+        Tab(String name, String description, int preferredPosition, JComponent view, JComponent[] options) {
             setName(name);
             setDescription(description);
             setPreferredPosition(preferredPosition);
@@ -270,20 +270,20 @@ class DisplayArea extends JComponent {
             setOptions(options);
         }
 
-        public void setName(String name) { this.name = name; }
-        public String getName() { return name; }
+        void setName(String name) { this.name = name; }
+        String getName() { return name; }
 
-        public void setDescription(String description) { this.description = description; }
-        public String getDescription() { return description; }
+        void setDescription(String description) { this.description = description; }
+        String getDescription() { return description; }
 
-        public void setPreferredPosition(int preferredPosition) { this.preferredPosition = preferredPosition; }
+        void setPreferredPosition(int preferredPosition) { this.preferredPosition = preferredPosition; }
         public int getPreferredPosition() { return preferredPosition; }
 
-        public void setView(JComponent view) { this.view = view; }
-        public JComponent getView() { return view; }
+        void setView(JComponent view) { this.view = view; }
+        JComponent getView() { return view; }
 
-        public void setOptions(JComponent[] options) { this.options = options != null ? options.clone() : null; }
-        public JComponent[] getOptions() { return options != null ? options.clone() : null; }
+        void setOptions(JComponent[] options) { this.options = options != null ? options.clone() : null; }
+        JComponent[] getOptions() { return options != null ? options.clone() : null; }
 
     }
 
