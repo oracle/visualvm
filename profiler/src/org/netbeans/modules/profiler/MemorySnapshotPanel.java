@@ -74,6 +74,8 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.Utils;
+import org.openide.util.ContextAwareAction;
+import org.openide.util.Lookup;
 
 
 /**
@@ -144,7 +146,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public MemorySnapshotPanel(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
+    public MemorySnapshotPanel(Lookup context, LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
         this.snapshot = (MemoryResultsSnapshot) ls.getSnapshot();
         this.project = ls.getProject();
 
@@ -205,7 +207,8 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
         toolBar.addSeparator();
         
-        findActionPresenter = toolBar.add(SystemAction.get(FindAction.class));
+        ContextAwareAction a = SystemAction.get(FindAction.class);
+        findActionPresenter = toolBar.add(a.createContextAwareInstance(context));
         findPreviousPresenter = toolBar.add(new FindPreviousAction(this));
         findNextPresenter = toolBar.add(new FindNextAction(this));
         
