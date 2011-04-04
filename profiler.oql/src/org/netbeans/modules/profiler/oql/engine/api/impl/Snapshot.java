@@ -45,17 +45,19 @@ import org.netbeans.modules.profiler.oql.engine.api.ReferenceChain;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.lib.profiler.heap.Field;
-import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.Value;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 
 /**
  *
@@ -70,9 +72,11 @@ public class Snapshot {
     private JavaClass weakReferenceClass;
     private int referentFieldIndex;
     private ReachableExcludes reachableExcludes;
-
-    public Snapshot(Heap heap) {
+    final private OQLEngine engine;
+    
+    public Snapshot(Heap heap, OQLEngine engine) {
         this.delegate = heap;
+        this.engine = engine;
         init();
     }
 
@@ -200,42 +204,70 @@ public class Snapshot {
         };
     }
 
-    public Iterator getReferrers(Instance obj) {
+    public Iterator getReferrers(Object obj, boolean includeWeak) {
         List instances = new ArrayList();
-        List references = null;
-        references = obj.getReferences();
-        if (references != null) {
-            for (Iterator iter = references.iterator(); iter.hasNext();) {
-                Value val = (Value) iter.next();
-                instances.add(val.getDefiningInstance());
-            }
-        }
-        return instances.iterator();
-    }
-
-    public Iterator getReferees(Object obj) {
-        List instances = new ArrayList();
-        List values = null;
+        List references = new ArrayList();
+        
         if (obj instanceof Instance) {
-            values = ((Instance)obj).getFieldValues();
+            references.addAll(((Instance)obj).getReferences());
         } else if (obj instanceof JavaClass) {
-            values = ((JavaClass)obj).getStaticFieldValues();
+            references.addAll(((JavaClass)obj).getInstances());
+            references.add(((JavaClass)obj).getClassLoader());
         }
-        if (values != null) {
-            for (Object value : values) {
-                if (value instanceof ObjectFieldValue) {
-                    instances.add(((ObjectFieldValue) value).getInstance());
+        if (!references.isEmpty()) {
+            for (Object o : references) {
+                if (o instanceof Value) {
+                    Value val = (Value) o;
+                    Instance inst = val.getDefiningInstance();
+                    if (includeWeak || !isWeakRef(inst)) {
+                        instances.add(inst);
+                    }
+                } else if (o instanceof Instance) {
+                    if (includeWeak || !isWeakRef((Instance)o)) {
+                        instances.add(o);
+                    }
                 }
             }
         }
         return instances.iterator();
     }
 
-    public Iterator getReferees(JavaClass clz) {
+    public Iterator getReferees(Object obj, boolean includeWeak) {
         List instances = new ArrayList();
-        for (Object value : clz.getStaticFieldValues()) {
-            if (value instanceof ObjectFieldValue) {
-                instances.add(((ObjectFieldValue) value).getInstance());
+        List values = new ArrayList();
+        
+        if (obj instanceof Instance) {
+            Instance o = (Instance)obj;
+            values.addAll(o.getFieldValues());
+        }
+        if (obj instanceof JavaClass) {
+            values.addAll(((JavaClass)obj).getStaticFieldValues());
+        }
+        if (obj instanceof ObjectArrayInstance) {
+            ObjectArrayInstance oarr = (ObjectArrayInstance)obj;
+            values.addAll(oarr.getValues());
+        }
+        if (!values.isEmpty()) {
+            for (Object value : values) {
+                if (value instanceof ObjectFieldValue && ((ObjectFieldValue) value).getInstance() != null) {
+                    Instance inst = ((ObjectFieldValue) value).getInstance();
+                    if (includeWeak || !isWeakRef(inst)) {
+                        if (inst.getJavaClass().getName().equals("java.lang.Class")) {
+                            JavaClass jc = delegate.getJavaClassByID(inst.getInstanceId());
+                            if (jc != null) {
+                                instances.add(jc);
+                            } else {
+                                instances.add(inst);
+                            }
+                        } else {
+                            instances.add(inst);
+                        }
+                    }
+                } else if (value instanceof Instance) {
+                    if (includeWeak || !isWeakRef((Instance)value)) {
+                        instances.add(value);
+                    }
+                }
             }
         }
         return instances.iterator();
@@ -268,81 +300,85 @@ public class Snapshot {
     }
 
     public Iterator getRoots() {
-        return delegate.getGCRoots().iterator();
+        return getRootsList().iterator();
+    }
+    
+    public List getRootsList() {
+        List<Object> roots = new ArrayList<Object>();
+        for(Object rootObj : delegate.getGCRoots()) {
+            GCRoot root = (GCRoot)rootObj;
+            Instance inst = root.getInstance();
+            if (inst.getJavaClass().getName().equals("java.lang.Class")) {
+                JavaClass jc = delegate.getJavaClassByID(inst.getInstanceId());
+                if (jc != null) {
+                    roots.add(jc);
+                } else {
+                    roots.add(inst);
+                }
+            } else {
+                roots.add(inst);
+            }
+        }
+        return roots;
     }
 
     public GCRoot[] getRootsArray() {
-        return (GCRoot[]) delegate.getGCRoots().toArray();
+        List rootList = getRootsList();
+        return (GCRoot[]) rootList.toArray(new GCRoot[rootList.size()]);
     }
-
+   
     public ReferenceChain[] rootsetReferencesTo(Instance target, boolean includeWeak) {
-        Queue<ReferenceChain> fifo = new LinkedList<ReferenceChain>();
-        // Must be a fifo to go breadth-first
-        Map visited = new HashMap();
+        class State {
+            private Iterator<Instance> iterator;
+            private ReferenceChain path;
+            private AtomicLong hits = new AtomicLong(0);
 
-        // Objects are added here right after being added to fifo.
+            public State(ReferenceChain path, Iterator<Instance> iterator) {
+                this.iterator = iterator;
+                this.path = path;
+            }
+        }
+        Deque<State> stack = new LinkedList<State>();
+        Set ignored = new HashSet();
+        
         List<ReferenceChain> result = new ArrayList<ReferenceChain>();
-        visited.put(target, target);
-        fifo.add(new ReferenceChain(target, null));
-
-        ReferenceChain chain = null;
+        
+        Iterator toInspect = getRoots();
+        ReferenceChain path = null;
+        State s = new State(path, toInspect);
+        
         do {
-            chain = (ReferenceChain) fifo.poll();
-            if (chain == null) {
-                continue;
-            }
+            if (path != null && path.getObj().equals(target)) {
+                result.add(path);
+                s.hits.incrementAndGet();
+            } else {
+                while(!engine.isCancelled() && toInspect.hasNext()) {
+                    Object node = toInspect.next();
+                    if (path != null && path.contains(node)) continue;
+                    if (ignored.contains(node)) continue;
 
-            Instance curr = chain.getObj();
-            if (curr.isGCRoot()) {
-                result.add(chain);
-            // Even though curr is in the rootset, we want to explore its
-            // referers, because they might be more interesting.
-            }
-            List<Instance> referers = getReferers(curr);
-            for (Instance t : referers) {
-                if (t != null && !visited.containsKey(t)) {
-                    if (includeWeak || !refersOnlyWeaklyTo(t, curr)) {
-                        visited.put(t, t);
-                        fifo.add(new ReferenceChain(t, chain));
-                    }
+                    stack.push(s);
+                    path = new ReferenceChain(delegate, node, path);
+                    toInspect = getReferees(node, includeWeak);
+                    s = new State(path, toInspect);
+                }
+                if (path != null && path.getObj().equals(target)) {
+                    result.add(path);
+                    s.hits.incrementAndGet();
                 }
             }
-        } while (chain != null);
+            State s1 = stack.poll();
+            if (s1 == null) break;
+            s1.hits.addAndGet(s.hits.get());
+            if (s.hits.get() == 0L) {
+                ignored.add(path.getObj());
+            }
+            s = s1;
+            path = s.path;
+            toInspect = s.iterator;
+        } while (!engine.isCancelled());
 
         return result.toArray(new ReferenceChain[result.size()]);
-    }
-
-    private List<Instance> getReferers(Instance instance) {
-        List<Instance> referers = new ArrayList<Instance>();
-
-        for (Object fldObj : instance.getReferences()) {
-            if (fldObj instanceof Value) {
-                referers.add(((Value) fldObj).getDefiningInstance());
-            }
-        }
-        return referers;
-    }
-
-    private boolean refersOnlyWeaklyTo(Instance from, Instance to) {
-        if (getWeakReferenceClass() != null) {
-            if (isAssignable(getWeakReferenceClass(), from.getJavaClass())) {
-                //
-                // REMIND:  This introduces a dependency on the JDK
-                // 	implementation that is undesirable.
-                FieldValue[] flds = (FieldValue[]) from.getFieldValues().toArray();
-                for (int i = 0; i < flds.length; i++) {
-                    if (i != referentFieldIndex) {
-                        if (flds[i] instanceof ObjectFieldValue) {
-                            if (((ObjectFieldValue) flds[i]).getInstance() == to) {
-                                return false;
-                            }
-                        }
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     private boolean isAssignable(JavaClass from, JavaClass to) {
@@ -354,6 +390,10 @@ public class Snapshot {
             return isAssignable(from.getSuperClass(), to);
         // Trivial tail recursion:  I have faith in javac.
         }
+    }
+    
+    private boolean isWeakRef(Instance inst) {
+        return weakReferenceClass != null && isAssignable(inst.getJavaClass(), weakReferenceClass);
     }
 
     public JavaClass getWeakReferenceClass() {
