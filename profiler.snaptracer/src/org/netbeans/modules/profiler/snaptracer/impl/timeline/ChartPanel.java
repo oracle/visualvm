@@ -127,7 +127,6 @@ final class ChartPanel extends JPanel {
         selectionOverlay.registerChart(support);
 
         XChartSelectionOverlay xOverlay = new XChartSelectionOverlay(support);
-//        xOverlay.setLineMode(false, true, false, true);
         xOverlay.setLineMode(false, false, false, false);
         chart.addOverlayComponent(xOverlay);
         xOverlay.registerChart(chart);
@@ -194,13 +193,6 @@ final class ChartPanel extends JPanel {
     boolean resetSelection() {
         chart.getSelectionModel().setSelectionBounds(null);
         return false;
-
-//        if (chart.isRowSelection()) {
-//            chart.clearRowsSelection();
-//            return true;
-//        } else {
-//            return false;
-//        }
     }
 
 
@@ -358,7 +350,6 @@ final class ChartPanel extends JPanel {
             Timeline timeline = ((SynchronousXYItemsModel)chart.getItemsModel()).getTimeline();
             setEnabled(timeline.getTimestampsCount() > 1 && !chart.fitsWidth() &&
                        chart.viewWidth(1000) < ONE_SECOND_WIDTH_THRESHOLD);
-//            System.err.println(">>> Update, enabled: " + isEnabled() + ", getTimestampsCount: " + timeline.getTimestampsCount() + ", fitsWidth: " + chart.fitsWidth() + ", viewWidth thr: " + (chart.viewWidth(1000) < ONE_SECOND_WIDTH_THRESHOLD));
         }
 
     }
