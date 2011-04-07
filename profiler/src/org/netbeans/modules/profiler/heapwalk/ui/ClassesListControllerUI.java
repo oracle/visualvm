@@ -871,7 +871,6 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     private void showSubclassesForClass(JavaClass jClass) {
-        filterComponent.setFilterType(ClassesListController.FILTER_SUBCLASS);
-        filterComponent.setFilterString(jClass.getName()); // fires change in filterComponent
+        filterComponent.setFilterValues(jClass.getName(),ClassesListController.FILTER_SUBCLASS);
     }
 }
