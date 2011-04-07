@@ -43,10 +43,14 @@
 
 package org.netbeans.lib.profiler.classfile;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.instrumentation.JavaClassConstants;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import org.netbeans.lib.profiler.classfile.ClassInfo.StackMapFrame.FrameType;
 
 
 /**
@@ -325,6 +329,449 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             super(ci, ci.localVariableTypeTablesOffsets, ci.localVariableTypeTablesLengths);
         }
     }
+//    public static Logger LOG = Logger.getLogger(ClassInfo.class.getName());   
+    public class StackMapTables {
+
+
+        private StackMapFrame[][] frames;
+        private byte[][] framesBytes;
+        private boolean hasTable;
+         
+        StackMapTables() {
+            byte[] classBuf = null;
+
+            try {
+                classBuf = ClassInfo.this.getClassFileBytes();
+            } catch (IOException ex1) { // Should not happen - class file already loaded once by this time
+            } catch (ClassNotFoundException ex2) {
+            } // Ditto
+
+            int nMethods = ClassInfo.this.getMethodNames().length;
+            frames = new StackMapFrame[nMethods][];
+            framesBytes = new byte[nMethods][];
+            for (int i = 0; i < nMethods; i++) {
+                int tableLen = ClassInfo.this.stackMapTablesLengths[i];
+
+                if (tableLen == 0) {
+                    continue;
+                }
+                int startOfs = ClassInfo.this.methodInfoOffsets[i] + ClassInfo.this.stackMapTablesOffsets[i];
+                int ofs = startOfs;
+                StackMapFrame[] frms = frames[i] = new StackMapFrame[tableLen];
+//                LOG.finer("Class "+ClassInfo.this.name+" method "+ClassInfo.this.getMethodName(i));
+                for (int j = 0; j < tableLen; j++) {
+                    frms[j] = new StackMapFrame(classBuf,ofs);
+                    ofs+=frms[j].getSize();
+//                    LOG.finer(frms[j].toString());
+                }
+                int len = ofs - startOfs;
+                framesBytes[i] = new byte[len+tableLen+2*(StackMapFrame.FrameType.FULL_FRAME.size()+2*3)];
+                System.arraycopy(classBuf,startOfs,framesBytes[i],0,len);
+                hasTable = true;
+            }
+        }
+
+        public boolean hasTable() {
+            return hasTable;
+        }
+
+        public void updateTable(int injectionPos, int injectedBytesCount, int methodIdx) {
+            if (hasTable()) {
+                StackMapFrame[] frms = frames[methodIdx];
+                
+                if (frms != null) {
+                    int bciIter = -1;
+                    boolean  offsetAdjusted = false; // only need to adjust one offset
+                    
+                    for (StackMapFrame frame : frms) {
+                        int offsetDelta = frame.getOffsetDelta();
+                        bciIter += offsetDelta;
+
+                        if (!offsetAdjusted && bciIter > injectionPos) {
+                            setOffsetDelta(methodIdx, frame, offsetDelta + injectedBytesCount);
+                            offsetAdjusted = true;
+                        }
+                        frame.updateUnitilializedList(injectionPos, injectedBytesCount);
+                    }
+                }                
+            }
+        }
+        
+        public int getNumberOfFrames(int methodIdx) {
+            StackMapFrame[] frms = frames[methodIdx];
+            
+            if (frms != null) {
+                return frms.length;
+            }
+            return 0;
+        }
+
+        public byte[] getAttributeHeader(int methodIdx) {
+            byte[] header = new byte[8];
+            putU2(header,0,ClassInfo.this.stackMapTableCPindex);
+            return header;
+        }
+        
+        public byte[] writeTable(int methodIdx) {
+            StackMapFrame[] frms = frames[methodIdx];
+            byte frameBytes[] = framesBytes[methodIdx];
+            
+            if (frms != null) {
+                byte[] ret;
+                int offset = 0;
+                
+                for (StackMapFrame frame : frms) {
+                    frame.writeFrame(frameBytes, offset);
+                    offset+=frame.getSize();
+                }
+                ret = new byte[offset];
+                System.arraycopy(frameBytes,0,ret,0,offset);
+                return ret;
+            }
+            return null;
+        }
+
+        void addFullStackMapFrameEntry(int methodIdx, int endPC, int[] locals, int[] stacks) {
+            StackMapFrame[] frms = frames[methodIdx];
+            StackMapFrame[] newFrms;
+
+            if (frms != null) {
+                int bciIter = -1;
+
+                for (StackMapFrame frame : frms) {
+                    bciIter += frame.getOffsetDelta();
+                }
+                newFrms = frames[methodIdx] = new StackMapFrame[frms.length+1];
+                System.arraycopy(frms,0,newFrms,0,frms.length);
+                newFrms[frms.length] = new FullStackMapFrame(endPC - bciIter, locals, stacks);
+            } else {
+                newFrms = frames[methodIdx] = new StackMapFrame[1];
+                newFrms[0] = new FullStackMapFrame(endPC + 1, locals, stacks);
+                framesBytes[methodIdx] = new byte[newFrms[0].getSize()];
+                hasTable = true;
+            }
+        }
+
+        private void setOffsetDelta(int methodIdx, StackMapFrame frame, int newOffsetDelta) {
+            FrameType frameType = frame.frameType;
+            
+            if (frameType.equals(FrameType.SAME) && newOffsetDelta > 63) {
+                 extendFrame(methodIdx,frame,2);
+                frame.setFrameType(FrameType.SAME_FRAME_EXTENDED);
+            }
+            if (frameType.equals(FrameType.SAME_LOCALS_1_STACK_ITEM) && newOffsetDelta > 63) {
+                extendFrame(methodIdx,frame,2);
+                frame.setFrameType(frameType.SAME_LOCALS_1_STACK_ITEM_EXTENDED);
+            }
+            frame.setOffsetDelta(newOffsetDelta);
+        }
+
+        private void extendFrame(int methodIdx, StackMapFrame frame, int addBytes) {
+             StackMapFrame[] frms = frames[methodIdx];
+             byte[] data = framesBytes[methodIdx];
+             int offset = 0;
+             
+             for (StackMapFrame f : frms) {
+                 if (f == frame) {
+                     break;
+                 }
+                 offset += f.getSize();
+             }
+             System.arraycopy(data,offset,data,offset+addBytes,data.length-offset-addBytes);
+        }
+    }
+    
+    static class StackMapFrame {
+        enum FrameType {
+            SAME(1),
+            SAME_LOCALS_1_STACK_ITEM(1),
+            SAME_LOCALS_1_STACK_ITEM_EXTENDED(3),
+            CHOP(3),
+            SAME_FRAME_EXTENDED(3),
+            APPEND(3),
+            FULL_FRAME(7);
+                    
+            private int frameSize;
+
+            int size() {return frameSize;}
+
+            FrameType(int size){
+               frameSize = size;
+            }
+        }
+        
+        FrameType frameType;
+        int storedOffsetDelta;
+        int size;
+        boolean modified;
+        boolean frameModified;
+        boolean uninitializedListModified;
+        List<Integer> uninitializedList;
+        
+        StackMapFrame(FrameType type, int offset, int s) {
+            frameType = type;
+            storedOffsetDelta = offset - 1;
+            size = type.size()+s;
+        }
+        
+        StackMapFrame(byte[] buffer, int offset) {
+            int type;
+            
+            type = buffer[offset++] & 0xff;
+            if (type <= 63) {
+                frameType = FrameType.SAME;
+                storedOffsetDelta = type;
+            } else if (type <= 127) {
+                frameType = FrameType.SAME_LOCALS_1_STACK_ITEM;
+                storedOffsetDelta = type - 64;
+                size = getVerificationTypeInfoSize(buffer[offset]);
+                storeUninitializedVariableInfo(buffer,offset,0);
+            } else if (type <= 246) {
+                throw new IllegalArgumentException("Type: "+type);
+            } else if (type == 247) {
+                frameType = FrameType.SAME_LOCALS_1_STACK_ITEM_EXTENDED;
+                storedOffsetDelta = getU2(buffer,offset);
+                offset+=2;
+                size = getVerificationTypeInfoSize(buffer[offset]);
+                storeUninitializedVariableInfo(buffer,offset,0);
+            } else if (type <= 250) {
+                frameType = FrameType.CHOP;
+                storedOffsetDelta = getU2(buffer,offset);
+            } else if (type == 251) {
+                frameType = FrameType.SAME_FRAME_EXTENDED;
+                storedOffsetDelta = getU2(buffer,offset);
+            } else if (type <= 254) {
+                frameType = FrameType.APPEND;
+                storedOffsetDelta = getU2(buffer,offset);
+                offset+=2;
+                int locals = type - 251;
+                for (int i=0; i<locals; i++) {
+                    int typeInfoSize = getVerificationTypeInfoSize(buffer[offset]);
+                    size += typeInfoSize;
+                    storeUninitializedVariableInfo(buffer,offset,i);
+                    offset += typeInfoSize;
+                }
+            } else if (type == 255) {
+                frameType = FrameType.FULL_FRAME;
+                storedOffsetDelta = getU2(buffer,offset);
+                offset+=2;
+                int locals = getU2(buffer,offset);
+                offset+=2;
+//                LOG.finer("Locals: "+locals);
+                for (int i = 0; i<locals; i++) {
+                    int typeInfoSize = getVerificationTypeInfoSize(buffer[offset]);
+                    size += typeInfoSize;
+                    storeUninitializedVariableInfo(buffer,offset,i);
+                    offset += typeInfoSize;
+                }
+                int stacks = getU2(buffer,offset);
+                offset+=2;
+//                LOG.finer("Stacks: "+stacks);
+                for (int i=0; i<stacks; i++) {
+                    int typeInfoSize = getVerificationTypeInfoSize(buffer[offset]);
+                    size += typeInfoSize;
+                    storeUninitializedVariableInfo(buffer,offset,locals+i);
+                    offset += typeInfoSize;
+                }
+            } else {
+                throw new IllegalArgumentException("Type: "+type);
+            }
+            size+=frameType.size();
+        }
+
+        int getSize() {
+            return size;
+        }
+        
+        void setFrameType(FrameType newFrameType) {
+            int frameSizeDiff = newFrameType.size() - frameType.size();
+            frameType = newFrameType;
+            size+=frameSizeDiff;
+            frameModified = true;
+        }
+        
+        private int getVerificationTypeInfoSize(byte type) {
+//            LOG.finer("VerificationTypeInfo: "+(type+0));
+            switch (type) {
+                case 0: // ITEM_Top
+                case 1: // ITEM_Integrer
+                case 2: // ITEM_Float
+                case 3: // ITEM_Double
+                case 4: // ITEM_Long
+                case 5: // ITEM_Null
+                case 6: // ITEM_UnitializedThis
+                    return 1;
+                case 7: // ITEM_Object
+                case 8: // ITEM_Uninitialized
+                    return 3;
+                default:
+                    throw new IllegalArgumentException("Type "+type);
+            }
+        }
+
+        public String toString() {
+            // for debugging
+            return "StackMapFrame "+frameType+" offsetDelta "+getOffsetDelta()+" size "+getSize();
+        }
+
+        private int getOffsetDelta() {
+            return storedOffsetDelta + 1;
+        }
+
+        private void setOffsetDelta(int newOffsetDelta) {
+            storedOffsetDelta = newOffsetDelta - 1;
+            modified = true;
+        }
+        
+        private void updateUnitilializedList(int injectionPos, int injectedBytesCount) {
+            if (uninitializedList != null) {
+                for (int i = 0; i<uninitializedList.size();i++) {
+                    Integer off = uninitializedList.get(i);
+                    if (off != null) {
+                        int uninitializedOffset = off.intValue();
+                        if (uninitializedOffset > injectionPos) {
+                            uninitializedList.set(i,Integer.valueOf(uninitializedOffset+injectedBytesCount));
+                            uninitializedListModified = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void storeUninitializedVariableInfo(byte[] buffer, int offset, int listIndex) {
+            byte type = buffer[offset++]; 
+            if (type == 8) { // ITEM_Unitialized
+                if (uninitializedList == null) {
+                    uninitializedList = new ArrayList();
+                }
+                while (uninitializedList.size() < listIndex+1) {
+                    uninitializedList.add(null);
+                }
+                uninitializedList.set(listIndex,Integer.valueOf(getU2(buffer,offset)));
+//                LOG.finer("ITEM_Unitialized "+Integer.valueOf(getU2(buffer,offset)));
+            }
+        }
+
+        void writeFrame(byte[] ret, int newFrameOffset) {
+            if (modified) {
+//                LOG.finer("Updating "+frameType+" new offset "+getOffsetDelta()+" old type "+Integer.valueOf(ret[newFrameOffset]&0xff));
+                if (frameModified) {
+                    switch (frameType) {
+                        case SAME_LOCALS_1_STACK_ITEM_EXTENDED:
+                            ret[newFrameOffset] = (byte)247;
+                            break;
+                        case SAME_FRAME_EXTENDED:
+                            ret[newFrameOffset] = (byte)251;
+                            break;
+                    }
+                }
+                switch (frameType) {
+                    case SAME:
+                        ret[newFrameOffset] = (byte)(storedOffsetDelta & 0x3F);
+                        break;
+                    case SAME_LOCALS_1_STACK_ITEM:
+                        ret[newFrameOffset] = (byte)(64 + (storedOffsetDelta & 0x3F));
+                        break;
+                    case SAME_LOCALS_1_STACK_ITEM_EXTENDED:
+                    case CHOP:
+                    case SAME_FRAME_EXTENDED:
+                    case APPEND:
+                    case FULL_FRAME:
+                        putU2(ret, newFrameOffset+1, storedOffsetDelta);
+                        break;
+                }
+            }
+            if (uninitializedListModified) {
+                switch (frameType) {
+                    case SAME_LOCALS_1_STACK_ITEM:
+                        putU2(ret,newFrameOffset+2,uninitializedList.get(0).intValue());
+                        break;
+                    case SAME_LOCALS_1_STACK_ITEM_EXTENDED:
+                        putU2(ret,newFrameOffset+3,uninitializedList.get(0).intValue());
+                        break;
+                    case APPEND: {
+                        int offset = newFrameOffset+3;
+                        for (Integer off : uninitializedList) {
+                            byte type = ret[offset];
+                            int typeInfoSize = getVerificationTypeInfoSize(type);
+
+                            if (type == 8) { // ITEM_Unitialized
+                                putU2(ret,offset+1,off.intValue());
+                            }
+                            offset += typeInfoSize;
+                        }
+                        break;
+                    }
+                    case FULL_FRAME: {
+                        int offset = newFrameOffset+3;
+                        int locals = getU2(ret,offset);
+                        
+                        offset+=2;
+//                        LOG.finer("Locals: "+locals);
+                        for (int i=0; i<locals; i++) {
+                            byte type = ret[offset];
+                            int typeInfoSize = getVerificationTypeInfoSize(type);
+                            
+                            if (type == 8) { // ITEM_Unitialized
+                                putU2(ret,offset+1,uninitializedList.get(i).intValue());
+                            }
+                            offset += typeInfoSize;
+                        }
+                        int stacks = getU2(ret,offset);
+                        offset+=2;
+//                        LOG.finer("Stacks: "+stacks);
+                        for (int i=0; i<stacks; i++) {
+                            byte type = ret[offset];
+                            int typeInfoSize = getVerificationTypeInfoSize(type);
+                            
+                            if (type == 8) { // ITEM_Unitialized
+                                putU2(ret,offset+1,uninitializedList.get(locals+i).intValue());
+                            }
+                            offset += typeInfoSize;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    static class FullStackMapFrame extends StackMapFrame {
+        int[] localsCPIdx;
+        int[] stacksCPIdx;
+        
+        FullStackMapFrame(int delta, int[] locals, int stacks[]) {
+            super(FrameType.FULL_FRAME, delta, stacks.length*3+((locals.length>0 && locals[0] == 0)?locals.length:3*locals.length));
+            localsCPIdx = locals;
+            stacksCPIdx = stacks;
+        }
+        
+        void writeFrame(byte[] ret, int offset) {
+            ret[offset++] = (byte)255; // FULL_FRAME
+            putU2(ret,offset,storedOffsetDelta); // offset_delta
+            offset+=2;
+            putU2(ret,offset,localsCPIdx.length); // locals
+            offset+=2;
+            for (int i=0; i<localsCPIdx.length;i++) {
+                int cpIndex = localsCPIdx[i];
+                
+                if (cpIndex == 0) {
+                   ret[offset++] = 0;  // ITEM_Top
+                } else {
+                    ret[offset++] = 7; // ITEM_Object
+                    putU2(ret,offset,cpIndex);
+                    offset+=2;
+                }
+            }
+            putU2(ret,offset,stacksCPIdx.length); // stacks
+            offset+=2;
+            for (int i=0; i<stacksCPIdx.length;i++) {
+                ret[offset++] = 7; // ITEM_Object
+                putU2(ret,offset,stacksCPIdx[i]);  // cpool_index
+                offset+=2;
+            }            
+        }
+    }
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -349,6 +796,9 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     int localVaribaleTypeTableCPindex;
     char[] localVariableTypeTablesLengths;
     int[] localVariableTypeTablesOffsets; // Relative offsets within a MethodInfo
+    int stackMapTableCPindex;
+    char[] stackMapTablesLengths;
+    int[] stackMapTablesOffsets; // Relative offsets within a MethodInfo
     char[] methodAccessFlags;
     char[] methodBytecodesLengths;
     int[] methodBytecodesOffsets; // Relative offsets within a MethodInfo
@@ -357,6 +807,8 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     String[] methodNames;
     String[] methodSignatures;
     String[] nestedClassNames;
+    int majorVersion;  // class file major version
+    int classIndex; // constant pool entry index representing this class
     char accessFlags; // isInterface flag included
     int attrsStartOfs; // Ditto for class attributes
     int cpoolStartOfs; // Starting offset, in bytes, of the original cpool (cpool length char included)
@@ -367,6 +819,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     private LineNumberTables lineNumberTables;
     private LocalVariableTables localVariableTables;
     private LocalVariableTypeTables localVariableTypeTables;
+    private StackMapTables stackMapTables;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -393,6 +846,10 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public int getMajorVersion() {
+        return majorVersion;
+    }
+    
     public boolean isAbstract() {
         return Modifier.isAbstract(accessFlags);
     }
@@ -414,6 +871,10 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
     public int getLocalVariableTypeTableStartOffsetInMethodInfo(int i) {
         return localVariableTypeTablesOffsets[i];
+    }
+
+    public int getStackMapTableStartOffsetInMethodInfo(int i) {
+        return stackMapTablesOffsets[i];
     }
 
     public boolean isInterface() {
@@ -440,6 +901,11 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         return localVariableTypeTables;
     }
 
+    public StackMapTables getStackMapTables() {
+        initStackMapTables();
+        return stackMapTables;
+    }
+    
     public boolean isMethodAbstract(int i) {
         return Modifier.isAbstract(methodAccessFlags[i]);
     }
@@ -578,6 +1044,16 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         return null;
     }
 
+    public int getCPIndexOfClass(String className) {
+        int cpIndex = -1;
+        for (int i=0; i<cpoolRefsToClassName.length; i++) {
+            if (cpoolRefsToClassName[i].equals(className)) {
+                cpIndex = cpoolRefsToClassIdx[i];
+            }
+        }
+        return cpIndex;
+    }
+    
     public String[] getRefMethodsClassNameAndSig(int refMethodIdx) {
         for (int i = 0; i < cpoolRefsToMethodIdx.length; i++) {
             if (cpoolRefsToMethodIdx[i] == refMethodIdx) {
@@ -774,6 +1250,10 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         buf[pos + 1] = (byte) (value & 0xFF);
     }
 
+    static int getU2(byte[] buf, int pos) {
+        return ((buf[pos] & 0xFF) << 8) + (buf[pos + 1] & 0xFF);
+    }
+
     //----------------------------------------- Private implementation -----------------------------------
 
     private synchronized void initLineNumberTables() {
@@ -791,6 +1271,12 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     private synchronized void initLocalVariableTypeTables() {
         if (localVariableTypeTables == null) {
             localVariableTypeTables = new LocalVariableTypeTables(this);
+        }
+    }
+
+    private synchronized void initStackMapTables() {
+        if (stackMapTables == null) {
+            stackMapTables = new StackMapTables();
         }
     }
 }

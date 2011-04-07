@@ -43,15 +43,16 @@
 
 package org.netbeans.modules.profiler.snaptracer.logs;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import org.openide.filesystems.FileObject;
 
 /** Reads log records from file.
  *
@@ -61,19 +62,19 @@ public final class LogReader {
  
     private static final Logger LOG = Logger.getLogger(LogRecords.class.getName());
 
-    private File logFile;
+    private FileObject logFile;
 //    private int records;
 //    private long startTime;
     private NavigableMap<Long,LogRecord> recordList;
 
-    public LogReader(File f) {
+    public LogReader(FileObject f) {
         logFile = f;
         recordList = new TreeMap();
     }
 
 
     public void load() throws IOException {
-        InputStream is = new FileInputStream(logFile);
+        InputStream is = new BufferedInputStream(logFile.getInputStream(),32768);
         try {
             LogRecords.scan(is, new LogHandler());
         } finally {
@@ -82,8 +83,14 @@ public final class LogReader {
     }
 
     public LogRecord getRecordFor(long time) {
-        return recordList.ceilingEntry(new Long(time)).getValue();
+        Map.Entry<Long,LogRecord> entry = recordList.floorEntry(new Long(time));
+        
+        if (entry != null) {
+            return entry.getValue();
+        }
+        return null;
     }
+    
     class LogHandler extends Handler {
 
         @Override
