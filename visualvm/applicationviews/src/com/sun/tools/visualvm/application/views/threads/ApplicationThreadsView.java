@@ -43,6 +43,7 @@ import com.sun.tools.visualvm.tools.jmx.JvmMXBeansFactory;
 import com.sun.tools.visualvm.tools.jmx.MBeanCacheListener;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -69,11 +70,12 @@ import org.openide.util.WeakListeners;
 class ApplicationThreadsView extends DataSourceView implements DataRemovedListener<Application> {
 
     private static final String IMAGE_PATH = "com/sun/tools/visualvm/application/views/resources/threads.png";  // NOI18N
+    private static final String DEADLOCK_ALERT_TEXT = NbBundle.getMessage(ApplicationThreadsView.class, "Deadlock_Alert_Text"); // NOI18N
     private JvmMXBeans mxbeans;
     private VisualVMThreadsDataManager threadsManager;
     private MBeanCacheListener listener;
-
     private boolean takeThreadDumpSupported;
+    private MasterViewSupport mvs;
 
     ApplicationThreadsView(DataSource dataSource) {
         super(dataSource, NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Threads"), new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH, true)).getImage(), 30, false);   // NOI18N
@@ -91,7 +93,14 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             if (jmxModel != null && jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
                 mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel, GlobalPreferences.sharedInstance().getThreadsPoll() * 1000);
                 if (mxbeans != null) {
-                    threadsManager = new ThreadMXBeanDataManager(mxbeans.getThreadMXBean());
+                    ThreadMXBeanDataManager threadsMXManager = new ThreadMXBeanDataManager(mxbeans.getThreadMXBean());
+                    
+                    threadsMXManager.addPropertyChangeListener(new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            handleThreadsPropertyChange(evt);
+                        }
+                    });
+                    threadsManager = threadsMXManager;
                 }
             }
         } else {
@@ -119,12 +128,17 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         }
     }
 
+    @Override
+    protected void setAlert(Alert newAlert, String newText) {
+        super.setAlert(newAlert,newText);
+        mvs.setAlertText(newText);
+    }
+
     protected DataViewComponent createComponent() {
         DataSource ds = getDataSource();
         final Application application = ds instanceof Application ?
             (Application)ds : null;
-        final MasterViewSupport mvs =
-                new MasterViewSupport(ds, takeThreadDumpSupported, threadsManager);
+        mvs = new MasterViewSupport(ds, takeThreadDumpSupported, threadsManager);
         if (mxbeans != null) {
             listener = new MBeanCacheListener() {
                 public void flushed() {
@@ -165,6 +179,17 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         return dvc;
     }
+    
+    private void handleThreadsPropertyChange(PropertyChangeEvent evt) {
+        if (ThreadMXBeanDataManager.DEADLOCK_PROP.equals(evt.getPropertyName())) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    setAlert(Alert.ERROR,DEADLOCK_ALERT_TEXT);
+                    
+                }
+            });
+        }
+    }
 
     // --- General data --------------------------------------------------------
 
@@ -174,6 +199,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
         private Application application;
         private HTMLTextArea area;
+        private HTMLTextArea alertArea;
         private JButton threadDumpButton;
         private static final String LIVE_THRADS = NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Live_threads");    // NOI18N
         private static final String DAEMON_THREADS = NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Daemon_threads");   // NOI18N
@@ -208,7 +234,13 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             area = new HTMLTextArea();
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
 
-            add(area, BorderLayout.CENTER);
+            add(area, BorderLayout.WEST);
+
+            alertArea = new HTMLTextArea();
+            alertArea.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
+            alertArea.setForeground(Color.RED);
+
+            add(alertArea, BorderLayout.CENTER);
 
             threadDumpButton = new JButton(new AbstractAction(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Thread_Dump")) {   // NOI18N
                 public void actionPerformed(ActionEvent e) {
@@ -235,7 +267,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             }
         }
 
-        void updateThreadsCounts(final VisualVMThreadsDataManager threadsManager) {
+        private void updateThreadsCounts(final VisualVMThreadsDataManager threadsManager) {
 
             final int[] threads = new int[2];
 
@@ -257,6 +289,13 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             });
         }
 
+        private void setAlertText(String alert) {
+            int selStart = alertArea.getSelectionStart();
+            int selEnd = alertArea.getSelectionEnd();
+            alertArea.setText("<center>"+alert+"</center>");   // NOI18N
+            alertArea.select(selStart, selEnd);
+        }
+        
         private void updateThreadsCounts(int liveThreads, int daemonThreads) {
             StringBuilder data = new StringBuilder();
 

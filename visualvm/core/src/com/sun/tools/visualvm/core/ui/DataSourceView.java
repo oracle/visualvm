@@ -29,6 +29,8 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.Image;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  * Definition of a subtab representing a concrete view of a DataSource in DataSource Window.
@@ -37,6 +39,10 @@ import java.awt.Image;
  */
 public abstract class DataSourceView implements Positionable {
 
+    protected static enum Alert { ERROR, WARNING, OK };
+    protected static final String ALERT_PROP = "Alert"; // NOI18N
+    protected static final String ALERT_STRING_PROP = "Alert String"; // NOI18N
+    
     private DataSource dataSource;
     private String name;
     private Image icon;
@@ -44,8 +50,10 @@ public abstract class DataSourceView implements Positionable {
     private boolean isClosable;
     private DataViewComponent component;
     private DataSourceViewProvider controller;
-
-
+    private Alert alert;
+    private String alertText;
+    private PropertyChangeSupport propertyChangeSupport;
+    
     /**
      * Creates new DataSourceView.
      * 
@@ -68,6 +76,7 @@ public abstract class DataSourceView implements Positionable {
         this.icon = icon;
         this.preferredPosition = preferredPosition;
         this.isClosable = isClosable;
+        propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
 
@@ -124,6 +133,15 @@ public abstract class DataSourceView implements Positionable {
         return isClosable;
     }
     
+    protected void setAlert(Alert newAlert, String newText) {
+        Alert oldAlert = alert;
+        String oldText = newText;
+        
+        alert = newAlert;
+        alertText = newText;
+        propertyChangeSupport.firePropertyChange(ALERT_PROP, oldAlert, alert);
+        propertyChangeSupport.firePropertyChange(ALERT_STRING_PROP, oldText, newText);
+    }
     
     /**
      * Notification when the view is about to be added to DataSourceWindow.
@@ -149,7 +167,18 @@ public abstract class DataSourceView implements Positionable {
     protected void removed() {
     }
     
+    Alert getAlert() {
+        return alert;
+    }
     
+    void addPropertyChangeListener(PropertyChangeListener l) {
+        propertyChangeSupport.addPropertyChangeListener(l);
+    }
+    
+    void removePropertyChangeListener(PropertyChangeListener l) {
+        propertyChangeSupport.removePropertyChangeListener(l);
+    }
+      
     DataViewComponent getView() {
         if (component == null) {
             component = createComponent();

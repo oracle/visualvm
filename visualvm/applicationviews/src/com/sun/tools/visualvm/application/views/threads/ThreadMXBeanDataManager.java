@@ -25,8 +25,11 @@
 
 package com.sun.tools.visualvm.application.views.threads;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -44,12 +47,19 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
 
     private static final long[] dummyLong = new long[0];
     private static final Logger LOGGER = Logger.getLogger(ThreadMXBeanDataManager.class.getName());
+    static final String DEADLOCK_PROP = "Deadlock";   // NOI18N
+    
     private ThreadMXBean threadBean;
     private Set<Long> threadIdSet = new HashSet();
     private boolean refreshRunning;
-
+    private DeadlockDetector deadlockDetector;
+    private PropertyChangeSupport changeSupport;
+    private long[] deadlockThreadIds;
+            
     ThreadMXBeanDataManager(ThreadMXBean tb) {
         threadBean = tb;
+        deadlockDetector = new DeadlockDetector(tb);
+        changeSupport = new PropertyChangeSupport(this);
     }
 
     // Non-blocking call for general usage
@@ -60,7 +70,13 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
         }
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
+                long[] oldDeadlockThreadIds = deadlockThreadIds;
+                
                 refreshThreadsSync();
+                deadlockThreadIds = deadlockDetector.detectDeadlock();
+                if (deadlockThreadIds != null && !Arrays.equals(oldDeadlockThreadIds,deadlockThreadIds)) {
+                    changeSupport.firePropertyChange(DEADLOCK_PROP,oldDeadlockThreadIds,deadlockThreadIds);
+                }
                 synchronized (ThreadMXBeanDataManager.this) {
                    refreshRunning = false; 
                 }
@@ -86,7 +102,15 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
     int getThreadCount() {
         return threadBean.getThreadCount();
     }
-
+    
+    void addPropertyChangeListener(PropertyChangeListener l) {
+         changeSupport.addPropertyChangeListener(l);
+    }
+    
+    void removePropertyChangeListener(PropertyChangeListener l) {
+        changeSupport.removePropertyChangeListener(l);
+    }
+    
     class ThreadMonitoredDataResponse extends MonitoredNumbersResponse {
 
         ThreadMonitoredDataResponse() {

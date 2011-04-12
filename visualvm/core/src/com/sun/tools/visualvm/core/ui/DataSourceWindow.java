@@ -28,8 +28,10 @@ package com.sun.tools.visualvm.core.ui;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.ui.DataSourceView.Alert;
 import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -39,6 +41,7 @@ import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
+import org.openide.util.WeakListeners;
 import org.openide.windows.TopComponent;
 
 /**
@@ -52,12 +55,11 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             new RequestProcessor("DataSourceWindow Processor", 5); // NOI18N
     
     private int viewsCount = 0;
-
     private DataSource dataSource;
     private DataSourceDescriptor dataSourceDescriptor;
     private DataSourceWindowTabbedPane.ViewContainer singleViewContainer;
     private JPanel multiViewContainer;
-
+    private AlertListener alertListener;
 
     // Doesn't need to be called from EDT
     public DataSourceWindow(DataSource dataSource) {
@@ -85,6 +87,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(dataSource), view);
             add(singleViewContainer, BorderLayout.CENTER);
             doLayout();
+            alertListener = new AlertListener();
         } else if (viewsCount == 1) {
             remove(singleViewContainer);
 
@@ -98,6 +101,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             tabbedContainer.addViewTab(dataSource, view);
         }
         viewsCount++;
+        view.addPropertyChangeListener(WeakListeners.propertyChange(alertListener,view));
     }
     
     public void selectView(DataSourceView view) {
@@ -221,10 +225,62 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         add(multiViewContainer, BorderLayout.CENTER);
     }
     
+    private void setAlert(DataSourceView view, Alert alert) {
+        int viewIndex = tabbedContainer.indexOfView(view);
+        
+        tabbedContainer.setBackgroundAt(viewIndex,getAlertColor(alert));
+        if (alert != Alert.OK) {
+            requestAttention(false);
+        } else if (getApplicationAlert(alert) == Alert.OK) {
+            cancelRequestAttention();
+        }
+    }
+
+    private Color getAlertColor(final Alert alert) {
+        Color color = null;
+        
+        switch (alert) {
+            case ERROR: 
+                color = Color.RED;
+                break;
+            case WARNING:
+                color = Color.YELLOW;
+                break;
+            case OK:
+                color = null;
+                break;
+        }
+        return color;
+    }
+
+    private Alert getApplicationAlert(Alert alert) {
+        if (alert == Alert.ERROR) {
+            return alert;
+        }
+        for (DataSourceView view : getViews()) {
+            Alert a = view.getAlert();
+            if (a == Alert.ERROR) {
+                return a;
+            }
+            if (a == Alert.WARNING) {
+                alert = a;
+            }
+        }
+        return alert;
+    }
+    
     private DataSourceWindowTabbedPane tabbedContainer;
     
     
     public int getPersistenceType() { return TopComponent.PERSISTENCE_NEVER; }
     protected String preferredID() { return getClass().getName(); }
 
+    private class AlertListener implements PropertyChangeListener {
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (DataSourceView.ALERT_PROP.equals(evt.getPropertyName())) {
+                setAlert((DataSourceView) evt.getSource(), (Alert) evt.getNewValue());
+            }
+        }
+    }
 }
