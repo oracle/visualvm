@@ -148,7 +148,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
     // -- Private methods --------------------------------------------------------------------------------------------------
     private void displayMemoryAllocDiff(MemoryResultsSnapshot diff, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
                                         int sortingColumn, boolean sortingOrder, Project project) {
-        MemoryDiffPanel allocDiffPanel = new MemoryDiffPanel(diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
+        MemoryDiffPanel allocDiffPanel = new MemoryDiffPanel(getLookup(), diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         updateFind(true, allocDiffPanel);
         add(allocDiffPanel, BorderLayout.CENTER);
         setName(ALLOC_CAPTION);
@@ -157,7 +157,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
 
     private void displayMemoryLivenessDiff(MemoryResultsSnapshot diff, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
                                            int sortingColumn, boolean sortingOrder, Project project) {
-        MemoryDiffPanel livenessDiffPanel = new MemoryDiffPanel(diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
+        MemoryDiffPanel livenessDiffPanel = new MemoryDiffPanel(getLookup(), diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         updateFind(true, livenessDiffPanel);
         add(livenessDiffPanel, BorderLayout.CENTER);
         setName(LIVENESS_CAPTION);
