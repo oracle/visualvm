@@ -102,9 +102,6 @@ final class ContinuousXYPainter extends TimelineXYPainter {
                          List<ItemSelection> selected, Graphics2D g,
                          Rectangle dirtyArea, SynchronousXYChartContext context) {
 
-//        g.setColor(new Color((int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)));
-//        g.fill(dirtyArea);
-
         int valuesCount = item.getValuesCount();
         int extraTrailing = fillColor != null ? 2 : 0;
 
