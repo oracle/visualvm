@@ -50,6 +50,8 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -75,19 +77,19 @@ public final class IdeSnapshotAction implements ActionListener {
     }
 
     static void openSnapshot(final IdeSnapshot snapshot) {
-        final TracerModel model = new TracerModel(snapshot);
-        final TracerController controller = new TracerController(model);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                TopComponent ui = ui(model, controller, snapshot.getNpssFile());
+                TracerModel model = new TracerModel(snapshot);
+                TracerController controller = new TracerController(model);
+                TopComponent ui = ui(model, controller, snapshot.getNpssFileName());
                 ui.open();
                 ui.requestActive();
             }
         });
     }
 
-    private static TopComponent ui(TracerModel model, TracerController controller, File npssFile) {
-        TopComponent tc = new IdeSnapshotComponent(npssFile);
+    private static TopComponent ui(TracerModel model, TracerController controller, String npssFileName) {
+        TopComponent tc = new IdeSnapshotComponent(npssFileName);
         TracerView tracer = new TracerView(model, controller);
         tc.add(tracer.createComponent(), BorderLayout.CENTER);
         return tc;
@@ -97,7 +99,10 @@ public final class IdeSnapshotAction implements ActionListener {
         File file = snapshotFile();
         if (file == null) return null;
         try {
-            return new IdeSnapshot(file, new File(file.getCanonicalPath() + ".xml"));
+            FileObject primary = FileUtil.toFileObject(file);
+            FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log");
+            
+            return new IdeSnapshot(primary, uigestureFO);
         } catch (Throwable t) { Exceptions.printStackTrace(t); return null; }
     }
 
@@ -118,7 +123,6 @@ public final class IdeSnapshotAction implements ActionListener {
         } else {
             return null;
         }
-//        return new File("C:\\Users\\JiS\\Documents\\snapshot_tracer_test.npss");
     }
 
     private static JFileChooser createFileChooser() {
@@ -139,8 +143,8 @@ public final class IdeSnapshotAction implements ActionListener {
 
     private static class IdeSnapshotComponent extends TopComponent {
 
-        IdeSnapshotComponent(File npssFile) {
-            setDisplayName(npssFile.getName());
+        IdeSnapshotComponent(String npssFileName) {
+            setDisplayName(npssFileName);
             setLayout(new BorderLayout());
         }
 
