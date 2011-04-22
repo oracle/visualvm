@@ -64,6 +64,7 @@ public class JmxSupport implements DataRemovedListener {
     private static final String PERM_GEN = "Perm Gen";  // NOI18N
     private static final String PS_PERM_GEN = "PS Perm Gen";    // NOI18N
     private static final String CMS_PERM_GEN = "CMS Perm Gen";    // NOI18N
+    private static final String G1_PERM_GEN = "G1 Perm Gen";    // NOI18N
     private static final String IBM_PERM_GEN = "class storage";    // NOI18N
     private static final ObjectName osName = getOSName();
     private static long INITIAL_DELAY = 100;
@@ -220,6 +221,7 @@ public class JmxSupport implements DataRemovedListener {
                                 (PERM_GEN.equals(name) ||
                                 PS_PERM_GEN.equals(name) ||
                                 CMS_PERM_GEN.equals(name) ||
+                                G1_PERM_GEN.equals(name) ||
                                 IBM_PERM_GEN.equals(name))) {
                             permGenPool = pool;
                             break;
