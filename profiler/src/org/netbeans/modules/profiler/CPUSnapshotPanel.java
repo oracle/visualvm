@@ -82,6 +82,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.openide.util.ContextAwareAction;
+import org.openide.util.Lookup;
 
 
 /**
@@ -357,7 +359,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public CPUSnapshotPanel(final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
+    public CPUSnapshotPanel(Lookup context, final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
         this.loadedSnapshot = ls;
         this.snapshot = (CPUResultsSnapshot) ls.getSnapshot();
 
@@ -572,7 +574,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         toolBar.addSeparator();
         
-        findActionPresenter = toolBar.add(SystemAction.get(FindAction.class));
+        ContextAwareAction a = SystemAction.get(FindAction.class);
+        findActionPresenter = toolBar.add(a.createContextAwareInstance(context));
         findPreviousPresenter = toolBar.add(new FindPreviousAction(this));
         findNextPresenter = toolBar.add(new FindNextAction(this));
         

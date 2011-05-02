@@ -90,8 +90,7 @@ public final class TracerSupportImpl {
     public synchronized List<TracerPackage> getPackages(IdeSnapshot snapshot) {
         List<TracerPackage> packages = new ArrayList();
         for (TracerPackageProvider provider : providers)
-//            if (snapshot == null || provider.getScope().isInstance(snapshot))
-                packages.addAll(Arrays.asList(provider.getPackages(snapshot)));
+            packages.addAll(Arrays.asList(provider.getPackages(snapshot)));
         Collections.sort(packages, Positionable.COMPARATOR);
         return packages;
     }

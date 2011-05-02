@@ -68,7 +68,6 @@ import org.netbeans.lib.profiler.charts.ChartContext;
 public class XChartSelectionOverlay extends ChartOverlay {
 
     private static final boolean FORCE_SPEED = Utils.forceSpeed();
-//    private static int REPAINT_COLLAPSE_LIMIT = 20;
 
     private ChartComponent chart;
     private int selectionMode;
@@ -212,13 +211,6 @@ public class XChartSelectionOverlay extends ChartOverlay {
             rect.width = 0 - rect.width;
         }
 
-////        /*if (chart.fitsHeight()) {
-////            rect.y = 0;
-////            rect.height = getHeight();
-////        } else*/ if (rect.height < 0) {
-////            rect.y += rect.height;
-////            rect.height = 0 - rect.height;
-////        }
         rect.y = 0;
         rect.height = getHeight();
 
@@ -233,41 +225,7 @@ public class XChartSelectionOverlay extends ChartOverlay {
         
         Graphics2D g2 = (Graphics2D)g;
 
-//        if (selectionMode == ChartSelectionModel.SELECTION_LINE_V ||
-//            selectionMode == ChartSelectionModel.SELECTION_CROSS) {
-//            if (!forceSpeed && linePaint != null && lineStroke != null) {
-//                g2.setPaint(linePaint);
-//                g2.setStroke(lineStroke);
-//                g2.drawLine(selectionBounds.x, 0, selectionBounds.x, getHeight());
-//            } else if (forceSpeed) {
-//                g2.setPaint(Color.BLACK);
-//                g2.setStroke(evenPerfStroke);
-//                g2.drawLine(selectionBounds.x, 0, selectionBounds.x, getHeight());
-//                g2.setPaint(Color.WHITE);
-//                g2.setStroke(oddPerfStroke);
-//                g2.drawLine(selectionBounds.x, 0, selectionBounds.x, getHeight());
-//            }
-//        }
-
-//        if (selectionMode == ChartSelectionModel.SELECTION_LINE_H ||
-//            selectionMode == ChartSelectionModel.SELECTION_CROSS) {
-//            if (!forceSpeed && linePaint != null && lineStroke != null) {
-//                g2.setPaint(linePaint);
-//                g2.setStroke(lineStroke);
-//                g2.drawLine(0, selectionBounds.y, getWidth(), selectionBounds.y);
-//            } else if (forceSpeed) {
-//                g2.setPaint(Color.BLACK);
-//                g2.setStroke(evenPerfStroke);
-//                g2.drawLine(0, selectionBounds.y, getWidth(), selectionBounds.y);
-//                g2.setPaint(Color.WHITE);
-//                g2.setStroke(oddPerfStroke);
-//                g2.drawLine(0, selectionBounds.y, getWidth(), selectionBounds.y);
-//            }
-//        }
-
-//        if (selectionMode == ChartSelectionModel.SELECTION_RECT) {
         Rectangle bounds = normalizeRect(new Rectangle(selectionBounds), 0);
-//        Rectangle bounds = new Rectangle(selectionBounds);
 
         if (selectionBounds.width != 0 /*|| selectionBounds.height != 0*/) {
 
@@ -298,7 +256,6 @@ public class XChartSelectionOverlay extends ChartOverlay {
             if (!FORCE_SPEED) {
                 g2.setPaint(selectionMode == ChartSelectionModel.SELECTION_RECT ?
                     fillPaint : linePaint);
-//                g2.setPaint(linePaint != null ? linePaint : fillPaint);
                 g2.setStroke(lineStroke);
                 g.drawLine(bounds.x, bounds.y, bounds.x, bounds.y + bounds.height - 1);
             } else if (FORCE_SPEED) {
