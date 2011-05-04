@@ -176,7 +176,8 @@
         <file name="Clipboard_hidden"/>
         <file name="Edit_hidden"/>
         <file name="Profile_hidden"/>
-            <file name="UndoRedo_hidden"/>
+        <file name="UndoRedo_hidden"/>
+        <file name="QuickSearch_hidden"/>        
     </folder>
     <folder name="Windows2">
         <file name="WindowManager.wswmgr" url="WindowManager.wswmgr"/>
