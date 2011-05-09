@@ -143,7 +143,7 @@
                 <friend>org.netbeans.modules.profiler.j2ee.sunas</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.tomcat</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.weblogic</friend>
-                <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.j2se.impl</friend>
                 <package>org.netbeans.modules.profiler.attach</package>
                 <package>org.netbeans.modules.profiler.attach.panels</package>
                 <package>org.netbeans.modules.profiler.attach.panels.components</package>
