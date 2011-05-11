@@ -348,9 +348,9 @@ public final class ProjectUtilities {
     public static float getProfilingOverhead(ProfilingSettings settings) {
         float o = 0.0f;
 
-        if (org.netbeans.modules.profiler.ui.stp.Utils.isMonitorSettings(settings)) {
+        if (org.netbeans.modules.profiler.stp.Utils.isMonitorSettings(settings)) {
             //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings)) {
+        } else if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings)) {
             if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
                 o += 0.5f; // entire app
             } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
@@ -360,7 +360,7 @@ public final class ProjectUtilities {
             if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
                 o += 0.5f; // profile all classes
             }
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isMemorySettings(settings)) {
+        } else if (org.netbeans.modules.profiler.stp.Utils.isMemorySettings(settings)) {
             if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
                 o += 0.5f; // object allocations
             } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {

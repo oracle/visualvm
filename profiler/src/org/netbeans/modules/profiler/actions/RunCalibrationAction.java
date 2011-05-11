@@ -52,6 +52,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -129,7 +130,7 @@ public final class RunCalibrationAction extends AbstractAction {
         }
 
         final JavaPlatform calibratePlatform = platform;
-        IDEUtils.getProfilerRequestProcessor().post(new Runnable() {
+        ProfilerUtils.getProfilerRequestProcessor().post(new Runnable() {
                 public void run() {
                     if (doDetach) {
                         Profiler.getDefault().detachFromApp();

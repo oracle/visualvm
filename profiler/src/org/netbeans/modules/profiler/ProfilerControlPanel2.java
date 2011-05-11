@@ -106,6 +106,7 @@ import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.Utilities;
 
 
@@ -722,20 +723,20 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         public void actionPerformed(final ActionEvent e) {
             if ((e.getSource() == takeCPUSnapshotButton) || (e.getSource() == takeFragmentSnapshotButton)) {
-                IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                         public void run() {
                             ResultsManager.getDefault().takeSnapshot();
                         }
                     });
             } else if (e.getSource() == takeMemorySnapshotButton) {
                 if (TAKE_SNAPSHOT_BUTTON_NAME.equals(e.getActionCommand())) {
-                    IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                             public void run() {
                                 ResultsManager.getDefault().takeSnapshot();
                             }
                         });
                 } else {
-                    IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                             public void run() {
                                 SharedClassObject.findObject(HeapDumpAction.class, true).dumpToProject();
                             }
@@ -1329,7 +1330,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
                 @Override
                 protected void nonResponding() {
-                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
                         @Override
                         public void run() {
                             list.setEnabled(false);
@@ -1885,7 +1886,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     }
 
     public static synchronized void closeIfOpened() {
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        ProfilerUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (defaultInstance != null && defaultInstance.isOpened()) defaultInstance.close();
             }

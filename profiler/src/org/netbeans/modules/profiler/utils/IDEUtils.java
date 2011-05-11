@@ -57,7 +57,6 @@ import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ProfilerModule;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
 import org.openide.DialogDescriptor;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
@@ -67,7 +66,6 @@ import org.openide.filesystems.FileUtil;
 import org.openide.modules.InstalledFileLocator;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import java.awt.*;
@@ -77,7 +75,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
@@ -88,6 +85,8 @@ import javax.swing.event.ListSelectionListener;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
 import org.openide.filesystems.URLMapper;
 
@@ -121,8 +120,6 @@ public final class IDEUtils {
     private static final String OK_BUTTON_TEXT = NbBundle.getMessage(IDEUtils.class, "IDEUtils_OkButtonText"); //NOI18N
                                                                                                                // -----
     private static final String SETTINGS_FOR_ATTR = "settingsFor";
-    private static final RequestProcessor profilerRequestProcessor = new RequestProcessor("Profiler Request Processor", 1); // NOI18N
-    private static final ErrorManager profilerErrorManager = ErrorManager.getDefault().getInstance("org.netbeans.modules.profiler"); // NOI18N
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -285,10 +282,6 @@ public final class IDEUtils {
         return jvmExe;
     }
 
-    public static RequestProcessor getProfilerRequestProcessor() {
-        return profilerRequestProcessor;
-    }
-
     public static Project getProjectFromSettingsFolder(FileObject settingsFolder) {
         Object o = settingsFolder.getAttribute(SETTINGS_FOR_ATTR);
         if (o instanceof URL) {
@@ -416,7 +409,7 @@ public final class IDEUtils {
 
     public static ProgressHandle indeterminateProgress(String title, final int timeout) {
         final ProgressHandle ph = ProgressHandleFactory.createHandle(title);
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
                 public void run() {
                     ph.setInitialDelay(timeout);
                     ph.start();
@@ -424,32 +417,6 @@ public final class IDEUtils {
             });
 
         return ph;
-    }
-
-    public static void runInEventDispatchThread(final Runnable r) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            SwingUtilities.invokeLater(r);
-        }
-    }
-
-    public static void runInEventDispatchThreadAndWait(final Runnable r) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InvocationTargetException e) {
-                profilerErrorManager.notify(e);
-            } catch (InterruptedException e) {
-                profilerErrorManager.notify(e);
-            }
-        }
-    }
-
-    public static void runInProfilerRequestProcessor(final Runnable r) {
-        profilerRequestProcessor.post(r);
     }
 
     /**
@@ -558,7 +525,7 @@ public final class IDEUtils {
 
     private static boolean matchesMask(final ProfilingSettings settings, final int mask) {
         // TODO: should only check Monitor/CPU/Memory
-        return org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings);
+        return org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings);
 
         //    return (settings.getProfilingType() & mask) != 0;    
     }

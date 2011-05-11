@@ -103,6 +103,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.filesystems.FileChangeListener;
 
 
@@ -251,7 +252,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             };
             
             if (SwingUtilities.isEventDispatchThread()) {
-                IDEUtils.runInProfilerRequestProcessor(processor);
+                ProfilerUtils.runInProfilerRequestProcessor(processor);
             } else {
                 processor.run();
             }
@@ -271,7 +272,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
             };
             
             if (SwingUtilities.isEventDispatchThread()) {
-                IDEUtils.runInProfilerRequestProcessor(processor);
+                ProfilerUtils.runInProfilerRequestProcessor(processor);
             } else {
                 processor.run();
             }
@@ -336,7 +337,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
     private ProfilingPointsManager() {
         refreshProfilingPointFactories();
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     processOpenedProjectsChanged(); // will subsequently invoke projectOpened on all open projects
                     NetBeansProfiler.getDefaultNB().addProfilingStateListener(ProfilingPointsManager.this);
@@ -533,7 +534,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     public void profilingStateChanged(final ProfilingStateEvent profilingStateEvent) {
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
             public void run() {
                 boolean wasProfilingInProgress = profilingInProgress;
                 boolean wasProfilingSessionInProgres = profilingSessionInProgress;
@@ -560,7 +561,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
 
                 if ((wasProfilingInProgress != profilingInProgress) || (wasProfilingSessionInProgres != profilingSessionInProgress)) {
                     GlobalProfilingPointsProcessor.getDefault().notifyProfilingStateChanged();
-                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 ProfilingPointsWindow.getDefault().notifyProfilingStateChanged(); // this needs to be called on EDT
                             }
@@ -573,7 +574,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof Line && Line.PROP_LINE_NUMBER.equals(evt.getPropertyName())) {
             final Line line = (Line) evt.getSource();
-            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         for (ProfilingPoint pp : profilingPoints) {
                             if (pp instanceof CodeProfilingPoint) {
@@ -614,7 +615,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
                 firePropertyChanged(PROPERTY_PROFILING_POINTS_CHANGED);
             }
         } else if (OpenProjects.PROPERTY_OPEN_PROJECTS.equals(evt.getPropertyName())) {
-            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         processOpenedProjectsChanged();
                     }
@@ -976,7 +977,7 @@ public class ProfilingPointsManager extends ProfilingPointsProcessor implements 
     }
 
     private void annotate(final CodeProfilingPoint profilingPoint, final CodeProfilingPoint.Annotation[] annotations) {
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     for (CodeProfilingPoint.Annotation cppa : annotations) {
                         // --- Code for saving dirty profiling points on document save instead of IDE closing ----------------

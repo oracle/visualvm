@@ -81,6 +81,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.Utilities;
 
 
@@ -431,7 +432,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
     // askForDestination == false ? dump to project : ask for destination (project vs. external file)
     private void takeHeapDump(final boolean askForDestination) {
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     NetBeansProfiler nbProfiler = NetBeansProfiler.getDefaultNB();
 
