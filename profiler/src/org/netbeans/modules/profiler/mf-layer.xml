@@ -447,7 +447,7 @@ made subject to such option by the copyright holder.
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
                 <attr name="position" intvalue="99500"/>
             </file>
-            <file name="DummyHprofResolver" url="DummyHprofResolver">
+            <file name="DummyHprofResolver.xml" url="DummyHprofResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
                 <attr name="position" intvalue="99990"/>
             </file>
