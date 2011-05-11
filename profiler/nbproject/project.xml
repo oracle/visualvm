@@ -420,12 +420,12 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.profiling</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
                 <friend>org.netbeans.modules.autoproject.profiler</friend>
-                <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler.j2me</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
+                <friend>org.netbeans.modules.profiler.heapwalker</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.generic</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
@@ -440,7 +440,6 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.modules.profiler</package>
                 <package>org.netbeans.modules.profiler.actions</package>
                 <package>org.netbeans.modules.profiler.categories</package>
-                <package>org.netbeans.modules.profiler.heapwalk</package>
                 <package>org.netbeans.modules.profiler.spi</package>
                 <package>org.netbeans.modules.profiler.ui</package>
                 <package>org.netbeans.modules.profiler.ui.stats</package>

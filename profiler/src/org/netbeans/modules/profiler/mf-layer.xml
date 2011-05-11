@@ -153,8 +153,8 @@ made subject to such option by the copyright holder.
                          <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
                          <attr name="mimeType" stringvalue="x-application/hprof"/>
                      </file>
-                 </folder>
-             </folder>
+         </folder>
+    </folder>
          </folder>
     </folder>
 
@@ -449,7 +449,7 @@ made subject to such option by the copyright holder.
             </file>
             <file name="HprofResolver.xml" url="HprofResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
-                <attr name="position" intvalue="99700"/>
+                <attr name="position" intvalue="99990"/>
             </file>
         </folder>
     </folder>

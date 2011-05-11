@@ -39,11 +39,13 @@
  *
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.ui;
+package org.netbeans.modules.profiler.heapwalker;
 
 import java.io.IOException;
+import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
@@ -51,6 +53,7 @@ import org.openide.loaders.MultiFileLoader;
 import org.openide.nodes.Node;
 import org.openide.nodes.Children;
 import org.openide.util.Lookup;
+import org.openide.util.RequestProcessor;
 
 /**
  * HPROF heapdump DataObject
@@ -75,6 +78,13 @@ public class HprofDataObject extends MultiDataObject implements OpenCookie {
     }
     
     public void open() {
-        // display dialog, no viewer available
+        final FileObject heapDumpFo = getPrimaryFile();
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                if (heapDumpFo != null) {
+                    HeapWalkerManager.getDefault().openHeapWalker(FileUtil.toFile(heapDumpFo));
+                }
+            }
+        });
     }
 }

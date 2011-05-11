@@ -54,8 +54,6 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.heapwalk.HeapWalker;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
@@ -83,6 +81,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.modules.profiler.utils.Utilities;
 
 
 /**
@@ -496,11 +495,11 @@ public final class HeapDumpAction extends ProfilingAwareAction {
                                 dnsa.setDNSADefault(false);
 
                                 if (ProfilerDialogs.notify(dnsa).equals(ProfilerDialogs.DNSAConfirmation.YES_OPTION)) {
-                                    HeapWalkerManager.getDefault().openHeapWalker(new File(dumpFileName));
+                                    Utilities.openSnapshot(new File(dumpFileName));
                                 }
                             } else {
                                 if (ProfilerIDESettings.getInstance().getAutoOpenSnapshot()) {
-                                    HeapWalkerManager.getDefault().openHeapWalker(new File(dumpFileName));
+                                    Utilities.openSnapshot(new File(dumpFileName));
                                 }
                             }
                         } else {

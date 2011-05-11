@@ -63,14 +63,12 @@ import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.SnippetPanel;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.*;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -108,6 +106,7 @@ import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
+import org.netbeans.modules.profiler.utils.Utilities;
 
 
 /**
@@ -947,9 +946,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
                                 String fileName = fo.getName();
 
-                                if (HeapWalkerManager.getDefault().isHeapWalkerOpened(FileUtil.toFile(fo))) {
-                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
-                                }
+//  TTTT                          if (HeapWalkerManager.getDefault().isHeapWalkerOpened(FileUtil.toFile(fo))) {
+//                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
+//                                }
 
                                 if (fileName.startsWith("heapdump-")) { // NOI18N
 
@@ -1248,7 +1247,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 if (selectedSnapshotFileExt.equalsIgnoreCase(ResultsManager.SNAPSHOT_EXTENSION)) {
                     ResultsManager.getDefault().deleteSnapshot(selectedSnapshots[i]);
                 } else if (selectedSnapshotFileExt.equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
-                    HeapWalkerManager.getDefault().deleteHeapDump(FileUtil.toFile(selectedSnapshotFile));
+// TTTTT            HeapWalkerManager.getDefault().deleteHeapDump(FileUtil.toFile(selectedSnapshotFile));
                 }
             }
         }
@@ -1278,7 +1277,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                     RequestProcessor.getDefault().post(new Runnable() {
                             public void run() {
                                 try {
-                                    HeapWalkerManager.getDefault().openHeapWalker(FileUtil.toFile(selectedSnapshotFile));
+                                    Utilities.openSnapshot(FileUtil.toFile(selectedSnapshotFile));
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }

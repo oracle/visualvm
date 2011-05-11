@@ -41,10 +41,8 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.heapwalk;
+package org.netbeans.modules.profiler;
 
-import org.netbeans.modules.profiler.ProfilerControlPanel2;
-import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.NotifyDescriptor;
@@ -58,6 +56,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import org.netbeans.modules.profiler.utils.Utilities;
 
 
 /**
@@ -152,7 +151,7 @@ public class HeapDumpWatch {
                                                                           NotifyDescriptor.QUESTION_MESSAGE); // NOI18N
 
             if (ProfilerDialogs.notify(ndOpen) == NotifyDescriptor.YES_OPTION) {
-                HeapWalkerManager.getDefault().openHeapWalker(FileUtil.toFile(heapDump));
+                Utilities.openSnapshot(FileUtil.toFile(heapDump));
             } else {
                 if (ProfilerDialogs.notify(ndDelete) == NotifyDescriptor.YES_OPTION) {
                     heapDump.delete();
