@@ -61,7 +61,6 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dialog;
@@ -74,13 +73,11 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -88,12 +85,9 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.categories.Categorization;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
-import org.openide.util.Lookup;
 
 
 /**
@@ -632,8 +626,6 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   .getSelectedInstrumentationFilter()));
                         }
                     }
-
-                    configureMarkerEngine(settings);
                 }
                 
                 return settings;
@@ -648,19 +640,6 @@ public class SelectProfilingTask extends JPanel implements TaskChooser.Listener,
         }
     }
 
-    private void configureMarkerEngine(ProfilingSettings settings) {
-        boolean isMarksEnabled = (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) || (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
-        isMarksEnabled &= Categorization.isAvailable(project);
-
-        if (isMarksEnabled) {
-            Categorization ctg = new Categorization(project);
-            ctg.reset();
-            MarkingEngine.getDefault().configure(ctg.getMappings(), Lookup.getDefault().lookupAll(MarkingEngine.StateObserver.class));
-        } else {
-            MarkingEngine.getDefault().deconfigure();
-        }
-    }
-    
     private void initClosedProjectHook() {
         OpenProjects.getDefault().addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
