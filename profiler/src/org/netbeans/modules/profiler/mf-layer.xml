@@ -449,7 +449,7 @@ made subject to such option by the copyright holder.
             </file>
             <file name="DummyHprofResolver.xml" url="DummyHprofResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
-                <attr name="position" intvalue="99700"/>
+                <attr name="position" intvalue="99900"/>
             </file>
         </folder>
     </folder>
