@@ -149,8 +149,6 @@ final class TimelineAxis extends JPanel {
 
         support.addSelectionListener(new TimelineSupport.SelectionListener() {
 
-//            public void rowSelectionChanged(boolean rowsSelected) {}
-
             public void indexSelectionChanged() {}
 
             public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {
@@ -293,8 +291,6 @@ final class TimelineAxis extends JPanel {
             timeRenderer.setBackground(Color.WHITE);
             timeRenderer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             timeFormat = new SimpleDateFormat(TimeAxisUtils.getFormatString(1, 1, 1));
-
-//            setToolTipText("Click a mark to select or unselect it");
 
             setOpaque(false);
         }
