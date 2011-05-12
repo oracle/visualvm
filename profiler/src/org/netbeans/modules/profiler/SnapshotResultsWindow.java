@@ -338,7 +338,7 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
     }
 
     private void displayCPUResults(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
-        CPUSnapshotPanel cpuPanel = new CPUSnapshotPanel(ls, sortingColumn, sortingOrder);
+        CPUSnapshotPanel cpuPanel = new CPUSnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
         displayedPanel = cpuPanel;
         updateFind(true, cpuPanel);
         add(cpuPanel, BorderLayout.CENTER);
@@ -358,7 +358,7 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
     }
 
     private void displayMemoryResults(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
-        MemorySnapshotPanel memoryPanel = new MemorySnapshotPanel(ls, sortingColumn, sortingOrder);
+        MemorySnapshotPanel memoryPanel = new MemorySnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
         displayedPanel = memoryPanel;
         updateFind(true, memoryPanel);
         add(memoryPanel, BorderLayout.CENTER);
