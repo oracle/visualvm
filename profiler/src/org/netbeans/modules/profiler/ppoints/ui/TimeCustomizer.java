@@ -416,7 +416,7 @@ public class TimeCustomizer extends ValidityAwarePanel implements ActionListener
         timeFrequencySpinner = new JExtendedSpinner(new SpinnerNumberModel(1, 1, 9999, 1)) {
                 public Dimension getPreferredSize() {
                     return new Dimension(Math.max(super.getPreferredSize().width, 55),
-                                         org.netbeans.modules.profiler.ui.stp.Utils.getDefaultSpinnerHeight());
+                                         org.netbeans.modules.profiler.stp.Utils.getDefaultSpinnerHeight());
                 }
 
                 public Dimension getMinimumSize() {

@@ -138,7 +138,7 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
-import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
 import org.netbeans.modules.profiler.utils.JavaSourceLocation;
 import org.openide.execution.ExecutorTask;
@@ -425,7 +425,7 @@ public final class NetBeansProfiler extends Profiler {
         }
 
         public void takeSnapshot() {
-            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         ResultsManager.getDefault().takeSnapshot();
                     }
@@ -831,7 +831,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     // clear rerun
                     actionSupport.nullAll();
-                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 CallableSystemAction.get(RerunAction.class).updateAction();
                             }
@@ -862,7 +862,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
-                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 openWindowsOnProfilingStart();
                             }
@@ -920,7 +920,7 @@ public final class NetBeansProfiler extends Profiler {
                         monitor.monitorVM(targetAppRunner);
 
                         if (threadsMonitoringEnabled) {
-                            IDEUtils.runInEventDispatchThread(new Runnable() {
+                            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         ThreadsWindow.getDefault().showThreads();
                                     }
@@ -1079,7 +1079,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
-                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 openWindowsOnProfilingStart();
                             }
@@ -1111,7 +1111,7 @@ public final class NetBeansProfiler extends Profiler {
                     if (targetAppRunner.targetAppIsRunning()) {
                         getThreadsManager()
                             .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                        IDEUtils.runInEventDispatchThread(new Runnable() {
+                        ProfilerUtils.runInEventDispatchThread(new Runnable() {
                                 public void run() {
                                     monitor.monitorVM(targetAppRunner);
                                 }
@@ -1307,7 +1307,7 @@ public final class NetBeansProfiler extends Profiler {
             }
         });
 
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     changeStateTo(PROFILING_IN_TRANSITION);
                     targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
@@ -1457,7 +1457,7 @@ public final class NetBeansProfiler extends Profiler {
         // This call reduces the speedup for class instrumentation on the 2nd and further runs that we could otherwise
         // have, but guarantees that if any classes have been recompiled in between runs, their most up-to-date copies will
         // be used.
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     final Cursor cursor = mainWindow.getCursor();
                     mainWindow.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -1490,7 +1490,7 @@ public final class NetBeansProfiler extends Profiler {
                         if (targetAppRunner.targetAppIsRunning()) {
                             getThreadsManager()
                                 .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                            IDEUtils.runInEventDispatchThread(new Runnable() {
+                            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         // System.err.println("------------ 8: "+ (System.currentTimeMillis() - time));
                                         monitor.monitorVM(targetAppRunner);

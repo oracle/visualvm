@@ -142,20 +142,20 @@ made subject to such option by the copyright holder.
                         <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.ui.NpsDataObject"/>
                         <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
                         <attr name="mimeType" stringvalue="x-application/nps"/>
-                    </file>
-                </folder>
-            </folder>
-            <folder name="x-netbeans-profiler-hprof">
-                <folder name="Factories">
-                    <file name="HprofDataLoader.instance">
-                        <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/resources/snapshotDataObject.png"/>
-                        <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.ui.HprofDataObject"/>
-                        <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
-                        <attr name="mimeType" stringvalue="x-application/hprof"/>
-                    </file>
-                </folder>
-            </folder>
-        </folder>
+                     </file>
+                 </folder>
+             </folder>
+             <folder name="x-netbeans-profiler-hprof">
+                 <folder name="Factories">
+                     <file name="HprofDataLoader.instance">
+                         <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/resources/snapshotDataObject.png"/>
+                         <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.ui.HprofDataObject"/>
+                         <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
+                         <attr name="mimeType" stringvalue="x-application/hprof"/>
+                     </file>
+         </folder>
+    </folder>
+         </folder>
     </folder>
 
     <folder name="Menu">

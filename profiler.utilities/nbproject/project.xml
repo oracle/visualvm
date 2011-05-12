@@ -10,7 +10,15 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.19</specification-version>
+                        <specification-version>7.47</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.openide.util</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>8.15</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -18,7 +26,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.0</specification-version>
+                        <specification-version>8.8</specification-version>
                     </run-dependency>
                 </dependency>
             </module-dependencies>
@@ -40,12 +48,15 @@
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.attach</friend>
                 <friend>org.netbeans.modules.profiler.attach.support.spi</friend>
+                <friend>org.netbeans.modules.profiler.heapwalker</friend>
+                <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.categories.api</friend>
                 <friend>org.netbeans.modules.profiler.categorization.api</friend>
                 <friend>org.netbeans.modules.profiler.drilldown</friend>
                 <friend>org.netbeans.modules.profiler.projectsupport</friend>
                 <friend>org.netbeans.modules.profiler.selector.spi</friend>
                 <friend>org.netbeans.modules.profiler.selector.ui</friend>
+                <friend>org.netbeans.modules.profiler.stp</friend>
                 <package>org.netbeans.modules.profiler.utilities</package>
                 <package>org.netbeans.modules.profiler.utilities.queries</package>
                 <package>org.netbeans.modules.profiler.utilities.trees</package>

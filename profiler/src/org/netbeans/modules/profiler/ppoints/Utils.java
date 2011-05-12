@@ -53,7 +53,6 @@ import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.ui.components.table.EnhancedTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.modules.editor.NbEditorUtilities;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.LineCookie;
 import org.openide.filesystems.FileObject;
@@ -74,7 +73,6 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -93,6 +91,7 @@ import org.netbeans.api.editor.EditorRegistry;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -886,7 +885,7 @@ public class Utils {
             return;
         }
 
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        ProfilerUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     UiUtils.open(fileObject, documentOffset);
                 } // this MUST use UiUtils since there is no replacement method yet

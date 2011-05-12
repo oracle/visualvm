@@ -69,7 +69,7 @@ import org.netbeans.lib.profiler.ui.memory.LiveLivenessResultsPanel;
 import org.netbeans.lib.profiler.ui.memory.MemoryResUserActionsHandler;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
@@ -118,6 +118,7 @@ import org.netbeans.lib.profiler.ui.memory.ClassHistoryActionsHandler;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -213,7 +214,7 @@ public final class LiveResultsWindow extends TopComponent
         public void cctEstablished(RuntimeCCTNode runtimeCCTNode, boolean empty) {
             if (!empty) {
                 getDefault().resultsAvailable = true;
-                IDEUtils.runInEventDispatchThread(new Runnable() {
+                ProfilerUtils.runInEventDispatchThread(new Runnable() {
                         public void run() {
                             getDefault().updateResultsDisplay();
                         }
@@ -257,7 +258,7 @@ public final class LiveResultsWindow extends TopComponent
             List<ProfilingSettings> cpuSettings = new ArrayList<ProfilingSettings>();
 
             for (ProfilingSettings settings : projectSettings) {
-                if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
                     cpuSettings.add(settings);
                 }
             }
@@ -326,12 +327,12 @@ public final class LiveResultsWindow extends TopComponent
         }
 
         public void showStacksForClass(final int selectedClassId, final int sortingColumn, final boolean sortingOrder) {
-            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         final LoadedSnapshot ls = ResultsManager.getDefault().takeSnapshot();
 
                         if (ls != null) {
-                            IDEUtils.runInEventDispatchThread(new Runnable() {
+                            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
 
@@ -500,7 +501,7 @@ public final class LiveResultsWindow extends TopComponent
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LiveResultsWindow() {
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
                 initUI();
             }
@@ -599,7 +600,7 @@ public final class LiveResultsWindow extends TopComponent
 
     public static void closeIfOpened() {
         if (hasDefault()) {
-            IDEUtils.runInEventDispatchThread(new Runnable() {
+            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         if (defaultLiveInstance.isOpened()) {
                             defaultLiveInstance.close();
@@ -1063,7 +1064,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private void requestProfilingDataUpdate(final boolean force) {
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        ProfilerUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     if (!isAutoRefresh() && !force) {
                         return;
@@ -1073,7 +1074,7 @@ public final class LiveResultsWindow extends TopComponent
                         return;
                     }
 
-                    IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                             public void run() {
                                 // send a command to server to generate the newest live data
                                 callForceObtainedResultsDump(runner.getProfilerClient());
@@ -1160,7 +1161,7 @@ public final class LiveResultsWindow extends TopComponent
                 add(currentDisplayComponent, BorderLayout.CENTER);
                 revalidate();
                 repaint();
-                IDEUtils.runInEventDispatchThread(new Runnable() {
+                ProfilerUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         currentDisplayComponent.requestFocusInWindow(); // must be invoked lazily to override default focus behavior
                     }
