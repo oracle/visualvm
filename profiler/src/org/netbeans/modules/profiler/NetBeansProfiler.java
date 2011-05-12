@@ -79,7 +79,6 @@ import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModule;
 import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModuleContainer;
 import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
@@ -90,7 +89,6 @@ import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsWindow;
 import org.netbeans.modules.profiler.spi.LoadGenPlugin;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stats.ProjectAwareStatisticalModule;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.modules.profiler.utils.OutputParameter;
 import org.openide.DialogDescriptor;
@@ -312,6 +310,18 @@ public final class NetBeansProfiler extends Profiler {
         }
     }
 
+    public static interface SessionListener {
+        public static abstract class Adapter implements SessionListener {
+            @Override
+            public void onShutdown() {}
+
+            @Override
+            public void onStartup(ProfilingSettings ps, Project p) {}
+        }
+        void onStartup(ProfilingSettings ps, Project p);
+        void onShutdown();
+    }
+    
     // -- NetBeansProfiler-only callback classes ---------------------------------------------------------------------------
     private final class IDEAppStatusHandler implements AppStatusHandler {
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -2057,35 +2067,8 @@ public final class NetBeansProfiler extends Profiler {
                 }
             }
 
-            // done
-            StatisticalModuleContainer statModulesContainer = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
-            Collection<?extends StatisticalModule> modules = Lookup.getDefault().lookupAll(StatisticalModule.class);
-
-            if ((statModulesContainer != null) && (modules != null)) {
-                for (StatisticalModule module : modules) {
-                    /* Using workaround here
-                     * For some reasons when the lookupAll is called the second time it returns ALL subtypes as well
-                     * So I must check for the proper type and check for project support eventually
-                     */
-                    if (module instanceof ProjectAwareStatisticalModule) {
-                        if (((ProjectAwareStatisticalModule) module).supportsProject(project)) {
-                            statModulesContainer.addModule(module);
-                        }
-                    } else {
-                        statModulesContainer.addModule(module);
-                    }
-                }
-            }
-
-            Collection<?extends ProjectAwareStatisticalModule> pmodules = Lookup.getDefault()
-                                                                                .lookupAll(ProjectAwareStatisticalModule.class);
-
-            if (pmodules != null) {
-                for (ProjectAwareStatisticalModule module : pmodules) {
-                    if (module.supportsProject(project)) {
-                        statModulesContainer.addModule(module);
-                    }
-                }
+            for(SessionListener sl : Lookup.getDefault().lookupAll(SessionListener.class)) {
+                sl.onStartup(profilingSettings, project);
             }
 
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
@@ -2101,27 +2084,6 @@ public final class NetBeansProfiler extends Profiler {
             FlatProfileBuilder fpb = Lookup.getDefault().lookup(FlatProfileBuilder.class);
             TimeCollector tc = Lookup.getDefault().lookup(TimeCollector.class);
             fpb.setContext(client, tc, filter);
-            
-//            Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);
-//
-//            for (ContextAware instance : contextAwareInstances) {
-//                instance.setContext(client);
-//            }
-
-//            boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
-//                                     || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
-//
-////            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-//            Categorization ctg = project != null ? project.getLookup().lookup(Categorization.class) : null;
-//
-//            isMarksEnabled &= (ctg != null);
-//
-//            if (isMarksEnabled) {
-//                ctg.reset();
-//                MarkingEngine.getDefault().configure(ctg.getMappings());
-//            } else {
-//                MarkingEngine.getDefault().deconfigure();
-//            }
 
             Collection listeners = null;
 
@@ -2249,11 +2211,11 @@ public final class NetBeansProfiler extends Profiler {
             //      for(CCTProvider cctProvider : cctProviders) {
             //        cctProvider.removeAllListeners();
             //      }
-            StatisticalModuleContainer statModulesContainer = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
-
-            if (statModulesContainer != null) {
-                statModulesContainer.removeAllModules();
-            }
+//            StatisticalModuleContainer statModulesContainer = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
+//
+//            if (statModulesContainer != null) {
+//                statModulesContainer.removeAllModules();
+//            }
 
             // deconfigure the profiler client
             ProfilerClient client = getTargetAppRunner().getProfilerClient();

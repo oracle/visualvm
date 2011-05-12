@@ -172,6 +172,15 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.modules.lexer</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>2</release-version>
+                        <specification-version>1.30</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.options.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -428,10 +437,13 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.profiling</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
                 <friend>org.netbeans.modules.autoproject.profiler</friend>
+                <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler.j2me</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>
+                <friend>org.netbeans.modules.profiler.categorization.api</friend>
+                <friend>org.netbeans.modules.profiler.drilldown</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.heapwalker</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
@@ -447,11 +459,8 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.snaptracer</friend>
                 <package>org.netbeans.modules.profiler</package>
                 <package>org.netbeans.modules.profiler.actions</package>
-                <package>org.netbeans.modules.profiler.categories</package>
                 <package>org.netbeans.modules.profiler.spi</package>
                 <package>org.netbeans.modules.profiler.ui</package>
-                <package>org.netbeans.modules.profiler.ui.stats</package>
-                <package>org.netbeans.modules.profiler.ui.stp</package>
                 <package>org.netbeans.modules.profiler.utils</package>
             </friend-packages>
             <extra-compilation-unit>

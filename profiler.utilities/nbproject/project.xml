@@ -50,6 +50,9 @@
                 <friend>org.netbeans.modules.profiler.attach.support.spi</friend>
                 <friend>org.netbeans.modules.profiler.heapwalker</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
+                <friend>org.netbeans.modules.profiler.categories.api</friend>
+                <friend>org.netbeans.modules.profiler.categorization.api</friend>
+                <friend>org.netbeans.modules.profiler.drilldown</friend>
                 <friend>org.netbeans.modules.profiler.projectsupport</friend>
                 <friend>org.netbeans.modules.profiler.selector.spi</friend>
                 <friend>org.netbeans.modules.profiler.selector.ui</friend>

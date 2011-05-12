@@ -174,7 +174,6 @@ public final class ProfilerModule extends ModuleInstall {
                         // force closing of all windows
                         ProfilerControlPanel2.closeIfOpened();
                         TelemetryOverviewPanel.closeIfOpened();
-                        DrillDownWindow.closeIfOpened();
                         LiveResultsWindow.closeIfOpened();
                         TelemetryWindow.closeIfOpened();
                         ThreadsWindow.closeIfOpened();
