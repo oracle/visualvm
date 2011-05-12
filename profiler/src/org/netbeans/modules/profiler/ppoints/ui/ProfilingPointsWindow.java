@@ -49,6 +49,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import java.awt.BorderLayout;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 
 
@@ -97,7 +98,7 @@ public class ProfilingPointsWindow extends TopComponent {
     
     public static synchronized ProfilingPointsWindow getDefault() {
         if (defaultInstance == null) {
-            IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
                 public void run() {
                     defaultInstance = (ProfilingPointsWindow) WindowManager.getDefault().findTopComponent(ID);
                     if (defaultInstance == null) defaultInstance = new ProfilingPointsWindow();
@@ -109,7 +110,7 @@ public class ProfilingPointsWindow extends TopComponent {
     }
     
     public static synchronized void closeIfOpened() {
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        ProfilerUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (defaultInstance != null && defaultInstance.isOpened()) defaultInstance.close();
             }

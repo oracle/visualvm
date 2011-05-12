@@ -99,7 +99,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.RequestProcessor;
 
 
@@ -753,7 +753,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     private void initData() {
         if (displayCache == null) displayCache = new Object[0][columnCount + 1];
 
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        ProfilerUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 final AtomicBoolean initInProgress = new AtomicBoolean(false);
                 
