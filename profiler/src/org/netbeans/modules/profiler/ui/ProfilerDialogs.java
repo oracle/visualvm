@@ -57,6 +57,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 public final class ProfilerDialogs {
@@ -468,7 +469,7 @@ public final class ProfilerDialogs {
         };
 
         dialog.addComponentListener(listener);
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        ProfilerUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     dialog.setVisible(false);
                 }
@@ -503,7 +504,7 @@ public final class ProfilerDialogs {
         };
 
         dialog.addComponentListener(listener);
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        ProfilerUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     dialog.setVisible(true);
                 }

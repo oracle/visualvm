@@ -465,7 +465,7 @@ public class LocationCustomizer extends ValidityAwarePanel implements ActionList
         lineNumberSpinner = new JExtendedSpinner() {
                 public Dimension getPreferredSize() {
                     return new Dimension(Math.max(super.getPreferredSize().width, 55),
-                                         org.netbeans.modules.profiler.ui.stp.Utils.getDefaultSpinnerHeight());
+                                         org.netbeans.modules.profiler.stp.Utils.getDefaultSpinnerHeight());
                 }
 
                 public Dimension getMinimumSize() {
@@ -534,7 +534,7 @@ public class LocationCustomizer extends ValidityAwarePanel implements ActionList
         lineOffsetSpinner = new JExtendedSpinner() {
                 public Dimension getPreferredSize() {
                     return new Dimension(Math.max(super.getPreferredSize().width, 55),
-                                         org.netbeans.modules.profiler.ui.stp.Utils.getDefaultSpinnerHeight());
+                                         org.netbeans.modules.profiler.stp.Utils.getDefaultSpinnerHeight());
                 }
 
                 public Dimension getMinimumSize() {

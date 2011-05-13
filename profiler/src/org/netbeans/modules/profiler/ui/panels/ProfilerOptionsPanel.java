@@ -557,7 +557,7 @@ public final class ProfilerOptionsPanel extends JPanel implements ActionListener
         portNoSpinner = new JExtendedSpinner() {
                 public Dimension getPreferredSize() {
                     return new Dimension(super.getPreferredSize().width,
-                                         org.netbeans.modules.profiler.ui.stp.Utils.getDefaultSpinnerHeight());
+                                         org.netbeans.modules.profiler.stp.Utils.getDefaultSpinnerHeight());
                 }
 
                 public Dimension getMinimumSize() {

@@ -54,7 +54,6 @@ import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.ppoints.ui.TriggeredTakeSnapshotCustomizer;
 import org.netbeans.modules.profiler.ppoints.ui.ValidityAwarePanel;
 import org.netbeans.modules.profiler.utils.IDEUtils;
@@ -62,7 +61,6 @@ import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -84,6 +82,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.utils.Utilities;
 
 
 /**
@@ -269,17 +268,9 @@ public final class TriggeredTakeSnapshotProfilingPoint extends TriggeredGlobalPr
                         final File snapshotFile = resolvedFile;
 
                         if ((snapshotFile != null) && snapshotFile.exists()) {
-                            if (TriggeredTakeSnapshotProfilingPoint.this.getSnapshotType().equals(TYPE_PROFDATA_KEY)) {
-                                File sf = FileUtil.normalizeFile(snapshotFile);
-                                LoadedSnapshot snapshot = ResultsManager.getDefault()
-                                                                        .loadSnapshot(FileUtil.toFileObject(sf));
-                                ResultsManager.getDefault().openSnapshot(snapshot);
-                            } else if (TriggeredTakeSnapshotProfilingPoint.this.getSnapshotType().equals(TYPE_HEAPDUMP_KEY)) {
-                                RequestProcessor.getDefault().post(new Runnable() {
-                                        public void run() {
-                                            HeapWalkerManager.getDefault().openHeapWalker(snapshotFile);
-                                        }
-                                    });
+                            String type = TriggeredTakeSnapshotProfilingPoint.this.getSnapshotType();
+                            if (type.equals(TYPE_PROFDATA_KEY) || type.equals(TYPE_HEAPDUMP_KEY)) {
+                                Utilities.openSnapshot(snapshotFile);
                             }
                         } else {
                             NetBeansProfiler.getDefaultNB().displayWarning(SNAPSHOT_NOT_AVAILABLE_MSG);

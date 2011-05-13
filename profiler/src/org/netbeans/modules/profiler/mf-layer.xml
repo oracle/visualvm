@@ -153,8 +153,8 @@ made subject to such option by the copyright holder.
                          <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
                          <attr name="mimeType" stringvalue="x-application/hprof"/>
                      </file>
-                 </folder>
-             </folder>
+         </folder>
+    </folder>
          </folder>
     </folder>
 
@@ -447,9 +447,9 @@ made subject to such option by the copyright holder.
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
                 <attr name="position" intvalue="99500"/>
             </file>
-            <file name="HprofResolver.xml" url="HprofResolver.xml">
+            <file name="DummyHprofResolver.xml" url="DummyHprofResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
-                <attr name="position" intvalue="99700"/>
+                <attr name="position" intvalue="99900"/>
             </file>
         </folder>
     </folder>
@@ -549,9 +549,6 @@ made subject to such option by the copyright holder.
         </folder>
         <folder name="Groups">
             <file name="LiveResultsGroup.wsgrp" url="LiveResultsGroupWsgrp.xml"/>
-            <folder name="LiveResultsGroup">
-                <file name="DrillDownWindow.wstcgrp" url="DrillDownWindowWstcgrp.xml"/>
-            </folder>
         </folder>
     </folder>
 

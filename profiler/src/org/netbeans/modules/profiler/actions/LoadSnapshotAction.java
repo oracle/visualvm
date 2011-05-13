@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -58,6 +57,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.utils.Utilities;
 
 
 /**
@@ -175,7 +175,9 @@ public final class LoadSnapshotAction extends AbstractAction {
             if (!heapdumpsFArr.isEmpty()) {
                 RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
-                            HeapWalkerManager.getDefault().openHeapWalkers(heapdumpsFArr.toArray(new File[heapdumpsFArr.size()]));
+                            for (File heapDump : heapdumpsFArr) {
+                                Utilities.openSnapshot(heapDump);
+                            }
                         }
                     });
 

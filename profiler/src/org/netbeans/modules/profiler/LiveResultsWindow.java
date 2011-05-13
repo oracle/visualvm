@@ -64,21 +64,17 @@ import org.netbeans.lib.profiler.ui.cpu.CPUResUserActionsHandler;
 import org.netbeans.lib.profiler.ui.cpu.CodeRegionLivePanel;
 import org.netbeans.lib.profiler.ui.cpu.FlatProfilePanel;
 import org.netbeans.lib.profiler.ui.cpu.LiveFlatProfilePanel;
-import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModuleContainer;
-import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownListener;
 import org.netbeans.lib.profiler.ui.memory.LiveAllocResultsPanel;
 import org.netbeans.lib.profiler.ui.memory.LiveLivenessResultsPanel;
 import org.netbeans.lib.profiler.ui.memory.MemoryResUserActionsHandler;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
-import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDown;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.util.actions.Presenter;
 import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
@@ -122,7 +118,7 @@ import org.netbeans.lib.profiler.ui.memory.ClassHistoryActionsHandler;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stats.drilldown.DrillDownFactory;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -183,6 +179,34 @@ public final class LiveResultsWindow extends TopComponent
         }
     }
 
+    public static interface Contributor {
+        public static abstract class Adapter implements Contributor {
+            @Override
+            public void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Project project) {}
+
+            @Override
+            public void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Project project) {}
+
+            @Override
+            public void hide() {}
+
+            @Override
+            public void show() {}
+
+            @Override
+            public void refresh() {}
+
+            @Override
+            public void reset() {}
+        }
+        void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Project project);
+        void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Project project);
+        void show();
+        void hide();
+        void refresh();
+        void reset();
+    }
+    
     @org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.CPUCCTProvider.Listener.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.memory.MemoryCCTProvider.Listener.class)})
     public static final class ResultsMonitor implements CPUCCTProvider.Listener, MemoryCCTProvider.Listener {
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -190,7 +214,7 @@ public final class LiveResultsWindow extends TopComponent
         public void cctEstablished(RuntimeCCTNode runtimeCCTNode, boolean empty) {
             if (!empty) {
                 getDefault().resultsAvailable = true;
-                IDEUtils.runInEventDispatchThread(new Runnable() {
+                ProfilerUtils.runInEventDispatchThread(new Runnable() {
                         public void run() {
                             getDefault().updateResultsDisplay();
                         }
@@ -205,23 +229,23 @@ public final class LiveResultsWindow extends TopComponent
         }
     }
 
-    public static class ActivateDrillDownAction extends AbstractAction {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public void actionPerformed(ActionEvent e) {
-            //      System.out.println("ActivateDrillDownAction Invoked");
-            if (TopComponent.getRegistry().getActivated() == LiveResultsWindow.getDefault()) {
-                // LiveResultsWindow is active
-                TopComponent drillDown = DrillDownWindow.getDefault();
-
-                //        System.out.println(" Drill window: "+drillDown.isOpened());
-                if (drillDown.isOpened()) {
-                    // DrillDown is visible
-                    drillDown.requestActive();
-                }
-            }
-        }
-    }
+//    public static class ActivateDrillDownAction extends AbstractAction {
+//        //~ Methods --------------------------------------------------------------------------------------------------------------
+//
+//        public void actionPerformed(ActionEvent e) {
+//            //      System.out.println("ActivateDrillDownAction Invoked");
+//            if (TopComponent.getRegistry().getActivated() == LiveResultsWindow.getDefault()) {
+//                // LiveResultsWindow is active
+//                TopComponent drillDown = DrillDownWindow.getDefault();
+//
+//                //        System.out.println(" Drill window: "+drillDown.isOpened());
+//                if (drillDown.isOpened()) {
+//                    // DrillDown is visible
+//                    drillDown.requestActive();
+//                }
+//            }
+//        }
+//    }
 
     private final class CPUActionsHandler extends CPUResUserActionsHandler.Adapter {
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -234,7 +258,7 @@ public final class LiveResultsWindow extends TopComponent
             List<ProfilingSettings> cpuSettings = new ArrayList<ProfilingSettings>();
 
             for (ProfilingSettings settings : projectSettings) {
-                if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
                     cpuSettings.add(settings);
                 }
             }
@@ -303,12 +327,12 @@ public final class LiveResultsWindow extends TopComponent
         }
 
         public void showStacksForClass(final int selectedClassId, final int sortingColumn, final boolean sortingOrder) {
-            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         final LoadedSnapshot ls = ResultsManager.getDefault().takeSnapshot();
 
                         if (ls != null) {
-                            IDEUtils.runInEventDispatchThread(new Runnable() {
+                            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
 
@@ -443,7 +467,6 @@ public final class LiveResultsWindow extends TopComponent
 
     private CPUResUserActionsHandler cpuActionsHandler;
     private Component lastFocusOwner;
-    private DrillDown dd = null;
     private EmptyLiveResultsPanel noResultsPanel;
     private JButton runGCButton;
     private JButton updateNowButton;
@@ -468,7 +491,6 @@ public final class LiveResultsWindow extends TopComponent
     private MemoryResUserActionsHandler memoryActionsHandler;
     private HistoryActionsHandler historyActionsHandler;
     private boolean autoRefresh = true;
-    private boolean drillDownGroupOpened;
     private volatile boolean profilerRunning = false;
     private volatile boolean resultsAvailable = false;
 
@@ -479,7 +501,7 @@ public final class LiveResultsWindow extends TopComponent
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LiveResultsWindow() {
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
                 initUI();
             }
@@ -553,36 +575,7 @@ public final class LiveResultsWindow extends TopComponent
 
         historyPanel = new JPanel(new BorderLayout());
 
-        JPanel toolbarSpacer = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0)) {
-            public Dimension getPreferredSize() {
-                if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
-                    int currentWidth = toolBar.getSize().width;
-                    int minimumWidth = toolBar.getMinimumSize().width;
-                    int extraWidth = currentWidth - minimumWidth;
-                    return new Dimension(Math.max(extraWidth, 0), 0);
-                } else {
-                    return super.getPreferredSize();
-                }
-            }
-        };
-        toolbarSpacer.setOpaque(false);
-
-        final DrillDownWindow drillDownWin = DrillDownWindow.getDefault();
-        DrillDownWindow.closeIfOpened();
-        drillDownWin.getPresenter().addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (drillDownWin.getPresenter().isSelected()) {
-                        drillDownWin.open();
-                    } else {
-                        drillDownWin.close();
-                    }
-                }
-            });
-
-        toolBar.add(toolbarSpacer);
-        toolBar.add(drillDownWin.getPresenter());
-
-        hideDrillDown();
+        hideContributors();
         //******************
         setFocusable(true);
         setRequestFocusEnabled(true);
@@ -607,7 +600,7 @@ public final class LiveResultsWindow extends TopComponent
 
     public static void closeIfOpened() {
         if (hasDefault()) {
-            IDEUtils.runInEventDispatchThread(new Runnable() {
+            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         if (defaultLiveInstance.isOpened()) {
                             defaultLiveInstance.close();
@@ -714,10 +707,7 @@ public final class LiveResultsWindow extends TopComponent
         profilerRunning = false;
 
         if (isShowing()) {
-            //      if (currentDisplay != null) currentDisplay.handleShutdown();
-
-            // TODO update the display
-            hideDrillDown(); // close the drilldown; this is because sometimes the JVM can be terminated before we get here - look at Profiler.fireProfilingStateChange
+            hideContributors();
             requestProfilingDataUpdate(false);
         }
 
@@ -747,7 +737,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     public void ideClosing() {
-        hideDrillDown();
+        hideContributors();
     }
 
     public void instrumentationChanged(int oldInstrType, int currentInstrType) {
@@ -837,7 +827,7 @@ public final class LiveResultsWindow extends TopComponent
     protected void componentHidden() {
         super.componentHidden();
 
-        hideDrillDown();
+        hideContributors();
     }
 
     //
@@ -885,7 +875,7 @@ public final class LiveResultsWindow extends TopComponent
             resetResultsDisplay();
         }
 
-        resetDrillDown();
+        resetContributors();
     }
 
     // -- Private implementation -------------------------------------------------------------------------------------------
@@ -998,23 +988,8 @@ public final class LiveResultsWindow extends TopComponent
         return toolBar;
     }
 
-    private void hideDrillDown() {
-        IDEUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    TopComponentGroup group = WindowManager.getDefault().findTopComponentGroup("LiveResultsGroup"); //NOI18N
-
-                    if (group != null) {
-                        group.close();
-                    }
-                    drillDownGroupOpened = false;
-                    DrillDownWindow.getDefault().getPresenter().setEnabled(false);
-                }
-            });
-    }
-
     private LiveResultsPanel preparePanelForInstrType(int instrumentationType) {
         LiveResultsPanel aPanel = null;
-        dd = null;
 
         switch (instrumentationType) {
             case ProfilerEngineSettings.INSTR_OBJECT_ALLOCATIONS: {
@@ -1058,33 +1033,11 @@ public final class LiveResultsWindow extends TopComponent
             case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
             case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED: {
                 Project project = NetBeansProfiler.getDefaultNB().getProfiledProject();
-//                ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
 
-                List additionalStats = new ArrayList();
+                final LiveFlatProfilePanel cpuPanel = new LiveFlatProfilePanel(runner, cpuActionsHandler);
 
-                dd = Lookup.getDefault().lookup(DrillDownFactory.class).createDrillDown(project, runner.getProfilerClient());
-                if (dd != null) {
-                    StatisticalModuleContainer container = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
-                    additionalStats.addAll(container.getAllModules());
-
-
-                    DrillDownWindow.getDefault().setDrillDown(dd, additionalStats);
-                    showDrillDown();
-                } else {
-                    hideDrillDown();
-                }
-
-                final LiveFlatProfilePanel cpuPanel = new LiveFlatProfilePanel(runner, cpuActionsHandler, additionalStats);
-
-                if (dd != null) {
-                    dd.addListener(new DrillDownListener() {
-                        public void dataChanged() {
-                        }
-
-                        public void drillDownPathChanged(List list) {
-                            cpuPanel.updateLiveResults();
-                        }
-                    });
+                for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+                    c.addToCpuResults(cpuPanel, toolBar, runner.getProfilerClient(), project);
                 }
 
                 currentDisplayComponent = cpuPanel;
@@ -1111,7 +1064,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private void requestProfilingDataUpdate(final boolean force) {
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        ProfilerUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     if (!isAutoRefresh() && !force) {
                         return;
@@ -1121,7 +1074,7 @@ public final class LiveResultsWindow extends TopComponent
                         return;
                     }
 
-                    IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                             public void run() {
                                 // send a command to server to generate the newest live data
                                 callForceObtainedResultsDump(runner.getProfilerClient());
@@ -1129,12 +1082,6 @@ public final class LiveResultsWindow extends TopComponent
                         });
                 }
             });
-    }
-
-    private void resetDrillDown() {
-        if (dd != null) {
-            dd.reset();
-        }
     }
 
     private void resetResultsDisplay() {
@@ -1147,26 +1094,8 @@ public final class LiveResultsWindow extends TopComponent
             graphButtonsSeparator.setVisible(false);
             revalidate();
             repaint();
-            hideDrillDown();
+            hideContributors();
         }
-    }
-
-    private void showDrillDown() {
-        IDEUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    TopComponentGroup group = WindowManager.getDefault().findTopComponentGroup("LiveResultsGroup"); //NOI18N
-
-                    if (group != null) {
-                        group.open();
-                        drillDownGroupOpened = true;
-                        DrillDownWindow.getDefault().getPresenter().setEnabled(true);
-
-                        //          if (DrillDownWindow.getDefault().needsDocking()) DrillDownWindow.getDefault().open(); // Do not open DrillDown by default, only on demand by DrillDownWindow.getDefault().getPresenter()
-                    } else {
-                        LOGGER.severe("LiveResultsGroup not existing!"); // NOI18N
-                    }
-                }
-            });
     }
 
     private void updateActions(int newState) {
@@ -1174,27 +1103,23 @@ public final class LiveResultsWindow extends TopComponent
         updateNowButton.setEnabled(newState == Profiler.PROFILING_RUNNING);
     }
 
-    private void updateDrillDown() {
-        if (dd != null) {
-            dd.refresh(); // TODO race condition by cleaning the dd variable!
-        }
-
+    private void refresh() {        
         if (LOGGER.isLoggable(Level.FINE) && (currentDisplayComponent != null)) {
-            LOGGER.fine("updating drilldown: " + currentDisplayComponent.getClass().getName()); // NOI18N
+            LOGGER.fine("refreshing contributors for drilldown: " + currentDisplayComponent.getClass().getName()); // NOI18N
         }
+        
+        refreshContributors();
 
-        if (profilerRunning && currentDisplayComponent instanceof LiveFlatProfilePanel && (dd != null) && dd.isValid()) {
-            LOGGER.fine("Showing drilldown"); // NOI18N
+        if (profilerRunning && currentDisplayComponent instanceof LiveFlatProfilePanel) {
+            LOGGER.fine("Showing contributors"); // NOI18N
 
-            if (!drillDownGroupOpened && isVisible()) {
-                showDrillDown();
+            if (isVisible()) {
+                showContributors();
             }
         } else {
-            LOGGER.fine("Hiding drilldown"); // NOI18N
+            LOGGER.fine("Hiding contributors"); // NOI18N
 
-            if (drillDownGroupOpened) {
-                hideDrillDown();
-            }
+            hideContributors();
         }
     }
 
@@ -1236,7 +1161,7 @@ public final class LiveResultsWindow extends TopComponent
                 add(currentDisplayComponent, BorderLayout.CENTER);
                 revalidate();
                 repaint();
-                IDEUtils.runInEventDispatchThread(new Runnable() {
+                ProfilerUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         currentDisplayComponent.requestFocusInWindow(); // must be invoked lazily to override default focus behavior
                     }
@@ -1249,6 +1174,30 @@ public final class LiveResultsWindow extends TopComponent
 
         }
 
-        updateDrillDown();
+        refresh();
+    }
+    
+    private void hideContributors() {
+        for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+            c.hide();
+        }
+    }
+    
+    private void showContributors() {
+        for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+            c.show();
+        }
+    }
+    
+    private void refreshContributors() {
+        for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+            c.refresh();
+        }
+    }
+    
+    private void resetContributors() {
+        for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+            c.reset();
+        }
     }
 }
