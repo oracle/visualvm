@@ -91,6 +91,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.j2se.impl</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>
+                <friend>org.netbeans.modules.profiler.ppoints</friend>
                 <friend>org.netbeans.modules.profiler.projectsupport</friend>
                 <friend>org.netbeans.modules.profiler.stp</friend>
                 <friend>org.netbeans.modules.profiler.utilities</friend>

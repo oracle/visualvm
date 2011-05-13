@@ -83,6 +83,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.heapwalker</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.ppoints</friend>
                 <friend>org.netbeans.modules.profiler.selector.java</friend>
                 <friend>org.netbeans.modules.profiler.selector.spi</friend>
                 <friend>org.netbeans.modules.profiler.selector.ui</friend>
