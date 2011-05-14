@@ -51,7 +51,7 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.panels.PIDSelectPanel;
-import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
+import org.netbeans.modules.profiler.stp.SelectProfilingTask;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
