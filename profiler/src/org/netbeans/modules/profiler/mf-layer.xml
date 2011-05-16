@@ -461,7 +461,6 @@ made subject to such option by the copyright holder.
         <folder name="Components">
             <file name="profiler_cp.settings" url="profiler_cp.settings"/>
             <file name="profiler_to.settings" url="profiler_to.settings"/>
-            <file name="profiler_pp.settings" url="profiler_pp.settings"/>
         </folder>
         <folder name="Modes">
             <folder name="explorer">
@@ -472,9 +471,6 @@ made subject to such option by the copyright holder.
             <folder name="output">
                 <file name="profiler_to.wstcref" url="profiler_to.wstcref">
                     <attr name="position" intvalue="1500"/>
-                </file>
-                <file name="profiler_pp.wstcref" url="profiler_pp.wstcref">
-                    <attr name="position" intvalue="1550"/>
                 </file>
             </folder>
         </folder>
