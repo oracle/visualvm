@@ -153,8 +153,8 @@ made subject to such option by the copyright holder.
                          <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
                          <attr name="mimeType" stringvalue="x-application/hprof"/>
                      </file>
-                 </folder>
-             </folder>
+         </folder>
+    </folder>
          </folder>
     </folder>
 
@@ -183,10 +183,6 @@ made subject to such option by the copyright holder.
                 <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.shadow">
                     <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance"/>
                     <attr name="position" intvalue="200"/>
-                </file>
-                <file name="org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.instance"/>
-                    <attr name="position" intvalue="600"/>
                 </file>
             </folder>
         </folder>
@@ -344,9 +340,6 @@ made subject to such option by the copyright holder.
         <file name="S-F2.shadow">
             <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-StopAction.instance"/>
         </file>
-        <file name="S-F9.shadow">
-            <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-ppoints-ui-ToggleProfilingPointAction.instance"/>
-        </file>
         <!-- XXX: Does this registration really work? If so, please register in Actions and use shadow
         <file name="C-U D.instance">
             <attr name="instanceClass" stringvalue="org.netbeans.modules.profiler.LiveResultsWindow$ActivateDrillDownAction"/>
@@ -385,25 +378,6 @@ made subject to such option by the copyright holder.
                 <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/resources/memory.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
-            </file>
-            <file name="org-netbeans-modules-profiler-ppoints-ui-OpenProfilingPointsWindowAction.instance"/>
-            <file name="org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-AddRootMethodAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-SelectJavaRootMethodsAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance"/>
-
-            <file name="org-netbeans-modules-profiler-actions-RerunAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-StopAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
-            <file name="org-netbeans-modules-profiler-ppoints-ui-ToggleProfilingPointAction.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.ppoints.ui.ToggleProfilingPointAction.getInstance"/>
             </file>
             <file name="org-netbeans-modules-profiler-actions-ProfileSingleAction.instance">
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSingle"/>
@@ -447,9 +421,9 @@ made subject to such option by the copyright holder.
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
                 <attr name="position" intvalue="99500"/>
             </file>
-            <file name="HprofResolver.xml" url="HprofResolver.xml">
+            <file name="DummyHprofResolver.xml" url="DummyHprofResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
-                <attr name="position" intvalue="99700"/>
+                <attr name="position" intvalue="99900"/>
             </file>
         </folder>
     </folder>
@@ -477,51 +451,8 @@ made subject to such option by the copyright holder.
                             <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-SelectJavaRootMethodsAction.instance"/>
                             <attr name="position" intvalue="200"/>
                         </file>
-                        <file name="org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.shadow">
-                            <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-ppoints-ui-InsertProfilingPointAction.instance"/>
-                            <attr name="position" intvalue="300"/>
-                        </file>
                     </folder>
                 </folder>
-            </folder>
-        </folder>
-        <folder name="AnnotationTypes">
-            <file name="resetResultsProfilingPoint.xml" url="ppoints/ui/resources/resetResultsProfilingPoint.xml"/>
-            <file name="resetResultsProfilingPointD.xml" url="ppoints/ui/resources/resetResultsProfilingPointD.xml"/>
-            <file name="stopwatchProfilingPoint.xml" url="ppoints/ui/resources/stopwatchProfilingPoint.xml"/>
-            <file name="stopwatchProfilingPointD.xml" url="ppoints/ui/resources/stopwatchProfilingPointD.xml"/>
-            <file name="takeSnapshotProfilingPoint.xml" url="ppoints/ui/resources/takeSnapshotProfilingPoint.xml"/>
-            <file name="takeSnapshotProfilingPointD.xml" url="ppoints/ui/resources/takeSnapshotProfilingPointD.xml"/>
-            <file name="loadgenProfilingPoint.xml" url="ppoints/ui/resources/loadgenProfilingPoint.xml"/>
-            <file name="loadgenProfilingPointD.xml" url="ppoints/ui/resources/loadgenProfilingPointD.xml"/>
-            <folder name="SingleProfilePointActions">
-                <file name="org-netbeans-modules-profiler-ppoints-ui-EnableDisableProfilingPointAction.instance">
-                    <attr name="position" intvalue="100"/>
-                </file>
-                <file name="org-netbeans-modules-profiler-ppoints-ui-CustomizeProfilingPointAction.instance">
-                    <attr name="position" intvalue="200"/>
-                </file>
-                <file name="org-netbeans-modules-profiler-ppoints-ui-DeleteProfilingPointAction.instance">
-                    <attr name="position" intvalue="300"/>
-                </file>
-            </folder>
-            <folder name="PairedProfilePointActions">
-                <file name="org-netbeans-modules-profiler-ppoints-ui-EnableDisableProfilingPointAction.instance">
-                    <attr name="position" intvalue="100"/>
-                </file>
-                <file name="org-netbeans-modules-profiler-ppoints-ui-CustomizeProfilingPointAction.instance">
-                    <attr name="position" intvalue="200"/>
-                </file>
-                <file name="org-netbeans-modules-profiler-ppoints-ui-DeleteProfilingPointAction.instance">
-                    <attr name="position" intvalue="300"/>
-                </file>
-                <file name="profiler-ppoints-annotationpopup-separator.instance">
-                    <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
-                    <attr name="position" intvalue="400"/>
-                </file>
-                <file name="org-netbeans-modules-profiler-ppoints-ui-ShowOppositeProfilingPointAction.instance">
-                    <attr name="position" intvalue="500"/>
-                </file>
             </folder>
         </folder>
     </folder>
@@ -549,9 +480,6 @@ made subject to such option by the copyright holder.
         </folder>
         <folder name="Groups">
             <file name="LiveResultsGroup.wsgrp" url="LiveResultsGroupWsgrp.xml"/>
-            <folder name="LiveResultsGroup">
-                <file name="DrillDownWindow.wstcgrp" url="DrillDownWindowWstcgrp.xml"/>
-            </folder>
         </folder>
     </folder>
 
