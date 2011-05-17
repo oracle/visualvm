@@ -47,7 +47,7 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.lib.profiler.common</code-name-base>
+            <code-name-base>org.netbeans.modules.profiler.api</code-name-base>
             <module-dependencies>
                 <dependency>
                     <code-name-base>org.netbeans.lib.profiler</code-name-base>
@@ -55,7 +55,42 @@ made subject to such option by the copyright holder.
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.1</specification-version>
+                        <specification-version>1.14</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.lib.profiler.common</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.14</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.java.platform</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.21</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.projectapi</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.36</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.openide.filesystems</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>7.47</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -63,44 +98,13 @@ made subject to such option by the copyright holder.
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.2</specification-version>
+                        <specification-version>8.8</specification-version>
                     </run-dependency>
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>com.sun.tools.visualvm.core</friend>
-                <friend>com.sun.tools.visualvm.profiler</friend>
-                <friend>com.sun.tools.visualvm.profiling</friend>
-                <friend>com.sun.tools.visualvm.sampler</friend>
-                <friend>org.netbeans.modules.javafx.profiler</friend>
-                <friend>org.netbeans.modules.javame.profiler</friend>
-                <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
-                <friend>org.netbeans.modules.profiler.api</friend>
-                <friend>org.netbeans.modules.profiler.attach</friend>
-                <friend>org.netbeans.modules.profiler.attach.impl</friend>
-                <friend>org.netbeans.modules.profiler.categorization.api</friend>
-                <friend>org.netbeans.modules.profiler.drilldown</friend>
-                <friend>org.netbeans.modules.profiler.freeform</friend>
-                <friend>org.netbeans.modules.profiler.heapwalker</friend>
-                <friend>org.netbeans.modules.profiler.j2ee</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.generic</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.sunas</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.tomcat</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.weblogic</friend>
-                <friend>org.netbeans.modules.profiler.j2se</friend>
-                <friend>org.netbeans.modules.profiler.j2se.impl</friend>
-                <friend>org.netbeans.modules.profiler.nbmodule</friend>
-                <friend>org.netbeans.modules.profiler.options</friend>
-                <friend>org.netbeans.modules.profiler.ppoints</friend>
-                <friend>org.netbeans.modules.profiler.projectsupport</friend>
-                <friend>org.netbeans.modules.profiler.stp</friend>
-                <friend>org.netbeans.modules.profiler.utilities</friend>
-                <package>org.netbeans.lib.profiler.common</package>
-                <package>org.netbeans.lib.profiler.common.event</package>
-                <package>org.netbeans.lib.profiler.common.filters</package>
-                <package>org.netbeans.lib.profiler.common.integration</package>
+                <package>org.netbeans.modules.profiler.spi</package>
             </friend-packages>
         </data>
     </configuration>

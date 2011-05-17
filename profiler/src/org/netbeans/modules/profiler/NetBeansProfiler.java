@@ -79,7 +79,6 @@ import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModuleContainer;
 import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
 import org.netbeans.lib.profiler.wireprotocol.WireIO;
