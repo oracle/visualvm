@@ -43,11 +43,11 @@
 
 package org.netbeans.modules.profiler.spi;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.spi.LoadGenPlugin.Result;
 import org.openide.filesystems.FileObject;
 import java.util.Collection;
 import java.util.Set;
+import org.netbeans.api.project.Project;
 
 
 /**

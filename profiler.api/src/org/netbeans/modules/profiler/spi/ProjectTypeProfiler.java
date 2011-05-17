@@ -49,8 +49,8 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.modules.profiler.stp.DefaultSettingsConfigurator;
-import org.netbeans.modules.profiler.stp.SelectProfilingTask;
+//import org.netbeans.modules.profiler.stp.DefaultSettingsConfigurator;
+//import org.netbeans.modules.profiler.stp.SelectProfilingTask;
 import org.openide.filesystems.FileObject;
 import java.util.Collections;
 import java.util.HashSet;
@@ -59,7 +59,7 @@ import java.util.Properties;
 import java.util.Set;
 import javax.swing.JComponent;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
-import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
+//import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 
 
 /**
@@ -112,9 +112,9 @@ public interface ProjectTypeProfiler {
             return null;
         }
 
-        public SelectProfilingTask.SettingsConfigurator getSettingsConfigurator() {
-            return DefaultSettingsConfigurator.SHARED_INSTANCE;
-        }
+//        public SelectProfilingTask.SettingsConfigurator getSettingsConfigurator() {
+//            return DefaultSettingsConfigurator.SHARED_INSTANCE;
+//        }
 
         public void computeProjectPackages(Project project, boolean subprojects, String[][] storage) {
         }
@@ -152,19 +152,19 @@ public interface ProjectTypeProfiler {
 
         public boolean isAttachSupported(Project project) {
             // Check if project contains any Java sources
-            if (ProjectUtilities.isJavaProject(project)) {
-                return true;
-            }
-
-            // Check if any subproject contains any Java sources
-            Set<Project> subprojects = new HashSet<Project>();
-            ProjectUtilities.fetchSubprojects(project, subprojects);
-
-            for (Project subproject : subprojects) {
-                if (ProjectUtilities.isJavaProject(subproject)) {
-                    return true;
-                }
-            }
+//            if (ProjectUtilities.isJavaProject(project)) {
+//                return true;
+//            }
+//
+//            // Check if any subproject contains any Java sources
+//            Set<Project> subprojects = new HashSet<Project>();
+//            ProjectUtilities.fetchSubprojects(project, subprojects);
+//
+//            for (Project subproject : subprojects) {
+//                if (ProjectUtilities.isJavaProject(subproject)) {
+//                    return true;
+//                }
+//            }
 
             // Project and eventually subprojects don't contain any Java sources
             return false;
@@ -200,29 +200,29 @@ public interface ProjectTypeProfiler {
 
             float o = 0.0f;
 
-            if (org.netbeans.modules.profiler.stp.Utils.isMonitorSettings(settings)) {
-                //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
-            } else if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings)) {
-                if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
-                    o += 0.5f; // entire app
-                } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
-                    o += 0.2f; // part of app
-                }
-
-                if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
-                    o += 0.5f; // profile all classes
-                }
-            } else if (org.netbeans.modules.profiler.stp.Utils.isMemorySettings(settings)) {
-                if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
-                    o += 0.5f; // object allocations
-                } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
-                    o += 0.7f; // object liveness
-                }
-
-                if (settings.getAllocStackTraceLimit() != 0) {
-                    o += 0.3f; // record allocation stack traces
-                }
-            }
+//            if (org.netbeans.modules.profiler.stp.Utils.isMonitorSettings(settings)) {
+//                //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
+//            } else if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings)) {
+//                if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
+//                    o += 0.5f; // entire app
+//                } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
+//                    o += 0.2f; // part of app
+//                }
+//
+//                if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
+//                    o += 0.5f; // profile all classes
+//                }
+//            } else if (org.netbeans.modules.profiler.stp.Utils.isMemorySettings(settings)) {
+//                if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
+//                    o += 0.5f; // object allocations
+//                } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
+//                    o += 0.7f; // object liveness
+//                }
+//
+//                if (settings.getAllocStackTraceLimit() != 0) {
+//                    o += 0.3f; // record allocation stack traces
+//                }
+//            }
 
             return o;
         }
@@ -335,7 +335,7 @@ public interface ProjectTypeProfiler {
     JavaPlatform getProjectJavaPlatform(Project project);
 
     // Customizer for profiling settings, DefaultSettingsConfigurator.SHARED_INSTANCE is typically perfect fit
-    SelectProfilingTask.SettingsConfigurator getSettingsConfigurator();
+//    SelectProfilingTask.SettingsConfigurator getSettingsConfigurator();
 
     /**
      * This method will be called before the profiling starts to check if the project is in a correct state.
