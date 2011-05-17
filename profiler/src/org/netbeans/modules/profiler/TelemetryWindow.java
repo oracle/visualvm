@@ -54,7 +54,6 @@ import org.netbeans.lib.profiler.ui.graphs.GraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.MemoryGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.SurvivingGenerationsGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.ThreadsGraphPanel;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -71,6 +70,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /** An IDE TopComponent to display profiling results.
@@ -418,7 +418,7 @@ public final class TelemetryWindow extends TopComponent {
 
     public static void closeIfOpened() {
         if (defaultInstance != null) {
-            IDEUtils.runInEventDispatchThread(new Runnable() {
+            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         if (defaultInstance.isOpened()) {
                             defaultInstance.close();

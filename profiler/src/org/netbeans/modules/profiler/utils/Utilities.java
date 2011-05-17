@@ -54,13 +54,19 @@ import org.openide.util.NbBundle;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.openide.cookies.OpenCookie;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObjectNotFoundException;
+import org.openide.util.Exceptions;
 
 
 /**
- * Miscelaneous utilities for the NetBeans integration.
+ * Miscellaneous utilities for the NetBeans integration.
  *
  * @author Tomas Hurka
  * @author Ian Formanek
@@ -191,4 +197,22 @@ public final class Utilities {
 
         return null;
     }
+
+    public static void openSnapshot(File snapshot) {
+        File sf = FileUtil.normalizeFile(snapshot);
+        FileObject snapshotFo = FileUtil.toFileObject(sf);
+        
+        try {
+            DataObject snapshotDo = DataObject.find(snapshotFo);
+            OpenCookie open = snapshotDo.getCookie(OpenCookie.class);
+            if (open != null) {
+                open.open();
+            }
+        } catch (DataObjectNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+    
+
+
 }

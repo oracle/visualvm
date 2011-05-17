@@ -53,6 +53,7 @@ import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
 import javax.swing.*;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -122,7 +123,7 @@ public final class ProfilingMonitor {
                                             // TODO: move this code to a separate class performing the update if necessary
                                             if (NetBeansProfiler.getDefaultNB().processesProfilingPoints() && (ppsize > 0)
                                                     && (!doUpdateLiveResults || !LiveResultsWindow.hasDefault())) {
-                                                org.netbeans.modules.profiler.utils.IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                                                ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                                                         public void run() {
                                                             try {
                                                                 ProfilerClient client = Profiler.getDefault().getTargetAppRunner()

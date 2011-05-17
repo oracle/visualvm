@@ -46,18 +46,13 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.spi.LoadGenPlugin;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
-import java.util.Properties;
 import javax.swing.*;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -135,7 +130,7 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
         if (task != null) {
             taskPosted = true;
             updateEnabledState();
-            IDEUtils.runInProfilerRequestProcessor(task);
+            ProfilerUtils.runInProfilerRequestProcessor(task);
         }
     }
 
