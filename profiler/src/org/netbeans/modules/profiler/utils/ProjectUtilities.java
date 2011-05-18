@@ -57,7 +57,6 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
@@ -107,6 +106,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.HeapDumpWatch;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.spi.project.ProjectServiceProvider;
@@ -348,9 +348,9 @@ public final class ProjectUtilities {
     public static float getProfilingOverhead(ProfilingSettings settings) {
         float o = 0.0f;
 
-        if (org.netbeans.modules.profiler.ui.stp.Utils.isMonitorSettings(settings)) {
+        if (org.netbeans.modules.profiler.stp.Utils.isMonitorSettings(settings)) {
             //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings)) {
+        } else if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings)) {
             if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
                 o += 0.5f; // entire app
             } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
@@ -360,7 +360,7 @@ public final class ProjectUtilities {
             if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
                 o += 0.5f; // profile all classes
             }
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isMemorySettings(settings)) {
+        } else if (org.netbeans.modules.profiler.stp.Utils.isMemorySettings(settings)) {
             if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
                 o += 0.5f; // object allocations
             } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {

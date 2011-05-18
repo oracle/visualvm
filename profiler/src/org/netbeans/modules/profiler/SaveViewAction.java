@@ -63,6 +63,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 class SaveViewAction extends AbstractAction {
@@ -201,7 +202,7 @@ class SaveViewAction extends AbstractAction {
         image = null;
         imagePreview.reset();
 
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     ProgressHandle pHandle = null;
 
