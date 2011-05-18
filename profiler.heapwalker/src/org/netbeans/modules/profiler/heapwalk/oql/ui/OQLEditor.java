@@ -58,7 +58,7 @@ import javax.swing.text.JTextComponent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 import org.netbeans.modules.profiler.oql.engine.api.OQLException;
-import org.netbeans.modules.profiler.spi.OQLEditorImpl;
+import org.netbeans.modules.profiler.oql.spi.OQLEditorImpl;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Lookup;
 

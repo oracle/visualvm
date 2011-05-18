@@ -76,6 +76,7 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.uisupport</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
+                <friend>org.netbeans.modules.profiler.api</friend>
                 <friend>org.netbeans.modules.profiler.attach</friend>
                 <friend>org.netbeans.modules.profiler.categorization.api</friend>
                 <friend>org.netbeans.modules.profiler.drilldown</friend>

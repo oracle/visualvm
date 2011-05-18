@@ -117,6 +117,7 @@ import org.netbeans.lib.profiler.ui.graphs.LivenessHistoryGraphPanel;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryActionsHandler;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
 import org.netbeans.lib.profiler.utils.VMUtils;
+import org.netbeans.modules.profiler.spi.LiveResultsWindowContributor;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
@@ -177,34 +178,6 @@ public final class LiveResultsWindow extends TopComponent
 
         public void updateLiveResults() {
         }
-    }
-
-    public static interface Contributor {
-        public static abstract class Adapter implements Contributor {
-            @Override
-            public void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Project project) {}
-
-            @Override
-            public void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Project project) {}
-
-            @Override
-            public void hide() {}
-
-            @Override
-            public void show() {}
-
-            @Override
-            public void refresh() {}
-
-            @Override
-            public void reset() {}
-        }
-        void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Project project);
-        void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Project project);
-        void show();
-        void hide();
-        void refresh();
-        void reset();
     }
     
     @org.openide.util.lookup.ServiceProviders({@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.cpu.CPUCCTProvider.Listener.class), @org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.results.memory.MemoryCCTProvider.Listener.class)})
@@ -1036,7 +1009,7 @@ public final class LiveResultsWindow extends TopComponent
 
                 final LiveFlatProfilePanel cpuPanel = new LiveFlatProfilePanel(runner, cpuActionsHandler);
 
-                for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+                for(LiveResultsWindowContributor c : Lookup.getDefault().lookupAll(LiveResultsWindowContributor.class)) {
                     c.addToCpuResults(cpuPanel, toolBar, runner.getProfilerClient(), project);
                 }
 
@@ -1178,25 +1151,25 @@ public final class LiveResultsWindow extends TopComponent
     }
     
     private void hideContributors() {
-        for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+        for(LiveResultsWindowContributor c : Lookup.getDefault().lookupAll(LiveResultsWindowContributor.class)) {
             c.hide();
         }
     }
     
     private void showContributors() {
-        for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+        for(LiveResultsWindowContributor c : Lookup.getDefault().lookupAll(LiveResultsWindowContributor.class)) {
             c.show();
         }
     }
     
     private void refreshContributors() {
-        for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+        for(LiveResultsWindowContributor c : Lookup.getDefault().lookupAll(LiveResultsWindowContributor.class)) {
             c.refresh();
         }
     }
     
     private void resetContributors() {
-        for(Contributor c : Lookup.getDefault().lookupAll(Contributor.class)) {
+        for(LiveResultsWindowContributor c : Lookup.getDefault().lookupAll(LiveResultsWindowContributor.class)) {
             c.reset();
         }
     }

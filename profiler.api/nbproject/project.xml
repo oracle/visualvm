@@ -68,6 +68,15 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.lib.profiler.ui</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.14</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.java.platform</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -104,6 +113,10 @@ made subject to such option by the copyright holder.
             </module-dependencies>
             <friend-packages>
                 <friend>org.netbeans.modules.profiler</friend>
+                <friend>org.netbeans.modules.profiler.categorization.api</friend>
+                <friend>org.netbeans.modules.profiler.drilldown</friend>
+                <friend>org.netbeans.modules.profiler.j2ee</friend>
+                <friend>org.netbeans.modules.profiler.j2se</friend>
                 <package>org.netbeans.modules.profiler.spi</package>
             </friend-packages>
         </data>

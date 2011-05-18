@@ -137,6 +137,7 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
+import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.GoToSourceHelper;
 import org.netbeans.modules.profiler.utils.JavaSourceLocation;
@@ -307,18 +308,6 @@ public final class NetBeansProfiler extends Profiler {
                 instantiated = true;
             }
         }
-    }
-
-    public static interface SessionListener {
-        public static abstract class Adapter implements SessionListener {
-            @Override
-            public void onShutdown() {}
-
-            @Override
-            public void onStartup(ProfilingSettings ps, Project p) {}
-        }
-        void onStartup(ProfilingSettings ps, Project p);
-        void onShutdown();
     }
     
     // -- NetBeansProfiler-only callback classes ---------------------------------------------------------------------------
