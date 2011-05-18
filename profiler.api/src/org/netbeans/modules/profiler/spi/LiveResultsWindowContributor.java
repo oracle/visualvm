@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,32 +34,60 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.profiler.spi;
 
-package org.netbeans.lib.profiler.ui.cpu.statistics;
-
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
-import javax.swing.JPanel;
-
+import javax.swing.JToolBar;
+import org.netbeans.api.project.Project;
+import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.ui.cpu.LiveFlatProfilePanel;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public abstract class StatisticalModule extends JPanel {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+public interface LiveResultsWindowContributor {
 
-    private int mId = -1;
+    public static abstract class Adapter implements LiveResultsWindowContributor {
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+        @Override
+        public void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Project project) {
+        }
 
-    public void setSelectedMethodId(int methodId) {
-        mId = methodId;
+        @Override
+        public void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Project project) {
+        }
+
+        @Override
+        public void hide() {
+        }
+
+        @Override
+        public void show() {
+        }
+
+        @Override
+        public void refresh() {
+        }
+
+        @Override
+        public void reset() {
+        }
     }
 
-    public abstract void refresh(RuntimeCPUCCTNode appNode);
-    
-    protected int getSelectedMethodId() {
-        return mId;
-    }
+    void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Project project);
+
+    void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Project project);
+
+    void show();
+
+    void hide();
+
+    void refresh();
+
+    void reset();
 }
