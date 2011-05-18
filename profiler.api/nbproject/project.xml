@@ -112,11 +112,13 @@ made subject to such option by the copyright holder.
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.categorization.api</friend>
                 <friend>org.netbeans.modules.profiler.drilldown</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.nbmodule</friend>
                 <package>org.netbeans.modules.profiler.spi</package>
             </friend-packages>
         </data>
