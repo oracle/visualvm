@@ -45,7 +45,7 @@ package org.netbeans.modules.profiler.heapwalk;
 
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.openide.ErrorManager;
 import org.openide.util.NbBundle;
@@ -168,7 +168,7 @@ public class HeapWalkerManager {
             try {
                 hw = new HeapWalker(heapDump);
             } catch (Exception e) {
-                NetBeansProfiler.getDefaultNB()
+                Profiler.getDefault()
                                 .displayError(MessageFormat.format(CANNOT_OPEN_HEAPWALKER_MSG,
                                                                    new Object[] { e.getLocalizedMessage() }));
             }
@@ -244,7 +244,7 @@ public class HeapWalkerManager {
 
                             deleteHeapDumpImpl(file, retries - 1);
                         } else {
-                            NetBeansProfiler.getDefaultNB().displayError(CANNOT_DELETE_HEAPDUMP_MSG);
+                            Profiler.getDefault().displayError(CANNOT_DELETE_HEAPDUMP_MSG);
                         }
                     } else {
                         ProfilerControlPanel2.getDefault().refreshSnapshotsList();

@@ -62,7 +62,7 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.heapwalk.ui.OverviewControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
@@ -347,7 +347,7 @@ public class OverviewController extends AbstractController {
             if (i != null) {
                 heapFragmentWalker.getClassesController().showInstance(i);
             } else {
-                NetBeansProfiler.getDefaultNB()
+                Profiler.getDefault()
                         .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
                         new Object[] { id[1], id[0] }));
             }
@@ -361,7 +361,7 @@ public class OverviewController extends AbstractController {
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+                Profiler.getDefault().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
             }
         }   else if (urls.startsWith(THREAD_URL_PREFIX)) {
             urls = urls.substring(THREAD_URL_PREFIX.length());

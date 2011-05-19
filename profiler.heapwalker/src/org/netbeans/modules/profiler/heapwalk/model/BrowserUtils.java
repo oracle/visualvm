@@ -44,7 +44,7 @@
 package org.netbeans.modules.profiler.heapwalk.model;
 
 import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -246,7 +246,7 @@ public class BrowserUtils {
                                 }
                             });
 
-                            if (oome) NetBeansProfiler.getDefaultNB().displayError(OUT_OF_MEMORY_MSG);
+                            if (oome) Profiler.getDefault().displayError(OUT_OF_MEMORY_MSG);
                         }
                     }
                 });

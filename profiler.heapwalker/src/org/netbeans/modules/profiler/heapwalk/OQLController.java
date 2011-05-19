@@ -59,7 +59,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Utils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.OQLControllerUI;
@@ -350,7 +350,7 @@ public class OQLController extends AbstractTopLevelController
                         i = instances.get(instanceNumber - 1);
                     }
                 } else {
-                    NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[]{clzName}));
+                    Profiler.getDefault().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[]{clzName}));
                 }
             } else if (pointerPos > -1) {
                 identifier = urls.substring(pointerPos + 1);
@@ -361,7 +361,7 @@ public class OQLController extends AbstractTopLevelController
             if (i != null) {
                 heapFragmentWalker.getClassesController().showInstance(i);
             } else {
-                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
+                Profiler.getDefault().displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
                         new Object[]{identifier, clzName}));
             }
         } else if (urls.startsWith("file://class/")) { // NOI18N
@@ -372,7 +372,7 @@ public class OQLController extends AbstractTopLevelController
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[]{urls}));
+                Profiler.getDefault().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[]{urls}));
             }
         }
     }

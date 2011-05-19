@@ -45,7 +45,7 @@ package org.netbeans.modules.profiler.heapwalk;
 
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.heapwalk.memorylint.MemoryLint;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Rule;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -54,7 +54,6 @@ import org.openide.util.NbBundle;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
@@ -182,12 +181,12 @@ public class AnalysisController extends AbstractTopLevelController implements Na
                 if (i != null) {
                     heapFragmentWalker.getClassesController().showInstance(i);
                 } else {
-                    NetBeansProfiler.getDefaultNB()
+                    Profiler.getDefault()
                                     .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
                                                                        new Object[] { id[1], c.getName() }));
                 }
             } else {
-                NetBeansProfiler.getDefaultNB()
+                Profiler.getDefault()
                                 .displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
             }
         } else if (urls.startsWith("file://class/")) { // NOI18N
@@ -198,7 +197,7 @@ public class AnalysisController extends AbstractTopLevelController implements Na
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
+                Profiler.getDefault().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
             }
         }
     }
