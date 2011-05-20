@@ -44,7 +44,7 @@
 package org.netbeans.modules.profiler.ui.panels;
 
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.Utils;
+import org.netbeans.modules.profiler.stp.Utils;
 import org.openide.DialogDescriptor;
 import org.openide.util.Cancellable;
 import org.openide.util.NbBundle;
