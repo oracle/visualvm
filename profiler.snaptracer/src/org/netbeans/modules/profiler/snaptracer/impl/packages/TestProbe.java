@@ -73,8 +73,8 @@ class TestProbe extends TracerProbe {
     
     private static ProbeItemDescriptor[] descriptors(int items) {
         ProbeItemDescriptor[] descriptors = new ProbeItemDescriptor[items];
-        descriptors[0] = ProbeItemDescriptor.continuousLineItem("Cummulative stack depth",
-                             "Reports the cummulative depth of all running threads", ItemValueFormatter.DEFAULT_DECIMAL);
+        descriptors[0] = ProbeItemDescriptor.continuousLineItem("Cumulative stack depth",
+                             "Reports the cumulative depth of all running threads", ItemValueFormatter.DEFAULT_DECIMAL);
 //        for (int i = 0; i < descriptors.length; i++)
 //            descriptors[i] = ProbeItemDescriptor.continuousLineItem("Item " + i,
 //                             "Description " + i, ItemValueFormatter.SIMPLE);
