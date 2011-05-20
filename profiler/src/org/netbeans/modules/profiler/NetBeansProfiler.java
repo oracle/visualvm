@@ -1664,7 +1664,7 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     // TODO [ian] - perform saving of global settings differently
-    public void saveGlobalFilters() {
+    public void saveFilters() {
         // 1. save global filters
         FileLock lock = null;
 
