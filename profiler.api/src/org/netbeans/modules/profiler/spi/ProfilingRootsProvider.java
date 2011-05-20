@@ -39,18 +39,16 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api;
+package org.netbeans.modules.profiler.spi;
 
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.modules.profiler.spi.ProfilingRootsProvider;
 import org.openide.util.Lookup;
 
 /**
- * Support for selecting profiling roots.
  *
  * @author Jiri Sedlacek
  */
-public final class ProfilingRoots {
+public abstract class ProfilingRootsProvider {
     
     /**
      * Requests profiling roots selection from the user.
@@ -59,16 +57,8 @@ public final class ProfilingRoots {
      * @param project project context for selecting profiling roots
      * @return profiling roots selection from the user
      */
-    public static ClientUtils.SourceCodeSelection[] selectRoots(
+    public abstract ClientUtils.SourceCodeSelection[] selectRoots(
             ClientUtils.SourceCodeSelection[] currentRoots,
-            Lookup.Provider project) {
-        ProfilingRootsProvider p = provider();
-        if (p != null) return p.selectRoots(currentRoots, project);
-        else return null;
-    }
-    
-    private static ProfilingRootsProvider provider() {
-        return Lookup.getDefault().lookup(ProfilingRootsProvider.class);
-    }
+            Lookup.Provider project);
     
 }

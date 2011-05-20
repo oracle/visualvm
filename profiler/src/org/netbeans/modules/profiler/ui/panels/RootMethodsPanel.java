@@ -66,6 +66,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 
 
 /**
@@ -116,7 +117,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     private JButton addManualButton;
     private JButton removeButton;
     private JList rootsList;
-    private Project project;
+    private Lookup.Provider project;
     private boolean globalAttach = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -136,7 +137,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     }
 
     public static ClientUtils.SourceCodeSelection[] getSelectedRootMethods(ClientUtils.SourceCodeSelection[] roots,
-                                                                           Project project) {
+                                                                           Lookup.Provider project) {
         final RootMethodsPanel rm = getDefault();
         rm.project = project;
         rm.globalAttach = rm.project == null;
