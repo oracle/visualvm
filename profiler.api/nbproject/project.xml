@@ -120,6 +120,8 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>
+                <friend>org.netbeans.modules.profiler.stp</friend>
+                <package>org.netbeans.modules.profiler.api</package>
                 <package>org.netbeans.modules.profiler.spi</package>
             </friend-packages>
         </data>
