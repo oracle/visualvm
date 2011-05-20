@@ -42,6 +42,7 @@
 
 package org.netbeans.modules.profiler.utils;
 
+import org.netbeans.modules.profiler.spi.GoToSourceProvider;
 import org.netbeans.modules.profiler.spi.*;
 import java.text.MessageFormat;
 import java.util.Collection;

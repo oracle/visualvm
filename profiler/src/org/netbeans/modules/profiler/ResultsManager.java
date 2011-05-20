@@ -76,6 +76,7 @@ import java.io.*;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /** An manager for management/notifications about obtainer profiling results.
@@ -603,7 +604,7 @@ public final class ResultsManager {
 
     public void openSnapshot(final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
         if (ls == null) NetBeansProfiler.getDefaultNB().displayError(CANNOT_OPEN_SNAPSHOT_MSG);
-        else IDEUtils.runInEventDispatchThread(new Runnable() {
+        else ProfilerUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
                 srw.open();
@@ -821,7 +822,7 @@ public final class ResultsManager {
     }
 
     public LoadedSnapshot takeSnapshot() {
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
                 public void run() {
                     mainWindow = WindowManager.getDefault().getMainWindow();
                 }
