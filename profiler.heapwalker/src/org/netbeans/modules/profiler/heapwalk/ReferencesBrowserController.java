@@ -46,7 +46,7 @@ package org.netbeans.modules.profiler.heapwalk;
 import javax.swing.BoundedRangeModel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.heapwalk.model.AbstractHeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
@@ -251,13 +251,13 @@ public class ReferencesBrowserController extends AbstractController {
 
                 if (gcRootNode != null) {
                     if (instanceNode == gcRootNode) {
-                        NetBeansProfiler.getDefaultNB().displayInfo(SELF_GCROOT_MSG);
+                        Profiler.getDefault().displayInfo(SELF_GCROOT_MSG);
                     } else {
                         ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
                         controlerUI.selectNode(gcRootNode);
                     }
                 } else {
-                    NetBeansProfiler.getDefaultNB().displayInfo(NO_GCROOT_MSG);
+                    Profiler.getDefault().displayInfo(NO_GCROOT_MSG);
                 }
             }
         }.execute();

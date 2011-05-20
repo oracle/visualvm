@@ -58,7 +58,7 @@ import org.netbeans.lib.profiler.ui.components.table.ExtendedTableModel;
 import org.netbeans.lib.profiler.ui.components.table.JExtendedTablePanel;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.heapwalk.ClassesListController;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -98,6 +98,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.RequestProcessor;
@@ -864,7 +865,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
     private void showInstancesForClass(JavaClass jClass) {
         if (jClass.getInstancesCount() == 0) {
-            NetBeansProfiler.getDefaultNB().displayInfo(MessageFormat.format(NO_INSTANCES_MSG, new Object[] { jClass.getName() }));
+            Profiler.getDefault().displayInfo(MessageFormat.format(NO_INSTANCES_MSG, new Object[] { jClass.getName() }));
         } else {
             classesListController.getClassesController().getHeapFragmentWalker().showInstancesForClass(jClass);
         }
