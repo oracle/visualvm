@@ -453,8 +453,6 @@ public final class NetBeansProfiler extends Profiler {
                                                                                               "NetBeansProfiler_ErrorSavingProfilingSettingsMessage"); //NOI18N
     private static final String ERROR_SAVING_FILTER_SETS_MESSAGE = NbBundle.getMessage(NetBeansProfiler.class,
                                                                                        "NetBeansProfiler_ErrorSavingFilterSetsMessage"); //NOI18N
-    private static final String ERROR_SAVING_ATTACH_SETTINGS_MESSAGE = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                           "NetBeansProfiler_ErrorSavingAttachSettingsMessage"); //NOI18N
     private static final String CANNOT_FIND_LIBS_MSG = NbBundle.getMessage(NetBeansProfiler.class,
                                                                            "NetBeansProfiler_CannotFindLibsMsg"); //NOI18N
     private static final String ENGINE_INIT_FAILED_MSG = NbBundle.getMessage(NetBeansProfiler.class,
@@ -478,7 +476,6 @@ public final class NetBeansProfiler extends Profiler {
     private static final String GLOBAL_FILTERS_FILENAME = "filters"; //NOI18N
     private static final String DEFINED_FILTERSETS_FILENAME = "filtersets"; //NOI18N
     private static final String DEFAULT_FILE_SUFFIX = "-default"; //NOI18N
-    private static final String ATTACH_SETTINGS_FILENAME = "attach"; //NOI18N
     private static boolean initialized = false;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -1202,36 +1199,6 @@ public final class NetBeansProfiler extends Profiler {
         client.initiateRecursiveCPUProfInstrumentation(rootMethods);
     }
 
-    public static AttachSettings loadAttachSettings(Project project)
-                                             throws IOException {
-        FileObject folder = IDEUtils.getProjectSettingsFolder(project, false);
-
-        if (folder == null) {
-            return null;
-        }
-
-        FileObject attachSettingsFile = folder.getFileObject(ATTACH_SETTINGS_FILENAME, "xml"); //NOI18N
-
-        if (attachSettingsFile == null) {
-            return null;
-        }
-
-        final InputStream fis = attachSettingsFile.getInputStream();
-        final BufferedInputStream bis = new BufferedInputStream(fis);
-
-        try {
-            final Properties props = new Properties();
-            props.loadFromXML(bis);
-
-            AttachSettings as = new AttachSettings();
-            as.load(props);
-
-            return as;
-        } finally {
-            bis.close();
-        }
-    }
-
     public void log(int severity, final String message) {
         switch (severity) {
             case Profiler.INFORMATIONAL:
@@ -1576,45 +1543,6 @@ public final class NetBeansProfiler extends Profiler {
         pes.setMainClassPath(savedCP);
 
         return result;
-    }
-
-    public static void saveAttachSettings(Project project, AttachSettings as) {
-        FileLock lock = null;
-
-        try {
-            final FileObject folder = IDEUtils.getProjectSettingsFolder(project, true);
-            FileObject fo = folder.getFileObject(ATTACH_SETTINGS_FILENAME, "xml"); //NOI18N
-
-            if (fo == null) {
-                fo = folder.createData(ATTACH_SETTINGS_FILENAME, "xml"); //NOI18N
-            }
-
-            lock = fo.lock();
-
-            final BufferedOutputStream bos = new BufferedOutputStream(fo.getOutputStream(lock));
-            final Properties globalProps = new Properties();
-            try {
-                as.store(globalProps);
-                globalProps.storeToXML(bos, ""); //NOI18N
-            } finally {
-                if (bos != null) {
-                    try {
-                        bos.close();
-                    } catch (IOException ex) {
-                        // ignore
-                    }
-                }
-            }
-        } catch (Exception e) {
-            ProfilerLogger.log(e);
-            ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_SAVING_ATTACH_SETTINGS_MESSAGE,
-                                                                                     new Object[] { e.getMessage() }),
-                                                                NotifyDescriptor.ERROR_MESSAGE));
-        } finally {
-            if (lock != null) {
-                lock.releaseLock();
-            }
-        }
     }
 
     public void setProfiledProject(Project project, FileObject singleFile) {

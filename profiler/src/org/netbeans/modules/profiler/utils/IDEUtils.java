@@ -119,8 +119,6 @@ public final class IDEUtils {
     private static final String LIST_ACCESS_NAME = NbBundle.getMessage(IDEUtils.class, "IDEUtils_ListAccessName"); //NOI18N
     private static final String OK_BUTTON_TEXT = NbBundle.getMessage(IDEUtils.class, "IDEUtils_OkButtonText"); //NOI18N
                                                                                                                // -----
-    private static final String SETTINGS_FOR_ATTR = "settingsFor";
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static String getAntProfilerStartArgument15(int port, int architecture) {
@@ -280,52 +278,6 @@ public final class IDEUtils {
         }
 
         return jvmExe;
-    }
-
-    public static Project getProjectFromSettingsFolder(FileObject settingsFolder) {
-        Object o = settingsFolder.getAttribute(SETTINGS_FOR_ATTR);
-        if (o instanceof URL) {
-            FileObject d = URLMapper.findFileObject((URL) o);
-            if (d != null && d.isFolder()) {
-                try {
-                    return ProjectManager.getDefault().findProject(d);
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
-        }
-        Project p = FileOwnerQuery.getOwner(settingsFolder);
-        try {
-            if (p != null && getProjectSettingsFolder(p, false) == settingsFolder) {
-                return p;
-            }
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        return null;
-    }
-
-    public static FileObject getProjectSettingsFolder(Project project, boolean create)
-                                               throws IOException {
-        if (project == null) { // global folder for attach
-
-            return getSettingsFolder(true);
-        } else {
-            // resolve 'nbproject'
-            FileObject nbproject = project.getProjectDirectory().getFileObject("nbproject"); // NOI18N
-            FileObject d;
-            if (nbproject != null) {
-                // For compatibility, continue to use nbproject/private/profiler for Ant-based projects.
-                d = create ? FileUtil.createFolder(nbproject, "private/profiler") : nbproject.getFileObject("private/profiler"); // NOI18N
-            } else {
-                // Maven projects, autoprojects, etc.
-                d = ProjectUtils.getCacheDirectory(project, IDEUtils.class);
-            }
-            if (d != null) {
-                d.setAttribute(SETTINGS_FOR_ATTR, project.getProjectDirectory().getURL()); // NOI18N
-            }
-            return d;
-        }
     }
 
     public static FileObject getSettingsFolder(final boolean create)

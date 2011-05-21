@@ -76,6 +76,7 @@ import java.io.*;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
@@ -481,7 +482,7 @@ public final class ResultsManager {
 
     public FileObject[] listSavedHeapdumps(Project project) {
         try {
-            FileObject profilerFolder = IDEUtils.getProjectSettingsFolder(project, false);
+            FileObject profilerFolder = ProjectStorage.getSettingsFolder(project, false);
 
             if (profilerFolder == null) {
                 return new FileObject[0];
@@ -526,7 +527,7 @@ public final class ResultsManager {
 
     public FileObject[] listSavedSnapshots(Project project) {
         try {
-            FileObject profilerFolder = IDEUtils.getProjectSettingsFolder(project, false);
+            FileObject profilerFolder = ProjectStorage.getSettingsFolder(project, false);
 
             if (profilerFolder == null) {
                 return new FileObject[0];
@@ -799,7 +800,7 @@ public final class ResultsManager {
         FileObject saveDir = null;
 
         try {
-            saveDir = IDEUtils.getProjectSettingsFolder(p, true);
+            saveDir = ProjectStorage.getSettingsFolder(p, true);
         } catch (IOException e) {
             ErrorManager.getDefault()
                         .annotate(e, MessageFormat.format(CANT_FIND_SNAPSHOT_LOCATION_MSG, new Object[] { e.getMessage() }));
@@ -1109,7 +1110,7 @@ public final class ResultsManager {
     }
 
     private Project findProjectForSnapshot(FileObject selectedFile) {
-        return IDEUtils.getProjectFromSettingsFolder(selectedFile.getParent());
+        return (Project)ProjectStorage.getProjectFromSettingsFolder(selectedFile.getParent());
     }
 
     private LoadedSnapshot loadSnapshotFromFileObject(FileObject selectedFile)

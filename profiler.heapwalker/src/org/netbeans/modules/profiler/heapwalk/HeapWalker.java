@@ -52,7 +52,6 @@ import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.HeapWalkerUI;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -63,6 +62,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.api.ProjectStorage;
 
 
 /**
@@ -208,7 +208,7 @@ public class HeapWalker {
             return null;
         }
 
-        return IDEUtils.getProjectFromSettingsFolder(heapDumpDirObj);
+        return (Project)ProjectStorage.getProjectFromSettingsFolder(heapDumpDirObj);
     }
 
     private static Heap createHeap(File heapFile) throws FileNotFoundException, IOException {

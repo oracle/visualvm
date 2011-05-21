@@ -58,6 +58,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.io.IOException;
 import java.text.MessageFormat;
+import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.attach.AttachWizard;
 
 
@@ -265,7 +266,7 @@ public final class ProfilingSupport {
                         AttachSettings as = null;
 
                         try {
-                            as = NetBeansProfiler.loadAttachSettings(project);
+                            as = ProjectStorage.loadAttachSettings(project);
                         } catch (IOException e) {
                             Profiler.getDefault()
                                     .displayWarning(MessageFormat.format(FAILED_LOAD_SETTINGS_MSG, new Object[] { e.getMessage() }));
@@ -291,7 +292,7 @@ public final class ProfilingSupport {
 //                            as = attachWizard.getAttachSettings();
                             as = AttachWizard.getDefault().configure(as);
                             if (as == null) return; // cancelled by the user
-                            NetBeansProfiler.saveAttachSettings(project, as);
+                            ProjectStorage.saveAttachSettings(project, as);
                         }
 
                         if (!as.isRemote() && as.isDynamic16()) {

@@ -81,6 +81,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.Utilities;
 
@@ -352,7 +353,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         try {
             String fileName = TAKEN_HEAPDUMP_PREFIX + System.currentTimeMillis();
             FileObject folder = (targetFolder == null)
-                                ? IDEUtils.getProjectSettingsFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
+                                ? ProjectStorage.getSettingsFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
                                 : FileUtil.toFileObject(FileUtil.normalizeFile(new File(targetFolder)));
 
             return FileUtil.toFile(folder).getAbsolutePath() + File.separator
