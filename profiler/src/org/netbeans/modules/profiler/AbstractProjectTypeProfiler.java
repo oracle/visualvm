@@ -53,8 +53,8 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.modules.profiler.ui.stp.DefaultSettingsConfigurator;
-import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
+import org.netbeans.modules.profiler.stp.DefaultSettingsConfigurator;
+import org.netbeans.modules.profiler.stp.SelectProfilingTask;
 import org.netbeans.spi.project.support.ant.GeneratedFilesHelper;
 import org.openide.filesystems.FileObject;
 import java.util.List;
@@ -147,9 +147,9 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
     public float getProfilingOverhead(ProfilingSettings settings) {
          float o = 0.0f;
 
-        if (org.netbeans.modules.profiler.ui.stp.Utils.isMonitorSettings(settings)) {
+        if (org.netbeans.modules.profiler.stp.Utils.isMonitorSettings(settings)) {
             //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings)) {
+        } else if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings)) {
             if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
                 o += 0.5f; // entire app
             } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
@@ -159,7 +159,7 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
             if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
                 o += 0.5f; // profile all classes
             }
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isMemorySettings(settings)) {
+        } else if (org.netbeans.modules.profiler.stp.Utils.isMemorySettings(settings)) {
             if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
                 o += 0.5f; // object allocations
             } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {

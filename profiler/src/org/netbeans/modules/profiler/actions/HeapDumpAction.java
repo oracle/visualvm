@@ -54,8 +54,6 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.heapwalk.HeapWalker;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
@@ -83,6 +81,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.modules.profiler.api.ProjectStorage;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.netbeans.modules.profiler.utils.Utilities;
 
 
 /**
@@ -352,7 +353,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         try {
             String fileName = TAKEN_HEAPDUMP_PREFIX + System.currentTimeMillis();
             FileObject folder = (targetFolder == null)
-                                ? IDEUtils.getProjectSettingsFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
+                                ? ProjectStorage.getSettingsFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
                                 : FileUtil.toFileObject(FileUtil.normalizeFile(new File(targetFolder)));
 
             return FileUtil.toFile(folder).getAbsolutePath() + File.separator
@@ -432,7 +433,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
     // askForDestination == false ? dump to project : ask for destination (project vs. external file)
     private void takeHeapDump(final boolean askForDestination) {
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     NetBeansProfiler nbProfiler = NetBeansProfiler.getDefaultNB();
 
@@ -496,11 +497,11 @@ public final class HeapDumpAction extends ProfilingAwareAction {
                                 dnsa.setDNSADefault(false);
 
                                 if (ProfilerDialogs.notify(dnsa).equals(ProfilerDialogs.DNSAConfirmation.YES_OPTION)) {
-                                    HeapWalkerManager.getDefault().openHeapWalker(new File(dumpFileName));
+                                    Utilities.openSnapshot(new File(dumpFileName));
                                 }
                             } else {
                                 if (ProfilerIDESettings.getInstance().getAutoOpenSnapshot()) {
-                                    HeapWalkerManager.getDefault().openHeapWalker(new File(dumpFileName));
+                                    Utilities.openSnapshot(new File(dumpFileName));
                                 }
                             }
                         } else {

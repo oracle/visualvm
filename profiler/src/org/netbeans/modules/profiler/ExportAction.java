@@ -58,6 +58,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
@@ -372,7 +373,7 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
 
-            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         ProgressHandle pHandle = null;
                         pHandle = ProgressHandleFactory.createHandle(EXPORTING_VIEW_MSG);

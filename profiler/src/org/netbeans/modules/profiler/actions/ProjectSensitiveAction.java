@@ -48,7 +48,6 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.ui.panels.ProgressDisplayer;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.modules.profiler.utils.OutputParameter;
 import org.netbeans.spi.project.ActionProvider;
 import org.openide.DialogDisplayer;
@@ -67,6 +66,7 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -411,7 +411,7 @@ public class ProjectSensitiveAction extends AbstractAction implements ContextAwa
                 return;
             }
 
-            IDEUtils.runInEventDispatchThread(new Runnable() {
+            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         int oldReqCount = -1;
                         int currentReqCount = -1;

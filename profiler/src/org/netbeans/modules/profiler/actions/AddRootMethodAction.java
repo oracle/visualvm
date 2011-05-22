@@ -49,7 +49,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.NotifyDescriptor;
 import org.openide.loaders.DataObject;
@@ -163,7 +163,7 @@ public final class AddRootMethodAction extends NodeAction {
                         List<ProfilingSettings> cpuSettings = new ArrayList();
 
                         for (ProfilingSettings settings : projectSettings) {
-                            if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                            if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
                                 cpuSettings.add(settings);
                             }
                         }
