@@ -98,7 +98,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.RequestProcessor;
@@ -575,7 +575,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                             className = className.substring(0, className.length() - 2); // NOI18N
                         }
                         Project p = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject();
-                        NetBeansProfiler.getDefaultNB().openJavaSource(p, className, null, null);
+                        GoToSource.openSource(p, className, null, null);
                     }
                 }
             });

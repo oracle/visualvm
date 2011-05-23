@@ -78,12 +78,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.actions.Presenter;
 import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
-import org.openide.windows.TopComponentGroup;
-import org.openide.windows.WindowManager;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -96,7 +92,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -117,6 +112,7 @@ import org.netbeans.lib.profiler.ui.graphs.LivenessHistoryGraphPanel;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryActionsHandler;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
 import org.netbeans.lib.profiler.utils.VMUtils;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.spi.LiveResultsWindowContributor;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
@@ -275,7 +271,7 @@ public final class LiveResultsWindow extends TopComponent
         }
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
-            Profiler.getDefault().openJavaSource(className, methodName, methodSig);
+            GoToSource.openSource(NetBeansProfiler.getDefaultNB().getProfiledProject(), className, methodName, methodSig);
         }
 
         public void viewChanged(int viewType) {
@@ -296,7 +292,7 @@ public final class LiveResultsWindow extends TopComponent
             else if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName))
                      Profiler.getDefault().displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
             // Display source
-            else NetBeansProfiler.getDefaultNB().openJavaSource(className, methodName, methodSig);
+            else GoToSource.openSource(NetBeansProfiler.getDefaultNB().getProfiledProject(), className, methodName, methodSig);
         }
 
         public void showStacksForClass(final int selectedClassId, final int sortingColumn, final boolean sortingOrder) {

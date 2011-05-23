@@ -139,8 +139,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.netbeans.modules.profiler.utils.GoToSourceHelper;
-import org.netbeans.modules.profiler.utils.JavaSourceLocation;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.openide.execution.ExecutorTask;
 
 
@@ -516,8 +515,6 @@ public final class NetBeansProfiler extends Profiler {
     private int lastMode = MODE_PROFILE;
     private int profilingMode = MODE_PROFILE;
     private int profilingState = PROFILING_INACTIVE;
-
-    private final RequestProcessor srcOpenerRP = new RequestProcessor("Profiler Source Opener"); // NOI18N
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -1341,18 +1338,9 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public void openJavaSource(String className, String methodName, String methodSig) {
-        openJavaSource(getProfiledProject(), className, methodName, methodSig);
+//        openJavaSource(getProfiledProject(), className, methodName, methodSig);
     }
-
-    public void openJavaSource(final Project project, final String className, final String methodName, final String methodSig) {
-        // Bugfix #175844 doesn't need to be called in EDT any more, ElementOpen.open() is now thread-aware
-        srcOpenerRP.post(new Runnable() {
-            public void run() {
-                GoToSourceHelper.openSource(project, new JavaSourceLocation(className, methodName, methodSig));
-            }
-        });
-    }
-
+    
     public boolean processesProfilingPoints() {
         return processesProfilingPoints;
     }

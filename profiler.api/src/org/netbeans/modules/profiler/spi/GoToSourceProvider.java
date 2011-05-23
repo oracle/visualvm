@@ -59,8 +59,5 @@ public abstract class GoToSourceProvider {
      * @param line The line number or {@linkplain Integer#MIN_VALUE}
      * @return Returns TRUE if the infrastructure was able to open the source code, FALSE otherwise
      */
-    public boolean openSource(Project project, String className, String methodName, String signature, int line) {
-        Logger.getLogger(GoToSourceProvider.class.getName()).warning("Using the default implementation of GoToSourceProvider!");
-        return false;
-    }
+    public abstract boolean openSource(Project project, String className, String methodName, String signature, int line);
 }

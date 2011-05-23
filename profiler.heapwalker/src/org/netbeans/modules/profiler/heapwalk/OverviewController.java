@@ -69,8 +69,7 @@ import javax.swing.JPanel;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.utils.GoToSourceHelper;
-import org.netbeans.modules.profiler.utils.JavaSourceLocation;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.openide.util.NbBundle;
 
 /**
@@ -335,8 +334,7 @@ public class OverviewController extends AbstractController {
             String className = parts[0];
             String method = parts[1];
             int linenumber = Integer.parseInt(parts[2]);
-            GoToSourceHelper.openSource(heapFragmentWalker.getHeapDumpProject(),
-                    new JavaSourceLocation(className, method, linenumber));
+            GoToSource.openSource(heapFragmentWalker.getHeapDumpProject(), className, method, linenumber);
         } else if (urls.startsWith(INSTANCE_URL_PREFIX)) {
             urls = urls.substring(INSTANCE_URL_PREFIX.length());
 

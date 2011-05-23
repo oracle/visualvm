@@ -55,7 +55,6 @@ import org.netbeans.lib.profiler.ui.components.treetable.AbstractTreeTableModel;
 import org.netbeans.lib.profiler.ui.components.treetable.ExtendedTreeTableModel;
 import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
 import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.heapwalk.FieldsBrowserController;
 import org.netbeans.modules.profiler.heapwalk.model.ClassNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerInstanceNode;
@@ -97,6 +96,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.openide.util.RequestProcessor;
@@ -585,7 +585,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                             className = className.substring(0, className.length() - 2);
                         }
                         Project p = fieldsBrowserController.getInstancesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
-                        NetBeansProfiler.getDefaultNB().openJavaSource(p, className, null, null);
+                        GoToSource.openSource(p, className, null, null);
                     }
                 }
             });

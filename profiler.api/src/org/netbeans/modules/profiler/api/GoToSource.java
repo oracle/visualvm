@@ -40,51 +40,70 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.profiler.utils;
+package org.netbeans.modules.profiler.api;
 
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
-import org.netbeans.modules.profiler.spi.*;
 import java.text.MessageFormat;
 import java.util.Collection;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jaroslav Bachorik
+ * @author Tomas Hurka
  */
-final public class GoToSourceHelper {
-    public static boolean openSource(Project project, JavaSourceLocation location) {
+final public class GoToSource {
+
+    private static final RequestProcessor srcOpenerRP = new RequestProcessor("Profiler Source Opener"); // NOI18N  
+    
+    public static void openSource(Project project, String className, String methodName, String methodSig) {
+        openSource(project, className, methodName, methodSig, -1);
+    }
+
+    public static void openSource(Project project, String className, String methodName, int line) {
+        openSource(project, className, methodName, null, line);
+    }
+
+    private static void openSource(final Project project, final String className, final String methodName, final String signature, final int line) {
+        srcOpenerRP.post(new Runnable() {
+            
+            @Override
+            public void run() {
+                openSourceImpl(project, className, methodName, signature, line);
+            }
+        });
+    }
+    
+    private static void openSourceImpl(final Project project, final String className, final String methodName, final String signature, final int line) {
         // *** logging stuff ***
-        ProfilerLogger.debug("Open Source: Project: " + ((project == null) ? "null" : ProjectUtilities.getProjectName(project))); // NOI18N
-        ProfilerLogger.debug("Open Source: Class name: " + location.className); // NOI18N
-        ProfilerLogger.debug("Open Source: Method name: " + location.methodName); // NOI18N
-        ProfilerLogger.debug("Open Source: Method sig: " + location.signature); // NOI18N
+        ProfilerLogger.debug("Open Source: Project: " + project); // NOI18N
+        ProfilerLogger.debug("Open Source: Class name: " + className); // NOI18N
+        ProfilerLogger.debug("Open Source: Method name: " + methodName); // NOI18N
+        ProfilerLogger.debug("Open Source: Method sig: " + signature); // NOI18N
         
         Collection<? extends GoToSourceProvider> implementations = Lookup.getDefault().lookupAll(GoToSourceProvider.class);
         
-        String st = MessageFormat.format(NbBundle.getMessage(GoToSourceHelper.class, "OpeningSourceMsg"),
-                                                             new Object[] { location.className }); // NOI18N
+        String st = MessageFormat.format(NbBundle.getMessage(GoToSource.class, "OpeningSourceMsg"),  // NOI18N
+                                                             new Object[] { className });
         final String finalStatusText = st + " ..."; // NOI18N
         StatusDisplayer.getDefault().setStatusText(finalStatusText);
         
         for(GoToSourceProvider impl : implementations) {
             try {
-                if (impl.openSource(project, location.className, location.methodName, location.signature, location.line)) return true;
+                if (impl.openSource(project, className, methodName, signature, line)) return;
             } catch (Exception e) {
                 ProfilerLogger.log(e);
             }
         }
         
-        Profiler.getDefault().displayError(MessageFormat.format(NbBundle.getMessage(GoToSourceHelper.class,
+        Profiler.getDefault().displayError(MessageFormat.format(NbBundle.getMessage(GoToSource.class,
                                                                                         "NoSourceFoundMessage"), // NOI18N
-                                                                                        new Object[] { location.className }));
-        
-        return false;
+                                                                                        new Object[] { className }));
     }
 }

@@ -82,6 +82,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
 
@@ -169,7 +170,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
-            NetBeansProfiler.getDefaultNB().openJavaSource(loadedSnapshot.getProject(), className, methodName, methodSig);
+            GoToSource.openSource(loadedSnapshot.getProject(), className, methodName, methodSig);
         }
 
         public void showSubtreeCallGraph(CPUResultsSnapshot s, CCTNode node, int view, int sortingColumn, boolean sortingOrder) {
