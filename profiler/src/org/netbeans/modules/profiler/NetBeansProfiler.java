@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler;
 
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;

@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.ui;
 
-import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;

@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.netbeans.modules.profiler.api;
 
 import java.util.prefs.BackingStoreException;
 import org.netbeans.lib.profiler.common.GlobalProfilingSettings;

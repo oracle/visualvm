@@ -44,7 +44,7 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;

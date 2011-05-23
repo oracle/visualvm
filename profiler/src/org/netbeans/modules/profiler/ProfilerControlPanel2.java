@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler;
 
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import java.util.Arrays;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;

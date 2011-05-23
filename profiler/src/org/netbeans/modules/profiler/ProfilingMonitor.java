@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler;
 
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
