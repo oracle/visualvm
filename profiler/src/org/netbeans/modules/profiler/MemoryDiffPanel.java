@@ -74,6 +74,7 @@ import java.util.Date;
 import javax.swing.*;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.utils.VMUtils;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.ui.Utils;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
@@ -99,7 +100,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
             else if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName))
                      Profiler.getDefault().displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
             // Display source
-            else NetBeansProfiler.getDefaultNB().openJavaSource(project, className, methodName, methodSig);
+            else GoToSource.openSource(project, className, methodName, methodSig);
         }
 
         public void showStacksForClass(int selectedClassId, int sortingColumn, boolean sortingOrder) {

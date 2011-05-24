@@ -56,7 +56,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ProfilerModule;
 import org.netbeans.modules.profiler.actions.JavaPlatformSelector;
 import org.netbeans.modules.profiler.actions.ProfilingSupport;

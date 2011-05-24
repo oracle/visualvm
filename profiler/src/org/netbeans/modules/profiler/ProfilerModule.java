@@ -47,7 +47,7 @@ import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
+//import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.NotifyDescriptor;
@@ -174,12 +174,11 @@ public final class ProfilerModule extends ModuleInstall {
                         // force closing of all windows
                         ProfilerControlPanel2.closeIfOpened();
                         TelemetryOverviewPanel.closeIfOpened();
-                        DrillDownWindow.closeIfOpened();
                         LiveResultsWindow.closeIfOpened();
                         TelemetryWindow.closeIfOpened();
                         ThreadsWindow.closeIfOpened();
                         SnapshotResultsWindow.closeAllWindows();
-                        HeapWalkerManager.getDefault().closeAllHeapWalkers();
+//                        HeapWalkerManager.getDefault().closeAllHeapWalkers();
                         ProfilingPointsWindow.closeIfOpened();
 
                         // perform any shutdown

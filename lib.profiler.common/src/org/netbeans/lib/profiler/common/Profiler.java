@@ -150,6 +150,8 @@ public abstract class Profiler {
     public abstract DefinedFilterSets getDefinedFilterSets();
 
     public abstract GlobalFilters getGlobalFilters();
+    
+    public abstract void saveFilters();
 
     public abstract GlobalProfilingSettings getGlobalProfilingSettings();
 

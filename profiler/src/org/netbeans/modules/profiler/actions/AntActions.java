@@ -54,8 +54,7 @@ import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ProfilerIDESettings;
-import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
@@ -74,6 +73,8 @@ import java.text.MessageFormat;
 import java.util.Properties;
 import javax.swing.Action;
 import org.netbeans.lib.profiler.global.Platform;
+import org.netbeans.modules.profiler.HeapDumpWatch;
+import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
@@ -422,7 +423,7 @@ public final class AntActions {
             case ProfilerIDESettings.OOME_DETECTION_PROJECTDIR:
 
                 try {
-                    return FileUtil.toFile(IDEUtils.getProjectSettingsFolder(project, true)).getAbsolutePath();
+                    return FileUtil.toFile(ProjectStorage.getSettingsFolder(project, true)).getAbsolutePath();
                 } catch (IOException e) {
                     ErrorManager.getDefault().annotate(e, "Cannot resolve project settings directory:\n" + e.getMessage());
                     ErrorManager.getDefault().notify(ErrorManager.ERROR, e);

@@ -46,15 +46,13 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.ResultsListener;
-import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -96,7 +94,7 @@ public final class ResetResultsAction extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent e) {
         
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
             public void run() {
                 ResultsManager.getDefault().reset();
         
