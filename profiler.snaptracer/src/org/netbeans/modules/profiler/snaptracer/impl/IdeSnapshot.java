@@ -42,7 +42,6 @@
  */
 package org.netbeans.modules.profiler.snaptracer.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -55,6 +54,7 @@ import javax.swing.Icon;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.netbeans.modules.profiler.snaptracer.logs.LogReader;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
@@ -70,15 +70,13 @@ public final class IdeSnapshot {
     private LogRecord lastRecord;
     private Map<Integer, LogRecord> recordsMap;
     private Map<Integer, LogRecordInfo> infosMap;
-    private final File npssFile;
-    private final File uigestureFile;
+    private final String npssFileName;
 
-    IdeSnapshot(File npssFile, File uigestureFile) throws IOException {
-        cpuSnapshot = new SampledCPUSnapshot((npssFile));
-        this.npssFile = npssFile;
-        this.uigestureFile = uigestureFile;
-        if (uigestureFile != null && uigestureFile.exists()) {
-            xmlLogs = new LogReader(uigestureFile);
+    IdeSnapshot(FileObject npssFO, FileObject uigestureFO) throws IOException {
+        cpuSnapshot = new SampledCPUSnapshot(npssFO);
+        this.npssFileName = npssFO.getName();
+        if (uigestureFO != null) {
+            xmlLogs = new LogReader(uigestureFO);
             xmlLogs.load();
             recordsMap = new HashMap();
             infosMap = new HashMap();
@@ -93,12 +91,8 @@ public final class IdeSnapshot {
         return cpuSnapshot.getTimestamp(sampleIndex);
     }
 
-    File getNpssFile() {
-        return npssFile;
-    }
-
-    File getUiGestureFile() {
-        return uigestureFile;
+    String getNpssFileName() {
+        return npssFileName;
     }
 
     public boolean hasUiGestures() {
