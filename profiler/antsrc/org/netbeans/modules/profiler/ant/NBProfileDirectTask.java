@@ -71,6 +71,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
 
 
@@ -233,7 +234,11 @@ public final class NBProfileDirectTask extends Task {
 
             // 2. process parameters passed via Properties
             ps.load(props);
-            ss.load(props);
+            try {
+                ss.load(props);
+            } catch (IllegalArgumentException e) {
+                ProfilerDialogs.displayWarning(e.getLocalizedMessage());
+            }
 
             // get correct working directory available only at runtime (not from ProjectTypeProfiler!)
             String projectWorkDir = (String) props.get("work.dir"); // NOI18N
@@ -348,7 +353,7 @@ public final class NBProfileDirectTask extends Task {
                 || !Profiler.getDefault()
                                 .runCalibration(true, ss.getJavaExecutable(), ss.getJavaVersionString(),
                                                     ss.getSystemArchitecture())) {
-            Profiler.getDefault().displayError(CALIBRATION_FAILED_MESSAGE);
+            ProfilerDialogs.displayError(CALIBRATION_FAILED_MESSAGE);
             throw new BuildException(CALIBRATION_FAILED_MESSAGE); // failed, cannot proceed
         }
 

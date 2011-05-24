@@ -113,8 +113,8 @@ import org.netbeans.lib.profiler.ui.memory.ClassHistoryActionsHandler;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.spi.LiveResultsWindowContributor;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
@@ -287,10 +287,10 @@ public final class LiveResultsWindow extends TopComponent
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
             // Check if primitive type/array
             if ((methodName == null && methodSig == null) && (VMUtils.isVMPrimitiveType(className) ||
-                 VMUtils.isPrimitiveType(className))) Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
+                 VMUtils.isPrimitiveType(className))) ProfilerDialogs.displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
             // Check if allocated by reflection
             else if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName))
-                     Profiler.getDefault().displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
+                     ProfilerDialogs.displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
             // Display source
             else GoToSource.openSource(NetBeansProfiler.getDefaultNB().getProfiledProject(), className, methodName, methodSig);
         }
@@ -323,31 +323,15 @@ public final class LiveResultsWindow extends TopComponent
             String currentlyTrackedClassName = classHistoryManager.getTrackedClassName();
             if (currentlyTrackedClass != -1) {
                 if (classID == currentlyTrackedClass) {
-                    ProfilerDialogs.DNSAConfirmationChecked dnsa =
-                            new ProfilerDialogs.DNSAConfirmationChecked(
-                                        "History.historylogging.reset", //NOI18N
-                                        MessageFormat.format(LOGGING_RESET_MSG,
-                                        new Object[] { currentlyTrackedClassName }),
-                                        LOGGING_CONFIRMATION_CAPTION,
-                                        ProfilerDialogs.DNSAConfirmationChecked.
-                                        YES_NO_OPTION);
-
-                    if (!ProfilerDialogs.notify(dnsa).equals(
-                            ProfilerDialogs.DNSAConfirmationChecked.YES_OPTION)) {
+                    if (!ProfilerDialogs.displayConfirmationDNSA(MessageFormat.format(
+                            LOGGING_RESET_MSG, new Object[] { currentlyTrackedClassName }),
+                            LOGGING_CONFIRMATION_CAPTION, null, "History.historylogging.reset", true)) { //NOI18N
                         return;
                     }
                 } else {
-                    ProfilerDialogs.DNSAConfirmationChecked dnsa =
-                            new ProfilerDialogs.DNSAConfirmationChecked(
-                                        "History.historylogging.stop", //NOI18N
-                                        MessageFormat.format(LOGGING_STOP_MSG,
-                                        new Object[] { currentlyTrackedClassName }),
-                                        LOGGING_CONFIRMATION_CAPTION,
-                                        ProfilerDialogs.DNSAConfirmationChecked.
-                                        YES_NO_OPTION);
-
-                    if (!ProfilerDialogs.notify(dnsa).equals(
-                            ProfilerDialogs.DNSAConfirmationChecked.YES_OPTION)) {
+                    if (!ProfilerDialogs.displayConfirmationDNSA(MessageFormat.format(
+                            LOGGING_STOP_MSG, new Object[] { currentlyTrackedClassName }),
+                            LOGGING_CONFIRMATION_CAPTION, null, "History.historylogging.stop", true)) { //NOI18N
                         return;
                     }
                 }
@@ -933,7 +917,7 @@ public final class LiveResultsWindow extends TopComponent
                     try {
                         runner.runGC();
                     } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                        Profiler.getDefault().displayError(ex.getMessage());
+                        ProfilerDialogs.displayError(ex.getMessage());
                         ProfilerLogger.log(ex);
                     }
 

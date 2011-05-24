@@ -47,12 +47,10 @@ import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.heapwalk.AnalysisController;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Rule;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -81,6 +79,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.text.html.HTMLDocument;
+import org.openide.DialogDisplayer;
 
 
 /**
@@ -108,7 +107,7 @@ public class AnalysisControllerUI extends JPanel {
                                                              rule.getDisplayName(), true,
                                                              new Object[] { DialogDescriptor.OK_OPTION },
                                                              DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN, null, null);
-            final Dialog d = ProfilerDialogs.createDialog(dd);
+            final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
             d.pack(); // allows correct resizing of textarea in PreferredInstrFilterPanel
             d.setVisible(true);
         }

@@ -49,22 +49,18 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ProfilerModule;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.ErrorManager;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.modules.InstalledFileLocator;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -75,20 +71,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.ProjectManager;
-import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
-import org.openide.filesystems.URLMapper;
+import org.openide.DialogDisplayer;
 
 
 /**
@@ -251,13 +244,11 @@ public final class IDEUtils {
 
             if (ProfilerIDESettings.getInstance().getJavaPlatformForProfiling() == null) {
                 // used platform defined for project
-                Profiler.getDefault()
-                        .displayError(MessageFormat.format(INVALID_PLATFORM_PROJECT_MSG,
+                ProfilerDialogs.displayError(MessageFormat.format(INVALID_PLATFORM_PROJECT_MSG,
                                                            new Object[] { platform.getDisplayName() }));
             } else {
                 // used platform defined in Options / Profiler
-                Profiler.getDefault()
-                        .displayError(MessageFormat.format(INVALID_PLATFORM_PROFILER_MSG,
+                ProfilerDialogs.displayError(MessageFormat.format(INVALID_PLATFORM_PROFILER_MSG,
                                                            new Object[] { platform.getDisplayName() }));
             }
 
@@ -331,12 +322,12 @@ public final class IDEUtils {
             propertiesFO.delete(propertiesFOLock);
         } catch (Exception e) {
             ProfilerLogger.log(e);
-            ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_CONVERTING_PROFILING_SETTINGS_MESSAGE,
-                                                                                     new Object[] {
-                                                                                         FileUtil.toFile(propertiesFO).getPath(),
-                                                                                         FileUtil.toFile(xmlFO).getPath(),
-                                                                                         e.getMessage()
-                                                                                     }), NotifyDescriptor.WARNING_MESSAGE));
+            ProfilerDialogs.displayWarning(MessageFormat.format(ERROR_CONVERTING_PROFILING_SETTINGS_MESSAGE,
+                                             new Object[] {
+                                                 FileUtil.toFile(propertiesFO).getPath(),
+                                                 FileUtil.toFile(xmlFO).getPath(),
+                                                 e.getMessage()
+                                             }));
         } finally {
             if (propertiesFOLock != null) {
                 propertiesFOLock.releaseLock();
@@ -414,7 +405,7 @@ public final class IDEUtils {
         final DialogDescriptor dd = new DialogDescriptor(panel, SELECT_SETTINGS_CONFIGURATION_DIALOG_CAPTION, true,
                                                          new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton, 0,
                                                          null, null);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
 
         if (dd.getValue() == okButton) {

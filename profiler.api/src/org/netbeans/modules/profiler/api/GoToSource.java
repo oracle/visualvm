@@ -102,8 +102,8 @@ final public class GoToSource {
             }
         }
         
-        Profiler.getDefault().displayError(MessageFormat.format(NbBundle.getMessage(GoToSource.class,
-                                                                                        "NoSourceFoundMessage"), // NOI18N
-                                                                                        new Object[] { className }));
+        ProfilerDialogs.displayError(MessageFormat.format(NbBundle.getMessage(GoToSource.class,
+                                                                                "NoSourceFoundMessage"), // NOI18N
+                                                                                new Object[] { className }));
     }
 }

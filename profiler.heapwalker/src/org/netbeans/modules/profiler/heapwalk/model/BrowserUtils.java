@@ -44,12 +44,12 @@
 package org.netbeans.modules.profiler.heapwalk.model;
 
 import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 
 
 /**
@@ -246,7 +246,7 @@ public class BrowserUtils {
                                 }
                             });
 
-                            if (oome) Profiler.getDefault().displayError(OUT_OF_MEMORY_MSG);
+                            if (oome) ProfilerDialogs.displayError(OUT_OF_MEMORY_MSG);
                         }
                     }
                 });

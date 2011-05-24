@@ -46,9 +46,7 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.NotifyDescriptor;
@@ -60,6 +58,7 @@ import org.openide.util.actions.NodeAction;
 import java.util.ArrayList;
 import java.util.List;
 import javax.lang.model.element.ExecutableElement;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
@@ -132,8 +131,7 @@ public final class AddRootMethodAction extends NodeAction {
                                                                                                         currentOffsetInEditor);
 
                         if (resolvedMethod == null) {
-                            NetBeansProfiler.getDefaultNB()
-                                            .displayWarning(NbBundle.getMessage(AddRootMethodAction.class,
+                            ProfilerDialogs.displayWarning(NbBundle.getMessage(AddRootMethodAction.class,
                                                                                 "MSG_NoMethodFoundAtPosition")); // NOI18N
 
                             return;
@@ -147,9 +145,8 @@ public final class AddRootMethodAction extends NodeAction {
 
                         // Check if method is executable
                         if (!SourceUtils.isExecutableMethod(method)) {
-                            ProfilerDialogs.notify(new NotifyDescriptor.Message(NbBundle.getMessage(AddRootMethodAction.class,
-                                                                                                    "MSG_CannotAddAbstractNativeProfilingRoot"), // NOI18N
-                                                                                NotifyDescriptor.INFORMATION_MESSAGE));
+                            ProfilerDialogs.displayInfo(NbBundle.getMessage(AddRootMethodAction.class,
+                                                        "MSG_CannotAddAbstractNativeProfilingRoot")); // NOI18N
 
                             return;
                         }
@@ -189,9 +186,8 @@ public final class AddRootMethodAction extends NodeAction {
                             ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
                         }
                     } catch (Exception ex) {
-                        ProfilerDialogs.notify(new NotifyDescriptor.Message(NbBundle.getMessage(AddRootMethodAction.class,
-                                                                                                "MSG_ProblemAddingRootMethod"), // NOI18N
-                                                                            NotifyDescriptor.WARNING_MESSAGE));
+                        ProfilerDialogs.displayWarning(NbBundle.getMessage(AddRootMethodAction.class,
+                                                        "MSG_ProblemAddingRootMethod")); // NOI18N
                     }
                 }
             }.execute();

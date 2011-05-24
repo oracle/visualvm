@@ -56,7 +56,6 @@ import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.spi.project.ui.support.MainProjectSensitiveActions;
 import org.netbeans.spi.project.ui.support.ProjectActionPerformer;
@@ -74,6 +73,7 @@ import java.util.Properties;
 import javax.swing.Action;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.HeapDumpWatch;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
@@ -142,7 +142,7 @@ public final class AntActions {
                     if (isProjectTypeSupported(project)) {
                         doProfileProject(project, null, false);
                     } else {
-                        NetBeansProfiler.getDefaultNB().displayError(UNSUPPORTED_PROJECT_TYPE_MSG);
+                        ProfilerDialogs.displayError(UNSUPPORTED_PROJECT_TYPE_MSG);
                     }
                 }
             }, NbBundle.getMessage(AntActions.class, "LBL_ProfileMainProjectAction"), // NOI18N
@@ -534,8 +534,7 @@ public final class AntActions {
                             final String javaVersion = IDEUtils.getPlatformJDKVersion(platform);
 
                             if (javaVersion == null) {
-                                Profiler.getDefault()
-                                        .displayError(MessageFormat.format(FAILED_DETERMINE_JAVA_PLATFORM_MSG,
+                                ProfilerDialogs.displayError(MessageFormat.format(FAILED_DETERMINE_JAVA_PLATFORM_MSG,
                                                                            new Object[] { platform.getDisplayName() }));
 
                                 return;
@@ -597,7 +596,7 @@ public final class AntActions {
                                     if (jp == null) {
                                         // selected platform does not exist, use 
                                         String text = MessageFormat.format(INVALID_JAVAPLATFORM_MSG,new Object[] {javaPlatformName});
-                                        NetBeansProfiler.getDefaultNB().displayWarningAndWait(text);
+                                        ProfilerDialogs.displayWarning(text);
                                         jp = platform;
                                     }
                                 } else { 
@@ -659,8 +658,7 @@ public final class AntActions {
                                 final FileObject buildScriptFO = ptp.getProjectBuildScript(project);
 
                                 if (buildScriptFO == null) {
-                                    Profiler.getDefault()
-                                            .displayError(MessageFormat.format(FAILED_DETERMINE_PROJECT_BUILDSCRIPT_MSG,
+                                    ProfilerDialogs.displayError(MessageFormat.format(FAILED_DETERMINE_PROJECT_BUILDSCRIPT_MSG,
                                                                                new Object[] {
                                                                                    ProjectUtils.getInformation(project).getName()
                                                                                }));
@@ -724,13 +722,13 @@ public final class AntActions {
 
             while (true) {
                 if (projectPlatform.getSpecification().getVersion().compareTo(platform.getSpecification().getVersion()) > 0) {
-                    Object res = ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(INCORRECT_JAVA_SPECVERSION_DIALOG_MSG,
-                                                                                          INCORRECT_JAVA_SPECVERSION_DIALOG_CAPTION,
-                                                                                          NotifyDescriptor.YES_NO_CANCEL_OPTION));
+                    Boolean ret = ProfilerDialogs.displayCancellableConfirmation(
+                            INCORRECT_JAVA_SPECVERSION_DIALOG_MSG,
+                            INCORRECT_JAVA_SPECVERSION_DIALOG_CAPTION);
 
-                    if (res == NotifyDescriptor.YES_OPTION) {
+                    if (Boolean.TRUE.equals(ret)) {
                         break;
-                    } else if (res == NotifyDescriptor.NO_OPTION) {
+                    } else if (Boolean.FALSE.equals(ret)) {
                         platform = JavaPlatformSelector.getDefault().selectPlatformToUse();
 
                         if (platform == null) {

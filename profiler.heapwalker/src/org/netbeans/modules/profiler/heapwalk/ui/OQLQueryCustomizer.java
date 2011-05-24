@@ -79,8 +79,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
 import org.netbeans.modules.profiler.heapwalk.OQLSupport;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -141,7 +141,7 @@ public class OQLQueryCustomizer {
                                             new Object[] { okButton,
                                             DialogDescriptor.CANCEL_OPTION },
                                             okButton, 0, null, null);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.pack();
         d.setVisible(true);
 
@@ -238,7 +238,7 @@ public class OQLQueryCustomizer {
                                                upDownButtons[1] });
         updateButtons(upDownButtons, node);
 
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
 
         d.pack();
         d.setVisible(true);

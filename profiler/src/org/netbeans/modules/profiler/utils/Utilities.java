@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.utils;
 
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
@@ -58,6 +57,7 @@ import java.io.File;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.openide.DialogDisplayer;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -183,7 +183,7 @@ public final class Utilities {
         final DialogDescriptor dd = new DialogDescriptor(selectClassPanel, SELECT_CLASS_DIALOG_CAPTION, true,
                                                          new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                          DialogDescriptor.BOTTOM_ALIGN, null, null);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
 
         if (dd.getValue() == okButton) {

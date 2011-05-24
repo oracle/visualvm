@@ -55,7 +55,6 @@ import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.modules.profiler.spi.ProjectStorageProvider;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;

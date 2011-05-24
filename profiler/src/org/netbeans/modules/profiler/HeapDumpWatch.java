@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileChangeAdapter;
 import org.openide.filesystems.FileEvent;
@@ -56,6 +55,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.Utilities;
 
 
@@ -141,22 +141,13 @@ public class HeapDumpWatch {
         ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // refresh list of snapshots
 
         try {
-            NotifyDescriptor ndOpen = new NotifyDescriptor.Confirmation(NbBundle.getMessage(this.getClass(),
-                                                                                            "OOME_PROTECTION_OPEN_HEAPDUMP"),
-                                                                        NotifyDescriptor.YES_NO_OPTION,
-                                                                        NotifyDescriptor.QUESTION_MESSAGE); // NOI18N
-            NotifyDescriptor ndDelete = new NotifyDescriptor.Confirmation(NbBundle.getMessage(this.getClass(),
-                                                                                              "OOME_PROTECTION_REMOVE_HEAPDUMP"),
-                                                                          NotifyDescriptor.YES_NO_OPTION,
-                                                                          NotifyDescriptor.QUESTION_MESSAGE); // NOI18N
-
-            if (ProfilerDialogs.notify(ndOpen) == NotifyDescriptor.YES_OPTION) {
+            if (ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
+                    this.getClass(), "OOME_PROTECTION_OPEN_HEAPDUMP"))) { // NOI18N
                 Utilities.openSnapshot(FileUtil.toFile(heapDump));
-            } else {
-                if (ProfilerDialogs.notify(ndDelete) == NotifyDescriptor.YES_OPTION) {
-                    heapDump.delete();
-                    ProfilerControlPanel2.getDefault().refreshSnapshotsList();
-                }
+            } else if (ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
+                    this.getClass(), "OOME_PROTECTION_REMOVE_HEAPDUMP"))) { // NOI18N
+                heapDump.delete();
+                ProfilerControlPanel2.getDefault().refreshSnapshotsList();
             }
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();

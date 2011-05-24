@@ -58,7 +58,6 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.netbeans.spi.project.ActionProvider;
@@ -89,7 +88,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -108,6 +106,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.modules.profiler.HeapDumpWatch;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.spi.project.ProjectServiceProvider;
 import org.netbeans.spi.project.ui.ProjectOpenedHook;
@@ -1014,15 +1013,13 @@ public final class ProjectUtilities {
         String projectName = ProjectUtils.getInformation(project).getDisplayName();
 
         if (isProfilerIntegrated(project)) {
-            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(PROFILER_WILL_BE_UNINTEGRATED_MSG,
-                                                                                                  new Object[] { projectName }),
-                                                                             NotifyDescriptor.YES_NO_OPTION)) != NotifyDescriptor.YES_OPTION) {
+            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(PROFILER_WILL_BE_UNINTEGRATED_MSG,
+                                                                          new Object[] { projectName }))) {
                 return; // cancelled by the user
             }
         } else {
-            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(PROFILER_ISNT_INTEGRATED_MSG,
-                                                                                                  new Object[] { projectName }),
-                                                                             NotifyDescriptor.YES_NO_OPTION)) != NotifyDescriptor.YES_OPTION) {
+            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(PROFILER_ISNT_INTEGRATED_MSG,
+                                                                          new Object[] { projectName }))) {
                 return; // cancelled by the user
             }
         }
@@ -1093,11 +1090,10 @@ public final class ProjectUtilities {
         }
 
         if (failed) {
-            Profiler.getDefault()
-                    .displayError(MessageFormat.format(UNINTEGRATION_ERRORS_OCCURED_MSG,
+            ProfilerDialogs.displayError(MessageFormat.format(UNINTEGRATION_ERRORS_OCCURED_MSG,
                                                        new Object[] { exceptionsReport.toString() }));
         } else {
-            Profiler.getDefault().displayInfo(MessageFormat.format(UNINTEGRATION_SUCCESSFUL_MSG, new Object[] { projectName }));
+            ProfilerDialogs.displayInfo(MessageFormat.format(UNINTEGRATION_SUCCESSFUL_MSG, new Object[] { projectName }));
         }
     }
 

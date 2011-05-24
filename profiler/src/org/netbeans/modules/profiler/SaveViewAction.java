@@ -47,7 +47,6 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.modules.profiler.ui.ImagePreviewPanel;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
@@ -63,6 +62,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
@@ -163,7 +163,7 @@ class SaveViewAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent evt) {
         if (!viewProvider.hasView()) { // nothing to save in current view
-            NetBeansProfiler.getDefaultNB().displayError(NO_VIEW_MSG);
+            ProfilerDialogs.displayError(NO_VIEW_MSG);
 
             return;
         }
@@ -218,9 +218,9 @@ class SaveViewAction extends AbstractAction {
                             stream.close();
                         }
                     } catch (OutOfMemoryError e) {
-                        NetBeansProfiler.getDefaultNB().displayError(OOME_SAVING_MSG);
+                        ProfilerDialogs.displayError(OOME_SAVING_MSG);
                     } catch (IOException ex) {
-                        NetBeansProfiler.getDefaultNB().displayError(
+                        ProfilerDialogs.displayError(
                                 NbBundle.getMessage(SaveViewAction.class,
                                 "ExportAction_FileWriteErrorMsg", //NOI18N
                                 file.getAbsolutePath()));
@@ -304,16 +304,13 @@ class SaveViewAction extends AbstractAction {
 
     private boolean checkFileExists(File file) {
         if (file.exists()) {
-            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(OVERWRITE_FILE_CAPTION,
-                                                                                                  new Object[] { file.getName() }),
-                                                                             OVERWRITE_FILE_CAPTION,
-                                                                             NotifyDescriptor.YES_NO_OPTION)) != NotifyDescriptor.YES_OPTION) {
+            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(OVERWRITE_FILE_CAPTION,
+                                                  new Object[] { file.getName() }), OVERWRITE_FILE_CAPTION)) {
                 return false; // cancelled by the user
             }
 
             if (!file.delete()) {
-                NetBeansProfiler.getDefaultNB()
-                                .displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
+                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
 
                 return false;
             }

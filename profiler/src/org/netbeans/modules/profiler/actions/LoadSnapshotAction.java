@@ -57,6 +57,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.Utilities;
 
 
@@ -166,8 +167,7 @@ public final class LoadSnapshotAction extends AbstractAction {
                                                           .loadSnapshots(snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
                 ResultsManager.getDefault().openSnapshots(imported);
             } else if (!handleHeapdumps) {
-                NetBeansProfiler.getDefaultNB()
-                        .displayError(MessageFormat
+                ProfilerDialogs.displayError(MessageFormat
                         .format(CANNOT_OPEN_SNAPSHOT_MSG, null));
 
             }

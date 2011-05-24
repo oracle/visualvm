@@ -41,26 +41,21 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.ui;
+package org.netbeans.modules.profiler.impl;
 
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.netbeans.modules.profiler.ui.NBHTMLLabel;
 
 
-public final class ProfilerDialogs {
+final class ProfilerDialogs {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static final class DNSAConfirmation extends NotifyDescriptor.Confirmation {
@@ -453,68 +448,10 @@ public final class ProfilerDialogs {
         silent = value;
     }
 
-    public static void close(final Dialog dialog) {
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        final ComponentListener listener = new ComponentAdapter() {
-            @Override
-            public void componentHidden(ComponentEvent e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void componentShown(ComponentEvent e) {
-                super.componentShown(e);
-            }
-        };
-
-        dialog.addComponentListener(listener);
-        ProfilerUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    dialog.setVisible(false);
-                }
-            });
-
-        try {
-            latch.await();
-            dialog.removeComponentListener(listener);
-        } catch (InterruptedException e) {
-        }
-    }
-
     public static Dialog createDialog(final DialogDescriptor descriptor) {
         descriptor.setLeaf(true);
 
         return standard.createDialog(descriptor);
-    }
-
-    public static void display(final Dialog dialog) {
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        final ComponentListener listener = new ComponentAdapter() {
-            @Override
-            public void componentHidden(ComponentEvent e) {
-                super.componentHidden(e);
-            }
-
-            @Override
-            public void componentShown(ComponentEvent e) {
-                latch.countDown();
-            }
-        };
-
-        dialog.addComponentListener(listener);
-        ProfilerUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    dialog.setVisible(true);
-                }
-            });
-
-        try {
-            latch.await();
-            dialog.removeComponentListener(listener);
-        } catch (InterruptedException e) {
-        }
     }
 
     public static Object notify(final NotifyDescriptor descriptor) {

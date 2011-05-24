@@ -62,7 +62,6 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.heapwalk.ui.OverviewControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
@@ -70,6 +69,7 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
 
 /**
@@ -345,8 +345,7 @@ public class OverviewController extends AbstractController {
             if (i != null) {
                 heapFragmentWalker.getClassesController().showInstance(i);
             } else {
-                Profiler.getDefault()
-                        .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
+                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
                         new Object[] { id[1], id[0] }));
             }
         } else if (urls.startsWith(CLASS_URL_PREFIX)) {
@@ -359,7 +358,7 @@ public class OverviewController extends AbstractController {
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                Profiler.getDefault().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
             }
         }   else if (urls.startsWith(THREAD_URL_PREFIX)) {
             urls = urls.substring(THREAD_URL_PREFIX.length());

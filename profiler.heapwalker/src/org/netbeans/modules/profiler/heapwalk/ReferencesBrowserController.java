@@ -54,7 +54,6 @@ import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
 import org.netbeans.modules.profiler.heapwalk.model.InstanceNode;
 import org.netbeans.modules.profiler.heapwalk.ui.ReferencesBrowserControllerUI;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
@@ -67,6 +66,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.openide.DialogDisplayer;
 
 
 /**
@@ -251,13 +252,13 @@ public class ReferencesBrowserController extends AbstractController {
 
                 if (gcRootNode != null) {
                     if (instanceNode == gcRootNode) {
-                        Profiler.getDefault().displayInfo(SELF_GCROOT_MSG);
+                        ProfilerDialogs.displayInfo(SELF_GCROOT_MSG);
                     } else {
                         ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
                         controlerUI.selectNode(gcRootNode);
                     }
                 } else {
-                    Profiler.getDefault().displayInfo(NO_GCROOT_MSG);
+                    ProfilerDialogs.displayInfo(NO_GCROOT_MSG);
                 }
             }
         }.execute();
@@ -308,9 +309,9 @@ public class ReferencesBrowserController extends AbstractController {
             progress.setModel(model);
         }
         panel.add(progress, BorderLayout.SOUTH);
-        dialog = ProfilerDialogs.createDialog(new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true, new Object[] {  },
-                                                                   DialogDescriptor.CANCEL_OPTION, DialogDescriptor.RIGHT_ALIGN,
-                                                                   null, null));
+        dialog = DialogDisplayer.getDefault().createDialog(new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true, new Object[] {  },
+                                                           DialogDescriptor.CANCEL_OPTION, DialogDescriptor.RIGHT_ALIGN,
+                                                           null, null));
 
         return dialog;
     }

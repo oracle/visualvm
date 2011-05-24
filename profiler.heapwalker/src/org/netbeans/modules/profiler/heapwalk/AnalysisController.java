@@ -58,6 +58,7 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JPanel;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.ErrorManager;
 
 
@@ -181,13 +182,11 @@ public class AnalysisController extends AbstractTopLevelController implements Na
                 if (i != null) {
                     heapFragmentWalker.getClassesController().showInstance(i);
                 } else {
-                    Profiler.getDefault()
-                                    .displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
+                    ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
                                                                        new Object[] { id[1], c.getName() }));
                 }
             } else {
-                Profiler.getDefault()
-                                .displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
             }
         } else if (urls.startsWith("file://class/")) { // NOI18N
             urls = urls.substring("file://class/".length()); // NOI18N
@@ -197,7 +196,7 @@ public class AnalysisController extends AbstractTopLevelController implements Na
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                Profiler.getDefault().displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
+                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
             }
         }
     }

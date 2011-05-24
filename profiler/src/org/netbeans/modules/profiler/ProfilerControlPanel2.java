@@ -64,8 +64,6 @@ import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.SnippetPanel;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.*;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
@@ -106,6 +104,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicComboBoxUI;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.Utilities;
@@ -1044,10 +1043,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                             final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
 
-                            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation( //"Do you really want to delete selected snapshot"
-                                                                                              //+ ((selectedSnapshotFiles.length > 1) ? "s" : "")
-                                                                                              //+ " from disk?\nYou will not be able to undo this operation.",
-                                CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION, NotifyDescriptor.YES_NO_OPTION)) == NotifyDescriptor.YES_OPTION) {
+                            if (ProfilerDialogs.displayConfirmation(CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION)) {
                                 RequestProcessor.getDefault().post(new Runnable() {
                                         public void run() {
                                             deleteSnapshots(selectedSnapshotFiles);
@@ -1163,10 +1159,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             } else if (e.getSource() == deleteButton) {
                 final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
 
-                if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation( //"Do you really want to delete selected snapshot"
-                                                                                  //+ ((selectedSnapshotFiles.length > 1) ? "s" : "")
-                                                                                  //+ " from disk?\nYou will not be able to undo this operation.",
-                    CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION, NotifyDescriptor.YES_NO_OPTION)) == NotifyDescriptor.YES_OPTION) {
+                if (ProfilerDialogs.displayConfirmation(CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION)) {
                     RequestProcessor.getDefault().post(new Runnable() {
                             public void run() {
                                 deleteSnapshots(selectedSnapshotFiles);

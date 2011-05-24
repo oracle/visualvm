@@ -60,8 +60,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
 
 
@@ -134,12 +135,8 @@ public class HeapFragmentWalker {
         if (retainedSizesStatus != RETAINED_SIZES_UNSUPPORTED &&
             retainedSizesStatus != RETAINED_SIZES_COMPUTED) {
 
-            ProfilerDialogs.DNSAConfirmationChecked dnsa =
-                new ProfilerDialogs.DNSAConfirmationChecked("HeapFragmentWalker.computeRetainedSizes", //NOI18N
-                                                            COMPUTE_RETAINED_MSG, COMPUTE_RETAINED_CAPTION,
-                                                            ProfilerDialogs.DNSAConfirmationChecked.YES_NO_OPTION);
-
-            if (!ProfilerDialogs.notify(dnsa).equals(ProfilerDialogs.DNSAConfirmationChecked.YES_OPTION)) {
+            if (!ProfilerDialogs.displayConfirmationDNSA(COMPUTE_RETAINED_MSG, COMPUTE_RETAINED_CAPTION,
+                            null, "HeapFragmentWalker.computeRetainedSizes", false)) { //NOI18N
                 changeState(RETAINED_SIZES_CANCELLED, masterAction);
             } else {
                 changeState(RETAINED_SIZES_COMPUTING, masterAction);
@@ -205,9 +202,9 @@ public class HeapFragmentWalker {
         ps.setSize(Math.max(ps.getWidth(), 350), Math.max(ps.getHeight(), 50));
         panel.setPreferredSize(ps);
 
-        dialog = ProfilerDialogs.createDialog(new DialogDescriptor(panel, caption, true, new Object[] {  },
-                                                                   DialogDescriptor.CANCEL_OPTION, DialogDescriptor.RIGHT_ALIGN,
-                                                                   null, null));
+        dialog = DialogDisplayer.getDefault().createDialog(new DialogDescriptor(panel, caption, true, new Object[] {  },
+                                                           DialogDescriptor.CANCEL_OPTION, DialogDescriptor.RIGHT_ALIGN,
+                                                           null, null));
 
         return dialog;
     }

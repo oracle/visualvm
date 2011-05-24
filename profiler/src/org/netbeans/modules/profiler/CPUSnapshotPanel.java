@@ -83,6 +83,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
 
@@ -838,7 +839,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 
@@ -930,7 +931,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 
@@ -1022,7 +1023,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 

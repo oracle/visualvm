@@ -61,7 +61,6 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
@@ -76,6 +75,7 @@ import java.io.*;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
@@ -317,7 +317,7 @@ public final class ResultsManager {
         if ((s1 != null) && (s2 != null)) {
             compareSnapshots(s1, s2);
         } else {
-            NetBeansProfiler.getDefaultNB().displayError(SNAPSHOTS_LOAD_FAILED_MSG);
+            ProfilerDialogs.displayError(SNAPSHOTS_LOAD_FAILED_MSG);
         }
     }
 
@@ -339,8 +339,7 @@ public final class ResultsManager {
             sdw.open();
             sdw.requestActive();
         } else {
-            NetBeansProfiler.getDefaultNB()
-                            .displayError(MessageFormat.format(CANNOT_COMPARE_SNAPSHOTS_MSG,
+            ProfilerDialogs.displayError(MessageFormat.format(CANNOT_COMPARE_SNAPSHOTS_MSG,
                                                                new Object[] { s1.getFile().getName(), s2.getFile().getName() }));
         }
     }
@@ -391,9 +390,7 @@ public final class ResultsManager {
                 File file = chooser.getSelectedFile();
 
                 if (!file.exists()) {
-                    if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(DIRECTORY_DOESNT_EXIST_MSG,
-                                                                                     DIRECTORY_DOESNT_EXIST_CAPTION,
-                                                                                     NotifyDescriptor.YES_NO_OPTION)) != NotifyDescriptor.YES_OPTION) {
+                    if (!ProfilerDialogs.displayConfirmation(DIRECTORY_DOESNT_EXIST_MSG, DIRECTORY_DOESNT_EXIST_CAPTION)) {
                         return; // cancelled by the user
                     }
 
@@ -452,16 +449,11 @@ public final class ResultsManager {
         }
 
         if (unsaved.size() > 0) {
-            Object ret = ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(SAVE_SNAPSHOTS_DIALOG_MSG,
-                                                                                                       new Object[] {
-                                                                                                           "" + unsaved.size()
-                                                                                                       }), // NOI18N
-                                                                                                           //"You have " + unsaved.size() + " unsaved snapshot" + ((unsaved.size() > 1)?"s.": ".") + "\n" +
-                                                                                                           //"Do you want to save them before exiting the IDE?",
-                                                                                  SAVE_SNAPSHOTS_DIALOG_CAPTION,
-                                                                                  NotifyDescriptor.YES_NO_CANCEL_OPTION));
+            Boolean ret = ProfilerDialogs.displayCancellableConfirmation(MessageFormat.format(
+                    SAVE_SNAPSHOTS_DIALOG_MSG, new Object[] { "" + unsaved.size() }), // NOI18N
+                    SAVE_SNAPSHOTS_DIALOG_CAPTION);
 
-            if (ret == NotifyDescriptor.YES_OPTION) {
+            if (Boolean.TRUE.equals(ret)) {
                 Iterator unsIt = unsaved.iterator();
 
                 while (unsIt.hasNext()) {
@@ -470,7 +462,7 @@ public final class ResultsManager {
                 }
 
                 return true; // exit the IDE
-            } else if (ret == NotifyDescriptor.NO_OPTION) {
+            } else if (Boolean.FALSE.equals(ret)) {
                 return true; // exit the IDE
             } else {
                 return false; // cancel
@@ -604,7 +596,7 @@ public final class ResultsManager {
     }
 
     public void openSnapshot(final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
-        if (ls == null) NetBeansProfiler.getDefaultNB().displayError(CANNOT_OPEN_SNAPSHOT_MSG);
+        if (ls == null) ProfilerDialogs.displayError(CANNOT_OPEN_SNAPSHOT_MSG);
         else ProfilerUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
@@ -765,8 +757,7 @@ public final class ResultsManager {
             } catch (Exception e2) {
             }
 
-            NetBeansProfiler.getDefaultNB()
-                            .displayError(MessageFormat.format(SNAPSHOT_SAVE_FAILED_MSG, new Object[] { e.getMessage() }));
+            ProfilerDialogs.displayError(MessageFormat.format(SNAPSHOT_SAVE_FAILED_MSG, new Object[] { e.getMessage() }));
 
             return false; // failure => we wont continue with firing the event
         } catch (OutOfMemoryError e) {
@@ -781,7 +772,7 @@ public final class ResultsManager {
             } catch (Exception e2) {
             }
 
-            NetBeansProfiler.getDefaultNB().displayError(OUT_OF_MEMORY_SAVING);
+            ProfilerDialogs.displayError(OUT_OF_MEMORY_SAVING);
 
             return false; // failure => we wont continue with firing the event
         } finally {
@@ -1054,13 +1045,11 @@ public final class ResultsManager {
         FileObject existingFile = sf.folder.getFileObject(sf.fileName, sf.fileExt);
 
         if (existingFile != null) {
-            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(OVERWRITE_FILE_DIALOG_MSG,
+            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(OVERWRITE_FILE_DIALOG_MSG,
                                                                                                   new Object[] {
-                                                                                                      sf.fileName + "."
+                                                                                                      sf.fileName + "." //NOI18N
                                                                                                       + sf.fileExt
-                                                                                                  }), //NOI18N
-                                                                             OVERWRITE_FILE_DIALOG_CAPTION,
-                                                                             NotifyDescriptor.YES_NO_OPTION)) != NotifyDescriptor.YES_OPTION) {
+                                                                                                  }), OVERWRITE_FILE_DIALOG_CAPTION)) {
                 return false; // cancelled by the user
             }
 
