@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.utils;
+package org.netbeans.modules.profiler.impl;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,6 +59,7 @@ import org.netbeans.api.java.source.ui.ElementOpen;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
+import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.cookies.LineCookie;
 import org.openide.filesystems.FileObject;
@@ -72,7 +73,7 @@ import org.openide.text.NbDocument;
  * @author Jaroslav Bachorik
  */
 @org.openide.util.lookup.ServiceProvider(service = org.netbeans.modules.profiler.spi.GoToSourceProvider.class)
-public class GoToJavaSourceProvider extends GoToSourceProvider {
+public final class GoToJavaSourceProvider extends GoToSourceProvider {
     @Override
     public boolean openSource(final Project project, final String className, final String methodName, final String signature, final int line) {
         final AtomicBoolean result = new AtomicBoolean(false);
