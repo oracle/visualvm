@@ -46,18 +46,12 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.spi.LoadGenPlugin;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
-import java.util.Properties;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -101,21 +95,16 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
         Runnable task = null;
 
         if (mode == Profiler.MODE_ATTACH) {
-            ProfilerDialogs.DNSAConfirmation dd = new ProfilerDialogs.DNSAConfirmation(StopAction.class.getName(),
-                                                                                       MSG_DO_YOU_WANT_TO_TERMINATE_MSG,
-                                                                                       NotifyDescriptor.YES_NO_CANCEL_OPTION);
-            dd.setDNSADefault(false);
+            Boolean ret = ProfilerDialogs.displayCancellableConfirmationDNSA(MSG_DO_YOU_WANT_TO_TERMINATE_MSG, null, null, StopAction.class.getName(), false);
 
-            final Object res = ProfilerDialogs.notify(dd);
-
-            if (res.equals(NotifyDescriptor.YES_OPTION)) {
+            if (Boolean.TRUE.equals(ret)) {
                 task = new Runnable() {
                         public void run() {
                             Profiler.getDefault().stopApp();
                             taskPosted = false;
                         }
                     };
-            } else if (res.equals(NotifyDescriptor.NO_OPTION)) {
+            } else if (Boolean.FALSE.equals(ret)) {
                 task = new Runnable() {
                         public void run() {
                             Profiler.getDefault().detachFromApp();
@@ -135,7 +124,7 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
         if (task != null) {
             taskPosted = true;
             updateEnabledState();
-            IDEUtils.runInProfilerRequestProcessor(task);
+            ProfilerUtils.runInProfilerRequestProcessor(task);
         }
     }
 

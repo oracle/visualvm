@@ -61,7 +61,7 @@ import org.netbeans.jemmy.util.NameComponentChooser;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.ui.components.ComponentMorpher;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
-import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
+import org.netbeans.modules.profiler.stp.SelectProfilingTask;
 
 /**
  * Operator for profiler dialog. Should be able to set the profiler session.

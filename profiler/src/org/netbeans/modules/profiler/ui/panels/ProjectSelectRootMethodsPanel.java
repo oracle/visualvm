@@ -43,14 +43,12 @@
 package org.netbeans.modules.profiler.ui.panels;
 
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.util.Lookup;
@@ -70,7 +68,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -112,7 +109,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     private JButton okButton;
     private JCheckBox advancedShowAllProjectsCheckBox;
     private JComboBox treeBuilderList;
-    private Project currentProject;
+    private Lookup.Provider currentProject;
     private RequestProcessor rp = new RequestProcessor("SRM-UI Processor", 1); // NOI18N
     private RootSelectorTree advancedLogicalPackageTree;
     private volatile boolean changingBuilderList = false;
@@ -151,7 +148,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
      * @param currentSelection The current root method selection (valid for the profiling session)
      * @return Returns the array of newly selected root methods or <b>null</b> to signal that no root methods were selected
      */
-    public ClientUtils.SourceCodeSelection[] getRootMethods(final Project project,
+    public ClientUtils.SourceCodeSelection[] getRootMethods(final Lookup.Provider project,
             final ClientUtils.SourceCodeSelection[] currentSelection) {
         this.currentProject = project;
 
@@ -194,7 +191,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
                 dd.setAdditionalOptions(additionalOptions);
             }
 
-            final Dialog d = ProfilerDialogs.createDialog(dd);
+            final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
             d.pack(); // To properly layout HTML hint area
             d.setVisible(true);
 
@@ -383,9 +380,9 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         }
     }
 
-    private Project[] relevantProjects() {
+    private Lookup.Provider[] relevantProjects() {
         return advancedShowAllProjectsCheckBox.isSelected() ? OpenProjects.getDefault().getOpenProjects()
-                : new Project[]{currentProject};
+                : new Lookup.Provider[]{currentProject};
     }
 
     private void updateSelector(Runnable updater) {

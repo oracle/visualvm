@@ -56,16 +56,15 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
 import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
-import org.netbeans.modules.profiler.selector.ui.SelectionTreeView;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.util.HelpCtx;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 
@@ -177,7 +176,7 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
 //                dd.setAdditionalOptions(additionalOptions);
 //            }
 
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.pack(); // To properly layout HTML hint area
         d.setVisible(true);
 

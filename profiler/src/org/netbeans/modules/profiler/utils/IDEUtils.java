@@ -49,25 +49,19 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.utils.MiscUtils;
-import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ProfilerModule;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
 import org.openide.DialogDescriptor;
 import org.openide.ErrorManager;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.modules.InstalledFileLocator;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import java.awt.*;
@@ -77,19 +71,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.ProjectManager;
-import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
-import org.openide.filesystems.URLMapper;
+import org.openide.DialogDisplayer;
 
 
 /**
@@ -120,10 +112,6 @@ public final class IDEUtils {
     private static final String LIST_ACCESS_NAME = NbBundle.getMessage(IDEUtils.class, "IDEUtils_ListAccessName"); //NOI18N
     private static final String OK_BUTTON_TEXT = NbBundle.getMessage(IDEUtils.class, "IDEUtils_OkButtonText"); //NOI18N
                                                                                                                // -----
-    private static final String SETTINGS_FOR_ATTR = "settingsFor";
-    private static final RequestProcessor profilerRequestProcessor = new RequestProcessor("Profiler Request Processor", 1); // NOI18N
-    private static final ErrorManager profilerErrorManager = ErrorManager.getDefault().getInstance("org.netbeans.modules.profiler"); // NOI18N
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static String getAntProfilerStartArgument15(int port, int architecture) {
@@ -256,13 +244,11 @@ public final class IDEUtils {
 
             if (ProfilerIDESettings.getInstance().getJavaPlatformForProfiling() == null) {
                 // used platform defined for project
-                Profiler.getDefault()
-                        .displayError(MessageFormat.format(INVALID_PLATFORM_PROJECT_MSG,
+                ProfilerDialogs.displayError(MessageFormat.format(INVALID_PLATFORM_PROJECT_MSG,
                                                            new Object[] { platform.getDisplayName() }));
             } else {
                 // used platform defined in Options / Profiler
-                Profiler.getDefault()
-                        .displayError(MessageFormat.format(INVALID_PLATFORM_PROFILER_MSG,
+                ProfilerDialogs.displayError(MessageFormat.format(INVALID_PLATFORM_PROFILER_MSG,
                                                            new Object[] { platform.getDisplayName() }));
             }
 
@@ -283,56 +269,6 @@ public final class IDEUtils {
         }
 
         return jvmExe;
-    }
-
-    public static RequestProcessor getProfilerRequestProcessor() {
-        return profilerRequestProcessor;
-    }
-
-    public static Project getProjectFromSettingsFolder(FileObject settingsFolder) {
-        Object o = settingsFolder.getAttribute(SETTINGS_FOR_ATTR);
-        if (o instanceof URL) {
-            FileObject d = URLMapper.findFileObject((URL) o);
-            if (d != null && d.isFolder()) {
-                try {
-                    return ProjectManager.getDefault().findProject(d);
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
-        }
-        Project p = FileOwnerQuery.getOwner(settingsFolder);
-        try {
-            if (p != null && getProjectSettingsFolder(p, false) == settingsFolder) {
-                return p;
-            }
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        return null;
-    }
-
-    public static FileObject getProjectSettingsFolder(Project project, boolean create)
-                                               throws IOException {
-        if (project == null) { // global folder for attach
-
-            return getSettingsFolder(true);
-        } else {
-            // resolve 'nbproject'
-            FileObject nbproject = project.getProjectDirectory().getFileObject("nbproject"); // NOI18N
-            FileObject d;
-            if (nbproject != null) {
-                // For compatibility, continue to use nbproject/private/profiler for Ant-based projects.
-                d = create ? FileUtil.createFolder(nbproject, "private/profiler") : nbproject.getFileObject("private/profiler"); // NOI18N
-            } else {
-                // Maven projects, autoprojects, etc.
-                d = ProjectUtils.getCacheDirectory(project, IDEUtils.class);
-            }
-            if (d != null) {
-                d.setAttribute(SETTINGS_FOR_ATTR, project.getProjectDirectory().getURL()); // NOI18N
-            }
-            return d;
-        }
     }
 
     public static FileObject getSettingsFolder(final boolean create)
@@ -386,12 +322,12 @@ public final class IDEUtils {
             propertiesFO.delete(propertiesFOLock);
         } catch (Exception e) {
             ProfilerLogger.log(e);
-            ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_CONVERTING_PROFILING_SETTINGS_MESSAGE,
-                                                                                     new Object[] {
-                                                                                         FileUtil.toFile(propertiesFO).getPath(),
-                                                                                         FileUtil.toFile(xmlFO).getPath(),
-                                                                                         e.getMessage()
-                                                                                     }), NotifyDescriptor.WARNING_MESSAGE));
+            ProfilerDialogs.displayWarning(MessageFormat.format(ERROR_CONVERTING_PROFILING_SETTINGS_MESSAGE,
+                                             new Object[] {
+                                                 FileUtil.toFile(propertiesFO).getPath(),
+                                                 FileUtil.toFile(xmlFO).getPath(),
+                                                 e.getMessage()
+                                             }));
         } finally {
             if (propertiesFOLock != null) {
                 propertiesFOLock.releaseLock();
@@ -416,7 +352,7 @@ public final class IDEUtils {
 
     public static ProgressHandle indeterminateProgress(String title, final int timeout) {
         final ProgressHandle ph = ProgressHandleFactory.createHandle(title);
-        IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
                 public void run() {
                     ph.setInitialDelay(timeout);
                     ph.start();
@@ -424,32 +360,6 @@ public final class IDEUtils {
             });
 
         return ph;
-    }
-
-    public static void runInEventDispatchThread(final Runnable r) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            SwingUtilities.invokeLater(r);
-        }
-    }
-
-    public static void runInEventDispatchThreadAndWait(final Runnable r) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InvocationTargetException e) {
-                profilerErrorManager.notify(e);
-            } catch (InterruptedException e) {
-                profilerErrorManager.notify(e);
-            }
-        }
-    }
-
-    public static void runInProfilerRequestProcessor(final Runnable r) {
-        profilerRequestProcessor.post(r);
     }
 
     /**
@@ -495,7 +405,7 @@ public final class IDEUtils {
         final DialogDescriptor dd = new DialogDescriptor(panel, SELECT_SETTINGS_CONFIGURATION_DIALOG_CAPTION, true,
                                                          new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton, 0,
                                                          null, null);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
 
         if (dd.getValue() == okButton) {
@@ -558,7 +468,7 @@ public final class IDEUtils {
 
     private static boolean matchesMask(final ProfilingSettings settings, final int mask) {
         // TODO: should only check Monitor/CPU/Memory
-        return org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings);
+        return org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings);
 
         //    return (settings.getProfilingType() & mask) != 0;    
     }

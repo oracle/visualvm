@@ -59,7 +59,7 @@ import org.netbeans.modules.profiler.actions.FindNextAction;
 import org.netbeans.modules.profiler.actions.FindPreviousAction;
 import org.netbeans.modules.profiler.ui.FindDialog;
 import org.netbeans.modules.profiler.ui.Utils;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.actions.FindAction;
 import org.openide.util.ImageUtilities;
@@ -82,6 +82,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
 
@@ -107,7 +109,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             List<ProfilingSettings> cpuSettings = new ArrayList();
 
             for (ProfilingSettings settings : projectSettings) {
-                if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
                     cpuSettings.add(settings);
                 }
             }
@@ -169,7 +171,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
-            NetBeansProfiler.getDefaultNB().openJavaSource(loadedSnapshot.getProject(), className, methodName, methodSig);
+            GoToSource.openSource(loadedSnapshot.getProject(), className, methodName, methodSig);
         }
 
         public void showSubtreeCallGraph(CPUResultsSnapshot s, CCTNode node, int view, int sortingColumn, boolean sortingOrder) {
@@ -837,7 +839,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 
@@ -929,7 +931,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 
@@ -1021,7 +1023,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 
