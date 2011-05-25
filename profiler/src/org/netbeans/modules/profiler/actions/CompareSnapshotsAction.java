@@ -69,6 +69,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import org.openide.DialogDisplayer;
+import org.openide.windows.WindowManager;
 
 
 public class CompareSnapshotsAction extends AbstractAction {
@@ -222,7 +223,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                         JFileChooser snapshotChooser = CompareSnapshotsAction.getSnapshotFileChooser();
                         snapshotChooser.setCurrentDirectory(new File(getSnapshot1Filename()));
 
-                        if (snapshotChooser.showOpenDialog(IDEUtils.getMainWindow()) == 0) {
+                        if (snapshotChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == 0) {
                             File file = snapshotChooser.getSelectedFile();
 
                             if (file != null) {
@@ -238,7 +239,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                         snapshotChooser.setCurrentDirectory(new File((getSnapshot2Filename().length() == 0)
                                                                      ? getSnapshot1Filename() : getSnapshot2Filename()));
 
-                        if (snapshotChooser.showOpenDialog(IDEUtils.getMainWindow()) == 0) {
+                        if (snapshotChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == 0) {
                             File file = snapshotChooser.getSelectedFile();
 
                             if (file != null) {
@@ -657,7 +658,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                         JFileChooser snapshotChooser = CompareSnapshotsAction.getSnapshotFileChooser();
                         snapshotChooser.setCurrentDirectory(new File(externalFileField.getText()));
 
-                        if (snapshotChooser.showOpenDialog(IDEUtils.getMainWindow()) == 0) {
+                        if (snapshotChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == 0) {
                             File file = snapshotChooser.getSelectedFile();
 
                             if (file != null) {

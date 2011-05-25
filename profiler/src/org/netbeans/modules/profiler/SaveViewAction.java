@@ -47,8 +47,6 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.modules.profiler.ui.ImagePreviewPanel;
-import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
@@ -64,6 +62,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.windows.WindowManager;
 
 
 class SaveViewAction extends AbstractAction {
@@ -346,7 +345,7 @@ class SaveViewAction extends AbstractAction {
                 ;
             });
 
-        int result = chooser.showSaveDialog(IDEUtils.getMainWindow());
+        int result = chooser.showSaveDialog(WindowManager.getDefault().getMainWindow());
         imagePreview.reset();
 
         if (result != JFileChooser.APPROVE_OPTION) {

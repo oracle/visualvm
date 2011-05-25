@@ -80,13 +80,14 @@ public final class ProjectStorage {
     /**
      * Returns FileObject which can be used as a settings storage for the provided project or null if not available.
      * 
-     * @param project project context
+     * @param project project context, for null GlobalStorage.getSettingsFolder(create) will be called
      * @param create if <code>true</code> the storage will be created if not already available
      * @return FileObject which can be used as a settings storage for the provided project or null if not available
      * @throws IOException 
      */
     public static FileObject getSettingsFolder(Lookup.Provider project, boolean create)
             throws IOException {
+        if (project == null) return GlobalStorage.getSettingsFolder(create);
         ProjectStorageProvider p = provider();
         if (p != null) return p.getSettingsFolder(project, create);
         else return null;

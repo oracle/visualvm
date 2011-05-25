@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -23,7 +23,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,37 +34,28 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
- * Portions Copyrighted 2007 Sun Microsystems, Inc.
+ *
+ * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-
-package org.netbeans.modules.profiler.utilities.queries.impl;
+package org.netbeans.modules.profiler.spi;
 
 import java.io.IOException;
-import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery.class)
-public class SettingsFolderQueryImpl extends SettingsFolderQuery {
-    private static final String PROFILER_FOLDER = "NBProfiler/Config";  // NOI18N
-    private static final String SETTINGS_FOLDER = "Settings";   // NOI18N
+public abstract class GlobalStorageProvider {
     
-    @Override
-    synchronized public FileObject getSettingsFolder(boolean create) throws IOException {
-        final FileObject folder = FileUtil.getConfigFile(PROFILER_FOLDER);
-        FileObject settingsFolder = folder.getFileObject(SETTINGS_FOLDER, null);
-
-        if ((settingsFolder == null) && create) {
-            settingsFolder = folder.createFolder(SETTINGS_FOLDER);
-        }
-
-        return settingsFolder;
-    }
+    /**
+     * Returns FileObject which can be used as a general settings storage.
+     * @param create If <code>true</code> the folder will be created if it doesn't exist yet
+     * @return FileObject which can be used as a general settings storage
+     * @throws IOException 
+     */
+    public abstract FileObject getSettingsFolder(boolean create) throws IOException;
+    
 }

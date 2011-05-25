@@ -45,42 +45,28 @@ package org.netbeans.modules.profiler.utils;
 
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.ProfilerModule;
 import org.openide.DialogDescriptor;
 import org.openide.ErrorManager;
-import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.modules.InstalledFileLocator;
 import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 import java.awt.*;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
 import org.openide.DialogDisplayer;
 
 
@@ -126,25 +112,25 @@ public final class IDEUtils {
         return getAntProfilerStartArgument(port, architecture, CommonConstants.JDK_17_STRING);
     }
 
-    // Searches for a localized help. The default directory is <profiler_cluster>/docs/profiler,
-    // localized help is in <profiler_cluster>/docs/profiler_<locale_suffix> as obtained by NbBundle.getLocalizingSuffixes()
-    // see Issue 65429 (http://www.netbeans.org/issues/show_bug.cgi?id=65429)
-    public static String getHelpDir() {
-        Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
-        File localizedHelpDir = null;
-
-        while (suffixesIterator.hasNext() && (localizedHelpDir == null)) {
-            localizedHelpDir = InstalledFileLocator.getDefault()
-                                                   .locate("docs/profiler" + suffixesIterator.next(),
-                                                           "org.netbeans.modules.profiler", false); //NOI18N
-        }
-
-        if (localizedHelpDir == null) {
-            return null;
-        } else {
-            return localizedHelpDir.getPath();
-        }
-    }
+//    // Searches for a localized help. The default directory is <profiler_cluster>/docs/profiler,
+//    // localized help is in <profiler_cluster>/docs/profiler_<locale_suffix> as obtained by NbBundle.getLocalizingSuffixes()
+//    // see Issue 65429 (http://www.netbeans.org/issues/show_bug.cgi?id=65429)
+//    public static String getHelpDir() {
+//        Iterator suffixesIterator = NbBundle.getLocalizingSuffixes();
+//        File localizedHelpDir = null;
+//
+//        while (suffixesIterator.hasNext() && (localizedHelpDir == null)) {
+//            localizedHelpDir = InstalledFileLocator.getDefault()
+//                                                   .locate("docs/profiler" + suffixesIterator.next(),
+//                                                           "org.netbeans.modules.profiler", false); //NOI18N
+//        }
+//
+//        if (localizedHelpDir == null) {
+//            return null;
+//        } else {
+//            return localizedHelpDir.getPath();
+//        }
+//    }
 
     public static JavaPlatform getJavaPlatformByName(String platformName) {
         if (platformName != null) {
@@ -160,22 +146,6 @@ public final class IDEUtils {
         }
 
         return null;
-    }
-
-    public static String getLibsDir() {
-        final File dir = InstalledFileLocator.getDefault()
-                                             .locate(ProfilerModule.LIBS_DIR + "/jfluid-server.jar",
-                                                     "org.netbeans.lib.profiler", false); //NOI18N
-
-        if (dir == null) {
-            return null;
-        } else {
-            return dir.getParentFile().getPath();
-        }
-    }
-
-    public static Component getMainWindow() {
-        return WindowManager.getDefault().getMainWindow();
     }
 
     public static int getPlatformArchitecture(JavaPlatform platform) {
@@ -271,97 +241,6 @@ public final class IDEUtils {
         return jvmExe;
     }
 
-    public static FileObject getSettingsFolder(final boolean create)
-                                        throws IOException {
-        return SettingsFolderQuery.getDefault().getSettingsFolder(create);
-    }
-
-    /**
-     * @param temp the component
-     * @return the TopComponent that contains this component or null if not found (the componenet is not in any container or not under TopComponent).
-     */
-    public static TopComponent getTopComponent(Component temp) {
-        while (!(temp instanceof TopComponent)) {
-            temp = temp.getParent();
-
-            if (temp == null) {
-                return null;
-            }
-        }
-
-        return (TopComponent) temp;
-    }
-
-    // Stores settings from .properties file to .xml properties file and then deletes the .properties file
-    public static void convertPropertiesToXML(FileObject propertiesFO, FileObject xmlFO) {
-        Properties properties;
-        FileLock propertiesFOLock = null;
-        FileLock xmlFOLock = null;
-
-        try {
-            // load the configuration from .properties file
-            propertiesFOLock = propertiesFO.lock();
-
-            final InputStream fis = propertiesFO.getInputStream();
-            final BufferedInputStream bis = new BufferedInputStream(fis);
-            properties = new Properties();
-            properties.load(bis);
-            bis.close();
-            fis.close();
-
-            // save the configuration to .xml file
-            xmlFOLock = xmlFO.lock();
-
-            final OutputStream fos = xmlFO.getOutputStream(xmlFOLock);
-            final BufferedOutputStream bos = new BufferedOutputStream(fos);
-            properties.storeToXML(bos, ""); //NOI18N
-            bos.close();
-            fos.close();
-
-            // delete the .properties file
-            propertiesFO.delete(propertiesFOLock);
-        } catch (Exception e) {
-            ProfilerLogger.log(e);
-            ProfilerDialogs.displayWarning(MessageFormat.format(ERROR_CONVERTING_PROFILING_SETTINGS_MESSAGE,
-                                             new Object[] {
-                                                 FileUtil.toFile(propertiesFO).getPath(),
-                                                 FileUtil.toFile(xmlFO).getPath(),
-                                                 e.getMessage()
-                                             }));
-        } finally {
-            if (propertiesFOLock != null) {
-                propertiesFOLock.releaseLock();
-            }
-
-            if (xmlFOLock != null) {
-                xmlFOLock.releaseLock();
-            }
-        }
-    }
-
-    public static Properties duplicateProperties(Properties props) {
-        Properties ret = new Properties();
-
-        for (Enumeration e = props.keys(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
-            ret.setProperty(key, props.getProperty(key));
-        }
-
-        return ret;
-    }
-
-    public static ProgressHandle indeterminateProgress(String title, final int timeout) {
-        final ProgressHandle ph = ProgressHandleFactory.createHandle(title);
-        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
-                public void run() {
-                    ph.setInitialDelay(timeout);
-                    ph.start();
-                }
-            });
-
-        return ph;
-    }
-
     /**
      * Opens a dialog that allows the user to select one of existing profiling settings
      */
@@ -438,7 +317,7 @@ public final class IDEUtils {
     }
 
     private static String getAntProfilerStartArgument(int port, int architecture, String jdkVersion) {
-        String ld = IDEUtils.getLibsDir();
+        String ld = Profiler.getDefault().getLibsDir();
 
         // -agentpath:D:/Testing/41 userdir/lib/deployed/jdk15/windows/profilerinterface.dll=D:\Testing\41 userdir\lib,5140
         return "-agentpath:" // NOI18N
@@ -447,29 +326,5 @@ public final class IDEUtils {
                + port + "," // NOI18N
                + System.getProperty("profiler.agent.connect.timeout", "10"); // NOI18N // 10 seconds timeout by default
     }
-
-    private static ArrayList getSettings(final Project project, final int mask) {
-        final ArrayList matching = new ArrayList();
-        ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
-                                                                      .getProfilingSettings();
-
-        for (ProfilingSettings settings : projectSettings) {
-            if (matchesMask(settings, mask)) {
-                matching.add(settings);
-            }
-        }
-
-        return matching;
-    }
-
-    private static String forwardSlashes(String text) {
-        return text.replace('\\', '/'); // NOI18N
-    }
-
-    private static boolean matchesMask(final ProfilingSettings settings, final int mask) {
-        // TODO: should only check Monitor/CPU/Memory
-        return org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings);
-
-        //    return (settings.getProfilingType() & mask) != 0;    
-    }
+    
 }

@@ -54,7 +54,6 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -85,6 +84,7 @@ import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.Utilities;
 import org.openide.DialogDisplayer;
+import org.openide.windows.WindowManager;
 
 
 /**
@@ -253,7 +253,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
                         JFileChooser directoryChooser = HeapDumpAction.getSnapshotDirectoryChooser();
                         directoryChooser.setCurrentDirectory(new File(getCustomDirectory()));
 
-                        if (directoryChooser.showOpenDialog(IDEUtils.getMainWindow()) == 0) {
+                        if (directoryChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == 0) {
                             File file = directoryChooser.getSelectedFile();
 
                             if (file != null) {

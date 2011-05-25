@@ -386,7 +386,7 @@ public final class ResultsManager {
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             chooser.setMultiSelectionEnabled(false);
 
-            if (chooser.showSaveDialog(IDEUtils.getMainWindow()) == JFileChooser.APPROVE_OPTION) {
+            if (chooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
 
                 if (!file.exists()) {
@@ -1004,7 +1004,7 @@ public final class ResultsManager {
                 }
             });
 
-        if (chooser.showSaveDialog(IDEUtils.getMainWindow()) != JFileChooser.APPROVE_OPTION) {
+        if (chooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) != JFileChooser.APPROVE_OPTION) {
             return null; // cancelled by the user
         }
 

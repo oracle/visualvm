@@ -49,7 +49,6 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -78,7 +77,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
@@ -386,9 +387,14 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private void updateSelector(Runnable updater) {
-        ProgressHandle ph = IDEUtils.indeterminateProgress(NbBundle.getMessage(this.getClass(),
-                "SelectRootMethodsPanel_ParsingProjectStructureMessage"),
-                500); // NOI18N
+        final ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
+                "SelectRootMethodsPanel_ParsingProjectStructureMessage")); // NOI18N
+        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() {
+                ph.setInitialDelay(500);
+                ph.start();
+            }
+        });
 
         try {
             treeBuilderList.setEnabled(false);

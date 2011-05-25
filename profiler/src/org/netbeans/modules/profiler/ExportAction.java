@@ -59,12 +59,12 @@ import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
 import org.openide.util.ImageUtilities;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -272,7 +272,7 @@ public final class ExportAction extends AbstractAction {
         if (exportDir != null) {
             chooser.setCurrentDirectory(exportDir);
         }
-        int result = chooser.showSaveDialog(IDEUtils.getMainWindow());
+        int result = chooser.showSaveDialog(WindowManager.getDefault().getMainWindow());
         if (result != JFileChooser.APPROVE_OPTION) {
             return null; // cancelled by the user
         }

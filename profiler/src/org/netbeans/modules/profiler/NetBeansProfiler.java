@@ -140,11 +140,13 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
+import org.netbeans.modules.profiler.api.GlobalStorage;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDisplayer;
 import org.openide.execution.ExecutorTask;
+import org.openide.modules.InstalledFileLocator;
 
 
 /**
@@ -571,7 +573,7 @@ public final class NetBeansProfiler extends Profiler {
         final ProfilerEngineSettings sharedSettings = new ProfilerEngineSettings();
 
         try {
-            String libsDir = IDEUtils.getLibsDir();
+            String libsDir = getLibsDir();
 
             if (libsDir == null) {
                 throw new IOException(CANNOT_FIND_LIBS_MSG);
@@ -744,7 +746,15 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public String getLibsDir() {
-        return IDEUtils.getLibsDir();
+        final File dir = InstalledFileLocator.getDefault()
+                                             .locate(ProfilerModule.LIBS_DIR + "/jfluid-server.jar",
+                                                     "org.netbeans.lib.profiler", false); //NOI18N
+
+        if (dir == null) {
+            return null;
+        } else {
+            return dir.getParentFile().getPath();
+        }
     }
 
     public int getPlatformArchitecture(String platformName) {
@@ -1619,7 +1629,7 @@ public final class NetBeansProfiler extends Profiler {
         FileLock lock = null;
 
         try {
-            final FileObject folder = IDEUtils.getSettingsFolder(true);
+            final FileObject folder = GlobalStorage.getSettingsFolder(true);
             FileObject fo = folder.getFileObject(GLOBAL_FILTERS_FILENAME, "xml"); //NOI18N
 
             if (fo == null) {
@@ -1648,7 +1658,7 @@ public final class NetBeansProfiler extends Profiler {
         lock = null;
 
         try {
-            final FileObject folder = IDEUtils.getSettingsFolder(true);
+            final FileObject folder = GlobalStorage.getSettingsFolder(true);
             FileObject fo = folder.getFileObject(DEFINED_FILTERSETS_FILENAME, "xml"); //NOI18N
 
             if (fo == null) {
@@ -1853,7 +1863,7 @@ public final class NetBeansProfiler extends Profiler {
     // -- Package-Private stuff --------------------------------------------------------------------------------------------
     private void loadGlobalFilters() {
         try {
-            FileObject folder = IDEUtils.getSettingsFolder(false);
+            FileObject folder = GlobalStorage.getSettingsFolder(false);
             FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config");
 
             // 1. Deal with global filters

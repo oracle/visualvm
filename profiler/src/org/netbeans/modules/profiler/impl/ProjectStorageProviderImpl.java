@@ -54,6 +54,7 @@ import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.modules.profiler.api.GlobalStorage;
 import org.netbeans.modules.profiler.spi.ProjectStorageProvider;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.NotifyDescriptor;
@@ -151,9 +152,9 @@ public final class ProjectStorageProviderImpl extends ProjectStorageProvider {
     }
 
     @Override
-    public FileObject getSettingsFolder(Provider project, boolean create) throws IOException {
+    public synchronized FileObject getSettingsFolder(Provider project, boolean create) throws IOException {
         if (project == null) { // global folder for attach
-            return IDEUtils.getSettingsFolder(true);
+            return GlobalStorage.getSettingsFolder(create);
         } else {
             // resolve 'nbproject'
             Project p = (Project)project;

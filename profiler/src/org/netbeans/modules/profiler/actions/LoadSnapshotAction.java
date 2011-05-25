@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -59,6 +58,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.Utilities;
+import org.openide.windows.WindowManager;
 
 
 /**
@@ -146,7 +146,7 @@ public final class LoadSnapshotAction extends AbstractAction {
                 }
             });
 
-        if (chooser.showOpenDialog(IDEUtils.getMainWindow()) == JFileChooser.APPROVE_OPTION) {
+        if (chooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             final File[] files = chooser.getSelectedFiles();
             final ArrayList<FileObject> snapshotsFOArr = new ArrayList();
             final ArrayList<File> heapdumpsFArr = new ArrayList();

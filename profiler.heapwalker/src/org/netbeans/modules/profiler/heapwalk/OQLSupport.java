@@ -54,6 +54,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import org.netbeans.lib.profiler.ProfilerLogger;
+import org.netbeans.modules.profiler.api.GlobalStorage;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryCategory;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryDefinition;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryRepository;
@@ -101,7 +102,7 @@ public final class OQLSupport {
 
         // Custom category
         try {
-            FileObject folder = IDEUtils.getSettingsFolder(false);
+            FileObject folder = GlobalStorage.getSettingsFolder(false);
 
             FileObject filtersFO = null;
 
@@ -140,7 +141,7 @@ public final class OQLSupport {
         FileLock lock = null;
         try {
             Properties properties = modelToProperties(model);
-            FileObject folder = IDEUtils.getSettingsFolder(true);
+            FileObject folder = GlobalStorage.getSettingsFolder(true);
             FileObject fo = folder.getFileObject(SAVED_OQL_QUERIES_FILENAME,
                                                             "xml"); // NOI18N
             if (fo != null || !properties.isEmpty()) {
