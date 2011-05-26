@@ -114,7 +114,7 @@ import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.spi.LiveResultsWindowContributor;
+import org.netbeans.lib.profiler.ui.cpu.LiveResultsWindowContributor;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 

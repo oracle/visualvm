@@ -74,6 +74,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNodeFree;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 
 
 /**
@@ -122,8 +124,8 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private AbstractTreeTableModel abstractTreeTableModel;
     private EnhancedTreeCellRenderer enhancedTreeCellRenderer = new MethodNameTreeCellRenderer();
     private ExtendedTreeTableModel treeTableModel;
-    private ImageIcon leafIcon = new ImageIcon(ReverseCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/reverseNode.png")); // NOI18N
-    private ImageIcon nodeIcon = new ImageIcon(ReverseCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/reverseNode.png")); // NOI18N
+    private Icon leafIcon = Icons.getIcon(ProfilerIcons.NODE_REVERSE);
+    private Icon nodeIcon = Icons.getIcon(ProfilerIcons.NODE_REVERSE);
     private int minNamesColumnWidth; // minimal width of classnames columns
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------

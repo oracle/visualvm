@@ -41,53 +41,20 @@
  */
 package org.netbeans.modules.profiler.spi;
 
-import javax.swing.JToolBar;
-import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ui.cpu.LiveFlatProfilePanel;
+import java.awt.Image;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-public interface LiveResultsWindowContributor {
-
-    public static abstract class Adapter implements LiveResultsWindowContributor {
-
-        @Override
-        public void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Project project) {
-        }
-
-        @Override
-        public void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Project project) {
-        }
-
-        @Override
-        public void hide() {
-        }
-
-        @Override
-        public void show() {
-        }
-
-        @Override
-        public void refresh() {
-        }
-
-        @Override
-        public void reset() {
-        }
-    }
-
-    void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Project project);
-
-    void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Project project);
-
-    void show();
-
-    void hide();
-
-    void refresh();
-
-    void reset();
+public abstract class IconsProvider {
+    
+    /**
+     * Returns an Image instance according to the provided key.
+     * 
+     * @param key image key
+     * @return Image instance according to the provided key or null if no image is provided for the key by this provider
+     */
+    public abstract Image getImage(String key);
+    
 }
