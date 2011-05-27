@@ -57,4 +57,12 @@ public abstract class IconsProvider {
      */
     public abstract Image getImage(String key);
     
+    /**
+     * Returns path to image resource without leading slash according to the provided key.
+     * 
+     * @param key image key
+     * @return path to image resource without leading slash according to the provided key or null if no image is provided for the key by this provider
+     */
+    public abstract String getResource(String key);
+    
 }

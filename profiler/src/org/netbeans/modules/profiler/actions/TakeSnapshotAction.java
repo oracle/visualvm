@@ -46,6 +46,8 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -110,7 +112,7 @@ public final class TakeSnapshotAction extends ProfilingAwareAction implements Re
     }
 
     protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/takeSnapshot.png"; //NOI18N
+        return Icons.getResource(ProfilerIcons.SNAPSHOT_TAKE);
     }
 
     protected boolean requiresInstrumentation() {

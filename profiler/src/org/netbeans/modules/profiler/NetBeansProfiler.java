@@ -914,7 +914,7 @@ public final class NetBeansProfiler extends Profiler {
 
                         boolean success = false;
 
-                        if (prepareInstrumentationImpl(profilingSettings)) {
+                        if (prepareInstrumentation(profilingSettings)) {
                             success = targetAppRunner.initiateSession(1, false) && targetAppRunner.attachToTargetVMOnStartup();
                         }
 
@@ -934,7 +934,7 @@ public final class NetBeansProfiler extends Profiler {
                         try {
                             loadAgentIntoTargetJVM(jar, options, pid);
 
-                            if (prepareInstrumentationImpl(profilingSettings)) {
+                            if (prepareInstrumentation(profilingSettings)) {
                                 success = targetAppRunner.initiateSession(2, false) && targetAppRunner.attachToTargetVM();
                             }
                         } catch (Exception ex) {
@@ -1134,7 +1134,7 @@ public final class NetBeansProfiler extends Profiler {
                     }
 
                     // perform the selected instrumentation
-                    if (!prepareInstrumentationImpl(profilingSettings)) {
+                    if (!prepareInstrumentation(profilingSettings)) {
                         methodResult.setValue(Boolean.FALSE);
 
                         return; // failed, cannot proceed
@@ -1313,7 +1313,7 @@ public final class NetBeansProfiler extends Profiler {
                     }
 
                     try {
-                        prepareInstrumentationImpl(profilingSettings);
+                        prepareInstrumentation(profilingSettings);
                         changeStateTo(PROFILING_RUNNING);
                     } finally {
                         if (waitDialog != null) {
@@ -1440,7 +1440,7 @@ public final class NetBeansProfiler extends Profiler {
 
                         // System.err.println("-----------------------------------5: "+ (System.currentTimeMillis() - time));
                         // perform the selected instrumentation
-                        boolean success = prepareInstrumentationImpl(profilingSettings);
+                        boolean success = prepareInstrumentation(profilingSettings);
 
                         // and run the target application
                         //        System.err.println("---------------------------- 6: "+ (System.currentTimeMillis() - time));

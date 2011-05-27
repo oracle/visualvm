@@ -73,7 +73,9 @@ import java.util.Properties;
 import javax.swing.Action;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.HeapDumpWatch;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
@@ -149,10 +151,8 @@ public final class AntActions {
                                                                                 null);
         a.putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(AntActions.class, "HINT_ProfileMainProjectAction" // NOI18N
         ));
-        a.putValue("iconBase", // NOI18N
-                   "org/netbeans/modules/profiler/actions/resources/profile.png" // NOI18N
-        );
-        a.putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/profile.png", false));
+        a.putValue("iconBase", Icons.getResource(ProfilerIcons.PROFILE));
+        a.putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.PROFILE));
 
         return a;
     }

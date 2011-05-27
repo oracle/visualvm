@@ -47,11 +47,12 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CallableSystemAction;
 import javax.swing.Action;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 
 
@@ -144,6 +145,6 @@ public final class RerunAction extends CallableSystemAction implements Profiling
     }
 
     protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/rerun.png"; //NOI18N
+        return Icons.getResource(GeneralIcons.RERUN);
     }
 }

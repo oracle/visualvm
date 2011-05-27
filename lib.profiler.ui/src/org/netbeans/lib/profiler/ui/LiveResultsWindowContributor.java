@@ -39,10 +39,11 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.ui.cpu;
+package org.netbeans.lib.profiler.ui;
 
 import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.ui.cpu.LiveFlatProfilePanel;
 import org.openide.util.Lookup;
 
 /**

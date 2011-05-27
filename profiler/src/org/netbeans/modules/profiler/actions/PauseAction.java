@@ -47,6 +47,8 @@ import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -69,7 +71,7 @@ public final class PauseAction extends ProfilingAwareAction {
     private boolean suspended = false;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
+    
     public HelpCtx getHelpCtx() {
         return HelpCtx.DEFAULT_HELP;
 
@@ -108,9 +110,9 @@ public final class PauseAction extends ProfilingAwareAction {
 
     protected String iconResource() {
         if (suspended) {
-            return "org/netbeans/modules/profiler/actions/resources/resume.png"; //NOI18N
+            return Icons.getResource(GeneralIcons.RESUME);
         } else {
-            return "org/netbeans/modules/profiler/actions/resources/pause.png"; //NOI18N
+            return Icons.getResource(GeneralIcons.PAUSE);
         }
     }
 }

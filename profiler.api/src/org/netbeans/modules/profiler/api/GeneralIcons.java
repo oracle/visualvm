@@ -68,5 +68,14 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String ZOOM_OUT = "GeneralIcons.ZoomOut";
     public static final String SCALE_TO_FIT = "GeneralIcons.ScaleToFit";
     public static final String INFO = "GeneralIcons.Info";
+    public static final String FIND_NEXT = "GeneralIcons.FindNext";
+    public static final String FIND_PREVIOUS = "GeneralIcons.FindPrevious";
+    public static final String SAVE = "GeneralIcons.Save";
+    public static final String SAVE_AS = "GeneralIcons.SaveAs";
+    public static final String DETACH = "GeneralIcons.Detach";
+    public static final String PAUSE = "GeneralIcons.Pause";
+    public static final String RERUN = "GeneralIcons.Rerun";
+    public static final String RESUME = "GeneralIcons.Resume";
+    public static final String STOP = "GeneralIcons.Stop";
     
 }

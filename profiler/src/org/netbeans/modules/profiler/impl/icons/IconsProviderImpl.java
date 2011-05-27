@@ -60,8 +60,13 @@ public final class IconsProviderImpl extends IconsProvider {
 
     @Override
     public Image getImage(String key) {
-        String imagePath = getImageCache().get(key);
-        return imagePath == null ? null : ImageUtilities.loadImage(imagePath, true);
+        String resource = getResource(key);
+        return resource == null ? null : ImageUtilities.loadImage(resource, true);
+    }
+    
+    @Override
+    public String getResource(String key) {
+        return getImageCache().get(key);
     }
     
     private Map<String, String> getImageCache() {
@@ -102,14 +107,37 @@ public final class IconsProviderImpl extends IconsProvider {
         cache.put(GeneralIcons.ZOOM_OUT, "zoomOut.png");
         cache.put(GeneralIcons.SCALE_TO_FIT, "scaleToFit.png");
         cache.put(GeneralIcons.INFO, "infoIcon.png");
+        cache.put(GeneralIcons.FIND_NEXT, "findNext.png");
+        cache.put(GeneralIcons.FIND_PREVIOUS, "findPrevious.png");
+        cache.put(GeneralIcons.SAVE, "save.png");
+        cache.put(GeneralIcons.SAVE_AS, "saveAs.png");
+        cache.put(GeneralIcons.DETACH, "detach.png");
+        cache.put(GeneralIcons.PAUSE, "pause.png");
+        cache.put(GeneralIcons.RERUN, "rerun.png");
+        cache.put(GeneralIcons.RESUME, "resume.png");
+        cache.put(GeneralIcons.STOP, "stop.png");
         
         cache.put(ProfilerIcons.NODE_FORWARD, "forwardNode.png");
         cache.put(ProfilerIcons.NODE_REVERSE, "reverseNode.png");
         cache.put(ProfilerIcons.NODE_LEAF, "leafNode.png");
-        cache.put(ProfilerIcons.SNAPSHOT_MEMORY_BIG, "memorySnapshotBig.png");
-        cache.put(ProfilerIcons.VIEW_THREADS_BIG, "threadsViewBig.png");
+        cache.put(ProfilerIcons.SNAPSHOT_MEMORY_24, "memorySnapshot24.png");
+        cache.put(ProfilerIcons.VIEW_THREADS_24, "threadsView24.png");
         cache.put(ProfilerIcons.THREAD, "thread.png");
         cache.put(ProfilerIcons.ALL_THREADS, "allThreads.png");
+        cache.put(ProfilerIcons.ATTACH, "attach.png");
+        cache.put(ProfilerIcons.ATTACH_24, "attach24.png");
+        cache.put(ProfilerIcons.SNAPSHOTS_COMPARE, "compareSnapshots.png");
+        cache.put(ProfilerIcons.SNAPSHOT_OPEN, "openSnapshot.png");
+        cache.put(ProfilerIcons.SNAPSHOT_TAKE, "takeSnapshot.png");
+        cache.put(ProfilerIcons.PROFILE, "profile.png");
+        cache.put(ProfilerIcons.PROFILE_24, "profile24.png");
+        cache.put(ProfilerIcons.RESET_RESULTS, "resetResults.png");
+        cache.put(ProfilerIcons.RUN_GC, "runGC.png");
+        cache.put(ProfilerIcons.SNAPSHOT_HEAP, "heapSnapshot.png");
+        cache.put(ProfilerIcons.CONTROL_PANEL, "controlPanel.gif");
+        cache.put(ProfilerIcons.LIVE_RESULTS, "liveResults.png");
+        cache.put(ProfilerIcons.MODIFY_PROFILING, "modifyProfiling.png");
+        cache.put(ProfilerIcons.SHOW_GRAPHS, "showGraphs.png");
     }
     
 }

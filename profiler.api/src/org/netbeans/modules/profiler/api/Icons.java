@@ -92,6 +92,21 @@ public final class Icons {
         return null;
     }
     
+    /**
+     * Returns path to image resource without leading slash according to the provided key.
+     * 
+     * @param key image key
+     * @return path to image resource without leading slash according to the provided key
+     */
+    public static String getResource(String key) {
+        Collection<? extends IconsProvider> ps = providers();
+        for (IconsProvider p : ps) {
+            String resource = p.getResource(key);
+            if (resource != null) return resource;
+        }
+        return null;
+    }
+    
     private static Collection<? extends IconsProvider> providers() {
         return Lookup.getDefault().lookupAll(IconsProvider.class);
     }

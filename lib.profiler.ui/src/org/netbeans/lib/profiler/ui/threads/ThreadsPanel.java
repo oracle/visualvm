@@ -449,7 +449,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         enableThreadsMonitoringLabel1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 3));
         enableThreadsMonitoringLabel1.setForeground(Color.DARK_GRAY);
 
-        enableThreadsMonitoringButton = new JButton(Icons.getIcon(ProfilerIcons.VIEW_THREADS_BIG));
+        enableThreadsMonitoringButton = new JButton(Icons.getIcon(ProfilerIcons.VIEW_THREADS_24));
         enableThreadsMonitoringButton.setContentAreaFilled(false);
         enableThreadsMonitoringButton.setMargin(new Insets(3, 3, 0, 0));
         enableThreadsMonitoringButton.setVerticalTextPosition(SwingConstants.BOTTOM);

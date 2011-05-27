@@ -47,7 +47,9 @@ import javax.swing.Action;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
@@ -96,6 +98,6 @@ public final class RunGCAction extends ProfilingAwareAction {
     }
 
     protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/runGC.png"; //NOI18N
+        return Icons.getResource(ProfilerIcons.RUN_GC);
     }
 }

@@ -47,12 +47,27 @@ package org.netbeans.modules.profiler.api;
  */
 public interface ProfilerIcons extends Icons.Keys {
     
-    public static final String NODE_FORWARD = "GeneralIcons.NodeForward";
-    public static final String NODE_REVERSE = "GeneralIcons.NodeReverse";
-    public static final String NODE_LEAF = "GeneralIcons.NodeLeaf";
-    public static final String SNAPSHOT_MEMORY_BIG = "GeneralIcons.SnapshotMemoryBig";
-    public static final String VIEW_THREADS_BIG = "GeneralIcons.ViewThreadsBig";
-    public static final String THREAD = "GeneralIcons.Thread";
-    public static final String ALL_THREADS = "GeneralIcons.AllThreads";
+    public static final String NODE_FORWARD = "ProfilerIcons.NodeForward";
+    public static final String NODE_REVERSE = "ProfilerIcons.NodeReverse";
+    public static final String NODE_LEAF = "ProfilerIcons.NodeLeaf";
+    public static final String SNAPSHOT_MEMORY_24 = "ProfilerIcons.SnapshotMemory24";
+    public static final String VIEW_THREADS_24 = "ProfilerIcons.ViewThreads24";
+    public static final String THREAD = "ProfilerIcons.Thread";
+    public static final String ALL_THREADS = "ProfilerIcons.AllThreads";
+    
+    public static final String ATTACH = "ProfilerIcons.Attach";
+    public static final String ATTACH_24 = "ProfilerIcons.Attach24";
+    public static final String SNAPSHOTS_COMPARE = "ProfilerIcons.SnapshotsCompare";
+    public static final String SNAPSHOT_OPEN = "ProfilerIcons.SnapshotOpen";
+    public static final String SNAPSHOT_TAKE = "ProfilerIcons.SnapshotTake";
+    public static final String PROFILE = "ProfilerIcons.Profile";
+    public static final String PROFILE_24 = "ProfilerIcons.Profile24";
+    public static final String RESET_RESULTS = "ProfilerIcons.ResetResults";
+    public static final String RUN_GC = "ProfilerIcons.RunGC";
+    public static final String SNAPSHOT_HEAP = "ProfilerIcons.SnapshotHeap";
+    public static final String CONTROL_PANEL = "ProfilerIcons.ControlPanel";
+    public static final String LIVE_RESULTS = "ProfilerIcons.LiveResults";
+    public static final String MODIFY_PROFILING = "ProfilerIcons.ModifyProfiling";
+    public static final String SHOW_GRAPHS = "ProfilerIcons.ShowGraphs";
     
 }

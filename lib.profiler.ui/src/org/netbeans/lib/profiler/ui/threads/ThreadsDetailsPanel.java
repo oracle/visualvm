@@ -141,7 +141,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         noContentPanel.setLayout(new BorderLayout());
         noContentPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        JLabel noContentIcon = new JLabel(Icons.getIcon(ProfilerIcons.VIEW_THREADS_BIG));
+        JLabel noContentIcon = new JLabel(Icons.getIcon(ProfilerIcons.VIEW_THREADS_24));
         noContentIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         noContentIcon.setVerticalAlignment(SwingConstants.TOP);
         noContentIcon.setEnabled(false);

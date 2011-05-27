@@ -114,7 +114,9 @@ import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.lib.profiler.ui.cpu.LiveResultsWindowContributor;
+import org.netbeans.lib.profiler.ui.LiveResultsWindowContributor;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
@@ -911,7 +913,7 @@ public final class LiveResultsWindow extends TopComponent
         updateNowButton.setToolTipText(UPDATE_RESULTS_NOW_TOOLTIP);
         updateNowButton.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_NOW_TOOLTIP);
 
-        runGCButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/runGC.png", false)); //NOI18N
+        runGCButton = new JButton(Icons.getIcon(ProfilerIcons.RUN_GC));
         runGCButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     try {
