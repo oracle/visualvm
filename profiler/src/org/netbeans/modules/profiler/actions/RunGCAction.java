@@ -47,6 +47,7 @@ import javax.swing.Action;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
@@ -85,7 +86,7 @@ public final class RunGCAction extends ProfilingAwareAction {
         try {
             Profiler.getDefault().getTargetAppRunner().runGC();
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
-            Profiler.getDefault().displayError(e.getMessage());
+            ProfilerDialogs.displayError(e.getMessage());
             ProfilerLogger.log(e);
         }
     }

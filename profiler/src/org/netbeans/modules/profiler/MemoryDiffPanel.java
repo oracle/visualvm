@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
@@ -74,6 +73,8 @@ import java.util.Date;
 import javax.swing.*;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.utils.VMUtils;
+import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.Utils;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
@@ -94,12 +95,12 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         public void showSourceForMethod(String className, String methodName, String methodSig) {
             // Check if primitive type/array
             if ((methodName == null && methodSig == null) && (VMUtils.isVMPrimitiveType(className) ||
-                 VMUtils.isPrimitiveType(className))) Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
+                 VMUtils.isPrimitiveType(className))) ProfilerDialogs.displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
             // Check if allocated by reflection
             else if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName))
-                     Profiler.getDefault().displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
+                     ProfilerDialogs.displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
             // Display source
-            else NetBeansProfiler.getDefaultNB().openJavaSource(project, className, methodName, methodSig);
+            else GoToSource.openSource(project, className, methodName, methodSig);
         }
 
         public void showStacksForClass(int selectedClassId, int sortingColumn, boolean sortingOrder) {
@@ -255,7 +256,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
                     srw.open();
                     srw.requestActive();
                 } else {
-                    NetBeansProfiler.getDefaultNB().displayWarning(SNAPSHOT_NOT_AVAILABLE_MSG);
+                    ProfilerDialogs.displayWarning(SNAPSHOT_NOT_AVAILABLE_MSG);
                 }
             }
         };
@@ -317,7 +318,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         memoryPanel.setFindString(findString);
 
         if (!memoryPanel.findFirst()) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 
@@ -333,7 +334,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         }
 
         if (!memoryPanel.findNext()) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 
@@ -349,7 +350,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         }
 
         if (!memoryPanel.findPrevious()) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 

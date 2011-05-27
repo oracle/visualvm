@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.actions.FindAction;
 import org.openide.cookies.SaveCookie;
@@ -53,7 +52,6 @@ import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.util.actions.CallbackSystemAction;
 import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
@@ -63,6 +61,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 
 
 /**
@@ -251,26 +250,22 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
             return true; // already saved
         }
 
-        ProfilerDialogs.DNSAConfirmation dd = new ProfilerDialogs.DNSAConfirmation("org.netbeans.modules.profiler.SnapshotResultsWindow.canClose", // NOI18N
-                                                                                   SAVE_SNAPSHOT_DIALOG_MSG,
-                                                                                   DialogDescriptor.YES_NO_CANCEL_OPTION);
-        dd.setDNSADefault(false);
+        Boolean ret = ProfilerDialogs.displayCancellableConfirmationDNSA(SAVE_SNAPSHOT_DIALOG_MSG,
+                null, null, "org.netbeans.modules.profiler.SnapshotResultsWindow.canClose", false); // NOI18N
 
-        Object ret = ProfilerDialogs.notify(dd);
-
-        if (ret.equals(DialogDescriptor.CANCEL_OPTION) || ret.equals(DialogDescriptor.CLOSED_OPTION)) {
-            return false;
-        } else if (ret.equals(DialogDescriptor.YES_OPTION)) {
+        if (Boolean.TRUE.equals(ret)) {
             ResultsManager.getDefault().saveSnapshot(snapshot);
             // clean up to avoid being held in memory
             setActivatedNodes(new Node[0]);
 
             return true;
-        } else {
+        } else if (Boolean.FALSE.equals(ret)) {
             // clean up to avoid being held in memory
             setActivatedNodes(new Node[0]);
 
             return true;
+        } else {
+            return false;
         }
     }
 

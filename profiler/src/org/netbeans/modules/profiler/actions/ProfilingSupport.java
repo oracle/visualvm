@@ -49,15 +49,16 @@ import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.*;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.panels.PIDSelectPanel;
-import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
+import org.netbeans.modules.profiler.stp.SelectProfilingTask;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.io.IOException;
 import java.text.MessageFormat;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.attach.AttachWizard;
 
 
@@ -139,21 +140,13 @@ public final class ProfilingSupport {
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(STOP_START_PROFILE_SESSION_MESSAGE,
-                                                                             QUESTION_DIALOG_CAPTION,
-                                                                             NotifyDescriptor.YES_NO_OPTION);
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(STOP_START_PROFILE_SESSION_MESSAGE, QUESTION_DIALOG_CAPTION)) {
                     return true;
                 }
 
                 Profiler.getDefault().stopApp();
             } else {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(STOP_START_ATTACH_SESSION_MESSAGE,
-                                                                             QUESTION_DIALOG_CAPTION,
-                                                                             NotifyDescriptor.YES_NO_OPTION);
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(STOP_START_ATTACH_SESSION_MESSAGE, QUESTION_DIALOG_CAPTION)) {
                     return true;
                 }
 
@@ -265,10 +258,9 @@ public final class ProfilingSupport {
                         AttachSettings as = null;
 
                         try {
-                            as = NetBeansProfiler.loadAttachSettings(project);
+                            as = ProjectStorage.loadAttachSettings(project);
                         } catch (IOException e) {
-                            Profiler.getDefault()
-                                    .displayWarning(MessageFormat.format(FAILED_LOAD_SETTINGS_MSG, new Object[] { e.getMessage() }));
+                            ProfilerDialogs.displayWarning(MessageFormat.format(FAILED_LOAD_SETTINGS_MSG, new Object[] { e.getMessage() }));
                             ProfilerLogger.log(e);
                         }
 
@@ -291,7 +283,7 @@ public final class ProfilingSupport {
 //                            as = attachWizard.getAttachSettings();
                             as = AttachWizard.getDefault().configure(as);
                             if (as == null) return; // cancelled by the user
-                            NetBeansProfiler.saveAttachSettings(project, as);
+                            ProjectStorage.saveAttachSettings(project, as);
                         }
 
                         if (!as.isRemote() && as.isDynamic16()) {

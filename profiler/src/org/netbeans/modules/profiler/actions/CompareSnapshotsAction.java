@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.*;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.filesystems.FileObject;
@@ -69,6 +68,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import org.openide.DialogDisplayer;
+import org.openide.windows.WindowManager;
 
 
 public class CompareSnapshotsAction extends AbstractAction {
@@ -222,7 +223,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                         JFileChooser snapshotChooser = CompareSnapshotsAction.getSnapshotFileChooser();
                         snapshotChooser.setCurrentDirectory(new File(getSnapshot1Filename()));
 
-                        if (snapshotChooser.showOpenDialog(IDEUtils.getMainWindow()) == 0) {
+                        if (snapshotChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == 0) {
                             File file = snapshotChooser.getSelectedFile();
 
                             if (file != null) {
@@ -238,7 +239,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                         snapshotChooser.setCurrentDirectory(new File((getSnapshot2Filename().length() == 0)
                                                                      ? getSnapshot1Filename() : getSnapshot2Filename()));
 
-                        if (snapshotChooser.showOpenDialog(IDEUtils.getMainWindow()) == 0) {
+                        if (snapshotChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == 0) {
                             File file = snapshotChooser.getSelectedFile();
 
                             if (file != null) {
@@ -657,7 +658,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                         JFileChooser snapshotChooser = CompareSnapshotsAction.getSnapshotFileChooser();
                         snapshotChooser.setCurrentDirectory(new File(externalFileField.getText()));
 
-                        if (snapshotChooser.showOpenDialog(IDEUtils.getMainWindow()) == 0) {
+                        if (snapshotChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == 0) {
                             File file = snapshotChooser.getSelectedFile();
 
                             if (file != null) {
@@ -962,7 +963,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                      new Object[] {
                                                          getSecondSnapshotSelector().getOKButton(), DialogDescriptor.CANCEL_OPTION
                                                      }, DialogDescriptor.OK_OPTION, 0, null, null);
-        Object res = ProfilerDialogs.notify(desc);
+        Object res = DialogDisplayer.getDefault().notify(desc);
 
         if (res.equals(getSecondSnapshotSelector().getOKButton())) {
             Object selectedSnapshot = getSecondSnapshotSelector().getSnapshot();
@@ -990,7 +991,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                          getExternalSnapshotsSelector().getOKButton(),
                                                          DialogDescriptor.CANCEL_OPTION
                                                      }, DialogDescriptor.OK_OPTION, 0, null, null);
-        Object res = ProfilerDialogs.notify(desc);
+        Object res = DialogDisplayer.getDefault().notify(desc);
 
         if (res.equals(getExternalSnapshotsSelector().getOKButton())) {
             ResultsManager.getDefault()

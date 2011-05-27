@@ -47,6 +47,7 @@ import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
@@ -96,7 +97,7 @@ public final class PauseAction extends ProfilingAwareAction {
                 firePropertyChange(PROP_ICON, null, null);
             }
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
-            Profiler.getDefault().displayError(e.getMessage());
+            ProfilerDialogs.displayError(e.getMessage());
             ProfilerLogger.log(e);
         }
     }
