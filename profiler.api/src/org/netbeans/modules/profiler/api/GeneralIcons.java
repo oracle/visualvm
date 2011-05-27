@@ -77,5 +77,8 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String RERUN = "GeneralIcons.Rerun";
     public static final String RESUME = "GeneralIcons.Resume";
     public static final String STOP = "GeneralIcons.Stop";
+    public static final String EMPTY = "GeneralIcons.Empty";
+    public static final String ERROR = "GeneralIcons.Error";
+    public static final String FIND = "GeneralIcons.Find";
     
 }

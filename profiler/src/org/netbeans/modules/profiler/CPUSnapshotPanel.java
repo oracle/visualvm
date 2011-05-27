@@ -58,7 +58,6 @@ import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.modules.profiler.actions.FindNextAction;
 import org.netbeans.modules.profiler.actions.FindPreviousAction;
 import org.netbeans.modules.profiler.ui.FindDialog;
-import org.netbeans.modules.profiler.ui.Utils;
 import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.actions.FindAction;
@@ -82,7 +81,10 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.api.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
@@ -315,9 +317,9 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private static final String FIND_IN_CALLTREE_STRING = MessageFormat.format(FIND_IN_STATEMENT, new Object[] { CALLTREE_STRING });
 
     // -----
-    private static final ImageIcon CLASSES_ICON = Utils.CLASS_ICON;
-    private static final ImageIcon METHODS_ICON = Utils.METHODS_ICON;
-    private static final ImageIcon PACKAGES_ICON = Utils.PACKAGE_ICON;
+    private static final Icon CLASSES_ICON = Icons.getIcon(LanguageIcons.CLASS);
+    private static final Icon METHODS_ICON = Icons.getIcon(LanguageIcons.METHODS);
+    private static final Icon PACKAGES_ICON = Icons.getIcon(LanguageIcons.PACKAGE);
     private static final ImageIcon CALL_TREE_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/callTreeTab.png", false);
     private static final ImageIcon HOTSPOTS_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/hotspotsTab.png", false);
     private static final ImageIcon COMBINED_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/combinedTab.png", false);
@@ -583,7 +585,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         
         if (findActionPresenter instanceof AbstractButton) {
             AbstractButton ab = (AbstractButton)findActionPresenter;
-            ab.setIcon(Utils.FIND_ACTION_ICON);
+            ab.setIcon(Icons.getIcon(GeneralIcons.FIND));
             ab.setText(""); // NOI18N
             ab.setToolTipText(FIND_ACTION_TOOLTIP);
         }

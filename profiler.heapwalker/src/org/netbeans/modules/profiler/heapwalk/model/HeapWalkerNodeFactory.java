@@ -58,6 +58,8 @@ import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.Value;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 
 
 /**
@@ -303,7 +305,7 @@ public class HeapWalkerNodeFactory {
             }
 
             protected Icon computeIcon() {
-                return org.netbeans.modules.profiler.ui.Utils.ERROR_ICON;
+                return Icons.getIcon(GeneralIcons.ERROR);
             }
         };
     }

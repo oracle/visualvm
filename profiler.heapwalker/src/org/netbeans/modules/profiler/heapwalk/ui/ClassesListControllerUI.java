@@ -98,6 +98,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
@@ -700,7 +702,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
                                                                    .getResource("/org/netbeans/lib/profiler/ui/resources/filterRegExp.png") // NOI18N
         ), FILTER_REGEXP, CommonConstants.FILTER_REGEXP);
-        filterComponent.addFilterItem(org.netbeans.modules.profiler.ui.Utils.CLASS_ICON,
+        filterComponent.addFilterItem(Icons.getImageIcon(LanguageIcons.CLASS),
                                       hasProjectContext ? FILTER_IMPLEMENTATION : FILTER_SUBCLASS,
                                       classesListController.FILTER_SUBCLASS);
         filterComponent.setEmptyFilterText(DEFAULT_FILTER_TEXT);

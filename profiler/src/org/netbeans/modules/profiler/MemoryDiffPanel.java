@@ -73,9 +73,10 @@ import java.util.Date;
 import javax.swing.*;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.utils.VMUtils;
+import org.netbeans.modules.profiler.api.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.Utils;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
 
@@ -186,7 +187,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         
         if (findActionPresenter instanceof AbstractButton) {
             AbstractButton ab = (AbstractButton)findActionPresenter;
-            ab.setIcon(Utils.FIND_ACTION_ICON);
+            ab.setIcon(Icons.getIcon(GeneralIcons.FIND));
             ab.setText(""); // NOI18N
             ab.setToolTipText(FIND_ACTION_TOOLTIP);
         }

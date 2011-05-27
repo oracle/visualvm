@@ -65,7 +65,8 @@ import javax.swing.SpinnerNumberModel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
-import org.netbeans.modules.profiler.ui.Utils;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 
 /**
  *
@@ -99,7 +100,7 @@ public class HintsControllerUI extends JTitledPanel {
     
     // --- Constructors ----------------------------------------------------------
     public HintsControllerUI(HintsController hintsController) {
-        super(VIEW_TITLE_HINTS, Utils.FIND_ACTION_ICON, true);
+        super(VIEW_TITLE_HINTS, Icons.getIcon(GeneralIcons.FIND), true);
         
         this.hintsController = hintsController;
        

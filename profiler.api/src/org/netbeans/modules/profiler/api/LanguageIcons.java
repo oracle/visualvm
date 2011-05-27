@@ -47,4 +47,34 @@ package org.netbeans.modules.profiler.api;
  */
 public interface LanguageIcons extends Icons.Keys {
     
+    public static final String CLASS = "LanguageIcons.Class";
+    public static final String CONSTRUCTOR_PACKAGE = "LanguageIcons.ConstructorPackage";
+    public static final String CONSTRUCTOR_PRIVATE = "LanguageIcons.ConstructorPrivate";
+    public static final String CONSTRUCTOR_PROTECTED = "LanguageIcons.ConstructorProtected";
+    public static final String CONSTRUCTOR_PUBLIC = "LanguageIcons.ConstructorPublic";
+    public static final String CONSTRUCTORS = "LanguageIcons.Constructors";
+    public static final String INITIALIZER = "LanguageIcons.Initializer";
+    public static final String INITIALIZER_STATIC = "LanguageIcons.InitializerStatic";
+    public static final String INTERFACE = "LanguageIcons.Interface";
+    public static final String LIBRARIES = "LanguageIcons.Libraries";
+    public static final String METHOD_PACKAGE = "LanguageIcons.MethodPackage";
+    public static final String METHOD_PRIVATE = "LanguageIcons.MethodPrivate";
+    public static final String METHOD_PROTECTED = "LanguageIcons.MethodProtected";
+    public static final String METHOD_PUBLIC = "LanguageIcons.MethodPublic";
+    public static final String METHOD_PACKAGE_STATIC = "LanguageIcons.MethodPackageStatic";
+    public static final String METHOD_PRIVATE_STATIC = "LanguageIcons.MethodPrivateStatic";
+    public static final String METHOD_PROTECTED_STATIC = "LanguageIcons.MethodProtectedStatic";
+    public static final String METHOD_PUBLIC_STATIC = "LanguageIcons.MethodPublicStatic";
+    public static final String METHODS = "LanguageIcons.Methods";
+    public static final String PACKAGE = "LanguageIcons.Package";
+    public static final String VARIABLE_PACKAGE = "LanguageIcons.VariablePackage";
+    public static final String VARIABLE_PRIVATE = "LanguageIcons.VariablePrivate";
+    public static final String VARIABLE_PROTECTED = "LanguageIcons.VariableProtected";
+    public static final String VARIABLE_PUBLIC = "LanguageIcons.VariablePublic";
+    public static final String VARIABLE_PACKAGE_STATIC = "LanguageIcons.VariablePackageStatic";
+    public static final String VARIABLE_PRIVATE_STATIC = "LanguageIcons.VariablePrivateStatic";
+    public static final String VARIABLE_PROTECTED_STATIC = "LanguageIcons.VariableProtectedStatic";
+    public static final String VARIABLE_PUBLIC_STATIC = "LanguageIcons.VariablePublicStatic";
+    public static final String VARIABLES = "LanguageIcons.Variables";
+    
 }

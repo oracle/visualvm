@@ -45,6 +45,7 @@ import java.awt.Image;
 import java.util.HashMap;
 import java.util.Map;
 import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.netbeans.modules.profiler.spi.IconsProvider;
 import org.openide.util.ImageUtilities;
@@ -116,6 +117,9 @@ public final class IconsProviderImpl extends IconsProvider {
         cache.put(GeneralIcons.RERUN, "rerun.png");
         cache.put(GeneralIcons.RESUME, "resume.png");
         cache.put(GeneralIcons.STOP, "stop.png");
+        cache.put(GeneralIcons.EMPTY, "empty.gif");
+        cache.put(GeneralIcons.ERROR, "error.png");
+        cache.put(GeneralIcons.FIND, "find.png");
         
         cache.put(ProfilerIcons.NODE_FORWARD, "forwardNode.png");
         cache.put(ProfilerIcons.NODE_REVERSE, "reverseNode.png");
@@ -138,6 +142,36 @@ public final class IconsProviderImpl extends IconsProvider {
         cache.put(ProfilerIcons.LIVE_RESULTS, "liveResults.png");
         cache.put(ProfilerIcons.MODIFY_PROFILING, "modifyProfiling.png");
         cache.put(ProfilerIcons.SHOW_GRAPHS, "showGraphs.png");
+        
+        cache.put(LanguageIcons.CLASS, "class.png");
+        cache.put(LanguageIcons.CONSTRUCTOR_PACKAGE, "constructorPackage.png");
+        cache.put(LanguageIcons.CONSTRUCTOR_PRIVATE, "constructorPrivate.gif");
+        cache.put(LanguageIcons.CONSTRUCTOR_PROTECTED, "constructorProtected.png");
+        cache.put(LanguageIcons.CONSTRUCTOR_PUBLIC, "constructorPublic.png");
+        cache.put(LanguageIcons.CONSTRUCTORS, "constructors.png");
+        cache.put(LanguageIcons.INITIALIZER, "initializer.png");
+        cache.put(LanguageIcons.INITIALIZER_STATIC, "initializerSt.png");
+        cache.put(LanguageIcons.INTERFACE, "interface.png");
+        cache.put(LanguageIcons.LIBRARIES, "libraries.png");
+        cache.put(LanguageIcons.METHOD_PACKAGE, "methodPackage.png");
+        cache.put(LanguageIcons.METHOD_PRIVATE, "methodPrivate.gif");
+        cache.put(LanguageIcons.METHOD_PROTECTED, "methodProtected.png");
+        cache.put(LanguageIcons.METHOD_PUBLIC, "methodPublic.png");
+        cache.put(LanguageIcons.METHOD_PACKAGE_STATIC, "methodStPackage.png");
+        cache.put(LanguageIcons.METHOD_PRIVATE_STATIC, "methodStPrivate.png");
+        cache.put(LanguageIcons.METHOD_PROTECTED_STATIC, "methodStProtected.png");
+        cache.put(LanguageIcons.METHOD_PUBLIC_STATIC, "methodStPublic.png");
+        cache.put(LanguageIcons.METHODS, "methods.png");
+        cache.put(LanguageIcons.PACKAGE, "package.png");
+        cache.put(LanguageIcons.VARIABLE_PACKAGE, "variablePackage.png");
+        cache.put(LanguageIcons.VARIABLE_PRIVATE, "variablePrivate.gif");
+        cache.put(LanguageIcons.VARIABLE_PROTECTED, "variableProtected.png");
+        cache.put(LanguageIcons.VARIABLE_PUBLIC, "variablePublic.png");
+        cache.put(LanguageIcons.VARIABLE_PACKAGE_STATIC, "variableStPackage.png");
+        cache.put(LanguageIcons.VARIABLE_PRIVATE_STATIC, "variableStPrivate.png");
+        cache.put(LanguageIcons.VARIABLE_PROTECTED_STATIC, "variableStProtected.png");
+        cache.put(LanguageIcons.VARIABLE_PUBLIC_STATIC, "variableStPublic.png");
+        cache.put(LanguageIcons.VARIABLES, "variables.png");
     }
     
 }
