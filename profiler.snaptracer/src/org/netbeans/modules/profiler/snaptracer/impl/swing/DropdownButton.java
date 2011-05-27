@@ -93,7 +93,6 @@ public final class DropdownButton extends JToggleButton {
             public void popupMenuCanceled(PopupMenuEvent e) {}
         });
         popup.show(this, getWidth() - popup.getPreferredSize().width, getHeight());
-//        popup.show(this, 0, getHeight());
     }
 
     private void addAction(JPopupMenu popup, Action action) {

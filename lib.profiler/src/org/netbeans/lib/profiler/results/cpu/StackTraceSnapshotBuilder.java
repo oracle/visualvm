@@ -75,6 +75,7 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("java.lang.Object", "wait[native]"), // NOI18N
         new MethodInfo("java.lang.Thread", "sleep[native]"), // NOI18N
         new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0[native]"), // NOI18N
+        new MethodInfo("java.lang.ProcessImpl","waitFor[native]"), // NOI18N
     });
 
     private InstrumentationFilter filter;

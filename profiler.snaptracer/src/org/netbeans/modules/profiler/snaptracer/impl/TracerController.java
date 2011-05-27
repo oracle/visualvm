@@ -92,7 +92,6 @@ final class TracerController  {
     private String error;
     private boolean wasNegativeValue;
 
-//    private boolean running;
     private RequestProcessor processor;
 
 
@@ -183,11 +182,6 @@ final class TracerController  {
     }
     
     private void doPerformSession() {
-//        try {
-//            System.err.println(">>> Thread dump: " + model.getSnapshot().getThreadDump(100));
-//        } catch (IOException ex) {
-//            Exceptions.printStackTrace(ex);
-//        }
         int samples = model.getSamplesCount();
         for (int i = 0; i < samples; i++) fetchData(i);
     }
@@ -413,7 +407,6 @@ final class TracerController  {
     }
     
     private void fetchData(final int sampleIndex) {
-//        if (!running) return;
         
         final List<TracerProbe> probes = model.getDefinedProbes();
         if (probes.isEmpty()) return;
@@ -425,12 +418,10 @@ final class TracerController  {
     }
 
     private void fetchDataImpl(List<TracerProbe> probes, int itemsCount, int sampleIndex) {
-//        if (!running) return;
 
         final long[] values = new long[itemsCount];
         int currentIndex = 0;
 
-//        final long timestamp = System.currentTimeMillis();
         final long timestamp = model.getTimestamp(sampleIndex);
         
         for (TracerProbe probe : probes) {
@@ -461,11 +452,9 @@ final class TracerController  {
             }
         }
 
-//        if (!running) return;
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-//                if (!running) return;
                 
                 model.getTimelineSupport().addValues(timestamp, values);
             }

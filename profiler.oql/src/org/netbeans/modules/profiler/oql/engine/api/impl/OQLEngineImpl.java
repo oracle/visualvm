@@ -56,6 +56,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.OQLQuery;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
 
@@ -207,6 +208,10 @@ public class OQLEngineImpl {
 
     public void cancelQuery() throws OQLException {
         cancelled.set(true);
+    }
+    
+    public boolean isCancelled() {
+        return cancelled.get();
     }
 
     private void executeQuery(OQLQueryImpl q, ObjectVisitor visitor)
