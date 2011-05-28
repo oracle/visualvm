@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.utils;
 
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
@@ -54,13 +53,20 @@ import org.openide.util.NbBundle;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.openide.DialogDisplayer;
+import org.openide.cookies.OpenCookie;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObjectNotFoundException;
+import org.openide.util.Exceptions;
 
 
 /**
- * Miscelaneous utilities for the NetBeans integration.
+ * Miscellaneous utilities for the NetBeans integration.
  *
  * @author Tomas Hurka
  * @author Ian Formanek
@@ -177,7 +183,7 @@ public final class Utilities {
         final DialogDescriptor dd = new DialogDescriptor(selectClassPanel, SELECT_CLASS_DIALOG_CAPTION, true,
                                                          new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                          DialogDescriptor.BOTTOM_ALIGN, null, null);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
 
         if (dd.getValue() == okButton) {
@@ -191,4 +197,22 @@ public final class Utilities {
 
         return null;
     }
+
+    public static void openSnapshot(File snapshot) {
+        File sf = FileUtil.normalizeFile(snapshot);
+        FileObject snapshotFo = FileUtil.toFileObject(sf);
+        
+        try {
+            DataObject snapshotDo = DataObject.find(snapshotFo);
+            OpenCookie open = snapshotDo.getCookie(OpenCookie.class);
+            if (open != null) {
+                open.open();
+            }
+        } catch (DataObjectNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+    
+
+
 }
