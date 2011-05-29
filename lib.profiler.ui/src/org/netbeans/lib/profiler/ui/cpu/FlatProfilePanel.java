@@ -68,6 +68,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 
 
 /**
@@ -912,17 +914,13 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         filterComponent = new FilterComponent();
 
         //filterComponent.setEmptyFilterText("[Method Name Filter]");
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/filterStartsWith.png") // NOI18N
-        ), STARTS_WITH_STRING, CommonConstants.FILTER_STARTS_WITH);
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/filterContains.png") // NOI18N
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
+                STARTS_WITH_STRING, CommonConstants.FILTER_STARTS_WITH);
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS
         ), CONTAINS_STRING, CommonConstants.FILTER_CONTAINS);
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/filterEndsWith.png") // NOI18N
-        ), ENDS_WITH_STRING, CommonConstants.FILTER_ENDS_WITH);
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/filterRegExp.png")), // NOI18N
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
+                ENDS_WITH_STRING, CommonConstants.FILTER_ENDS_WITH);
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP), // NOI18N
                                       REGEXP_STRING, CommonConstants.FILTER_REGEXP);
         //filterComponent.addSeparatorItem();
         filterComponent.setFilterValues(filterString, filterType);

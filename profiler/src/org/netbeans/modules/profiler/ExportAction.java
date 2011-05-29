@@ -57,14 +57,14 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
 import org.openide.util.ImageUtilities;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -248,16 +248,13 @@ public final class ExportAction extends AbstractAction {
 
     private boolean checkFileExists(File file) {
         if (file.exists()) {
-            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(
-                        MessageFormat.format(OVERWRITE_FILE_CAPTION,new Object[] { file.getName() }),
-                        OVERWRITE_FILE_CAPTION,
-                        NotifyDescriptor.YES_NO_OPTION)
-                    ) != NotifyDescriptor.YES_OPTION) {
+            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(
+                    OVERWRITE_FILE_CAPTION,new Object[] { file.getName() }),
+                    OVERWRITE_FILE_CAPTION))
                 return false; // cancelled by the user
-            }
 
             if (!file.delete()) {
-                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
+                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
                 return false;
             }
         }
@@ -275,7 +272,7 @@ public final class ExportAction extends AbstractAction {
         if (exportDir != null) {
             chooser.setCurrentDirectory(exportDir);
         }
-        int result = chooser.showSaveDialog(IDEUtils.getMainWindow());
+        int result = chooser.showSaveDialog(WindowManager.getDefault().getMainWindow());
         if (result != JFileChooser.APPROVE_OPTION) {
             return null; // cancelled by the user
         }
@@ -328,7 +325,7 @@ public final class ExportAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent evt) {
         if (!exportProvider.hasExportableView() && !exportProvider.hasLoadedSnapshot()) { // nothing to export
-            NetBeansProfiler.getDefaultNB().displayError(NO_VIEW_MSG);
+            ProfilerDialogs.displayError(NO_VIEW_MSG);
             return;
         }
 
@@ -372,7 +369,7 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
 
-            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         ProgressHandle pHandle = null;
                         pHandle = ProgressHandleFactory.createHandle(EXPORTING_VIEW_MSG);
@@ -385,12 +382,12 @@ public final class ExportAction extends AbstractAction {
                             ExportDataDumper eDD = new ExportDataDumper(fo);
                             exportProvider.exportData(exportedFileType, eDD);
                             if (eDD.getCaughtException()!=null) {
-                                NetBeansProfiler.getDefaultNB().displayError(eDD.getNumExceptions()+IOEXCEPTION_EXPORTING_MSG);
+                                ProfilerDialogs.displayError(eDD.getNumExceptions()+IOEXCEPTION_EXPORTING_MSG);
                             }
                         } catch (FileNotFoundException ex) {
                             ex.printStackTrace();
                         } catch (OutOfMemoryError e) {
-                            NetBeansProfiler.getDefaultNB().displayError(OOME_EXPORTING_MSG+e.getMessage());
+                            ProfilerDialogs.displayError(OOME_EXPORTING_MSG+e.getMessage());
                         } finally {
                             if (pHandle != null) {
                                 pHandle.finish();

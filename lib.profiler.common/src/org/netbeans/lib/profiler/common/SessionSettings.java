@@ -233,7 +233,7 @@ public final class SessionSettings {
         return sb.toString();
     }
 
-    public void load(Map props) {
+    public void load(Map props) throws IllegalArgumentException {
         setMainClass(getProperty(props, PROP_CLASS_NAME, "")); //NOI18N
         setMainClassPath(getProperty(props, PROP_CLASS_PATH, "")); //NOI18N
         setMainArgs(getProperty(props, PROP_ARGS, "")); //NOI18N
@@ -247,8 +247,8 @@ public final class SessionSettings {
         try {
             setSystemArchitecture(Integer.parseInt(arch));
         } catch (NumberFormatException e) {
-            Profiler.getDefault().displayWarning(INCORRECT_ARCH_MSG);
             architecture = 32;
+            throw new IllegalArgumentException(INCORRECT_ARCH_MSG, e);
         }
 
         String port = getProperty(props, PROP_PORT_NO, "5140"); //NOI18N
@@ -256,8 +256,8 @@ public final class SessionSettings {
         try {
             setPortNo(Integer.parseInt(port));
         } catch (NumberFormatException e) {
-            Profiler.getDefault().displayWarning(INCORRECT_PORT_MSG);
             portNo = 5140;
+            throw new IllegalArgumentException(INCORRECT_PORT_MSG, e);
         }
     }
 
