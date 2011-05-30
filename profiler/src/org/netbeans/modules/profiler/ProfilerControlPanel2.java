@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler;
 
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import java.util.Arrays;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
@@ -63,14 +64,10 @@ import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.SnippetPanel;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.*;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -107,7 +104,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicComboBoxUI;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.netbeans.modules.profiler.utils.Utilities;
 
 
 /**
@@ -723,20 +723,20 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         public void actionPerformed(final ActionEvent e) {
             if ((e.getSource() == takeCPUSnapshotButton) || (e.getSource() == takeFragmentSnapshotButton)) {
-                IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                         public void run() {
                             ResultsManager.getDefault().takeSnapshot();
                         }
                     });
             } else if (e.getSource() == takeMemorySnapshotButton) {
                 if (TAKE_SNAPSHOT_BUTTON_NAME.equals(e.getActionCommand())) {
-                    IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                             public void run() {
                                 ResultsManager.getDefault().takeSnapshot();
                             }
                         });
                 } else {
-                    IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                             public void run() {
                                 SharedClassObject.findObject(HeapDumpAction.class, true).dumpToProject();
                             }
@@ -947,9 +947,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
                                 String fileName = fo.getName();
 
-                                if (HeapWalkerManager.getDefault().isHeapWalkerOpened(FileUtil.toFile(fo))) {
-                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
-                                }
+//  TTTT                          if (HeapWalkerManager.getDefault().isHeapWalkerOpened(FileUtil.toFile(fo))) {
+//                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
+//                                }
 
                                 if (fileName.startsWith("heapdump-")) { // NOI18N
 
@@ -1043,10 +1043,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                             final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
 
-                            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation( //"Do you really want to delete selected snapshot"
-                                                                                              //+ ((selectedSnapshotFiles.length > 1) ? "s" : "")
-                                                                                              //+ " from disk?\nYou will not be able to undo this operation.",
-                                CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION, NotifyDescriptor.YES_NO_OPTION)) == NotifyDescriptor.YES_OPTION) {
+                            if (ProfilerDialogs.displayConfirmation(CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION)) {
                                 RequestProcessor.getDefault().post(new Runnable() {
                                         public void run() {
                                             deleteSnapshots(selectedSnapshotFiles);
@@ -1162,10 +1159,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             } else if (e.getSource() == deleteButton) {
                 final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
 
-                if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation( //"Do you really want to delete selected snapshot"
-                                                                                  //+ ((selectedSnapshotFiles.length > 1) ? "s" : "")
-                                                                                  //+ " from disk?\nYou will not be able to undo this operation.",
-                    CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION, NotifyDescriptor.YES_NO_OPTION)) == NotifyDescriptor.YES_OPTION) {
+                if (ProfilerDialogs.displayConfirmation(CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION)) {
                     RequestProcessor.getDefault().post(new Runnable() {
                             public void run() {
                                 deleteSnapshots(selectedSnapshotFiles);
@@ -1248,7 +1242,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 if (selectedSnapshotFileExt.equalsIgnoreCase(ResultsManager.SNAPSHOT_EXTENSION)) {
                     ResultsManager.getDefault().deleteSnapshot(selectedSnapshots[i]);
                 } else if (selectedSnapshotFileExt.equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
-                    HeapWalkerManager.getDefault().deleteHeapDump(FileUtil.toFile(selectedSnapshotFile));
+// TTTTT            HeapWalkerManager.getDefault().deleteHeapDump(FileUtil.toFile(selectedSnapshotFile));
                 }
             }
         }
@@ -1278,7 +1272,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                     RequestProcessor.getDefault().post(new Runnable() {
                             public void run() {
                                 try {
-                                    HeapWalkerManager.getDefault().openHeapWalker(FileUtil.toFile(selectedSnapshotFile));
+                                    Utilities.openSnapshot(FileUtil.toFile(selectedSnapshotFile));
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
@@ -1330,7 +1324,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
                 @Override
                 protected void nonResponding() {
-                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
                         @Override
                         public void run() {
                             list.setEnabled(false);
@@ -1886,7 +1880,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     }
 
     public static synchronized void closeIfOpened() {
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        ProfilerUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (defaultInstance != null && defaultInstance.isOpened()) defaultInstance.close();
             }
