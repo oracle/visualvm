@@ -87,6 +87,8 @@ public class InstancesListController extends AbstractController {
         public String getRetainedSize();
 
         public String getSize();
+        
+        public long getID();
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -134,6 +136,11 @@ public class InstancesListController extends AbstractController {
             }
 
             return instancePath;
+        }
+
+        @Override
+        public long getID() {
+            return getJavaClass().getJavaClassId();
         }
 
         public JavaClass getJavaClassByID(long javaclassId) {
@@ -313,7 +320,11 @@ public class InstancesListController extends AbstractController {
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
-
+        @Override
+        public long getID() {
+            return getSelectedInstance().getInstanceId();
+        }
+        
         public TreePath getInstancePath(Instance instance) {
             TreePath instancePath = null;
 
@@ -451,6 +462,11 @@ public class InstancesListController extends AbstractController {
             return instance;
         }
 
+        @Override
+        public long getID() {
+            return getInstance().getInstanceId();
+        }
+
         public TreePath getInstancePath(Instance inst) {
             TreePath instancePath = null;
 
@@ -559,10 +575,12 @@ public class InstancesListController extends AbstractController {
                 case 0:
                     return Integer.valueOf(instance1.getInstanceNumber()).compareTo(Integer.valueOf(instance2.getInstanceNumber()));
                 case 1:
-                    return Integer.valueOf(instance1.getSize()).compareTo(Integer.valueOf(instance2.getSize()));
+                    return Long.valueOf(instance1.getInstanceId()).compareTo(Long.valueOf(instance2.getInstanceId()));
                 case 2:
-                    return Integer.valueOf(instance1.getRetainedSize()).compareTo(Integer.valueOf(instance2.getRetainedSize()));
+                    return Integer.valueOf(instance1.getSize()).compareTo(Integer.valueOf(instance2.getSize()));
                 case 3:
+                    return Integer.valueOf(instance1.getRetainedSize()).compareTo(Integer.valueOf(instance2.getRetainedSize()));
+                case 4:
                     return Integer.valueOf(instance1.getReachableSize()).compareTo(Integer.valueOf(instance2.getReachableSize()));
                 default:
                     throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N

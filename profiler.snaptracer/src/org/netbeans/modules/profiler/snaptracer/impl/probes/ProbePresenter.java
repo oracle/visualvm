@@ -77,8 +77,6 @@ public final class ProbePresenter extends JLabel {
         super(d.getProbeName(), d.getProbeIcon(), JLabel.LEADING);
         
         // --- ToolTips support
-        // Note: cannot use setToolTipText here, breaks mouseListener on parent
-//        setToolTipText(d.getProbeDescription());
         // Let's store the tooltip in client property and resolve it from parent
         putClientProperty("ToolTipHelper", d.getProbeDescription()); // NOI18N
         // ---
