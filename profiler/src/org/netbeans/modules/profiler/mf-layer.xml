@@ -254,11 +254,6 @@ made subject to such option by the copyright holder.
                 <attr name="position" intvalue="1400"/>
                 <attr name="ergonomics" boolvalue="true"/>
             </file>
-            <file name="org-netbeans-modules-profiler-OpenHeapWalkerAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance"/>
-                <attr name="position" intvalue="1500"/>
-                <attr name="ergonomics" boolvalue="true"/>
-            </file>
             <file name="org-netbeans-modules-profiler-actions-CompareSnapshotsAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-CompareSnapshotsAction.instance"/>
                 <attr name="position" intvalue="1600"/>
@@ -372,13 +367,20 @@ made subject to such option by the copyright holder.
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
             </file>
-            <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance">
-                <attr name="delegate" newvalue="org.netbeans.modules.profiler.heapwalk.ui.OpenHeapWalkerAction"/>
-                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.heapwalk.ui.Bundle#OpenHeapWalkerAction_ActionName"/>
-                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/impl/icons/memory.png"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
-                <attr name="noIconInMenu" boolvalue="false"/>
-            </file>
+            <file name="org-netbeans-modules-profiler-actions-AddRootMethodAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-SelectJavaRootMethodsAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-ControlPanelAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-ShowLiveResultsWindowAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-ShowTelemetryViewAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance"/>
+
+            <file name="org-netbeans-modules-profiler-actions-RerunAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-StopAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-ProfileSingleAction.instance">
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSingle"/>
             </file>

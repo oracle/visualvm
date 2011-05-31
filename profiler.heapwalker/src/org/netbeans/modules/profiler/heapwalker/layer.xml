@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
+    <folder name="Actions">
+        <folder name="Profile">
+            <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance">
+                <attr name="delegate" newvalue="org.netbeans.modules.profiler.heapwalk.ui.OpenHeapWalkerAction"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.heapwalk.ui.Bundle#OpenHeapWalkerAction_ActionName"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/impl/icons/memory.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+        </folder>
+    </folder>
     <folder name="Loaders">
         <folder name="text">
             <folder name="x-netbeans-profiler-hprof">
@@ -13,6 +24,15 @@
                     </file>
                 </folder>
             </folder>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="Profile">
+            <file name="org-netbeans-modules-profiler-OpenHeapWalkerAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance"/>
+                <attr name="position" intvalue="1500"/>
+                <attr name="ergonomics" boolvalue="true"/>
+            </file>
         </folder>
     </folder>
     <folder name="Services">
