@@ -122,7 +122,7 @@ public final class IconsProviderImpl extends IconsProvider {
         cache.put(GeneralIcons.STOP, "stop.png");
         cache.put(GeneralIcons.EMPTY, "empty.gif");
         cache.put(GeneralIcons.ERROR, "error.png");
-        cache.put(GeneralIcons.FIND, "find.png");
+        cache.put(GeneralIcons.FIND, "find.gif");
         cache.put(GeneralIcons.SLAVE_DOWN, "slaveDown.png");
         cache.put(GeneralIcons.SLAVE_UP, "slaveUp.png");
         cache.put(GeneralIcons.UPDATE_AUTO, "autoRefresh.png");
