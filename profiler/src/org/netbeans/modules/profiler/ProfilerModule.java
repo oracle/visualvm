@@ -47,13 +47,13 @@ import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
+//import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.NotifyDescriptor;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.NbBundle;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsWindow;
 
 
@@ -90,21 +90,13 @@ public final class ProfilerModule extends ModuleInstall {
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(EXITING_FROM_PROFILE_MESSAGE,
-                                                                             QUESTION_DIALOG_CAPTION,
-                                                                             NotifyDescriptor.YES_NO_OPTION);
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(EXITING_FROM_PROFILE_MESSAGE, QUESTION_DIALOG_CAPTION)) {
                     return false;
                 }
 
                 Profiler.getDefault().stopApp();
             } else {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(EXITING_FROM_ATTACH_MESSAGE,
-                                                                             QUESTION_DIALOG_CAPTION,
-                                                                             NotifyDescriptor.YES_NO_OPTION);
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(EXITING_FROM_ATTACH_MESSAGE, QUESTION_DIALOG_CAPTION)) {
                     return false;
                 }
 
@@ -174,12 +166,11 @@ public final class ProfilerModule extends ModuleInstall {
                         // force closing of all windows
                         ProfilerControlPanel2.closeIfOpened();
                         TelemetryOverviewPanel.closeIfOpened();
-                        DrillDownWindow.closeIfOpened();
                         LiveResultsWindow.closeIfOpened();
                         TelemetryWindow.closeIfOpened();
                         ThreadsWindow.closeIfOpened();
                         SnapshotResultsWindow.closeAllWindows();
-                        HeapWalkerManager.getDefault().closeAllHeapWalkers();
+//                        HeapWalkerManager.getDefault().closeAllHeapWalkers();
                         ProfilingPointsWindow.closeIfOpened();
 
                         // perform any shutdown

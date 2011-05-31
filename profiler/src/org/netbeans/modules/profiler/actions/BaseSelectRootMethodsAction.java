@@ -47,9 +47,8 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
@@ -58,6 +57,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.actions.NodeAction;
 import java.util.ArrayList;
 import java.util.List;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.panels.ClassSelectRootMethodsPanel;
 import org.openide.filesystems.FileObject;
 
@@ -130,7 +130,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
                         List<ProfilingSettings> cpuSettings = new ArrayList();
 
                         for (ProfilingSettings settings : projectSettings) {
-                            if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                            if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
                                 cpuSettings.add(settings);
                             }
                         }
@@ -165,7 +165,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
                             ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
                         }
                     } else {
-                        NetBeansProfiler.getDefaultNB().displayError(NO_CLASS_FOUND_MSG);
+                        ProfilerDialogs.displayError(NO_CLASS_FOUND_MSG);
                     }
                 }
             }.execute();

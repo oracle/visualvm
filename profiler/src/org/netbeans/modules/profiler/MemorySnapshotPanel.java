@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
@@ -73,7 +72,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.utils.VMUtils;
-import org.netbeans.modules.profiler.ui.Utils;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
 
@@ -94,12 +96,12 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
         public void showSourceForMethod(String className, String methodName, String methodSig) {
             // Check if primitive type/array
             if ((methodName == null && methodSig == null) && (VMUtils.isVMPrimitiveType(className) ||
-                 VMUtils.isPrimitiveType(className))) Profiler.getDefault().displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
+                 VMUtils.isPrimitiveType(className))) ProfilerDialogs.displayWarning(CANNOT_SHOW_PRIMITIVE_SRC_MSG);
             // Check if allocated by reflection
             else if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName))
-                     Profiler.getDefault().displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
+                     ProfilerDialogs.displayWarning(CANNOT_SHOW_REFLECTION_SRC_MSG);
             // Display source
-            else NetBeansProfiler.getDefaultNB().openJavaSource(project, className, methodName, methodSig);
+            else GoToSource.openSource(project, className, methodName, methodSig);
         }
 
         public void showStacksForClass(int selectedClassId, int sortingColumn, boolean sortingOrder) {
@@ -214,7 +216,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
         
         if (findActionPresenter instanceof AbstractButton) {
             AbstractButton ab = (AbstractButton)findActionPresenter;
-            ab.setIcon(Utils.FIND_ACTION_ICON);
+            ab.setIcon(Icons.getIcon(GeneralIcons.FIND));
             ab.setText(""); // NOI18N
             ab.setToolTipText(FIND_ACTION_TOOLTIP);
         }
@@ -342,7 +344,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             if (reversePanel != null) reversePanel.setFindString(findString);
 
             if (!memoryPanel.findFirst()) {
-                NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
             }
         } else if (tabs.getSelectedComponent() == reversePanel) {
             String findString = FindDialog.getFindString();
@@ -355,7 +357,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             reversePanel.setFindString(findString);
 
             if (!reversePanel.findFirst()) {
-                NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
             }
         }
     }
@@ -374,7 +376,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
 
             if (!memoryPanel.findNext()) {
-                NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
             }
         } else if (tabs.getSelectedComponent() == reversePanel) {
             if (!reversePanel.isFindStringDefined()) {
@@ -389,7 +391,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
 
             if (!reversePanel.findNext()) {
-                NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
             }
         }
     }
@@ -408,7 +410,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
 
             if (!memoryPanel.findPrevious()) {
-                NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
             }
         }
 
@@ -425,7 +427,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
 
             if (!reversePanel.findPrevious()) {
-                NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
             }
         }
     }
