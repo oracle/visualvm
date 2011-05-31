@@ -132,6 +132,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.loadgen</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>
                 <friend>org.netbeans.modules.profiler.options</friend>
+                <friend>org.netbeans.modules.profiler.oql</friend>
                 <friend>org.netbeans.modules.profiler.ppoints</friend>
                 <friend>org.netbeans.modules.profiler.selector.java</friend>
                 <friend>org.netbeans.modules.profiler.selector.spi</friend>

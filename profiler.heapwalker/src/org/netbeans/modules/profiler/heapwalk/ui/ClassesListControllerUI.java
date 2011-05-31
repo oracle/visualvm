@@ -82,6 +82,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -97,11 +98,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.modules.profiler.api.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.RequestProcessor;
 
@@ -267,7 +270,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     private static final String CLASSES_TABLE_ACCESS_DESCR = NbBundle.getMessage(ClassesListControllerUI.class,
                                                                                   "ClassesListControllerUI_ClassesTableAccessDescr"); // NOI18N
                                                                                                                                        // -----
-    private static ImageIcon ICON_CLASSES = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/classes.png", false); // NOI18N
+    private static Icon ICON_CLASSES = Icons.getIcon(HeapWalkerIcons.CLASSES);
     private static String filterValue = ""; // NOI18N
     private static int filterType = CommonConstants.FILTER_CONTAINS;
 
@@ -499,7 +502,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/hideColumn.png", false)); // NOI18N
+        final JButton cornerButton = new JButton(Icons.getIcon(GeneralIcons.HIDE_COLUMN));
         cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
         cornerButton.setDefaultCapable(false);
 
@@ -690,21 +693,17 @@ public class ClassesListControllerUI extends JTitledPanel {
         setColumnsData();
 
         filterComponent = new FilterComponent();
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/filterStartsWith.png") // NOI18N
-        ), FILTER_STARTS_WITH, CommonConstants.FILTER_STARTS_WITH);
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/filterContains.png") // NOI18N
-        ), FILTER_CONTAINS, CommonConstants.FILTER_CONTAINS);
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/filterEndsWith.png") // NOI18N
-        ), FILTER_ENDS_WITH, CommonConstants.FILTER_ENDS_WITH);
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/filterRegExp.png") // NOI18N
-        ), FILTER_REGEXP, CommonConstants.FILTER_REGEXP);
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
+                FILTER_STARTS_WITH, CommonConstants.FILTER_STARTS_WITH);
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS),
+                FILTER_CONTAINS, CommonConstants.FILTER_CONTAINS);
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
+                FILTER_ENDS_WITH, CommonConstants.FILTER_ENDS_WITH);
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP),
+                FILTER_REGEXP, CommonConstants.FILTER_REGEXP);
         filterComponent.addFilterItem(Icons.getImageIcon(LanguageIcons.CLASS),
-                                      hasProjectContext ? FILTER_IMPLEMENTATION : FILTER_SUBCLASS,
-                                      classesListController.FILTER_SUBCLASS);
+                hasProjectContext ? FILTER_IMPLEMENTATION : FILTER_SUBCLASS,
+                classesListController.FILTER_SUBCLASS);
         filterComponent.setEmptyFilterText(DEFAULT_FILTER_TEXT);
         filterComponent.setFilterValues(filterValue, filterType);
         filterComponent.addFilterListener(new FilterComponent.FilterListener() {
@@ -730,7 +729,8 @@ public class ClassesListControllerUI extends JTitledPanel {
         HTMLTextArea hintArea = new HTMLTextArea();
         hintArea.setBorder(BorderFactory.createEmptyBorder(10, 8, 8, 8));
 
-        String hintText = "<img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/progress.png'>&nbsp;&nbsp;"
+        String progressRes = Icons.getResource(HeapWalkerIcons.PROGRESS);
+        String hintText = "<img border='0' align='bottom' src='nbresloc:/" + progressRes + "'>&nbsp;&nbsp;"
                           + FITERING_PROGRESS_TEXT; // NOI18N
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);

@@ -112,6 +112,8 @@ public final class IconsProviderImpl extends IconsProvider {
         cache.put(GeneralIcons.FIND_PREVIOUS, "findPrevious.png");
         cache.put(GeneralIcons.SAVE, "save.png");
         cache.put(GeneralIcons.SAVE_AS, "saveAs.png");
+        cache.put(GeneralIcons.SAVE_VIEW, "saveView.png");
+        cache.put(GeneralIcons.EXPORT, "saveAs.png");
         cache.put(GeneralIcons.DETACH, "detach.png");
         cache.put(GeneralIcons.PAUSE, "pause.png");
         cache.put(GeneralIcons.RERUN, "rerun.png");
@@ -120,12 +122,22 @@ public final class IconsProviderImpl extends IconsProvider {
         cache.put(GeneralIcons.EMPTY, "empty.gif");
         cache.put(GeneralIcons.ERROR, "error.png");
         cache.put(GeneralIcons.FIND, "find.png");
+        cache.put(GeneralIcons.SLAVE_DOWN, "slaveDown.png");
+        cache.put(GeneralIcons.SLAVE_UP, "slaveUp.png");
+        cache.put(GeneralIcons.UPDATE_AUTO, "autoRefresh.png");
+        cache.put(GeneralIcons.PIE, "pie.png");
+        cache.put(GeneralIcons.UPDATE_NOW, "updateNow.png");
+        cache.put(GeneralIcons.BUTTON_ATTACH, "attachButton.gif");
+        cache.put(GeneralIcons.BUTTON_RUN, "runButton.gif");
+        cache.put(GeneralIcons.UP, "up.png");
+        cache.put(GeneralIcons.DOWN, "down.png");
+        cache.put(GeneralIcons.FORWARD, "forward.png");
+        cache.put(GeneralIcons.BACK, "back.png");
         
         cache.put(ProfilerIcons.NODE_FORWARD, "forwardNode.png");
         cache.put(ProfilerIcons.NODE_REVERSE, "reverseNode.png");
         cache.put(ProfilerIcons.NODE_LEAF, "leafNode.png");
-        cache.put(ProfilerIcons.SNAPSHOT_MEMORY_24, "memorySnapshot24.png");
-        cache.put(ProfilerIcons.VIEW_THREADS_24, "threadsView24.png");
+        cache.put(ProfilerIcons.SNAPSHOT_MEMORY_32, "memorySnapshot32.png");
         cache.put(ProfilerIcons.THREAD, "thread.png");
         cache.put(ProfilerIcons.ALL_THREADS, "allThreads.png");
         cache.put(ProfilerIcons.ATTACH, "attach.png");
@@ -142,6 +154,44 @@ public final class IconsProviderImpl extends IconsProvider {
         cache.put(ProfilerIcons.LIVE_RESULTS, "liveResults.png");
         cache.put(ProfilerIcons.MODIFY_PROFILING, "modifyProfiling.png");
         cache.put(ProfilerIcons.SHOW_GRAPHS, "showGraphs.png");
+        cache.put(ProfilerIcons.SNAPSHOT_DO, "snapshotDataObject.png");
+        cache.put(ProfilerIcons.SNAPSHOT_DO_32, "snapshotDataObject32.png");
+        cache.put(ProfilerIcons.SNAPSHOT_CPU_DO, "snapshotDataObjectCPU.gif");
+        cache.put(ProfilerIcons.SNAPSHOT_CPU_DO_32, "snapshotDataObjectCPU32.gif");
+        cache.put(ProfilerIcons.SNAPSHOT_MEMORY_DO, "snapshotDataObjectMemory.gif");
+        cache.put(ProfilerIcons.SNAPSHOT_MEMORY_DO_32, "snapshotDataObjectMemory32.gif");
+        cache.put(ProfilerIcons.SNAPSHOT_FRAGMENT_DO, "snapshotDataObjectFragment.gif");
+        cache.put(ProfilerIcons.SNAPSHOT_FRAGMENT_DO_32, "snapshotDataObjectFragment32.gif");
+        cache.put(ProfilerIcons.TAKE_SNAPSHOT_CPU_32, "takeSnapshotCPU32.png");
+        cache.put(ProfilerIcons.TAKE_SNAPSHOT_FRAGMENT_32, "takeSnapshotFragment32.png");
+        cache.put(ProfilerIcons.TAKE_SNAPSHOT_MEMORY_32, "takeSnapshotMem32.png");
+        cache.put(ProfilerIcons.TAB_BACK_TRACES, "backTracesTab.png");
+        cache.put(ProfilerIcons.TAB_CALL_TREE, "callTreeTab.png");
+        cache.put(ProfilerIcons.TAB_COMBINED, "combinedTab.png");
+        cache.put(ProfilerIcons.TAB_HOTSPOTS, "hotspotsTab.png");
+        cache.put(ProfilerIcons.TAB_INFO, "infoTab.png");
+        cache.put(ProfilerIcons.TAB_MEMORY_RESULTS, "memoryResultsTab.png");
+        cache.put(ProfilerIcons.TAB_STACK_TRACES, "stackTracesTab.png");
+        cache.put(ProfilerIcons.TAB_SUBTREE, "subtreeTab.png");
+        cache.put(ProfilerIcons.WINDOW_CONTROL_PANEL, "controlPanelWindow.gif");
+        cache.put(ProfilerIcons.WINDOW_LIVE_RESULTS, "liveResultsWindow.png");
+        cache.put(ProfilerIcons.WINDOW_TELEMETRY, "telemetryWindow.png");
+        cache.put(ProfilerIcons.WINDOW_TELEMETRY_OVERVIEW, "telemetryOverviewWindow.png");
+        cache.put(ProfilerIcons.WINDOW_THREADS, "threadsWindow.png");
+        cache.put(ProfilerIcons.VIEW_LIVE_RESULTS_CPU_32, "liveResultsCPUView32.png");
+        cache.put(ProfilerIcons.VIEW_LIVE_RESULTS_FRAGMENT_32, "liveResultsFragmentView32.png");
+        cache.put(ProfilerIcons.VIEW_LIVE_RESULTS_MEMORY_32, "liveResultsMemView32.png");
+        cache.put(ProfilerIcons.VIEW_THREADS_32, "threadsView32.png");
+        cache.put(ProfilerIcons.VIEW_TELEMETRY_32, "telemetryView32.png");
+        cache.put(ProfilerIcons.CPU, "cpu.png");
+        cache.put(ProfilerIcons.CPU_32, "cpu32.png");
+        cache.put(ProfilerIcons.FRAGMENT, "fragment.png");
+        cache.put(ProfilerIcons.MEMORY, "memory.png");
+        cache.put(ProfilerIcons.MEMORY_32, "memory32.png");
+        cache.put(ProfilerIcons.CUSTOM_32, "custom32.png");
+        cache.put(ProfilerIcons.MONITORING, "monitoring.png");
+        cache.put(ProfilerIcons.MONITORING_32, "monitoring32.png");
+        cache.put(ProfilerIcons.STARTUP_32, "startup32.png");
         
         cache.put(LanguageIcons.CLASS, "class.png");
         cache.put(LanguageIcons.CONSTRUCTOR_PACKAGE, "constructorPackage.png");
@@ -172,6 +222,9 @@ public final class IconsProviderImpl extends IconsProvider {
         cache.put(LanguageIcons.VARIABLE_PROTECTED_STATIC, "variableStProtected.png");
         cache.put(LanguageIcons.VARIABLE_PUBLIC_STATIC, "variableStPublic.png");
         cache.put(LanguageIcons.VARIABLES, "variables.png");
+        cache.put(LanguageIcons.ARRAY, "array.png");
+        cache.put(LanguageIcons.INSTANCE, "instance.png");
+        cache.put(LanguageIcons.PRIMITIVE, "primitive.png");
     }
     
 }

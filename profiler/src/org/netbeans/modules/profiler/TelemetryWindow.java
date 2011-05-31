@@ -55,7 +55,6 @@ import org.netbeans.lib.profiler.ui.graphs.MemoryGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.SurvivingGenerationsGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.ThreadsGraphPanel;
 import org.openide.util.HelpCtx;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.awt.event.ActionEvent;
@@ -70,6 +69,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
@@ -340,7 +341,7 @@ public final class TelemetryWindow extends TopComponent {
     private static final String HELP_CTX_KEY = "TelemetryWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static TelemetryWindow defaultInstance;
-    private static final Image windowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png"); // NOI18N
+    private static final Image windowIcon = Icons.getImage(ProfilerIcons.WINDOW_TELEMETRY);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

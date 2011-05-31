@@ -72,6 +72,8 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String FIND_PREVIOUS = "GeneralIcons.FindPrevious";
     public static final String SAVE = "GeneralIcons.Save";
     public static final String SAVE_AS = "GeneralIcons.SaveAs";
+    public static final String SAVE_VIEW = "GeneralIcons.SaveView";
+    public static final String EXPORT = "GeneralIcons.Export";
     public static final String DETACH = "GeneralIcons.Detach";
     public static final String PAUSE = "GeneralIcons.Pause";
     public static final String RERUN = "GeneralIcons.Rerun";
@@ -80,5 +82,16 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String EMPTY = "GeneralIcons.Empty";
     public static final String ERROR = "GeneralIcons.Error";
     public static final String FIND = "GeneralIcons.Find";
+    public static final String SLAVE_DOWN = "GeneralIcons.SlaveDown";
+    public static final String SLAVE_UP = "GeneralIcons.SlaveUp";
+    public static final String UPDATE_AUTO = "GeneralIcons.UpdateAuto";
+    public static final String PIE = "GeneralIcons.Pie";
+    public static final String UPDATE_NOW = "GeneralIcons.UpdateNow";
+    public static final String BUTTON_ATTACH = "GeneralIcons.ButtonAttach";
+    public static final String BUTTON_RUN = "GeneralIcons.ButtonRun";
+    public static final String UP = "GeneralIcons.Up";
+    public static final String DOWN = "GeneralIcons.Down";
+    public static final String FORWARD = "GeneralIcons.Forward";
+    public static final String BACK = "GeneralIcons.Back";
     
 }

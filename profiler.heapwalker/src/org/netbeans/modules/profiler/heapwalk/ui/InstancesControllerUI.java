@@ -47,9 +47,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.modules.profiler.heapwalk.InstancesController;
 import org.netbeans.modules.profiler.heapwalk.LegendPanel;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.HierarchyEvent;
@@ -58,12 +56,14 @@ import java.net.URL;
 import java.text.MessageFormat;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.LanguageIcons;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 
 
 /**
@@ -75,17 +75,13 @@ public class InstancesControllerUI extends JPanel {
 
     // --- Presenter -------------------------------------------------------------
     private static class Presenter extends JToggleButton {
-        //~ Static fields/initializers -------------------------------------------------------------------------------------------
-
-        private static ImageIcon ICON_INSTANCE = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/instance.png", false); // NOI18N
-
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public Presenter() {
             super();
             setText(VIEW_CAPTION);
             setToolTipText(VIEW_DESCR);
-            setIcon(ICON_INSTANCE);
+            setIcon(BrowserUtils.ICON_INSTANCE);
             setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
         }
     }
@@ -199,9 +195,10 @@ public class InstancesControllerUI extends JPanel {
 
         hintArea.setBorder(BorderFactory.createEmptyBorder(10, 8, 8, 8));
 
+        String classesRes = Icons.getResource(LanguageIcons.CLASS);
         String hintText = MessageFormat.format(NO_CLASS_DEFINED_MSG,
                                                new Object[] {
-                                                   "<a href='#'><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/class.png'></a>"
+                                                   "<a href='#'><img border='0' align='bottom' src='nbresloc:/" + classesRes + "'></a>"
                                                }); // NOI18N
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);

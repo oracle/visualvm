@@ -48,18 +48,19 @@ import org.netbeans.modules.profiler.heapwalk.ClassesController;
 import org.netbeans.modules.profiler.heapwalk.LegendPanel;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.LanguageIcons;
 
 
 /**
@@ -73,7 +74,7 @@ public class ClassesControllerUI extends JPanel {
     private static class Presenter extends JToggleButton {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static ImageIcon ICON_CLASS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png", false); // NOI18N
+        private static Icon ICON_CLASS = Icons.getIcon(LanguageIcons.CLASS);
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 

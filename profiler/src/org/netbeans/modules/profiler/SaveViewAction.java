@@ -60,6 +60,8 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.windows.WindowManager;
@@ -136,7 +138,7 @@ class SaveViewAction extends AbstractAction {
                                                                           "SaveViewAction_SaveDialogVisible"); //NOI18N
     private static final String OOME_SAVING_MSG = NbBundle.getMessage(SaveViewAction.class, "SaveViewAction_OomeSavingMsg"); //NOI18N
                                                                                                                                    // -----
-    private static final ImageIcon ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/saveView.png", false); // NOI18N
+    private static final Icon ICON = Icons.getIcon(GeneralIcons.SAVE_VIEW);
     private static File exportDir;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -154,7 +156,7 @@ class SaveViewAction extends AbstractAction {
         putValue(Action.NAME, SAVE_VIEW_ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, SAVE_VIEW_ACTION_DESCR);
         putValue(Action.SMALL_ICON, ICON);
-        putValue("iconBase", "org/netbeans/modules/profiler/resources/export.png"); // NOI18N
+        putValue("iconBase", Icons.getResource(GeneralIcons.SAVE_VIEW));
         this.viewProvider = viewProvider;
     }
 

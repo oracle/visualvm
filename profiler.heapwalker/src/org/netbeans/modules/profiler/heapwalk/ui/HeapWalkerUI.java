@@ -51,6 +51,8 @@ import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 
 
 /**
@@ -115,7 +117,7 @@ public class HeapWalkerUI extends TopComponent {
 
     private void initDefaults() {
         setName(heapWalker.getName());
-        setIcon(ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png")); // NOI18N);
+        setIcon(Icons.getImage(ProfilerIcons.MEMORY));
         getAccessibleContext().setAccessibleDescription(COMPONENT_DESCR);
     }
 }

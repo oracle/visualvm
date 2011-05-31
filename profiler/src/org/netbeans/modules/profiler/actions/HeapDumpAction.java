@@ -84,7 +84,6 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.netbeans.modules.profiler.utils.Utilities;
 import org.openide.DialogDisplayer;
 import org.openide.windows.WindowManager;
 
@@ -493,11 +492,11 @@ public final class HeapDumpAction extends ProfilingAwareAction {
                                 // Heapdump saved, open in HeapWalker?
                                 if (ProfilerDialogs.displayConfirmationDNSA(SAVED_DIALOG_TEXT,
                                         SAVED_DIALOG_CAPTION, null, "HeapDumpAction.heapdumpSaved", false)) { //NOI18N
-                                    Utilities.openSnapshot(new File(dumpFileName));
+                                    ResultsManager.getDefault().openSnapshot(new File(dumpFileName));
                                 }
                             } else {
                                 if (ProfilerIDESettings.getInstance().getAutoOpenSnapshot()) {
-                                    Utilities.openSnapshot(new File(dumpFileName));
+                                    ResultsManager.getDefault().openSnapshot(new File(dumpFileName));
                                 }
                             }
                         } else {

@@ -111,7 +111,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         noContentPanel.setLayout(new BorderLayout());
         noContentPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        JLabel noContentIcon = new JLabel(Icons.getIcon(ProfilerIcons.SNAPSHOT_MEMORY_24));
+        JLabel noContentIcon = new JLabel(Icons.getIcon(ProfilerIcons.SNAPSHOT_MEMORY_32));
         noContentIcon.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 5));
         noContentIcon.setVerticalAlignment(SwingConstants.TOP);
         noContentIcon.setEnabled(false);

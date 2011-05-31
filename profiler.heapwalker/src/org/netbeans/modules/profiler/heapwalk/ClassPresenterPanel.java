@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.heapwalk;
 
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -53,13 +52,14 @@ import java.awt.FlowLayout;
 import java.net.URL;
 import java.text.MessageFormat;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.LanguageIcons;
 import org.openide.util.RequestProcessor;
 
 
@@ -108,7 +108,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
     private static final String RETAINED_SIZES_STRING = NbBundle.getMessage(ClassPresenterPanel.class,
                                                                         "ClassPresenterPanel_RetainedSizesString"); // NOI18N
                                                                                                                 // -----
-    private static ImageIcon ICON_CLASS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/class.png", false); // NOI18N
+    private static Icon ICON_CLASS = Icons.getIcon(LanguageIcons.CLASS);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

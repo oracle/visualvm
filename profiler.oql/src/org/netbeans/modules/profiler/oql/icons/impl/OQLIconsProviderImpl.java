@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -37,14 +37,55 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.profiler.oql.icons.impl;
 
-package org.netbeans.modules.profiler.utils;
+import java.awt.Image;
+import java.util.HashMap;
+import java.util.Map;
+import org.netbeans.modules.profiler.oql.icons.OQLIcons;
+import org.netbeans.modules.profiler.spi.IconsProvider;
+import org.openide.util.ImageUtilities;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-public interface SourceLocation {
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.spi.IconsProvider.class)
+public final class OQLIconsProviderImpl extends IconsProvider {
+    
+    private Map<String, String> images;
+
+    @Override
+    public Image getImage(String key) {
+        String resource = getResource(key);
+        return resource == null ? null : ImageUtilities.loadImage(resource, true);
+    }
+    
+    @Override
+    public String getResource(String key) {
+        return getImageCache().get(key);
+    }
+    
+    private Map<String, String> getImageCache() {
+        synchronized (this) {
+            if (images == null) {
+                final String packagePrefix = getClass().getPackage().getName().
+                                             replace('.', '/') + "/"; // NOI18N
+                images = new HashMap<String, String>() {
+                    public String put(String key, String value) {
+                        return super.put(key, packagePrefix + value);
+                    }
+                };
+                initImageCache(images);
+            }
+        }
+        return images;
+    }
+    
+    private static void initImageCache(Map<String, String> cache) {
+        cache.put(OQLIcons.OQL, "oql.png"); // NOI18N
+    }
+    
 }

@@ -81,7 +81,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
@@ -96,9 +96,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.api.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.RequestProcessor;
 
 
@@ -272,7 +275,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
     private static final String RETAINED_SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
                                                                                  "InstancesListControllerUI_RetainedSizeColumnDescr"); // NOI18N
     // -----
-    private static ImageIcon ICON_FIELDS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/data.png", false); // NOI18N
+    private static Icon ICON_FIELDS = Icons.getIcon(HeapWalkerIcons.DATA);
 
     // --- UI definition ---------------------------------------------------------
     private static final String DATA = "Data"; // NOI18N
@@ -477,7 +480,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/hideColumn.png", false)); // NOI18N
+        final JButton cornerButton = new JButton(Icons.getIcon(GeneralIcons.HIDE_COLUMN));
         cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
         cornerButton.setDefaultCapable(false);
 
@@ -738,15 +741,17 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         HTMLTextArea hintArea = new HTMLTextArea();
         hintArea.setBorder(BorderFactory.createEmptyBorder(10, 8, 8, 8));
 
+        String instancesRes = Icons.getResource(HeapWalkerIcons.INSTANCES);
+        String classesRes = Icons.getResource(HeapWalkerIcons.CLASSES);
         String hintText = (fieldsBrowserController.getRootMode() == FieldsBrowserController.ROOT_INSTANCE)
                           ? MessageFormat.format(NO_INSTANCE_SELECTED_MSG,
                                                  new Object[] {
-                                                     "<img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png'>" // NOI18N
+                                                     "<img border='0' align='bottom' src='nbresloc:/" + instancesRes + "'>" // NOI18N
                                                  })
                           :
         MessageFormat.format(NO_CLASS_SELECTED_MSG,
                              new Object[] {
-                                 "<img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/classes.png'>" // NOI18N
+                                 "<img border='0' align='bottom' src='nbresloc:/" + classesRes + "'>" // NOI18N
                              });
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);

@@ -57,7 +57,6 @@ import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.Utilities;
 import org.openide.windows.WindowManager;
 
 
@@ -176,7 +175,7 @@ public final class LoadSnapshotAction extends AbstractAction {
                 RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
                             for (File heapDump : heapdumpsFArr) {
-                                Utilities.openSnapshot(heapDump);
+                                ResultsManager.getDefault().openSnapshot(heapDump);
                             }
                         }
                     });

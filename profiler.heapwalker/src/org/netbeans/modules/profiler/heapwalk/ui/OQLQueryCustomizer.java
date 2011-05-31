@@ -58,6 +58,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -78,6 +79,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -123,10 +126,8 @@ public class OQLQueryCustomizer {
             OQLQueryCustomizer.class, "OQLQueryCustomizer_UpdateQueryLabelText"); // NOI18N
     // -----
 
-    private static ImageIcon ICON_UP = ImageUtilities.loadImageIcon(
-            "org/netbeans/modules/profiler/heapwalk/ui/resources/up.png", false); // NOI18N
-    private static ImageIcon ICON_DOWN = ImageUtilities.loadImageIcon(
-            "org/netbeans/modules/profiler/heapwalk/ui/resources/down.png", false); // NOI18N
+    private static Icon ICON_UP = Icons.getIcon(GeneralIcons.UP);
+    private static Icon ICON_DOWN = Icons.getIcon(GeneralIcons.DOWN);
 
 
     public static boolean saveQuery(final String query,

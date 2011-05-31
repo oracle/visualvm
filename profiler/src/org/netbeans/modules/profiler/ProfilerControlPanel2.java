@@ -65,11 +65,9 @@ import org.netbeans.lib.profiler.ui.components.SnippetPanel;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.*;
 import org.openide.ErrorManager;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.HelpCtx;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.SharedClassObject;
@@ -104,10 +102,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicComboBoxUI;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.netbeans.modules.profiler.utils.Utilities;
 
 
 /**
@@ -589,12 +589,12 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         private static final int CPU = 1;
         private static final int MEMORY = 2;
         private static final int FRAGMENT = 3;
-        private static final ImageIcon TAKE_SNAPSHOT_CPU_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/takeSnapshotCPU.png", false);
-        private static final ImageIcon TAKE_SNAPSHOT_MEMORY_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/takeSnapshotMem.png", false);
-        private static final ImageIcon TAKE_SNAPSHOT_FRAGMENT_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/takeSnapshotFragment.png", false);
-        private static final ImageIcon LIVE_RESULTS_CPU_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/liveResultsCPUView.png", false);
-        private static final ImageIcon LIVE_RESULTS_MEMORY_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/liveResultsMemView.png", false);
-        private static final ImageIcon LIVE_RESULTS_FRAGMENT_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/liveResultsFragmentView.png", false);
+        private static final Icon TAKE_SNAPSHOT_CPU_ICON = Icons.getIcon(ProfilerIcons.TAKE_SNAPSHOT_CPU_32);
+        private static final Icon TAKE_SNAPSHOT_MEMORY_ICON = Icons.getIcon(ProfilerIcons.TAKE_SNAPSHOT_MEMORY_32);
+        private static final Icon TAKE_SNAPSHOT_FRAGMENT_ICON = Icons.getIcon(ProfilerIcons.TAKE_SNAPSHOT_FRAGMENT_32);
+        private static final Icon LIVE_RESULTS_CPU_ICON = Icons.getIcon(ProfilerIcons.VIEW_LIVE_RESULTS_CPU_32);
+        private static final Icon LIVE_RESULTS_MEMORY_ICON = Icons.getIcon(ProfilerIcons.VIEW_LIVE_RESULTS_MEMORY_32);
+        private static final Icon LIVE_RESULTS_FRAGMENT_ICON = Icons.getIcon(ProfilerIcons.VIEW_LIVE_RESULTS_FRAGMENT_32);
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -638,7 +638,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                                                    DUMP_HEAP_BUTTON_NAME
                                                                                                },
                                                                                                new ImageIcon[] {
-                                                                                                   TAKE_SNAPSHOT_MEMORY_ICON
+                                                                                                   (ImageIcon)TAKE_SNAPSHOT_MEMORY_ICON
                                                                                                });
             UIUtils.fixButtonUI(takeMemorySnapshotButton);
             takeMemorySnapshotButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) takeMemorySnapshotButton
@@ -1272,7 +1272,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                     RequestProcessor.getDefault().post(new Runnable() {
                             public void run() {
                                 try {
-                                    Utilities.openSnapshot(FileUtil.toFile(selectedSnapshotFile));
+                                    ResultsManager.getDefault().openSnapshot(selectedSnapshotFile);
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
@@ -1576,7 +1576,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                                                         Color.LIGHT_GRAY),
                                                                new FlatToolBar.FlatMarginBorder());
 
-            vmTelemetryButton = new JButton(TELEMETRY_BUTTON_NAME, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/vmTelemetryView.png", false));
+            vmTelemetryButton = new JButton(TELEMETRY_BUTTON_NAME, Icons.getIcon(ProfilerIcons.VIEW_TELEMETRY_32));
             UIUtils.fixButtonUI(vmTelemetryButton);
             vmTelemetryButton.addActionListener(this);
             vmTelemetryButton.setContentAreaFilled(false);
@@ -1587,7 +1587,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             vmTelemetryButton.setBorder(myRolloverBorder);
             vmTelemetryButton.setToolTipText(TELEMETRY_BUTTON_TOOLTIP);
 
-            threadsButton = new JButton(THREADS_BUTTON_NAME, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/threadsView.png", false));
+            threadsButton = new JButton(THREADS_BUTTON_NAME, Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
             UIUtils.fixButtonUI(threadsButton);
             threadsButton.addActionListener(this);
             threadsButton.setContentAreaFilled(false);
@@ -1750,11 +1750,11 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     private static final String HELP_CTX_KEY = "ProfilerControlPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static ProfilerControlPanel2 defaultInstance;
-    private static final Image windowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/controlPanelWindow.gif"); // NOI18N
-    private static final ImageIcon cpuIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/cpuSmall.png", false); // NOI18N
-    private static final ImageIcon fragmentIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/fragmentSmall.png", false); // NOI18N
-    private static final ImageIcon memoryIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memorySmall.png", false); // NOI18N
-    private static final ImageIcon emptyIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/empty16.gif", false); // NOI18N
+    private static final Image windowIcon = Icons.getImage(ProfilerIcons.WINDOW_CONTROL_PANEL);
+    private static final Icon cpuIcon = Icons.getIcon(ProfilerIcons.CPU);
+    private static final Icon fragmentIcon = Icons.getIcon(ProfilerIcons.FRAGMENT);
+    private static final Icon memoryIcon = Icons.getIcon(ProfilerIcons.MEMORY);
+    private static final Icon emptyIcon = Icons.getIcon(GeneralIcons.EMPTY);
     private static final String ID = "profiler_cp"; // NOI18N // for winsys persistence
     private static final Integer EXTERNALIZABLE_VERSION_WITH_SNAPSHOTS = Integer.valueOf(3);
     

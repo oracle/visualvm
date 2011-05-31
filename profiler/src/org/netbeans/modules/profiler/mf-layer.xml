@@ -138,7 +138,7 @@ made subject to such option by the copyright holder.
                 </folder>
                 <folder name="Factories">
                     <file name="NpsDataLoader.instance">
-                        <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/resources/snapshotDataObject.png"/>
+                        <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png"/>
                         <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.ui.NpsDataObject"/>
                         <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
                         <attr name="mimeType" stringvalue="x-application/nps"/>
@@ -148,7 +148,7 @@ made subject to such option by the copyright holder.
              <folder name="x-netbeans-profiler-hprof">
                  <folder name="Factories">
                      <file name="HprofDataLoader.instance">
-                         <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/resources/snapshotDataObject.png"/>
+                         <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png"/>
                          <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.ui.HprofDataObject"/>
                          <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
                          <attr name="mimeType" stringvalue="x-application/hprof"/>
@@ -375,7 +375,7 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-heapwalk-ui-OpenHeapWalkerAction.instance">
                 <attr name="delegate" newvalue="org.netbeans.modules.profiler.heapwalk.ui.OpenHeapWalkerAction"/>
                 <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.heapwalk.ui.Bundle#OpenHeapWalkerAction_ActionName"/>
-                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/resources/memory.png"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/impl/icons/memory.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
             </file>

@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileChangeAdapter;
 import org.openide.filesystems.FileEvent;
 import org.openide.filesystems.FileObject;
@@ -56,7 +55,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.Utilities;
 
 
 /**
@@ -143,7 +141,7 @@ public class HeapDumpWatch {
         try {
             if (ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
                     this.getClass(), "OOME_PROTECTION_OPEN_HEAPDUMP"))) { // NOI18N
-                Utilities.openSnapshot(FileUtil.toFile(heapDump));
+                ResultsManager.getDefault().openSnapshot(heapDump);
             } else if (ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
                     this.getClass(), "OOME_PROTECTION_REMOVE_HEAPDUMP"))) { // NOI18N
                 heapDump.delete();

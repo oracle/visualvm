@@ -43,13 +43,17 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
+import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.*;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 
 
 /**
@@ -82,13 +86,13 @@ public class BrowserUtils {
     private static final String OUT_OF_MEMORY_MSG = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_OutOfMemoryMsg"); // NOI18N
     private static final String TRUNCATED_STRING = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_TruncatedMsg"); // NOI18N
                                                                                                                             // -----
-    public static final ImageIcon ICON_INSTANCE = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/instance.png", false); // NOI18N
-    public static final ImageIcon ICON_PRIMITIVE = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/primitive.png", false); // NOI18N
-    public static final ImageIcon ICON_ARRAY = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/array.png", false); // NOI18N
-    public static final ImageIcon ICON_PROGRESS = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/progress.png", false); // NOI18N
-    public static final ImageIcon ICON_STATIC = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/static.png", false); // NOI18N
-    public static final ImageIcon ICON_LOOP = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/loop.png", false); // NOI18N
-    public static final ImageIcon ICON_GCROOT = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/gcRoot.png", false); // NOI18N
+    public static final ImageIcon ICON_INSTANCE = Icons.getImageIcon(LanguageIcons.INSTANCE);
+    public static final ImageIcon ICON_PRIMITIVE = Icons.getImageIcon(LanguageIcons.PRIMITIVE);
+    public static final ImageIcon ICON_ARRAY = Icons.getImageIcon(LanguageIcons.ARRAY);
+    public static final ImageIcon ICON_PROGRESS = Icons.getImageIcon(HeapWalkerIcons.PROGRESS);
+    public static final ImageIcon ICON_STATIC = Icons.getImageIcon(HeapWalkerIcons.STATIC);
+    public static final ImageIcon ICON_LOOP = Icons.getImageIcon(HeapWalkerIcons.LOOP);
+    public static final ImageIcon ICON_GCROOT = Icons.getImageIcon(HeapWalkerIcons.GC_ROOT);
     private static final RequestProcessor requestProcessor = new RequestProcessor("HeapWalker Processor", 3); // NOI18N
 
     private static final int MAX_FULLNAME_LENGTH = 100;

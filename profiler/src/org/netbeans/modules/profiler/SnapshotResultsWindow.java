@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.openide.DialogDescriptor;
 import org.openide.actions.FindAction;
 import org.openide.cookies.SaveCookie;
 import org.openide.nodes.AbstractNode;
@@ -61,7 +60,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 
 
 /**
@@ -131,9 +132,9 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
     private static final String MEMORY_SNAPSHOT_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
                                                                                    "SnapshotResultsWindow_MemorySnapshotAccessDescr"); // NOI18N
                                                                                                                                        // -----
-    private static final Image WINDOW_ICON_CPU = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/cpu.png"); // NOI18N
-    private static final Image WINDOWS_ICON_FRAGMENT = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/fragment.png"); // NOI18N
-    private static final Image WINDOWS_ICON_MEMORY = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/memory.png"); // NOI18N
+    private static final Image WINDOW_ICON_CPU = Icons.getImage(ProfilerIcons.CPU);
+    private static final Image WINDOWS_ICON_FRAGMENT = Icons.getImage(ProfilerIcons.FRAGMENT);
+    private static final Image WINDOWS_ICON_MEMORY = Icons.getImage(ProfilerIcons.MEMORY);
     private static final HashMap /*<ResultsSnapshot, SnapshotResultsWindow>*/ windowsList = new HashMap();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

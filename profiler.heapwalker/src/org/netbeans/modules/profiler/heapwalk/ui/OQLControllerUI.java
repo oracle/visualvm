@@ -61,7 +61,7 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -85,13 +85,15 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.components.JTitledPanel;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.heapwalk.OQLController;
 import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.netbeans.modules.profiler.heapwalk.oql.ui.OQLEditor;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+import org.netbeans.modules.profiler.oql.icons.OQLIcons;
 import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -103,6 +105,8 @@ import org.openide.util.RequestProcessor;
  * @author Jaroslav Bachorik
  */
 public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
+    
+    private static Icon OQL_ICON = Icons.getIcon(OQLIcons.OQL);
 
 
     // --- Presenter -------------------------------------------------------------
@@ -110,7 +114,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
     private static class Presenter extends JToggleButton implements HelpCtx.Provider {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static ImageIcon ICON_INFO = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/oql.png", false); // NOI18N
+        private static Icon OQL_ICON = Icons.getIcon(OQLIcons.OQL);
 
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -118,7 +122,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             super();
             setText(CONTROLLER_NAME);
             setToolTipText(CONTROLLER_DESCR);
-            setIcon(ICON_INFO);
+            setIcon(OQL_ICON);
             setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
 
             addKeyListener(new KeyAdapter() {
@@ -249,8 +253,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private OQLController.ResultsController resultsController;
         private HTMLTextArea resultsArea;
 
-        private static ImageIcon ICON = ImageUtilities.loadImageIcon(
-                "org/netbeans/modules/profiler/heapwalk/ui/resources/properties.png", false); // NOI18N
+        private static Icon ICON = Icons.getIcon(HeapWalkerIcons.PROPERTIES);
 
         public ResultsUI(OQLController.ResultsController resultsController) {
             super(QUERY_RESULTS_CAPTION, ICON, true);
@@ -311,8 +314,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
         private boolean queryValid = true;
 
-        private static ImageIcon ICON = ImageUtilities.loadImageIcon(
-                "org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png", false); // NOI18N
+        private static Icon ICON = Icons.getIcon(HeapWalkerIcons.RULES);
 
         public QueryUI(OQLController.QueryController queryController, OQLEngine engine) {
             super(QUERY_EDITOR_CAPTION, ICON, true);
@@ -525,8 +527,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private boolean queriesLoaded = false;
 
 
-        private static ImageIcon ICON = ImageUtilities.loadImageIcon(
-                "org/netbeans/modules/profiler/heapwalk/ui/resources/savedOQL.png", false); // NOI18N
+        private static Icon ICON = Icons.getIcon(HeapWalkerIcons.SAVED_OQL_QUERIES);
 
         public SavedUI(OQLController.SavedController savedController) {
             super(SAVED_QUERIES_CAPTION, ICON, true);

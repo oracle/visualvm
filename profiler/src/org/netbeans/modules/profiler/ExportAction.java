@@ -50,13 +50,15 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.ErrorManager;
@@ -133,7 +135,7 @@ public final class ExportAction extends AbstractAction {
     private static final String OOME_EXPORTING_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_OomeExportingMsg"); //NOI18N
     private static final String IOEXCEPTION_EXPORTING_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_IOException_Exporting_Msg"); //NOI18N
     private static final String SNAPSHOT_CREATE_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,"ResultsManager_SnapshotCreateFailedMsg"); // NOI18N
-    private static final ImageIcon ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/export.png", false); // NOI18N
+    private static final Icon ICON = Icons.getIcon(GeneralIcons.EXPORT);
     private static final String FILE_EXTENSION_CSV = "csv"; // NOI18N
     private static final String FILE_EXTENSION_XML = "xml"; // NOI18N
     private static final String FILE_EXTENSION_HTML = "html"; // NOI18N
@@ -159,7 +161,7 @@ public final class ExportAction extends AbstractAction {
         putValue(Action.NAME, EXPORT_ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, EXPORT_ACTION_DESCRIPTION);
         putValue(Action.SMALL_ICON, ICON);
-        putValue("iconBase", "org/netbeans/modules/profiler/resources/export.png"); // NOI18N
+        putValue("iconBase", Icons.getResource(GeneralIcons.EXPORT)); // NOI18N
         this.exportProvider = exportProvider;
         if (!(loadedSnapshot==null)) {
             this.snapshot=loadedSnapshot;

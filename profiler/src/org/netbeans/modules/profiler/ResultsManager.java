@@ -78,6 +78,10 @@ import javax.swing.*;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.cookies.OpenCookie;
+import org.openide.loaders.DataObject;
+import org.openide.loaders.DataObjectNotFoundException;
+import org.openide.util.Exceptions;
 
 
 /** An manager for management/notifications about obtainer profiling results.
@@ -589,6 +593,24 @@ public final class ResultsManager {
         }
 
         return ret;
+    }
+    
+    public void openSnapshot(File snapshot) {
+        File sf = FileUtil.normalizeFile(snapshot);
+        FileObject snapshotFo = FileUtil.toFileObject(sf);
+        openSnapshot(snapshotFo);
+    }
+    
+    public void openSnapshot(FileObject snapshotFo) {
+        try {
+            DataObject snapshotDo = DataObject.find(snapshotFo);
+            OpenCookie open = snapshotDo.getCookie(OpenCookie.class);
+            if (open != null) {
+                open.open();
+            }
+        } catch (DataObjectNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
 
     public void openSnapshot(LoadedSnapshot ls) {

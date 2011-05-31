@@ -115,6 +115,7 @@ import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.lib.profiler.ui.LiveResultsWindowContributor;
+import org.netbeans.modules.profiler.api.GeneralIcons;
 import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
@@ -415,7 +416,7 @@ public final class LiveResultsWindow extends TopComponent
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static LiveResultsWindow defaultLiveInstance;
     private static final TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-    private static final Image liveWindowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/liveResultsWindow.png"); // NOI18N
+    private static final Image liveWindowIcon = Icons.getImage(ProfilerIcons.WINDOW_LIVE_RESULTS);
     private static final AtomicBoolean resultsDumpForced = new AtomicBoolean(false);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -488,7 +489,7 @@ public final class LiveResultsWindow extends TopComponent
         final JLabel noResultsLabel = new JLabel(NO_PROFILING_RESULTS_LABEL_TEXT);
 
         noResultsLabel.setFont(noResultsLabel.getFont().deriveFont(14));
-        noResultsLabel.setIcon(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/ui/resources/monitoring.png", false)); //NOI18N
+        noResultsLabel.setIcon(Icons.getIcon(ProfilerIcons.MONITORING_32));
         noResultsLabel.setIconTextGap(10);
         noResultsLabel.setEnabled(false);
         noResultsPanel.add(noResultsLabel, BorderLayout.NORTH);
@@ -894,7 +895,7 @@ public final class LiveResultsWindow extends TopComponent
         toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
         toolBar.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        autoToggle = new JToggleButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/autoRefresh.png", false)); //NOI18N
+        autoToggle = new JToggleButton(Icons.getIcon(GeneralIcons.UPDATE_AUTO));
         autoToggle.setSelected(true);
         autoToggle.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -904,7 +905,7 @@ public final class LiveResultsWindow extends TopComponent
         autoToggle.setToolTipText(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
         autoToggle.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
 
-        updateNowButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/updateNow.png", false)); //NOI18N
+        updateNowButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW));
         updateNowButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     requestProfilingDataUpdate(true);

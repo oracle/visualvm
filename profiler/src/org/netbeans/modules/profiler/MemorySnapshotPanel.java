@@ -57,7 +57,6 @@ import org.netbeans.modules.profiler.actions.FindNextAction;
 import org.netbeans.modules.profiler.actions.FindPreviousAction;
 import org.netbeans.modules.profiler.ui.FindDialog;
 import org.openide.actions.FindAction;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.SystemAction;
 import java.awt.*;
@@ -76,6 +75,7 @@ import org.netbeans.modules.profiler.api.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
 
@@ -129,9 +129,9 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     private static final String FIND_ACTION_TOOLTIP = NbBundle.getMessage(MemorySnapshotPanel.class,
                                                                            "MemorySnapshotPanel_FindActionTooltip"); // NOI18N
                                                                                                                      // -----
-    private static final ImageIcon MEMORY_RESULTS_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memoryResultsTab.png", false); //NOI18N
-    private static final ImageIcon INFO_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false); //NOI18N
-    private static final ImageIcon STACK_TRACES_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/stackTracesTab.png", false); //NOI18N
+    private static final Icon MEMORY_RESULTS_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_MEMORY_RESULTS);
+    private static final Icon INFO_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_INFO);
+    private static final Icon STACK_TRACES_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_STACK_TRACES);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

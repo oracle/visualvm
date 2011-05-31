@@ -44,17 +44,17 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
 import org.netbeans.modules.profiler.heapwalk.SummaryController;
-import java.awt.Dimension;
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
-import org.openide.util.ImageUtilities;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 import org.openide.util.NbBundle;
 
 /**
@@ -70,7 +70,7 @@ public class SummaryControllerUI extends JPanel {
     private static class Presenter extends JToggleButton {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static ImageIcon ICON_INFO = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false); // NOI18N
+        private static Icon ICON_INFO = Icons.getIcon(GeneralIcons.INFO);
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 

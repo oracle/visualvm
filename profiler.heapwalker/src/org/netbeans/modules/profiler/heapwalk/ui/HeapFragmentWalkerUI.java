@@ -58,9 +58,12 @@ import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 
 
@@ -84,8 +87,8 @@ public class HeapFragmentWalkerUI extends JPanel {
                                                                                                                            // -----
 
     // --- UI definition ---------------------------------------------------------
-    private static ImageIcon ICON_BACK = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/back.png", false); // NOI18N
-    private static ImageIcon ICON_FORWARD = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/forward.png", false); // NOI18N
+    private static Icon ICON_BACK = Icons.getIcon(GeneralIcons.BACK);
+    private static Icon ICON_FORWARD = Icons.getIcon(GeneralIcons.FORWARD);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

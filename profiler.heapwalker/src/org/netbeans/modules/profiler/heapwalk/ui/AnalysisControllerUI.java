@@ -48,7 +48,6 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.heapwalk.AnalysisController;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Rule;
 import org.openide.DialogDescriptor;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.awt.BorderLayout;
@@ -66,7 +65,7 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -79,6 +78,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.text.html.HTMLDocument;
+import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.DialogDisplayer;
 
 
@@ -134,7 +135,7 @@ public class AnalysisControllerUI extends JPanel {
     private static class Presenter extends JToggleButton {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
-        private static ImageIcon ICON_INFO = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/memoryLint.png", false); // NOI18N
+        private static Icon ICON_INFO = Icons.getIcon(HeapWalkerIcons.MEMORY_LINT);
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -283,7 +284,8 @@ public class AnalysisControllerUI extends JPanel {
 
         // settingsArea
         settingsArea = new HTMLTextArea();
-        settingsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png'>&nbsp;&nbsp;"
+        String rulesRes = Icons.getResource(HeapWalkerIcons.RULES);
+        settingsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/" + rulesRes + "'>&nbsp;&nbsp;"
                              + RULES_TO_APPLY_STRING + "</b><br><hr>&nbsp;&nbsp;&nbsp;&nbsp;Searching for rules..."); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -336,7 +338,8 @@ public class AnalysisControllerUI extends JPanel {
 
         // resultsArea
         resultsArea = new HTMLTextArea();
-        resultsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/properties.png'>&nbsp;&nbsp;"
+        String propertiesRes = Icons.getResource(HeapWalkerIcons.PROPERTIES);
+        resultsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/" + propertiesRes + "'>&nbsp;&nbsp;"
                             + ANALYSIS_RESULTS_TEXT + "</b><br><hr>"); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -477,7 +480,8 @@ public class AnalysisControllerUI extends JPanel {
                                     constraints.insets = new Insets(3, 0, 0, 8);
                                     add(performButton, constraints);
 
-                                    settingsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/rules.png'>&nbsp;&nbsp;"
+                                    String rulesRes = Icons.getResource(HeapWalkerIcons.RULES);
+                                    settingsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/" + rulesRes + "'>&nbsp;&nbsp;"
                                                          + RULES_TO_APPLY_STRING + "</b><br><hr>"); // NOI18N
                                     updatePerformButton();
                                 }

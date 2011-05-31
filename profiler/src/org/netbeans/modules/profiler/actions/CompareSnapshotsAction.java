@@ -796,9 +796,9 @@ public class CompareSnapshotsAction extends AbstractAction {
     private static final String SNAPSHOTS_LIST_ACCESS_DESCR = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                                   "CompareSnapshotsAction_SnapshotsListAccessDescr"); // NOI18N
                                                                                                                                       // -----
-    private static final ImageIcon cpuIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/cpuSmall.png", false); // NOI18N
-    private static final ImageIcon fragmentIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/fragmentSmall.png", false); // NOI18N
-    private static final ImageIcon memoryIcon = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/memorySmall.png", false); // NOI18N
+    private static final Icon cpuIcon = Icons.getIcon(ProfilerIcons.CPU);
+    private static final Icon fragmentIcon = Icons.getIcon(ProfilerIcons.FRAGMENT);
+    private static final Icon memoryIcon = Icons.getIcon(ProfilerIcons.MEMORY);
     private static JFileChooser snapshotFileChooser;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

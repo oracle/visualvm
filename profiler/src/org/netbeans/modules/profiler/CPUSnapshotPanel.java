@@ -86,6 +86,7 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
 
@@ -320,14 +321,14 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private static final Icon CLASSES_ICON = Icons.getIcon(LanguageIcons.CLASS);
     private static final Icon METHODS_ICON = Icons.getIcon(LanguageIcons.METHODS);
     private static final Icon PACKAGES_ICON = Icons.getIcon(LanguageIcons.PACKAGE);
-    private static final ImageIcon CALL_TREE_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/callTreeTab.png", false);
-    private static final ImageIcon HOTSPOTS_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/hotspotsTab.png", false);
-    private static final ImageIcon COMBINED_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/combinedTab.png", false);
-    private static final ImageIcon INFO_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false);
-    private static final ImageIcon BACK_TRACES_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/backTracesTab.png", false);
-    private static final ImageIcon SUBTREE_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/subtree.png", false);
-    private static final ImageIcon SLAVE_DOWN_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/slaveDown.png", false);
-    private static final ImageIcon SLAVE_UP_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/slaveUp.png", false);
+    private static final Icon CALL_TREE_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_CALL_TREE);
+    private static final Icon HOTSPOTS_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS);
+    private static final Icon COMBINED_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_COMBINED);
+    private static final Icon INFO_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_INFO);
+    private static final Icon BACK_TRACES_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_BACK_TRACES);
+    private static final Icon SUBTREE_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_SUBTREE);
+    private static final Icon SLAVE_DOWN_ICON = Icons.getIcon(GeneralIcons.SLAVE_DOWN);
+    private static final Icon SLAVE_UP_ICON = Icons.getIcon(GeneralIcons.SLAVE_UP);
     private static final double SPLIT_HALF = 0.5d;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

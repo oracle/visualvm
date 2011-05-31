@@ -62,7 +62,6 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
@@ -78,7 +77,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
@@ -94,7 +93,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
@@ -286,7 +288,7 @@ public class InstancesListControllerUI extends JTitledPanel {
                                                                                "InstancesListControllerUI_CopyIdString"); // NOI18N
 // -----
     private static KeyStroke COPY_ID_KEYSTROKE = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK + InputEvent.CTRL_DOWN_MASK);
-    private static ImageIcon ICON_INSTANCES = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png", false); // NOI18N
+    private static Icon ICON_INSTANCES = Icons.getIcon(HeapWalkerIcons.INSTANCES);
     private int columnCount;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -517,7 +519,7 @@ public class InstancesListControllerUI extends JTitledPanel {
     }
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(ImageUtilities.loadImageIcon("org/netbeans/lib/profiler/ui/resources/hideColumn.png", false)); // NOI18N
+        final JButton cornerButton = new JButton(Icons.getIcon(GeneralIcons.HIDE_COLUMN));
         cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
         cornerButton.setDefaultCapable(false);
 

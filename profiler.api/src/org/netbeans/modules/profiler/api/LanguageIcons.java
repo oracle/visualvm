@@ -76,5 +76,8 @@ public interface LanguageIcons extends Icons.Keys {
     public static final String VARIABLE_PROTECTED_STATIC = "LanguageIcons.VariableProtectedStatic";
     public static final String VARIABLE_PUBLIC_STATIC = "LanguageIcons.VariablePublicStatic";
     public static final String VARIABLES = "LanguageIcons.Variables";
+    public static final String ARRAY = "LanguageIcons.Array";
+    public static final String INSTANCE = "LanguageIcons.Instance";
+    public static final String PRIMITIVE = "LanguageIcons.Primitive";
     
 }

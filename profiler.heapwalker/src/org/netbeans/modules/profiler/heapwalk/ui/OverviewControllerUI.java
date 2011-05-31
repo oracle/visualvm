@@ -58,12 +58,13 @@ import org.openide.util.RequestProcessor;
 import java.net.URL;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.openide.util.ImageUtilities;
+import org.netbeans.modules.profiler.api.GeneralIcons;
+import org.netbeans.modules.profiler.api.Icons;
 
 /**
  *
@@ -74,7 +75,7 @@ public class OverviewControllerUI extends JTitledPanel {
     
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     
-    private static ImageIcon ICON_INFO = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false); // NOI18N
+    private static Icon ICON_INFO = Icons.getIcon(GeneralIcons.INFO);
     private static final String VIEW_TITLE = NbBundle.getMessage(OverviewControllerUI.class, "OverviewControllerUI_ViewTitle"); // NOI18N
     private static final String VIEW_DESCR = NbBundle.getMessage(OverviewControllerUI.class, "OverviewControllerUI_ViewDescr"); // NOI18N
     private static final String IN_PROGRESS_MSG = NbBundle.getMessage(OverviewControllerUI.class, "OverviewControllerUI_InProgressMsg"); // NOI18N

@@ -69,7 +69,10 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIcons;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.NbBundle;
 
 /**
@@ -254,7 +257,8 @@ public class OverviewController extends AbstractController {
                 + MessageFormat.format(OOME_ITEM_STRING,
                 new Object[] {  threadUrl });
         }
-        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/resources/memory.png'>&nbsp;&nbsp;" // NOI18N
+        String memoryRes = Icons.getResource(ProfilerIcons.MEMORY);
+        return "<b><img border='0' align='bottom' src='nbresloc:/" + memoryRes + "'>&nbsp;&nbsp;" // NOI18N
                 + SUMMARY_STRING + "</b><br><hr>" + dateTaken + "<br>" + filename + "<br>" + filesize + "<br><br>" + liveBytes // NOI18N
                 + "<br>" + liveClasses + "<br>" + liveInstances + "<br>" + classloaders + "<br>" + gcroots + "<br>" + finalizersInfo + oomeString; // NOI18N
     }
@@ -302,7 +306,8 @@ public class OverviewController extends AbstractController {
                 + MessageFormat.format(JAVA_VENDOR_ITEM_STRING,
                 new Object[] { sysprops.getProperty("java.vendor", NOT_AVAILABLE_MSG) }); // NOI18N
         
-        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/sysinfo.png'>&nbsp;&nbsp;" // NOI18N
+        String sysinfoRes = Icons.getResource(HeapWalkerIcons.SYSTEM_INFO);
+        return "<b><img border='0' align='bottom' src='nbresloc:/" + sysinfoRes + "'>&nbsp;&nbsp;" // NOI18N
                 + ENVIRONMENT_STRING + "</b><br><hr>" + os + "<br>" + arch + "<br>" + jdk + "<br>" + version + "<br>" + jvm + "<br>" + vendor; // NOI18N
     }
     
@@ -313,14 +318,16 @@ public class OverviewController extends AbstractController {
             return NOT_AVAILABLE_MSG;
         }
         
-        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/resources/properties.png'>&nbsp;&nbsp;" // NOI18N
+        String propertiesRes = Icons.getResource(HeapWalkerIcons.PROPERTIES);
+        return "<b><img border='0' align='bottom' src='nbresloc:/" + propertiesRes + "'>&nbsp;&nbsp;" // NOI18N
                 + SYSTEM_PROPERTIES_STRING + "</b><br><hr>" // NOI18N
                 + (showSystemProperties ? formatSystemProperties(sysprops)
                 : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_SYSPROPS_URL + "'>" + SHOW_SYSPROPS_LINK_STRING + "</a>")); // NOI18N
     }
     
     public String computeThreads(boolean showThreads) {
-        return "<b><img border='0' align='bottom' src='nbresloc:/org/netbeans/modules/profiler/resources/threadsWindow.png'>&nbsp;&nbsp;" // NOI18N
+        String threadsWindowRes = Icons.getResource(ProfilerIcons.WINDOW_THREADS);
+        return "<b><img border='0' align='bottom' src='nbresloc:/" + threadsWindowRes + "'>&nbsp;&nbsp;" // NOI18N
                 + THREADS_STRING + "</b><br><hr>" // NOI18N
                 + (showThreads ? getStackTrace()
                 : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_THREADS_URL + "'>" + SHOW_THREADS_LINK_STRING + "</a><br>&nbsp;")); // NOI18N

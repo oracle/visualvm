@@ -6,7 +6,7 @@
             <folder name="x-netbeans-profiler-hprof">
                 <folder name="Factories">
                     <file name="HprofDataLoader.instance">
-                        <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/heapwalker/snapshotDataObject.png"/>
+                        <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/icons/snapshotDataObject.png"/>
                         <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.heapwalker.HprofDataObject"/>
                         <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
                         <attr name="mimeType" stringvalue="x-application/hprof"/>
