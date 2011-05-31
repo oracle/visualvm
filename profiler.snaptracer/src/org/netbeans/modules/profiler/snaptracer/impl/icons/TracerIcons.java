@@ -61,5 +61,7 @@ public interface TracerIcons extends Icons.Keys {
     public static final String MARK_HIGHLIGHT = "TracerIcons.MarkHiglight"; // NOI18N
     public static final String SELECT_ALL = "TracerIcons.SelectAll"; // NOI18N
     public static final String PROBE = "TracerIcons.Probe"; // NOI18N
+    public static final String TRACER = "TracerIcons.Tracer"; // NOI18N
+    public static final String TRACER_32 = "TracerIcons.Tracer32"; // NOI18N
     
 }

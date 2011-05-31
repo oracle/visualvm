@@ -96,6 +96,8 @@ public final class TracerIconsProviderImpl extends IconsProvider {
         cache.put(TracerIcons.MARK_HIGHLIGHT, "markHighl.png"); // NOI18N
         cache.put(TracerIcons.SELECT_ALL, "selectAll.png"); // NOI18N
         cache.put(TracerIcons.PROBE, "probe.png"); // NOI18N
+        cache.put(TracerIcons.TRACER, "tracer.png"); // NOI18N
+        cache.put(TracerIcons.TRACER_32, "tracer32.png"); // NOI18N
     }
     
 }
