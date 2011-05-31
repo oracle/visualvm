@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,47 +34,32 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.profiler.snaptracer.impl.icons;
 
-package org.netbeans.modules.profiler.snaptracer.impl.options;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import org.netbeans.spi.options.OptionsCategory;
-import org.netbeans.spi.options.OptionsPanelController;
-import org.openide.util.ImageUtilities;
+import org.netbeans.modules.profiler.api.Icons;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-final class TracerOptionsCategory extends OptionsCategory {
-
-    private static TracerOptionsCategory INSTANCE;
-
-
-    public static synchronized TracerOptionsCategory instance() {
-        if (INSTANCE == null) INSTANCE = new TracerOptionsCategory();
-        return INSTANCE;
-    }
-
-    public Icon getIcon() {
-        return new ImageIcon(ImageUtilities.loadImage(
-                "org/netbeans/modules/profiler/snaptracer/impl/icons/tracer32.png"));  // NOI18N
-    }
-
-    public String getCategoryName() {
-        return "Tracer";
-    }
-
-    public String getTitle() {
-        return "Tracer";
-    }
-
-    public OptionsPanelController create() {
-        return new TracerOptionsPanelController();
-    }
-
-    private TracerOptionsCategory() {}
-
+public interface TracerIcons extends Icons.Keys {
+    
+    public static final String INCREMENT = "TracerIcons.Increment"; // NOI18N
+    public static final String DECREMENT = "TracerIcons.Decrement"; // NOI18N
+    public static final String RESET = "TracerIcons.Reset"; // NOI18N
+    public static final String GENERIC_ACTION = "TracerIcons.GenericAction"; // NOI18N
+    public static final String MOUSE_WHEEL_HORIZONTAL = "TracerIcons.MouseWheelHorizontal"; // NOI18N
+    public static final String MOUSE_WHEEL_VERTICAL = "TracerIcons.MouseWheelVertical"; // NOI18N
+    public static final String MOUSE_WHEEL_ZOOM = "TracerIcons.MouseWheelZoom"; // NOI18N
+    public static final String MARK = "TracerIcons.Mark"; // NOI18N
+    public static final String MARK_CLEAR = "TracerIcons.MarkClear"; // NOI18N
+    public static final String MARK_HIGHLIGHT = "TracerIcons.MarkHiglight"; // NOI18N
+    public static final String SELECT_ALL = "TracerIcons.SelectAll"; // NOI18N
+    public static final String PROBE = "TracerIcons.Probe"; // NOI18N
+    
 }

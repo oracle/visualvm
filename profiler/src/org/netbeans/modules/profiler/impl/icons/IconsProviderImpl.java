@@ -115,6 +115,7 @@ public final class IconsProviderImpl extends IconsProvider {
         cache.put(GeneralIcons.SAVE_VIEW, "saveView.png");
         cache.put(GeneralIcons.EXPORT, "saveAs.png");
         cache.put(GeneralIcons.DETACH, "detach.png");
+        cache.put(GeneralIcons.START, "start.png");
         cache.put(GeneralIcons.PAUSE, "pause.png");
         cache.put(GeneralIcons.RERUN, "rerun.png");
         cache.put(GeneralIcons.RESUME, "resume.png");

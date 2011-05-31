@@ -75,6 +75,7 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String SAVE_VIEW = "GeneralIcons.SaveView";
     public static final String EXPORT = "GeneralIcons.Export";
     public static final String DETACH = "GeneralIcons.Detach";
+    public static final String START = "GeneralIcons.Start";
     public static final String PAUSE = "GeneralIcons.Pause";
     public static final String RERUN = "GeneralIcons.Rerun";
     public static final String RESUME = "GeneralIcons.Resume";
