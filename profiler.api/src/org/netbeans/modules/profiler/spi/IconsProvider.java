@@ -42,6 +42,9 @@
 package org.netbeans.modules.profiler.spi;
 
 import java.awt.Image;
+import java.util.HashMap;
+import java.util.Map;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -64,5 +67,47 @@ public abstract class IconsProvider {
      * @return path to image resource without leading slash according to the provided key or null if no image is provided for the key by this provider
      */
     public abstract String getResource(String key);
+    
+    
+    /**
+     * Basic implementation of a simple IconsProvider supporting statically defined and dynamically generated images.
+     */
+    public static abstract class Basic extends IconsProvider {
+        
+        private Map<String, String> images;
+
+        @Override
+        public final Image getImage(String key) {
+            String resource = getResource(key);
+            if (resource == null) return getDynamicImage(key);
+            else return ImageUtilities.loadImage(resource, true);
+        }
+
+        @Override
+        public final String getResource(String key) {
+            return getImageCache().get(key);
+        }
+
+        private Map<String, String> getImageCache() {
+            synchronized (this) {
+                if (images == null) {
+                    final String packagePrefix = getClass().getPackage().getName().
+                                                 replace('.', '/') + "/"; // NOI18N
+                    images = new HashMap<String, String>() {
+                        public String put(String key, String value) {
+                            return super.put(key, packagePrefix + value);
+                        }
+                    };
+                    initStaticImages(images);
+                }
+            }
+            return images;
+        }
+
+        protected void initStaticImages(Map<String, String> cache) {}
+
+        protected Image getDynamicImage(String key) { return null; }
+        
+    }
     
 }

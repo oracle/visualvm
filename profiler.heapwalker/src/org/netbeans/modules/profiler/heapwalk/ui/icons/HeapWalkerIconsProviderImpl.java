@@ -41,49 +41,18 @@
  */
 package org.netbeans.modules.profiler.heapwalk.ui.icons;
 
-import java.awt.Image;
-import java.util.HashMap;
 import java.util.Map;
 import org.netbeans.modules.profiler.spi.IconsProvider;
-import org.openide.util.ImageUtilities;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 @org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.spi.IconsProvider.class)
-public final class HeapWalkerIconsProviderImpl extends IconsProvider {
-    
-    private Map<String, String> images;
-
-    @Override
-    public Image getImage(String key) {
-        String resource = getResource(key);
-        return resource == null ? null : ImageUtilities.loadImage(resource, true);
-    }
+public final class HeapWalkerIconsProviderImpl extends IconsProvider.Basic {
     
     @Override
-    public String getResource(String key) {
-        return getImageCache().get(key);
-    }
-    
-    private Map<String, String> getImageCache() {
-        synchronized (this) {
-            if (images == null) {
-                final String packagePrefix = getClass().getPackage().getName().
-                                             replace('.', '/') + "/"; // NOI18N
-                images = new HashMap<String, String>() {
-                    public String put(String key, String value) {
-                        return super.put(key, packagePrefix + value);
-                    }
-                };
-                initImageCache(images);
-            }
-        }
-        return images;
-    }
-    
-    private static void initImageCache(Map<String, String> cache) {
+    protected final void initStaticImages(Map<String, String> cache) {
         cache.put(HeapWalkerIcons.CLASSES, "classes.png"); // NOI18N
         cache.put(HeapWalkerIcons.DATA, "data.png"); // NOI18N
         cache.put(HeapWalkerIcons.GC_ROOT, "gcRoot.png"); // NOI18N
