@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
+import java.awt.datatransfer.Transferable;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIConstants;
@@ -61,9 +62,15 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -75,6 +82,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -87,6 +95,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
+import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
 
@@ -97,6 +106,46 @@ import org.openide.util.RequestProcessor;
 public class InstancesListControllerUI extends JTitledPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
+    private class InstancesListTableKeyListener extends KeyAdapter {
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        public void keyPressed(KeyEvent e) {
+            if ((e.getKeyCode() == KeyEvent.VK_CONTEXT_MENU)
+                    || ((e.getKeyCode() == KeyEvent.VK_F10) && (e.getModifiers() == InputEvent.SHIFT_MASK))) {
+                int selectedRow = instancesListTable.getSelectedRow();
+
+                if (selectedRow != -1) {
+                    Rectangle rowBounds = instancesListTable.getCellRect(selectedRow, 0, true);
+                    tablePopup.show(instancesListTable, rowBounds.x + (rowBounds.width / 2), rowBounds.y + (rowBounds.height / 2));
+                }
+            } else if (KeyStroke.getAWTKeyStroke(e.getKeyCode(), e.getModifiers()).equals(COPY_ID_KEYSTROKE)) {
+                copyIdToClipboard();
+            }
+        }
+    }
+    
+    private class InstancesListTableMouseListener extends MouseAdapter {
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        private void updateSelection(int row) {
+            instancesListTable.requestFocusInWindow();
+            if (row != -1) instancesListTable.setRowSelectionInterval(row, row);
+            else instancesListTable.clearSelection();
+        }
+
+        public void mousePressed(final MouseEvent e) {
+            final int row = instancesListTable.rowAtPoint(e.getPoint());
+            updateSelection(row);
+            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            int row = instancesListTable.rowAtPoint(e.getPoint());
+            updateSelection(row);
+            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
+    
     // --- TreeTable model -------------------------------------------------------
     private class InstancesListTreeTableModel extends AbstractTreeTableModel {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -152,12 +201,14 @@ public class InstancesListControllerUI extends JTitledPanel {
                     case 0:
                         return node;
                     case 1:
-                        return node.getSize();
+                        return "0x" + Long.toHexString(node.getID());
                     case 2:
+                        return node.getSize();
+                    case 3:
                         return node.getRetainedSize();
 
                     // TODO: uncomment once reachable size implemented
-                    //          case 3: return node.getReachableSize();
+                    //          case 4: return node.getReachableSize();
 
                     default:
                         return null;
@@ -215,6 +266,10 @@ public class InstancesListControllerUI extends JTitledPanel {
                                                                            "InstancesListControllerUI_InstanceColumnName"); // NOI18N
     private static final String INSTANCE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
                                                                             "InstancesListControllerUI_InstanceColumnDescr"); // NOI18N
+    private static final String OBJID_COLUMN_NAME = NbBundle.getMessage(InstancesListControllerUI.class,
+                                                                           "InstancesListControllerUI_ObjidColumnName"); // NOI18N
+    private static final String OBJID_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
+                                                                            "InstancesListControllerUI_ObjidColumnDescr"); // NOI18N
     private static final String SIZE_COLUMN_NAME = NbBundle.getMessage(InstancesListControllerUI.class,
                                                                        "InstancesListControllerUI_SizeColumnName"); // NOI18N
     private static final String SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
@@ -227,7 +282,10 @@ public class InstancesListControllerUI extends JTitledPanel {
                                                                                  "InstancesListControllerUI_ReachableSizeColumnName"); // NOI18N
     private static final String REACHABLE_SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
                                                                                   "InstancesListControllerUI_ReachableSizeColumnDescr"); // NOI18N
-                                                                                                                                         // -----
+    private static final String COPY_ID_STRING = NbBundle.getMessage(InstancesListControllerUI.class,
+                                                                               "InstancesListControllerUI_CopyIdString"); // NOI18N
+// -----
+    private static KeyStroke COPY_ID_KEYSTROKE = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK + InputEvent.CTRL_DOWN_MASK);
     private static ImageIcon ICON_INSTANCES = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/heapwalk/ui/resources/instances.png", false); // NOI18N
     private int columnCount;
 
@@ -243,6 +301,7 @@ public class InstancesListControllerUI extends JTitledPanel {
 
     // --- UI definition ---------------------------------------------------------
     private JPanel dataPanel;
+    private JPopupMenu tablePopup;
     private JPopupMenu cornerPopup;
     private JTreeTable instancesListTable;
     private String filterValue = ""; // NOI18N
@@ -258,7 +317,7 @@ public class InstancesListControllerUI extends JTitledPanel {
     private boolean sorting = false;
     private boolean sortingOrder = false;
     private int selectedRow;
-    private int sortingColumn = 1;
+    private int sortingColumn = 2;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -271,7 +330,7 @@ public class InstancesListControllerUI extends JTitledPanel {
         retainedSizeSupported = instancesListController.getInstancesController().
                                 getHeapFragmentWalker().getRetainedSizesStatus() !=
                                 HeapFragmentWalker.RETAINED_SIZES_UNSUPPORTED;
-        columnCount = retainedSizeSupported ? 3 : 2;
+        columnCount = retainedSizeSupported ? 4 : 3;
 
         realInstancesListModel = new InstancesListTreeTableModel();
         instancesListTableModel = new ExtendedTreeTableModel(realInstancesListModel);
@@ -289,7 +348,7 @@ public class InstancesListControllerUI extends JTitledPanel {
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
                                         instancesListTableModel.
-                                                setRealColumnVisibility(2, true);
+                                                setRealColumnVisibility(3, true);
                                         instancesListTable.createDefaultColumnsFromModel();
                                         instancesListTable.updateTreeTableHeader();
                                         setColumnsData();
@@ -310,13 +369,16 @@ public class InstancesListControllerUI extends JTitledPanel {
                         JavaClass selectedClass = instancesListController.getInstancesController().getSelectedClass();
 
                         if ((selectedClass != null) && selectedClass.isArray()) {
-                            if (!instancesListTableModel.isRealColumnVisible(1)) {
-                                toggleColumnVisibility(1, false);
+                            if (!instancesListTableModel.isRealColumnVisible(2)) {
+                                toggleColumnVisibility(2, false);
                             }
                         } else {
-                            if (instancesListTableModel.isRealColumnVisible(1)) {
-                                toggleColumnVisibility(1, false);
+                            if (instancesListTableModel.isRealColumnVisible(2)) {
+                                toggleColumnVisibility(2, false);
                             }
+                        }
+                        if (instancesListTableModel.isRealColumnVisible(1)) {
+                            toggleColumnVisibility(1, false); // objectid is not visible as default
                         }
                     }
                 });
@@ -428,7 +490,7 @@ public class InstancesListControllerUI extends JTitledPanel {
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 if (internalChange[0]) return;
                 final int column = Integer.parseInt(e.getActionCommand());
-                if (column == 2 && !instancesListTableModel.isRealColumnVisible(column)) {
+                if (column == 3 && !instancesListTableModel.isRealColumnVisible(column)) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
                             final int retainedSizesState = instancesListController.getInstancesController().
@@ -498,7 +560,36 @@ public class InstancesListControllerUI extends JTitledPanel {
 
         return cornerButton;
     }
+    
+    private JPopupMenu createTablePopup() {
+        JPopupMenu popup = new JPopupMenu();
+        
+        JMenuItem copyIdItem = new JMenuItem(COPY_ID_STRING);
+        copyIdItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                copyIdToClipboard();
+            }
+        });
+        copyIdItem.setAccelerator(COPY_ID_KEYSTROKE);
+//        copyIdItem.setFont(popup.getFont().deriveFont(Font.BOLD));
 
+        popup.add(copyIdItem);
+
+        return popup;
+    }
+
+    private void copyIdToClipboard() {
+        Clipboard clipboard = Lookup.getDefault().lookup(Clipboard.class);
+
+        clipboard.setContents(new StringSelection("0x" + Long.toHexString(instancesListController.getSelectedInstance().getInstanceId())), new ClipboardOwner() {
+
+            @Override
+            public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                // ignore
+            }
+        });
+    }
+    
     private boolean displaysCollapsedInstances() {
         HeapWalkerNode root = (HeapWalkerNode) instancesListTableModel.getRoot();
 
@@ -522,12 +613,15 @@ public class InstancesListControllerUI extends JTitledPanel {
         columnNames[0] = INSTANCE_COLUMN_NAME;
         columnToolTips[0] = INSTANCE_COLUMN_DESCR;
 
-        columnNames[1] = SIZE_COLUMN_NAME;
-        columnToolTips[1] = SIZE_COLUMN_DESCR;
+        columnNames[1] = OBJID_COLUMN_NAME;
+        columnToolTips[1] = OBJID_COLUMN_DESCR;
+        
+        columnNames[2] = SIZE_COLUMN_NAME;
+        columnToolTips[2] = SIZE_COLUMN_DESCR;
 
         if (retainedSizeSupported) {
-            columnNames[2] = RETAINED_SIZE_COLUMN_NAME;
-            columnToolTips[2] = RETAINED_SIZE_COLUMN_DESCR;
+            columnNames[3] = RETAINED_SIZE_COLUMN_NAME;
+            columnToolTips[3] = RETAINED_SIZE_COLUMN_DESCR;
         }
 
         // TODO: uncomment once reachable size implemented
@@ -545,12 +639,15 @@ public class InstancesListControllerUI extends JTitledPanel {
         // method / class / package name
         columnRenderers[0] = null;
 
-        columnWidths[1 - 1] = maxWidth;
-        columnRenderers[1] = dataCellRenderer;
+        // objectid
+        columnRenderers[1] = null;
+        
+        columnWidths[2 - 2] = maxWidth;
+        columnRenderers[2] = dataCellRenderer;
 
         if (retainedSizeSupported) {
-            columnWidths[2 - 1] = maxWidth;
-            columnRenderers[2] = dataCellRenderer;
+            columnWidths[3 - 2] = maxWidth;
+            columnRenderers[3] = dataCellRenderer;
         }
         
         // TODO: uncomment once reachable size implemented
@@ -564,7 +661,7 @@ public class InstancesListControllerUI extends JTitledPanel {
         treeCellRenderer.setOpenIcon(null);
 
         if (retainedSizeSupported)
-            instancesListTableModel.setRealColumnVisibility(2, instancesListController.
+            instancesListTableModel.setRealColumnVisibility(3, instancesListController.
                 getInstancesController().getHeapFragmentWalker().getRetainedSizesStatus()
                                           == HeapFragmentWalker.RETAINED_SIZES_COMPUTED);
         
@@ -594,6 +691,8 @@ public class InstancesListControllerUI extends JTitledPanel {
                 ;
             };
         instancesListTable.getTree().setRootVisible(false);
+        instancesListTable.addMouseListener(new InstancesListTableMouseListener());
+        instancesListTable.addKeyListener(new InstancesListTableKeyListener());
         instancesListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         instancesListTable.setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
         instancesListTable.setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
@@ -615,7 +714,7 @@ public class InstancesListControllerUI extends JTitledPanel {
 
         setColumnsData();
 
-        //    tablePopup = createTablePopup();
+        tablePopup = createTablePopup();
         cornerPopup = new JPopupMenu();
 
         JTreeTablePanel tablePanel = new JTreeTablePanel(instancesListTable);
