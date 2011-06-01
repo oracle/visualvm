@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -37,31 +37,35 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2009 Sun Microsystems, Inc.
+ * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.profiler.api;
 
-package org.netbeans.modules.profiler.spi;
-
-import org.netbeans.api.project.Project;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.openide.filesystems.FileObject;
+import org.openide.util.Lookup;
+import org.openide.util.lookup.Lookups;
+import org.openide.util.lookup.ProxyLookup;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-abstract public class ProjectProfilingSupport {
-    private Project project;
-
-    protected ProjectProfilingSupport(Project project) {
-        this.project = project;
+abstract public class ProfilerProject implements Lookup.Provider {
+    final private Object lkpLock = new Object();
+    // @GuardedBy lkpLock
+    private Lookup lkp;
+    private Lookup.Provider provider;
+    
+    protected ProfilerProject(Lookup.Provider project) {
+        this.provider = project;
     }
 
-    protected Project getProject() {
-        return project;
+    @Override
+    public Lookup getLookup() {
+        synchronized(lkpLock) {
+            if (lkp == null) {
+                lkp = new ProxyLookup(provider.getLookup(), Lookups.fixed(provider, this));
+            }
+            return lkp;
+        }
     }
-
-    abstract public String getFilter(boolean useSubprojects);
-    abstract public ClientUtils.SourceCodeSelection[] getRootMethods(FileObject profiledClassFile);
-    abstract public boolean canProfileFile(FileObject file);
 }

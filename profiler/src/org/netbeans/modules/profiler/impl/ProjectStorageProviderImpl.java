@@ -55,7 +55,7 @@ import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.modules.profiler.api.GlobalStorage;
-import org.netbeans.modules.profiler.spi.ProjectStorageProvider;
+import org.netbeans.modules.profiler.spi.project.ProjectStorageProvider;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;
@@ -71,7 +71,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.spi.ProjectStorageProvider.class)
+@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.spi.project.ProjectStorageProvider.class)
 public final class ProjectStorageProviderImpl extends ProjectStorageProvider {
     
     private static final String ERROR_SAVING_ATTACH_SETTINGS_MESSAGE = NbBundle.getMessage(ProjectStorageProviderImpl.class,

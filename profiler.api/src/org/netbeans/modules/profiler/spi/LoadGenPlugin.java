@@ -47,7 +47,7 @@ import org.netbeans.modules.profiler.spi.LoadGenPlugin.Result;
 import org.openide.filesystems.FileObject;
 import java.util.Collection;
 import java.util.Set;
-import org.netbeans.api.project.Project;
+import org.openide.util.Lookup;
 
 
 /**
@@ -113,7 +113,7 @@ public interface LoadGenPlugin {
      * @param project The project to search for scripts
      * @return Returns a list of FileObject instances representing loadgen scripts
      */
-    Collection<FileObject> listScripts(Project project);
+    Collection<FileObject> listScripts(Lookup.Provider project);
 
     /**
      * Runs a given loadgen script

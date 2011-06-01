@@ -39,23 +39,18 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi;
+package org.netbeans.modules.profiler.spi.java;
 
-import org.netbeans.lib.profiler.common.ProfilingSettings;
+import java.util.Collection;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public interface SessionListener {
-    public static abstract class Adapter implements SessionListener {
-            @Override
-            public void onShutdown() {}
-
-            @Override
-            public void onStartup(ProfilingSettings ps, Lookup.Provider p) {}
-        }
-        void onStartup(ProfilingSettings ps, Lookup.Provider p);
-        void onShutdown();
+public interface ProfilerTypeUtilsProvider {
+    String[] getSubclasses(String className, Lookup.Provider project);
+    Collection<String> getMainClasses(Lookup.Provider project);
+    FileObject findFile(String className, Lookup.Provider project);
 }

@@ -68,6 +68,15 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.modules.editor.mimelookup</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.23</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.java.platform</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -82,7 +91,7 @@ made subject to such option by the copyright holder.
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.36</specification-version>
+                        <specification-version>1.37</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -130,16 +139,21 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.loadgen</friend>
+                <friend>org.netbeans.modules.profiler.nbimpl</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>
                 <friend>org.netbeans.modules.profiler.options</friend>
                 <friend>org.netbeans.modules.profiler.oql</friend>
                 <friend>org.netbeans.modules.profiler.ppoints</friend>
+                <friend>org.netbeans.modules.profiler.projectsupport</friend>
                 <friend>org.netbeans.modules.profiler.selector.java</friend>
                 <friend>org.netbeans.modules.profiler.selector.spi</friend>
                 <friend>org.netbeans.modules.profiler.snaptracer</friend>
                 <friend>org.netbeans.modules.profiler.stp</friend>
                 <package>org.netbeans.modules.profiler.api</package>
+                <package>org.netbeans.modules.profiler.api.java</package>
                 <package>org.netbeans.modules.profiler.spi</package>
+                <package>org.netbeans.modules.profiler.spi.java</package>
+                <package>org.netbeans.modules.profiler.spi.project</package>
             </friend-packages>
         </data>
     </configuration>

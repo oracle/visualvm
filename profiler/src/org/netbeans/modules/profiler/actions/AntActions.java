@@ -55,7 +55,7 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
+import org.netbeans.modules.profiler.spi.project.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.spi.project.ui.support.MainProjectSensitiveActions;
 import org.netbeans.spi.project.ui.support.ProjectActionPerformer;
@@ -74,6 +74,7 @@ import javax.swing.Action;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.HeapDumpWatch;
 import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIcons;
 import org.netbeans.modules.profiler.api.ProjectStorage;
@@ -142,7 +143,7 @@ public final class AntActions {
 
                 public void perform(final Project project) {
                     if (isProjectTypeSupported(project)) {
-                        doProfileProject(project, null, false);
+                        doProfileProject(project, null);
                     } else {
                         ProfilerDialogs.displayError(UNSUPPORTED_PROJECT_TYPE_MSG);
                     }
@@ -175,7 +176,7 @@ public final class AntActions {
                 }
 
                 public void perform(final Project project, final Lookup context) {
-                    doProfileProject(project, null, false);
+                    doProfileProject(project, null);
                 }
             }, NbBundle.getMessage(AntActions.class, "LBL_ProfileProjectAction40_General"), // NOI18N
                                                                        NbBundle.getMessage(AntActions.class,
@@ -204,7 +205,7 @@ public final class AntActions {
                 }
 
                 public void perform(final Project project, final Lookup context) {
-                    doProfileProject(project, null, false);
+                    doProfileProject(project, null);
                 }
             }, NbBundle.getMessage(AntActions.class, "LBL_ProfileProjectActionPopup"), // NOI18N
                                                                        NbBundle.getMessage(AntActions.class,
@@ -254,7 +255,7 @@ public final class AntActions {
                         throw new IllegalStateException();
                     }
 
-                    doProfileProject(project, fos[0], SourceUtils.isTest(fos[0]));
+                    doProfileProject(project, JavaProfilerSource.createFrom(fos[0]));
                 }
             }, NbBundle.getMessage(AntActions.class, "LBL_ProfileSingleAction40_General"), // NOI18N
                                                                  NbBundle.getMessage(AntActions.class, "LBL_ProfileSingleAction40"), // NOI18N
@@ -308,7 +309,7 @@ public final class AntActions {
                         throw new IllegalStateException();
                     }
 
-                    doProfileProject(project, fos[0], SourceUtils.isTest(fos[0]));
+                    doProfileProject(project, JavaProfilerSource.createFrom(fos[0]));
                 }
             }, NbBundle.getMessage(AntActions.class, "LBL_ProfileSingleActionPopup"), // NOI18N
                                                                  NbBundle.getMessage(AntActions.class,
@@ -370,7 +371,7 @@ public final class AntActions {
                         throw new IllegalStateException();
                     }
 
-                    doProfileProject(project, fo, true);
+                    doProfileProject(project, JavaProfilerSource.createFrom(fo));
                 }
             }, NbBundle.getMessage(AntActions.class, "LBL_ProfileTestAction_General"), // NI18N
                                                                  NbBundle.getMessage(AntActions.class, "LBL_ProfileTestAction"), // NOI18N
@@ -481,7 +482,10 @@ public final class AntActions {
      * @param project           The project to profile
      * @param profiledClassFile In case profiledClass is not null, this is the FileObject representing the specified class
      */
-    private static void doProfileProject(final Project project, final FileObject profiledClassFile, final boolean isTest) {
+    private static void doProfileProject(final Project project, final JavaProfilerSource profiledClassFile) {
+        final boolean isTest = profiledClassFile != null ? profiledClassFile.isTest() : false;
+        final FileObject fo = profiledClassFile != null ? profiledClassFile.getFile() : null;
+        
         if (ProfilingSupport.getDefault().isProfilingActionInvoked()) {
             return;
         }
@@ -518,7 +522,8 @@ public final class AntActions {
                             }
 
                             // 3. check if the project is properly setup to be profiled (e.g. main class has a main method)
-                            if (!ptp.checkProjectCanBeProfiled(project, profiledClassFile)) {
+                            // FIXME - probably it would be better to pass around JavaProfilerSource instead of FileObject
+                            if (!ptp.checkProjectCanBeProfiled(project, fo)) {
                                 return;
                             }
 
@@ -553,7 +558,7 @@ public final class AntActions {
                             while (!settingsAccepted) {
                                 // 6. show SelectTaskPanel and let the user choose the profiling type
                                 pSettings = ProfilingSupport.getDefault()
-                                                            .selectTaskForProfiling(project, ss, profiledClassFile,
+                                                            .selectTaskForProfiling(project, ss, fo,
                                                                                     ptp.supportsSettingsOverride());
 
                                 if (pSettings == null) {
@@ -577,8 +582,8 @@ public final class AntActions {
                             String projectDir = FileUtil.toFile(project.getProjectDirectory()).getAbsolutePath();
                             props.setProperty("profiler.info.project.dir", projectDir); // NOI18N // TODO: create constant
 
-                            if (profiledClassFile != null) {
-                                String singleFile = FileUtil.toFile(profiledClassFile).getAbsolutePath();
+                            if (fo != null) {
+                                String singleFile = FileUtil.toFile(fo).getAbsolutePath();
                                 props.setProperty("profiler.info.single.file", singleFile); // NOI18N // TODO: create constant
                             }
 
@@ -652,7 +657,7 @@ public final class AntActions {
                                 activateLinuxPosixThreadTime(pSettings, props, project);
                             }
                             
-                            if (!ptp.startProfilingSession(project, profiledClassFile, isTest, props)) { // Used for Maven - ProjectTypeProfiler itself controls starting profiling session
+                            if (!ptp.startProfilingSession(project, fo, isTest, props)) { // Used for Maven - ProjectTypeProfiler itself controls starting profiling session
                                 
                                 // 8. determine the build script and target to run
                                 final FileObject buildScriptFO = ptp.getProjectBuildScript(project);
@@ -670,21 +675,21 @@ public final class AntActions {
                                 int type;
 
                                 if (isTest) {
-                                    type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE_TEST
+                                    type = (fo == null) ? ProjectTypeProfiler.TARGET_PROFILE_TEST
                                                                        : ProjectTypeProfiler.TARGET_PROFILE_TEST_SINGLE;
                                 } else {
-                                    type = (profiledClassFile == null) ? ProjectTypeProfiler.TARGET_PROFILE
+                                    type = (fo == null) ? ProjectTypeProfiler.TARGET_PROFILE
                                                                        : ProjectTypeProfiler.TARGET_PROFILE_SINGLE;
                                 }
 
-                                final String profileTarget = ptp.getProfilerTargetName(project, buildScriptFO, type, profiledClassFile);
+                                final String profileTarget = ptp.getProfilerTargetName(project, buildScriptFO, type, fo);
 
                                 if (profileTarget == null) {
                                     return; // already notified the user or user's choice
                                 }
 
                                 // 9. final ability of the ProjectTypeProfiler to influence the properties passed to Ant
-                                ptp.configurePropertiesForProfiling(props, project, profiledClassFile);
+                                ptp.configurePropertiesForProfiling(props, project, fo);
 
                                 // 10. Run the target
                                 NetBeansProfiler.getDefaultNB().runTarget(buildScriptFO, profileTarget, props);

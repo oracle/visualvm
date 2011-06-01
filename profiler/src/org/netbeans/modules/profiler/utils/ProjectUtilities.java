@@ -44,11 +44,7 @@
 package org.netbeans.modules.profiler.utils;
 
 import org.apache.tools.ant.module.api.support.ActionUtils;
-import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.project.JavaProjectConstants;
-import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.api.java.queries.UnitTestForSourceQuery;
-import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.project.*;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -57,9 +53,7 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.spi.java.classpath.PathResourceImplementation;
-import org.netbeans.spi.java.classpath.support.ClassPathSupport;
+import org.netbeans.modules.profiler.spi.project.ProjectTypeProfiler;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.SubprojectProvider;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
@@ -67,7 +61,6 @@ import org.netbeans.spi.project.support.ant.PropertyUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
-import org.openide.NotifyDescriptor;
 import org.openide.awt.MouseUtils;
 import org.openide.execution.ExecutorTask;
 import org.openide.filesystems.FileLock;
@@ -104,10 +97,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.modules.profiler.HeapDumpWatch;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.netbeans.modules.profiler.projectsupport.utilities.AppletSupport;
 import org.netbeans.spi.project.ProjectServiceProvider;
 import org.netbeans.spi.project.ui.ProjectOpenedHook;
 import org.openide.loaders.DataObject;
@@ -213,74 +207,8 @@ public final class ProjectUtilities {
         return result.allInstances();
     }
 
-    public static ClientUtils.SourceCodeSelection[] getClassConstructors(FileObject classFile) {
-        return SourceUtils.getClassConstructors(classFile);
-
-        //    JavaClass fileClass = MDRUtils.getToplevelClass(classFile);
-        //    if (fileClass == null) return new ClientUtils.SourceCodeSelection[0];
-        //
-        //    Constructor[] constructors = MDRUtils.getConstructors(fileClass);
-        //    ClientUtils.SourceCodeSelection[] classConstructors = new ClientUtils.SourceCodeSelection[constructors.length];
-        //    for (int i = 0; i < constructors.length; i++) {
-        //      classConstructors[i] = new ClientUtils.SourceCodeSelection(MDRUtils.getVMClassName(fileClass), "<init>", MDRUtils.getSignature(constructors[i])); // NOI18N
-        //    }
-        //
-        //    return classConstructors;
-        //    return new ClientUtils.SourceCodeSelection[0];
-    }
-
-    public static ClasspathInfo getClasspathInfo(final Project project) {
-        return getClasspathInfo(project, true);
-    }
-
-    public static ClasspathInfo getClasspathInfo(final Project project, final boolean includeSubprojects) {
-        return getClasspathInfo(project, includeSubprojects, true, true);
-    }
-
-    public static ClasspathInfo getClasspathInfo(final Project project, final boolean includeSubprojects,
-                                                 final boolean includeSources, final boolean includeLibraries) {
-        FileObject[] sourceRoots = getSourceRoots(project, includeSubprojects);
-        if (((sourceRoots == null) || (sourceRoots.length == 0)) && !includeSubprojects) {
-            sourceRoots = getSourceRoots(project, true);
-        }
-        
-        if (sourceRoots == null || sourceRoots.length == 0) {
-            return null; // fail early
-        }
-        
-        java.util.List<URL> urlList = new ArrayList<URL>();
-
-        final ClassPath cpEmpty = ClassPathSupport.createClassPath(new FileObject[0]);
-
-        ClassPath cpSource = ClassPathSupport.createClassPath(sourceRoots);
-
-        // cleaning up compile classpatth; we need to get rid off all project's class file references in the classpath
-        ClassPath cpCompile = ClassPath.getClassPath(sourceRoots[0], ClassPath.COMPILE);
-
-        for (ClassPath.Entry entry : cpCompile.entries()) {
-            SourceForBinaryQuery.Result rslt = SourceForBinaryQuery.findSourceRoots(entry.getURL());
-            FileObject[] roots = rslt.getRoots();
-
-            if ((roots == null) || (roots.length == 0)) {
-                urlList.add(entry.getURL());
-            }
-        }
-
-        cpCompile = ClassPathSupport.createClassPath(urlList.toArray(new URL[urlList.size()]));
-
-        return ClasspathInfo.create(includeLibraries ? ClassPath.getClassPath(sourceRoots[0], ClassPath.BOOT) : cpEmpty,
-                                    includeLibraries ? cpCompile : cpEmpty, includeSources ? cpSource : cpEmpty);
-    }
-
     public static String getDefaultPackageClassNames(Project project) {
-        Collection<String> classNames = SourceUtils.getDefaultPackageClassNames(project);
-        StringBuffer classNamesBuf = new StringBuffer();
-
-        for (String className : classNames) {
-            classNamesBuf.append(className).append(" "); //NOI18N
-        }
-
-        return classNamesBuf.toString();
+        return org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getDefaultPackageClassNames(project);
     }
 
     // Returns true if the project contains any Java sources (does not check subprojects!)
@@ -800,41 +728,6 @@ public final class ProjectUtilities {
         }
     }
 
-    /**
-     * Will find
-     * Copied from JUnit module implementation in 4.1 and modified
-     */
-    public static FileObject findTestForFile(final FileObject selectedFO) {
-        if ((selectedFO == null) || !selectedFO.getExt().equalsIgnoreCase("java")) {
-            return null; // NOI18N
-        }
-
-        ClassPath cp = ClassPath.getClassPath(selectedFO, ClassPath.SOURCE);
-
-        if (cp == null) {
-            return null;
-        }
-
-        FileObject packageRoot = cp.findOwnerRoot(selectedFO);
-
-        if (packageRoot == null) {
-            return null; // not a file in the source dirs - e.g. generated class in web app
-        }
-
-        URL[] testRoots = UnitTestForSourceQuery.findUnitTests(packageRoot);
-        FileObject fileToOpen = null;
-
-        for (int j = 0; j < testRoots.length; j++) {
-            fileToOpen = findUnitTestInTestRoot(cp, selectedFO, testRoots[j]);
-
-            if (fileToOpen != null) {
-                return fileToOpen;
-            }
-        }
-
-        return null;
-    }
-
     public static URL generateAppletHTML(Project project, PropertyEvaluator props, FileObject profiledClassFile) {
         String buildDirProp = props.getProperty("build.dir"); //NOI18N
         String classesDirProp = props.getProperty("build.classes.dir"); //NOI18N
@@ -967,7 +860,7 @@ public final class ProjectUtilities {
                 throw new IllegalArgumentException();
         }
 
-        final MainClassWarning panel = new MainClassWarning(message, getSourceRoots(project));
+        final MainClassWarning panel = new MainClassWarning(message, project);
         Object[] options = new Object[] { okButton, DialogDescriptor.CANCEL_OPTION };
 
         panel.addChangeListener(new ChangeListener() {
@@ -1096,7 +989,7 @@ public final class ProjectUtilities {
             ProfilerDialogs.displayInfo(MessageFormat.format(UNINTEGRATION_SUCCESSFUL_MSG, new Object[] { projectName }));
         }
     }
-
+    
     private static void getSourceRoots(final Project project, final boolean traverse, Set<Project> projects, Set<FileObject> roots) {
         final Sources sources = ProjectUtils.getSources(project);
 
@@ -1116,24 +1009,6 @@ public final class ProjectUtilities {
                 }
             }
         }
-    }
-
-    /**
-     * Copied from JUnit module implementation in 4.1 and modified
-     */
-    private static String getTestName(ClassPath cp, FileObject selectedFO) {
-        String resource = cp.getResourceName(selectedFO, '/', false); //NOI18N
-        String testName = null;
-
-        if (selectedFO.isFolder()) {
-            //find Suite for package
-            testName = convertPackage2SuiteName(resource);
-        } else {
-            // find Test for class
-            testName = convertClass2TestName(resource);
-        }
-
-        return testName;
     }
 
     // --- private part ----------------------------------------------------------------------------------------------------
@@ -1171,67 +1046,6 @@ public final class ProjectUtilities {
                 }
             }
         }
-    }
-
-    /**
-     * Copied from JUnit module implementation in 4.1 and modified
-     * Hardcoded test name prefix/suffix.
-     */
-    private static String convertClass2TestName(String classFileName) {
-        if ((classFileName == null) || "".equals(classFileName)) {
-            return ""; //NOI18N
-        }
-
-        int index = classFileName.lastIndexOf('/'); //NOI18N
-        String pkg = (index > -1) ? classFileName.substring(0, index) : ""; // NOI18N
-        String clazz = (index > -1) ? classFileName.substring(index + 1) : classFileName;
-        clazz = clazz.substring(0, 1).toUpperCase() + clazz.substring(1);
-
-        if (pkg.length() > 0) {
-            pkg += "/"; // NOI18N
-        }
-
-        return pkg + clazz + "Test"; // NOI18N
-    }
-
-    /**
-     * Copied from JUnit module implementation in 4.1 and modified
-     * Hardcoded test name prefix/suffix.
-     */
-    private static String convertPackage2SuiteName(String packageFileName) {
-        if ((packageFileName == null) || "".equals(packageFileName)) {
-            return ""; //NOI18N
-        }
-
-        int index = packageFileName.lastIndexOf('/'); //NOI18N
-        String pkg = (index > -1) ? packageFileName.substring(index + 1) : packageFileName;
-        pkg = pkg.substring(0, 1).toUpperCase() + pkg.substring(1);
-
-        return packageFileName + "/" + pkg + "Test"; // NOI18N
-    }
-
-    /**
-     * Copied from JUnit module implementation in 4.1 and modified
-     */
-    private static FileObject findUnitTestInTestRoot(ClassPath cp, FileObject selectedFO, URL testRoot) {
-        ClassPath testClassPath = null;
-
-        if (testRoot == null) { //no tests, use sources instead
-            testClassPath = cp;
-        } else {
-            try {
-                java.util.List<PathResourceImplementation> cpItems = new ArrayList<PathResourceImplementation>();
-                cpItems.add(ClassPathSupport.createResource(testRoot));
-                testClassPath = ClassPathSupport.createClassPath(cpItems);
-            } catch (IllegalArgumentException ex) {
-                ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
-                testClassPath = cp;
-            }
-        }
-
-        String testName = getTestName(cp, selectedFO);
-
-        return testClassPath.findResource(testName + ".java"); // NOI18N
     }
 
     private static boolean hasSubprojects(Project project) {

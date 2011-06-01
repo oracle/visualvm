@@ -39,23 +39,31 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi;
+package org.netbeans.modules.profiler.api;
 
-import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.api.editor.mimelookup.MimeLookup;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public interface SessionListener {
-    public static abstract class Adapter implements SessionListener {
-            @Override
-            public void onShutdown() {}
+abstract public class ProfilerSource implements Lookup.Provider {
+    private FileObject file;
+    
+    protected ProfilerSource(FileObject file) {
+        this.file = file;
+    }
+    
+    final public FileObject getFile() {
+        return file;
+    }
 
-            @Override
-            public void onStartup(ProfilingSettings ps, Lookup.Provider p) {}
-        }
-        void onStartup(ProfilingSettings ps, Lookup.Provider p);
-        void onShutdown();
+    @Override
+    final public Lookup getLookup() {
+        return MimeLookup.getLookup(file.getMIMEType());
+    }
+    
+    abstract public boolean isRunnable();
 }

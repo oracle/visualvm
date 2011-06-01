@@ -39,23 +39,39 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi;
+package org.netbeans.modules.profiler.api.java;
 
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.openide.util.Lookup;
+import org.netbeans.modules.profiler.api.ProfilerProject;
+import org.openide.util.Lookup.Provider;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public interface SessionListener {
-    public static abstract class Adapter implements SessionListener {
-            @Override
-            public void onShutdown() {}
-
-            @Override
-            public void onStartup(ProfilingSettings ps, Lookup.Provider p) {}
+final public class JavaProfilerProject extends ProfilerProject {
+    final private Object lazyInitLock = new Object();
+    
+    // @GuardedBy lazyInitLock
+    private ProfilerTypeUtils typeUtils = null;
+    
+    public static JavaProfilerProject createFrom(Provider nbProject) {
+        JavaProfilerProject jpp = nbProject.getLookup().lookup(JavaProfilerProject.class);
+        if (jpp == null) {
+            jpp = new JavaProfilerProject(nbProject);
         }
-        void onStartup(ProfilingSettings ps, Lookup.Provider p);
-        void onShutdown();
+        return jpp;
+    }
+    
+    private JavaProfilerProject(Provider project) {
+        super(project);
+    }
+    
+    public ProfilerTypeUtils getTypeUtils() {
+        synchronized(lazyInitLock) {
+            if (typeUtils == null) {
+                typeUtils = new ProfilerTypeUtils(this);
+            }
+        }
+        return typeUtils;
+    }
 }

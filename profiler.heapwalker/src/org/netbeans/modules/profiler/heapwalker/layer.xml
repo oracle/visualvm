@@ -17,7 +17,8 @@
             <folder name="x-netbeans-profiler-hprof">
                 <folder name="Factories">
                     <file name="HprofDataLoader.instance">
-                        <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/heapwalk/ui/icons/snapshotDataObject.png"/>
+                        <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/heapwalk/ui/icons/snapshotDataObject.png"/>
+                        <attr name="position" intvalue="10"/>
                         <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.heapwalker.HprofDataObject"/>
                         <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
                         <attr name="mimeType" stringvalue="x-application/hprof"/>
@@ -38,7 +39,7 @@
     <folder name="Services">
         <folder name="MIMEResolver">
             <file name="HprofResolver.xml" url="HprofResolver.xml">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.heapwalker.Bundle"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.heapwalker.Bundle#Services/MIMEResolver/HprofResolver.xml"/>
                 <attr name="position" intvalue="99700"/>
             </file>
         </folder>

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -23,7 +23,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,30 +34,50 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ *
+ * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.profiler.api.java;
 
-package org.netbeans.modules.profiler.spi;
-
-import java.util.logging.Logger;
-import org.netbeans.api.project.Project;
+import java.util.Collection;
+import org.netbeans.modules.profiler.spi.java.ProfilerTypeUtilsProvider;
+import org.openide.filesystems.FileObject;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public abstract class GoToSourceProvider {
-    /**
-     * Implementors will provide a specific functionality to open a source code
-     * @param project The associated project
-     * @param className The class name
-     * @param methodName The method name or NULL
-     * @param signature The signature or NULL
-     * @param line The line number or {@linkplain Integer#MIN_VALUE}
-     * @return Returns TRUE if the infrastructure was able to open the source code, FALSE otherwise
-     */
-    public abstract boolean openSource(Project project, String className, String methodName, String signature, int line);
+final public class ProfilerTypeUtils {
+    final private Lookup.Provider project;
+    ProfilerTypeUtils(Lookup.Provider project) {
+        this.project = project;
+    }
+    
+    private ProfilerTypeUtilsProvider getProvider() {
+        return Lookup.getDefault().lookup(ProfilerTypeUtilsProvider.class);
+    }
+    
+    public String[] getSubclasses(String className) {
+        ProfilerTypeUtilsProvider typeUtils = getProvider();
+        assert typeUtils != null;
+        
+        return typeUtils.getSubclasses(className, project);
+    }
+    
+    public FileObject findFile(String className) {
+        ProfilerTypeUtilsProvider typeUtils = getProvider();
+        assert typeUtils != null;
+        
+        return typeUtils.findFile(className, project);
+    }
+    
+    public Collection<String> getMainClasses() {
+        ProfilerTypeUtilsProvider typeUtils = getProvider();
+        assert typeUtils  != null;
+        
+        return typeUtils.getMainClasses(project);
+    }
 }

@@ -48,7 +48,7 @@ import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.*;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
+import org.netbeans.modules.profiler.spi.project.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.panels.PIDSelectPanel;
 import org.netbeans.modules.profiler.stp.SelectProfilingTask;
 import org.openide.NotifyDescriptor;

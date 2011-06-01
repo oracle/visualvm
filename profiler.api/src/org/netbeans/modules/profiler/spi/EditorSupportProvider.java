@@ -41,21 +41,53 @@
  */
 package org.netbeans.modules.profiler.spi;
 
-import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.modules.profiler.api.ProfilerProject;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public interface SessionListener {
-    public static abstract class Adapter implements SessionListener {
-            @Override
-            public void onShutdown() {}
+public interface EditorSupportProvider {
+    public static EditorSupportProvider NULL = new EditorSupportProvider() {
 
-            @Override
-            public void onStartup(ProfilingSettings ps, Lookup.Provider p) {}
+        @Override
+        public FileObject getCurrentFile() {
+            return null;
         }
-        void onStartup(ProfilingSettings ps, Lookup.Provider p);
-        void onShutdown();
+
+        @Override
+        public int getCurrentOffset() {
+            return -1;
+        }
+
+        @Override
+        public boolean isOffsetValid(FileObject file, int offset) {
+            return false;
+        }
+
+        @Override
+        public int getLineForOffset(FileObject file, int offset) {
+            return -1;
+        }
+
+        @Override
+        public ProfilerProject getCurrentProject() {
+            return null;
+        }
+
+        @Override
+        public int[] getSelectionOffsets() {
+            return new int[]{-1, -1};
+        }        
+    };
+   
+    
+    FileObject getCurrentFile();
+    int getCurrentOffset();
+    boolean isOffsetValid(FileObject file, int offset);
+    int getLineForOffset(FileObject file, int offset);
+    Lookup.Provider getCurrentProject();
+    int[] getSelectionOffsets();
 }

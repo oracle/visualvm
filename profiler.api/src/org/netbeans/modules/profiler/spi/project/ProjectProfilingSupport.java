@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -37,54 +37,20 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2011 Sun Microsystems, Inc.
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi;
 
-import java.io.IOException;
-import org.netbeans.lib.profiler.common.AttachSettings;
+package org.netbeans.modules.profiler.spi.project;
+
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Lookup;
 
 /**
  *
- * @author Jiri Sedlacek
+ * @author Jaroslav Bachorik
  */
-public abstract class ProjectStorageProvider {
-    
-    /**
-     * Returns attach settings for the provided project or null if not available.
-     * 
-     * @param project project context
-     * @return attach settings for the provided project or null if not available
-     */
-    public abstract AttachSettings loadAttachSettings(Lookup.Provider project) throws IOException;
-    
-    /**
-     * Saves attach settings in context of the provided project.
-     * 
-     * @param project project context
-     * @param settings attach settings
-     */
-    public abstract void saveAttachSettings(Lookup.Provider project, AttachSettings settings);
-    
-    /**
-     * Returns FileObject which can be used as a settings storage for the provided project or null if not available.
-     * 
-     * @param project project context
-     * @param create if <code>true</code> the storage will be created if not already available
-     * @return FileObject which can be used as a settings storage for the provided project or null if not available
-     * @throws IOException 
-     */
-    public abstract FileObject getSettingsFolder(Lookup.Provider project, boolean create)
-            throws IOException;
-    
-    /**
-     * Returns project context for the provided settings storage FileObject or null if not resolvable.
-     * 
-     * @param settingsFolder settings storage
-     * @return  project context for the provided settings storage FileObject or null if not resolvable
-     */
-    public abstract Lookup.Provider getProjectFromSettingsFolder(FileObject settingsFolder);
-    
+public interface ProjectProfilingSupport {
+    String getFilter(boolean useSubprojects);
+    ClientUtils.SourceCodeSelection[] getRootMethods(FileObject profiledClassFile);
+    boolean canProfileFile(FileObject file);
 }

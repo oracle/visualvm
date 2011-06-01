@@ -39,20 +39,18 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api;
+package org.netbeans.modules.profiler.spi.project;
 
 import java.io.IOException;
 import org.netbeans.lib.profiler.common.AttachSettings;
-import org.netbeans.modules.profiler.spi.project.ProjectStorageProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
- * Support for storing and retrieving data in context of a project.
  *
  * @author Jiri Sedlacek
  */
-public final class ProjectStorage {
+public abstract class ProjectStorageProvider {
     
     /**
      * Returns attach settings for the provided project or null if not available.
@@ -60,11 +58,7 @@ public final class ProjectStorage {
      * @param project project context
      * @return attach settings for the provided project or null if not available
      */
-    public static AttachSettings loadAttachSettings(Lookup.Provider project) throws IOException {
-        ProjectStorageProvider p = provider();
-        if (p != null) return p.loadAttachSettings(project);
-        else return null;
-    }
+    public abstract AttachSettings loadAttachSettings(Lookup.Provider project) throws IOException;
     
     /**
      * Saves attach settings in context of the provided project.
@@ -72,26 +66,18 @@ public final class ProjectStorage {
      * @param project project context
      * @param settings attach settings
      */
-    public static void saveAttachSettings(Lookup.Provider project, AttachSettings settings) {
-        ProjectStorageProvider p = provider();
-        if (p != null) p.saveAttachSettings(project, settings);
-    }
+    public abstract void saveAttachSettings(Lookup.Provider project, AttachSettings settings);
     
     /**
      * Returns FileObject which can be used as a settings storage for the provided project or null if not available.
      * 
-     * @param project project context, for null GlobalStorage.getSettingsFolder(create) will be called
+     * @param project project context
      * @param create if <code>true</code> the storage will be created if not already available
      * @return FileObject which can be used as a settings storage for the provided project or null if not available
      * @throws IOException 
      */
-    public static FileObject getSettingsFolder(Lookup.Provider project, boolean create)
-            throws IOException {
-        if (project == null) return GlobalStorage.getSettingsFolder(create);
-        ProjectStorageProvider p = provider();
-        if (p != null) return p.getSettingsFolder(project, create);
-        else return null;
-    }
+    public abstract FileObject getSettingsFolder(Lookup.Provider project, boolean create)
+            throws IOException;
     
     /**
      * Returns project context for the provided settings storage FileObject or null if not resolvable.
@@ -99,14 +85,6 @@ public final class ProjectStorage {
      * @param settingsFolder settings storage
      * @return  project context for the provided settings storage FileObject or null if not resolvable
      */
-    public static Lookup.Provider getProjectFromSettingsFolder(FileObject settingsFolder) {
-        ProjectStorageProvider p = provider();
-        if (p != null) return p.getProjectFromSettingsFolder(settingsFolder);
-        else return null;
-    }
-    
-    private static ProjectStorageProvider provider() {
-        return Lookup.getDefault().lookup(ProjectStorageProvider.class);
-    }
+    public abstract Lookup.Provider getProjectFromSettingsFolder(FileObject settingsFolder);
     
 }

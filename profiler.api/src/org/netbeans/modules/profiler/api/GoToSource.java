@@ -42,13 +42,12 @@
 
 package org.netbeans.modules.profiler.api;
 
-import org.netbeans.modules.profiler.spi.GoToSourceProvider;
+import org.netbeans.modules.profiler.spi.java.GoToSourceProvider;
 import java.text.MessageFormat;
 import java.util.Collection;
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.openide.awt.StatusDisplayer;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -62,15 +61,25 @@ final public class GoToSource {
 
     private static final RequestProcessor srcOpenerRP = new RequestProcessor("Profiler Source Opener"); // NOI18N  
     
-    public static void openSource(Project project, String className, String methodName, String methodSig) {
+    public static void openFile(final FileObject srcFile, final int offset) {
+        srcOpenerRP.post(new Runnable() {
+
+            @Override
+            public void run() {
+                openFileImpl(srcFile, offset);
+            }
+        });
+    }
+    
+    public static void openSource(Lookup.Provider project, String className, String methodName, String methodSig) {
         openSource(project, className, methodName, methodSig, -1);
     }
 
-    public static void openSource(Project project, String className, String methodName, int line) {
+    public static void openSource(Lookup.Provider project, String className, String methodName, int line) {
         openSource(project, className, methodName, null, line);
     }
 
-    private static void openSource(final Project project, final String className, final String methodName, final String signature, final int line) {
+    private static void openSource(final Lookup.Provider project, final String className, final String methodName, final String signature, final int line) {
         srcOpenerRP.post(new Runnable() {
             
             @Override
@@ -80,7 +89,7 @@ final public class GoToSource {
         });
     }
     
-    private static void openSourceImpl(final Project project, final String className, final String methodName, final String signature, final int line) {
+    private static void openSourceImpl(final Lookup.Provider project, final String className, final String methodName, final String signature, final int line) {
         // *** logging stuff ***
         ProfilerLogger.debug("Open Source: Project: " + project); // NOI18N
         ProfilerLogger.debug("Open Source: Class name: " + className); // NOI18N
@@ -105,5 +114,30 @@ final public class GoToSource {
         ProfilerDialogs.displayError(MessageFormat.format(NbBundle.getMessage(GoToSource.class,
                                                                                 "NoSourceFoundMessage"), // NOI18N
                                                                                 new Object[] { className }));
+    }
+    
+    private static void openFileImpl(FileObject srcFile, int offset) {
+        // *** logging stuff ***
+        ProfilerLogger.debug("Open Source: FileObject: " + srcFile); // NOI18N
+        ProfilerLogger.debug("Open Source: Offset: " + offset); // NOI18N
+        
+        Collection<? extends GoToSourceProvider> implementations = Lookup.getDefault().lookupAll(GoToSourceProvider.class);
+        
+        String st = MessageFormat.format(NbBundle.getMessage(GoToSource.class, "OpeningFileMsg"),  // NOI18N
+                                                             new Object[] { srcFile.getName() });
+        final String finalStatusText = st + " ..."; // NOI18N
+        StatusDisplayer.getDefault().setStatusText(finalStatusText);
+        
+        for(GoToSourceProvider impl : implementations) {
+            try {
+                if (impl.openFile(srcFile, offset)) return;
+            } catch (Exception e) {
+                ProfilerLogger.log(e);
+            }
+        }
+        
+        ProfilerDialogs.displayError(MessageFormat.format(NbBundle.getMessage(GoToSource.class,
+                                                                                "OpenFileFailsMessage"), // NOI18N
+                                                                                new Object[] { srcFile.getName(), offset }));
     }
 }

@@ -59,6 +59,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
+import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
@@ -211,7 +212,9 @@ public class ClassesListController extends AbstractController {
 
             HashSet subclasses = new HashSet();
 
-            String[] subclassesNames = SourceUtils.getSubclassesNames(className, project);
+            // FIXME
+            JavaProfilerProject prj = JavaProfilerProject.createFrom(project);
+            String[] subclassesNames = prj.getTypeUtils().getSubclasses(className);
 
             for (int i = 0; i < subclassesNames.length; i++) {
                 JavaClass jClass = heap.getJavaClassByName(subclassesNames[i]);

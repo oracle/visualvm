@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.spi;
+package org.netbeans.modules.profiler.spi.project;
 
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.project.Project;
@@ -53,12 +53,9 @@ import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 //import org.netbeans.modules.profiler.stp.SelectProfilingTask;
 import org.openide.filesystems.FileObject;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import javax.swing.JComponent;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
 //import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 
 
