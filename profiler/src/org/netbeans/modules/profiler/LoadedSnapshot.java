@@ -69,6 +69,7 @@ import java.util.zip.Inflater;
 import javax.management.openmbean.CompositeData;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 
 
 public class LoadedSnapshot {
@@ -512,7 +513,7 @@ public class LoadedSnapshot {
                 LOGGER.finest("-------------------------------------------------------------------------------"); // NOI18N
             }
         } catch (OutOfMemoryError e) {
-            NetBeansProfiler.getDefaultNB().displayError(OUT_OF_MEMORY_LOADING);
+            ProfilerDialogs.displayError(OUT_OF_MEMORY_LOADING);
 
             return false;
         }
