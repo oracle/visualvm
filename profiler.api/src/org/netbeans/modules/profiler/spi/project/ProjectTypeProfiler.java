@@ -105,10 +105,6 @@ public interface ProjectTypeProfiler {
         public void configurePropertiesForProfiling(Properties props, Project project, FileObject profiledClassFile) {
         }
 
-        public JComponent getAdditionalConfigurationComponent(Project project) {
-            return null;
-        }
-
 //        public SelectProfilingTask.SettingsConfigurator getSettingsConfigurator() {
 //            return DefaultSettingsConfigurator.SHARED_INSTANCE;
 //        }
@@ -249,10 +245,6 @@ public interface ProjectTypeProfiler {
     int TARGET_PROFILE_TEST_SINGLE = 4;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    // Returns JComponent that will be displayed in left bottom corner of STP and used for setting additional configuration
-    // related to the concrete project type & project. Currently displayed only for Profile Project, not for Attach Profiler
-    JComponent getAdditionalConfigurationComponent(Project project);
 
     /**
      * The project type implementation returns true for projects it can profile using attach and false for those it can

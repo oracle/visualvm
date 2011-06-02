@@ -80,10 +80,6 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
 
     public abstract boolean isProfilingSupported(Project project);
 
-    public JComponent getAdditionalConfigurationComponent(Project project) {
-        return null;
-    }
-
     public boolean isAttachSupported(Project project) {
         return true;
     }
