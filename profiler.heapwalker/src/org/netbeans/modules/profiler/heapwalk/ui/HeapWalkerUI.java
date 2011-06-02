@@ -51,8 +51,8 @@ import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
-import org.netbeans.modules.profiler.api.Icons;
-import org.netbeans.modules.profiler.api.ProfilerIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**

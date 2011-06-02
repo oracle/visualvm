@@ -47,8 +47,8 @@ import org.netbeans.modules.profiler.SnapshotResultsWindow;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import org.netbeans.modules.profiler.api.GeneralIcons;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**

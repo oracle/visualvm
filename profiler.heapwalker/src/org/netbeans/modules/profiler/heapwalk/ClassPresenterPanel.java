@@ -58,8 +58,8 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
-import org.netbeans.modules.profiler.api.Icons;
-import org.netbeans.modules.profiler.api.LanguageIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.openide.util.RequestProcessor;
 
 

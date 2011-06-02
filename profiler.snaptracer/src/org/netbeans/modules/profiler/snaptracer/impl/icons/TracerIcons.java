@@ -41,7 +41,7 @@
  */
 package org.netbeans.modules.profiler.snaptracer.impl.icons;
 
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *

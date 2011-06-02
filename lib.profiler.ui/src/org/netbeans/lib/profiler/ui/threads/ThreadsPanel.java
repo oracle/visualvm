@@ -69,9 +69,9 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import org.netbeans.modules.profiler.api.GeneralIcons;
-import org.netbeans.modules.profiler.api.Icons;
-import org.netbeans.modules.profiler.api.ProfilerIcons;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**

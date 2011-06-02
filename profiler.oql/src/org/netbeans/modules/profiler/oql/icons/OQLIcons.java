@@ -41,7 +41,7 @@
  */
 package org.netbeans.modules.profiler.oql.icons;
 
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *

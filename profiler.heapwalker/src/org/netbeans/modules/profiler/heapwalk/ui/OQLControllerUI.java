@@ -85,7 +85,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.components.JTitledPanel;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.OQLController;
 import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.netbeans.modules.profiler.heapwalk.oql.ui.OQLEditor;

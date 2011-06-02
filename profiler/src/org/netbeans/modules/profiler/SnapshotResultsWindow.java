@@ -60,9 +60,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.swing.*;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProfilerIcons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**

@@ -47,8 +47,8 @@ import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import org.netbeans.modules.profiler.api.Icons;
-import org.netbeans.modules.profiler.api.ProfilerIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**

@@ -57,8 +57,8 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
-import org.netbeans.modules.profiler.api.GeneralIcons;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *

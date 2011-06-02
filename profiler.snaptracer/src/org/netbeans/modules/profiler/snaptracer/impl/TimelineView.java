@@ -61,7 +61,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
 import org.openide.util.ImageUtilities;

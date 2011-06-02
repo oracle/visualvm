@@ -42,9 +42,9 @@
 package org.netbeans.modules.profiler.impl.icons;
 
 import java.util.Map;
-import org.netbeans.modules.profiler.api.GeneralIcons;
-import org.netbeans.modules.profiler.api.LanguageIcons;
-import org.netbeans.modules.profiler.api.ProfilerIcons;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.spi.IconsProvider;
 
 /**

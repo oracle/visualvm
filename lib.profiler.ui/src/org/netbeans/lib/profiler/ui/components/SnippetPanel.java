@@ -55,8 +55,8 @@ import javax.accessibility.AccessibleContext;
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.GeneralIcons;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 public class SnippetPanel extends JPanel implements MouseListener, KeyListener, FocusListener {

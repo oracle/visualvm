@@ -45,7 +45,7 @@ package org.netbeans.modules.profiler.snaptracer;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.openide.util.ImageUtilities;
 

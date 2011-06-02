@@ -63,7 +63,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.TracerProbe;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.modules.profiler.snaptracer.impl.probes.ProbePresenter;

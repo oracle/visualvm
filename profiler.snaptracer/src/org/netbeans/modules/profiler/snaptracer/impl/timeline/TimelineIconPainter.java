@@ -59,7 +59,7 @@ import org.netbeans.lib.profiler.charts.xy.XYItemChange;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChartContext;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 

@@ -48,8 +48,8 @@ import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import java.awt.Component;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.Icons;
-import org.netbeans.modules.profiler.api.ProfilerIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**

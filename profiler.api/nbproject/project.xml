@@ -150,6 +150,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.snaptracer</friend>
                 <friend>org.netbeans.modules.profiler.stp</friend>
                 <package>org.netbeans.modules.profiler.api</package>
+                <package>org.netbeans.modules.profiler.api.icons</package>
                 <package>org.netbeans.modules.profiler.api.java</package>
                 <package>org.netbeans.modules.profiler.spi</package>
                 <package>org.netbeans.modules.profiler.spi.java</package>

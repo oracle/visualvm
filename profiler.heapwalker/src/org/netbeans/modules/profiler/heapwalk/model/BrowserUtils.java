@@ -50,8 +50,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.api.Icons;
-import org.netbeans.modules.profiler.api.LanguageIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 

@@ -41,7 +41,7 @@
  */
 package org.netbeans.modules.profiler.heapwalk.ui.icons;
 
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *

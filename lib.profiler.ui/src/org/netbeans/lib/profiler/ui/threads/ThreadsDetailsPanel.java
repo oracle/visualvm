@@ -59,8 +59,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import javax.swing.*;
-import org.netbeans.modules.profiler.api.Icons;
-import org.netbeans.modules.profiler.api.ProfilerIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**

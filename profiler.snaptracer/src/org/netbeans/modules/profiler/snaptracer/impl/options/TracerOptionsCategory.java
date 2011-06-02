@@ -44,7 +44,7 @@
 package org.netbeans.modules.profiler.snaptracer.impl.options;
 
 import javax.swing.Icon;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.spi.options.OptionsCategory;
 import org.netbeans.spi.options.OptionsPanelController;

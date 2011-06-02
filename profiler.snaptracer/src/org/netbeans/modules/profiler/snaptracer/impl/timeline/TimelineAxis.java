@@ -88,7 +88,7 @@ import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderPanel;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.LegendFont;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.TimelineMarksPainter;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.Icons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.openide.util.ImageUtilities;
 
