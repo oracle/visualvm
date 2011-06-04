@@ -46,12 +46,9 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.NotifyDescriptor;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.util.HelpCtx;
@@ -59,7 +56,10 @@ import org.openide.util.NbBundle;
 import org.openide.util.actions.NodeAction;
 import java.util.ArrayList;
 import java.util.List;
-import javax.lang.model.element.ExecutableElement;
+import org.netbeans.modules.profiler.api.EditorSupport;
+import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
+import org.netbeans.modules.profiler.api.java.JavaProfilerSource.MethodInfo;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
@@ -115,41 +115,42 @@ public final class AddRootMethodAction extends NodeAction {
                     try {
                         // Get DataObject
                         DataObject dobj = (DataObject) nodes[0].getLookup().lookup(DataObject.class);
-
+                        
                         if (dobj == null) {
                             return;
                         }
+                        
+                        JavaProfilerSource src = JavaProfilerSource.createFrom(dobj.getPrimaryFile());
 
+                        if (src == null) {
+                            return;
+                        }
+                        
                         // Read current offset in editor
-                        int currentOffsetInEditor = SourceUtils.getCurrentOffsetInEditor();
+                        int currentOffsetInEditor = EditorSupport.getDefault().getCurrentOffset();
 
                         if (currentOffsetInEditor == -1) {
                             return;
                         }
 
                         // Get method at cursor
-                        SourceUtils.ResolvedMethod resolvedMethod = SourceUtils.resolveMethodAtPosition(dobj.getPrimaryFile(),
-                                                                                                        currentOffsetInEditor);
+                        MethodInfo resolvedMethod = src.resolveMethodAtPosition(currentOffsetInEditor);
 
                         if (resolvedMethod == null) {
-                            NetBeansProfiler.getDefaultNB()
-                                            .displayWarning(NbBundle.getMessage(AddRootMethodAction.class,
+                            ProfilerDialogs.displayWarning(NbBundle.getMessage(AddRootMethodAction.class,
                                                                                 "MSG_NoMethodFoundAtPosition")); // NOI18N
 
                             return;
                         }
 
-                        ExecutableElement method = resolvedMethod.getMethod();
-
-                        if (method == null) {
+                        if (resolvedMethod == null) {
                             return;
                         }
 
                         // Check if method is executable
-                        if (!SourceUtils.isExecutableMethod(method)) {
-                            ProfilerDialogs.notify(new NotifyDescriptor.Message(NbBundle.getMessage(AddRootMethodAction.class,
-                                                                                                    "MSG_CannotAddAbstractNativeProfilingRoot"), // NOI18N
-                                                                                NotifyDescriptor.INFORMATION_MESSAGE));
+                        if (!resolvedMethod.isExecutable()) {
+                            ProfilerDialogs.displayInfo(NbBundle.getMessage(AddRootMethodAction.class,
+                                                        "MSG_CannotAddAbstractNativeProfilingRoot")); // NOI18N
 
                             return;
                         }
@@ -163,7 +164,7 @@ public final class AddRootMethodAction extends NodeAction {
                         List<ProfilingSettings> cpuSettings = new ArrayList();
 
                         for (ProfilingSettings settings : projectSettings) {
-                            if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                            if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
                                 cpuSettings.add(settings);
                             }
                         }
@@ -177,8 +178,8 @@ public final class AddRootMethodAction extends NodeAction {
                             return; // cancelled by the user
                         }
 
-                        settings.addRootMethod(resolvedMethod.getVMClassName(), resolvedMethod.getVMMethodName(),
-                                               resolvedMethod.getVMMethodSignature());
+                        settings.addRootMethod(resolvedMethod.getClassName(), resolvedMethod.getVMName(),
+                                               resolvedMethod.getSignature());
 
                         if (cpuSettings.contains(settings)) {
                             ProfilingSettingsManager.getDefault().storeProfilingSettings(projectSettings, settings, project);
@@ -189,9 +190,8 @@ public final class AddRootMethodAction extends NodeAction {
                             ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
                         }
                     } catch (Exception ex) {
-                        ProfilerDialogs.notify(new NotifyDescriptor.Message(NbBundle.getMessage(AddRootMethodAction.class,
-                                                                                                "MSG_ProblemAddingRootMethod"), // NOI18N
-                                                                            NotifyDescriptor.WARNING_MESSAGE));
+                        ProfilerDialogs.displayWarning(NbBundle.getMessage(AddRootMethodAction.class,
+                                                        "MSG_ProblemAddingRootMethod")); // NOI18N
                     }
                 }
             }.execute();

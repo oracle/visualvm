@@ -81,6 +81,8 @@ import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**
@@ -286,10 +288,10 @@ public class JTitledPanel extends JPanel {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final ImageIcon closePanelIcon = new ImageIcon(JTitledPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/closePanel.png")); // NOI18N
-    private static final ImageIcon maximizePanelIcon = new ImageIcon(JTitledPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/maximizePanel.png")); // NOI18N
-    private static final ImageIcon restorePanelIcon = new ImageIcon(JTitledPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/restorePanel.png")); // NOI18N
-    private static final ImageIcon minimizePanelIcon = new ImageIcon(JTitledPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/minimizePanel.png")); // NOI18N
+    private static final ImageIcon closePanelIcon = Icons.getImageIcon(GeneralIcons.CLOSE_PANEL);
+    private static final ImageIcon maximizePanelIcon = Icons.getImageIcon(GeneralIcons.MAXIMIZE_PANEL);
+    private static final ImageIcon restorePanelIcon = Icons.getImageIcon(GeneralIcons.RESTORE_PANEL);
+    private static final ImageIcon minimizePanelIcon = Icons.getImageIcon(GeneralIcons.MINIMIZE_PANEL);
     public static final int STATE_CLOSED = 1000;
     public static final int STATE_RESTORED = 1001;
     public static final int STATE_MAXIMIZED = 1002;
