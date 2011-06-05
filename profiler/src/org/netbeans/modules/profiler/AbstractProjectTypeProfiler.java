@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -52,10 +51,9 @@ import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.modules.profiler.ui.stp.DefaultSettingsConfigurator;
-import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
-import org.netbeans.spi.project.support.ant.GeneratedFilesHelper;
+import org.netbeans.modules.profiler.spi.project.ProjectTypeProfiler;
+import org.netbeans.modules.profiler.stp.DefaultSettingsConfigurator;
+import org.netbeans.modules.profiler.stp.SelectProfilingTask;
 import org.openide.filesystems.FileObject;
 import java.util.List;
 import java.util.Properties;
@@ -64,9 +62,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
-import org.netbeans.modules.profiler.spi.ProjectProfilingSupport;
-import org.openide.util.Lookup;
+import org.netbeans.modules.profiler.spi.project.ProjectProfilingSupport;
 
 
 /**
@@ -83,10 +79,6 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
     public abstract String getProfilerTargetName(Project project, FileObject buildScript, int type, FileObject profiledClassFile);
 
     public abstract boolean isProfilingSupported(Project project);
-
-    public JComponent getAdditionalConfigurationComponent(Project project) {
-        return null;
-    }
 
     public boolean isAttachSupported(Project project) {
         return true;
@@ -147,9 +139,9 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
     public float getProfilingOverhead(ProfilingSettings settings) {
          float o = 0.0f;
 
-        if (org.netbeans.modules.profiler.ui.stp.Utils.isMonitorSettings(settings)) {
+        if (org.netbeans.modules.profiler.stp.Utils.isMonitorSettings(settings)) {
             //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings)) {
+        } else if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings)) {
             if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
                 o += 0.5f; // entire app
             } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
@@ -159,7 +151,7 @@ public abstract class AbstractProjectTypeProfiler implements ProjectTypeProfiler
             if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
                 o += 0.5f; // profile all classes
             }
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isMemorySettings(settings)) {
+        } else if (org.netbeans.modules.profiler.stp.Utils.isMemorySettings(settings)) {
             if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
                 o += 0.5f; // object allocations
             } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
