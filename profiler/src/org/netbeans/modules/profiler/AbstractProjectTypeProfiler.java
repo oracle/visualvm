@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
@@ -61,6 +60,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
+import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.spi.project.ProjectProfilingSupport;
 

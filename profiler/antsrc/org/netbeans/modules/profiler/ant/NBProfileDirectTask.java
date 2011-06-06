@@ -48,7 +48,6 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.apache.tools.ant.types.Path;
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
@@ -71,6 +70,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
 
@@ -475,7 +475,7 @@ public final class NBProfileDirectTask extends Task {
             ss.setMainClass(mainClass);
         }
 
-        JavaPlatform platform = IDEUtils.getJavaPlatformByName(ProfilerIDESettings.getInstance().getJavaPlatformForProfiling());
+        JavaPlatform platform = JavaPlatform.getJavaPlatformById(ProfilerIDESettings.getInstance().getJavaPlatformForProfiling());
 
         if (platform == null) {
             platform = JavaPlatformSelector.getDefault().selectPlatformToUse();
@@ -485,13 +485,13 @@ public final class NBProfileDirectTask extends Task {
             }
         }
 
-        String javaFile = IDEUtils.getPlatformJavaFile(platform);
+        String javaFile = platform.getPlatformJavaFile();
 
         if (javaFile == null) {
             throw new BuildException("Cannot determine Java executable for platform: " + platform.getDisplayName()); //NOI18N
         }
 
-        String javaVersion = IDEUtils.getPlatformJDKVersion(platform);
+        String javaVersion = platform.getPlatformJDKVersion();
 
         if (javaVersion == null) {
             throw new BuildException("Cannot determine Java version for the selected Java platform"); //NOI18N
@@ -499,7 +499,7 @@ public final class NBProfileDirectTask extends Task {
 
         ss.setJavaExecutable(javaFile);
         ss.setJavaVersionString(javaVersion);
-        ss.setSystemArchitecture(IDEUtils.getPlatformArchitecture(platform));
+        ss.setSystemArchitecture(platform.getPlatformArchitecture());
 
         ps = ProfilingSupport.getDefault().selectTaskForProfiling(p, ss, null, false);
 

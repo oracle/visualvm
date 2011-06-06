@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.spi.project;
 
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
@@ -56,6 +55,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.JComponent;
+import org.netbeans.modules.profiler.api.JavaPlatform;
 //import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 
 

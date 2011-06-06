@@ -48,7 +48,6 @@ import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
@@ -88,7 +87,6 @@ import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
 import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsWindow;
 import org.netbeans.modules.profiler.spi.LoadGenPlugin;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.modules.profiler.utils.OutputParameter;
 import org.openide.DialogDescriptor;
 import org.openide.ErrorManager;
@@ -141,6 +139,7 @@ import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
 import org.netbeans.modules.profiler.api.GlobalStorage;
+import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
@@ -758,33 +757,21 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public int getPlatformArchitecture(String platformName) {
-        JavaPlatform platform = IDEUtils.getJavaPlatformByName(platformName);
+        JavaPlatform platform = JavaPlatform.getJavaPlatformById(platformName);
 
-        if (platform == null) {
-            return Platform.ARCH_32;
-        } else {
-            return IDEUtils.getPlatformArchitecture(platform);
-        }
+        return platform.getPlatformArchitecture();
     }
 
     public String getPlatformJDKVersion(String platformName) {
-        JavaPlatform platform = IDEUtils.getJavaPlatformByName(platformName);
+        JavaPlatform platform = JavaPlatform.getJavaPlatformById(platformName);
 
-        if (platform == null) {
-            return null;
-        } else {
-            return IDEUtils.getPlatformJDKVersion(platform);
-        }
+        return platform.getPlatformJDKVersion();
     }
 
     public String getPlatformJavaFile(String platformName) {
-        JavaPlatform platform = IDEUtils.getJavaPlatformByName(platformName);
+        JavaPlatform platform = JavaPlatform.getJavaPlatformById(platformName);
 
-        if (platform == null) {
-            return null;
-        } else {
-            return IDEUtils.getPlatformJavaFile(platform);
-        }
+        return platform.getPlatformJavaFile();
     }
 
     public int getProfilingMode() {

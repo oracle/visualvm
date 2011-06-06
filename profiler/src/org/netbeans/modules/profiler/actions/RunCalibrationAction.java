@@ -43,13 +43,12 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
@@ -126,9 +125,9 @@ public final class RunCalibrationAction extends AbstractAction {
                     }
 
                     if (!Profiler.getDefault()
-                                     .runCalibration(false, IDEUtils.getPlatformJavaFile(calibratePlatform),
-                                                         IDEUtils.getPlatformJDKVersion(calibratePlatform),
-                                                         IDEUtils.getPlatformArchitecture(calibratePlatform))) {
+                                     .runCalibration(false, calibratePlatform.getPlatformJavaFile(),
+                                                         calibratePlatform.getPlatformJDKVersion(),
+                                                         calibratePlatform.getPlatformArchitecture())) {
                         ProfilerDialogs.displayError(NbBundle.getMessage(RunCalibrationAction.class, "MSG_CalibrationFailed")); //NOI18N
                     }
                 }

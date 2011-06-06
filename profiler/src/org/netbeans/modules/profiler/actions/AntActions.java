@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.ui.OpenProjects;
@@ -60,10 +59,8 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.spi.project.ui.support.MainProjectSensitiveActions;
 import org.netbeans.spi.project.ui.support.ProjectActionPerformer;
 import org.openide.ErrorManager;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -74,12 +71,12 @@ import javax.swing.Action;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.HeapDumpWatch;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
 /**
@@ -107,6 +104,10 @@ public final class AntActions {
                                                                                    "AntActions_UnsupportedProjectTypeMsg"); // NOI18N                                                                                                                            
     private static final String INVALID_JAVAPLATFORM_MSG = NbBundle.getMessage(AntActions.class,
                                                                                    "AntActions_InvalidJavaplatformMsg"); // NOI18N
+    private static final String INVALID_PLATFORM_PROJECT_MSG = NbBundle.getMessage(AntActions.class,
+                                                                                   "AntActions_InvalidPlatformProjectMsg"); // NOI18N
+    private static final String INVALID_PLATFORM_PROFILER_MSG = NbBundle.getMessage(AntActions.class,
+                                                                                    "AntActions_InvalidPlatformProfilerMsg"); // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -530,13 +531,22 @@ public final class AntActions {
                             // 5. get session settings from the project context
                             final ProfilerIDESettings gps = ProfilerIDESettings.getInstance();
 
-                            final String javaFile = IDEUtils.getPlatformJavaFile(platform);
+                            final String javaFile = platform.getPlatformJavaFile();
 
                             if (javaFile == null) {
-                                return; // error has been reported
+                                if (ProfilerIDESettings.getInstance().getJavaPlatformForProfiling() == null) {
+                                    // used platform defined for project
+                                    ProfilerDialogs.displayError(MessageFormat.format(INVALID_PLATFORM_PROJECT_MSG,
+                                                                               new Object[] { platform.getDisplayName() }));
+                                } else {
+                                    // used platform defined in Options / Profiler
+                                    ProfilerDialogs.displayError(MessageFormat.format(INVALID_PLATFORM_PROFILER_MSG,
+                                                                               new Object[] { platform.getDisplayName() }));
+                                }
+                                return;
                             }
 
-                            final String javaVersion = IDEUtils.getPlatformJDKVersion(platform);
+                            final String javaVersion = platform.getPlatformJDKVersion();
 
                             if (javaVersion == null) {
                                 ProfilerDialogs.displayError(MessageFormat.format(FAILED_DETERMINE_JAVA_PLATFORM_MSG,
@@ -548,7 +558,7 @@ public final class AntActions {
                             final SessionSettings ss = new SessionSettings();
                             ss.setJavaExecutable(javaFile);
                             ss.setJavaVersionString(javaVersion);
-                            ss.setSystemArchitecture(IDEUtils.getPlatformArchitecture(platform));
+                            ss.setSystemArchitecture(platform.getPlatformArchitecture());
                             ss.setPortNo(gps.getPortNo());
                             ptp.setupProjectSessionSettings(project, ss);
 
@@ -596,7 +606,7 @@ public final class AntActions {
                                 
                                 if (javaPlatformName != null) {
                                     usedJavaExecutable = Profiler.getDefault().getPlatformJavaFile(javaPlatformName);
-                                    jp = IDEUtils.getJavaPlatformByName(javaPlatformName);
+                                    jp = JavaPlatform.getJavaPlatformById(javaPlatformName);
 
                                     if (jp == null) {
                                         // selected platform does not exist, use 
@@ -610,12 +620,12 @@ public final class AntActions {
                                 }
                                 // added to support nbstartprofiledserver
                                 props.setProperty("profiler.info.javaPlatform",
-                                                  jp.getProperties().get("platform.ant.name")); // NOI18N
+                                                  jp.getPlatformId());
                                 usedJvmArgs = profilingSettings.getJVMArgs();
                             } else {
                                 // added to support nbstartprofiledserver
                                 props.setProperty("profiler.info.javaPlatform",
-                                                  platform.getProperties().get("platform.ant.name").toString()); // NOI18N
+                                                  platform.getPlatformId());
                             }
 
                             props.setProperty("profiler.info.jvm", usedJavaExecutable); // NOI18N
@@ -629,7 +639,7 @@ public final class AntActions {
                                                                                          ss.getSystemArchitecture()) //NOI18N
                                 );
 
-                                if (IDEUtils.getPlatformJDKMinor(platform) >= 7) {
+                                if (platform.getPlatformJDKMinor() >= 7) {
                                     activateOOMProtection(gps, props, project);
                                 } else {
                                     ProfilerLogger.log("Profiler.OutOfMemoryDetection: Disabled. Not supported JVM. Use at least 1.4.2_12 or 1.5.0_07"); // NOI18N
@@ -708,7 +718,7 @@ public final class AntActions {
     private static JavaPlatform initPlatform(Project project, ProjectTypeProfiler ptp) {
         // 1. check if we have a Java platform to use for profiling
         final ProfilerIDESettings gps = ProfilerIDESettings.getInstance();
-        JavaPlatform platform = IDEUtils.getJavaPlatformByName(gps.getJavaPlatformForProfiling());
+        JavaPlatform platform = JavaPlatform.getJavaPlatformById(gps.getJavaPlatformForProfiling());
         JavaPlatform projectPlatform = ptp.getProjectJavaPlatform(project);
 
         if (platform == null) { // should use the one defined in project
@@ -726,7 +736,7 @@ public final class AntActions {
         if (projectPlatform != null) { // check that the project platform is not newer than platform to use
 
             while (true) {
-                if (projectPlatform.getSpecification().getVersion().compareTo(platform.getSpecification().getVersion()) > 0) {
+                if (projectPlatform.getVersion().compareTo(platform.getVersion()) > 0) {
                     Boolean ret = ProfilerDialogs.displayCancellableConfirmation(
                             INCORRECT_JAVA_SPECVERSION_DIALOG_MSG,
                             INCORRECT_JAVA_SPECVERSION_DIALOG_CAPTION);

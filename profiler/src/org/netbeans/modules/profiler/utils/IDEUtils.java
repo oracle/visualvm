@@ -43,29 +43,18 @@
 
 package org.netbeans.modules.profiler.utils;
 
-import org.netbeans.api.java.platform.JavaPlatform;
-import org.netbeans.api.java.platform.JavaPlatformManager;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.utils.MiscUtils;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.openide.DialogDescriptor;
-import org.openide.ErrorManager;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
 import java.awt.*;
-import java.io.File;
-import java.text.MessageFormat;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.openide.DialogDisplayer;
 
@@ -87,10 +76,6 @@ public final class IDEUtils {
                                                                                                "IDEUtils_SelectSettingsConfigurationLabelText"); // NOI18N
     private static final String SELECT_SETTINGS_CONFIGURATION_DIALOG_CAPTION = NbBundle.getMessage(IDEUtils.class,
                                                                                                    "IDEUtils_SelectSettingsConfigurationDialogCaption"); // NOI18N
-    private static final String INVALID_PLATFORM_PROJECT_MSG = NbBundle.getMessage(IDEUtils.class,
-                                                                                   "IDEUtils_InvalidPlatformProjectMsg"); // NOI18N
-    private static final String INVALID_PLATFORM_PROFILER_MSG = NbBundle.getMessage(IDEUtils.class,
-                                                                                    "IDEUtils_InvalidPlatformProfilerMsg"); // NOI18N
     private static final String INVALID_TARGET_JVM_EXEFILE_ERROR = NbBundle.getMessage(IDEUtils.class,
                                                                                        "IDEUtils_InvalidTargetJVMExeFileError"); // NOI18N // TODO: move to this package's bundle
     private static final String ERROR_CONVERTING_PROFILING_SETTINGS_MESSAGE = NbBundle.getMessage(IDEUtils.class,
@@ -131,115 +116,6 @@ public final class IDEUtils {
 //            return localizedHelpDir.getPath();
 //        }
 //    }
-
-    public static JavaPlatform getJavaPlatformByName(String platformName) {
-        if (platformName != null) {
-            JavaPlatform[] platforms = JavaPlatformManager.getDefault().getPlatforms(platformName, null);
-
-            for (int i = 0; i < platforms.length; i++) {
-                JavaPlatform platform = platforms[i];
-
-                if ((platformName != null) && platform.getDisplayName().equals((platformName))) {
-                    return platform;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public static int getPlatformArchitecture(JavaPlatform platform) {
-        assert platform != null : "Platform may not be NULL"; // NOI18N
-
-        Map props = platform.getSystemProperties();
-        String arch = (String) props.get("sun.arch.data.model"); // NOI18N
-
-        if (arch == null) {
-            return 32;
-        }
-
-        return Integer.parseInt(arch);
-    }
-
-    public static int getPlatformJDKMinor(JavaPlatform platform) {
-        assert platform != null : "Platform may not be NULL"; // NOI18N
-
-        Map props = platform.getSystemProperties();
-        String ver = (String) props.get("java.version"); // NOI18N
-
-        return Platform.getJDKMinorNumber(ver);
-    }
-
-    /** Gets a version for to provided JavaPlatform. The platform passed cannot be null.
-     *
-     * @param platform A JavaPlatform for which we need the java executable path
-     * @return A path to java executable or null if not found
-     * @see CommonConstants.JDK_15_STRING
-     * @see CommonConstants.JDK_16_STRING
-     * @see CommonConstants.JDK_17_STRING
-     */
-    public static String getPlatformJDKVersion(JavaPlatform platform) {
-        assert platform != null : "Platform may not be NULL"; // NOI18N
-
-        Map props = platform.getSystemProperties();
-        String ver = (String) props.get("java.version"); // NOI18N
-
-        if (ver == null) {
-            return null;
-        }
-
-        if (ver.startsWith("1.5")) {
-            return CommonConstants.JDK_15_STRING; // NOI18N
-        } else if (ver.startsWith("1.6")) {
-            return CommonConstants.JDK_16_STRING; // NOI18N
-        } else if (ver.startsWith("1.7")) {
-            return CommonConstants.JDK_17_STRING; // NOI18N
-        } else {
-            return null;
-        }
-    }
-
-    /** Gets a path to java executable for specified platform. The platform passed cannot be null.
-     * Errors when obtaining the java executable will be reported to the user and null will be returned.
-     *
-     * @param platform A JavaPlatform for which we need the java executable path
-     * @return A path to java executable or null if not found
-     */
-    public static String getPlatformJavaFile(JavaPlatform platform) {
-        assert platform != null : "Platform may not be NULL"; // NOI18N
-
-        FileObject fo = platform.findTool("java"); // NOI18N
-
-        if (fo == null) { // probably invalid platform
-
-            if (ProfilerIDESettings.getInstance().getJavaPlatformForProfiling() == null) {
-                // used platform defined for project
-                ProfilerDialogs.displayError(MessageFormat.format(INVALID_PLATFORM_PROJECT_MSG,
-                                                           new Object[] { platform.getDisplayName() }));
-            } else {
-                // used platform defined in Options / Profiler
-                ProfilerDialogs.displayError(MessageFormat.format(INVALID_PLATFORM_PROFILER_MSG,
-                                                           new Object[] { platform.getDisplayName() }));
-            }
-
-            return null;
-        }
-
-        String jvmExe = null;
-
-        try {
-            File file = FileUtil.toFile(fo);
-            jvmExe = file.getAbsolutePath();
-            MiscUtils.checkFileForName(jvmExe);
-        } catch (Exception e) {
-            ErrorManager.getDefault()
-                        .annotate(e,
-                                  MessageFormat.format(INVALID_TARGET_JVM_EXEFILE_ERROR, new Object[] { jvmExe, e.getMessage() }));
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
-        }
-
-        return jvmExe;
-    }
 
     /**
      * Opens a dialog that allows the user to select one of existing profiling settings
