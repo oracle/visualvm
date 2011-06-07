@@ -48,7 +48,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.HeapWalkerUI;
@@ -63,6 +62,7 @@ import java.text.MessageFormat;
 import java.util.Date;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.api.ProjectStorage;
+import org.openide.util.Lookup;
 
 
 /**
@@ -87,7 +87,7 @@ public class HeapWalker {
     private File heapDumpFile;
     private HeapFragmentWalker mainHeapWalker;
     private HeapWalkerUI heapWalkerUI;
-    private Project heapDumpProject;
+    private Lookup.Provider heapDumpProject;
     private String heapWalkerName;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ public class HeapWalker {
         return heapDumpFile;
     }
 
-    public Project getHeapDumpProject() {
+    public Lookup.Provider getHeapDumpProject() {
         return heapDumpProject;
     }
 
@@ -191,7 +191,7 @@ public class HeapWalker {
     }
 
     // --- Private implementation ------------------------------------------------
-    private static Project computeHeapDumpProject(File heapDumpFile) {
+    private static Lookup.Provider computeHeapDumpProject(File heapDumpFile) {
         if (heapDumpFile == null) {
             return null;
         }
@@ -208,7 +208,7 @@ public class HeapWalker {
             return null;
         }
 
-        return (Project)ProjectStorage.getProjectFromSettingsFolder(heapDumpDirObj);
+        return ProjectStorage.getProjectFromSettingsFolder(heapDumpDirObj);
     }
 
     private static Heap createHeap(File heapFile) throws FileNotFoundException, IOException {

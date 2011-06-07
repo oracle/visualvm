@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.heapwalk;
 
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.ui.ClassesListControllerUI;
@@ -61,6 +60,7 @@ import javax.swing.AbstractButton;
 import javax.swing.JPanel;
 import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.openide.util.Lookup;
 
 
 /**
@@ -202,7 +202,7 @@ public class ClassesListController extends AbstractController {
         return new ClassesListControllerUI(this);
     }
 
-    private static Collection getContextSubclasses(Heap heap, String className, Project project) {
+    private static Collection getContextSubclasses(Heap heap, String className, Lookup.Provider project) {
         ProgressHandle pHandle = null;
 
         try {
@@ -256,7 +256,7 @@ public class ClassesListController extends AbstractController {
         return filteredClasses;
     }
 
-    private static List getSubclasses(Heap heap, String[] filterStrings, Project project) {
+    private static List getSubclasses(Heap heap, String[] filterStrings, Lookup.Provider project) {
         HashSet subclasses = new HashSet();
 
         for (int i = 0; i < filterStrings.length; i++) {

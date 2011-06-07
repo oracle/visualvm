@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -102,6 +101,7 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
 
@@ -587,7 +587,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                         while (className.endsWith("[]")) { // NOI18N
                             className = className.substring(0, className.length() - 2);
                         }
-                        Project p = fieldsBrowserController.getInstancesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
+                        Lookup.Provider p = fieldsBrowserController.getInstancesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
                         GoToSource.openSource(p, className, null, null);
                     }
                 }

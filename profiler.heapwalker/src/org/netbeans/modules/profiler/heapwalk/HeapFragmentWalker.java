@@ -49,7 +49,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.ui.HeapFragmentWalkerUI;
 import java.io.File;
@@ -63,6 +62,7 @@ import javax.swing.border.EmptyBorder;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 
@@ -271,7 +271,7 @@ public class HeapFragmentWalker {
         return heapWalker.getHeapDumpFile();
     }
 
-    public Project getHeapDumpProject() {
+    public Lookup.Provider getHeapDumpProject() {
         return heapWalker.getHeapDumpProject();
     }
 

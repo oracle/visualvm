@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIConstants;
@@ -106,6 +105,7 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
 
@@ -579,7 +579,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                         while (className.endsWith("[]")) {
                             className = className.substring(0, className.length() - 2); // NOI18N
                         }
-                        Project p = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject();
+                        Lookup.Provider p = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject();
                         GoToSource.openSource(p, className, null, null);
                     }
                 }
