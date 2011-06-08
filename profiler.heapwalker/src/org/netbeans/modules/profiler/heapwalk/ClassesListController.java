@@ -59,7 +59,6 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
 import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.openide.util.Lookup;
 
 
