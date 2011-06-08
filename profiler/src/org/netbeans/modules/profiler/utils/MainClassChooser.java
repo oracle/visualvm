@@ -58,7 +58,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
+import org.openide.util.Lookup;
 
 
 /**
@@ -88,14 +89,14 @@ public class MainClassChooser extends JPanel {
     /**
      * Creates new form MainClassChooser
      */
-    public MainClassChooser(FileObject[] sourcesRoots) {
-        this(sourcesRoots, null);
+    public MainClassChooser(Lookup.Provider project) {
+        this(project, null);
     }
 
-    public MainClassChooser(FileObject[] sourcesRoots, String subtitle) {
+    public MainClassChooser(Lookup.Provider project, String subtitle) {
         dialogSubtitle = subtitle;
         initComponents();
-        initClassesView(sourcesRoots);
+        initClassesView(project);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -141,13 +142,13 @@ public class MainClassChooser extends JPanel {
         return new Object[] { NbBundle.getMessage(MainClassChooser.class, "LBL_ChooseMainClass_WARMUP_MESSAGE") }; // NOI18N
     }
 
-    private void initClassesView(final FileObject[] sourcesRoots) {
+    private void initClassesView(final Lookup.Provider project) {
         possibleMainClasses = null;
         jMainClassList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jMainClassList.setListData(getWarmupList());
         RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    possibleMainClasses = SourceUtils.findMainClasses(sourcesRoots);
+                    possibleMainClasses = JavaProfilerProject.createFrom(project).getTypeUtils().getMainClasses();
 
                     if (possibleMainClasses.isEmpty()) {
                         jMainClassList.setListData(new String[] {

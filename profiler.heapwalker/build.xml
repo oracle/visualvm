@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="netbeans" name="profiler.heapwalker">
+    <description>Builds, tests, and runs the project org.netbeans.modules.profiler.heapwalker</description>
+    <import file="../nbbuild/templates/projectized.xml"/>
+</project>
