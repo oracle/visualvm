@@ -43,8 +43,7 @@
 
 package org.netbeans.modules.profiler.ui.panels;
 
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stp.Utils;
+import org.netbeans.modules.profiler.stp.Utils;
 import org.openide.DialogDescriptor;
 import org.openide.util.Cancellable;
 import org.openide.util.NbBundle;
@@ -63,6 +62,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import org.openide.DialogDisplayer;
 
 
 /**
@@ -124,7 +124,7 @@ public class ModalProgressDisplayer extends JPanel {
             final ModalProgressDisplayer pd = ModalProgressDisplayer.getDefault();
 
             final DialogDescriptor dd = pd.createDialogDescriptor(caption, message, controller);
-            final Dialog d = ProfilerDialogs.createDialog(dd);
+            final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
             d.pack();
 
             pd.setOwner(d);
