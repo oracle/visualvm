@@ -43,6 +43,7 @@ package org.netbeans.modules.profiler.spi;
 
 import java.util.Set;
 import javax.swing.Icon;
+import javax.swing.event.ChangeListener;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup.Provider;
 
@@ -65,4 +66,16 @@ public abstract class ProjectUtilitiesProvider {
     public abstract void fetchSubprojects(Provider project, Set<Provider> subprojects);
 
     public abstract Provider[] getSortedProjects(Provider[] openedProjects);
+    
+    /**
+     * Adds a listener to be notified when set of open projects changes.
+     * @param listener listener to be added
+     */
+    public abstract void addOpenProjectsListener(ChangeListener listener);
+    
+    /**
+     * Removes a listener to be notified when set of open projects changes.
+     * @param listener listener to be removed
+     */
+    public abstract void removeOpenProjectsListener(ChangeListener listener);
 }

@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.*;
@@ -55,10 +54,12 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.io.IOException;
 import java.text.MessageFormat;
+import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectStorage;
 import org.netbeans.modules.profiler.api.project.ProjectProfilingSupport;
 import org.netbeans.modules.profiler.attach.AttachWizard;
+import org.openide.util.Lookup;
 
 
 /**
@@ -76,18 +77,18 @@ public final class ProfilingSupport {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private ProfilingSettings ps;
-        private Project p;
+        private Lookup.Provider p;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        private AttachSTPData(ProfilingSettings ps, Project p) {
+        private AttachSTPData(ProfilingSettings ps, Lookup.Provider p) {
             this.ps = ps;
             this.p = p;
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public Project getProject() {
+        public Lookup.Provider getProject() {
             return p;
         }
 
@@ -156,7 +157,7 @@ public final class ProfilingSupport {
         return false;
     }
 
-    public AttachSTPData selectTaskForAttach(final Project project, final SessionSettings sessionSettings) {
+    public AttachSTPData selectTaskForAttach(final Lookup.Provider project, final SessionSettings sessionSettings) {
         SelectProfilingTask.Configuration configuration = SelectProfilingTask.selectAttachProfilerTask(project);
 
         if (configuration == null) {
@@ -166,7 +167,7 @@ public final class ProfilingSupport {
         }
     }
 
-    public ProfilingSettings selectTaskForProfiling(final Project project, final SessionSettings sessionSettings,
+    public ProfilingSettings selectTaskForProfiling(final Lookup.Provider project, final SessionSettings sessionSettings,
                                                     FileObject profiledFile, boolean enableOverride) {
         SelectProfilingTask.Configuration configuration = SelectProfilingTask.selectProfileProjectTask(project, profiledFile,
                                                                                                        enableOverride);
@@ -209,7 +210,7 @@ public final class ProfilingSupport {
                         // NOTE: Let's not preselect main project, force the user to choose from list of projects and remember selection
                         //       Project should be passed here from hypotetic Attach To Project action (not implemented yet)
                         //Project project = ProjectUtilities.getMainProject();
-                        Project project = null;
+                        Lookup.Provider project = null;
 
                         //2. load or ask the user for attach settings
                         final GlobalProfilingSettings gps = Profiler.getDefault().getGlobalProfilingSettings();

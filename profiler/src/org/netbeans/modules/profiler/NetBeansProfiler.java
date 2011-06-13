@@ -1544,11 +1544,11 @@ public final class NetBeansProfiler extends Profiler {
         return result;
     }
 
-    public void setProfiledProject(Project project, FileObject singleFile) {
-        profiledProject = project;
+    public void setProfiledProject(Lookup.Provider project, FileObject singleFile) {
+        profiledProject = (Project)project;
         profiledSingleFile = singleFile;
 
-        ProfilerControlPanel2.getDefault().setProfiledProject(project);
+        ProfilerControlPanel2.getDefault().setProfiledProject(profiledProject);
     }
 
     public Project getProfiledProject() {
