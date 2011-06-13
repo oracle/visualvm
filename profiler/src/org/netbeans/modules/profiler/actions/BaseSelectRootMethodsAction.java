@@ -59,7 +59,6 @@ import java.util.List;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.panels.ClassSelectRootMethodsPanel;
-import org.openide.filesystems.FileObject;
 
 /**
  * Base class for actions providing functionality to select a profiling root
@@ -129,7 +128,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
                     List<ProfilingSettings> cpuSettings = new ArrayList();
 
                     for (ProfilingSettings settings : projectSettings) {
-                        if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                        if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
                             cpuSettings.add(settings);
                         }
                     }

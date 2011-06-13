@@ -77,15 +77,6 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.projectapi</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.37</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.openide.awt</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -143,6 +134,7 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.modules.profiler.api</package>
                 <package>org.netbeans.modules.profiler.api.icons</package>
                 <package>org.netbeans.modules.profiler.api.java</package>
+                <package>org.netbeans.modules.profiler.api.project</package>
                 <package>org.netbeans.modules.profiler.spi</package>
                 <package>org.netbeans.modules.profiler.spi.java</package>
                 <package>org.netbeans.modules.profiler.spi.project</package>

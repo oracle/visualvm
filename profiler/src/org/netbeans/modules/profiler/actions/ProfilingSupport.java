@@ -48,10 +48,8 @@ import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.*;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.spi.project.ProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.panels.PIDSelectPanel;
 import org.netbeans.modules.profiler.stp.SelectProfilingTask;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -59,6 +57,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectStorage;
+import org.netbeans.modules.profiler.api.project.ProjectProfilingSupport;
 import org.netbeans.modules.profiler.attach.AttachWizard;
 
 
@@ -218,15 +217,18 @@ public final class ProfilingSupport {
                         SessionSettings ss = new SessionSettings();
                         ss.setPortNo(gps.getPortNo());
 
-                        ProjectTypeProfiler ptp = null;
-
-                        if (project != null) {
-                            ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-                        }
-
-                        if (ptp != null) {
-                            ptp.setupProjectSessionSettings(project, ss); // can be null in case of global attach
-                        }
+//                        ProjectTypeProfiler ptp = null;
+//
+//                        if (project != null) {
+//                            ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+//                        }
+//
+//                        if (ptp != null) {
+//                            ptp.setupProjectSessionSettings(project, ss); // can be null in case of global attach
+//                        }
+                        
+                        ProjectProfilingSupport pps = ProjectProfilingSupport.get(project);
+                        pps.setupProjectSessionSettings(ss);
 
                         boolean settingsAccepted = false;
                         ProfilingSettings ps = null;

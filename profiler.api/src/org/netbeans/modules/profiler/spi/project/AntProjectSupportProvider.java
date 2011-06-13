@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -37,20 +37,42 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2009 Sun Microsystems, Inc.
+ * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.profiler.spi.project;
 
-import org.netbeans.lib.profiler.client.ClientUtils;
 import org.openide.filesystems.FileObject;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-public interface ProjectProfilingSupport {
-    String getFilter(boolean useSubprojects);
-    ClientUtils.SourceCodeSelection[] getRootMethods(FileObject profiledClassFile);
-    boolean canProfileFile(FileObject file);
+public abstract class AntProjectSupportProvider {
+    
+    public abstract String getProfilerTargetName(FileObject buildScript, int type, FileObject profiledClassFile);
+    
+    public abstract FileObject getProjectBuildScript();
+    
+    public abstract FileObject getProjectBuildScript(String buildFileName);
+    
+    
+    public static class Basic extends AntProjectSupportProvider {
+
+        @Override
+        public String getProfilerTargetName(FileObject buildScript, int type, FileObject profiledClassFile) {
+            return null;
+        }
+        
+        @Override
+        public FileObject getProjectBuildScript() {
+            return null;
+        }
+
+        @Override
+        public FileObject getProjectBuildScript(String buildFileName) {
+            return null;
+        }
+        
+    }
+    
 }

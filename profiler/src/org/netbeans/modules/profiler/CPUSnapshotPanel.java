@@ -61,7 +61,6 @@ import org.netbeans.modules.profiler.ui.FindDialog;
 import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.actions.FindAction;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.SystemAction;
 import java.awt.*;
@@ -112,7 +111,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             List<ProfilingSettings> cpuSettings = new ArrayList();
 
             for (ProfilingSettings settings : projectSettings) {
-                if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
                     cpuSettings.add(settings);
                 }
             }

@@ -72,7 +72,6 @@ import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
-import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.Presenter;
@@ -230,7 +229,7 @@ public final class LiveResultsWindow extends TopComponent
             List<ProfilingSettings> cpuSettings = new ArrayList<ProfilingSettings>();
 
             for (ProfilingSettings settings : projectSettings) {
-                if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
                     cpuSettings.add(settings);
                 }
             }

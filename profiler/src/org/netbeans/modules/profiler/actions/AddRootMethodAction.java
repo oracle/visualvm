@@ -60,7 +60,6 @@ import org.netbeans.modules.profiler.api.EditorSupport;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource.MethodInfo;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 
 /**
@@ -164,7 +163,7 @@ public final class AddRootMethodAction extends NodeAction {
                         List<ProfilingSettings> cpuSettings = new ArrayList();
 
                         for (ProfilingSettings settings : projectSettings) {
-                            if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                            if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
                                 cpuSettings.add(settings);
                             }
                         }

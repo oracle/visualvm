@@ -50,10 +50,7 @@ import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.modules.profiler.spi.project.ProjectTypeProfiler;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.SubprojectProvider;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
@@ -97,10 +94,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.modules.profiler.HeapDumpWatch;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.project.AntProjectSupport;
+import org.netbeans.modules.profiler.api.project.ProjectProfilingSupport;
 import org.netbeans.modules.profiler.projectsupport.utilities.AppletSupport;
 import org.netbeans.spi.project.ProjectServiceProvider;
 import org.netbeans.spi.project.ui.ProjectOpenedHook;
@@ -195,17 +193,17 @@ public final class ProjectUtilities {
      *
      * @return Collection<ProjectTypeProfiler> of all ProjectTypeProfilers currently installed
      */
-    public static Collection<?extends ProjectTypeProfiler> getAllProjectTypeProfilers() {
-        final Lookup lookup = Lookup.getDefault();
-        final Lookup.Template<ProjectTypeProfiler> template = new Lookup.Template<ProjectTypeProfiler>(ProjectTypeProfiler.class);
-        final Lookup.Result<ProjectTypeProfiler> result = lookup.lookup(template);
-
-        if (result == null) {
-            return new ArrayList<ProjectTypeProfiler>();
-        }
-
-        return result.allInstances();
-    }
+//    public static Collection<?extends ProjectTypeProfiler> getAllProjectTypeProfilers() {
+//        final Lookup lookup = Lookup.getDefault();
+//        final Lookup.Template<ProjectTypeProfiler> template = new Lookup.Template<ProjectTypeProfiler>(ProjectTypeProfiler.class);
+//        final Lookup.Result<ProjectTypeProfiler> result = lookup.lookup(template);
+//
+//        if (result == null) {
+//            return new ArrayList<ProjectTypeProfiler>();
+//        }
+//
+//        return result.allInstances();
+//    }
 
     public static String getDefaultPackageClassNames(Project project) {
         return org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getDefaultPackageClassNames(project);
@@ -272,42 +270,12 @@ public final class ProjectUtilities {
         return m.find();
     }
 
-    public static float getProfilingOverhead(ProfilingSettings settings) {
-        float o = 0.0f;
-
-        if (org.netbeans.modules.profiler.stp.Utils.isMonitorSettings(settings)) {
-            //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
-        } else if (org.netbeans.modules.profiler.stp.Utils.isCPUSettings(settings)) {
-            if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
-                o += 0.5f; // entire app
-            } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
-                o += 0.2f; // part of app
-            }
-
-            if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
-                o += 0.5f; // profile all classes
-            }
-        } else if (org.netbeans.modules.profiler.stp.Utils.isMemorySettings(settings)) {
-            if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
-                o += 0.5f; // object allocations
-            } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
-                o += 0.7f; // object liveness
-            }
-
-            if (settings.getAllocStackTraceLimit() != 0) {
-                o += 0.3f; // record allocation stack traces
-            }
-        }
-
-        return o;
-    }
-
     public static String getProjectBuildScript(final Project project) {
         return getProjectBuildScript(project, "build.xml");
     }
 
     public static String getProjectBuildScript(final Project project, final String buildXml) {
-        final FileObject buildFile = findBuildFile(project, buildXml);
+        final FileObject buildFile = AntProjectSupport.get(project).getProjectBuildScript(buildXml);
         if (buildFile == null) {
             return null;
         }
@@ -347,23 +315,25 @@ public final class ProjectUtilities {
         }
     }
 
-    public static FileObject findBuildFile(final Project project) {
-        FileObject buildFile = null;
-
-        Properties props = org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getProjectProperties(project);
-        String buildFileName = props != null ? props.getProperty("buildfile") : null; // NOI18N
-        if (buildFileName != null) {
-            buildFile = findBuildFile(project, buildFileName);
-        }
-        if (buildFile == null) {
-            buildFile = findBuildFile(project, "build.xml"); //NOI18N
-        }
-        return buildFile;
-    }
-
-    public static FileObject findBuildFile(final Project project, final String buildFileName) {
-        return project.getProjectDirectory().getFileObject(buildFileName);
-    }
+//    Now available using AntProjectSupport
+//
+//    public static FileObject findBuildFile(final Project project) {
+//        FileObject buildFile = null;
+//
+//        Properties props = org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getProjectProperties(project);
+//        String buildFileName = props != null ? props.getProperty("buildfile") : null; // NOI18N
+//        if (buildFileName != null) {
+//            buildFile = findBuildFile(project, buildFileName);
+//        }
+//        if (buildFile == null) {
+//            buildFile = findBuildFile(project, "build.xml"); //NOI18N
+//        }
+//        return buildFile;
+//    }
+//
+//    public static FileObject findBuildFile(final Project project, final String buildFileName) {
+//        return project.getProjectDirectory().getFileObject(buildFileName);
+//    }
 
     public static java.util.List<SimpleFilter> getProjectDefaultInstrFilters(Project project) {
         java.util.List<SimpleFilter> v = new ArrayList<SimpleFilter>();
@@ -461,49 +431,50 @@ public final class ProjectUtilities {
         return packages.toArray(new String[0]);
     }
 
-    /**
-     * Checks if ProjectTypeProfiler capable of profiling the provided project exists and if so, returns it.
-     *
-     * @param project The project
-     * @return ProjectTypeProfiler capable of profiling the project or null if none of the installed PTPs supports it
-     */
-    public static ProjectTypeProfiler getProjectTypeProfiler(final Project project) {
-        if (project == null) {
-            return ProjectTypeProfiler.DEFAULT; // global attach
-        }
-
-        ProjectTypeProfiler fromProject = project.getLookup().lookup(ProjectTypeProfiler.class);
-        
-        return fromProject != null ? (fromProject.isProfilingSupported(project) ? fromProject : ProjectTypeProfiler.DEFAULT) : ProjectTypeProfiler.DEFAULT;
-//        final Collection c = getAllProjectTypeProfilers();
-//
-//        for (Iterator i = c.iterator(); i.hasNext();) {
-//            final ProjectTypeProfiler ptp = (ProjectTypeProfiler) i.next();
-//
-//            if (ptp.isProfilingSupported(project)) {
-//                return ptp; // project type profiler for provided project
-//            }
+//    /**
+//     * Checks if ProjectTypeProfiler capable of profiling the provided project exists and if so, returns it.
+//     *
+//     * @param project The project
+//     * @return ProjectTypeProfiler capable of profiling the project or null if none of the installed PTPs supports it
+//     */
+//    public static ProjectTypeProfiler getProjectTypeProfiler(final Project project) {
+//        if (project == null) {
+//            return ProjectTypeProfiler.DEFAULT; // global attach
 //        }
-    }
+//
+//        ProjectTypeProfiler fromProject = project.getLookup().lookup(ProjectTypeProfiler.class);
+//        
+//        return fromProject != null ? (fromProject.isProfilingSupported(project) ? fromProject : ProjectTypeProfiler.DEFAULT) : ProjectTypeProfiler.DEFAULT;
+////        final Collection c = getAllProjectTypeProfilers();
+////
+////        for (Iterator i = c.iterator(); i.hasNext();) {
+////            final ProjectTypeProfiler ptp = (ProjectTypeProfiler) i.next();
+////
+////            if (ptp.isProfilingSupported(project)) {
+////                return ptp; // project type profiler for provided project
+////            }
+////        }
+//    }
 
     /**
      * @return true if there is a ProjectTypeProfilers capable of profiling the provided project using the Profile (Main) Project action, false otherwise.
      */
     public static boolean isProjectTypeSupported(final Project project) {
-        ProjectTypeProfiler ptp = getProjectTypeProfiler(project);
-
-        if (ptp.isProfilingSupported(project)) {
-            return true;
-        }
-
-        return hasAction(project, "profile"); //NOI18N
+//        ProjectTypeProfiler ptp = getProjectTypeProfiler(project);
+//
+//        if (ptp.isProfilingSupported(project)) {
+//            return true;
+//        }
+        return ProjectProfilingSupport.get(project).isProfilingSupported() ||
+                hasAction(project, "profile"); //NOI18N
     }
 
     /**
      * @return true if the project can be used for profiling using the Attach Profiler action (== Java project), false otherwise.
      */
     public static boolean isProjectTypeSupportedForAttach(Project project) {
-        return getProjectTypeProfiler(project).isAttachSupported(project);
+//        return getProjectTypeProfiler(project).isAttachSupported(project);
+        return ProjectProfilingSupport.get(project).isAttachSupported();
     }
 
     /**
@@ -584,7 +555,7 @@ public final class ProjectUtilities {
     }
 
     public static boolean backupBuildScript(final Project project) {
-        final FileObject buildFile = findBuildFile(project);
+        final FileObject buildFile = AntProjectSupport.get(project).getProjectBuildScript();
         final FileObject buildBackupFile = project.getProjectDirectory().getFileObject("build-before-profiler.xml"); //NOI18N
 
         if (buildFile != null) {
@@ -925,7 +896,7 @@ public final class ProjectUtilities {
         FileLock buildBackup2FileLock = null;
 
         try {
-            final FileObject buildFile = findBuildFile(project); //NOI18N
+            final FileObject buildFile = AntProjectSupport.get(project).getProjectBuildScript();
             final FileObject buildBackupFile = project.getProjectDirectory().getFileObject("build-before-profiler.xml"); //NOI18N
 
             if (buildFile != null && (buildBackupFile != null && buildBackupFile.isValid())) {
