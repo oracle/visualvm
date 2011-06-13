@@ -48,7 +48,6 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.apache.tools.ant.types.Path;
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
@@ -56,7 +55,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ProfilerModule;
 import org.netbeans.modules.profiler.actions.JavaPlatformSelector;
 import org.netbeans.modules.profiler.actions.ProfilingSupport;
@@ -71,6 +70,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.netbeans.modules.profiler.api.JavaPlatform;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
 
 
@@ -233,7 +234,11 @@ public final class NBProfileDirectTask extends Task {
 
             // 2. process parameters passed via Properties
             ps.load(props);
-            ss.load(props);
+            try {
+                ss.load(props);
+            } catch (IllegalArgumentException e) {
+                ProfilerDialogs.displayWarning(e.getLocalizedMessage());
+            }
 
             // get correct working directory available only at runtime (not from ProjectTypeProfiler!)
             String projectWorkDir = (String) props.get("work.dir"); // NOI18N
@@ -348,7 +353,7 @@ public final class NBProfileDirectTask extends Task {
                 || !Profiler.getDefault()
                                 .runCalibration(true, ss.getJavaExecutable(), ss.getJavaVersionString(),
                                                     ss.getSystemArchitecture())) {
-            Profiler.getDefault().displayError(CALIBRATION_FAILED_MESSAGE);
+            ProfilerDialogs.displayError(CALIBRATION_FAILED_MESSAGE);
             throw new BuildException(CALIBRATION_FAILED_MESSAGE); // failed, cannot proceed
         }
 
@@ -470,7 +475,7 @@ public final class NBProfileDirectTask extends Task {
             ss.setMainClass(mainClass);
         }
 
-        JavaPlatform platform = IDEUtils.getJavaPlatformByName(ProfilerIDESettings.getInstance().getJavaPlatformForProfiling());
+        JavaPlatform platform = JavaPlatform.getJavaPlatformById(ProfilerIDESettings.getInstance().getJavaPlatformForProfiling());
 
         if (platform == null) {
             platform = JavaPlatformSelector.getDefault().selectPlatformToUse();
@@ -480,13 +485,13 @@ public final class NBProfileDirectTask extends Task {
             }
         }
 
-        String javaFile = IDEUtils.getPlatformJavaFile(platform);
+        String javaFile = platform.getPlatformJavaFile();
 
         if (javaFile == null) {
             throw new BuildException("Cannot determine Java executable for platform: " + platform.getDisplayName()); //NOI18N
         }
 
-        String javaVersion = IDEUtils.getPlatformJDKVersion(platform);
+        String javaVersion = platform.getPlatformJDKVersion();
 
         if (javaVersion == null) {
             throw new BuildException("Cannot determine Java version for the selected Java platform"); //NOI18N
@@ -494,7 +499,7 @@ public final class NBProfileDirectTask extends Task {
 
         ss.setJavaExecutable(javaFile);
         ss.setJavaVersionString(javaVersion);
-        ss.setSystemArchitecture(IDEUtils.getPlatformArchitecture(platform));
+        ss.setSystemArchitecture(platform.getPlatformArchitecture());
 
         ps = ProfilingSupport.getDefault().selectTaskForProfiling(p, ss, null, false);
 
