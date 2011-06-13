@@ -160,10 +160,6 @@ public final class ProjectUtilities {
                                                                                   "ProjectUtilities_FailedCopyAppletFileMsg"); // NOI18N
     private static final String FAILED_CREATE_OUTPUT_FOLDER_MSG = NbBundle.getMessage(ProjectUtilities.class,
                                                                                       "ProjectUtilities_FailedCreateOutputFolderMsg"); // NOI18N
-    private static final String PROFILE_PROJECT_CLASSES_STRING = NbBundle.getMessage(ProjectUtilities.class,
-                                                                                     "ProjectUtilities_ProfileProjectClassesString"); // NOI18N
-    private static final String PROFILE_PROJECT_SUBPROJECT_CLASSES_STRING = NbBundle.getMessage(ProjectUtilities.class,
-                                                                                                "ProjectUtilities_ProfileProjectSubprojectClassesString"); // NOI18N
     private static final String PROFILER_WILL_BE_UNINTEGRATED_MSG = NbBundle.getMessage(ProjectUtilities.class,
                                                                                         "ProjectUtilities_ProfilerWillBeUnintegratedMsg"); // NOI18N
     private static final String PROFILER_ISNT_INTEGRATED_MSG = NbBundle.getMessage(ProjectUtilities.class,
@@ -179,13 +175,6 @@ public final class ProjectUtilities {
     private static final String UNINTEGRATION_SUCCESSFUL_MSG = NbBundle.getMessage(ProjectUtilities.class,
                                                                                    "ProjectUtilities_UnintegrationSuccessfulMsg"); // NOI18N
                                                                                                                                    // -----
-    public static final SimpleFilter FILTER_PROJECT_ONLY = new SimpleFilter(PROFILE_PROJECT_CLASSES_STRING,
-                                                                            SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
-                                                                            "{$project.classes.only}"); // NOI18N
-    public static final SimpleFilter FILTER_PROJECT_SUBPROJECTS_ONLY = new SimpleFilter(PROFILE_PROJECT_SUBPROJECT_CLASSES_STRING,
-                                                                                        SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
-                                                                                        "{$project.subprojects.classes.only}"); // NOI18N
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /**
@@ -335,19 +324,19 @@ public final class ProjectUtilities {
 //        return project.getProjectDirectory().getFileObject(buildFileName);
 //    }
 
-    public static java.util.List<SimpleFilter> getProjectDefaultInstrFilters(Project project) {
-        java.util.List<SimpleFilter> v = new ArrayList<SimpleFilter>();
-
-        if (ProjectUtils.getSources(project).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA).length > 0) {
-            v.add(FILTER_PROJECT_ONLY);
-        }
-
-        if (hasSubprojects(project)) {
-            v.add(FILTER_PROJECT_SUBPROJECTS_ONLY);
-        }
-
-        return v;
-    }
+//    public static java.util.List<SimpleFilter> getProjectDefaultInstrFilters(Project project) {
+//        java.util.List<SimpleFilter> v = new ArrayList<SimpleFilter>();
+//
+//        if (ProjectUtils.getSources(project).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA).length > 0) {
+//            v.add(FILTER_PROJECT_ONLY);
+//        }
+//
+//        if (hasSubprojects(project)) {
+//            v.add(FILTER_PROJECT_SUBPROJECTS_ONLY);
+//        }
+//
+//        return v;
+//    }
 
     public static ClientUtils.SourceCodeSelection[] getProjectDefaultRoots(Project project, String[][] projectPackagesDescr) {
         computeProjectPackages(project, true, projectPackagesDescr);
@@ -585,37 +574,37 @@ public final class ProjectUtilities {
         return false;
     }
 
-    public static SimpleFilter computeProjectOnlyInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,
-                                                                       String[][] projectPackagesDescr) {
-        // TODO: projectPackagesDescr[1] should only contain packages from subprojects, currently contains also toplevel project packages
-        if (FILTER_PROJECT_ONLY.equals(predefinedInstrFilter)) {
-            computeProjectPackages(project, false, projectPackagesDescr);
-
-            StringBuffer projectPackages = new StringBuffer();
-
-            for (int i = 0; i < projectPackagesDescr[0].length; i++) {
-                projectPackages.append("".equals(projectPackagesDescr[0][i]) ? getDefaultPackageClassNames(project)
-                                                                             : (projectPackagesDescr[0][i] + ". ")); //NOI18N
-            }
-
-            return new SimpleFilter(PROFILE_PROJECT_CLASSES_STRING, SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
-                                    projectPackages.toString().trim());
-        } else if (FILTER_PROJECT_SUBPROJECTS_ONLY.equals(predefinedInstrFilter)) {
-            computeProjectPackages(project, true, projectPackagesDescr);
-
-            StringBuffer projectPackages = new StringBuffer();
-
-            for (int i = 0; i < projectPackagesDescr[1].length; i++) {
-                projectPackages.append("".equals(projectPackagesDescr[1][i]) ? getDefaultPackageClassNames(project)
-                                                                             : (projectPackagesDescr[1][i] + ". ")); //NOI18N // TODO: default packages need to be processed also for subprojects!!!
-            }
-
-            return new SimpleFilter(PROFILE_PROJECT_SUBPROJECT_CLASSES_STRING, SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
-                                    projectPackages.toString().trim());
-        }
-
-        return null;
-    }
+//    public static SimpleFilter computeProjectOnlyInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,
+//                                                                       String[][] projectPackagesDescr) {
+//        // TODO: projectPackagesDescr[1] should only contain packages from subprojects, currently contains also toplevel project packages
+//        if (FILTER_PROJECT_ONLY.equals(predefinedInstrFilter)) {
+//            computeProjectPackages(project, false, projectPackagesDescr);
+//
+//            StringBuffer projectPackages = new StringBuffer();
+//
+//            for (int i = 0; i < projectPackagesDescr[0].length; i++) {
+//                projectPackages.append("".equals(projectPackagesDescr[0][i]) ? getDefaultPackageClassNames(project)
+//                                                                             : (projectPackagesDescr[0][i] + ". ")); //NOI18N
+//            }
+//
+//            return new SimpleFilter(PROFILE_PROJECT_CLASSES_STRING, SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
+//                                    projectPackages.toString().trim());
+//        } else if (FILTER_PROJECT_SUBPROJECTS_ONLY.equals(predefinedInstrFilter)) {
+//            computeProjectPackages(project, true, projectPackagesDescr);
+//
+//            StringBuffer projectPackages = new StringBuffer();
+//
+//            for (int i = 0; i < projectPackagesDescr[1].length; i++) {
+//                projectPackages.append("".equals(projectPackagesDescr[1][i]) ? getDefaultPackageClassNames(project)
+//                                                                             : (projectPackagesDescr[1][i] + ". ")); //NOI18N // TODO: default packages need to be processed also for subprojects!!!
+//            }
+//
+//            return new SimpleFilter(PROFILE_PROJECT_SUBPROJECT_CLASSES_STRING, SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
+//                                    projectPackages.toString().trim());
+//        }
+//
+//        return null;
+//    }
 
     public static void computeProjectPackages(final Project project, boolean subprojects, String[][] storage) {
         if ((storage == null) || (storage.length != 2)) {

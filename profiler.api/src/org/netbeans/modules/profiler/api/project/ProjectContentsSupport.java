@@ -91,6 +91,12 @@ public final class ProjectContentsSupport {
         }
     }
     
+    public void reset() {
+        if (providers != null)
+            for (ProjectContentsSupportProvider provider : providers) 
+                provider.reset();
+    }
+    
     
     private ProjectContentsSupport(Collection<? extends ProjectContentsSupportProvider> providers) {
         this.providers = providers;

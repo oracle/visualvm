@@ -62,6 +62,8 @@ public abstract class ProjectUtilitiesProvider {
     public abstract FileObject getProjectDirectory(Provider project);
 
     public abstract Provider[] getOpenedProjects();
+    
+    public abstract boolean hasSubprojects(Provider project);
 
     public abstract void fetchSubprojects(Provider project, Set<Provider> subprojects);
 

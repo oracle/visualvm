@@ -102,6 +102,16 @@ public final class ProjectUtilities {
     public static Icon getIcon(Provider project) {
         return provider().getIcon(project);
     }
+    
+    /**
+     * Returns true if the provided project has sub-projects.
+     * 
+     * @param project a project
+     * @return true if the provided project has sub-projects, false otherwise
+     */
+    public static boolean hasSubprojects(Provider project) {
+        return provider().hasSubprojects(project);
+    }
 
     /**
      * Computes set of sub-projects of a project

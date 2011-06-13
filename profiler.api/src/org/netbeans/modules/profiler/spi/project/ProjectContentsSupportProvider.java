@@ -54,6 +54,8 @@ public abstract class ProjectContentsSupportProvider {
     
     public abstract String getInstrumentationFilter(boolean profileSubprojects);
     
+    public abstract void reset();
+    
     
 //    public static class Basic extends ProjectContentsSupportProvider {
 //        
