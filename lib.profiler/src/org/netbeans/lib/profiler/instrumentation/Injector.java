@@ -728,6 +728,6 @@ public abstract class Injector extends SingleMethodScaner {
     private void updateStackMapTable(int injectionPos, int injectedBytesCount) {
         ClassInfo.StackMapTables stackMapTable = clazz.getStackMapTables();
         
-        stackMapTable.updateTable(injectionPos, injectedBytesCount, methodIdx);
+        stackMapTable.updateTable(injectionPos, injectedBytesCount, methodIdx, changeTypeIsInjectNewInstr, injectionBindsToFollowingInstruction);
     }
 }
