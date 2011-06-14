@@ -47,6 +47,8 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import javax.swing.Action;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -103,6 +105,6 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
     }
 
     protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/modifyProfiling.png"; //NOI18N
+        return Icons.getResource(ProfilerIcons.MODIFY_PROFILING);
     }
 }

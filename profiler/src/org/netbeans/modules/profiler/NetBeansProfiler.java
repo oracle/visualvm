@@ -43,11 +43,11 @@
 
 package org.netbeans.modules.profiler;
 
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
@@ -79,8 +79,6 @@ import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModule;
-import org.netbeans.lib.profiler.ui.cpu.statistics.StatisticalModuleContainer;
 import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
 import org.netbeans.lib.profiler.wireprotocol.WireIO;
@@ -89,13 +87,9 @@ import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
 import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsWindow;
 import org.netbeans.modules.profiler.spi.LoadGenPlugin;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.ui.stats.ProjectAwareStatisticalModule;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.netbeans.modules.profiler.utils.OutputParameter;
 import org.openide.DialogDescriptor;
 import org.openide.ErrorManager;
-import org.openide.NotifyDescriptor;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -113,6 +107,9 @@ import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -128,6 +125,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -140,10 +138,14 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
-import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
-import org.netbeans.modules.profiler.utils.GoToSourceHelper;
-import org.netbeans.modules.profiler.utils.JavaSourceLocation;
+import org.netbeans.modules.profiler.api.GlobalStorage;
+import org.netbeans.modules.profiler.api.JavaPlatform;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.spi.SessionListener;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.DialogDisplayer;
 import org.openide.execution.ExecutorTask;
+import org.openide.modules.InstalledFileLocator;
 
 
 /**
@@ -243,7 +245,7 @@ public final class NetBeansProfiler extends Profiler {
                     LOGGER.finest("Closing async dialog"); // NOI18N
 
                     if (dialog.isShowing()) {
-                        ProfilerDialogs.close(dialog);
+                        dialogCloseImpl(dialog);
                     }
 
                     dialogState = DialogState.CLOSED;
@@ -253,6 +255,35 @@ public final class NetBeansProfiler extends Profiler {
                 }
             }
         }
+        
+        private static void dialogCloseImpl(final Dialog dialog) {
+            final CountDownLatch latch = new CountDownLatch(1);
+
+            final ComponentListener listener = new ComponentAdapter() {
+                @Override
+                public void componentHidden(ComponentEvent e) {
+                    latch.countDown();
+                }
+
+                @Override
+                public void componentShown(ComponentEvent e) {
+                    super.componentShown(e);
+                }
+            };
+
+            dialog.addComponentListener(listener);
+            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                    public void run() {
+                        dialog.setVisible(false);
+                    }
+                });
+
+            try {
+                latch.await();
+                dialog.removeComponentListener(listener);
+            } catch (InterruptedException e) {
+            }
+        }
 
         private void dialogShow() {
             synchronized (dialogStateLock) {
@@ -260,12 +291,41 @@ public final class NetBeansProfiler extends Profiler {
                     LOGGER.finest("Showing async dialog"); // NOI18N
 
                     Level lvl = LOGGER.getLevel();
-                    ProfilerDialogs.display(dialog);
+                    dialogShowImpl(dialog);
                     dialogState = DialogState.OPEN;
                 } else if (dialogState == DialogState.NOT_OPENED_CLOSED) {
                     LOGGER.fine("Async dialog has been closed before being opened. Setting to CLOSED"); // NOI18N
                     dialogState = DialogState.CLOSED;
                 }
+            }
+        }
+        
+        private static void dialogShowImpl(final Dialog dialog) {
+            final CountDownLatch latch = new CountDownLatch(1);
+
+            final ComponentListener listener = new ComponentAdapter() {
+                @Override
+                public void componentHidden(ComponentEvent e) {
+                    super.componentHidden(e);
+                }
+
+                @Override
+                public void componentShown(ComponentEvent e) {
+                    latch.countDown();
+                }
+            };
+
+            dialog.addComponentListener(listener);
+            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                    public void run() {
+                        dialog.setVisible(true);
+                    }
+                });
+
+            try {
+                latch.await();
+                dialog.removeComponentListener(listener);
+            } catch (InterruptedException e) {
             }
         }
 
@@ -291,7 +351,7 @@ public final class NetBeansProfiler extends Profiler {
                     panel.add(progress, BorderLayout.SOUTH);
                 }
 
-                dialog = ProfilerDialogs.createDialog(new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true,
+                dialog = DialogDisplayer.getDefault().createDialog(new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true,
                                                                            cancelAllowed
                                                                            ? new Object[] { DialogDescriptor.CANCEL_OPTION }
                                                                            : new Object[] {  }, DialogDescriptor.CANCEL_OPTION,
@@ -311,7 +371,7 @@ public final class NetBeansProfiler extends Profiler {
             }
         }
     }
-
+    
     // -- NetBeansProfiler-only callback classes ---------------------------------------------------------------------------
     private final class IDEAppStatusHandler implements AppStatusHandler {
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -320,30 +380,27 @@ public final class NetBeansProfiler extends Profiler {
         }
 
         public boolean confirmWaitForConnectionReply() {
-            NotifyDescriptor.Confirmation con = new NotifyDescriptor.Confirmation(TARGET_APP_NOT_RESPONDING_MSG,
-                                                                                  TARGET_APP_NOT_RESPONDING_DIALOG_TITLE,
-                                                                                  ProfilerDialogs.DNSAMessage.YES_NO_OPTION,
-                                                                                  ProfilerDialogs.DNSAMessage.WARNING_MESSAGE);
-
-            return (ProfilerDialogs.notify(con) != ProfilerDialogs.DNSAConfirmation.YES_OPTION);
+            // FIXXX: should display a NotifyDescriptor.WARNING_MESSAGE confirmation!
+            return (!ProfilerDialogs.displayConfirmation(TARGET_APP_NOT_RESPONDING_MSG,
+                                                         TARGET_APP_NOT_RESPONDING_DIALOG_TITLE));
         }
 
         // The following methods should display messages asynchronously, i.e. they shouldn't block the current
         // thread waiting for the user pressing OK.
         public void displayError(final String msg) {
             printDebugMsg("IDEAppStatusHandler - error: " + msg); //NOI18N
-            NetBeansProfiler.this.displayError(msg);
+            ProfilerDialogs.displayError(msg);
         }
 
         // These method SHOULD wait for the user to press ok, since they may be used in a sequence of displayed
         // panels, and the next one shouldn't be displayed before the previous one is read and understood.
         public void displayErrorAndWaitForConfirm(final String msg) {
             printDebugMsg("IDEAppStatusHandler - errorAndWaitForConfirm: " + msg); //NOI18N
-            NetBeansProfiler.this.displayErrorAndWait(msg);
+            ProfilerDialogs.displayError(msg);
         }
 
         public void displayErrorWithDetailsAndWaitForConfirm(String shortMsg, String detailsMsg) {
-            NetBeansProfiler.this.displayErrorWithDetailsAndWait(shortMsg, detailsMsg);
+            ProfilerDialogs.displayError(shortMsg, null, detailsMsg);
         }
 
         public void displayNotification(final String msg) {
@@ -351,21 +408,21 @@ public final class NetBeansProfiler extends Profiler {
         }
 
         public void displayNotificationAndWaitForConfirm(final String msg) {
-            NetBeansProfiler.this.displayInfoAndWait(msg);
+            ProfilerDialogs.displayInfo(msg);
         }
 
         public void displayNotificationWithDetailsAndWaitForConfirm(String shortMsg, String detailsMsg) {
-            NetBeansProfiler.this.displayInfoWithDetailsAndWait(shortMsg, detailsMsg);
+            ProfilerDialogs.displayInfo(shortMsg, null, detailsMsg);
         }
 
         public void displayWarning(final String msg) {
             printDebugMsg("IDEAppStatusHandler - warning: " + msg); //NOI18N
-            NetBeansProfiler.this.displayWarning(msg);
+            ProfilerDialogs.displayWarning(msg);
         }
 
         public void displayWarningAndWaitForConfirm(final String msg) {
             printDebugMsg("IDEAppStatusHandler - warningAndWaitForConfirm: " + msg); //NOI18N
-            NetBeansProfiler.this.displayWarningAndWait(msg);
+            ProfilerDialogs.displayWarning(msg);
         }
 
         public void handleShutdown() {
@@ -380,21 +437,9 @@ public final class NetBeansProfiler extends Profiler {
 
             if ((getTargetAppRunner().getProfilerClient().getCurrentInstrType() == CommonConstants.INSTR_NONE)
                     || !ResultsManager.getDefault().resultsAvailable()) {
-                ProfilerDialogs.DNSAMessage dnsa = new ProfilerDialogs.DNSAMessage("NetBeansProfiler.handleShutdown.noResults", //NOI18N
-                                                                                   TERMINATE_VM_ON_EXIT_MSG,
-                                                                                   ProfilerDialogs.DNSAMessage.INFORMATION_MESSAGE);
-                dnsa.setDNSADefault(false);
-                ProfilerDialogs.notify(dnsa);
-            } else {
-                ProfilerDialogs.DNSAConfirmation dnsa = new ProfilerDialogs.DNSAConfirmation("NetBeansProfiler.handleShutdown", //NOI18N
-                                                                                             TAKE_SNAPSHOT_ON_EXIT_MSG,
-                                                                                             TAKE_SNAPSHOT_ON_EXIT_DIALOG_TITLE,
-                                                                                             ProfilerDialogs.DNSAConfirmation.YES_NO_OPTION);
-                dnsa.setDNSADefault(false);
-
-                if (ProfilerDialogs.notify(dnsa).equals(ProfilerDialogs.DNSAConfirmation.YES_OPTION)) {
-                    ResultsManager.getDefault().takeSnapshot();
-                }
+                ProfilerDialogs.displayInfoDNSA(TERMINATE_VM_ON_EXIT_MSG, null, null, "NetBeansProfiler.handleShutdown.noResults", false); //NOI18N
+            } else if (ProfilerDialogs.displayConfirmationDNSA(TAKE_SNAPSHOT_ON_EXIT_MSG, TAKE_SNAPSHOT_ON_EXIT_DIALOG_TITLE, null, "NetBeansProfiler.handleShutdown", false)) { //NOI18N
+                ResultsManager.getDefault().takeSnapshot();
             }
 
             //            }
@@ -415,7 +460,7 @@ public final class NetBeansProfiler extends Profiler {
         }
 
         public void takeSnapshot() {
-            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         ResultsManager.getDefault().takeSnapshot();
                     }
@@ -455,8 +500,6 @@ public final class NetBeansProfiler extends Profiler {
                                                                                               "NetBeansProfiler_ErrorSavingProfilingSettingsMessage"); //NOI18N
     private static final String ERROR_SAVING_FILTER_SETS_MESSAGE = NbBundle.getMessage(NetBeansProfiler.class,
                                                                                        "NetBeansProfiler_ErrorSavingFilterSetsMessage"); //NOI18N
-    private static final String ERROR_SAVING_ATTACH_SETTINGS_MESSAGE = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                           "NetBeansProfiler_ErrorSavingAttachSettingsMessage"); //NOI18N
     private static final String CANNOT_FIND_LIBS_MSG = NbBundle.getMessage(NetBeansProfiler.class,
                                                                            "NetBeansProfiler_CannotFindLibsMsg"); //NOI18N
     private static final String ENGINE_INIT_FAILED_MSG = NbBundle.getMessage(NetBeansProfiler.class,
@@ -480,7 +523,6 @@ public final class NetBeansProfiler extends Profiler {
     private static final String GLOBAL_FILTERS_FILENAME = "filters"; //NOI18N
     private static final String DEFINED_FILTERSETS_FILENAME = "filtersets"; //NOI18N
     private static final String DEFAULT_FILE_SUFFIX = "-default"; //NOI18N
-    private static final String ATTACH_SETTINGS_FILENAME = "attach"; //NOI18N
     private static boolean initialized = false;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -521,8 +563,6 @@ public final class NetBeansProfiler extends Profiler {
     private int lastMode = MODE_PROFILE;
     private int profilingMode = MODE_PROFILE;
     private int profilingState = PROFILING_INACTIVE;
-
-    private final RequestProcessor srcOpenerRP = new RequestProcessor("Profiler Source Opener"); // NOI18N
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -532,7 +572,7 @@ public final class NetBeansProfiler extends Profiler {
         final ProfilerEngineSettings sharedSettings = new ProfilerEngineSettings();
 
         try {
-            String libsDir = IDEUtils.getLibsDir();
+            String libsDir = getLibsDir();
 
             if (libsDir == null) {
                 throw new IOException(CANNOT_FIND_LIBS_MSG);
@@ -545,7 +585,7 @@ public final class NetBeansProfiler extends Profiler {
                                                   ); // use for testing when something misbehaves
         } catch (RuntimeException e) {
             ProfilerLogger.log(e);
-            ProfilerDialogs.notify(new NotifyDescriptor.Message(e.getMessage(), NotifyDescriptor.ERROR_MESSAGE));
+            ProfilerDialogs.displayError(e.getMessage());
             initFailed = true;
         } catch (IOException e) {
             ErrorManager.getDefault()
@@ -705,37 +745,33 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public String getLibsDir() {
-        return IDEUtils.getLibsDir();
+        final File dir = InstalledFileLocator.getDefault()
+                                             .locate(ProfilerModule.LIBS_DIR + "/jfluid-server.jar",
+                                                     "org.netbeans.lib.profiler", false); //NOI18N
+
+        if (dir == null) {
+            return null;
+        } else {
+            return dir.getParentFile().getPath();
+        }
     }
 
     public int getPlatformArchitecture(String platformName) {
-        JavaPlatform platform = IDEUtils.getJavaPlatformByName(platformName);
+        JavaPlatform platform = JavaPlatform.getJavaPlatformById(platformName);
 
-        if (platform == null) {
-            return Platform.ARCH_32;
-        } else {
-            return IDEUtils.getPlatformArchitecture(platform);
-        }
+        return platform.getPlatformArchitecture();
     }
 
     public String getPlatformJDKVersion(String platformName) {
-        JavaPlatform platform = IDEUtils.getJavaPlatformByName(platformName);
+        JavaPlatform platform = JavaPlatform.getJavaPlatformById(platformName);
 
-        if (platform == null) {
-            return null;
-        } else {
-            return IDEUtils.getPlatformJDKVersion(platform);
-        }
+        return platform.getPlatformJDKVersion();
     }
 
     public String getPlatformJavaFile(String platformName) {
-        JavaPlatform platform = IDEUtils.getJavaPlatformByName(platformName);
+        JavaPlatform platform = JavaPlatform.getJavaPlatformById(platformName);
 
-        if (platform == null) {
-            return null;
-        } else {
-            return IDEUtils.getPlatformJavaFile(platform);
-        }
+        return platform.getPlatformJavaFile();
     }
 
     public int getProfilingMode() {
@@ -821,7 +857,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     // clear rerun
                     actionSupport.nullAll();
-                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 CallableSystemAction.get(RerunAction.class).updateAction();
                             }
@@ -852,7 +888,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
-                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 openWindowsOnProfilingStart();
                             }
@@ -889,7 +925,7 @@ public final class NetBeansProfiler extends Profiler {
                                 success = targetAppRunner.initiateSession(2, false) && targetAppRunner.attachToTargetVM();
                             }
                         } catch (Exception ex) {
-                            displayError(ex.getMessage());
+                            ProfilerDialogs.displayError(ex.getMessage());
                             ProfilerLogger.log(ex);
                         }
 
@@ -910,7 +946,7 @@ public final class NetBeansProfiler extends Profiler {
                         monitor.monitorVM(targetAppRunner);
 
                         if (threadsMonitoringEnabled) {
-                            IDEUtils.runInEventDispatchThread(new Runnable() {
+                            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         ThreadsWindow.getDefault().showThreads();
                                     }
@@ -1069,7 +1105,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
-                    IDEUtils.runInEventDispatchThread(new Runnable() {
+                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 openWindowsOnProfilingStart();
                             }
@@ -1077,7 +1113,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     if (!CalibrationDataFileIO.validateCalibrationInput(sessionSettings.getJavaVersionString(),
                                                                             sessionSettings.getJavaExecutable())) {
-                        displayErrorWithDetailsAndWait(CALIBRATION_MISSING_SHORT_MESSAGE, CALIBRATION_MISSING_MESSAGE);
+                        ProfilerDialogs.displayError(CALIBRATION_MISSING_SHORT_MESSAGE, null, CALIBRATION_MISSING_MESSAGE);
                         changeStateTo(PROFILING_INACTIVE);
                         methodResult.setValue(Boolean.FALSE);
 
@@ -1101,7 +1137,7 @@ public final class NetBeansProfiler extends Profiler {
                     if (targetAppRunner.targetAppIsRunning()) {
                         getThreadsManager()
                             .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                        IDEUtils.runInEventDispatchThread(new Runnable() {
+                        ProfilerUtils.runInEventDispatchThread(new Runnable() {
                                 public void run() {
                                     monitor.monitorVM(targetAppRunner);
                                 }
@@ -1145,7 +1181,7 @@ public final class NetBeansProfiler extends Profiler {
             try {
                 targetAppRunner.getProfilerClient().removeAllInstrumentation(false); // remove only the server side instrumentation
             } catch (InstrumentationException e) {
-                displayError(e.getMessage());
+                ProfilerDialogs.displayError(e.getMessage());
             }
         }
 
@@ -1155,39 +1191,6 @@ public final class NetBeansProfiler extends Profiler {
         // TODO reset all profilingresultslisteners
         //    CPUCallGraphBuilder.resetCollectors();
         //    ResultsManager.getDefault().reset();
-    }
-
-    public void displayError(final String message) {
-        ProfilerDialogs.notify(new NotifyDescriptor.Message(message, NotifyDescriptor.ERROR_MESSAGE));
-    }
-
-    public void displayErrorAndWait(final String message) {
-        ProfilerDialogs.notify(new NotifyDescriptor.Message(message, NotifyDescriptor.ERROR_MESSAGE));
-    }
-
-    public void displayErrorWithDetailsAndWait(final String shortMsg, final String detailsMsg) {
-        ProfilerDialogs.notify(new ProfilerDialogs.MessageWithDetails(shortMsg, detailsMsg, NotifyDescriptor.ERROR_MESSAGE, false));
-    }
-
-    public void displayInfo(final String message) {
-        ProfilerDialogs.notify(new NotifyDescriptor.Message(message, NotifyDescriptor.INFORMATION_MESSAGE));
-    }
-
-    public void displayInfoAndWait(final String message) {
-        ProfilerDialogs.notify(new NotifyDescriptor.Message(message, NotifyDescriptor.INFORMATION_MESSAGE));
-    }
-
-    public void displayInfoWithDetailsAndWait(final String shortMsg, final String detailsMsg) {
-        ProfilerDialogs.notify(new ProfilerDialogs.MessageWithDetails(shortMsg, detailsMsg, NotifyDescriptor.INFORMATION_MESSAGE,
-                                                                      false));
-    }
-
-    public void displayWarning(final String message) {
-        ProfilerDialogs.notify(new NotifyDescriptor.Message(message, NotifyDescriptor.WARNING_MESSAGE));
-    }
-
-    public void displayWarningAndWait(final String message) {
-        ProfilerDialogs.notify(new NotifyDescriptor.Message(message, NotifyDescriptor.WARNING_MESSAGE));
     }
 
     public void instrumentSelectedRoots(ClientUtils.SourceCodeSelection[] rootMethods)
@@ -1202,36 +1205,6 @@ public final class NetBeansProfiler extends Profiler {
 
         // Start the recursive code instrumentation
         client.initiateRecursiveCPUProfInstrumentation(rootMethods);
-    }
-
-    public static AttachSettings loadAttachSettings(Project project)
-                                             throws IOException {
-        FileObject folder = IDEUtils.getProjectSettingsFolder(project, false);
-
-        if (folder == null) {
-            return null;
-        }
-
-        FileObject attachSettingsFile = folder.getFileObject(ATTACH_SETTINGS_FILENAME, "xml"); //NOI18N
-
-        if (attachSettingsFile == null) {
-            return null;
-        }
-
-        final InputStream fis = attachSettingsFile.getInputStream();
-        final BufferedInputStream bis = new BufferedInputStream(fis);
-
-        try {
-            final Properties props = new Properties();
-            props.loadFromXML(bis);
-
-            AttachSettings as = new AttachSettings();
-            as.load(props);
-
-            return as;
-        } finally {
-            bis.close();
-        }
     }
 
     public void log(int severity, final String message) {
@@ -1297,7 +1270,7 @@ public final class NetBeansProfiler extends Profiler {
             }
         });
 
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     changeStateTo(PROFILING_IN_TRANSITION);
                     targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
@@ -1376,18 +1349,9 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public void openJavaSource(String className, String methodName, String methodSig) {
-        openJavaSource(getProfiledProject(), className, methodName, methodSig);
+//        openJavaSource(getProfiledProject(), className, methodName, methodSig);
     }
-
-    public void openJavaSource(final Project project, final String className, final String methodName, final String methodSig) {
-        // Bugfix #175844 doesn't need to be called in EDT any more, ElementOpen.open() is now thread-aware
-        srcOpenerRP.post(new Runnable() {
-            public void run() {
-                GoToSourceHelper.openSource(project, new JavaSourceLocation(className, methodName, methodSig));
-            }
-        });
-    }
-
+    
     public boolean processesProfilingPoints() {
         return processesProfilingPoints;
     }
@@ -1447,7 +1411,7 @@ public final class NetBeansProfiler extends Profiler {
         // This call reduces the speedup for class instrumentation on the 2nd and further runs that we could otherwise
         // have, but guarantees that if any classes have been recompiled in between runs, their most up-to-date copies will
         // be used.
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     final Cursor cursor = mainWindow.getCursor();
                     mainWindow.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -1455,7 +1419,7 @@ public final class NetBeansProfiler extends Profiler {
                     try {
                         if (!runCalibration(true, sessionSettings.getJavaExecutable(), sessionSettings.getJavaVersionString(),
                                                 sessionSettings.getSystemArchitecture())) {
-                            displayError(CALIBRATION_FAILED_MESSAGE);
+                            ProfilerDialogs.displayError(CALIBRATION_FAILED_MESSAGE);
                             changeStateTo(PROFILING_INACTIVE);
 
                             return; // failed, cannot proceed
@@ -1480,7 +1444,7 @@ public final class NetBeansProfiler extends Profiler {
                         if (targetAppRunner.targetAppIsRunning()) {
                             getThreadsManager()
                                 .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                            IDEUtils.runInEventDispatchThread(new Runnable() {
+                            ProfilerUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         // System.err.println("------------ 8: "+ (System.currentTimeMillis() - time));
                                         monitor.monitorVM(targetAppRunner);
@@ -1545,7 +1509,7 @@ public final class NetBeansProfiler extends Profiler {
             result = targetAppRunner.readSavedCalibrationData();
 
             if (!result) {
-                displayInfoAndWait(INITIAL_CALIBRATION_MSG);
+                ProfilerDialogs.displayInfo(INITIAL_CALIBRATION_MSG);
                 result = targetAppRunner.calibrateInstrumentationCode();
             }
 
@@ -1580,50 +1544,11 @@ public final class NetBeansProfiler extends Profiler {
         return result;
     }
 
-    public static void saveAttachSettings(Project project, AttachSettings as) {
-        FileLock lock = null;
-
-        try {
-            final FileObject folder = IDEUtils.getProjectSettingsFolder(project, true);
-            FileObject fo = folder.getFileObject(ATTACH_SETTINGS_FILENAME, "xml"); //NOI18N
-
-            if (fo == null) {
-                fo = folder.createData(ATTACH_SETTINGS_FILENAME, "xml"); //NOI18N
-            }
-
-            lock = fo.lock();
-
-            final BufferedOutputStream bos = new BufferedOutputStream(fo.getOutputStream(lock));
-            final Properties globalProps = new Properties();
-            try {
-                as.store(globalProps);
-                globalProps.storeToXML(bos, ""); //NOI18N
-            } finally {
-                if (bos != null) {
-                    try {
-                        bos.close();
-                    } catch (IOException ex) {
-                        // ignore
-                    }
-                }
-            }
-        } catch (Exception e) {
-            ProfilerLogger.log(e);
-            ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_SAVING_ATTACH_SETTINGS_MESSAGE,
-                                                                                     new Object[] { e.getMessage() }),
-                                                                NotifyDescriptor.ERROR_MESSAGE));
-        } finally {
-            if (lock != null) {
-                lock.releaseLock();
-            }
-        }
-    }
-
-    public void setProfiledProject(Project project, FileObject singleFile) {
-        profiledProject = project;
+    public void setProfiledProject(Lookup.Provider project, FileObject singleFile) {
+        profiledProject = (Project)project;
         profiledSingleFile = singleFile;
 
-        ProfilerControlPanel2.getDefault().setProfiledProject(project);
+        ProfilerControlPanel2.getDefault().setProfiledProject(profiledProject);
     }
 
     public Project getProfiledProject() {
@@ -1640,17 +1565,37 @@ public final class NetBeansProfiler extends Profiler {
 
     @Override
     public boolean prepareInstrumentation(ProfilingSettings profilingSettings) {
-        final boolean retValue;
-
         teardownDispatcher();
         setupDispatcher(profilingSettings);
 
         ClientUtils.SourceCodeSelection[] marks = MarkingEngine.getDefault().getMarkerMethods();
         profilingSettings.setInstrumentationMarkerMethods(marks);
 
-        retValue = super.prepareInstrumentation(profilingSettings);
+        return prepareInstrumentationImpl(profilingSettings);
+    }
+    
+    private boolean prepareInstrumentationImpl(ProfilingSettings profilingSettings) {
+        try {
+            return super.prepareInstrumentation(profilingSettings);
+        } catch (ClientUtils.TargetAppOrVMTerminated e) {
+            ProfilerDialogs.displayError(e.getMessage());
+            e.printStackTrace(System.err);
+        } catch (InstrumentationException e) {
+            ProfilerDialogs.displayError(e.getMessage());
+            e.printStackTrace(System.err);
+        } catch (BadLocationException e) {
+            ProfilerDialogs.displayError(e.getMessage());
+            e.printStackTrace(System.err);
+        } catch (ClassNotFoundException e) {
+            ProfilerDialogs.displayError(e.getMessage());
+            e.printStackTrace(System.err);
+        } catch (IOException e) {
+            ProfilerDialogs.displayError(e.getMessage());
+        } catch (ClassFormatError e) {
+            ProfilerDialogs.displayError(e.getMessage());
+        }
 
-        return retValue;
+        return false;
     }
 
     public void runTarget(FileObject buildScriptFO, String target, Properties props) {
@@ -1666,12 +1611,12 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     // TODO [ian] - perform saving of global settings differently
-    public void saveGlobalFilters() {
+    public void saveFilters() {
         // 1. save global filters
         FileLock lock = null;
 
         try {
-            final FileObject folder = IDEUtils.getSettingsFolder(true);
+            final FileObject folder = GlobalStorage.getSettingsFolder(true);
             FileObject fo = folder.getFileObject(GLOBAL_FILTERS_FILENAME, "xml"); //NOI18N
 
             if (fo == null) {
@@ -1688,9 +1633,8 @@ public final class NetBeansProfiler extends Profiler {
             bos.close();
         } catch (Exception e) {
             ProfilerLogger.log(e);
-            ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_SAVING_PROFILING_SETTINGS_MESSAGE,
-                                                                                     new Object[] { e.getMessage() }),
-                                                                NotifyDescriptor.ERROR_MESSAGE));
+            ProfilerDialogs.displayError(MessageFormat.format(ERROR_SAVING_PROFILING_SETTINGS_MESSAGE,
+                                                             new Object[] { e.getMessage() }));
         } finally {
             if (lock != null) {
                 lock.releaseLock();
@@ -1701,7 +1645,7 @@ public final class NetBeansProfiler extends Profiler {
         lock = null;
 
         try {
-            final FileObject folder = IDEUtils.getSettingsFolder(true);
+            final FileObject folder = GlobalStorage.getSettingsFolder(true);
             FileObject fo = folder.getFileObject(DEFINED_FILTERSETS_FILENAME, "xml"); //NOI18N
 
             if (fo == null) {
@@ -1720,9 +1664,8 @@ public final class NetBeansProfiler extends Profiler {
             bos.close();
         } catch (Exception e) {
             ProfilerLogger.log(e);
-            ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_SAVING_FILTER_SETS_MESSAGE,
-                                                                                     new Object[] { e.getMessage() }),
-                                                                NotifyDescriptor.ERROR_MESSAGE));
+            ProfilerDialogs.displayError(MessageFormat.format(ERROR_SAVING_FILTER_SETS_MESSAGE,
+                                                             new Object[] { e.getMessage() }));
         } finally {
             if (lock != null) {
                 lock.releaseLock();
@@ -1891,7 +1834,7 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     private void displayWarningAboutEntireAppProfiling() {
-        displayWarning(ENTIRE_APPLICATION_PROFILING_WARNING);
+        ProfilerDialogs.displayWarning(ENTIRE_APPLICATION_PROFILING_WARNING);
     }
 
     private void flushDebugMsgs() {
@@ -1907,7 +1850,7 @@ public final class NetBeansProfiler extends Profiler {
     // -- Package-Private stuff --------------------------------------------------------------------------------------------
     private void loadGlobalFilters() {
         try {
-            FileObject folder = IDEUtils.getSettingsFolder(false);
+            FileObject folder = GlobalStorage.getSettingsFolder(false);
             FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config");
 
             // 1. Deal with global filters
@@ -1953,9 +1896,8 @@ public final class NetBeansProfiler extends Profiler {
             }
         } catch (Exception e) {
             ProfilerLogger.log(e);
-            ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(ERROR_LOADING_PROFILING_SETTINGS_MESSAGE,
-                                                                                     new Object[] { e.getMessage() }),
-                                                                NotifyDescriptor.ERROR_MESSAGE));
+            ProfilerDialogs.displayError(MessageFormat.format(ERROR_LOADING_PROFILING_SETTINGS_MESSAGE,
+                                                              new Object[] { e.getMessage() }));
         }
     }
 
@@ -2057,35 +1999,8 @@ public final class NetBeansProfiler extends Profiler {
                 }
             }
 
-            // done
-            StatisticalModuleContainer statModulesContainer = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
-            Collection<?extends StatisticalModule> modules = Lookup.getDefault().lookupAll(StatisticalModule.class);
-
-            if ((statModulesContainer != null) && (modules != null)) {
-                for (StatisticalModule module : modules) {
-                    /* Using workaround here
-                     * For some reasons when the lookupAll is called the second time it returns ALL subtypes as well
-                     * So I must check for the proper type and check for project support eventually
-                     */
-                    if (module instanceof ProjectAwareStatisticalModule) {
-                        if (((ProjectAwareStatisticalModule) module).supportsProject(project)) {
-                            statModulesContainer.addModule(module);
-                        }
-                    } else {
-                        statModulesContainer.addModule(module);
-                    }
-                }
-            }
-
-            Collection<?extends ProjectAwareStatisticalModule> pmodules = Lookup.getDefault()
-                                                                                .lookupAll(ProjectAwareStatisticalModule.class);
-
-            if (pmodules != null) {
-                for (ProjectAwareStatisticalModule module : pmodules) {
-                    if (module.supportsProject(project)) {
-                        statModulesContainer.addModule(module);
-                    }
-                }
+            for(SessionListener sl : Lookup.getDefault().lookupAll(SessionListener.class)) {
+                sl.onStartup(profilingSettings, project);
             }
 
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
@@ -2101,27 +2016,6 @@ public final class NetBeansProfiler extends Profiler {
             FlatProfileBuilder fpb = Lookup.getDefault().lookup(FlatProfileBuilder.class);
             TimeCollector tc = Lookup.getDefault().lookup(TimeCollector.class);
             fpb.setContext(client, tc, filter);
-            
-//            Collection<?extends ContextAware> contextAwareInstances = Lookup.getDefault().lookupAll(ContextAware.class);
-//
-//            for (ContextAware instance : contextAwareInstances) {
-//                instance.setContext(client);
-//            }
-
-//            boolean isMarksEnabled = (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)
-//                                     || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART);
-//
-////            ProjectTypeProfiler ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-//            Categorization ctg = project != null ? project.getLookup().lookup(Categorization.class) : null;
-//
-//            isMarksEnabled &= (ctg != null);
-//
-//            if (isMarksEnabled) {
-//                ctg.reset();
-//                MarkingEngine.getDefault().configure(ctg.getMappings());
-//            } else {
-//                MarkingEngine.getDefault().deconfigure();
-//            }
 
             Collection listeners = null;
 
@@ -2249,11 +2143,11 @@ public final class NetBeansProfiler extends Profiler {
             //      for(CCTProvider cctProvider : cctProviders) {
             //        cctProvider.removeAllListeners();
             //      }
-            StatisticalModuleContainer statModulesContainer = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
-
-            if (statModulesContainer != null) {
-                statModulesContainer.removeAllModules();
-            }
+//            StatisticalModuleContainer statModulesContainer = Lookup.getDefault().lookup(StatisticalModuleContainer.class);
+//
+//            if (statModulesContainer != null) {
+//                statModulesContainer.removeAllModules();
+//            }
 
             // deconfigure the profiler client
             ProfilerClient client = getTargetAppRunner().getProfilerClient();
