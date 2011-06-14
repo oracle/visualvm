@@ -331,8 +331,6 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     }
 //    public static Logger LOG = Logger.getLogger(ClassInfo.class.getName());   
     public class StackMapTables {
-
-
         private StackMapFrame[][] frames;
         private byte[][] framesBytes;
         private boolean hasTable;
@@ -375,7 +373,11 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             return hasTable;
         }
 
-        public void updateTable(int injectionPos, int injectedBytesCount, int methodIdx) {
+        public void updateTable(int injectionPos, int injectedBytesCount, int methodIdx, boolean changeTypeIsInjectNewInstr, boolean injectionBindsToFollowingInstruction) {
+            String method = getMethodName(methodIdx);
+            if ("cpuTest".equals(method)) {
+                System.out.println("11!!!!");
+            }
             if (hasTable()) {
                 StackMapFrame[] frms = frames[methodIdx];
                 
@@ -387,11 +389,13 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
                         int offsetDelta = frame.getOffsetDelta();
                         bciIter += offsetDelta;
 
-                        if (!offsetAdjusted && bciIter > injectionPos) {
-                            setOffsetDelta(methodIdx, frame, offsetDelta + injectedBytesCount);
-                            offsetAdjusted = true;
+                        if (!offsetAdjusted) {
+                            if (adjustOffset(bciIter, injectionPos, changeTypeIsInjectNewInstr, injectionBindsToFollowingInstruction)) {
+                                setOffsetDelta(methodIdx, frame, offsetDelta + injectedBytesCount);
+                                offsetAdjusted = true;
+                            }
                         }
-                        frame.updateUnitilializedList(injectionPos, injectedBytesCount);
+                        frame.updateUnitilializedList(injectionPos, injectedBytesCount, changeTypeIsInjectNewInstr, injectionBindsToFollowingInstruction);
                     }
                 }                
             }
@@ -623,13 +627,13 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
             modified = true;
         }
         
-        private void updateUnitilializedList(int injectionPos, int injectedBytesCount) {
+        private void updateUnitilializedList(int injectionPos, int injectedBytesCount, boolean changeTypeIsInjectNewInstr, boolean injectionBindsToFollowingInstruction) {
             if (uninitializedList != null) {
                 for (int i = 0; i<uninitializedList.size();i++) {
                     Integer off = uninitializedList.get(i);
                     if (off != null) {
                         int uninitializedOffset = off.intValue();
-                        if (uninitializedOffset > injectionPos) {
+                        if (adjustOffset(uninitializedOffset, injectionPos, changeTypeIsInjectNewInstr, injectionBindsToFollowingInstruction)) {
                             uninitializedList.set(i,Integer.valueOf(uninitializedOffset+injectedBytesCount));
                             uninitializedListModified = true;
                         }
@@ -1254,6 +1258,19 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         return ((buf[pos] & 0xFF) << 8) + (buf[pos + 1] & 0xFF);
     }
 
+    private static boolean adjustOffset(int bciIter, int injectionPos, boolean changeTypeIsInjectNewInstr, boolean injectionBindsToFollowingInstruction) {
+        boolean adjustOffset = false;
+        if (bciIter > injectionPos) {
+            adjustOffset = true;
+        } else if (changeTypeIsInjectNewInstr) {
+            if (injectionPos == 0 && bciIter == 0) {
+                adjustOffset = true;
+            } else if (!injectionBindsToFollowingInstruction && bciIter >= injectionPos) {
+                adjustOffset = true;
+            }
+        }
+        return adjustOffset;
+    }    
     //----------------------------------------- Private implementation -----------------------------------
 
     private synchronized void initLineNumberTables() {
