@@ -71,28 +71,5 @@ public final class ProfilerUtils {
     
     public static void runInProfilerRequestProcessor(final Runnable r) {
         getProfilerRequestProcessor().post(r);
-    }
-    
-    public static void runInEventDispatchThread(final Runnable r) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            SwingUtilities.invokeLater(r);
-        }
-    }
-
-    public static void runInEventDispatchThreadAndWait(final Runnable r) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InvocationTargetException e) {
-                profilerErrorManager.notify(e);
-            } catch (InterruptedException e) {
-                profilerErrorManager.notify(e);
-            }
-        }
-    }
-    
+    }    
 }

@@ -56,11 +56,11 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
 import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
@@ -190,7 +190,7 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
     private void updateSelector(Runnable updater) {
         final ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
                 "SelectRootMethodsPanel_ParsingProjectStructureMessage")); // NOI18N
-        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
                 ph.setInitialDelay(500);
                 ph.start();

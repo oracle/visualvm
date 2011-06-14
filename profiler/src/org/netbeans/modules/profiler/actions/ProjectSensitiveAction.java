@@ -66,7 +66,7 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.netbeans.lib.profiler.common.CommonUtils;
 
 
 /**
@@ -411,7 +411,7 @@ public class ProjectSensitiveAction extends AbstractAction implements ContextAwa
                 return;
             }
 
-            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         int oldReqCount = -1;
                         int currentReqCount = -1;

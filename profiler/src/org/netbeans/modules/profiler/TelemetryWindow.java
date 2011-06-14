@@ -68,10 +68,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /** An IDE TopComponent to display profiling results.
@@ -419,7 +419,7 @@ public final class TelemetryWindow extends TopComponent {
 
     public static void closeIfOpened() {
         if (defaultInstance != null) {
-            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         if (defaultInstance.isOpened()) {
                             defaultInstance.close();

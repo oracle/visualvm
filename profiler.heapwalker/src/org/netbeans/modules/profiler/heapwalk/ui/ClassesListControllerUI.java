@@ -58,7 +58,6 @@ import org.netbeans.lib.profiler.ui.components.table.JExtendedTablePanel;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.modules.profiler.heapwalk.ClassesListController;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -82,7 +81,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
@@ -97,6 +95,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -104,7 +103,6 @@ import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
@@ -756,7 +754,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     private void initData() {
         if (displayCache == null) displayCache = new Object[0][columnCount + 1];
 
-        ProfilerUtils.runInEventDispatchThread(new Runnable() {
+        CommonUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 final AtomicBoolean initInProgress = new AtomicBoolean(false);
                 

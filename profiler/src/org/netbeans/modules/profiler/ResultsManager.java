@@ -61,7 +61,6 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
@@ -77,7 +76,6 @@ import java.util.*;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectStorage;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.cookies.OpenCookie;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
@@ -619,7 +617,7 @@ public final class ResultsManager {
 
     public void openSnapshot(final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
         if (ls == null) ProfilerDialogs.displayError(CANNOT_OPEN_SNAPSHOT_MSG);
-        else ProfilerUtils.runInEventDispatchThread(new Runnable() {
+        else CommonUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
                 srw.open();
@@ -836,7 +834,7 @@ public final class ResultsManager {
     }
 
     public LoadedSnapshot takeSnapshot() {
-        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
                 public void run() {
                     mainWindow = WindowManager.getDefault().getMainWindow();
                 }

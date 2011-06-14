@@ -103,6 +103,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
@@ -185,7 +186,7 @@ public final class LiveResultsWindow extends TopComponent
         public void cctEstablished(RuntimeCCTNode runtimeCCTNode, boolean empty) {
             if (!empty) {
                 getDefault().resultsAvailable = true;
-                ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                CommonUtils.runInEventDispatchThread(new Runnable() {
                         public void run() {
                             getDefault().updateResultsDisplay();
                         }
@@ -303,7 +304,7 @@ public final class LiveResultsWindow extends TopComponent
                         final LoadedSnapshot ls = ResultsManager.getDefault().takeSnapshot();
 
                         if (ls != null) {
-                            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                            CommonUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
 
@@ -456,7 +457,7 @@ public final class LiveResultsWindow extends TopComponent
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LiveResultsWindow() {
-        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
                 initUI();
             }
@@ -555,7 +556,7 @@ public final class LiveResultsWindow extends TopComponent
 
     public static void closeIfOpened() {
         if (hasDefault()) {
-            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         if (defaultLiveInstance.isOpened()) {
                             defaultLiveInstance.close();
@@ -1019,7 +1020,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private void requestProfilingDataUpdate(final boolean force) {
-        ProfilerUtils.runInEventDispatchThread(new Runnable() {
+        CommonUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     if (!isAutoRefresh() && !force) {
                         return;
@@ -1116,7 +1117,7 @@ public final class LiveResultsWindow extends TopComponent
                 add(currentDisplayComponent, BorderLayout.CENTER);
                 revalidate();
                 repaint();
-                ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         currentDisplayComponent.requestFocusInWindow(); // must be invoked lazily to override default focus behavior
                     }

@@ -102,6 +102,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicComboBoxUI;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -1323,7 +1324,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
                 @Override
                 protected void nonResponding() {
-                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                    CommonUtils.runInEventDispatchThread(new Runnable() {
                         @Override
                         public void run() {
                             list.setEnabled(false);
@@ -1879,7 +1880,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     }
 
     public static synchronized void closeIfOpened() {
-        ProfilerUtils.runInEventDispatchThread(new Runnable() {
+        CommonUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (defaultInstance != null && defaultInstance.isOpened()) defaultInstance.close();
             }

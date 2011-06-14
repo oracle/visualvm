@@ -78,8 +78,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
@@ -389,7 +389,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     private void updateSelector(Runnable updater) {
         final ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
                 "SelectRootMethodsPanel_ParsingProjectStructureMessage")); // NOI18N
-        ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
+        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
                 ph.setInitialDelay(500);
                 ph.start();

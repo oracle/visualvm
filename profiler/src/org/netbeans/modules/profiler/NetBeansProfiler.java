@@ -272,7 +272,7 @@ public final class NetBeansProfiler extends Profiler {
             };
 
             dialog.addComponentListener(listener);
-            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         dialog.setVisible(false);
                     }
@@ -316,7 +316,7 @@ public final class NetBeansProfiler extends Profiler {
             };
 
             dialog.addComponentListener(listener);
-            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         dialog.setVisible(true);
                     }
@@ -857,7 +857,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     // clear rerun
                     actionSupport.nullAll();
-                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                    CommonUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 CallableSystemAction.get(RerunAction.class).updateAction();
                             }
@@ -888,7 +888,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
-                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                    CommonUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 openWindowsOnProfilingStart();
                             }
@@ -946,7 +946,7 @@ public final class NetBeansProfiler extends Profiler {
                         monitor.monitorVM(targetAppRunner);
 
                         if (threadsMonitoringEnabled) {
-                            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                            CommonUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         ThreadsWindow.getDefault().showThreads();
                                     }
@@ -1105,7 +1105,7 @@ public final class NetBeansProfiler extends Profiler {
 
                     setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
-                    ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                    CommonUtils.runInEventDispatchThread(new Runnable() {
                             public void run() {
                                 openWindowsOnProfilingStart();
                             }
@@ -1137,7 +1137,7 @@ public final class NetBeansProfiler extends Profiler {
                     if (targetAppRunner.targetAppIsRunning()) {
                         getThreadsManager()
                             .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                        ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                        CommonUtils.runInEventDispatchThread(new Runnable() {
                                 public void run() {
                                     monitor.monitorVM(targetAppRunner);
                                 }
@@ -1444,7 +1444,7 @@ public final class NetBeansProfiler extends Profiler {
                         if (targetAppRunner.targetAppIsRunning()) {
                             getThreadsManager()
                                 .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                            ProfilerUtils.runInEventDispatchThread(new Runnable() {
+                            CommonUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         // System.err.println("------------ 8: "+ (System.currentTimeMillis() - time));
                                         monitor.monitorVM(targetAppRunner);

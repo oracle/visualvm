@@ -51,9 +51,9 @@ import org.openide.windows.WindowManager;
 import java.awt.*;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /** A panel with mini graphs intended to be displayed in the output area.
@@ -111,7 +111,7 @@ public final class TelemetryOverviewPanel extends TopComponent {
 
     public static synchronized TelemetryOverviewPanel getDefault() {
         if (defaultInstance == null) {
-            ProfilerUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
                 public void run() {
                     defaultInstance = (TelemetryOverviewPanel) WindowManager.getDefault().findTopComponent(ID);
                     if (defaultInstance == null) defaultInstance = new TelemetryOverviewPanel();
@@ -124,7 +124,7 @@ public final class TelemetryOverviewPanel extends TopComponent {
 
     /** Possibly closes the window avoiding unnecessary initialization if not created and displayed yet. */
     public static synchronized void closeIfOpened() {
-        ProfilerUtils.runInEventDispatchThread(new Runnable() {
+        CommonUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (defaultInstance != null && defaultInstance.isOpened()) defaultInstance.close();
             }
