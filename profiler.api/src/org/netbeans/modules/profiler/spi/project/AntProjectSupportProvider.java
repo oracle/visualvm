@@ -44,15 +44,35 @@ package org.netbeans.modules.profiler.spi.project;
 import org.openide.filesystems.FileObject;
 
 /**
+ * Provider of support for profiling Ant projects.
  *
  * @author Jiri Sedlacek
  */
 public abstract class AntProjectSupportProvider {
     
+    /**
+     * Returns Ant target to use for profiling.
+     * 
+     * @param buildScript build script
+     * @param type profiling type
+     * @param profiledClassFile profiled file or null for profiling entire project
+     * @return Ant target to use for profiling
+     */
     public abstract String getProfilerTargetName(FileObject buildScript, int type, FileObject profiledClassFile);
     
+    /**
+     * Returns build script of a project.
+     * 
+     * @return build script of a project
+     */
     public abstract FileObject getProjectBuildScript();
     
+    /**
+     * Returns build script according to provided file name.
+     * 
+     * @param buildFileName file name of the build script
+     * @return build script according to provided file name
+     */
     public abstract FileObject getProjectBuildScript(String buildFileName);
     
     

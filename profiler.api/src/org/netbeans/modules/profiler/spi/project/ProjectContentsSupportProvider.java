@@ -45,15 +45,32 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.openide.filesystems.FileObject;
 
 /**
+ * Provider of support for configuring profiling roots and instrumentation filter from a project.
  *
  * @author Jiri Sedlacek
  */
 public abstract class ProjectContentsSupportProvider {    
     
+    /**
+     * Returns array of profiling roots for the defined context.
+     * 
+     * @param profiledClassFile profiled file or null for profiling the entire project
+     * @param profileSubprojects true if profiling also project's subprojects, false for profiling just the project
+     * @return array of profiling roots for the defined context
+     */
     public abstract ClientUtils.SourceCodeSelection[] getProfilingRoots(FileObject profiledClassFile, boolean profileSubprojects);
     
+    /**
+     * Returns instrumentation filter for the defined context.
+     * 
+     * @param profileSubprojects true if profiling also project's subprojects, false for profiling just the project
+     * @return instrumentation filter for the defined context
+     */
     public abstract String getInstrumentationFilter(boolean profileSubprojects);
     
+    /**
+     * Resets the ProjectContentsSupport instance after submitting or cancelling the Select Profiling Task dialog.
+     */
     public abstract void reset();
     
     

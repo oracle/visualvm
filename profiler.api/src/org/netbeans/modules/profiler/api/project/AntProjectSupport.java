@@ -46,6 +46,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
+ * Support for profiling Ant projects.
  *
  * @author Jiri Sedlacek
  */
@@ -77,14 +78,33 @@ public final class AntProjectSupport {
     private final AntProjectSupportProvider provider;
     
     
+    /**
+     * Returns Ant target to use for profiling.
+     * 
+     * @param buildScript build script
+     * @param type profiling type
+     * @param profiledClassFile profiled file or null for profiling entire project
+     * @return Ant target to use for profiling
+     */
     public String getProfilerTargetName(FileObject buildScript, int type, FileObject profiledClassFile) {
         return provider.getProfilerTargetName(buildScript, type, profiledClassFile);
     }
     
+    /**
+     * Returns build script of a project.
+     * 
+     * @return build script of a project
+     */
     public FileObject getProjectBuildScript() {
         return provider.getProjectBuildScript();
     }
     
+    /**
+     * Returns build script according to provided file name.
+     * 
+     * @param buildFileName file name of the build script
+     * @return build script according to provided file name
+     */
     public FileObject getProjectBuildScript(String buildFileName) {
         return provider.getProjectBuildScript(buildFileName);
     }
@@ -101,6 +121,12 @@ public final class AntProjectSupport {
     }
     
     
+    /**
+     * Returns AntProjectSupport instance for the provided project.
+     * 
+     * @param project project
+     * @return AntProjectSupport instance for the provided project
+     */
     public static AntProjectSupport get(Lookup.Provider project) {
         AntProjectSupportProvider provider =
                 project.getLookup().lookup(AntProjectSupportProvider.class);

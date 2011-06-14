@@ -51,6 +51,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
+ * Support for configuring profiling roots and instrumentation filter from a project.
  *
  * @author Jiri Sedlacek
  */
@@ -62,6 +63,13 @@ public final class ProjectContentsSupport {
     private final Collection<? extends ProjectContentsSupportProvider> providers;
     
     
+    /**
+     * Returns array of profiling roots for the defined context.
+     * 
+     * @param profiledClassFile profiled file or null for profiling the entire project
+     * @param profileSubprojects true if profiling also project's subprojects, false for profiling just the project
+     * @return array of profiling roots for the defined context
+     */
     public ClientUtils.SourceCodeSelection[] getProfilingRoots(FileObject profiledClassFile,
                                                                boolean profileSubprojects) {
         if (providers == null) {
@@ -76,6 +84,12 @@ public final class ProjectContentsSupport {
         }
     }
     
+    /**
+     * Returns instrumentation filter for the defined context.
+     * 
+     * @param profileSubprojects true if profiling also project's subprojects, false for profiling just the project
+     * @return instrumentation filter for the defined context
+     */
     public String getInstrumentationFilter(boolean profileSubprojects) {
         if (providers == null) {
             return ""; // NOI18N
@@ -91,6 +105,9 @@ public final class ProjectContentsSupport {
         }
     }
     
+    /**
+     * Resets the ProjectContentsSupport instance after submitting or cancelling the Select Profiling Task dialog.
+     */
     public void reset() {
         if (providers != null)
             for (ProjectContentsSupportProvider provider : providers) 
@@ -109,6 +126,12 @@ public final class ProjectContentsSupport {
     }
     
 
+    /**
+     * Returns ProjectContentsSupport instance for the provided project.
+     * 
+     * @param project project
+     * @return ProjectContentsSupport instance for the provided project
+     */
     public static ProjectContentsSupport get(Lookup.Provider project) {
         Collection<? extends ProjectContentsSupportProvider> providers =
                 project.getLookup().lookupAll(ProjectContentsSupportProvider.class);

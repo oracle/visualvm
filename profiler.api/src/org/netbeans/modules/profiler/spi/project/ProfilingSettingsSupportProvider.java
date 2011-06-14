@@ -46,13 +46,25 @@ import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.modules.profiler.api.project.ProfilingSettingsSupport.SettingsCustomizer;
 
 /**
+ * Provider of support for project-specific information for the Select Profiling Task dialog.
  *
  * @author Jiri Sedlacek
  */
 public abstract class ProfilingSettingsSupportProvider {    
     
+    /**
+     * Returns expected profiling overhead imposed by the provided profiling settings.
+     * 
+     * @param settings profiling settings
+     * @return expected profiling overhead imposed by the provided profiling settings
+     */
     public abstract float getProfilingOverhead(ProfilingSettings settings);
     
+    /**
+     * Returns SettingsCustomizer instance for a project.
+     * 
+     * @return SettingsCustomizer instance for a project
+     */
     public abstract SettingsCustomizer getSettingsCustomizer();
     
     //    public abstract SettingsConfigurator getSettingsConfigurator();

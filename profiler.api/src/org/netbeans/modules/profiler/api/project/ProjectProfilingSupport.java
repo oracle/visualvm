@@ -49,6 +49,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
+ * Support for profiling projects.
  *
  * @author Jiri Sedlacek
  */
@@ -59,50 +60,114 @@ public final class ProjectProfilingSupport {
     private final ProjectProfilingSupportProvider provider;
     
     
+    /**
+     * Returns true if profiling a project is supported.
+     * 
+     * @return true if profiling a project is supported, false otherwise
+     */
     public boolean isProfilingSupported() {
         return provider.isProfilingSupported();
     }
     
+    /**
+     * Returns true if attaching to a running project is supported.
+     * 
+     * @return true if attaching to a running project is supported, false otherwise.
+     */
     public boolean isAttachSupported() {
         return provider.isAttachSupported();
     }
     
+    /**
+     * Returns true if profiling the provided file is supported.
+     * 
+     * @param fo file
+     * @return true if profiling the provided file is supported, false otherwise
+     */
     public boolean isFileObjectSupported(FileObject fo) {
         return provider.isFileObjectSupported(fo);
     }
     
+    /**
+     * Returns the Java platform configured for running the project.
+     * 
+     * @return Java platform configured for running the project
+     */
     public JavaPlatform getProjectJavaPlatform() {
         return provider.getProjectJavaPlatform();
     }
     
+    /**
+     * Returns true if the project is properly set up to be profiled (e.g. main class has a main method).
+     * 
+     * @param profiledClassFile profiled file or null for profiling the entire project
+     * @return true if the project is properly set up to be profiled, false otherwise
+     */
     public boolean checkProjectCanBeProfiled(FileObject profiledClassFile) {
         return provider.checkProjectCanBeProfiled(profiledClassFile);
     }
     
+    /**
+     * Returns true if the project is configured to be profiled (e.g. build script is customized if needed).
+     * 
+     * @return true if the project is configured to be profiled, false otherwise
+     */
     public boolean checkProjectIsModifiedForProfiler() {
         return provider.checkProjectIsModifiedForProfiler();
     }
     
+    /**
+     * Configures profiling properties passed to the Ant environment (to be moved to AntProjectSupport?).
+     * 
+     * @param props properties
+     * @param profiledClassFile profiled file or null for profiling the entire project
+     */
     public void configurePropertiesForProfiling(Properties props, FileObject profiledClassFile) {
         provider.configurePropertiesForProfiling(props, profiledClassFile);
     }
     
+    /**
+     * Configures project-specific session settings.
+     * 
+     * @param ss session settings
+     */
     public void setupProjectSessionSettings(SessionSettings ss) {
         provider.setupProjectSessionSettings(ss);
     }
     
+    /**
+     * Returns true if profiling settings can be customized by the user (working directory, Java platform etc.)
+     * 
+     * @return true if profiling settings can be customized by the user, false otherwise
+     */
     public boolean supportsSettingsOverride() {
         return provider.supportsSettingsOverride();
     }
     
+    /**
+     * Returns true if profiler integration can be removed from the project.
+     * 
+     * @return true if profiler integration can be removed from the project, false otherwise
+     */
     public boolean supportsUnintegrate() {
         return provider.supportsUnintegrate();
     }
     
+    /**
+     * Removes profiler integration from a project.
+     */
     public void unintegrateProfiler() {
         provider.unintegrateProfiler();
     }
     
+    /**
+     * Allows to start a profiling session directly by the ProjectProfilingSupport instance (workaround for Maven projects).
+     * 
+     * @param profiledClassFile profiled file
+     * @param isTest true if profiledClassFile is a test, false otherwise
+     * @param properties profiling properties
+     * @return true if the ProjectProfilingSupport instance started a profiling session, false otherwise
+     */
     public boolean startProfilingSession(FileObject profiledClassFile, boolean isTest, Properties properties) {
         return provider.startProfilingSession(profiledClassFile, isTest, properties);
     }
@@ -119,6 +184,12 @@ public final class ProjectProfilingSupport {
     }
     
     
+    /**
+     * Returns ProjectProfilingSupport instance for the provided project.
+     * 
+     * @param project project
+     * @return ProjectProfilingSupport instance for the provided project
+     */
     public static ProjectProfilingSupport get(Lookup.Provider project) {
         ProjectProfilingSupportProvider provider =
                 project.getLookup().lookup(ProjectProfilingSupportProvider.class);

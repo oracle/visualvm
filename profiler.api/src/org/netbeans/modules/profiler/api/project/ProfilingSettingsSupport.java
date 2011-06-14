@@ -42,13 +42,13 @@
 package org.netbeans.modules.profiler.api.project;
 
 import java.util.Properties;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.spi.project.ProfilingSettingsSupportProvider;
 import org.openide.util.Lookup;
 
 /**
+ * Support for project-specific information for the Select Profiling Task dialog.
  *
  * @author Jiri Sedlacek
  */
@@ -59,10 +59,21 @@ public final class ProfilingSettingsSupport {
     private final ProfilingSettingsSupportProvider provider;
     
     
+    /**
+     * Returns expected profiling overhead imposed by the provided profiling settings.
+     * 
+     * @param settings profiling settings
+     * @return expected profiling overhead imposed by the provided profiling settings
+     */
     public float getProfilingOverhead(ProfilingSettings settings) {
         return provider.getProfilingOverhead(settings);
     }
 
+    /**
+     * Returns SettingsCustomizer instance for a project.
+     * 
+     * @return SettingsCustomizer instance for a project
+     */
     public SettingsCustomizer getSettingsCustomizer() {
         return provider.getSettingsCustomizer();
     }
@@ -83,24 +94,46 @@ public final class ProfilingSettingsSupport {
     }
     
 
+    /**
+     * Returns ProfilingSettingsSupport instance for the provided project.
+     * 
+     * @param project project
+     * @return ProfilingSettingsSupport instance for the provided project
+     */
     public static ProfilingSettingsSupport get(Lookup.Provider project) {
         ProfilingSettingsSupportProvider provider =
                 project.getLookup().lookup(ProfilingSettingsSupportProvider.class);
-//        JOptionPane.showMessageDialog(null, "Provider: " + provider);
         if (provider == null) return defaultImpl();
         else return new ProfilingSettingsSupport(provider);
     }
     
     
+    /**
+     * Support for adding custom settings component into the Select Profiling Task dialog.
+     */
     public static abstract class SettingsCustomizer {
         
-        // Provides extra component for ProjectTypeProfiler-specific settings
+        /**
+         * Returns custom settings component to be displayed in the Select Profiling Task dialog.
+         * 
+         * @param isAttach true if Select Profiling Task dialog is displayed for profiler attach, false for profile project
+         * @param isModify true if Select Profiling Task dialog is displayed for modify profiling, false otherwise
+         * @return custom settings component to be displayed in the Select Profiling Task dialog
+         */
         public abstract JPanel getCustomSettingsPanel(boolean isAttach, boolean isModify);
         
-        // Loads custom settings from project's properties
+        /**
+         * Loads custom settings from project's properties.
+         * 
+         * @param properties properties
+         */
         public abstract void loadCustomSettings(Properties properties);
         
-        // Stores custom settings from project's properties
+        /**
+         * Stores custom settings into project's properties.
+         * 
+         * @param properties properties
+         */
         public abstract void storeCustomSettings(Properties properties);
         
     }
