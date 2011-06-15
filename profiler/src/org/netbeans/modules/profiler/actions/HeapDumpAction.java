@@ -82,7 +82,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.api.ProjectStorage;
+import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDisplayer;
 import org.openide.windows.WindowManager;

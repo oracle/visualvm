@@ -61,7 +61,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.api.ProjectStorage;
+import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.openide.util.Lookup;
 
 

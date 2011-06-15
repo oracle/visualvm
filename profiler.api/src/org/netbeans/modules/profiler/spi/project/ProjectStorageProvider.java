@@ -83,7 +83,7 @@ public abstract class ProjectStorageProvider {
      * Returns project context for the provided settings storage FileObject or null if not resolvable.
      * 
      * @param settingsFolder settings storage
-     * @return  project context for the provided settings storage FileObject or null if not resolvable
+     * @return project context for the provided settings storage FileObject or null if not resolvable
      */
     public abstract Lookup.Provider getProjectFromSettingsFolder(FileObject settingsFolder);
     

@@ -39,10 +39,11 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api;
+package org.netbeans.modules.profiler.api.project;
 
 import java.io.IOException;
 import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.modules.profiler.api.GlobalStorage;
 import org.netbeans.modules.profiler.spi.project.ProjectStorageProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;

@@ -54,7 +54,7 @@ import org.openide.util.RequestProcessor;
 import java.io.IOException;
 import java.text.MessageFormat;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProjectStorage;
+import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.api.TaskConfigurator;
 import org.netbeans.modules.profiler.api.project.ProjectProfilingSupport;
 import org.netbeans.modules.profiler.attach.AttachWizard;
