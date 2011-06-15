@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.ui.panels;
+package org.netbeans.modules.profiler.ui;
 
 import org.openide.DialogDescriptor;
 import org.openide.util.Cancellable;

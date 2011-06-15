@@ -45,41 +45,7 @@ made subject to such option by the copyright holder.
 -->
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
-    <folder name="Projects">
-        <folder name="Profiler_Actions_temporary">
-            <file name="org-netbeans-modules-profiler-actions-ProfileProjectActionPopup.shadow">
-                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ProfileProjectActionPopup.instance"/>
-            </file>
-        </folder>
-    </folder>
-
     <folder name="Loaders">
-        <folder name="text">
-            <folder name="x-java">
-                <folder name="Actions">
-                    <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.shadow">
-                        <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance"/>
-                        <attr name="position" intvalue="1200"/>
-                    </file>
-                </folder>
-            </folder>
-            <folder name="x-jsp">
-                <folder name="Actions">
-                    <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.shadow">
-                        <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance"/>
-                        <attr name="position" intvalue="800"/>
-                    </file>
-                </folder>
-            </folder>
-            <folder name="x-fx">
-                <folder name="Actions">
-                    <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.shadow">
-                        <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance"/>
-                        <attr name="position" intvalue="660"/>
-                    </file>
-                </folder>
-            </folder>
-        </folder>
         <folder name="application">
             <folder name="x-netbeans-profiler">
                 <folder name="Actions">
@@ -208,10 +174,6 @@ made subject to such option by the copyright holder.
                 <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
                 <attr name="position" intvalue="600"/>
             </file>
-            <file name="org-netbeans-modules-profiler-actions-ProfileMainProjectAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ProfileMainProjectAction.instance"/>
-                <attr name="position" intvalue="100"/>
-            </file>
             <file name="org-netbeans-modules-profiler-actions-RerunAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-RerunAction.instance"/>
                 <attr name="position" intvalue="500"/>
@@ -259,23 +221,6 @@ made subject to such option by the copyright holder.
                 <attr name="position" intvalue="1600"/>
                 <attr name="ergonomics" boolvalue="true"/>
             </file>
-            <folder name="ProfileOther">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
-                <attr name="position" intvalue="300"/>
-                <file name="org-netbeans-modules-profiler-actions-ProfileProjectAction.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ProfileProjectAction.instance"/>
-                    <attr name="position" intvalue="100"/>
-                </file>
-                <file name="org-netbeans-modules-profiler-actions-ProfileSingleAction.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ProfileSingleAction.instance"/>
-                    <attr name="position" intvalue="200"/>
-                </file>
-                <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfileProjectAction.instance"/>
-                <file name="org-netbeans-modules-profiler-actions-ProfileTestAction.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ProfileTestAction.instance"/>
-                    <attr name="position" intvalue="300"/>
-                </file>
-            </folder>
             <folder name="Advanced">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
                 <attr name="position" intvalue="1800"/>
@@ -295,31 +240,12 @@ made subject to such option by the copyright holder.
                     <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                     <attr name="position" intvalue="400"/>
                 </file>
-                <file name="org-netbeans-modules-profiler-actions-UnintegrateProfilerAction.shadow">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.unintegrateProfiler"/>
-                    <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-UnintegrateProfilerAction.instance"/>
-                    <attr name="position" intvalue="500"/>
-                </file>
                 <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance"/>
             </folder>
-
-            <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-ProfileMainProjectAction.instance"/>
-        </folder>
-    </folder>
-
-    <folder name="Toolbars">
-        <folder name="Build">
-            <file name="org-netbeans-modules-profiler-actions-ProfilerToolbarDropdownAction.instance">
-                <attr name="position" intvalue="400"/>
-                <attr name="misplaced.action.allowed" boolvalue="true"/>
-            </file>
         </folder>
     </folder>
 
     <folder name="Shortcuts">
-        <file name="A-F2.shadow">
-            <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ProfileMainProjectAction.instance"/>
-        </file>
         <file name="AC-F2.shadow">
             <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
         </file>
@@ -381,31 +307,9 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-ProfileSingleAction.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSingle"/>
-            </file>
-            <!-- XXX impl is nearly the same, really just different label... should probably share an Action instance -->
-            <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileSinglePopup"/>
-            </file>
-            <file name="org-netbeans-modules-profiler-actions-ProfileTestAction.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileTest"/>
-            </file>
-            <file name="org-netbeans-modules-profiler-actions-ProfileProjectAction.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileProject"/>
-            </file>
-            <file name="org-netbeans-modules-profiler-actions-ProfileMainProjectAction.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileMainProject"/>
-            </file>
-            <file name="org-netbeans-modules-profiler-actions-ProfileProjectActionPopup.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.profileProjectPopup"/>
-            </file>
             <file name="org-netbeans-modules-profiler-actions-InternalStatsAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-GetCmdLineArgumentsAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-UnintegrateProfilerAction.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.AntActions.unintegrateProfiler"/>
-            </file>
             <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance"/>
         </folder>
     </folder>

@@ -101,6 +101,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.heapwalker</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.nbimpl</friend>
                 <friend>org.netbeans.modules.profiler.options</friend>
                 <friend>org.netbeans.modules.profiler.ppoints</friend>
                 <friend>org.netbeans.modules.profiler.selector.java</friend>

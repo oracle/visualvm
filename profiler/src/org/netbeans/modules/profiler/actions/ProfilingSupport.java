@@ -178,11 +178,11 @@ public final class ProfilingSupport {
         }
     }
 
-    void setProfilingActionInvoked(boolean pai) {
+    public void setProfilingActionInvoked(boolean pai) {
         profilingActionInvoked = pai;
     }
 
-    boolean isProfilingActionInvoked() {
+    public boolean isProfilingActionInvoked() {
         return profilingActionInvoked;
     }
 
