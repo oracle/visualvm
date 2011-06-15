@@ -44,24 +44,13 @@
 package org.netbeans.modules.profiler.utils;
 
 import org.apache.tools.ant.module.api.support.ActionUtils;
-import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.project.JavaProjectConstants;
-import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.api.java.queries.UnitTestForSourceQuery;
-import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.project.*;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.modules.profiler.heapwalk.HeapDumpWatch;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.spi.java.classpath.PathResourceImplementation;
-import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.SubprojectProvider;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
@@ -69,7 +58,6 @@ import org.netbeans.spi.project.support.ant.PropertyUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
-import org.openide.NotifyDescriptor;
 import org.openide.awt.MouseUtils;
 import org.openide.execution.ExecutorTask;
 import org.openide.filesystems.FileLock;
@@ -90,7 +78,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -107,8 +94,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.HeapDumpWatch;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.project.AntProjectSupport;
+import org.netbeans.modules.profiler.api.project.ProjectProfilingSupport;
+import org.netbeans.modules.profiler.projectsupport.utilities.AppletSupport;
 import org.netbeans.spi.project.ProjectServiceProvider;
 import org.netbeans.spi.project.ui.ProjectOpenedHook;
 import org.openide.loaders.DataObject;
@@ -169,10 +160,6 @@ public final class ProjectUtilities {
                                                                                   "ProjectUtilities_FailedCopyAppletFileMsg"); // NOI18N
     private static final String FAILED_CREATE_OUTPUT_FOLDER_MSG = NbBundle.getMessage(ProjectUtilities.class,
                                                                                       "ProjectUtilities_FailedCreateOutputFolderMsg"); // NOI18N
-    private static final String PROFILE_PROJECT_CLASSES_STRING = NbBundle.getMessage(ProjectUtilities.class,
-                                                                                     "ProjectUtilities_ProfileProjectClassesString"); // NOI18N
-    private static final String PROFILE_PROJECT_SUBPROJECT_CLASSES_STRING = NbBundle.getMessage(ProjectUtilities.class,
-                                                                                                "ProjectUtilities_ProfileProjectSubprojectClassesString"); // NOI18N
     private static final String PROFILER_WILL_BE_UNINTEGRATED_MSG = NbBundle.getMessage(ProjectUtilities.class,
                                                                                         "ProjectUtilities_ProfilerWillBeUnintegratedMsg"); // NOI18N
     private static final String PROFILER_ISNT_INTEGRATED_MSG = NbBundle.getMessage(ProjectUtilities.class,
@@ -188,13 +175,6 @@ public final class ProjectUtilities {
     private static final String UNINTEGRATION_SUCCESSFUL_MSG = NbBundle.getMessage(ProjectUtilities.class,
                                                                                    "ProjectUtilities_UnintegrationSuccessfulMsg"); // NOI18N
                                                                                                                                    // -----
-    public static final SimpleFilter FILTER_PROJECT_ONLY = new SimpleFilter(PROFILE_PROJECT_CLASSES_STRING,
-                                                                            SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
-                                                                            "{$project.classes.only}"); // NOI18N
-    public static final SimpleFilter FILTER_PROJECT_SUBPROJECTS_ONLY = new SimpleFilter(PROFILE_PROJECT_SUBPROJECT_CLASSES_STRING,
-                                                                                        SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
-                                                                                        "{$project.subprojects.classes.only}"); // NOI18N
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /**
@@ -202,86 +182,20 @@ public final class ProjectUtilities {
      *
      * @return Collection<ProjectTypeProfiler> of all ProjectTypeProfilers currently installed
      */
-    public static Collection<?extends ProjectTypeProfiler> getAllProjectTypeProfilers() {
-        final Lookup lookup = Lookup.getDefault();
-        final Lookup.Template<ProjectTypeProfiler> template = new Lookup.Template<ProjectTypeProfiler>(ProjectTypeProfiler.class);
-        final Lookup.Result<ProjectTypeProfiler> result = lookup.lookup(template);
-
-        if (result == null) {
-            return new ArrayList<ProjectTypeProfiler>();
-        }
-
-        return result.allInstances();
-    }
-
-    public static ClientUtils.SourceCodeSelection[] getClassConstructors(FileObject classFile) {
-        return SourceUtils.getClassConstructors(classFile);
-
-        //    JavaClass fileClass = MDRUtils.getToplevelClass(classFile);
-        //    if (fileClass == null) return new ClientUtils.SourceCodeSelection[0];
-        //
-        //    Constructor[] constructors = MDRUtils.getConstructors(fileClass);
-        //    ClientUtils.SourceCodeSelection[] classConstructors = new ClientUtils.SourceCodeSelection[constructors.length];
-        //    for (int i = 0; i < constructors.length; i++) {
-        //      classConstructors[i] = new ClientUtils.SourceCodeSelection(MDRUtils.getVMClassName(fileClass), "<init>", MDRUtils.getSignature(constructors[i])); // NOI18N
-        //    }
-        //
-        //    return classConstructors;
-        //    return new ClientUtils.SourceCodeSelection[0];
-    }
-
-    public static ClasspathInfo getClasspathInfo(final Project project) {
-        return getClasspathInfo(project, true);
-    }
-
-    public static ClasspathInfo getClasspathInfo(final Project project, final boolean includeSubprojects) {
-        return getClasspathInfo(project, includeSubprojects, true, true);
-    }
-
-    public static ClasspathInfo getClasspathInfo(final Project project, final boolean includeSubprojects,
-                                                 final boolean includeSources, final boolean includeLibraries) {
-        FileObject[] sourceRoots = getSourceRoots(project, includeSubprojects);
-        if (((sourceRoots == null) || (sourceRoots.length == 0)) && !includeSubprojects) {
-            sourceRoots = getSourceRoots(project, true);
-        }
-        
-        if (sourceRoots == null || sourceRoots.length == 0) {
-            return null; // fail early
-        }
-        
-        java.util.List<URL> urlList = new ArrayList<URL>();
-
-        final ClassPath cpEmpty = ClassPathSupport.createClassPath(new FileObject[0]);
-
-        ClassPath cpSource = ClassPathSupport.createClassPath(sourceRoots);
-
-        // cleaning up compile classpatth; we need to get rid off all project's class file references in the classpath
-        ClassPath cpCompile = ClassPath.getClassPath(sourceRoots[0], ClassPath.COMPILE);
-
-        for (ClassPath.Entry entry : cpCompile.entries()) {
-            SourceForBinaryQuery.Result rslt = SourceForBinaryQuery.findSourceRoots(entry.getURL());
-            FileObject[] roots = rslt.getRoots();
-
-            if ((roots == null) || (roots.length == 0)) {
-                urlList.add(entry.getURL());
-            }
-        }
-
-        cpCompile = ClassPathSupport.createClassPath(urlList.toArray(new URL[urlList.size()]));
-
-        return ClasspathInfo.create(includeLibraries ? ClassPath.getClassPath(sourceRoots[0], ClassPath.BOOT) : cpEmpty,
-                                    includeLibraries ? cpCompile : cpEmpty, includeSources ? cpSource : cpEmpty);
-    }
+//    public static Collection<?extends ProjectTypeProfiler> getAllProjectTypeProfilers() {
+//        final Lookup lookup = Lookup.getDefault();
+//        final Lookup.Template<ProjectTypeProfiler> template = new Lookup.Template<ProjectTypeProfiler>(ProjectTypeProfiler.class);
+//        final Lookup.Result<ProjectTypeProfiler> result = lookup.lookup(template);
+//
+//        if (result == null) {
+//            return new ArrayList<ProjectTypeProfiler>();
+//        }
+//
+//        return result.allInstances();
+//    }
 
     public static String getDefaultPackageClassNames(Project project) {
-        Collection<String> classNames = SourceUtils.getDefaultPackageClassNames(project);
-        StringBuffer classNamesBuf = new StringBuffer();
-
-        for (String className : classNames) {
-            classNamesBuf.append(className).append(" "); //NOI18N
-        }
-
-        return classNamesBuf.toString();
+        return org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getDefaultPackageClassNames(project);
     }
 
     // Returns true if the project contains any Java sources (does not check subprojects!)
@@ -345,42 +259,12 @@ public final class ProjectUtilities {
         return m.find();
     }
 
-    public static float getProfilingOverhead(ProfilingSettings settings) {
-        float o = 0.0f;
-
-        if (org.netbeans.modules.profiler.ui.stp.Utils.isMonitorSettings(settings)) {
-            //} else if (org.netbeans.modules.profiler.ui.stp.Utils.isAnalyzerSettings(settings)) {
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings)) {
-            if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
-                o += 0.5f; // entire app
-            } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
-                o += 0.2f; // part of app
-            }
-
-            if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
-                o += 0.5f; // profile all classes
-            }
-        } else if (org.netbeans.modules.profiler.ui.stp.Utils.isMemorySettings(settings)) {
-            if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
-                o += 0.5f; // object allocations
-            } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
-                o += 0.7f; // object liveness
-            }
-
-            if (settings.getAllocStackTraceLimit() != 0) {
-                o += 0.3f; // record allocation stack traces
-            }
-        }
-
-        return o;
-    }
-
     public static String getProjectBuildScript(final Project project) {
         return getProjectBuildScript(project, "build.xml");
     }
 
     public static String getProjectBuildScript(final Project project, final String buildXml) {
-        final FileObject buildFile = findBuildFile(project, buildXml);
+        final FileObject buildFile = AntProjectSupport.get(project).getProjectBuildScript(buildXml);
         if (buildFile == null) {
             return null;
         }
@@ -420,37 +304,39 @@ public final class ProjectUtilities {
         }
     }
 
-    public static FileObject findBuildFile(final Project project) {
-        FileObject buildFile = null;
+//    Now available using AntProjectSupport
+//
+//    public static FileObject findBuildFile(final Project project) {
+//        FileObject buildFile = null;
+//
+//        Properties props = org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getProjectProperties(project);
+//        String buildFileName = props != null ? props.getProperty("buildfile") : null; // NOI18N
+//        if (buildFileName != null) {
+//            buildFile = findBuildFile(project, buildFileName);
+//        }
+//        if (buildFile == null) {
+//            buildFile = findBuildFile(project, "build.xml"); //NOI18N
+//        }
+//        return buildFile;
+//    }
+//
+//    public static FileObject findBuildFile(final Project project, final String buildFileName) {
+//        return project.getProjectDirectory().getFileObject(buildFileName);
+//    }
 
-        Properties props = org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities.getProjectProperties(project);
-        String buildFileName = props != null ? props.getProperty("buildfile") : null; // NOI18N
-        if (buildFileName != null) {
-            buildFile = findBuildFile(project, buildFileName);
-        }
-        if (buildFile == null) {
-            buildFile = findBuildFile(project, "build.xml"); //NOI18N
-        }
-        return buildFile;
-    }
-
-    public static FileObject findBuildFile(final Project project, final String buildFileName) {
-        return project.getProjectDirectory().getFileObject(buildFileName);
-    }
-
-    public static java.util.List<SimpleFilter> getProjectDefaultInstrFilters(Project project) {
-        java.util.List<SimpleFilter> v = new ArrayList<SimpleFilter>();
-
-        if (ProjectUtils.getSources(project).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA).length > 0) {
-            v.add(FILTER_PROJECT_ONLY);
-        }
-
-        if (hasSubprojects(project)) {
-            v.add(FILTER_PROJECT_SUBPROJECTS_ONLY);
-        }
-
-        return v;
-    }
+//    public static java.util.List<SimpleFilter> getProjectDefaultInstrFilters(Project project) {
+//        java.util.List<SimpleFilter> v = new ArrayList<SimpleFilter>();
+//
+//        if (ProjectUtils.getSources(project).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA).length > 0) {
+//            v.add(FILTER_PROJECT_ONLY);
+//        }
+//
+//        if (hasSubprojects(project)) {
+//            v.add(FILTER_PROJECT_SUBPROJECTS_ONLY);
+//        }
+//
+//        return v;
+//    }
 
     public static ClientUtils.SourceCodeSelection[] getProjectDefaultRoots(Project project, String[][] projectPackagesDescr) {
         computeProjectPackages(project, true, projectPackagesDescr);
@@ -534,49 +420,50 @@ public final class ProjectUtilities {
         return packages.toArray(new String[0]);
     }
 
-    /**
-     * Checks if ProjectTypeProfiler capable of profiling the provided project exists and if so, returns it.
-     *
-     * @param project The project
-     * @return ProjectTypeProfiler capable of profiling the project or null if none of the installed PTPs supports it
-     */
-    public static ProjectTypeProfiler getProjectTypeProfiler(final Project project) {
-        if (project == null) {
-            return ProjectTypeProfiler.DEFAULT; // global attach
-        }
-
-        ProjectTypeProfiler fromProject = project.getLookup().lookup(ProjectTypeProfiler.class);
-        
-        return fromProject != null ? (fromProject.isProfilingSupported(project) ? fromProject : ProjectTypeProfiler.DEFAULT) : ProjectTypeProfiler.DEFAULT;
-//        final Collection c = getAllProjectTypeProfilers();
-//
-//        for (Iterator i = c.iterator(); i.hasNext();) {
-//            final ProjectTypeProfiler ptp = (ProjectTypeProfiler) i.next();
-//
-//            if (ptp.isProfilingSupported(project)) {
-//                return ptp; // project type profiler for provided project
-//            }
+//    /**
+//     * Checks if ProjectTypeProfiler capable of profiling the provided project exists and if so, returns it.
+//     *
+//     * @param project The project
+//     * @return ProjectTypeProfiler capable of profiling the project or null if none of the installed PTPs supports it
+//     */
+//    public static ProjectTypeProfiler getProjectTypeProfiler(final Project project) {
+//        if (project == null) {
+//            return ProjectTypeProfiler.DEFAULT; // global attach
 //        }
-    }
+//
+//        ProjectTypeProfiler fromProject = project.getLookup().lookup(ProjectTypeProfiler.class);
+//        
+//        return fromProject != null ? (fromProject.isProfilingSupported(project) ? fromProject : ProjectTypeProfiler.DEFAULT) : ProjectTypeProfiler.DEFAULT;
+////        final Collection c = getAllProjectTypeProfilers();
+////
+////        for (Iterator i = c.iterator(); i.hasNext();) {
+////            final ProjectTypeProfiler ptp = (ProjectTypeProfiler) i.next();
+////
+////            if (ptp.isProfilingSupported(project)) {
+////                return ptp; // project type profiler for provided project
+////            }
+////        }
+//    }
 
     /**
      * @return true if there is a ProjectTypeProfilers capable of profiling the provided project using the Profile (Main) Project action, false otherwise.
      */
     public static boolean isProjectTypeSupported(final Project project) {
-        ProjectTypeProfiler ptp = getProjectTypeProfiler(project);
-
-        if (ptp.isProfilingSupported(project)) {
-            return true;
-        }
-
-        return hasAction(project, "profile"); //NOI18N
+//        ProjectTypeProfiler ptp = getProjectTypeProfiler(project);
+//
+//        if (ptp.isProfilingSupported(project)) {
+//            return true;
+//        }
+        return ProjectProfilingSupport.get(project).isProfilingSupported() ||
+                hasAction(project, "profile"); //NOI18N
     }
 
     /**
      * @return true if the project can be used for profiling using the Attach Profiler action (== Java project), false otherwise.
      */
     public static boolean isProjectTypeSupportedForAttach(Project project) {
-        return getProjectTypeProfiler(project).isAttachSupported(project);
+//        return getProjectTypeProfiler(project).isAttachSupported(project);
+        return ProjectProfilingSupport.get(project).isAttachSupported();
     }
 
     /**
@@ -657,7 +544,7 @@ public final class ProjectUtilities {
     }
 
     public static boolean backupBuildScript(final Project project) {
-        final FileObject buildFile = findBuildFile(project);
+        final FileObject buildFile = AntProjectSupport.get(project).getProjectBuildScript();
         final FileObject buildBackupFile = project.getProjectDirectory().getFileObject("build-before-profiler.xml"); //NOI18N
 
         if (buildFile != null) {
@@ -687,37 +574,37 @@ public final class ProjectUtilities {
         return false;
     }
 
-    public static SimpleFilter computeProjectOnlyInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,
-                                                                       String[][] projectPackagesDescr) {
-        // TODO: projectPackagesDescr[1] should only contain packages from subprojects, currently contains also toplevel project packages
-        if (FILTER_PROJECT_ONLY.equals(predefinedInstrFilter)) {
-            computeProjectPackages(project, false, projectPackagesDescr);
-
-            StringBuffer projectPackages = new StringBuffer();
-
-            for (int i = 0; i < projectPackagesDescr[0].length; i++) {
-                projectPackages.append("".equals(projectPackagesDescr[0][i]) ? getDefaultPackageClassNames(project)
-                                                                             : (projectPackagesDescr[0][i] + ". ")); //NOI18N
-            }
-
-            return new SimpleFilter(PROFILE_PROJECT_CLASSES_STRING, SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
-                                    projectPackages.toString().trim());
-        } else if (FILTER_PROJECT_SUBPROJECTS_ONLY.equals(predefinedInstrFilter)) {
-            computeProjectPackages(project, true, projectPackagesDescr);
-
-            StringBuffer projectPackages = new StringBuffer();
-
-            for (int i = 0; i < projectPackagesDescr[1].length; i++) {
-                projectPackages.append("".equals(projectPackagesDescr[1][i]) ? getDefaultPackageClassNames(project)
-                                                                             : (projectPackagesDescr[1][i] + ". ")); //NOI18N // TODO: default packages need to be processed also for subprojects!!!
-            }
-
-            return new SimpleFilter(PROFILE_PROJECT_SUBPROJECT_CLASSES_STRING, SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
-                                    projectPackages.toString().trim());
-        }
-
-        return null;
-    }
+//    public static SimpleFilter computeProjectOnlyInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,
+//                                                                       String[][] projectPackagesDescr) {
+//        // TODO: projectPackagesDescr[1] should only contain packages from subprojects, currently contains also toplevel project packages
+//        if (FILTER_PROJECT_ONLY.equals(predefinedInstrFilter)) {
+//            computeProjectPackages(project, false, projectPackagesDescr);
+//
+//            StringBuffer projectPackages = new StringBuffer();
+//
+//            for (int i = 0; i < projectPackagesDescr[0].length; i++) {
+//                projectPackages.append("".equals(projectPackagesDescr[0][i]) ? getDefaultPackageClassNames(project)
+//                                                                             : (projectPackagesDescr[0][i] + ". ")); //NOI18N
+//            }
+//
+//            return new SimpleFilter(PROFILE_PROJECT_CLASSES_STRING, SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
+//                                    projectPackages.toString().trim());
+//        } else if (FILTER_PROJECT_SUBPROJECTS_ONLY.equals(predefinedInstrFilter)) {
+//            computeProjectPackages(project, true, projectPackagesDescr);
+//
+//            StringBuffer projectPackages = new StringBuffer();
+//
+//            for (int i = 0; i < projectPackagesDescr[1].length; i++) {
+//                projectPackages.append("".equals(projectPackagesDescr[1][i]) ? getDefaultPackageClassNames(project)
+//                                                                             : (projectPackagesDescr[1][i] + ". ")); //NOI18N // TODO: default packages need to be processed also for subprojects!!!
+//            }
+//
+//            return new SimpleFilter(PROFILE_PROJECT_SUBPROJECT_CLASSES_STRING, SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
+//                                    projectPackages.toString().trim());
+//        }
+//
+//        return null;
+//    }
 
     public static void computeProjectPackages(final Project project, boolean subprojects, String[][] storage) {
         if ((storage == null) || (storage.length != 2)) {
@@ -799,41 +686,6 @@ public final class ProjectUtilities {
                     }
             }
         }
-    }
-
-    /**
-     * Will find
-     * Copied from JUnit module implementation in 4.1 and modified
-     */
-    public static FileObject findTestForFile(final FileObject selectedFO) {
-        if ((selectedFO == null) || !selectedFO.getExt().equalsIgnoreCase("java")) {
-            return null; // NOI18N
-        }
-
-        ClassPath cp = ClassPath.getClassPath(selectedFO, ClassPath.SOURCE);
-
-        if (cp == null) {
-            return null;
-        }
-
-        FileObject packageRoot = cp.findOwnerRoot(selectedFO);
-
-        if (packageRoot == null) {
-            return null; // not a file in the source dirs - e.g. generated class in web app
-        }
-
-        URL[] testRoots = UnitTestForSourceQuery.findUnitTests(packageRoot);
-        FileObject fileToOpen = null;
-
-        for (int j = 0; j < testRoots.length; j++) {
-            fileToOpen = findUnitTestInTestRoot(cp, selectedFO, testRoots[j]);
-
-            if (fileToOpen != null) {
-                return fileToOpen;
-            }
-        }
-
-        return null;
     }
 
     public static URL generateAppletHTML(Project project, PropertyEvaluator props, FileObject profiledClassFile) {
@@ -968,7 +820,7 @@ public final class ProjectUtilities {
                 throw new IllegalArgumentException();
         }
 
-        final MainClassWarning panel = new MainClassWarning(message, getSourceRoots(project));
+        final MainClassWarning panel = new MainClassWarning(message, project);
         Object[] options = new Object[] { okButton, DialogDescriptor.CANCEL_OPTION };
 
         panel.addChangeListener(new ChangeListener() {
@@ -1014,15 +866,13 @@ public final class ProjectUtilities {
         String projectName = ProjectUtils.getInformation(project).getDisplayName();
 
         if (isProfilerIntegrated(project)) {
-            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(PROFILER_WILL_BE_UNINTEGRATED_MSG,
-                                                                                                  new Object[] { projectName }),
-                                                                             NotifyDescriptor.YES_NO_OPTION)) != NotifyDescriptor.YES_OPTION) {
+            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(PROFILER_WILL_BE_UNINTEGRATED_MSG,
+                                                                          new Object[] { projectName }))) {
                 return; // cancelled by the user
             }
         } else {
-            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(PROFILER_ISNT_INTEGRATED_MSG,
-                                                                                                  new Object[] { projectName }),
-                                                                             NotifyDescriptor.YES_NO_OPTION)) != NotifyDescriptor.YES_OPTION) {
+            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(PROFILER_ISNT_INTEGRATED_MSG,
+                                                                          new Object[] { projectName }))) {
                 return; // cancelled by the user
             }
         }
@@ -1035,7 +885,7 @@ public final class ProjectUtilities {
         FileLock buildBackup2FileLock = null;
 
         try {
-            final FileObject buildFile = findBuildFile(project); //NOI18N
+            final FileObject buildFile = AntProjectSupport.get(project).getProjectBuildScript();
             final FileObject buildBackupFile = project.getProjectDirectory().getFileObject("build-before-profiler.xml"); //NOI18N
 
             if (buildFile != null && (buildBackupFile != null && buildBackupFile.isValid())) {
@@ -1093,14 +943,13 @@ public final class ProjectUtilities {
         }
 
         if (failed) {
-            Profiler.getDefault()
-                    .displayError(MessageFormat.format(UNINTEGRATION_ERRORS_OCCURED_MSG,
+            ProfilerDialogs.displayError(MessageFormat.format(UNINTEGRATION_ERRORS_OCCURED_MSG,
                                                        new Object[] { exceptionsReport.toString() }));
         } else {
-            Profiler.getDefault().displayInfo(MessageFormat.format(UNINTEGRATION_SUCCESSFUL_MSG, new Object[] { projectName }));
+            ProfilerDialogs.displayInfo(MessageFormat.format(UNINTEGRATION_SUCCESSFUL_MSG, new Object[] { projectName }));
         }
     }
-
+    
     private static void getSourceRoots(final Project project, final boolean traverse, Set<Project> projects, Set<FileObject> roots) {
         final Sources sources = ProjectUtils.getSources(project);
 
@@ -1120,24 +969,6 @@ public final class ProjectUtilities {
                 }
             }
         }
-    }
-
-    /**
-     * Copied from JUnit module implementation in 4.1 and modified
-     */
-    private static String getTestName(ClassPath cp, FileObject selectedFO) {
-        String resource = cp.getResourceName(selectedFO, '/', false); //NOI18N
-        String testName = null;
-
-        if (selectedFO.isFolder()) {
-            //find Suite for package
-            testName = convertPackage2SuiteName(resource);
-        } else {
-            // find Test for class
-            testName = convertClass2TestName(resource);
-        }
-
-        return testName;
     }
 
     // --- private part ----------------------------------------------------------------------------------------------------
@@ -1175,67 +1006,6 @@ public final class ProjectUtilities {
                 }
             }
         }
-    }
-
-    /**
-     * Copied from JUnit module implementation in 4.1 and modified
-     * Hardcoded test name prefix/suffix.
-     */
-    private static String convertClass2TestName(String classFileName) {
-        if ((classFileName == null) || "".equals(classFileName)) {
-            return ""; //NOI18N
-        }
-
-        int index = classFileName.lastIndexOf('/'); //NOI18N
-        String pkg = (index > -1) ? classFileName.substring(0, index) : ""; // NOI18N
-        String clazz = (index > -1) ? classFileName.substring(index + 1) : classFileName;
-        clazz = clazz.substring(0, 1).toUpperCase() + clazz.substring(1);
-
-        if (pkg.length() > 0) {
-            pkg += "/"; // NOI18N
-        }
-
-        return pkg + clazz + "Test"; // NOI18N
-    }
-
-    /**
-     * Copied from JUnit module implementation in 4.1 and modified
-     * Hardcoded test name prefix/suffix.
-     */
-    private static String convertPackage2SuiteName(String packageFileName) {
-        if ((packageFileName == null) || "".equals(packageFileName)) {
-            return ""; //NOI18N
-        }
-
-        int index = packageFileName.lastIndexOf('/'); //NOI18N
-        String pkg = (index > -1) ? packageFileName.substring(index + 1) : packageFileName;
-        pkg = pkg.substring(0, 1).toUpperCase() + pkg.substring(1);
-
-        return packageFileName + "/" + pkg + "Test"; // NOI18N
-    }
-
-    /**
-     * Copied from JUnit module implementation in 4.1 and modified
-     */
-    private static FileObject findUnitTestInTestRoot(ClassPath cp, FileObject selectedFO, URL testRoot) {
-        ClassPath testClassPath = null;
-
-        if (testRoot == null) { //no tests, use sources instead
-            testClassPath = cp;
-        } else {
-            try {
-                java.util.List<PathResourceImplementation> cpItems = new ArrayList<PathResourceImplementation>();
-                cpItems.add(ClassPathSupport.createResource(testRoot));
-                testClassPath = ClassPathSupport.createClassPath(cpItems);
-            } catch (IllegalArgumentException ex) {
-                ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
-                testClassPath = cp;
-            }
-        }
-
-        String testName = getTestName(cp, selectedFO);
-
-        return testClassPath.findResource(testName + ".java"); // NOI18N
     }
 
     private static boolean hasSubprojects(Project project) {
