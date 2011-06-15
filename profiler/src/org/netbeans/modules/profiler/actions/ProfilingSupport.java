@@ -48,15 +48,14 @@ import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.*;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.panels.PIDSelectPanel;
-import org.netbeans.modules.profiler.stp.SelectProfilingTask;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.io.IOException;
 import java.text.MessageFormat;
-import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectStorage;
+import org.netbeans.modules.profiler.api.TaskConfigurator;
 import org.netbeans.modules.profiler.api.project.ProjectProfilingSupport;
 import org.netbeans.modules.profiler.attach.AttachWizard;
 import org.openide.util.Lookup;
@@ -158,7 +157,7 @@ public final class ProfilingSupport {
     }
 
     public AttachSTPData selectTaskForAttach(final Lookup.Provider project, final SessionSettings sessionSettings) {
-        SelectProfilingTask.Configuration configuration = SelectProfilingTask.selectAttachProfilerTask(project);
+        TaskConfigurator.Configuration configuration = TaskConfigurator.getDefault().configureAttachProfilerTask(project);
 
         if (configuration == null) {
             return null; // Cancelled by the user
@@ -169,7 +168,7 @@ public final class ProfilingSupport {
 
     public ProfilingSettings selectTaskForProfiling(final Lookup.Provider project, final SessionSettings sessionSettings,
                                                     FileObject profiledFile, boolean enableOverride) {
-        SelectProfilingTask.Configuration configuration = SelectProfilingTask.selectProfileProjectTask(project, profiledFile,
+        TaskConfigurator.Configuration configuration = TaskConfigurator.getDefault().configureProfileProjectTask(project, profiledFile,
                                                                                                        enableOverride);
 
         if (configuration == null) {
@@ -323,7 +322,7 @@ public final class ProfilingSupport {
 
                         final boolean attach = (Profiler.getDefault().getProfilingMode() == Profiler.MODE_ATTACH);
 
-                        SelectProfilingTask.Configuration configuration = SelectProfilingTask.selectModifyProfilingTask(NetBeansProfiler.getDefaultNB()
+                        TaskConfigurator.Configuration configuration = TaskConfigurator.getDefault().configureModifyProfilingTask(NetBeansProfiler.getDefaultNB()
                                                                                                                                         .getProfiledProject(),
                                                                                                                         NetBeansProfiler.getDefaultNB()
                                                                                                                                         .getProfiledSingleFile(),
