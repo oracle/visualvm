@@ -133,7 +133,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
                         }
                     }
 
-                    ProfilingSettings settings = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
+                    ProfilingSettings settings = IDEUtils.selectSettings(ProfilingSettings.PROFILE_CPU_PART,
                             cpuSettings.toArray(new ProfilingSettings[cpuSettings.size()]),
                             null);
 

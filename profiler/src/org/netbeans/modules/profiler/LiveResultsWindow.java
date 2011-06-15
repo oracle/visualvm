@@ -247,7 +247,7 @@ public final class LiveResultsWindow extends TopComponent
                 }
             }
 
-            ProfilingSettings settingsToModify = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
+            ProfilingSettings settingsToModify = IDEUtils.selectSettings(ProfilingSettings.PROFILE_CPU_PART,
                                                                          cpuSettings.toArray(new ProfilingSettings[cpuSettings
                                                                                                                                                                                                                                                    .size()]),
                                                                          lastProfilingSettings);

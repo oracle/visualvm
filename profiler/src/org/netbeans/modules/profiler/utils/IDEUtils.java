@@ -120,8 +120,7 @@ public final class IDEUtils {
     /**
      * Opens a dialog that allows the user to select one of existing profiling settings
      */
-    public static ProfilingSettings selectSettings(Project project, int type, ProfilingSettings[] availableSettings,
-                                                   ProfilingSettings settingsToSelect) {
+    public static ProfilingSettings selectSettings(int type, org.netbeans.lib.profiler.common.ProfilingSettings[] availableSettings, org.netbeans.lib.profiler.common.ProfilingSettings settingsToSelect) {
         Object[] settings = new Object[availableSettings.length + 1];
 
         for (int i = 0; i < availableSettings.length; i++) {

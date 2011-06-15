@@ -116,7 +116,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                 }
             }
 
-            ProfilingSettings settings = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
+            ProfilingSettings settings = IDEUtils.selectSettings(ProfilingSettings.PROFILE_CPU_PART,
                                                                  cpuSettings.toArray(new ProfilingSettings[cpuSettings.size()]),
                                                                  null);
 
