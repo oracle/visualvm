@@ -410,12 +410,6 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.modules.profiler.ui</package>
                 <package>org.netbeans.modules.profiler.utils</package>
             </friend-packages>
-            <extra-compilation-unit>
-                <package-root>antsrc</package-root>
-                <classpath>${antsrc.cp}</classpath>
-                <built-to>build/antclasses</built-to>
-                <built-to>${cluster}/ant/nblib/${code.name.base.dashes}.jar</built-to>
-            </extra-compilation-unit>
         </data>
     </configuration>
 </project>
