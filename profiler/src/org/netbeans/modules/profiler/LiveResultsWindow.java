@@ -69,7 +69,7 @@ import org.netbeans.lib.profiler.ui.memory.LiveLivenessResultsPanel;
 import org.netbeans.lib.profiler.ui.memory.MemoryResUserActionsHandler;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
-import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;

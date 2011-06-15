@@ -47,14 +47,10 @@ import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
-//import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
-import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
-import org.openide.NotifyDescriptor;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.NbBundle;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsWindow;
 
 
 /**
@@ -107,8 +103,6 @@ public final class ProfilerModule extends ModuleInstall {
         if (!ResultsManager.getDefault().ideClosing()) {
             return false;
         }
-
-        ProfilingPointsManager.getDefault().ideClosing(); // TODO: dirty profiling points should be persisted on document save!
 
         // cleanup before exiting the IDE, always returns true
         if (LiveResultsWindow.hasDefault()) {
@@ -163,15 +157,15 @@ public final class ProfilerModule extends ModuleInstall {
                             }
                         }
 
-                        // force closing of all windows
-                        ProfilerControlPanel2.closeIfOpened();
-                        TelemetryOverviewPanel.closeIfOpened();
-                        LiveResultsWindow.closeIfOpened();
-                        TelemetryWindow.closeIfOpened();
-                        ThreadsWindow.closeIfOpened();
-                        SnapshotResultsWindow.closeAllWindows();
-//                        HeapWalkerManager.getDefault().closeAllHeapWalkers();
-                        ProfilingPointsWindow.closeIfOpened();
+// NB is performing IDE reset after uninstall anyway; no need to close the windows explicitly
+//                        // force closing of all windows
+//                        ProfilerControlPanel2.closeIfOpened();
+//                        TelemetryOverviewPanel.closeIfOpened();
+//                        LiveResultsWindow.closeIfOpened();
+//                        TelemetryWindow.closeIfOpened();
+//                        ThreadsWindow.closeIfOpened();
+//                        SnapshotResultsWindow.closeAllWindows();
+//                        ProfilingPointsWindow.closeIfOpened();
 
                         // perform any shutdown
                         ((NetBeansProfiler) Profiler.getDefault()).shutdown();

@@ -47,7 +47,7 @@ import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;

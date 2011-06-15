@@ -55,7 +55,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
 import org.openide.DialogDisplayer;
 
 
