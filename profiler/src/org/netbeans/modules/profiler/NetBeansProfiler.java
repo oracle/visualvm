@@ -83,8 +83,6 @@ import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
 import org.netbeans.lib.profiler.wireprotocol.WireIO;
 import org.netbeans.modules.profiler.actions.RerunAction;
-import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
-import org.netbeans.modules.profiler.ppoints.ui.ProfilingPointsWindow;
 import org.netbeans.modules.profiler.spi.LoadGenPlugin;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.utils.OutputParameter;
@@ -135,6 +133,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
@@ -371,6 +370,10 @@ public final class NetBeansProfiler extends Profiler {
             }
         }
     }
+
+    private ProfilingPointsProcessor getProfilingPointsManager() {
+        return Lookup.getDefault().lookup(ProfilingPointsProcessor.class);
+    }
     
     // -- NetBeansProfiler-only callback classes ---------------------------------------------------------------------------
     private final class IDEAppStatusHandler implements AppStatusHandler {
@@ -556,7 +559,7 @@ public final class NetBeansProfiler extends Profiler {
     // ---------------------------------------------------------------------------
     // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
     // TODO: implement better approach for refreshing profiling points and remove this code
-    private boolean processesProfilingPoints;
+//    private boolean processesProfilingPoints;
     private boolean silent;
     private boolean threadsMonitoringEnabled = false;
     private boolean waitDialogOpen = false;
@@ -595,7 +598,7 @@ public final class NetBeansProfiler extends Profiler {
         }
 
         // Initialize shared TargetAppRunner instance
-        targetAppRunner = new TargetAppRunner(sharedSettings, new IDEAppStatusHandler(), ProfilingPointsManager.getDefault());
+        targetAppRunner = new TargetAppRunner(sharedSettings, new IDEAppStatusHandler(), getProfilingPointsManager());
         targetAppRunner.addProfilingEventListener(new ProfilingEventListener() {
                 public void targetAppStarted() {
                     if (calibrating) {
@@ -1264,6 +1267,7 @@ public final class NetBeansProfiler extends Profiler {
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 if (LiveResultsWindow.hasDefault())
                     LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
@@ -1271,10 +1275,10 @@ public final class NetBeansProfiler extends Profiler {
         });
 
         ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+            @Override
                 public void run() {
                     changeStateTo(PROFILING_IN_TRANSITION);
                     targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
-                    ProfilingPointsManager.getDefault().reset();
                     ResultsManager.getDefault().reset();
 
                     try {
@@ -1353,7 +1357,7 @@ public final class NetBeansProfiler extends Profiler {
     }
     
     public boolean processesProfilingPoints() {
-        return processesProfilingPoints;
+        return getProfilingPointsManager().getSupportedProfilingPoints().length > 0;
     }
 
     /**
@@ -1814,7 +1818,6 @@ public final class NetBeansProfiler extends Profiler {
                     LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
             }
         });
-        ProfilingPointsManager.getDefault().reset();
         ResultsManager.getDefault().reset();
 
         ClassRepository.clearCache();
@@ -2039,32 +2042,8 @@ public final class NetBeansProfiler extends Profiler {
                 }
             }
 
-            if (profilingSettings.useProfilingPoints() && (getProfiledProject() != null)) {
-                RuntimeProfilingPoint[] points = ProfilingPointsManager.getDefault()
-                                                                       .createCodeProfilingConfiguration(getProfiledProject(),
-                                                                                                         profilingSettings);
-                processesProfilingPoints = points.length > 0;
-                targetAppRunner.getProfilerEngineSettings().setRuntimeProfilingPoints(points);
-
-                //      targetAppRunner.getProfilingSessionStatus().startProfilingPointsActive = profilingSettings.useProfilingPoints();
-            } else {
-                RuntimeProfilingPoint[] points = new RuntimeProfilingPoint[0];
-                processesProfilingPoints = false;
-                targetAppRunner.getProfilerEngineSettings().setRuntimeProfilingPoints(points);
-            }
-
-            // TODO: should be moved to openWindowsOnProfilingStart()
-            if (processesProfilingPoints) {
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            if (!ProfilingPointsWindow.getDefault().isOpened()) {
-                                ProfilingPointsWindow.getDefault().open();
-                                ProfilingPointsWindow.getDefault().requestVisible();
-                            }
-                        }
-                    });
-            }
-
+            getProfilingPointsManager().init(getProfiledProject());
+            
             ProfilingResultsDispatcher.getDefault().startup(client);
         }
     }

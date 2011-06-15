@@ -52,7 +52,6 @@ import org.netbeans.lib.profiler.client.MonitoredData;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import org.netbeans.modules.profiler.ppoints.ProfilingPointsManager;
 import javax.swing.*;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
@@ -99,10 +98,10 @@ public final class ProfilingMonitor {
         }
 
         public void run() {
-            Project project = NetBeansProfiler.getDefaultNB().getProfiledProject();
-            final int ppsize = ProfilingPointsManager.getDefault().getProfilingPoints(
-                               project, ProfilerIDESettings.getInstance().
-                               getIncludeProfilingPointsDependencies(), false).size(); // PPs are not modifiable during runtime!
+//            Project project = NetBeansProfiler.getDefaultNB().getProfiledProject();
+//            final int ppsize = ProfilingPointsManager.getDefault().getProfilingPoints(
+//                               project, ProfilerIDESettings.getInstance().
+//                               getIncludeProfilingPointsDependencies(), false).size(); // PPs are not modifiable during runtime!
 
             while (keepRunning) { // Main loop
 
@@ -122,7 +121,7 @@ public final class ProfilingMonitor {
                                             // ---------------------------------------------------------
                                             // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
                                             // TODO: move this code to a separate class performing the update if necessary
-                                            if (NetBeansProfiler.getDefaultNB().processesProfilingPoints() && (ppsize > 0)
+                                            if (NetBeansProfiler.getDefaultNB().processesProfilingPoints() // && (ppsize > 0)
                                                     && (!doUpdateLiveResults || !LiveResultsWindow.hasDefault())) {
                                                 ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                                                         public void run() {
