@@ -89,7 +89,7 @@ made subject to such option by the copyright holder.
 
   <target name="release-ml" depends="basic-init,check-run-mlbuild" if="run.ml.build">
       <taskdef name="repeat" classname="org.netbeans.nbbuild.Repeat"
-               classpath="${nb_all}/nbbuild/nbantext.jar"/>
+               classpath="${nbantext.jar}"/>
       <repeat target="release-one-locale" name="locale" values="${locales}"/>
   </target>
   
