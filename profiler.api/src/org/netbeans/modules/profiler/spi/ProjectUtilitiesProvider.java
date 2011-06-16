@@ -69,6 +69,8 @@ public abstract class ProjectUtilitiesProvider {
 
     public abstract Provider[] getSortedProjects(Provider[] openedProjects);
     
+    public abstract Provider getProject(FileObject fobj);
+    
     /**
      * Adds a listener to be notified when set of open projects changes.
      * @param listener listener to be added

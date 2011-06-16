@@ -54,7 +54,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -148,7 +147,7 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
         container.add(advancedLogicalPackageTreeScrollPane, gridBagConstraints);
     }
 
-    public ClientUtils.SourceCodeSelection[] getRootMethods(final Project project, final FileObject javaFile,
+    public ClientUtils.SourceCodeSelection[] getRootMethods(final FileObject javaFile,
             final ClientUtils.SourceCodeSelection[] currentSelection) {
         advancedLogicalPackageTree.reset();
 

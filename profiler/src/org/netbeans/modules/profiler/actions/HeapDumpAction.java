@@ -437,7 +437,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
     private void takeHeapDump(final boolean askForDestination) {
         ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
-                    TargetAppRunner targetApp = NetBeansProfiler.getDefaultNB().getTargetAppRunner();
+                    TargetAppRunner targetApp = Profiler.getDefault().getTargetAppRunner();
 
                     // not supported for JDK other than 1.6 & 1.7 & 1.5.0_12 and up
                     if (!targetApp.hasSupportedJDKForHeapDump()) {

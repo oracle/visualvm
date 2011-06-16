@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -80,6 +79,7 @@ import org.openide.cookies.OpenCookie;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
 
 /** An manager for management/notifications about obtainer profiling results.
@@ -474,7 +474,7 @@ public final class ResultsManager {
         return true;
     }
 
-    public FileObject[] listSavedHeapdumps(Project project) {
+    public FileObject[] listSavedHeapdumps(Lookup.Provider project) {
         try {
             FileObject profilerFolder = ProjectStorage.getSettingsFolder(project, false);
 
@@ -519,7 +519,7 @@ public final class ResultsManager {
         }
     }
 
-    public FileObject[] listSavedSnapshots(Project project) {
+    public FileObject[] listSavedSnapshots(Lookup.Provider project) {
         try {
             FileObject profilerFolder = ProjectStorage.getSettingsFolder(project, false);
 
@@ -714,7 +714,7 @@ public final class ResultsManager {
                 Profiler.getDefault().getLastProfilingSettings().copySettingsInto(settings);
                 settings.setSettingsName(Profiler.getDefault().getLastProfilingSettings().getSettingsName());
 
-                Project profiledProject = ((NetBeansProfiler) Profiler.getDefault()).getProfiledProject();
+                Lookup.Provider profiledProject = NetBeansProfiler.getDefaultNB().getProfiledProject();
 
                 return new LoadedSnapshot(snapshot, settings, null, profiledProject);
             }
@@ -807,7 +807,7 @@ public final class ResultsManager {
     public boolean saveSnapshot(LoadedSnapshot ls) {
         FileObject profFile = null;
 
-        Project p = ls.getProject();
+        Lookup.Provider p = ls.getProject();
         FileObject saveDir = null;
 
         try {
@@ -1118,8 +1118,8 @@ public final class ResultsManager {
         return null;
     }
 
-    private Project findProjectForSnapshot(FileObject selectedFile) {
-        return (Project)ProjectStorage.getProjectFromSettingsFolder(selectedFile.getParent());
+    private Lookup.Provider findProjectForSnapshot(FileObject selectedFile) {
+        return ProjectStorage.getProjectFromSettingsFolder(selectedFile.getParent());
     }
 
     private LoadedSnapshot loadSnapshotFromFileObject(FileObject selectedFile)

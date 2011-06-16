@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -223,7 +222,7 @@ public final class LiveResultsWindow extends TopComponent
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void addMethodToRoots(final String className, final String methodName, final String methodSig) {
-            Project project = ((NetBeansProfiler) Profiler.getDefault()).getProfiledProject();
+            Lookup.Provider project = NetBeansProfiler.getDefaultNB().getProfiledProject();
 
             ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
                                                                           .getProfilingSettings();
@@ -988,7 +987,7 @@ public final class LiveResultsWindow extends TopComponent
             }
             case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
             case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED: {
-                Project project = NetBeansProfiler.getDefaultNB().getProfiledProject();
+                Lookup.Provider project = NetBeansProfiler.getDefaultNB().getProfiledProject();
 
                 final LiveFlatProfilePanel cpuPanel = new LiveFlatProfilePanel(runner, cpuActionsHandler);
 

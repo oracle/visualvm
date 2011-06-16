@@ -43,12 +43,9 @@
 
 package org.netbeans.modules.profiler;
 
+import javax.swing.event.ChangeEvent;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import java.util.Arrays;
-import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectInformation;
-import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.MonitoredData;
@@ -97,6 +94,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.ComboBoxUI;
@@ -106,9 +104,10 @@ import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.util.Lookup;
 
 
 /**
@@ -565,10 +564,10 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             renderer.setEnabled(rendererOrig.isEnabled());
             renderer.setBorder(rendererOrig.getBorder());
 
-            if ((value != null) && value instanceof Project) {
-                ProjectInformation pi = ProjectUtils.getInformation((Project) value);
-                renderer.setText(pi.getDisplayName());
-                renderer.setIcon(pi.getIcon());
+            if ((value != null) && value instanceof Lookup.Provider) {
+                Lookup.Provider p = (Lookup.Provider) value;
+                renderer.setText(ProjectUtilities.getDisplayName(p));
+                renderer.setIcon(ProjectUtilities.getIcon(p));
 
                 if (ProjectUtilities.getMainProject() == value) {
                     renderer.setFontEx(renderer.getFont().deriveFont(Font.BOLD)); // bold for main project
@@ -849,7 +848,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     }
 
     private static final class SnapshotsPanel extends CPPanel implements ListSelectionListener, ActionListener,
-                                                                         PropertyChangeListener {
+                                                                         ChangeListener {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private DefaultListModel listModel;
@@ -859,7 +858,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         private JButton openButton;
         private JComboBox combo;
         private JList list;
-        private Project displayedProject;
+        private Lookup.Provider displayedProject;
         private boolean internalChange = false; // for combo box selection
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -914,7 +913,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             combo.setBackground(CP_BACKGROUND_COLOR);
 
             combo.addActionListener(this);
-            OpenProjects.getDefault().addPropertyChangeListener(this);
+            ProjectUtilities.addOpenProjectsListener(this);
 
             list = new JList(listModel = new DefaultListModel());
             list.getAccessibleContext().setAccessibleName(LIST_ACCESS_NAME);
@@ -1138,7 +1137,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public void setDisplayedProject(Project project) {
+        public void setDisplayedProject(Lookup.Provider project) {
             displayedProject = project;
             list.clearSelection(); // clear selection in the list before refreshing it
             refreshList();
@@ -1176,8 +1175,8 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 if (!internalChange) {
                     Object o = combo.getSelectedItem();
 
-                    if (o instanceof Project) {
-                        setDisplayedProject((Project) o);
+                    if (o instanceof Lookup.Provider) {
+                        setDisplayedProject((Lookup.Provider) o);
                     } else {
                         setDisplayedProject(null);
                     }
@@ -1185,10 +1184,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             }
         }
 
-        public void propertyChange(PropertyChangeEvent evt) {
-            if ((evt.getPropertyName() != null) && evt.getPropertyName().equals(OpenProjects.PROPERTY_OPEN_PROJECTS)) {
-                updateCombo();
-            }
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            updateCombo();
         }
 
         public void snapshotLoaded(LoadedSnapshot snapshot) {
@@ -1343,26 +1341,11 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         }
 
         private void updateCombo() {
-            Project[] projects = OpenProjects.getDefault().getOpenProjects();
+            Lookup.Provider[] projects = ProjectUtilities.getSortedProjects(ProjectUtilities.getOpenedProjects());
             Vector items = new Vector(projects.length + 1);
 
             for (int i = 0; i < projects.length; i++) {
                 items.add(projects[i]);
-            }
-
-            try {
-                Collections.sort(items,
-                                 new Comparator() {
-                        public int compare(Object o1, Object o2) {
-                            Project p1 = (Project) o1;
-                            Project p2 = (Project) o2;
-
-                            return ProjectUtils.getInformation(p1).getDisplayName().toLowerCase()
-                                               .compareTo(ProjectUtils.getInformation(p2).getDisplayName().toLowerCase());
-                        }
-                    });
-            } catch (Exception e) {
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e); // just in case ProjectUtils doesn't provide expected information
             }
 
             items.add(0, GLOBAL_COMBO_ITEM_STRING);
@@ -1379,7 +1362,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 combo.setSelectedItem(displayedProject);
                 internalChange = false;
             } else {
-                Project mainProject = ProjectUtilities.getMainProject();
+                Lookup.Provider mainProject = ProjectUtilities.getMainProject();
                 setDisplayedProject(mainProject);
             }
         }
@@ -1871,7 +1854,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         return HELP_CTX;
     }
 
-    public void setProfiledProject(Project project) {
+    public void setProfiledProject(Lookup.Provider project) {
         snapshotsSnippet.setDisplayedProject(project);
     }
 

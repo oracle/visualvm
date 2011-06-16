@@ -42,8 +42,6 @@
  */
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
@@ -58,7 +56,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.ui.panels.ClassSelectRootMethodsPanel;
+import org.openide.util.Lookup;
 
 /**
  * Base class for actions providing functionality to select a profiling root
@@ -123,7 +123,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
             @Override
             protected void done() {
                 if (className != null) {
-                    Project project = FileOwnerQuery.getOwner(dobj.getPrimaryFile());
+                    Lookup.Provider project = ProjectUtilities.getProject(dobj.getPrimaryFile());
                     ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project).getProfilingSettings();
                     List<ProfilingSettings> cpuSettings = new ArrayList();
 
@@ -141,8 +141,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
                         return; // cancelled by the user
                     }
 
-                    ClientUtils.SourceCodeSelection[] rootMethodsSelection = ClassSelectRootMethodsPanel.getDefault().getRootMethods(project,
-                            dobj.getPrimaryFile(),
+                    ClientUtils.SourceCodeSelection[] rootMethodsSelection = ClassSelectRootMethodsPanel.getDefault().getRootMethods(dobj.getPrimaryFile(),
                             settings.getInstrumentationRootMethods());
 
                     if (rootMethodsSelection == null) {

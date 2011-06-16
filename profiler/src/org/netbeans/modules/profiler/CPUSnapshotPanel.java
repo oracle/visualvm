@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
@@ -105,7 +104,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void addMethodToRoots(final String className, final String methodName, final String methodSig) {
-            Project project = loadedSnapshot.getProject();
+            Lookup.Provider project = loadedSnapshot.getProject();
             ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
                                                                           .getProfilingSettings();
             List<ProfilingSettings> cpuSettings = new ArrayList();

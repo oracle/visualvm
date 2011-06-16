@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.ui.panels;
 
-import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -63,6 +62,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
@@ -140,7 +140,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
         final RootMethodsPanel rm = getDefault();
         rm.project = project;
         rm.globalAttach = rm.project == null;
-        rm.addFromProjectButton.setEnabled(!rm.globalAttach || (OpenProjects.getDefault().getOpenProjects().length > 0));
+        rm.addFromProjectButton.setEnabled(!rm.globalAttach || (ProjectUtilities.getOpenedProjects().length > 0));
         rm.refreshList(roots);
 
         return performDisplay(rm);

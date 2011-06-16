@@ -43,7 +43,6 @@ package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.modules.profiler.api.EditorSupport;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 
 /**
  * Action enabled on Java sources allowing to select root method(s) for Profiling of Part of Application.

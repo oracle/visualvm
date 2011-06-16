@@ -43,7 +43,6 @@
 package org.netbeans.modules.profiler.ui.panels;
 
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -79,6 +78,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -382,7 +382,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private Lookup.Provider[] relevantProjects() {
-        return advancedShowAllProjectsCheckBox.isSelected() ? OpenProjects.getDefault().getOpenProjects()
+        return advancedShowAllProjectsCheckBox.isSelected() ? ProjectUtilities.getOpenedProjects()
                 : new Lookup.Provider[]{currentProject};
     }
 

@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
@@ -141,7 +140,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     private JTabbedPane tabs = new JTabbedPane(JTabbedPane.BOTTOM);
     private MemoryResultsPanel memoryPanel;
     private MemoryResultsSnapshot snapshot;
-    private Project project;
+    private Lookup.Provider project;
     private SaveSnapshotAction saveAction;
     private SnapshotInfoPanel infoPanel;
     private SnapshotReverseMemCallGraphPanel reversePanel;

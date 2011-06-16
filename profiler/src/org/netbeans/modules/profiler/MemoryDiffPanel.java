@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
@@ -128,12 +127,12 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
     private JButton findNextPresenter;
     private JButton findPreviousPresenter;
     private MemoryResultsPanel memoryPanel;
-    private Project project;
+    private Lookup.Provider project;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public MemoryDiffPanel(Lookup context, MemoryResultsSnapshot snapshot, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2, int sortingColumn,
-                           boolean sortingOrder, Project project) {
+                           boolean sortingOrder, Lookup.Provider project) {
         this.project = project;
 
         setLayout(new BorderLayout());

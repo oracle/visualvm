@@ -56,6 +56,7 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -65,7 +66,6 @@ import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
-import org.openide.util.ImageUtilities;
 import org.openide.windows.WindowManager;
 
 /**
@@ -332,7 +332,7 @@ public final class ExportAction extends AbstractAction {
         }
 
         final LiveResultsWindow lrw = (exportProvider instanceof LiveResultsWindow) ? (LiveResultsWindow) exportProvider : null;
-        final AppStatusHandler statusHandler = NetBeansProfiler.getDefaultNB().getTargetAppRunner().getAppStatusHandler();
+        final AppStatusHandler statusHandler = Profiler.getDefault().getTargetAppRunner().getAppStatusHandler();
 
         if (lrw != null) {
             statusHandler.pauseLiveUpdates();

@@ -43,8 +43,6 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
@@ -60,6 +58,8 @@ import org.netbeans.modules.profiler.api.EditorSupport;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource.MethodInfo;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
+import org.openide.util.Lookup;
 
 
 /**
@@ -155,7 +155,7 @@ public final class AddRootMethodAction extends NodeAction {
                         }
 
                         // Resolve owner project
-                        Project project = FileOwnerQuery.getOwner(dobj.getPrimaryFile());
+                        Lookup.Provider project = ProjectUtilities.getProject(dobj.getPrimaryFile());
 
                         // Specify Profiling Settings as a context
                         ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)

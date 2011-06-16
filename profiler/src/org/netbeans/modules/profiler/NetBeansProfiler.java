@@ -50,7 +50,6 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -59,7 +58,6 @@ import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.common.*;
 import org.netbeans.lib.profiler.common.filters.DefinedFilterSets;
 import org.netbeans.lib.profiler.common.filters.GlobalFilters;
@@ -82,8 +80,6 @@ import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
 import org.netbeans.lib.profiler.wireprotocol.WireIO;
-import org.netbeans.modules.profiler.actions.RerunAction;
-import org.netbeans.modules.profiler.spi.LoadGenPlugin;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.utils.OutputParameter;
 import org.openide.DialogDescriptor;
@@ -95,7 +91,6 @@ import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.actions.CallableSystemAction;
 import org.openide.windows.WindowManager;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -131,8 +126,6 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import org.apache.tools.ant.module.api.support.ActionUtils;
-import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
@@ -143,8 +136,6 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDisplayer;
-import org.openide.execution.ExecutorTask;
-import org.openide.modules.InstalledFileLocator;
 
 
 /**
@@ -159,8 +150,7 @@ import org.openide.modules.InstalledFileLocator;
  * @author Misha Dmitriev
  * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.lib.profiler.common.Profiler.class)
-public final class NetBeansProfiler extends Profiler {
+public abstract class NetBeansProfiler extends Profiler {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static final class ProgressPanel implements AppStatusHandler.AsyncDialog {
@@ -370,10 +360,6 @@ public final class NetBeansProfiler extends Profiler {
             }
         }
     }
-
-    private ProfilingPointsProcessor getProfilingPointsManager() {
-        return Lookup.getDefault().lookup(ProfilingPointsProcessor.class);
-    }
     
     // -- NetBeansProfiler-only callback classes ---------------------------------------------------------------------------
     private final class IDEAppStatusHandler implements AppStatusHandler {
@@ -543,12 +529,10 @@ public final class NetBeansProfiler extends Profiler {
     private DefinedFilterSets definedFilterSets;
     private FileObject profiledSingleFile;
 
-    // remembered values for rerun and modify actions
-    private ProfilerControlPanel2Support actionSupport = new ProfilerControlPanel2Support();
     private GlobalFilters globalFilters;
     private final Object setupLock = new Object();
     private ProfilingSettings lastProfilingSettings;
-    private Project profiledProject = null;
+    private Lookup.Provider profiledProject = null;
     private SessionSettings lastSessionSettings;
     private StringBuilder logMsgs = new StringBuilder();
     private ThreadsDataManager threadsManager;
@@ -715,10 +699,6 @@ public final class NetBeansProfiler extends Profiler {
         }
     }
 
-    public Properties getCurrentProfilingProperties() {
-        return actionSupport.getProperties();
-    }
-
     public SessionSettings getCurrentSessionSettings() {
         return lastSessionSettings;
     }
@@ -747,17 +727,7 @@ public final class NetBeansProfiler extends Profiler {
         return lastProfilingSettings;
     }
 
-    public String getLibsDir() {
-        final File dir = InstalledFileLocator.getDefault()
-                                             .locate(ProfilerModule.LIBS_DIR + "/jfluid-server.jar",
-                                                     "org.netbeans.lib.profiler", false); //NOI18N
-
-        if (dir == null) {
-            return null;
-        } else {
-            return dir.getParentFile().getPath();
-        }
-    }
+    public abstract String getLibsDir();
 
     public int getPlatformArchitecture(String platformName) {
         JavaPlatform platform = JavaPlatform.getJavaPlatformById(platformName);
@@ -833,7 +803,7 @@ public final class NetBeansProfiler extends Profiler {
      *
      * @param profilingSettings Settings to use for profiling
      * @param attachSettings    AttachSettings to use
-     * @return true if succesfully attached, false otherwise
+     * @return true if successfully attached, false otherwise
      */
     public boolean attachToApp(final ProfilingSettings profilingSettings, final AttachSettings attachSettings) {
         profilingMode = MODE_ATTACH;
@@ -857,14 +827,6 @@ public final class NetBeansProfiler extends Profiler {
                     lastProfilingSettings = profilingSettings;
                     lastSessionSettings = null;
                     lastMode = MODE_ATTACH;
-
-                    // clear rerun
-                    actionSupport.nullAll();
-                    CommonUtils.runInEventDispatchThread(new Runnable() {
-                            public void run() {
-                                CallableSystemAction.get(RerunAction.class).updateAction();
-                            }
-                        });
 
                     final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
                     profilingSettings.applySettings(sharedSettings); // can override the session settings
@@ -1061,7 +1023,7 @@ public final class NetBeansProfiler extends Profiler {
      *
      * @param profilingSettings Settings to use for profiling
      * @param sessionSettings   Session settings for profiling
-     * @return true if connected succesfully, false otherwise
+     * @return true if connected successfully, false otherwise
      */
     public boolean connectToStartedApp(final ProfilingSettings profilingSettings, final SessionSettings sessionSettings) {
         profilingMode = MODE_PROFILE;
@@ -1243,10 +1205,6 @@ public final class NetBeansProfiler extends Profiler {
     public void modifyCurrentProfiling(final ProfilingSettings profilingSettings) {
         lastProfilingSettings = profilingSettings;
 
-        if (actionSupport.getProperties()!=null) {
-            lastProfilingSettings.store(actionSupport.getProperties()); // Fix for http://www.netbeans.org/issues/show_bug.cgi?id=95651, update settings for ReRun
-        }
-
         if (!targetAppRunner.targetJVMIsAlive()) {
             return;
         }
@@ -1275,7 +1233,7 @@ public final class NetBeansProfiler extends Profiler {
         });
 
         ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-            @Override
+                @Override
                 public void run() {
                     changeStateTo(PROFILING_IN_TRANSITION);
                     targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
@@ -1365,7 +1323,7 @@ public final class NetBeansProfiler extends Profiler {
      *
      * @param profilingSettings Settings to use for profiling
      * @param sessionSettings   Session settings for profiling
-     * @return true if target app succesfully started, false otherwise
+     * @return true if target app successfully started, false otherwise
      */
     public boolean profileClass(final ProfilingSettings profilingSettings, final SessionSettings sessionSettings) {
         //final long time = System.currentTimeMillis();
@@ -1396,8 +1354,7 @@ public final class NetBeansProfiler extends Profiler {
         printDebugMsg("Instrumentation filter:\n" + sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
         flushDebugMsgs();
 
-        Project owningProject = FileOwnerQuery.getOwner(getProfiledSingleFile());
-        GestureSubmitter.logProfileClass(owningProject, sessionSettings);
+        GestureSubmitter.logProfileClass(getProfiledProject(), sessionSettings);
         GestureSubmitter.logConfig(profilingSettings);
 
         changeStateTo(PROFILING_STARTED);
@@ -1471,20 +1428,6 @@ public final class NetBeansProfiler extends Profiler {
         return true;
     }
 
-    public boolean rerunAvailable() {
-        return actionSupport.isActionAvailable();
-    }
-
-    public boolean modifyAvailable() {
-        return getProfilingMode()==MODE_ATTACH||actionSupport.isActionAvailable();
-    }
-
-    public void rerunLastProfiling() {
-        if (actionSupport.getTarget()!=null) {
-            doRunTarget(actionSupport.getScript(), actionSupport.getTarget(), actionSupport.getProperties());
-        }
-    }
-
     public boolean runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) {
         calibrating = true;
 
@@ -1549,13 +1492,13 @@ public final class NetBeansProfiler extends Profiler {
     }
 
     public void setProfiledProject(Lookup.Provider project, FileObject singleFile) {
-        profiledProject = (Project)project;
+        profiledProject = project;
         profiledSingleFile = singleFile;
 
         ProfilerControlPanel2.getDefault().setProfiledProject(profiledProject);
     }
 
-    public Project getProfiledProject() {
+    public Lookup.Provider getProfiledProject() {
         return profiledProject;
     }
 
@@ -1600,18 +1543,6 @@ public final class NetBeansProfiler extends Profiler {
         }
 
         return false;
-    }
-
-    public void runTarget(FileObject buildScriptFO, String target, Properties props) {
-        actionSupport.setAll(buildScriptFO, target, props);
-
-        SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    ((RerunAction) RerunAction.get(RerunAction.class)).updateAction();
-                }
-            });
-
-        doRunTarget(buildScriptFO, target, props);
     }
 
     // TODO [ian] - perform saving of global settings differently
@@ -1802,8 +1733,7 @@ public final class NetBeansProfiler extends Profiler {
         }
     }
 
-    private void cleanupAfterProfiling() {
-        stopLoadGenerator();
+    protected void cleanupAfterProfiling() {
         teardownDispatcher();
         MarkingEngine.getDefault().deconfigure();
         ClassRepository.cleanup();
@@ -1959,7 +1889,7 @@ public final class NetBeansProfiler extends Profiler {
 
     private void setupDispatcher(ProfilingSettings profilingSettings) {
         synchronized (setupLock) {
-            final Project project = getProfiledProject();
+            final Lookup.Provider project = getProfiledProject();
 
             // configure call-context-tree dispatching infrastructure
             CCTProvider cctProvider = null;
@@ -2043,7 +1973,7 @@ public final class NetBeansProfiler extends Profiler {
             }
 
             getProfilingPointsManager().init(getProfiledProject());
-            
+
             ProfilingResultsDispatcher.getDefault().startup(client);
         }
     }
@@ -2098,22 +2028,6 @@ public final class NetBeansProfiler extends Profiler {
         }
     }
 
-    private void stopLoadGenerator() {
-        Properties profilingProperties = NetBeansProfiler.getDefaultNB().getCurrentProfilingProperties();
-
-        if (profilingProperties != null) {
-            LoadGenPlugin plugin = Lookup.getDefault().lookup(LoadGenPlugin.class);
-
-            if (plugin != null) {
-                String scriptPath = profilingProperties.getProperty("profiler.loadgen.path"); // TODO factor out the "profiler.loadgen.path" constant; also used ing J2EEProjectTypeProfiler
-
-                if (scriptPath != null) {
-                    plugin.stop(scriptPath);
-                }
-            }
-        }
-    }
-
     private void teardownDispatcher() {
         synchronized (setupLock) {
             ProfilingResultsDispatcher.getDefault().shutdown();
@@ -2137,6 +2051,10 @@ public final class NetBeansProfiler extends Profiler {
         }
     }
 
+    private ProfilingPointsProcessor getProfilingPointsManager() {
+        return Lookup.getDefault().lookup(ProfilingPointsProcessor.class);
+    }
+    
     private boolean waitForDeleteAgentFile(File agentFile) {
         if (agentFile.delete()) {
             return true;
@@ -2154,29 +2072,5 @@ public final class NetBeansProfiler extends Profiler {
         }
 
         return false;
-    }
-
-    /**
-     * Runs an target in Ant script with properties context.
-     *
-     * @param buildScript The build script to run the target from
-     * @param target The name of target to run
-     * @param props The properties context to run the task in
-     * @return ExecutorTask to track the running Ant process
-     */
-    public static ExecutorTask doRunTarget(final FileObject buildScript, final String target, final Properties props) {
-        try {
-            String oomeenabled = props.getProperty(HeapDumpWatch.OOME_PROTECTION_ENABLED_KEY);
-
-            if ((oomeenabled != null) && oomeenabled.equals("yes")) { // NOI18N
-                HeapDumpWatch.getDefault().monitor(props.getProperty(HeapDumpWatch.OOME_PROTECTION_DUMPPATH_KEY));
-            }
-
-            return ActionUtils.runTarget(buildScript, new String[] { target }, props);
-        } catch (IOException e) {
-            Profiler.getDefault().notifyException(Profiler.EXCEPTION, e);
-        }
-
-        return null;
     }
 }

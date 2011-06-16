@@ -123,6 +123,14 @@ public final class ProjectUtilities {
     }
     
     /**
+     * Find the project, if any, which "owns" the given file.
+     * @param fobj the file (generally on disk)
+     * @return a project which contains it, or null if there is no known project containing it
+     */
+    public static Provider getProject(FileObject fobj) {
+        return provider().getProject(fobj);
+    }
+    /**
      * Adds a listener to be notified when set of open projects changes.
      * @param listener listener to be added
      */
