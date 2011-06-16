@@ -61,6 +61,8 @@ import org.netbeans.modules.profiler.heapwalk.ClassesListController;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
@@ -72,10 +74,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.text.MessageFormat;
-import java.text.NumberFormat;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractAction;
@@ -87,15 +88,21 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.lib.profiler.ui.components.HTMLLabel;
+import org.netbeans.lib.profiler.ui.components.table.DiffBarCellRenderer;
+import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -261,12 +268,14 @@ public class ClassesListControllerUI extends JTitledPanel {
                                                                         "ClassesListControllerUI_SizeColumnDescr"); // NOI18N
     private static final String FITERING_PROGRESS_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
                                                                              "ClassesListControllerUI_FilteringProgressText"); // NOI18N
-    private static final String RESULT_NOT_AVAILABLE_STRING = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                                  "ClassesListControllerUI_ResultNotAvailableString"); // NOI18N
     private static final String CLASSES_TABLE_ACCESS_NAME = NbBundle.getMessage(ClassesListControllerUI.class,
                                                                              "ClassesListControllerUI_ClassesTableAccessName"); // NOI18N
     private static final String CLASSES_TABLE_ACCESS_DESCR = NbBundle.getMessage(ClassesListControllerUI.class,
                                                                                   "ClassesListControllerUI_ClassesTableAccessDescr"); // NOI18N
+    private static final String COMPARE_WITH_ANOTHER_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
+                                                                                  "ClassesListControllerUI_CompareWithAnotherText"); // NOI18N
+    private static final String COMPARING_MSG = NbBundle.getMessage(ClassesListControllerUI.class,
+                                                                                  "ClassesListControllerUI_ComparingMsg"); // NOI18N
                                                                                                                                        // -----
     private static Icon ICON_CLASSES = Icons.getIcon(HeapWalkerIcons.CLASSES);
     private static String filterValue = ""; // NOI18N
@@ -281,8 +290,6 @@ public class ClassesListControllerUI extends JTitledPanel {
 
     private CardLayout contents;
     private ClassesListController classesListController;
-    private final NumberFormat percentFormat = NumberFormat.getPercentInstance();
-    private final NumberFormat numberFormat = NumberFormat.getInstance();
     private ClassesListTableModel realClassesListTableModel = new ClassesListTableModel();
     private ExtendedTableModel classesListTableModel = new ExtendedTableModel(realClassesListTableModel);
     private FilterComponent filterComponent;
@@ -306,9 +313,9 @@ public class ClassesListControllerUI extends JTitledPanel {
     private boolean sortingOrder = false;
 
     // --- Private implementation ------------------------------------------------
-    private int classesCount = -1;
     private int selectedRow;
     private int sortingColumn = 1;
+    private boolean isDiff = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -363,7 +370,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         sortingColumn = realSortingColumn;
         classesListTableModel.setInitialSorting(currentSortingColumn, sortingOrder);
         classesListTable.getTableHeader().repaint();
-        setColumnsData();
+        setColumnsData(true);
         restoreSelection();
 
         // TODO [ui-persistence]
@@ -470,13 +477,13 @@ public class ClassesListControllerUI extends JTitledPanel {
         }
     }
 
-    private void setColumnsData() {
+    private void setColumnsData(boolean widths) {
         TableColumnModel colModel = classesListTable.getColumnModel();
 
         for (int i = 0; i < classesListTableModel.getColumnCount(); i++) {
             int index = classesListTableModel.getRealColumn(i);
 
-            if (index != 0) {
+            if (widths && index != 0) {
                 colModel.getColumn(i).setPreferredWidth(columnWidths[index - 1]);
             }
 
@@ -574,8 +581,8 @@ public class ClassesListControllerUI extends JTitledPanel {
                     if (row != -1) {
                         String className = (String) displayCache[row][0];
 
-                        while (className.endsWith("[]")) {
-                            className = className.substring(0, className.length() - 2); // NOI18N
+                        while (className.endsWith("[]")) { // NOI18N
+                            className = className.substring(0, className.length() - 2);
                         }
                         Lookup.Provider p = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject();
                         GoToSource.openSource(p, className, null, null);
@@ -627,11 +634,87 @@ public class ClassesListControllerUI extends JTitledPanel {
         columnWidths[3 - 1] = maxWidth;
         columnRenderers[3] = dataCellRenderer;
     }
+    
+    private HTMLLabel l;
+    private JLabel w;
+    private JProgressBar p;
+    
+    protected Component[] getAdditionalControls() {
+        if (l == null) {
+            l = new HTMLLabel() {
+                protected void showURL(URL url) {
+                    if (classesListController.isDiff()) {
+                        classesListController.resetDiffAction();
+                    } else {
+                        classesListController.compareAction();
+                    }
+                }
+            };
+            l.setBorder(BorderFactory.createEmptyBorder());
+            l.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
+            l.setText("<nobr><a href='#'>" + COMPARE_WITH_ANOTHER_TEXT + "</a></nobr>"); // NOI18N
+        }
+        
+        if (w == null) {
+            w = new JLabel(COMPARING_MSG);
+            w.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+            w.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
+        }
+        
+        if (p == null) {
+            p = new JProgressBar() {
+                public Dimension getPreferredSize() {
+                    Dimension d = l.getPreferredSize();
+                    d.width = 130;
+                    return d;
+                }
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+            };
+            p.setIndeterminate(true);
+        }
+        
+        JPanel indent = new JPanel(null);
+        indent.setOpaque(false);
+        indent.setPreferredSize(new Dimension(5, 5));
+        indent.setMinimumSize(indent.getPreferredSize());
+        
+        w.setVisible(false);
+        p.setVisible(false);
+        l.setVisible(true);
+        
+        return new Component[] { w, p, l, indent };
+    }
+    
+    public void showDiffProgress() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                w.setVisible(true);
+                p.setVisible(true);
+                l.setVisible(false);
+            }
+        });
+    }
+    
+    public void hideDiffProgress() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                w.setVisible(false);
+                p.setVisible(false);
+                
+                if (classesListController.isDiff()) {
+                    l.setText("<nobr>" + NbBundle.getMessage(ClassesListControllerUI.class, // NOI18N
+                              "ClassesListControllerUI_ShowingDiffText", "<a href='#'>", "</a>") + "</nobr>"); // NOI18N
+                } else {
+                    l.setText("<nobr><a href='#'>" + COMPARE_WITH_ANOTHER_TEXT + "</a></nobr>"); // NOI18N
+                }
+                l.setVisible(true);
+            }
+        });
+    }
 
     private void initComponents() {
-        percentFormat.setMaximumFractionDigits(1);
-        percentFormat.setMinimumFractionDigits(0);
-
         classesListTable = new JExtendedTable(classesListTableModel) {
                 public void doLayout() {
                     int columnsWidthsSum = 0;
@@ -672,12 +755,12 @@ public class ClassesListControllerUI extends JTitledPanel {
         classesListTable.getAccessibleContext().setAccessibleDescription(CLASSES_TABLE_ACCESS_DESCR);
         classesListTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                         .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
-        classesListTable.getActionMap().put("DEFAULT_ACTION",
+        classesListTable.getActionMap().put("DEFAULT_ACTION", // NOI18N
                                             new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     performDefaultAction();
                 }
-            }); // NOI18N
+            });
 
         // Disable traversing table cells using TAB and Shift+TAB
         Set keys = new HashSet(classesListTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
@@ -688,7 +771,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
         classesListTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
 
-        setColumnsData();
+        setColumnsData(true);
 
         filterComponent = new FilterComponent();
         filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
@@ -701,7 +784,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                 FILTER_REGEXP, CommonConstants.FILTER_REGEXP);
         filterComponent.addFilterItem(Icons.getImageIcon(LanguageIcons.CLASS),
                 hasProjectContext ? FILTER_IMPLEMENTATION : FILTER_SUBCLASS,
-                classesListController.FILTER_SUBCLASS);
+                ClassesListController.FILTER_SUBCLASS);
         filterComponent.setEmptyFilterText(DEFAULT_FILTER_TEXT);
         filterComponent.setFilterValues(filterValue, filterType);
         filterComponent.addFilterListener(new FilterComponent.FilterListener() {
@@ -728,8 +811,8 @@ public class ClassesListControllerUI extends JTitledPanel {
         hintArea.setBorder(BorderFactory.createEmptyBorder(10, 8, 8, 8));
 
         String progressRes = Icons.getResource(HeapWalkerIcons.PROGRESS);
-        String hintText = "<img border='0' align='bottom' src='nbresloc:/" + progressRes + "'>&nbsp;&nbsp;"
-                          + FITERING_PROGRESS_TEXT; // NOI18N
+        String hintText = "<img border='0' align='bottom' src='nbresloc:/" + progressRes + "'>&nbsp;&nbsp;" // NOI18N
+                          + FITERING_PROGRESS_TEXT;
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);
 
@@ -774,45 +857,30 @@ public class ClassesListControllerUI extends JTitledPanel {
                 BrowserUtils.performTask(new Runnable() {
                     public void run() {
                         initInProgress.set(true);
-
-                        long totalLiveInstances = classesListController.getClassesController().
-                                getHeapFragmentWalker().getTotalLiveInstances();
-                        long totalLiveBytes = classesListController.getClassesController().
-                                getHeapFragmentWalker().getTotalLiveBytes();
-
-                        if (classesCount == -1) classesCount = classesListController.
-                                getClassesController().getHeapFragmentWalker().
-                                getHeapFragment().getAllClasses().size();
-
-                        List classes = classesListController.getFilteredSortedClasses(
-                                FilterComponent.getFilterStrings(filterValue), filterType,
-                                showZeroInstances, showZeroSize, sortingColumn, sortingOrder);
-                        final Object[][] displayCache2 = new Object[classes.size()][columnCount + 1];
-
-                        for (int i = 0; i < classes.size(); i++) {
-                            JavaClass jClass = (JavaClass) classes.get(i);
-
-                            int instancesCount = jClass.getInstancesCount();
-                            int instanceSize = jClass.getInstanceSize();
-                            long allInstancesSize = jClass.getAllInstancesSize();
-
-                            displayCache2[i][0] = jClass.getName();
-                            displayCache2[i][1] = new Double((double) instancesCount /
-                                                 (double) totalLiveInstances * 100);
-                            displayCache2[i][2] = numberFormat.format(instancesCount) + " (" // NOI18N
-                                                 + percentFormat.format((double) instancesCount /
-                                                 (double) totalLiveInstances) + ")"; // NOI18N
-                            displayCache2[i][3] = (allInstancesSize < 0) ? RESULT_NOT_AVAILABLE_STRING
-                                                  : (numberFormat.format(allInstancesSize) + " (" // NOI18N
-                                                  + percentFormat.format((double) allInstancesSize /
-                                                  (double) totalLiveBytes) + ")"); // NOI18N
-                            displayCache2[i][4] = jClass;
-                        }
+                        
+                        final Object[][] displayCache2 = classesListController.getData(
+                                 FilterComponent.getFilterStrings(filterValue), filterType,
+                                 showZeroInstances, showZeroSize, sortingColumn, sortingOrder, columnCount);
 
                         initInProgress.set(false);
 
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
+                                if (isDiff != classesListController.isDiff()) {
+                                    isDiff = !isDiff;
+                                    CustomBarCellRenderer customBarCellRenderer = isDiff ?
+                                            new DiffBarCellRenderer(classesListController.minDiff, classesListController.maxDiff) :
+                                            new CustomBarCellRenderer(0, 100);
+                                    columnRenderers[1] = customBarCellRenderer;
+                                    
+                                    TableCellRenderer dataCellRenderer = isDiff ?
+                                            new LabelTableCellRenderer(JLabel.TRAILING) :
+                                            new LabelBracketTableCellRenderer(JLabel.TRAILING);
+                                    columnRenderers[2] = dataCellRenderer;
+                                    columnRenderers[3] = dataCellRenderer;
+                                    setColumnsData(false);
+                                }
+                                
                                 displayCache = displayCache2;
                                 classesListTableModel.fireTableDataChanged();
                                 restoreSelection();

@@ -43,6 +43,10 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.NumberFormat;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -53,13 +57,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.AbstractButton;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -132,19 +141,203 @@ public class ClassesListController extends AbstractController {
     public void setColumnVisibility(int column, boolean isColumnVisible) {
         ((ClassesListControllerUI) getPanel()).setColumnVisibility(column, isColumnVisible);
     }
+    
+    private static final String RESULT_NOT_AVAILABLE_STRING = NbBundle.getMessage(ClassesListController.class,
+                                                                                  "ClassesListController_ResultNotAvailableString"); // NOI18N
+    private static final NumberFormat percentFormat = NumberFormat.getPercentInstance();
+    private static final NumberFormat numberFormat = NumberFormat.getInstance();
+    static {
+        percentFormat.setMaximumFractionDigits(1);
+        percentFormat.setMinimumFractionDigits(0);
+    }
+    
+    public long minDiff;
+    public long maxDiff;
 
     // --- Internal interface ----------------------------------------------------
+    public Object[][] getData(String[] filterStrings, int filterType, boolean showZeroInstances, boolean showZeroSize,
+                                         int sortingColumn, boolean sortingOrder, int columnCount) {
+        boolean diff = isDiff();
+        
+        long totalLiveInstances = classesController.getHeapFragmentWalker().getTotalLiveInstances();
+        long totalLiveBytes = classesController.getHeapFragmentWalker().getTotalLiveBytes();
+
+        List classes = getFilteredSortedClasses(filterStrings, filterType,
+                showZeroInstances, showZeroSize, sortingColumn, sortingOrder);
+        Object[][] data = new Object[classes.size()][columnCount + 1];
+        
+        minDiff = Long.MAX_VALUE;
+        maxDiff = Long.MIN_VALUE;
+
+        for (int i = 0; i < classes.size(); i++) {
+            JavaClass jClass = (JavaClass) classes.get(i);
+            
+            int instancesCount = jClass.getInstancesCount();
+//                            int instanceSize = jClass.getInstanceSize();
+            long allInstancesSize = jClass.getAllInstancesSize();
+
+            data[i][0] = jClass.getName();
+            
+            if (isDiff()) { 
+                minDiff = Math.min(minDiff, instancesCount);
+                maxDiff = Math.max(maxDiff, instancesCount);
+                data[i][1] = new Long(instancesCount);
+                data[i][2] = (instancesCount > 0 ? "+" : "") + numberFormat.format(instancesCount); // NOI18N
+                data[i][3] = (allInstancesSize > 0 ? "+" : "") + numberFormat.format(allInstancesSize); // NOI18N
+            } else {
+                data[i][1] = new Double((double) instancesCount /
+                                     (double) totalLiveInstances * 100);
+                data[i][2] = numberFormat.format(instancesCount) + " (" // NOI18N
+                                     + percentFormat.format((double) instancesCount /
+                                     (double) totalLiveInstances) + ")"; // NOI18N
+                data[i][3] = (allInstancesSize < 0) ? RESULT_NOT_AVAILABLE_STRING
+                                      : (numberFormat.format(allInstancesSize) + " (" // NOI18N
+                                      + percentFormat.format((double) allInstancesSize /
+                                      (double) totalLiveBytes) + ")"); // NOI18N
+            }
+            
+            data[i][4] = diff ? ((DiffJavaClass)jClass).getJavaClass() : jClass;
+        }
+        
+        if ((minDiff > 0) && (maxDiff > 0)) {
+            minDiff = 0;
+        } else if ((minDiff < 0) && (maxDiff < 0)) {
+            maxDiff = 0;
+        }
+        
+        return data;
+    }
+    
+    private static final class DiffJavaClass implements JavaClass {
+        
+        private final String name;
+        private long allInstancesSize;
+        private int instanceSize;
+        private int instancesCount;
+        private JavaClass real;
+        
+        static DiffJavaClass createExternal(JavaClass jc) {
+            return new DiffJavaClass(jc, false);
+        }
+        
+        static DiffJavaClass createReal(JavaClass jc) {
+            return new DiffJavaClass(jc, true);
+        }
+        
+        private DiffJavaClass(JavaClass jc, boolean realClass) {
+            name = jc.getName();
+            
+            if (realClass) {
+                instancesCount = jc.getInstancesCount();
+                instanceSize = jc.getInstanceSize();
+                allInstancesSize = jc.getAllInstancesSize();
+                real = jc;
+            } else {
+                instancesCount = -jc.getInstancesCount();
+                instanceSize = -jc.getInstanceSize();
+                allInstancesSize = -jc.getAllInstancesSize();
+                real = null;
+            }
+        }
+        
+        static String createID(JavaClass jc) {
+            String id = jc.getName();
+            try {
+                id += jc.getClassLoader().getJavaClass().getName();
+            } catch (Exception e) {
+                
+            }
+            return id;
+        }
+        
+        JavaClass getJavaClass() {
+            return real;
+        }
+        
+        void diff(DiffJavaClass djc) {
+            instancesCount += djc.instancesCount;
+            instanceSize += djc.instanceSize;
+            allInstancesSize += djc.allInstancesSize;
+            real = djc.real;
+        }
+
+        public Object getValueOfStaticField(String name) {
+            // Not implemented
+            return null;
+        }
+
+        public long getAllInstancesSize() {
+            return allInstancesSize;
+        }
+
+        public boolean isArray() {
+            // Not implemented
+            return false;
+        }
+
+        public Instance getClassLoader() {
+            // Not implemented
+            return null;
+        }
+
+        public List getFields() {
+            // Not implemented
+            return null;
+        }
+
+        public int getInstanceSize() {
+            return instanceSize;
+        }
+
+        public List getInstances() {
+            // Not implemented
+            return null;
+        }
+
+        public int getInstancesCount() {
+            return instancesCount;
+        }
+
+        public long getJavaClassId() {
+            // Not implemented
+            return -1;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public List getStaticFieldValues() {
+            // Not implemented
+            return null;
+        }
+
+        public Collection getSubClasses() {
+            // Not implemented
+            return null;
+        }
+
+        public JavaClass getSuperClass() {
+            // Not implemented
+            return null;
+        }
+        
+    }
+    
     public List getFilteredSortedClasses(String[] filterStrings, int filterType, boolean showZeroInstances, boolean showZeroSize,
                                          int sortingColumn, boolean sortingOrder) {
         HeapFragmentWalker fragmentWalker = classesController.getHeapFragmentWalker();
         Heap heap = fragmentWalker.getHeapFragment();
+        
         List filteredClasses;
 
         if ((filterType == FILTER_SUBCLASS) && !((filterStrings == null) || filterStrings[0].equals(""))) { // NOI18N
+            // TODO: support diffClasses !!!
             filteredClasses = getFilteredClasses(getSubclasses(heap, filterStrings, fragmentWalker.getHeapDumpProject()), null,
                                                  CommonConstants.FILTER_NONE, showZeroInstances, showZeroSize);
         } else {
-            filteredClasses = getFilteredClasses(heap.getAllClasses(), filterStrings, filterType, showZeroInstances, showZeroSize);
+            List classes = diffClasses == null ? heap.getAllClasses() : diffClasses;
+            filteredClasses = getFilteredClasses(classes, filterStrings, filterType, showZeroInstances, showZeroSize);
         }
 
         return getSortedClasses(filteredClasses, sortingColumn, sortingOrder);
@@ -190,6 +383,74 @@ public class ClassesListController extends AbstractController {
 
     public void updateData() {
         ((ClassesListControllerUI) getPanel()).updateData();
+    }
+    
+    private void showDiffProgress() {
+        ((ClassesListControllerUI) getPanel()).showDiffProgress();
+    }
+    
+    private void hideDiffProgress() {
+        ((ClassesListControllerUI) getPanel()).hideDiffProgress();
+    }
+    
+    private List diffClasses;
+    public void compareAction() {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                JFileChooser ch = new JFileChooser();
+                if (ch.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File dumpFile = ch.getSelectedFile();
+                    try {
+                        showDiffProgress();
+                        Heap currentHeap = classesController.getHeapFragmentWalker().getHeapFragment();
+                        Heap diffHeap = HeapFactory.createHeap(dumpFile);
+                        diffClasses = createDiffClasses(diffHeap, currentHeap);
+                    } catch (FileNotFoundException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } finally {
+                        hideDiffProgress();
+                    }
+                    updateData();
+                }
+            }
+        });
+    }
+    
+    public boolean isDiff() {
+        return diffClasses != null;
+    }
+    
+    private static List createDiffClasses(Heap h1, Heap h2) {
+        Map<String, DiffJavaClass> classes = new HashMap();
+        
+        List<JavaClass> classes1 = h1.getAllClasses();
+        for (JavaClass jc1 : classes1) {
+            String id1 = DiffJavaClass.createID(jc1);
+            DiffJavaClass djc1 = DiffJavaClass.createExternal(jc1);
+            classes.put(id1, djc1);
+        }
+        
+        List<JavaClass> classes2 = h2.getAllClasses();
+        for (JavaClass jc2 : classes2) {
+            String id2 = DiffJavaClass.createID(jc2);
+            DiffJavaClass djc2 = DiffJavaClass.createReal(jc2);
+            DiffJavaClass djc1 = classes.get(id2);
+            if (djc1 != null) djc1.diff(djc2);
+            else classes.put(id2, djc2);
+        }
+        
+        return new ArrayList(classes.values());
+    }
+    
+    public void resetDiffAction() {
+        if (diffClasses != null) {
+            diffClasses.clear();
+            diffClasses = null;
+        }
+        hideDiffProgress();
+        updateData();
     }
 
     protected AbstractButton createControllerPresenter() {
