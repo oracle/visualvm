@@ -192,7 +192,7 @@ public final class ProjectProfilingSupport {
      */
     public static ProjectProfilingSupport get(Lookup.Provider project) {
         ProjectProfilingSupportProvider provider =
-                project.getLookup().lookup(ProjectProfilingSupportProvider.class);
+                project != null ? project.getLookup().lookup(ProjectProfilingSupportProvider.class) : null;
         if (provider == null) return defaultImpl();
         else return new ProjectProfilingSupport(provider);
     }

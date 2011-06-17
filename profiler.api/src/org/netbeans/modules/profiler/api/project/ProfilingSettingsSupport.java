@@ -102,7 +102,7 @@ public final class ProfilingSettingsSupport {
      */
     public static ProfilingSettingsSupport get(Lookup.Provider project) {
         ProfilingSettingsSupportProvider provider =
-                project.getLookup().lookup(ProfilingSettingsSupportProvider.class);
+                project != null ? project.getLookup().lookup(ProfilingSettingsSupportProvider.class) : null;
         if (provider == null) return defaultImpl();
         else return new ProfilingSettingsSupport(provider);
     }
