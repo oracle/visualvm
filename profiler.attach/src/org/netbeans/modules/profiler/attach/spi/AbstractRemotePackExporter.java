@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -23,7 +23,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,60 +34,54 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ *
+ * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.attach.providers;
+package org.netbeans.modules.profiler.attach.spi;
 
 import java.io.IOException;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.attach.spi.AbstractRemotePackExporter;
-import org.openide.util.Lookup;
+import java.util.HashMap;
+import java.util.Map;
+import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
+import org.netbeans.modules.profiler.attach.providers.TargetPlatformEnum;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-final public class RemotePackExporter {
-
-    private static final class Singleton {
-
-        private static final RemotePackExporter INSTANCE = new RemotePackExporter();
-    }
-
-    public static RemotePackExporter getInstance() {
-        return Singleton.INSTANCE;
-    }
-
-    private AbstractRemotePackExporter impl = null;
+abstract public class AbstractRemotePackExporter {
+    private static final Map<String, String> scriptMapper = new HashMap<String, String>() {
+        {
+            put(IntegrationUtils.PLATFORM_LINUX_AMD64_OS, "linuxamd64"); //NOI18N
+            put(IntegrationUtils.PLATFORM_LINUX_OS, "linux"); //NOI18N
+            put(IntegrationUtils.PLATFORM_MAC_OS, "mac"); //NOI18N
+            put(IntegrationUtils.PLATFORM_SOLARIS_AMD64_OS, "solamd64"); //NOI18N
+            put(IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS, "solx86"); //NOI18N
+            put(IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS, "solsparc"); //NOI18N
+            put(IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS, "solsparcv9"); //NOI18N
+            put(IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS, "winamd64"); //NOI18N
+            put(IntegrationUtils.PLATFORM_WINDOWS_OS, "win"); //NOI18N
+        }
+    };
+    private static final Map<String, String> jdkMapper = new HashMap<String, String>() {
+        {
+            put(TargetPlatformEnum.JDK5.toString(), "15"); //NOI18N
+            put(TargetPlatformEnum.JDK6.toString(), "15"); //NOI18N
+            put(TargetPlatformEnum.JDK7.toString(), "15"); //NOI18N
+            put(TargetPlatformEnum.JDK_CVM.toString(), "cvm"); //NOI18N
+        }
+    };
     
-    private RemotePackExporter() {
-        impl = Lookup.getDefault().lookup(AbstractRemotePackExporter.class);
-    }
-
-    public String export(final String exportPath, final String hostOS, final String jvm) throws IOException {
-        if (impl == null) {
-            throw new IOException();
-        }
-        
-        ProgressHandle ph = ProgressHandleFactory.createHandle("Generating Remote Pack to " + impl.getRemotePackPath(exportPath, hostOS));
-        ph.setInitialDelay(500);
-        ph.start();
-        try {
-            return impl.export(exportPath, hostOS, jvm);
-        } finally {
-            ph.finish();
-        }
-    }
-
-    public void export(String hostOS, final String jvm) throws IOException {
-        export(null, hostOS, jvm);
+    final protected String getPlatformShort(String hostOS) {
+        return scriptMapper.get(hostOS);
     }
     
-    public boolean isAvailable() {
-        return impl != null;
+    final protected String getJVMShort(String jvm) {
+        return jdkMapper.get(jvm);
     }
+    
+    abstract public String export(String exportPath, String hostOS, String jvm) throws IOException;
+    abstract public String getRemotePackPath(String exportPath, String hostOS);
 }
