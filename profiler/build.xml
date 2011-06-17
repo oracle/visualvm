@@ -46,24 +46,6 @@ made subject to such option by the copyright holder.
 <project basedir="." default="netbeans" name="profiler">
     <description>Builds, tests, and runs the project org.yourorghere.main</description>
     <import file="../nbbuild/templates/projectized.xml"/>
-
-   <target name="nblib" depends="init">
-        <mkdir dir="build/antclasses"/>
-        <javac srcdir="antsrc" destdir="build/antclasses" debug="${build.compiler.debug}" deprecation="${build.compiler.deprecation}" source="1.6" target="1.6" includeantruntime="false">
-            <classpath>
-                <pathelement path="${antsrc.cp}"/>
-            </classpath>
-        </javac>
-        <copy todir="build/antclasses">
-            <fileset dir="antsrc" excludes="${jar-excludes}"/>
-        </copy>
-        <mkdir dir="${cluster}/ant/nblib"/>
-        <jar jarfile="${cluster}/ant/nblib/${code.name.base.dashes}.jar" compress="false">
-            <fileset dir="build/antclasses"/>
-        </jar>
-    </target>
-
-    <target name="netbeans-extra" depends="nblib"/>
     
   <target name="netbeans-extra-ml" depends="release-ml" if="locales"/>
 
