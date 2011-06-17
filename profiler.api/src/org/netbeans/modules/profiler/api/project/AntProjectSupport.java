@@ -129,7 +129,7 @@ public final class AntProjectSupport {
      */
     public static AntProjectSupport get(Lookup.Provider project) {
         AntProjectSupportProvider provider =
-                project.getLookup().lookup(AntProjectSupportProvider.class);
+                project != null ? project.getLookup().lookup(AntProjectSupportProvider.class) : null;
         if (provider == null) return defaultImpl();
         else return new AntProjectSupport(provider);
     }

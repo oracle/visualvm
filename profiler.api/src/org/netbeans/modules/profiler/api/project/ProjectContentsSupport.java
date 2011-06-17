@@ -134,7 +134,7 @@ public final class ProjectContentsSupport {
      */
     public static ProjectContentsSupport get(Lookup.Provider project) {
         Collection<? extends ProjectContentsSupportProvider> providers =
-                project.getLookup().lookupAll(ProjectContentsSupportProvider.class);
+                project != null ? project.getLookup().lookupAll(ProjectContentsSupportProvider.class) : null;
         if (providers == null || providers.isEmpty()) return defaultImpl();
         else return new ProjectContentsSupport(providers);
     }
