@@ -1294,14 +1294,13 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         private void refreshList() {
             final int[] selIdx = new int[] {-1};
-
+            listModel.removeAllElements();
             
             org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker() {
                 private final java.util.List modelElements = new ArrayList<Object>();
                 
                 @Override
                 protected void doInBackground() {
-                    listModel.removeAllElements();
                     FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(displayedProject);
                     modelElements.addAll(Arrays.asList(snapshotsOnDisk));
 
