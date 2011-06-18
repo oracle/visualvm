@@ -50,21 +50,23 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
-import org.openide.util.ImageUtilities;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -133,7 +135,7 @@ public final class ExportAction extends AbstractAction {
     private static final String OOME_EXPORTING_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_OomeExportingMsg"); //NOI18N
     private static final String IOEXCEPTION_EXPORTING_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_IOException_Exporting_Msg"); //NOI18N
     private static final String SNAPSHOT_CREATE_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,"ResultsManager_SnapshotCreateFailedMsg"); // NOI18N
-    private static final ImageIcon ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/export.png", false); // NOI18N
+    private static final Icon ICON = Icons.getIcon(GeneralIcons.EXPORT);
     private static final String FILE_EXTENSION_CSV = "csv"; // NOI18N
     private static final String FILE_EXTENSION_XML = "xml"; // NOI18N
     private static final String FILE_EXTENSION_HTML = "html"; // NOI18N
@@ -159,7 +161,7 @@ public final class ExportAction extends AbstractAction {
         putValue(Action.NAME, EXPORT_ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, EXPORT_ACTION_DESCRIPTION);
         putValue(Action.SMALL_ICON, ICON);
-        putValue("iconBase", "org/netbeans/modules/profiler/resources/export.png"); // NOI18N
+        putValue("iconBase", Icons.getResource(GeneralIcons.EXPORT)); // NOI18N
         this.exportProvider = exportProvider;
         if (!(loadedSnapshot==null)) {
             this.snapshot=loadedSnapshot;
@@ -248,16 +250,13 @@ public final class ExportAction extends AbstractAction {
 
     private boolean checkFileExists(File file) {
         if (file.exists()) {
-            if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(
-                        MessageFormat.format(OVERWRITE_FILE_CAPTION,new Object[] { file.getName() }),
-                        OVERWRITE_FILE_CAPTION,
-                        NotifyDescriptor.YES_NO_OPTION)
-                    ) != NotifyDescriptor.YES_OPTION) {
+            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(
+                    OVERWRITE_FILE_CAPTION,new Object[] { file.getName() }),
+                    OVERWRITE_FILE_CAPTION))
                 return false; // cancelled by the user
-            }
 
             if (!file.delete()) {
-                NetBeansProfiler.getDefaultNB().displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
+                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
                 return false;
             }
         }
@@ -275,7 +274,7 @@ public final class ExportAction extends AbstractAction {
         if (exportDir != null) {
             chooser.setCurrentDirectory(exportDir);
         }
-        int result = chooser.showSaveDialog(IDEUtils.getMainWindow());
+        int result = chooser.showSaveDialog(WindowManager.getDefault().getMainWindow());
         if (result != JFileChooser.APPROVE_OPTION) {
             return null; // cancelled by the user
         }
@@ -328,12 +327,12 @@ public final class ExportAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent evt) {
         if (!exportProvider.hasExportableView() && !exportProvider.hasLoadedSnapshot()) { // nothing to export
-            NetBeansProfiler.getDefaultNB().displayError(NO_VIEW_MSG);
+            ProfilerDialogs.displayError(NO_VIEW_MSG);
             return;
         }
 
         final LiveResultsWindow lrw = (exportProvider instanceof LiveResultsWindow) ? (LiveResultsWindow) exportProvider : null;
-        final AppStatusHandler statusHandler = NetBeansProfiler.getDefaultNB().getTargetAppRunner().getAppStatusHandler();
+        final AppStatusHandler statusHandler = Profiler.getDefault().getTargetAppRunner().getAppStatusHandler();
 
         if (lrw != null) {
             statusHandler.pauseLiveUpdates();
@@ -372,7 +371,7 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
 
-            IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         ProgressHandle pHandle = null;
                         pHandle = ProgressHandleFactory.createHandle(EXPORTING_VIEW_MSG);
@@ -385,12 +384,12 @@ public final class ExportAction extends AbstractAction {
                             ExportDataDumper eDD = new ExportDataDumper(fo);
                             exportProvider.exportData(exportedFileType, eDD);
                             if (eDD.getCaughtException()!=null) {
-                                NetBeansProfiler.getDefaultNB().displayError(eDD.getNumExceptions()+IOEXCEPTION_EXPORTING_MSG);
+                                ProfilerDialogs.displayError(eDD.getNumExceptions()+IOEXCEPTION_EXPORTING_MSG);
                             }
                         } catch (FileNotFoundException ex) {
                             ex.printStackTrace();
                         } catch (OutOfMemoryError e) {
-                            NetBeansProfiler.getDefaultNB().displayError(OOME_EXPORTING_MSG+e.getMessage());
+                            ProfilerDialogs.displayError(OOME_EXPORTING_MSG+e.getMessage());
                         } finally {
                             if (pHandle != null) {
                                 pHandle.finish();

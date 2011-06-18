@@ -59,6 +59,8 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -115,8 +117,8 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
     protected int minNamesColumnWidth; // minimal width of classnames columns
     CustomBarCellRenderer customBarCellRenderer;
     private EnhancedTreeCellRenderer enhancedTreeCellRenderer = new MethodNameTreeCellRenderer();
-    private ImageIcon leafIcon = new ImageIcon(ReverseMemCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/reverseNode.png")); // NOI18N
-    private ImageIcon nodeIcon = new ImageIcon(ReverseMemCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/reverseNode.png")); // NOI18N
+    private Icon leafIcon = Icons.getIcon(ProfilerIcons.NODE_REVERSE);
+    private Icon nodeIcon = Icons.getIcon(ProfilerIcons.NODE_REVERSE);
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
