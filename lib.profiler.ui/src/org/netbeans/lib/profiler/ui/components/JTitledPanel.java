@@ -81,6 +81,8 @@ import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**
@@ -286,10 +288,10 @@ public class JTitledPanel extends JPanel {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final ImageIcon closePanelIcon = new ImageIcon(JTitledPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/closePanel.png")); // NOI18N
-    private static final ImageIcon maximizePanelIcon = new ImageIcon(JTitledPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/maximizePanel.png")); // NOI18N
-    private static final ImageIcon restorePanelIcon = new ImageIcon(JTitledPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/restorePanel.png")); // NOI18N
-    private static final ImageIcon minimizePanelIcon = new ImageIcon(JTitledPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/minimizePanel.png")); // NOI18N
+    private static final ImageIcon closePanelIcon = Icons.getImageIcon(GeneralIcons.CLOSE_PANEL);
+    private static final ImageIcon maximizePanelIcon = Icons.getImageIcon(GeneralIcons.MAXIMIZE_PANEL);
+    private static final ImageIcon restorePanelIcon = Icons.getImageIcon(GeneralIcons.RESTORE_PANEL);
+    private static final ImageIcon minimizePanelIcon = Icons.getImageIcon(GeneralIcons.MINIMIZE_PANEL);
     public static final int STATE_CLOSED = 1000;
     public static final int STATE_RESTORED = 1001;
     public static final int STATE_MAXIMIZED = 1002;
@@ -505,6 +507,10 @@ public class JTitledPanel extends JPanel {
         state = STATE_RESTORED;
         fireActionPerformed();
     }
+    
+    protected Component[] getAdditionalControls() {
+        return null;
+    }
 
     protected Color getTitleBorderColor() {
         return UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
@@ -520,43 +526,86 @@ public class JTitledPanel extends JPanel {
 
     private void initComponents() {
         DoubleClickListener dblClickListener = new DoubleClickListener();
-        titlePanel = new JPanel();
+        
+        titlePanel = new JPanel(new GridBagLayout());
         titlePanel.addMouseListener(dblClickListener);
-
-        super.setLayout(new BorderLayout());
-
+        titlePanel.setBorder(BorderFactory.createCompoundBorder(
+                             BorderFactory.createLineBorder(getTitleBorderColor()),
+                             BorderFactory.createEmptyBorder(2, 5, 2, 2)));
+        titlePanel.setOpaque(true);
+        //    titlePanel.setBackground(UIManager.getColor("ToolTip.background"));
+        titlePanel.setBackground(new Color(245, 245, 245));
+        
+        GridBagConstraints gbc;
+        
+        if (icon != null) {
+            gbc = new GridBagConstraints();
+            gbc.insets = new Insets(0, 0, 0, 4);
+            JLabel iconLabel = new JLabel(icon) {
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+            };
+            iconLabel.setOpaque(false);
+            iconLabel.addMouseListener(dblClickListener);
+            titlePanel.add(iconLabel, gbc);
+        }
+        
         JLabel titleLabel = new JLabel(title) {
             public Dimension getMinimumSize() {
-                return new Dimension(0, super.getMinimumSize().height);
+                return getPreferredSize();
             }
         };
-
-        if (icon != null) {
-            titleLabel.setIcon(icon);
-        }
-
         titleLabel.setForeground(UIManager.getColor("ToolTip.foreground")); // NOI18N
         titleLabel.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
         titleLabel.setOpaque(false);
         titleLabel.addMouseListener(dblClickListener);
+        titlePanel.add(titleLabel, new GridBagConstraints());
+        
+        gbc = new GridBagConstraints();
+        gbc.weightx = 1f;
+        gbc.weighty = 1f;
+        JPanel spacer = new JPanel(null);
+        spacer.addMouseListener(dblClickListener);
+        spacer.setOpaque(false);
+        titlePanel.add(spacer, gbc);
+        
+        Component[] additionalControls = getAdditionalControls();
+        if (additionalControls != null && additionalControls.length > 0)
+            for (Component c : additionalControls)
+                titlePanel.add(c, new GridBagConstraints());
 
-        closePanelButton = new ImageIconButton(closePanelIcon);
-        closePanelButton.addActionListener(new ActionListener() {
+        minimizePanelButton = new ImageIconButton(minimizePanelIcon) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+        };
+        minimizePanelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    close();
+                    minimize();
                 }
                 ;
             });
+        //if (showButtons) titlePanel.add(minimizePanelButton, new GridBagConstraints());
 
-        maximizePanelButton = new ImageIconButton(maximizePanelIcon);
+        maximizePanelButton = new ImageIconButton(maximizePanelIcon) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+        };
         maximizePanelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     maximize();
                 }
                 ;
             });
+        //if (showButtons) titlePanel.add(maximizePanelButton, new GridBagConstraints());
 
-        restorePanelButton = new ImageIconButton(restorePanelIcon);
+        restorePanelButton = new ImageIconButton(restorePanelIcon) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+        };
         restorePanelButton.setVisible(false);
         restorePanelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -564,41 +613,23 @@ public class JTitledPanel extends JPanel {
                 }
                 ;
             });
-
-        minimizePanelButton = new ImageIconButton(minimizePanelIcon);
-        minimizePanelButton.addActionListener(new ActionListener() {
+        //if (showButtons) titlePanel.add(restorePanelButton, new GridBagConstraints());
+        
+        closePanelButton = new ImageIconButton(closePanelIcon) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+        };
+        closePanelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    minimize();
+                    close();
                 }
                 ;
             });
+        if (showButtons) titlePanel.add(closePanelButton, new GridBagConstraints());
 
-        JPanel buttonsContainer = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-        buttonsContainer.setOpaque(false);
-        //    buttonsContainer.add(minimizePanelButton);
-        //    buttonsContainer.add(restorePanelButton);
-        //    buttonsContainer.add(maximizePanelButton);
-        buttonsContainer.add(closePanelButton);
-
-        JPanel buttonsPanel = new JPanel(new GridBagLayout());
-        buttonsPanel.setOpaque(false);
-        buttonsPanel.add(buttonsContainer, new GridBagConstraints());
-
-        titlePanel.setLayout(new BorderLayout());
-        titlePanel.add(titleLabel, BorderLayout.WEST);
-
-        if (showButtons) {
-            titlePanel.add(buttonsPanel, BorderLayout.EAST);
-        }
-
-        titlePanel.setBorder(BorderFactory.createCompoundBorder(
-                             BorderFactory.createLineBorder(getTitleBorderColor()),
-                             BorderFactory.createEmptyBorder(2, 5, 2, 2)));
-        titlePanel.setOpaque(true);
-        //    titlePanel.setBackground(UIManager.getColor("ToolTip.background"));
-        titlePanel.setBackground(new Color(245, 245, 245));
-
-        super.add(titlePanel, BorderLayout.NORTH);
-        super.add(contentPanel, BorderLayout.CENTER);
+        super.setLayout(new BorderLayout()); // overridden for 'this'
+        super.add(titlePanel, BorderLayout.NORTH); // overridden for 'this'
+        super.add(contentPanel, BorderLayout.CENTER); // overridden for 'this'
     }
 }

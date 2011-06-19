@@ -43,8 +43,6 @@
 
 package org.netbeans.modules.profiler.ui.panels;
 
-import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -52,7 +50,6 @@ import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.modules.profiler.ui.ManualMethodSelect;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -64,8 +61,11 @@ import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
+import org.openide.DialogDisplayer;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 
 
 /**
@@ -116,7 +116,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     private JButton addManualButton;
     private JButton removeButton;
     private JList rootsList;
-    private Project project;
+    private Lookup.Provider project;
     private boolean globalAttach = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -136,11 +136,11 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     }
 
     public static ClientUtils.SourceCodeSelection[] getSelectedRootMethods(ClientUtils.SourceCodeSelection[] roots,
-                                                                           Project project) {
+                                                                           Lookup.Provider project) {
         final RootMethodsPanel rm = getDefault();
         rm.project = project;
         rm.globalAttach = rm.project == null;
-        rm.addFromProjectButton.setEnabled(!rm.globalAttach || (OpenProjects.getDefault().getOpenProjects().length > 0));
+        rm.addFromProjectButton.setEnabled(!rm.globalAttach || (ProjectUtilities.getOpenedProjects().length > 0));
         rm.refreshList(roots);
 
         return performDisplay(rm);
@@ -179,7 +179,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                         rootsList.setSelectedValue(newItem, true);
                     }
                 } catch (Exception ex) {
-                    NetBeansProfiler.getDefaultNB().displayError(INCORRECT_MANUAL_ROOT_MSG);
+                    ProfilerDialogs.displayError(INCORRECT_MANUAL_ROOT_MSG);
                 }
             }
         } else if (e.getSource() == removeButton) {
@@ -225,7 +225,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     // ---------------------------------------------------------------------------
     private static ClientUtils.SourceCodeSelection[] performDisplay(final RootMethodsPanel rm) {
         final DialogDescriptor dd = new DialogDescriptor(rm, SPECIFY_ROOT_METHODS_DIALOG_CAPTION);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
 
         if (rm.addFromProjectButton.isEnabled()) {
             rm.addFromProjectButton.grabFocus();
