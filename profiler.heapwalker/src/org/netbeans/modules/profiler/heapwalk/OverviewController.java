@@ -453,6 +453,7 @@ public class OverviewController extends AbstractController {
     
     private synchronized String getStackTrace() {
         if(stackTrace == null) {
+            boolean gotoSourceAvailable = heapFragmentWalker.getHeapDumpProject() != null && GoToSource.isAvailable();
             StringBuilder sb = new StringBuilder();
             Heap h = heapFragmentWalker.getHeapFragment();
             Collection<GCRoot> roots = h.getGCRoots();
@@ -499,7 +500,7 @@ public class OverviewController extends AbstractController {
                                 StackTraceElement stackElement = stack[i];
                                 String stackElementText = htmlize(stackElement.toString());
                                 
-                                if (heapFragmentWalker.getHeapDumpProject() != null) {
+                                if (gotoSourceAvailable) {
                                     String className = stackElement.getClassName();
                                     String method = stackElement.getMethodName();
                                     int lineNo = stackElement.getLineNumber();

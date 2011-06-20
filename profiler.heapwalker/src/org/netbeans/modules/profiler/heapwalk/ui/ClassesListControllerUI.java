@@ -573,27 +573,32 @@ public class ClassesListControllerUI extends JTitledPanel {
                 }
             });
 
-        JMenuItem showSourceItem = new JMenuItem(GO_TO_SOURCE_STRING);
-        showSourceItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    int row = classesListTable.getSelectedRow();
+        JMenuItem showSourceItem = null;
+        if (GoToSource.isAvailable()) {
+            showSourceItem = new JMenuItem(GO_TO_SOURCE_STRING);
+            showSourceItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        int row = classesListTable.getSelectedRow();
 
-                    if (row != -1) {
-                        String className = (String) displayCache[row][0];
+                        if (row != -1) {
+                            String className = (String) displayCache[row][0];
 
-                        while (className.endsWith("[]")) { // NOI18N
-                            className = className.substring(0, className.length() - 2);
+                            while (className.endsWith("[]")) { // NOI18N
+                                className = className.substring(0, className.length() - 2);
+                            }
+                            Lookup.Provider p = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject();
+                            GoToSource.openSource(p, className, null, null);
                         }
-                        Lookup.Provider p = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject();
-                        GoToSource.openSource(p, className, null, null);
                     }
-                }
-            });
+                });
+        }
 
         popup.add(showInstancesItem);
         popup.add(showInstancesOfItem);
-        popup.addSeparator();
-        popup.add(showSourceItem);
+        if (showSourceItem != null) {
+            popup.addSeparator();
+            popup.add(showSourceItem);
+        }
 
         return popup;
     }

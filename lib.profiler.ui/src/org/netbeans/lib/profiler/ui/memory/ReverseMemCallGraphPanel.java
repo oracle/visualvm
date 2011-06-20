@@ -59,6 +59,7 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
@@ -249,17 +250,19 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
         JPopupMenu popup = new JPopupMenu();
         Font boldfont = popup.getFont().deriveFont(Font.BOLD);
 
-        JMenuItem popupShowSource = new JMenuItem();
-        popupShowSource.setFont(boldfont);
-        popupShowSource.setText(GO_SOURCE_POPUP_ITEM);
-        popupShowSource.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    if (treePath != null) {
-                        performDefaultAction(treePath);
+        if (GoToSource.isAvailable()) {
+            JMenuItem popupShowSource = new JMenuItem();
+            popupShowSource.setFont(boldfont);
+            popupShowSource.setText(GO_SOURCE_POPUP_ITEM);
+            popupShowSource.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        if (treePath != null) {
+                            performDefaultAction(treePath);
+                        }
                     }
-                }
-            });
-        popup.add(popupShowSource);
+                });
+            popup.add(popupShowSource);
+        }
 
         return popup;
     }

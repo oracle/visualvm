@@ -620,23 +620,25 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                 }
             });
 
-        showSourceItem = new JMenuItem(GO_TO_SOURCE_ITEM_TEXT);
-        showSourceItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    int row = fieldsListTable.getSelectedRow();
+        if (GoToSource.isAvailable()) {
+            showSourceItem = new JMenuItem(GO_TO_SOURCE_ITEM_TEXT);
+            showSourceItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        int row = fieldsListTable.getSelectedRow();
 
-                    if (row != -1) {
-                        HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
-                        String className = node.getType();
+                        if (row != -1) {
+                            HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
+                            String className = node.getType();
 
-                        while (className.endsWith("[]")) {
-                            className = className.substring(0, className.length() - 2); // NOI18N
+                            while (className.endsWith("[]")) {
+                                className = className.substring(0, className.length() - 2); // NOI18N
+                            }
+                            Lookup.Provider p = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
+                            GoToSource.openSource(p, className, null, null);
                         }
-                        Lookup.Provider p = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
-                        GoToSource.openSource(p, className, null, null);
                     }
-                }
-            });
+                });
+        }
             
         showInThreadsItem = new JMenuItem(SHOW_IN_THREADS_ITEM_TEXT);
         showInThreadsItem.addActionListener(new ActionListener() {
@@ -659,7 +661,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         popup.add(showInThreadsItem);
         popup.addSeparator();
         popup.add(showLoopOriginItem);
-        popup.add(showSourceItem);
+        if (showSourceItem != null) popup.add(showSourceItem);
 
         return popup;
     }
@@ -880,7 +882,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 //        showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode || node instanceof ClassNode);
         showGcRootItem.setEnabled(node instanceof HeapWalkerInstanceNode && (!node.currentlyHasChildren() ||
                 (node.getNChildren() != 1 || !HeapWalkerNodeFactory.isMessageNode(node.getChild(0))))); // #124306
-        showSourceItem.setEnabled(node instanceof HeapWalkerInstanceNode);
+        if (showSourceItem != null) showSourceItem.setEnabled(node instanceof HeapWalkerInstanceNode);
         showInThreadsItem.setEnabled(false);
         if (node instanceof HeapWalkerInstanceNode) {
             Instance rootInstance = ((HeapWalkerInstanceNode)node).getInstance();

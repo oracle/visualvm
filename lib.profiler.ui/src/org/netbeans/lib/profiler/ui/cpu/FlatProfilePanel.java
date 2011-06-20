@@ -834,7 +834,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                         int selectedRow = resTable.getSelectedRow();
 
                         if (selectedRow != -1) {
-                            popupShowSource.setVisible(true);
+                            if (popupShowSource != null) popupShowSource.setVisible(true);
 
                             if (popupShowReverse != null) {
                                 popupShowReverse.setVisible(true);
@@ -870,7 +870,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                     int line = resTable.rowAtPoint(e.getPoint());
 
                     if (line == -1) {
-                        popupShowSource.setVisible(false);
+                        if (popupShowSource != null) popupShowSource.setVisible(false);
 
                         if (popupShowReverse != null) {
                             popupShowReverse.setVisible(false);
@@ -883,7 +883,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                             callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                         }
                     } else {
-                        popupShowSource.setVisible(true);
+                        if (popupShowSource != null) popupShowSource.setVisible(true);
 
                         if (popupShowReverse != null) {
                             popupShowReverse.setVisible(true);

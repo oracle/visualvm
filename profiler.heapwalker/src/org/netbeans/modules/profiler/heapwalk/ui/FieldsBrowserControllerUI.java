@@ -575,29 +575,31 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                 }
             });
 
-        showSourceItem = new JMenuItem(GO_TO_SOURCE_ITEM_TEXT);
-        showSourceItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    int row = fieldsListTable.getSelectedRow();
+        if (GoToSource.isAvailable()) {
+            showSourceItem = new JMenuItem(GO_TO_SOURCE_ITEM_TEXT);
+            showSourceItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        int row = fieldsListTable.getSelectedRow();
 
-                    if (row != -1) {
-                        HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
-                        String className = node.getType();
+                        if (row != -1) {
+                            HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
+                            String className = node.getType();
 
-                        while (className.endsWith("[]")) { // NOI18N
-                            className = className.substring(0, className.length() - 2);
+                            while (className.endsWith("[]")) { // NOI18N
+                                className = className.substring(0, className.length() - 2);
+                            }
+                            Lookup.Provider p = fieldsBrowserController.getInstancesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
+                            GoToSource.openSource(p, className, null, null);
                         }
-                        Lookup.Provider p = fieldsBrowserController.getInstancesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
-                        GoToSource.openSource(p, className, null, null);
                     }
-                }
-            });
+                });
+        }
 
         popup.add(showInstanceItem);
         popup.add(showClassItem);
         popup.addSeparator();
         popup.add(showLoopOriginItem);
-        popup.add(showSourceItem);
+        if (showSourceItem != null) popup.add(showSourceItem);
 
         return popup;
     }
@@ -830,8 +832,10 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode && ((HeapWalkerInstanceNode) node).hasInstance());
 
         // Go To Source
-        showSourceItem.setEnabled((node instanceof HeapWalkerInstanceNode && ((HeapWalkerInstanceNode) node).hasInstance())
-                                  || node instanceof ClassNode);
+        if (showSourceItem != null)
+            showSourceItem.setEnabled((node instanceof HeapWalkerInstanceNode &&
+                    ((HeapWalkerInstanceNode) node).hasInstance()) ||
+                    node instanceof ClassNode);
 
         if ((x == -1) || (y == -1)) {
             Rectangle rowBounds = fieldsListTable.getCellRect(row, 0, true);

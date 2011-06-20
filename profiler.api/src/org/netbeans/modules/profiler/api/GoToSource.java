@@ -61,6 +61,18 @@ final public class GoToSource {
 
     private static final RequestProcessor srcOpenerRP = new RequestProcessor("Profiler Source Opener"); // NOI18N  
     
+    
+    /**
+     * Returns true if at least one provider of GoToSource is available. This still
+     * doesn't mean that opening a concrete source is supported, the provider(s)
+     * may not support the source type.
+     * 
+     * @return true if at least one provider of GoToSource is available, false otherwise
+     */
+    public static boolean isAvailable() {
+        return Lookup.getDefault().lookup(GoToSourceProvider.class) != null;
+    }
+    
     public static void openFile(final FileObject srcFile, final int offset) {
         srcOpenerRP.post(new Runnable() {
 
