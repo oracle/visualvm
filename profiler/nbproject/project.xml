@@ -309,7 +309,6 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.profiling</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
                 <friend>org.netbeans.modules.autoproject.profiler</friend>
-                <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <friend>org.netbeans.modules.javafx.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler.j2me</friend>
@@ -317,11 +316,6 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.heapwalker</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.generic</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.sunas</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.tomcat</friend>
-                <friend>org.netbeans.modules.profiler.j2ee.weblogic</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
                 <friend>org.netbeans.modules.profiler.nbimpl</friend>
                 <friend>org.netbeans.modules.profiler.nbmodule</friend>

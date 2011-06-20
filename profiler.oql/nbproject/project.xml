@@ -72,7 +72,6 @@
                 </test-type>
             </test-dependencies>
             <friend-packages>
-                <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.heapwalker</friend>
                 <friend>org.netbeans.modules.profiler.oql.language</friend>
                 <package>org.netbeans.modules.profiler.oql.engine.api</package>
