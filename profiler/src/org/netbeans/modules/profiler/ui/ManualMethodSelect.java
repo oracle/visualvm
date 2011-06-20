@@ -53,6 +53,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.openide.DialogDisplayer;
 import org.openide.util.HelpCtx;
 
 
@@ -242,7 +243,7 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
                                                          new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                          DialogDescriptor.BOTTOM_ALIGN, null, null);
 
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.pack(); // To properly layout HTML hint area
         d.setVisible(true);
 
