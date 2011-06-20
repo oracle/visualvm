@@ -39,67 +39,41 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi;
+package org.netbeans.modules.profiler.api;
 
-import org.netbeans.modules.profiler.api.EditorContext;
-import org.netbeans.modules.profiler.api.ProfilerProject;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Lookup;
 
 /**
- *
- * @author Jaroslav Bachorik
+ * Editor context encapsulating document, project and (Swing) text component.
+ * 
+ * @author Jiri Sedlacek
  */
-public interface EditorSupportProvider {
-    public static EditorSupportProvider NULL = new EditorSupportProvider() {
-        
-        @Override
-        public boolean currentlyInJavaEditor() {
-            return false;
-        }
-        
-        public EditorContext getMostActiveJavaEditorContext() {
-            return null;
-        }
-
-        @Override
-        public FileObject getCurrentFile() {
-            return null;
-        }
-
-        @Override
-        public int getCurrentOffset() {
-            return -1;
-        }
-
-        @Override
-        public boolean isOffsetValid(FileObject file, int offset) {
-            return false;
-        }
-
-        @Override
-        public int getLineForOffset(FileObject file, int offset) {
-            return -1;
-        }
-
-        @Override
-        public ProfilerProject getCurrentProject() {
-            return null;
-        }
-
-        @Override
-        public int[] getSelectionOffsets() {
-            return new int[]{-1, -1};
-        }        
-    };
-   
+public final class EditorContext {
     
-    boolean currentlyInJavaEditor();
-    EditorContext getMostActiveJavaEditorContext();
-    FileObject getCurrentFile();
-    int getCurrentOffset();
-    boolean isOffsetValid(FileObject file, int offset);
-    int getLineForOffset(FileObject file, int offset);
-    Lookup.Provider getCurrentProject();
-    int[] getSelectionOffsets();
+    private Document document;
+    private FileObject fileObject;
+    private JTextComponent textComponent;
+
+    
+    public EditorContext(JTextComponent textComponent, Document document, FileObject fileObject) {
+        this.textComponent = textComponent;
+        this.document = document;
+        this.fileObject = fileObject;
+    }
+
+
+    public Document getDocument() {
+        return document;
+    }
+
+    public FileObject getFileObject() {
+        return fileObject;
+    }
+
+    public JTextComponent getTextComponent() {
+        return textComponent;
+    }
+    
 }

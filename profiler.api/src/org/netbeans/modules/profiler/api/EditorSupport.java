@@ -61,6 +61,24 @@ final public class EditorSupport {
     public static EditorSupport getDefault() {
         return new EditorSupport();
     }
+    
+    /**
+     * Returns true if curretly focused IDE component is Java editor.
+     * 
+     * @return true if curretly focused IDE component is Java editor, false otherwise
+     */
+    public boolean currentlyInJavaEditor() {
+        return getSupport().currentlyInJavaEditor();
+    }
+    
+    /**
+     * Returns editor context of the most active Java editor.
+     * 
+     * @return editor context of the most active Java editor or null if not available
+     */
+    public EditorContext getMostActiveJavaEditorContext() {
+        return getSupport().getMostActiveJavaEditorContext();
+    }
 
     /**
      * Returns the FileObject of the most active editor document
