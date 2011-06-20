@@ -67,8 +67,6 @@ public abstract class ProjectUtilitiesProvider {
 
     public abstract void fetchSubprojects(Provider project, Set<Provider> subprojects);
 
-    public abstract Provider[] getSortedProjects(Provider[] openedProjects);
-    
     public abstract Provider getProject(FileObject fobj);
     
     /**

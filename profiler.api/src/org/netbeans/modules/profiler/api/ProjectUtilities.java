@@ -41,6 +41,11 @@
  */
 package org.netbeans.modules.profiler.api;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.event.ChangeListener;
@@ -148,11 +153,26 @@ public final class ProjectUtilities {
 
     /**
      * Sorts projects by display name
-     * @param openedProjects
+     * @param projects
      * @return arrays of projects sorted by display name
      */
-    public static Provider[] getSortedProjects(Provider[] openedProjects) {
-        return provider().getSortedProjects(openedProjects);
+    public static Provider[] getSortedProjects(Provider[] projects) {
+        List<Provider> projectsArray = Arrays.asList(projects);
+
+        Collections.sort(projectsArray,
+                new Comparator() {
+
+                    @Override
+                    public int compare(Object o1, Object o2) {
+                        Provider p1 = (Provider) o1;
+                        Provider p2 = (Provider) o2;
+
+                        return getDisplayName(p1).toLowerCase().compareTo(getDisplayName(p2).toLowerCase());
+                    }
+                });
+        projectsArray.toArray(projects);
+
+        return projects;
     }
     
     private static ProjectUtilitiesProvider provider() {
