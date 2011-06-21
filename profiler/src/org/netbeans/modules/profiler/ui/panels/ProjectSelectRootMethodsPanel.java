@@ -78,10 +78,10 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
 import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.util.lookup.Lookups;
 
@@ -102,6 +102,8 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             "SelectRootMethodsPanel_RemoveAllItemText"); // NOI18N
     private static final String SELECT_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
             "SelectRootMethodsPanel_SelectAllItemText"); // NOI18N
+    private static final String NO_SELECTION_PROVIDES = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
+            "SelectRootMethodsPanel_NoSelectionProviders"); // NOI18N
     // -----
     protected static final Dimension PREFERRED_TOPTREE_DIMENSION = new Dimension(500, 250);
 
@@ -176,8 +178,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             });
 
             if (advancedLogicalPackageTree.getBuilderTypes().isEmpty()) {
-                NotifyDescriptor nd = new NotifyDescriptor.Message("SelectRootMethodsPanel_NoSelectionProviders"); // NOI18N
-                DialogDisplayer.getDefault().notify(nd);
+                ProfilerDialogs.displayWarning(NO_SELECTION_PROVIDES);
                 return null;
             }
 
