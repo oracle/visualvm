@@ -105,7 +105,7 @@ public final class ProfilerDialogsProviderImpl extends ProfilerDialogsProvider {
         NotifyDescriptor nd = details == null ? new NotifyDescriptor.Message(message, type) :
                         new ProfilerDialogs.MessageWithDetails(message, details, type, false);
         if (caption != null) nd.setTitle(caption);
-        DialogDisplayer.getDefault().notify(nd);
+        ProfilerDialogs.notify(nd);
     }
     
     private void displayDNSAMessage(String message, String caption, String dnsaMessage, String key, boolean dnsaDefault, int type) {
