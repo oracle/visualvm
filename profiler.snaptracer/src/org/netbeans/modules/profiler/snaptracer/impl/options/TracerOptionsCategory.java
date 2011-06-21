@@ -44,10 +44,10 @@
 package org.netbeans.modules.profiler.snaptracer.impl.options;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.spi.options.OptionsCategory;
 import org.netbeans.spi.options.OptionsPanelController;
-import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -64,8 +64,7 @@ final class TracerOptionsCategory extends OptionsCategory {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(ImageUtilities.loadImage(
-                "org/netbeans/modules/profiler/snaptracer/impl/resources/tracer24.png"));  // NOI18N
+        return Icons.getIcon(TracerIcons.TRACER_32);
     }
 
     public String getCategoryName() {

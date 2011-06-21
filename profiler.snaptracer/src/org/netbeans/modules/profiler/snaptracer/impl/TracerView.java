@@ -66,8 +66,7 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
-import org.netbeans.modules.profiler.utils.GoToSourceHelper;
-import org.netbeans.modules.profiler.utils.JavaSourceLocation;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -249,6 +248,9 @@ final class TracerView {
             Exceptions.printStackTrace(ex);
         }
 
+        if (td != null && !GoToSource.isAvailable()) {
+            td = td.replaceAll("<a href=\"file:/stackframe.*\">", "").replace("</a>", ""); // NOI18N
+        }
         final String tdF = td;
 
         if (tdF != null) SwingUtilities.invokeLater(new Runnable() {
@@ -290,7 +292,7 @@ final class TracerView {
             String className = parts[0];
             String method = parts[1];
             int linenumber = Integer.parseInt(parts[2]);
-            GoToSourceHelper.openSource(null,new JavaSourceLocation(className, method, linenumber));
+            GoToSource.openSource(null, className, method, linenumber);
         }
     }
 }
