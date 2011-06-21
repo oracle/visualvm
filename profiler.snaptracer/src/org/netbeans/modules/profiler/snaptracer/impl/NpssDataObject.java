@@ -52,6 +52,7 @@ import org.openide.nodes.Node;
 import org.openide.nodes.Children;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -76,6 +77,16 @@ public class NpssDataObject extends MultiDataObject implements OpenCookie {
 
     @Override
     public void open() {
+        RequestProcessor.getDefault().post(new Runnable() {
+
+            @Override
+            public void run() {
+                openImpl();
+            }
+        });
+    }
+
+    private void openImpl() {
         IdeSnapshot snapshot;
         FileObject primary = getPrimaryFile();
         FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log");
