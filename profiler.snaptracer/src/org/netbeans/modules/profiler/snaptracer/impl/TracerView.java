@@ -248,9 +248,6 @@ final class TracerView {
             Exceptions.printStackTrace(ex);
         }
 
-        if (td != null && !GoToSource.isAvailable()) {
-            td = td.replaceAll("<a href=\"file:/stackframe.*\">", "").replace("</a>", ""); // NOI18N
-        }
         final String tdF = td;
 
         if (tdF != null) SwingUtilities.invokeLater(new Runnable() {
