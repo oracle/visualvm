@@ -123,11 +123,12 @@ public class IntegrationUtils {
     }
 
     public static String getAssignEnvVariableValueString(String targetPlatform, String variableName, String variableValue) {
+        variableValue = variableValue.trim();
         if (isWindowsPlatform(targetPlatform)) {
             return getExportCommandString(targetPlatform) + " " + variableName + "=" + variableValue; //NOI18N
         }
 
-        return variableName + "=" + variableValue; //NOI18N
+        return variableName + "=" + (variableValue.contains(" ") ? "\"" + variableValue + "\"" : variableValue); //NOI18N
     }
 
     // Returns batch file extension bat / sh according to current / selected OS
@@ -450,7 +451,9 @@ public class IntegrationUtils {
     public static String getProfilerAgentCommandLineArgsWithoutQuotes(String targetPlatform, String targetJVM, boolean isRemote,
                                                                       int portNumber) {
         StringBuilder args = new StringBuilder();
-        if (targetJVM.equals(PLATFORM_JAVA_60) && (targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS))) {
+        
+        if ((targetJVM.equals(PLATFORM_JAVA_60) || targetJVM.equals(PLATFORM_JAVA_70)) && 
+            (targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS))) {
             args.append(" -XX:+UseLinuxPosixThreadCPUClocks "); // NOI18N
         }
         args.append("-agentpath:").append(getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)). // NOI18N
