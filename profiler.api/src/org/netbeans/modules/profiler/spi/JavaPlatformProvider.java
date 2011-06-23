@@ -49,12 +49,27 @@ import java.util.Map;
  */
 public abstract class JavaPlatformProvider {
 
+    /**
+     * @return  a descriptive, human-readable name of the platform
+     */
     public abstract String getDisplayName();
 
+    /** Gets the java platform system properties.
+     * @return the java platform system properties
+     */
     public abstract Map<String,String> getSystemProperties();
 
+    /** Gets a path to java executable for specified platform. The platform passed cannot be null.
+     * Errors when obtaining the java executable will be reported to the user and null will be returned.
+     *
+     * @param platform A JavaPlatform for which we need the java executable path
+     * @return A path to java executable or null if not found
+     */
     public abstract String getPlatformJavaFile();
 
+    /**
+     * @return  a unique name of the platform
+     */
     public abstract String getPlatformId();
     
 }

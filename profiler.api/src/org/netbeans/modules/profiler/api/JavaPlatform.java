@@ -178,7 +178,6 @@ public final class JavaPlatform {
     public String getPlatformJavaFile() {
         return provider.getPlatformJavaFile();
     }
-
     
     /** Gets the java platform system properties.
      * @return the java platform system properties

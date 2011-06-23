@@ -49,13 +49,19 @@ import org.openide.util.Lookup;
  * @author Jaroslav Bachorik
  */
 public interface SessionListener {
-    public static abstract class Adapter implements SessionListener {
-            @Override
-            public void onShutdown() {}
 
-            @Override
-            public void onStartup(ProfilingSettings ps, Lookup.Provider p) {}
+    public static abstract class Adapter implements SessionListener {
+
+        @Override
+        public void onShutdown() {
         }
-        void onStartup(ProfilingSettings ps, Lookup.Provider p);
-        void onShutdown();
+
+        @Override
+        public void onStartup(ProfilingSettings ps, Lookup.Provider p) {
+        }
+    }
+
+    void onStartup(ProfilingSettings ps, Lookup.Provider p);
+
+    void onShutdown();
 }

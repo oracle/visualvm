@@ -53,15 +53,15 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
- *
+ * GoToSource class allows to open source file at specified line number or method.
+ * 
  * @author Jaroslav Bachorik
  * @author Tomas Hurka
  */
 final public class GoToSource {
 
     private static final RequestProcessor srcOpenerRP = new RequestProcessor("Profiler Source Opener"); // NOI18N  
-    
-    
+     
     /**
      * Returns true if at least one provider of GoToSource is available. This still
      * doesn't mean that opening a concrete source is supported, the provider(s)
@@ -73,6 +73,12 @@ final public class GoToSource {
         return Lookup.getDefault().lookup(GoToSourceProvider.class) != null;
     }
     
+    /**
+     * Open a source code file on a given position.
+     * @param srcFile The source file to be opened
+     * @param offset The position to open the file at
+     * @return  Returns TRUE if such file exists and the offset is valid
+     */
     public static void openFile(final FileObject srcFile, final int offset) {
         srcOpenerRP.post(new Runnable() {
 
@@ -83,10 +89,24 @@ final public class GoToSource {
         });
     }
     
+    /**
+     * Open a source specified by parameters.
+     * @param project The associated project
+     * @param className The class name
+     * @param methodName The method name or NULL
+     * @param signature The signature or NULL
+     */
     public static void openSource(Lookup.Provider project, String className, String methodName, String methodSig) {
         openSource(project, className, methodName, methodSig, -1);
     }
 
+    /**
+     * Open a source specified by parameters.
+     * @param project The associated project
+     * @param className The class name
+     * @param methodName The method name or NULL
+     * @param line The line number or {@linkplain Integer#MIN_VALUE}
+     */
     public static void openSource(Lookup.Provider project, String className, String methodName, int line) {
         openSource(project, className, methodName, null, line);
     }

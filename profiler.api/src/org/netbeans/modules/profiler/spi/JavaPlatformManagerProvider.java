@@ -48,11 +48,20 @@ import java.util.List;
  * @author Tomas Hurka
  */
 public abstract class JavaPlatformManagerProvider {
-    
+
+    /** Gets an list of JavaPlatformProvider objects registered in the IDE.
+     * @return the array of java platform definitions.
+     */
     public abstract List<JavaPlatformProvider> getPlatforms();
 
+    /**
+     * Get the "default platform", meaning the JDK on which profiler itself is running.
+     * @return the default platform, if it can be found, or null
+     */
     public abstract JavaPlatformProvider getDefaultPlatform();
-    
-    public abstract void showCustomizer();
 
+    /**
+     * Shows java platforms customizer
+     */
+    public abstract void showCustomizer();
 }

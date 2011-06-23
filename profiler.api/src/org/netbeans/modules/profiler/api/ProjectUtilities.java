@@ -54,7 +54,9 @@ import org.openide.util.Lookup;
 import org.openide.util.Lookup.Provider;
 
 /**
- *
+ * ProjectUtilities provides profiler with necessary functionality work accessing
+ * project oriented data.
+ * 
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
