@@ -46,15 +46,14 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.ResultsListener;
-import org.netbeans.modules.profiler.utils.IDEUtils;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -70,10 +69,8 @@ public final class ResetResultsAction extends AbstractAction {
         ));
         putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ResetResultsAction.class, "HINT_ResetResultsAction" // NOI18N
         ));
-        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/resetResults.png", false));
-        putValue("iconBase", // NOI18N
-                 "org/netbeans/modules/profiler/actions/resources/resetResults.png" // NOI18N
-        );
+        putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.RESET_RESULTS));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.RESET_RESULTS)); // NOI18N
         
         updateEnabledState();
         ResultsManager.getDefault().addResultsListener(new ResultsListener() {
@@ -96,7 +93,7 @@ public final class ResetResultsAction extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent e) {
         
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
             public void run() {
                 ResultsManager.getDefault().reset();
         

@@ -57,4 +57,16 @@ public class TestProfilingPointsProcessor extends ProfilingPointsProcessor {
     public void timeAdjust(final int threadId, final long timeDiff0, final long timeDiff1) {
         // do nothing
     }
+
+    @Override
+    public RuntimeProfilingPoint[] getSupportedProfilingPoints() {
+        return new RuntimeProfilingPoint[0];
+    }
+
+    @Override
+    public void init(Object project) {
+        // do nothing
+    }
+    
+    
 }
