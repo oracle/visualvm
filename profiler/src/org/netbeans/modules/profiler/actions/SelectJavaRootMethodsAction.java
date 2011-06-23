@@ -56,7 +56,7 @@ final public class SelectJavaRootMethodsAction extends BaseSelectRootMethodsActi
         
         String className = null;
         // Read current offset in editor
-        int currentOffsetInEditor = EditorSupport.getDefault().getCurrentOffset();
+        int currentOffsetInEditor = EditorSupport.getCurrentOffset();
 
         if (currentOffsetInEditor == -1) {
             return null;

@@ -50,24 +50,18 @@ import org.openide.util.Lookup;
  * @author Jaroslav Bachorik
  */
 final public class EditorSupport {
-    private EditorSupport() {
-    }
     
     private static EditorSupportProvider getSupport() {
         EditorSupportProvider support = Lookup.getDefault().lookup(EditorSupportProvider.class);
         return support != null ? support : EditorSupportProvider.NULL;
     }
     
-    public static EditorSupport getDefault() {
-        return new EditorSupport();
-    }
-    
     /**
-     * Returns true if curretly focused IDE component is Java editor.
+     * Returns true if currently focused IDE component is Java editor.
      * 
-     * @return true if curretly focused IDE component is Java editor, false otherwise
+     * @return true if currently focused IDE component is Java editor, false otherwise
      */
-    public boolean currentlyInJavaEditor() {
+    public static boolean currentlyInJavaEditor() {
         return getSupport().currentlyInJavaEditor();
     }
     
@@ -76,7 +70,7 @@ final public class EditorSupport {
      * 
      * @return editor context of the most active Java editor or null if not available
      */
-    public EditorContext getMostActiveJavaEditorContext() {
+    public static EditorContext getMostActiveJavaEditorContext() {
         return getSupport().getMostActiveJavaEditorContext();
     }
 
@@ -84,7 +78,7 @@ final public class EditorSupport {
      * Returns the FileObject of the most active editor document
      * @return A FileObject or null
      */
-    public FileObject getCurrentFile() {
+    public static FileObject getCurrentFile() {
         return getSupport().getCurrentFile();
     }
     
@@ -93,7 +87,7 @@ final public class EditorSupport {
      * converted into line number
      * @return The line number or -1
      */
-    public int getCurrentLine() {
+    public static int getCurrentLine() {
         return getLineForOffset(getCurrentFile(), getCurrentOffset());
     }
     
@@ -101,7 +95,7 @@ final public class EditorSupport {
      * Returns the caret position within the active editor document
      * @return The caret offset or -1
      */
-    public int getCurrentOffset() {
+    public static int getCurrentOffset() {
         return getSupport().getCurrentOffset();
     }
 
@@ -109,7 +103,7 @@ final public class EditorSupport {
      * Validates the current offset
      * @return Returns TRUE if the current offset is valid within the bounds of the current file
      */
-    public boolean isCurrentOffsetValid() {
+    public static boolean isCurrentOffsetValid() {
         return isOffsetValid(getCurrentFile(), getCurrentOffset());
     }
     
@@ -119,7 +113,7 @@ final public class EditorSupport {
      * @param offset The offset within the file
      * @return Returns TRUE if the given offset is valid
      */
-    public boolean isOffsetValid(FileObject file, int offset) {
+    public static boolean isOffsetValid(FileObject file, int offset) {
         return getSupport().isOffsetValid(file, offset);
     }
     
@@ -127,7 +121,7 @@ final public class EditorSupport {
      * Calculates the line number for a given offset
      * @return Returns the line number within the active editor document or -1
      */
-    public int getLineForOffset(FileObject file, int offset) {
+    public static int getLineForOffset(FileObject file, int offset) {
         return getSupport().getLineForOffset(file, offset);
     }
     
@@ -135,7 +129,7 @@ final public class EditorSupport {
      * Returns the tuple of start/end selection offset in the currently activated editor
      * @return Tuple [startOffset, endOffset] or [-1, -1] if there is no selection
      */
-    public int[] getSelectionOffsets() {
+    public static int[] getSelectionOffsets() {
         return getSupport().getSelectionOffsets();
     }
 
@@ -143,7 +137,7 @@ final public class EditorSupport {
      * Returns the project the currently activated document belongs to
      * @return The most active project or null
      */
-    public Lookup.Provider getCurrentProject() {
+    public static Lookup.Provider getCurrentProject() {
         return getSupport().getCurrentProject();
     }
 }
