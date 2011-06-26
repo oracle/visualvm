@@ -59,6 +59,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -139,8 +141,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         noContentPanel.setLayout(new BorderLayout());
         noContentPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        JLabel noContentIcon = new JLabel(new javax.swing.ImageIcon(getClass()
-                                                                        .getResource("/org/netbeans/lib/profiler/ui/resources/threadsView.png"))); // NOI18N
+        JLabel noContentIcon = new JLabel(Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
         noContentIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         noContentIcon.setVerticalAlignment(SwingConstants.TOP);
         noContentIcon.setEnabled(false);

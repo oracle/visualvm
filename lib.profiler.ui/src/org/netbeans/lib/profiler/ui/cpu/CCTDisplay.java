@@ -80,6 +80,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNodeBacked;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -123,8 +125,8 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     private CPUSelectionHandler selectionHandler;
     private EnhancedTreeCellRenderer enhancedTreeCellRenderer = new MethodNameTreeCellRenderer();
     private ExtendedTreeTableModel treeTableModel;
-    private ImageIcon leafIcon = new ImageIcon(CCTDisplay.class.getResource("/org/netbeans/lib/profiler/ui/resources/leaf.png")); // NOI18N
-    private ImageIcon nodeIcon = new ImageIcon(CCTDisplay.class.getResource("/org/netbeans/lib/profiler/ui/resources/node.png")); // NOI18N
+    private Icon leafIcon = Icons.getIcon(ProfilerIcons.NODE_LEAF);
+    private Icon nodeIcon = Icons.getIcon(ProfilerIcons.NODE_FORWARD);
     private JButton cornerButton;
     private int minNamesColumnWidth; // minimal width of classnames columns
 
@@ -754,7 +756,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     }
 
     private void enableDisablePopup(PrestimeCPUCCTNode node) {
-        popupShowSource.setEnabled(isShowSourceAvailable() && ((node.getThreadId() != -1) && (node.getMethodId() > 0)));
+        if (popupShowSource != null) popupShowSource.setEnabled(isShowSourceAvailable() && ((node.getThreadId() != -1) && (node.getMethodId() > 0)));
         popupShowSubtree.setEnabled((node.getThreadId() != -1) && (node.getMethodId() > 0));
         popupShowReverse.setEnabled((node.getThreadId() != -1) && (node.getMethodId() > 0));
         popupAddToRoots.setEnabled(isAddToRootsAvailable() && ((node.getThreadId() != -1) && (node.getMethodId() > 0)));

@@ -43,9 +43,7 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
@@ -53,6 +51,9 @@ import org.openide.windows.WindowManager;
 import java.awt.*;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
+import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /** A panel with mini graphs intended to be displayed in the output area.
@@ -73,7 +74,7 @@ public final class TelemetryOverviewPanel extends TopComponent {
     private static final String HELP_CTX_KEY = "TelemetryOverviewPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static TelemetryOverviewPanel defaultInstance;
-    private static final Image windowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryOverviewWindow.png"); // NOI18N
+    private static final Image windowIcon = Icons.getImage(ProfilerIcons.WINDOW_TELEMETRY_OVERVIEW);
     private static final String ID = "profiler_to"; // NOI18N // for winsys persistence
     private static final Dimension PREFFERED_SIZE = new Dimension(580, 430);
 
@@ -110,7 +111,7 @@ public final class TelemetryOverviewPanel extends TopComponent {
 
     public static synchronized TelemetryOverviewPanel getDefault() {
         if (defaultInstance == null) {
-            IDEUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
                 public void run() {
                     defaultInstance = (TelemetryOverviewPanel) WindowManager.getDefault().findTopComponent(ID);
                     if (defaultInstance == null) defaultInstance = new TelemetryOverviewPanel();
@@ -123,7 +124,7 @@ public final class TelemetryOverviewPanel extends TopComponent {
 
     /** Possibly closes the window avoiding unnecessary initialization if not created and displayed yet. */
     public static synchronized void closeIfOpened() {
-        IDEUtils.runInEventDispatchThread(new Runnable() {
+        CommonUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (defaultInstance != null && defaultInstance.isOpened()) defaultInstance.close();
             }

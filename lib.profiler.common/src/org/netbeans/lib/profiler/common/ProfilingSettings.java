@@ -52,9 +52,7 @@ import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -183,6 +181,46 @@ public class ProfilingSettings {
 
     public ProfilingSettings(final String name) {
         this.settingsName = name;
+    }
+    
+    
+    // -- Static methods ---
+    
+    public static boolean isCPUSettings(ProfilingSettings settings) {
+        if (settings == null) {
+            return false;
+        }
+
+        return isCPUSettings(settings.getProfilingType());
+    }
+
+    public static boolean isCPUSettings(int type) {
+        return (type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)
+               || (type == ProfilingSettings.PROFILE_CPU_STOPWATCH);
+    }
+
+    public static boolean isMemorySettings(ProfilingSettings settings) {
+        if (settings == null) {
+            return false;
+        }
+
+        return isMemorySettings(settings.getProfilingType());
+    }
+
+    public static boolean isMemorySettings(int type) {
+        return (type == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) || (type == ProfilingSettings.PROFILE_MEMORY_LIVENESS);
+    }
+
+    public static boolean isMonitorSettings(ProfilingSettings settings) {
+        if (settings == null) {
+            return false;
+        }
+
+        return isMonitorSettings(settings.getProfilingType());
+    }
+
+    public static boolean isMonitorSettings(int type) {
+        return type == ProfilingSettings.PROFILE_MONITOR;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
