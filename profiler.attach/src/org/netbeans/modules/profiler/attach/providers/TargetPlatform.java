@@ -44,11 +44,6 @@
 package org.netbeans.modules.profiler.attach.providers;
 
 import java.io.File;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileStateInvalidException;
-import org.openide.modules.SpecificationVersion;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
