@@ -46,7 +46,8 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
- *
+ * IDE agnostic source file wrapper<br/>
+ * A simple {@linkplain Lookup.Provider} derived from the appropriate {@linkplain MimeLookup} registrations.
  * @author Jaroslav Bachorik
  */
 abstract public class ProfilerSource implements Lookup.Provider {
@@ -56,6 +57,10 @@ abstract public class ProfilerSource implements Lookup.Provider {
         this.file = file;
     }
     
+    /**
+     * The wrapped file
+     * @return Returns the {@linkplain FileObject|} representing a particular {@linkplain ProfilerSource}
+     */
     final public FileObject getFile() {
         return file;
     }
@@ -65,5 +70,9 @@ abstract public class ProfilerSource implements Lookup.Provider {
         return MimeLookup.getLookup(file.getMIMEType());
     }
     
+    /**
+     * Indicates whether a source can be run by the IDE or not
+     * @return Returns <b>TRUE</b> if the source can be run by the IDE (eg. main class, test etc.), <b>FALSE</b> otherwise
+     */
     abstract public boolean isRunnable();
 }

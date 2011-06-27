@@ -42,23 +42,65 @@
 package org.netbeans.modules.profiler.spi;
 
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.api.ProfilingSettingsManager.ProfilingSettingsDescriptor;
 import org.openide.util.Lookup;
 
 /**
- *
+ * SPI interface for {@linkplain ProfilingSettingsManager} functionality
  * @author Jaroslav Bachorik
  */
 abstract public class ProfilingSettingsManagerProvider {
+    /**
+     * Duplicates the provided settings and stores them in the array of available configurations
+     * @param originalSettings The original settings to be duplicated
+     * @param availableConfigurations The array of all available configurations to store the duplicated settings to
+     * @return Returns the duplicated {@linkplain ProfilingSettings} instance
+     */
     public abstract ProfilingSettings createDuplicateSettings(ProfilingSettings originalSettings, ProfilingSettings[] availableConfigurations);
 
+    /**
+     * Creates a new default instance of {@linkplain ProfilingSettings} and stores it in the array of available configurations
+     * @param availableConfigurations The array of available configurations to store the newly created settings into
+     * @return Returns a new instance of {@linkplain ProfilingSettings}
+     */
     public abstract ProfilingSettings createNewSettings(ProfilingSettings[] availableConfigurations);
 
+    /**
+     * Creates a new instance of {@linkplain ProfilingSettings} for certain session type and stores it in the array of available configurations
+     * @param type Any of the following values: <ul>
+     * <li>{@linkplain ProfilingSettings#PROFILE_CPU_ENTIRE}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_CPU_PART}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_MEMORY_ALLOCATIONS}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_MEMORY_LIVENESS}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_MONITOR}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_CPU_STOPWATCH}</li>
+     * </ul>
+     * @param availableConfigurations The array of available configurations to store the newly created settings into
+     * @return Returns a new instance of {@linkplain ProfilingSettings}
+     */
     public abstract ProfilingSettings createNewSettings(int type, ProfilingSettings[] availableConfigurations);
 
+    /**
+     * Retrieves the effective profiling settings from the given project
+     * @param project The project to retrieve the settings for
+     * @return Returns {@linkplain ProfilingSettingsDescriptor} instance wrapping the effective profiling settings
+     */
     public abstract ProfilingSettingsDescriptor getProfilingSettings(Lookup.Provider project);
 
+    /**
+     * Renames the given {@linkplain ProfilingSettings} and stores the changes in the array of available configurations
+     * @param originalSettings The settings to rename
+     * @param availableConfigurations The array of available configurations to store the newly created settings into
+     * @return Returns a renamed instance of {@linkplain ProfilingSettings}
+     */
     public abstract ProfilingSettings renameSettings(ProfilingSettings originalSettings, ProfilingSettings[] availableConfigurations);
 
+    /**
+     * Stores the given profiling settings alongside the defining project
+     * @param profilingSettings The collection of all available profiling settings
+     * @param activeProfilingSettings The active profiling settings
+     * @param project The project to store the settings for
+     */
     public abstract void storeProfilingSettings(ProfilingSettings[] profilingSettings, ProfilingSettings lastSelectedProfilingSettings, Lookup.Provider project);
 }

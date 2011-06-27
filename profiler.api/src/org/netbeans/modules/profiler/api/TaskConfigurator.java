@@ -48,11 +48,19 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
- *
+ * Accessor for configuring profiler tasks<br/>
+ * Profiler tasks are:<ul>
+ * <li>Profile Project</li>
+ * <li>Attach Profiler</li>
+ * <li>Modify Profiling</li>
+ * </ul>
  * @author Jaroslav Bachorik
  */
 final public class TaskConfigurator {
-        // --- Innerclass for passing results ----------------------------------------
+    /**
+     * Innerclass for passing results
+     * @author Jiri Sedlacek
+     */
     final public static class Configuration {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -97,14 +105,31 @@ final public class TaskConfigurator {
         return Singleton.INSTANCE;
     }
     
+    /**
+     * Creates a new <i>"Attach Profiler"</i> task {@linkplain Configuration} from the given project
+     * @param project The {@linkplain Project} to create the task configuration for
+     * @return Returns correctly initialized task {@linkplain Configuration} instance
+     */
     public Configuration configureAttachProfilerTask(Lookup.Provider project) {
         return impl.configureAttachProfilerTask(project);
     }
-    
+    /**
+     * Creates a new <i>"Modify Profiling"</i> task {@linkplain Configuration} from the given project
+     * @param project The {@linkplain Project} to create the task configuration for
+     * @param profiledFile The profiled file, if any. May be null if no single file is profiled/
+     * @param isAttach Indicates whether the current profiling session is the result of <i>"Attach Profiler"</i> (<b>TRUE</b>), or <i>"Profile Project"</i> (<b>FALSE</b>)
+     * @return Returns correctly initialized task {@linkplain Configuration} instance
+     */
     public Configuration configureModifyProfilingTask(Lookup.Provider project, FileObject profiledFile, boolean isAttach) {
         return impl.configureModifyProfilingTask(project, profiledFile, isAttach);
     }
-
+    /**
+     * Creates a new <i>"Profile Project"</i> task {@linkplain Configuration} from the given project
+     * @param project The {@linkplain Project} to create the task configuration for
+     * @param profiledFile The file to profile (<i>"Profile File"</i>). May be null = <i>"Profile Project"</i>
+     * @param enableOverride Indicates whether the default profiling settings derived from the project may be overriden (<b>TRUE</b>) or not (<b>FALSE</b>)
+     * @return Returns correctly initialized task {@linkplain Configuration} instance
+     */
     public Configuration configureProfileProjectTask(Lookup.Provider project, FileObject profiledFile, boolean enableOverride) {
         return impl.configureProfileProjectTask(project, profiledFile, enableOverride);
     }

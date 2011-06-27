@@ -45,11 +45,14 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.openide.util.Lookup;
 
 /**
- *
+ * A helper SPI interface for plugging in to the profiling session lifecycle
+ * 
  * @author Jaroslav Bachorik
  */
 public interface SessionListener {
-
+    /**
+     * Default No-op implementation of {@linkplain SessionListener}
+     */
     public static abstract class Adapter implements SessionListener {
 
         @Override
@@ -61,7 +64,15 @@ public interface SessionListener {
         }
     }
 
+    /**
+     * Called on the profiling session startup
+     * @param ps The {@linkplain ProfilingSettings} used to start the session
+     * @param p The associated project
+     */
     void onStartup(ProfilingSettings ps, Lookup.Provider p);
 
+    /**
+     * Called on the profiling session shutdown
+     */
     void onShutdown();
 }

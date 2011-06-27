@@ -46,7 +46,7 @@ import org.netbeans.modules.profiler.spi.ProfilingSettingsManagerProvider;
 import org.openide.util.Lookup;
 
 /**
- *
+ * API for managing profiling settings
  * @author Jaroslav Bachorik
  */
 final public class ProfilingSettingsManager {
@@ -54,6 +54,10 @@ final public class ProfilingSettingsManager {
         final private static ProfilingSettingsManager INSTANCE = new ProfilingSettingsManager();
     }
     
+    /**
+     * Profiling settings wrapper
+     * @author Jiri Sedlacek
+     */
     final public static class ProfilingSettingsDescriptor {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -87,27 +91,68 @@ final public class ProfilingSettingsManager {
         return Singleton.INSTANCE;
     }
     
+    /**
+     * Duplicates the provided settings and stores them in the array of available configurations
+     * @param originalSettings The original settings to be duplicated
+     * @param availableConfigurations The array of all available configurations to store the duplicated settings to
+     * @return Returns the duplicated {@linkplain ProfilingSettings} instance
+     */
     public ProfilingSettings createDuplicateSettings(ProfilingSettings originalSettings, ProfilingSettings[] availableConfigurations) {
         return impl.createDuplicateSettings(originalSettings, availableConfigurations);
     }
 
+    /**
+     * Creates a new default instance of {@linkplain ProfilingSettings} and stores it in the array of available configurations
+     * @param availableConfigurations The array of available configurations to store the newly created settings into
+     * @return Returns a new instance of {@linkplain ProfilingSettings}
+     */
     public ProfilingSettings createNewSettings(ProfilingSettings[] availableConfigurations) {
         return impl.createNewSettings(availableConfigurations);
     }
 
+    /**
+     * Creates a new instance of {@linkplain ProfilingSettings} for certain session type and stores it in the array of available configurations
+     * @param type Any of the following values: <ul>
+     * <li>{@linkplain ProfilingSettings#PROFILE_CPU_ENTIRE}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_CPU_PART}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_MEMORY_ALLOCATIONS}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_MEMORY_LIVENESS}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_MONITOR}</li>
+     * <li>{@linkplain ProfilingSettings#PROFILE_CPU_STOPWATCH}</li>
+     * </ul>
+     * @param availableConfigurations The array of available configurations to store the newly created settings into
+     * @return Returns a new instance of {@linkplain ProfilingSettings}
+     */
     public  ProfilingSettings createNewSettings(int type, ProfilingSettings[] availableConfigurations) {
         return impl.createNewSettings(type, availableConfigurations);
     }
 
+    /**
+     * Retrieves the effective profiling settings from the given project
+     * @param project The project to retrieve the settings for
+     * @return Returns {@linkplain ProfilingSettingsDescriptor} instance wrapping the effective profiling settings
+     */
     public ProfilingSettingsDescriptor getProfilingSettings(Lookup.Provider project) {
         return impl.getProfilingSettings(project);
     }
 
+    /**
+     * Renames the given {@linkplain ProfilingSettings} and stores the changes in the array of available configurations
+     * @param originalSettings The settings to rename
+     * @param availableConfigurations The array of available configurations to store the newly created settings into
+     * @return Returns a renamed instance of {@linkplain ProfilingSettings}
+     */
     public ProfilingSettings renameSettings(ProfilingSettings originalSettings, ProfilingSettings[] availableConfigurations) {
         return impl.renameSettings(originalSettings, availableConfigurations);
     }
 
-    public void storeProfilingSettings(ProfilingSettings[] profilingSettings, ProfilingSettings lastSelectedProfilingSettings, Lookup.Provider project) {
-        impl.storeProfilingSettings(profilingSettings, lastSelectedProfilingSettings, project);
+    /**
+     * Stores the given profiling settings alongside the defining project
+     * @param profilingSettings The collection of all available profiling settings
+     * @param activeProfilingSettings The active profiling settings
+     * @param project The project to store the settings for
+     */
+    public void storeProfilingSettings(ProfilingSettings[] profilingSettings, ProfilingSettings activeProfilingSettings, Lookup.Provider project) {
+        impl.storeProfilingSettings(profilingSettings, activeProfilingSettings, project);
     }
 }

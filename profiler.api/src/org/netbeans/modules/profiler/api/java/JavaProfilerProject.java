@@ -45,7 +45,7 @@ import org.netbeans.modules.profiler.api.ProfilerProject;
 import org.openide.util.Lookup.Provider;
 
 /**
- *
+ * Java based project representation
  * @author Jaroslav Bachorik
  */
 final public class JavaProfilerProject extends ProfilerProject {
@@ -54,6 +54,11 @@ final public class JavaProfilerProject extends ProfilerProject {
     // @GuardedBy lazyInitLock
     private ProfilerTypeUtils typeUtils = null;
     
+    /**
+     * Factory method for obtaining a {@linkplain JavaProfilerProject} from an IDE project
+     * @param nbProject The IDE project
+     * @return Returns a {@linkplain JavaProfilerProject} instance or NULL
+     */
     public static JavaProfilerProject createFrom(Provider nbProject) {
         JavaProfilerProject jpp = nbProject.getLookup().lookup(JavaProfilerProject.class);
         if (jpp == null) {
@@ -66,6 +71,10 @@ final public class JavaProfilerProject extends ProfilerProject {
         super(project);
     }
     
+    /**
+     * Accessor to the {@linkplain ProfilerTypeUtils}
+     * @return Returns the associated {@linkplain ProfilerTypeUtils} instance
+     */
     public ProfilerTypeUtils getTypeUtils() {
         synchronized(lazyInitLock) {
             if (typeUtils == null) {

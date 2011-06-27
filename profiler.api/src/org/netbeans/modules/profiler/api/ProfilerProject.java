@@ -46,7 +46,10 @@ import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 
 /**
- *
+ * IDE agnostic project definition wrapper.<br/>
+ * Basically, a simple {@linkplain Lookup.Provider} which contains, as a part 
+ * of its lookup, the real project implementation.
+ * 
  * @author Jaroslav Bachorik
  */
 abstract public class ProfilerProject implements Lookup.Provider {

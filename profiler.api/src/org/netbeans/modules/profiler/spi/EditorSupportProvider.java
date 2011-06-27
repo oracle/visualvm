@@ -42,12 +42,13 @@
 package org.netbeans.modules.profiler.spi;
 
 import org.netbeans.modules.profiler.api.EditorContext;
+import org.netbeans.modules.profiler.api.EditorSupport;
 import org.netbeans.modules.profiler.api.ProfilerProject;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
- *
+ * An SPI interface for {@linkplain EditorSupport} functionality
  * @author Jaroslav Bachorik
  */
 public interface EditorSupportProvider {
@@ -58,6 +59,7 @@ public interface EditorSupportProvider {
             return false;
         }
         
+        @Override
         public EditorContext getMostActiveJavaEditorContext() {
             return null;
         }
@@ -93,13 +95,48 @@ public interface EditorSupportProvider {
         }        
     };
    
-    
+    /**
+     * Returns true if currently focused IDE component is Java editor.
+     * 
+     * @return true if currently focused IDE component is Java editor, false otherwise
+     */
     boolean currentlyInJavaEditor();
+    /**
+     * Returns editor context of the most active Java editor.
+     * 
+     * @return editor context of the most active Java editor or null if not available
+     */
     EditorContext getMostActiveJavaEditorContext();
+    /**
+     * Returns the FileObject of the most active editor document
+     * @return A FileObject or null
+     */
     FileObject getCurrentFile();
+    /**
+     * Returns the caret position within the active editor document
+     * @return The caret offset or -1
+     */
     int getCurrentOffset();
+    /**
+     * Validates an offset within a particular file
+     * @param file The file to check
+     * @param offset The offset within the file
+     * @return Returns TRUE if the given offset is valid
+     */
     boolean isOffsetValid(FileObject file, int offset);
+    /**
+     * Calculates the line number for a given offset
+     * @return Returns the line number within the active editor document or -1
+     */
     int getLineForOffset(FileObject file, int offset);
+    /**
+     * Returns the project the currently activated document belongs to
+     * @return The most active project or null
+     */
     Lookup.Provider getCurrentProject();
+    /**
+     * Returns the tuple of start/end selection offset in the currently activated editor
+     * @return Tuple [startOffset, endOffset] or [-1, -1] if there is no selection
+     */
     int[] getSelectionOffsets();
 }

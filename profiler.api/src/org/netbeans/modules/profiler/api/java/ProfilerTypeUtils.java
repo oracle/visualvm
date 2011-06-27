@@ -47,7 +47,8 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
- *
+ * Java types related profiler utility methods
+ * 
  * @author Jaroslav Bachorik
  */
 final public class ProfilerTypeUtils {
@@ -60,6 +61,11 @@ final public class ProfilerTypeUtils {
         return Lookup.getDefault().lookup(ProfilerTypeUtilsProvider.class);
     }
     
+    /**
+     * Retrieves a list of subclasses for the given class name
+     * @param className The class name to check for subclasses
+     * @return Returns an array of subclasses for the class specified by the class name
+     */
     public String[] getSubclasses(String className) {
         ProfilerTypeUtilsProvider typeUtils = getProvider();
         assert typeUtils != null;
@@ -67,6 +73,11 @@ final public class ProfilerTypeUtils {
         return typeUtils.getSubclasses(className, project);
     }
     
+    /**
+     * Finds the defining file for the given class name
+     * @param className The class name to get the defining file for
+     * @return Returns the defining file for the given class name or NULL
+     */
     public FileObject findFile(String className) {
         ProfilerTypeUtilsProvider typeUtils = getProvider();
         assert typeUtils != null;
@@ -74,6 +85,10 @@ final public class ProfilerTypeUtils {
         return typeUtils.findFile(className, project);
     }
     
+    /**
+     * 
+     * @return Returns a list of all main classes present in the project
+     */
     public Collection<String> getMainClasses() {
         ProfilerTypeUtilsProvider typeUtils = getProvider();
         assert typeUtils  != null;

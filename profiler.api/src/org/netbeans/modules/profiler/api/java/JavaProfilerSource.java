@@ -49,28 +49,70 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
- *
+ * Java source file representation
+ * 
  * @author Jaroslav Bachorik
  */
 final public class JavaProfilerSource extends ProfilerSource {
     final private AbstractJavaProfilerSource impl;
     
+    /**
+     * A simplified java class descriptor
+     */
     public static interface ClassInfo {
+        /**
+         * 
+         * @return Returns the class simple name (the last part of the FQN)
+         */
         String getSimpleName();
+        /**
+         * 
+         * @return Returns the class FQN
+         */
         String getQualifiedName();
+        /**
+         * 
+         * @return Returns the VM internal class name
+         */
         String getVMName();
     }
-    
+    /**
+     * A simplified java method descriptor
+     */
     public static interface MethodInfo {
+        /**
+         * 
+         * @return Returns the containing class FQN
+         */
         String getClassName();
+        /**
+         * 
+         * @return Returns the method name
+         */
         String getName();
+        /**
+         * 
+         * @return Returns the method signature
+         */
         String getSignature();
+        /**
+         * 
+         * @return Returns the VM internal method name
+         */
         String getVMName();
         
+        /**
+         * 
+         * @return Returns TRUE if the method is executable (eg. main(String[]) or JSP main method)
+         */
         boolean isExecutable();
     }
     
-    final public static JavaProfilerSource createFrom(FileObject fo) {
+    /**
+     * Factory method for obtaining a {@linkplain JavaProfilerSource} from a file or NULL
+     * @return Returns a {@linkplain JavaProfilerSource} instance or NULL
+     */
+    public static JavaProfilerSource createFrom(FileObject fo) {
         if (fo == null) return null;
         
         Lookup lkp = MimeLookup.getLookup(fo.getMIMEType());
@@ -86,58 +128,130 @@ final public class JavaProfilerSource extends ProfilerSource {
         this.impl = impl;
     }
     
+    /**
+     * 
+     * @return Returns true if the source represents a junit tet
+     */
     public boolean isTest() {
         return impl.isTest(getFile());
     }
     
+    /**
+     * 
+     * @return Returns true if the source is a java applet
+     */
     public boolean isApplet() {
         return impl.isApplet(getFile());
     }
 
+    /**
+     * 
+     * @return Returns {@linkplain ClassInfo} of a top level class
+     */
     public ClassInfo getTopLevelClass() {
         return impl.getTopLevelClass(getFile());
     }
     
+    /**
+     * Lists all main classes contained in the source
+     * @return Returns a set of {@linkplain ClassInfo} instances from a source
+     */
     public Set<ClassInfo> getMainClasses() {
         return impl.getMainClasses(getFile());
     }
     
+    /**
+     * Lists all constructors contained in the source
+     * @return Returns a set of {@linkplain MethodInfo} instances from the source
+     */
     public Set<MethodInfo> getConstructors() {
         return impl.getConstructors(getFile());
     }
     
+    /**
+     * Finds a class present on the given position in the source
+     * @param position The position in the source
+     * @return Returns a {@linkplain ClassInfo} for the class present on the given position
+     */
     public ClassInfo getEnclosingClass(final int position) {
         return impl.getEnclosingClass(getFile(), position);
     }
     
+    /**
+     * Finds a method present on the given position in the source
+     * @param position The position in the source
+     * @return Returns a {@linkplain MethodInfo} for the method present on the given position
+     */
     public MethodInfo getEnclosingMethod(final int position) {
         return impl.getEnclosingMethod(getFile(), position);
     }
     
+    /**
+     * Checks whether the source represents any or all of the provided superclasses/interfaces
+     * @param classNames A list of required superclasses/interfaces
+     * @param allRequired Require all(TRUE)/any(FALSE) provided superclasses/interfaces to match
+     * @return Returns TRUE if the source represents any or all of the provided classes/interfaces
+     */
     public boolean isInstanceOf(String[] classNames, boolean allRequired) {
         return impl.isInstanceOf(getFile(), classNames, allRequired);
     }
     
+    /**
+     * Checks whether the source represents the provided superclass/interface
+     * @param className The required superclass/interface
+     * @return Returns TRUE if the source represents the provided superclass/interface
+     */
     public boolean isInstanceOf(String className) {
         return impl.isInstanceOf(getFile(), className);
     }
     
+    /**
+     * Checks whether the source contains any/all provided annotations
+     * @param annotationNames A list of required annotations
+     * @param allRequired Require all(TRUE)/any(FALSE) provided annotations to match
+     * @return Returns TRUE if the source contains any or all of the provided annotations
+     */
     public boolean hasAnnotation(String[] annotationNames, boolean allRequired) {
         return impl.hasAnnotation(getFile(), annotationNames, allRequired);
     }
     
+    /**
+     * Checks whether the source contains the provided annotation
+     * @param annotation The required annotation
+     * @return Returns TRUE if the source contains the provided annotation
+     */
     public boolean hasAnnotation(String annotation) {
         return impl.hasAnnotation(getFile(), annotation);
     }
     
+    /**
+     * Is the given offset valid within a particular source
+     * @param offset The offset to check
+     * @return Returns TRUE if the offset is valid for the source
+     */
     public boolean isOffsetValid(int offset) {
         return impl.isOffsetValid(getFile(), offset);
     }
     
+    /**
+     * Resolves a method at the given position<br/>
+     * In order to resolve the method there must be the method definition or invocation
+     * at the given position.
+     * @param position The position to check for method definition or invocation
+     * @return Returns the {@linkplain MethodInfo} for the method definition or invocation at the given position or NULL if there is none
+     */
     public MethodInfo resolveMethodAtPosition(int position) {
         return impl.resolveMethodAtPosition(getFile(), position);
     }
-    
+
+    /**
+     * Resolves a class at the given position<br/>
+     * In order to resolve the class there must be the class definition or reference
+     * at the given position.
+     * @param position The position to check for class definition or reference
+     * @param resolveField Should the class be resolved from a variable type too?
+     * @return Returns the {@linkplain ClassInfo} for the class definition or reference at the given position or NULL if there is none
+     */
     public ClassInfo resolveClassAtPosition(int position, boolean resolveField) {
         return impl.resolveClassAtPosition(getFile(), position, resolveField);
     }

@@ -48,7 +48,7 @@ import org.netbeans.modules.profiler.api.java.JavaProfilerSource.MethodInfo;
 import org.openide.filesystems.FileObject;
 
 /**
- *
+ * An SPI for {@linkplain JavaProfilerSource} functionality providers
  * @author Jaroslav Bachorik
  */
 public interface AbstractJavaProfilerSource {
@@ -125,31 +125,114 @@ public interface AbstractJavaProfilerSource {
         }
     };
     
+    /**
+     * @param fo The source file. Must not be NULL
+     * @return Returns true if the source represents a junit tet
+     */
     boolean isTest(FileObject fo);
 
+    /**
+     * @param fo The source file. Must not be NULL
+     * @return Returns true if the source is a java applet
+     */
     boolean isApplet(FileObject fo);
 
+    /**
+     * @param fo The source file. Must not be NULL
+     * @return Returns {@linkplain ClassInfo} of a top level class
+     */
     ClassInfo getTopLevelClass(FileObject fo);
 
+    /**
+     * Lists all main classes contained in the source
+     * @param fo The source file. Must not be NULL
+     * @return Returns a set of {@linkplain ClassInfo} instances from a source
+     */
     Set<ClassInfo> getMainClasses(FileObject fo);
     
+    /**
+     * Lists all constructors contained in the source
+     * @param fo The source file. Must not be NULL
+     * @return Returns a set of {@linkplain MethodInfo} instances from the source
+     */
     Set<MethodInfo> getConstructors(FileObject fo);
 
+    /**
+     * Finds a class present on the given position in the source
+     * @param fo The source file. Must not be NULL
+     * @param position The position in the source
+     * @return Returns a {@linkplain ClassInfo} for the class present on the given position
+     */
     ClassInfo getEnclosingClass(FileObject fo, final int position);
 
+    /**
+     * Finds a method present on the given position in the source
+     * @param fo The source file. Must not be NULL
+     * @param position The position in the source
+     * @return Returns a {@linkplain MethodInfo} for the method present on the given position
+     */
     MethodInfo getEnclosingMethod(FileObject fo, final int position);
 
+    /**
+     * Checks whether the source represents any or all of the provided superclasses/interfaces
+     * @param fo The source file. Must not be NULL
+     * @param classNames A list of required superclasses/interfaces
+     * @param allRequired Require all(TRUE)/any(FALSE) provided superclasses/interfaces to match
+     * @return Returns TRUE if the source represents any or all of the provided classes/interfaces
+     */
     boolean isInstanceOf(FileObject fo, String[] classNames, boolean allRequired);
 
+    /**
+     * Checks whether the source represents the provided superclass/interface
+     * @param fo The source file. Must not be NULL
+     * @param className The required superclass/interface
+     * @return Returns TRUE if the source represents the provided superclass/interface
+     */
     boolean isInstanceOf(FileObject fo, String className);
 
+    /**
+     * Checks whether the source contains any/all provided annotations
+     * @param fo The source file. Must not be NULL
+     * @param annotationNames A list of required annotations
+     * @param allRequired Require all(TRUE)/any(FALSE) provided annotations to match
+     * @return Returns TRUE if the source contains any or all of the provided annotations
+     */
     boolean hasAnnotation(FileObject fo, String[] annotationNames, boolean allRequired);
 
+    /**
+     * Checks whether the source contains the provided annotation
+     * @param fo The source file. Must not be NULL
+     * @param annotation The required annotation
+     * @return Returns TRUE if the source contains the provided annotation
+     */
     boolean hasAnnotation(FileObject fo, String annotation);
 
+    /**
+     * Is the given offset valid within a particular source
+     * @param fo The source file. Must not be NULL
+     * @param offset The offset to check
+     * @return Returns TRUE if the offset is valid for the source
+     */
     boolean isOffsetValid(FileObject fo, int offset);
     
+    /**
+     * Resolves a method at the given position<br/>
+     * In order to resolve the method there must be the method definition or invocation
+     * at the given position.
+     * @param fo The source file. Must not be NULL
+     * @param position The position to check for method definition or invocation
+     * @return Returns the {@linkplain MethodInfo} for the method definition or invocation at the given position or NULL if there is none
+     */
     MethodInfo resolveMethodAtPosition(FileObject fo, int position);
     
+    /**
+     * Resolves a class at the given position<br/>
+     * In order to resolve the class there must be the class definition or reference
+     * at the given position.
+     * @param fo The source file. Must not be NULL
+     * @param position The position to check for class definition or reference
+     * @param resolveField Should the class be resolved from a variable type too?
+     * @return Returns the {@linkplain ClassInfo} for the class definition or reference at the given position or NULL if there is none
+     */
     ClassInfo resolveClassAtPosition(FileObject fo, int position, boolean resolveField);
 }

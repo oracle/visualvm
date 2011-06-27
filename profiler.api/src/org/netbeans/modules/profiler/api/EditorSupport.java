@@ -46,7 +46,11 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
- *
+ * Decouples the profiler implementation from the underlying source code
+ * editor. Provides support for finding out eg. the currently edited file,
+ * the offset within that file etc.
+ * 
+ * @author Jiri Sedlacek
  * @author Jaroslav Bachorik
  */
 final public class EditorSupport {

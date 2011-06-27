@@ -46,11 +46,29 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
- *
+ * An SPI interface for providing {@linkplain TaskConfigurator} functionality
  * @author Jaroslav Bachorik
  */
-public interface TaskConfiguratorProvider {
+public interface TaskConfiguratorProvider {/**
+     * Creates a new <i>"Attach Profiler"</i> task {@linkplain Configuration} from the given project
+     * @param project The {@linkplain Project} to create the task configuration for
+     * @return Returns correctly initialized task {@linkplain Configuration} instance
+     */
     Configuration configureAttachProfilerTask(Lookup.Provider project);
+    /**
+     * Creates a new <i>"Modify Profiling"</i> task {@linkplain Configuration} from the given project
+     * @param project The {@linkplain Project} to create the task configuration for
+     * @param profiledFile The profiled file, if any. May be null if no single file is profiled/
+     * @param isAttach Indicates whether the current profiling session is the result of <i>"Attach Profiler"</i> (<b>TRUE</b>), or <i>"Profile Project"</i> (<b>FALSE</b>)
+     * @return Returns correctly initialized task {@linkplain Configuration} instance
+     */
     Configuration configureModifyProfilingTask(Lookup.Provider project, FileObject profiledFile, boolean isAttach);
+    /**
+     * Creates a new <i>"Profile Project"</i> task {@linkplain Configuration} from the given project
+     * @param project The {@linkplain Project} to create the task configuration for
+     * @param profiledFile The file to profile (<i>"Profile File"</i>). May be null = <i>"Profile Project"</i>
+     * @param enableOverride Indicates whether the default profiling settings derived from the project may be overriden (<b>TRUE</b>) or not (<b>FALSE</b>)
+     * @return Returns correctly initialized task {@linkplain Configuration} instance
+     */
     Configuration configureProfileProjectTask(Lookup.Provider project, FileObject profiledFile, boolean enableOverride);
 }
