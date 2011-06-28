@@ -105,7 +105,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         public void addMethodToRoots(final String className, final String methodName, final String methodSig) {
             Lookup.Provider project = loadedSnapshot.getProject();
-            ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
+            ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project)
                                                                           .getProfilingSettings();
             List<ProfilingSettings> cpuSettings = new ArrayList();
 
@@ -126,12 +126,12 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             settings.addRootMethod(className, methodName, methodSig);
 
             if (cpuSettings.contains(settings)) {
-                ProfilingSettingsManager.getDefault().storeProfilingSettings(projectSettings, settings, project);
+                ProfilingSettingsManager.storeProfilingSettings(projectSettings, settings, project);
             } else {
                 ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
                 System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
                 newProjectSettings[projectSettings.length] = settings;
-                ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
+                ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settings, project);
             }
         }
 

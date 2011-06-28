@@ -50,9 +50,6 @@ import org.openide.util.Lookup;
  * @author Jaroslav Bachorik
  */
 final public class ProfilingSettingsManager {
-    final private static class Singleton {
-        final private static ProfilingSettingsManager INSTANCE = new ProfilingSettingsManager();
-    }
     
     /**
      * Profiling settings wrapper
@@ -82,13 +79,8 @@ final public class ProfilingSettingsManager {
         }
     }
 
-    private ProfilingSettingsManagerProvider impl = null;
-    private ProfilingSettingsManager() {
-        impl = Lookup.getDefault().lookup(ProfilingSettingsManagerProvider.class);
-    }
-    
-    public static ProfilingSettingsManager getDefault() {
-        return Singleton.INSTANCE;
+    private static ProfilingSettingsManagerProvider getProvider() {
+        return Lookup.getDefault().lookup(ProfilingSettingsManagerProvider.class);
     }
     
     /**
@@ -97,8 +89,8 @@ final public class ProfilingSettingsManager {
      * @param availableConfigurations The array of all available configurations to store the duplicated settings to
      * @return Returns the duplicated {@linkplain ProfilingSettings} instance
      */
-    public ProfilingSettings createDuplicateSettings(ProfilingSettings originalSettings, ProfilingSettings[] availableConfigurations) {
-        return impl.createDuplicateSettings(originalSettings, availableConfigurations);
+    public static ProfilingSettings createDuplicateSettings(ProfilingSettings originalSettings, ProfilingSettings[] availableConfigurations) {
+        return getProvider().createDuplicateSettings(originalSettings, availableConfigurations);
     }
 
     /**
@@ -106,8 +98,8 @@ final public class ProfilingSettingsManager {
      * @param availableConfigurations The array of available configurations to store the newly created settings into
      * @return Returns a new instance of {@linkplain ProfilingSettings}
      */
-    public ProfilingSettings createNewSettings(ProfilingSettings[] availableConfigurations) {
-        return impl.createNewSettings(availableConfigurations);
+    public static ProfilingSettings createNewSettings(ProfilingSettings[] availableConfigurations) {
+        return getProvider().createNewSettings(availableConfigurations);
     }
 
     /**
@@ -123,8 +115,8 @@ final public class ProfilingSettingsManager {
      * @param availableConfigurations The array of available configurations to store the newly created settings into
      * @return Returns a new instance of {@linkplain ProfilingSettings}
      */
-    public  ProfilingSettings createNewSettings(int type, ProfilingSettings[] availableConfigurations) {
-        return impl.createNewSettings(type, availableConfigurations);
+    public static ProfilingSettings createNewSettings(int type, ProfilingSettings[] availableConfigurations) {
+        return getProvider().createNewSettings(type, availableConfigurations);
     }
 
     /**
@@ -132,8 +124,8 @@ final public class ProfilingSettingsManager {
      * @param project The project to retrieve the settings for
      * @return Returns {@linkplain ProfilingSettingsDescriptor} instance wrapping the effective profiling settings
      */
-    public ProfilingSettingsDescriptor getProfilingSettings(Lookup.Provider project) {
-        return impl.getProfilingSettings(project);
+    public static ProfilingSettingsDescriptor getProfilingSettings(Lookup.Provider project) {
+        return getProvider().getProfilingSettings(project);
     }
 
     /**
@@ -142,8 +134,8 @@ final public class ProfilingSettingsManager {
      * @param availableConfigurations The array of available configurations to store the newly created settings into
      * @return Returns a renamed instance of {@linkplain ProfilingSettings}
      */
-    public ProfilingSettings renameSettings(ProfilingSettings originalSettings, ProfilingSettings[] availableConfigurations) {
-        return impl.renameSettings(originalSettings, availableConfigurations);
+    public static ProfilingSettings renameSettings(ProfilingSettings originalSettings, ProfilingSettings[] availableConfigurations) {
+        return getProvider().renameSettings(originalSettings, availableConfigurations);
     }
 
     /**
@@ -152,7 +144,7 @@ final public class ProfilingSettingsManager {
      * @param activeProfilingSettings The active profiling settings
      * @param project The project to store the settings for
      */
-    public void storeProfilingSettings(ProfilingSettings[] profilingSettings, ProfilingSettings activeProfilingSettings, Lookup.Provider project) {
-        impl.storeProfilingSettings(profilingSettings, activeProfilingSettings, project);
+    public static void storeProfilingSettings(ProfilingSettings[] profilingSettings, ProfilingSettings activeProfilingSettings, Lookup.Provider project) {
+        getProvider().storeProfilingSettings(profilingSettings, activeProfilingSettings, project);
     }
 }

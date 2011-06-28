@@ -158,7 +158,7 @@ public final class AddRootMethodAction extends NodeAction {
                         Lookup.Provider project = ProjectUtilities.getProject(dobj.getPrimaryFile());
 
                         // Specify Profiling Settings as a context
-                        ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
+                        ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project)
                                                                                       .getProfilingSettings();
                         List<ProfilingSettings> cpuSettings = new ArrayList();
 
@@ -181,12 +181,12 @@ public final class AddRootMethodAction extends NodeAction {
                                                resolvedMethod.getSignature());
 
                         if (cpuSettings.contains(settings)) {
-                            ProfilingSettingsManager.getDefault().storeProfilingSettings(projectSettings, settings, project);
+                            ProfilingSettingsManager.storeProfilingSettings(projectSettings, settings, project);
                         } else {
                             ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
                             System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
                             newProjectSettings[projectSettings.length] = settings;
-                            ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
+                            ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settings, project);
                         }
                     } catch (Exception ex) {
                         ProfilerDialogs.displayWarning(NbBundle.getMessage(AddRootMethodAction.class,

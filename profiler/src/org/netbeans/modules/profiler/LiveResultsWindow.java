@@ -224,7 +224,7 @@ public final class LiveResultsWindow extends TopComponent
         public void addMethodToRoots(final String className, final String methodName, final String methodSig) {
             Lookup.Provider project = NetBeansProfiler.getDefaultNB().getProfiledProject();
 
-            ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
+            ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project)
                                                                           .getProfilingSettings();
             List<ProfilingSettings> cpuSettings = new ArrayList<ProfilingSettings>();
 
@@ -258,12 +258,12 @@ public final class LiveResultsWindow extends TopComponent
             settingsToModify.addRootMethod(className, methodName, methodSig);
 
             if (cpuSettings.contains(settingsToModify)) {
-                ProfilingSettingsManager.getDefault().storeProfilingSettings(projectSettings, settingsToModify, project);
+                ProfilingSettingsManager.storeProfilingSettings(projectSettings, settingsToModify, project);
             } else {
                 ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
                 System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
                 newProjectSettings[projectSettings.length] = settingsToModify;
-                ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settingsToModify, project);
+                ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settingsToModify, project);
             }
         }
 

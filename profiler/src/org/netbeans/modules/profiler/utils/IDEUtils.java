@@ -173,8 +173,7 @@ public final class IDEUtils {
                     return selectedSettings;
                 } else { // create a new setting
 
-                    ProfilingSettings newSettings = ProfilingSettingsManager.getDefault()
-                                                                            .createNewSettings(type, availableSettings);
+                    ProfilingSettings newSettings = ProfilingSettingsManager.createNewSettings(type, availableSettings);
 
                     if (newSettings == null) {
                         return null; // cancelled by the user

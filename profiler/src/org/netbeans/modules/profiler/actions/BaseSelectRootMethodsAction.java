@@ -124,7 +124,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
             protected void done() {
                 if (className != null) {
                     Lookup.Provider project = ProjectUtilities.getProject(dobj.getPrimaryFile());
-                    ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project).getProfilingSettings();
+                    ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project).getProfilingSettings();
                     List<ProfilingSettings> cpuSettings = new ArrayList();
 
                     for (ProfilingSettings settings : projectSettings) {
@@ -151,12 +151,12 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
                     settings.addRootMethods(rootMethodsSelection);
 
                     if (cpuSettings.contains(settings)) {
-                        ProfilingSettingsManager.getDefault().storeProfilingSettings(projectSettings, settings, project);
+                        ProfilingSettingsManager.storeProfilingSettings(projectSettings, settings, project);
                     } else {
                         ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
                         System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
                         newProjectSettings[projectSettings.length] = settings;
-                        ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
+                        ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settings, project);
                     }
                 } else {
                     ProfilerDialogs.displayError(NO_CLASS_FOUND_MSG);
