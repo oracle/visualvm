@@ -43,22 +43,22 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.*;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.spi.ProjectTypeProfiler;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.ui.panels.PIDSelectPanel;
-import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.io.IOException;
 import java.text.MessageFormat;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.api.TaskConfigurator;
+import org.netbeans.modules.profiler.api.project.ProjectProfilingSupport;
 import org.netbeans.modules.profiler.attach.AttachWizard;
+import org.openide.util.Lookup;
 
 
 /**
@@ -76,18 +76,18 @@ public final class ProfilingSupport {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private ProfilingSettings ps;
-        private Project p;
+        private Lookup.Provider p;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        private AttachSTPData(ProfilingSettings ps, Project p) {
+        private AttachSTPData(ProfilingSettings ps, Lookup.Provider p) {
             this.ps = ps;
             this.p = p;
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public Project getProject() {
+        public Lookup.Provider getProject() {
             return p;
         }
 
@@ -139,21 +139,13 @@ public final class ProfilingSupport {
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(STOP_START_PROFILE_SESSION_MESSAGE,
-                                                                             QUESTION_DIALOG_CAPTION,
-                                                                             NotifyDescriptor.YES_NO_OPTION);
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(STOP_START_PROFILE_SESSION_MESSAGE, QUESTION_DIALOG_CAPTION)) {
                     return true;
                 }
 
                 Profiler.getDefault().stopApp();
             } else {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(STOP_START_ATTACH_SESSION_MESSAGE,
-                                                                             QUESTION_DIALOG_CAPTION,
-                                                                             NotifyDescriptor.YES_NO_OPTION);
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(STOP_START_ATTACH_SESSION_MESSAGE, QUESTION_DIALOG_CAPTION)) {
                     return true;
                 }
 
@@ -164,8 +156,8 @@ public final class ProfilingSupport {
         return false;
     }
 
-    public AttachSTPData selectTaskForAttach(final Project project, final SessionSettings sessionSettings) {
-        SelectProfilingTask.Configuration configuration = SelectProfilingTask.selectAttachProfilerTask(project);
+    public AttachSTPData selectTaskForAttach(final Lookup.Provider project, final SessionSettings sessionSettings) {
+        TaskConfigurator.Configuration configuration = TaskConfigurator.getDefault().configureAttachProfilerTask(project);
 
         if (configuration == null) {
             return null; // Cancelled by the user
@@ -174,9 +166,9 @@ public final class ProfilingSupport {
         }
     }
 
-    public ProfilingSettings selectTaskForProfiling(final Project project, final SessionSettings sessionSettings,
+    public ProfilingSettings selectTaskForProfiling(final Lookup.Provider project, final SessionSettings sessionSettings,
                                                     FileObject profiledFile, boolean enableOverride) {
-        SelectProfilingTask.Configuration configuration = SelectProfilingTask.selectProfileProjectTask(project, profiledFile,
+        TaskConfigurator.Configuration configuration = TaskConfigurator.getDefault().configureProfileProjectTask(project, profiledFile,
                                                                                                        enableOverride);
 
         if (configuration == null) {
@@ -186,11 +178,11 @@ public final class ProfilingSupport {
         }
     }
 
-    void setProfilingActionInvoked(boolean pai) {
+    public void setProfilingActionInvoked(boolean pai) {
         profilingActionInvoked = pai;
     }
 
-    boolean isProfilingActionInvoked() {
+    public boolean isProfilingActionInvoked() {
         return profilingActionInvoked;
     }
 
@@ -217,7 +209,7 @@ public final class ProfilingSupport {
                         // NOTE: Let's not preselect main project, force the user to choose from list of projects and remember selection
                         //       Project should be passed here from hypotetic Attach To Project action (not implemented yet)
                         //Project project = ProjectUtilities.getMainProject();
-                        Project project = null;
+                        Lookup.Provider project = null;
 
                         //2. load or ask the user for attach settings
                         final GlobalProfilingSettings gps = Profiler.getDefault().getGlobalProfilingSettings();
@@ -225,15 +217,18 @@ public final class ProfilingSupport {
                         SessionSettings ss = new SessionSettings();
                         ss.setPortNo(gps.getPortNo());
 
-                        ProjectTypeProfiler ptp = null;
-
-                        if (project != null) {
-                            ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
-                        }
-
-                        if (ptp != null) {
-                            ptp.setupProjectSessionSettings(project, ss); // can be null in case of global attach
-                        }
+//                        ProjectTypeProfiler ptp = null;
+//
+//                        if (project != null) {
+//                            ptp = org.netbeans.modules.profiler.utils.ProjectUtilities.getProjectTypeProfiler(project);
+//                        }
+//
+//                        if (ptp != null) {
+//                            ptp.setupProjectSessionSettings(project, ss); // can be null in case of global attach
+//                        }
+                        
+                        ProjectProfilingSupport pps = ProjectProfilingSupport.get(project);
+                        pps.setupProjectSessionSettings(ss);
 
                         boolean settingsAccepted = false;
                         ProfilingSettings ps = null;
@@ -265,10 +260,9 @@ public final class ProfilingSupport {
                         AttachSettings as = null;
 
                         try {
-                            as = NetBeansProfiler.loadAttachSettings(project);
+                            as = ProjectStorage.loadAttachSettings(project);
                         } catch (IOException e) {
-                            Profiler.getDefault()
-                                    .displayWarning(MessageFormat.format(FAILED_LOAD_SETTINGS_MSG, new Object[] { e.getMessage() }));
+                            ProfilerDialogs.displayWarning(MessageFormat.format(FAILED_LOAD_SETTINGS_MSG, new Object[] { e.getMessage() }));
                             ProfilerLogger.log(e);
                         }
 
@@ -291,7 +285,7 @@ public final class ProfilingSupport {
 //                            as = attachWizard.getAttachSettings();
                             as = AttachWizard.getDefault().configure(as);
                             if (as == null) return; // cancelled by the user
-                            NetBeansProfiler.saveAttachSettings(project, as);
+                            ProjectStorage.saveAttachSettings(project, as);
                         }
 
                         if (!as.isRemote() && as.isDynamic16()) {
@@ -328,7 +322,7 @@ public final class ProfilingSupport {
 
                         final boolean attach = (Profiler.getDefault().getProfilingMode() == Profiler.MODE_ATTACH);
 
-                        SelectProfilingTask.Configuration configuration = SelectProfilingTask.selectModifyProfilingTask(NetBeansProfiler.getDefaultNB()
+                        TaskConfigurator.Configuration configuration = TaskConfigurator.getDefault().configureModifyProfilingTask(NetBeansProfiler.getDefaultNB()
                                                                                                                                         .getProfiledProject(),
                                                                                                                         NetBeansProfiler.getDefaultNB()
                                                                                                                                         .getProfiledSingleFile(),
