@@ -23,6 +23,10 @@
  *  questions.
  */
 
+/* @author Jaroslav Bachorik
+ * @author Tomas Hurka
+ */
+
 var scriptPath = "nbres:/com/sun/tools/visualvm/modules/tracer/jvm/resources/JavaIOTracer.btrace"
 var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
                         Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
@@ -211,6 +215,19 @@ VisualVM.Tracer.addPackages([{
                 name: "Reclaimed Memory",
                 desc: "The amout of memory reclaimed during the last GC run",
                 properties: getReclaimedMemory()
+            },
+            {
+                name: "Pending Finalizers Count",
+                desc: "The approximate number of objects for which finalization is pending",
+                properties: [
+                    {
+                        name: "Pending Finalizers Count",
+                        value: mbeanAttribute("java.lang:type=Memory", "ObjectPendingFinalizationCount"),
+                        presenter: {
+                            lineColor: Color.RED
+                        }
+                    }
+                ]
             }
         ]
     },
