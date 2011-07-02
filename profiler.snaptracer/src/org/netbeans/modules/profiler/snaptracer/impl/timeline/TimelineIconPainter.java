@@ -59,8 +59,9 @@ import org.netbeans.lib.profiler.charts.xy.XYItemChange;
 import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChartContext;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
-import org.openide.util.ImageUtilities;
+import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 
 /**
  *
@@ -68,9 +69,7 @@ import org.openide.util.ImageUtilities;
  */
 class TimelineIconPainter extends TimelineXYPainter {
 
-    private static final String IMAGE_PATH =
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/genericAction.png"; // NOI18N
-    private static final Icon ICON = ImageUtilities.loadImageIcon(IMAGE_PATH, true);
+    private static final Icon ICON = Icons.getIcon(TracerIcons.GENERIC_ACTION);
 
     private static final int ICON_EXTENT = 8;
 

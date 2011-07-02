@@ -58,7 +58,6 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JToggleButton;
@@ -68,9 +67,11 @@ import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.modules.profiler.snaptracer.impl.options.TracerOptions;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.ScrollBar;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
@@ -79,20 +80,13 @@ import org.openide.util.NbBundle;
  */
 final class ChartPanel extends JPanel {
 
-    private static final Icon ZOOM_IN_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/zoomIn.png")); // NOI18N
-    private static final Icon ZOOM_OUT_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/zoomOut.png")); // NOI18N
-    private static final Icon FIXED_SCALE_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/zoom.png")); // NOI18N
-    private static final Icon SCALE_TO_FIT_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/scaleToFit.png")); // NOI18N
-    private static final Icon ZMWHEEL_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/zmwheel.png")); // NOI18N
-    private static final Icon HMWHEEL_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/hmwheel.png")); // NOI18N
-    private static final Icon VMWHEEL_ICON = new ImageIcon(ImageUtilities.loadImage(
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/vmwheel.png")); // NOI18N
+    private static final Icon ZOOM_IN_ICON = Icons.getIcon(GeneralIcons.ZOOM_IN);
+    private static final Icon ZOOM_OUT_ICON = Icons.getIcon(GeneralIcons.ZOOM_OUT);
+    private static final Icon FIXED_SCALE_ICON = Icons.getIcon(GeneralIcons.ZOOM);
+    private static final Icon SCALE_TO_FIT_ICON = Icons.getIcon(GeneralIcons.SCALE_TO_FIT);
+    private static final Icon ZMWHEEL_ICON = Icons.getIcon(TracerIcons.MOUSE_WHEEL_ZOOM);
+    private static final Icon HMWHEEL_ICON = Icons.getIcon(TracerIcons.MOUSE_WHEEL_HORIZONTAL);
+    private static final Icon VMWHEEL_ICON = Icons.getIcon(TracerIcons.MOUSE_WHEEL_VERTICAL);
 
 
     private final TimelineChart chart;

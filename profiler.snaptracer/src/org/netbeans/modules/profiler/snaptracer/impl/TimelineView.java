@@ -61,6 +61,8 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -70,11 +72,6 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 final class TimelineView {
-
-    private static final String SELALL_IMAGE_PATH =
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/selectAll.png"; // NOI18N
-    private static final String CLMARK_IMAGE_PATH =
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/markClear.png"; // NOI18N
 
     private final TracerModel model;
     private TimelinePanel panel;
@@ -181,8 +178,7 @@ final class TimelineView {
         toolbar.add(mh);
         toolbar.addSeparator();
 
-        selectAllButton = new JButton(new ImageIcon(
-                ImageUtilities.loadImage(SELALL_IMAGE_PATH))) {
+        selectAllButton = new JButton(Icons.getIcon(TracerIcons.SELECT_ALL)) {
             protected void fireActionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() { support.selectAll(); }
@@ -193,8 +189,7 @@ final class TimelineView {
                 "TOOLTIP_SelectAll")); //NOI18N
         toolbar.add(selectAllButton);
         
-        clearTimestampSelectionButton = new JButton(new ImageIcon(
-                ImageUtilities.loadImage(CLMARK_IMAGE_PATH))) {
+        clearTimestampSelectionButton = new JButton(Icons.getIcon(TracerIcons.MARK_CLEAR)) {
             protected void fireActionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() { support.resetSelectedTimestamps(); }
