@@ -61,6 +61,7 @@ import javax.swing.event.PopupMenuListener;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
 import org.netbeans.lib.profiler.utils.StringUtils;
+import org.netbeans.modules.profiler.api.GoToSource;
 
 
 /**
@@ -125,7 +126,7 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == popupShowStacks) {
             actionsHandler.showStacksForClass(selectedClassId, getSortingColumn(), getSortingOrder());
-        } else if (e.getSource() == popupShowSource) {
+        } else if (e.getSource() == popupShowSource && popupShowSource != null) {
             showSourceForClass(selectedClassId);
         } else if (e.getSource() == startHisto) {
             String selectedClassName = StringUtils.userFormClassName(
@@ -276,14 +277,16 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
         if (memoryResPopupMenu == null) {
             memoryResPopupMenu = new JPopupMenu();
 
-            Font boldfont = memoryResPopupMenu.getFont().deriveFont(Font.BOLD);
+            if (GoToSource.isAvailable()) {
+                Font boldfont = memoryResPopupMenu.getFont().deriveFont(Font.BOLD);
 
-            popupShowSource = new JMenuItem();
-            popupShowSource.setFont(boldfont);
-            popupShowSource.setText(GO_SOURCE_POPUP_ITEM_NAME);
-            memoryResPopupMenu.add(popupShowSource);
+                popupShowSource = new JMenuItem();
+                popupShowSource.setFont(boldfont);
+                popupShowSource.setText(GO_SOURCE_POPUP_ITEM_NAME);
+                memoryResPopupMenu.add(popupShowSource);
 
-            popupShowSource.addActionListener(this);
+                popupShowSource.addActionListener(this);
+            }
 
             if (runner.getProfilerEngineSettings().getAllocStackTraceLimit() != 0) {
                 memoryResPopupMenu.addSeparator();

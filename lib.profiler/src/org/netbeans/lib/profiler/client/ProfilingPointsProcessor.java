@@ -54,4 +54,8 @@ public abstract class ProfilingPointsProcessor {
     public abstract void profilingPointHit(RuntimeProfilingPoint.HitEvent event);
 
     public abstract void timeAdjust(final int threadId, final long timeDiff0, final long timeDiff1);
+    
+    public abstract void init(Object project);
+    
+    public abstract RuntimeProfilingPoint[] getSupportedProfilingPoints();
 }
