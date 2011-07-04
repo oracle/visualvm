@@ -153,6 +153,14 @@ final public class JavaProfilerSource extends ProfilerSource {
     }
     
     /**
+     * List all top level classes contained in the source
+     * @return Returns a set of {@linkplain ClassInfo} instances from a source
+     */
+    public Set<ClassInfo> getClasses() {
+        return impl.getClasses(getFile());
+    }
+    
+    /**
      * Lists all main classes contained in the source
      * @return Returns a set of {@linkplain ClassInfo} instances from a source
      */

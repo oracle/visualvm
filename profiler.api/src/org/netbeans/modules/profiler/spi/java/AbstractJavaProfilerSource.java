@@ -70,6 +70,11 @@ public interface AbstractJavaProfilerSource {
         }
 
         @Override
+        public Set<ClassInfo> getClasses(FileObject fo) {
+            return Collections.EMPTY_SET;
+        }
+
+        @Override
         public Set<ClassInfo> getMainClasses(FileObject fo) {
             return Collections.EMPTY_SET;
         }
@@ -142,6 +147,13 @@ public interface AbstractJavaProfilerSource {
      * @return Returns {@linkplain ClassInfo} of a top level class
      */
     ClassInfo getTopLevelClass(FileObject fo);
+    
+    /**
+     * Lists all top level classes contained in the source
+     * @param fo The source file. Must not be NULL
+     * @return Returns a set of {@linkplain ClassInfo} instances from a source
+     */
+    Set<ClassInfo> getClasses(FileObject fo);
 
     /**
      * Lists all main classes contained in the source
