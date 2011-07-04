@@ -174,7 +174,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(LanguageIcons.INTERFACE, "interface.png");
         cache.put(LanguageIcons.LIBRARIES, "libraries.png");
         cache.put(LanguageIcons.METHOD_PACKAGE, "methodPackage.png");
-        cache.put(LanguageIcons.METHOD_PRIVATE, "methodPrivate.gif");
+        cache.put(LanguageIcons.METHOD_PRIVATE, "methodPrivate.png");
         cache.put(LanguageIcons.METHOD_PROTECTED, "methodProtected.png");
         cache.put(LanguageIcons.METHOD_PUBLIC, "methodPublic.png");
         cache.put(LanguageIcons.METHOD_PACKAGE_STATIC, "methodStPackage.png");
