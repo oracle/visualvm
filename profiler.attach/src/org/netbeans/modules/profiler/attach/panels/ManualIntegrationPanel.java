@@ -81,8 +81,8 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
             return getContext().getIntegrationProvider().getModificationHints(getContext().getAttachSettings());
         }
 
-        public boolean isRemote() {
-            return getContext().getAttachSettings().isRemote();
+        public boolean isAvailable() {
+            return RemotePackExporter.getInstance().isAvailable() && getContext().getAttachSettings().isRemote();
         }
         
         public void setJvm(TargetPlatformEnum jvm) {
@@ -129,10 +129,6 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
             } else {
                 throw new IOException();
             }
-        }
-        
-        public String getRemotePackPath(String exportPath) {
-            return RemotePackExporter.getInstance().getRemotePackPath(exportPath, getContext().getAttachSettings().getHostOS());
         }
     }    
     

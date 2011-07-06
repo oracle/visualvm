@@ -46,6 +46,7 @@ package org.netbeans.modules.profiler.utils;
 import org.openide.filesystems.FileObject;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
+import org.openide.util.Lookup;
 
 
 /**
@@ -61,15 +62,15 @@ public class MainClassWarning extends JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private JPanel jPanel1;
     private String message;
-    private FileObject[] sourcesRoots;
+    private Lookup.Provider project;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /**
      * Creates new form LibrariesChooser
      */
-    public MainClassWarning(String message, FileObject[] sourcesRoots) {
-        this.sourcesRoots = sourcesRoots;
+    public MainClassWarning(String message, Lookup.Provider project) {
+        this.project = project;
         this.message = message;
         initComponents();
     }
@@ -98,7 +99,7 @@ public class MainClassWarning extends JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = new MainClassChooser(sourcesRoots,
+        jPanel1 = new MainClassChooser(project,
                                        org.openide.util.NbBundle.getBundle(MainClassWarning.class)
                                                                 .getString("CTL_SelectAvaialableMainClasses")); // NOI18N
 
