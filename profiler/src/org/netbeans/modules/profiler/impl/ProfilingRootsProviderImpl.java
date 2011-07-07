@@ -43,7 +43,7 @@ package org.netbeans.modules.profiler.impl;
 
 import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
 import org.netbeans.modules.profiler.spi.ProfilingRootsProvider;
-import org.netbeans.modules.profiler.ui.panels.RootMethodsPanel;
+import org.netbeans.modules.profiler.ui.panels.ProjectSelectRootMethodsPanel;
 import org.openide.util.Lookup.Provider;
 
 /**
@@ -55,7 +55,8 @@ public final class ProfilingRootsProviderImpl extends ProfilingRootsProvider {
 
     @Override
     public SourceCodeSelection[] selectRoots(SourceCodeSelection[] currentRoots, Provider project) {
-        return RootMethodsPanel.getSelectedRootMethods(currentRoots, project);
+        //return RootMethodsPanel.getSelectedRootMethods(currentRoots, project);
+        return ProjectSelectRootMethodsPanel.getDefault().getRootMethods(project, currentRoots);
     }
     
 }

@@ -83,6 +83,7 @@ public class ProfilingSettings {
     public static final int PROFILE_CPU_ENTIRE = 8; // cpu: entire app (root = main)
     public static final int PROFILE_CPU_PART = 16; // cpu: root methods
     public static final int PROFILE_CPU_STOPWATCH = 32; // cpu: code fragment
+    public static final int PROFILE_CPU_SAMPLING = 64; // cpu: sampled profiling
     public static final boolean QUICK_FILTER_INCLUSIVE = true;
     public static final boolean QUICK_FILTER_EXCLUSIVE = false;
     public static final String LINES_PREFIX = "[lines]"; //NOI18N
@@ -119,11 +120,9 @@ public class ProfilingSettings {
     public static final String PROP_PROFILE_UNDERLYING_FRAMEWORK = "profiler.settings.profile.underlying.framework"; // NOI18N
     public static final String PROP_PROFILING_POINTS_ENABLED = "profiler.settings.profilingpoints.enabled"; //NOI18N
     public static final String PROP_QUICK_FILTER = "profiler.settings.cpu.quick.filter"; //NOI18N
+    public static final String PROP_SAMPLING_FREQUENCY = "profiler.settings.cpu.sampling.frequency"; //NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    // flag for Entire application profiling, instrumentationRootMethods will be computed lazily
-    public transient boolean instrRootMethodsPending = false;
 
     // CPU Profiling: Code Fragment
     private ClientUtils.SourceCodeSelection fragmentSelection = null;
@@ -168,10 +167,11 @@ public class ProfilingSettings {
     private int cpuProfilingType = CommonConstants.CPU_INSTR_FULL;
     private int instrScheme = CommonConstants.INSTRSCHEME_LAZY;
     private int nProfiledThreadsLimit = 32;
-    private int profilingType = PROFILE_CPU_ENTIRE;
+    private int profilingType = PROFILE_CPU_SAMPLING;
 
     // CPU Profiling: Sampled
-    private int samplingInterval = 10;
+    private int samplingInterval = 10; // hybrid
+    private int samplingFrequency = 10; // pure sampling
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -196,7 +196,7 @@ public class ProfilingSettings {
 
     public static boolean isCPUSettings(int type) {
         return (type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)
-               || (type == ProfilingSettings.PROFILE_CPU_STOPWATCH);
+               || (type == ProfilingSettings.PROFILE_CPU_STOPWATCH || type == PROFILE_CPU_SAMPLING);
     }
 
     public static boolean isMemorySettings(ProfilingSettings settings) {
@@ -356,7 +356,6 @@ public class ProfilingSettings {
     }
 
     public void setInstrumentationRootMethods(final ClientUtils.SourceCodeSelection[] roots) {
-        instrRootMethodsPending = false;
         instrumentationRootMethods.clear();
 
         for (int i = 0; i < roots.length; i++) {
@@ -371,6 +370,14 @@ public class ProfilingSettings {
     public ClientUtils.SourceCodeSelection[] getInstrumentationRootMethods() {
         return (ClientUtils.SourceCodeSelection[]) instrumentationRootMethods.toArray(new ClientUtils.SourceCodeSelection[instrumentationRootMethods
                                                                                                                           .size()]);
+    }
+    
+    public void setSamplingFrequency(int samplingFrequency) {
+        this.samplingFrequency = samplingFrequency;
+    }
+    
+    public int getSamplingFrequency() {
+        return samplingFrequency;
     }
 
     public void setIsPreset(boolean isPreset) {
@@ -687,6 +694,7 @@ public class ProfilingSettings {
         settings.setSortResultsByThreadCPUTime(getSortResultsByThreadCPUTime());
 
         settings.setSamplingInterval(getSamplingInterval());
+        settings.setSamplingFrequency(getSamplingFrequency());
         settings.setInstrumentationRootMethods(getInstrumentationRootMethods());
 
         settings.setCodeFragmentSelection(getCodeFragmentSelection());
@@ -810,6 +818,7 @@ public class ProfilingSettings {
                                              .booleanValue()); //NOI18N
         setProfileUnderlyingFramework(Boolean.valueOf(getProperty(props, prefix + PROP_PROFILE_UNDERLYING_FRAMEWORK, "false"))
                                              .booleanValue()); //NOI18N
+        setSamplingFrequency(Integer.parseInt(getProperty(props, prefix + PROP_SAMPLING_FREQUENCY, "10"))); // NOI18N
 
         Object iFilter = FilterUtils.loadFilter(props, prefix + PROP_SELECTED_INSTR_FILTER);
 
@@ -923,6 +932,7 @@ public class ProfilingSettings {
         props.put(prefix + PROP_INSTRUMENT_SPAWNED_THREADS, Boolean.toString(getInstrumentSpawnedThreads()));
         props.put(prefix + PROP_N_PROFILED_THREADS_LIMIT, Integer.toString(getNProfiledThreadsLimit()));
         props.put(prefix + PROP_SORT_RESULTS_BY_THREAD_CPU_TIME, Boolean.toString(getSortResultsByThreadCPUTime()));
+        props.put(prefix + PROP_SAMPLING_FREQUENCY, Integer.toString(getSamplingFrequency()));
 
         FilterUtils.storeFilter(props, getSelectedInstrumentationFilter(), prefix + PROP_SELECTED_INSTR_FILTER);
         FilterUtils.storeFilter(props, getQuickFilter(), prefix + PROP_QUICK_FILTER);

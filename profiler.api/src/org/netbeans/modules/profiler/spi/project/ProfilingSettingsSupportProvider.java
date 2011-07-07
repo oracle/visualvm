@@ -94,23 +94,27 @@ public abstract class ProfilingSettingsSupportProvider {
         @Override
         public float getProfilingOverhead(ProfilingSettings settings) {
             float o = 0.0f;
+            int profilingType = settings.getProfilingType();
 
             if (ProfilingSettings.isMonitorSettings(settings)) {
                 //} else if (ProfilingSettings.isAnalyzerSettings(settings)) {
             } else if (ProfilingSettings.isCPUSettings(settings)) {
-                if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE) {
+                if (profilingType == ProfilingSettings.PROFILE_CPU_SAMPLING) {
+                    o += 0.05f; // sample app
+                } else if (profilingType == ProfilingSettings.PROFILE_CPU_ENTIRE) {
                     o += 0.5f; // entire app
-                } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART) {
+                } else if (profilingType == ProfilingSettings.PROFILE_CPU_PART) {
                     o += 0.2f; // part of app
                 }
 
-                if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter())) {
+                if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter()) &&
+                    profilingType != ProfilingSettings.PROFILE_CPU_SAMPLING) {
                     o += 0.5f; // profile all classes
                 }
             } else if (ProfilingSettings.isMemorySettings(settings)) {
-                if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
+                if (profilingType == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
                     o += 0.5f; // object allocations
-                } else if (settings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
+                } else if (profilingType == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
                     o += 0.7f; // object liveness
                 }
 

@@ -96,12 +96,12 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     // I18N String constants
     private static final String OK_BUTTON_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
             "SelectRootMethodsPanel_OkButtonText"); // NOI18N
-    private static final String REMOVE_SELECTED_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_RemoveSelectedItemText"); // NOI18N
-    private static final String REMOVE_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_RemoveAllItemText"); // NOI18N
-    private static final String SELECT_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_SelectAllItemText"); // NOI18N
+//    private static final String REMOVE_SELECTED_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
+//            "SelectRootMethodsPanel_RemoveSelectedItemText"); // NOI18N
+//    private static final String REMOVE_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
+//            "SelectRootMethodsPanel_RemoveAllItemText"); // NOI18N
+//    private static final String SELECT_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
+//            "SelectRootMethodsPanel_SelectAllItemText"); // NOI18N
     private static final String NO_SELECTION_PROVIDES = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
             "SelectRootMethodsPanel_NoSelectionProviders"); // NOI18N
     // -----
@@ -156,8 +156,10 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         this.currentProject = project;
 
         advancedLogicalPackageTree.reset();
-
+        
         setGlobalMode(project == null);
+        advancedShowAllProjectsCheckBox.setSelected(project == null);
+        advancedShowAllProjectsCheckBox.setEnabled(ProjectUtilities.getOpenedProjects().length > 1);
 
         PropertyChangeListener pcl = new PropertyChangeListener() {
 
@@ -353,12 +355,26 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private Object[] getAdditionalOptions() {
-        return null;
+        return new Object[] { new JButton(NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_AdvancedButtonText")) { //NOI18N
+            protected void fireActionPerformed(ActionEvent e) {
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        final ClientUtils.SourceCodeSelection[] methods =
+                                RootMethodsPanel.getSelectedRootMethods(
+                                advancedLogicalPackageTree.getSelection(), currentProject);
+                        if (methods != null) updateSelector(new Runnable() {
+                            public void run() {
+                                advancedLogicalPackageTree.setContext(getContext());
+                                advancedLogicalPackageTree.setSelection(methods); // TODO: seems to add methods instead of set methods!!!
+                            }
+                        });
+                    }
+                });
+            }
+        }};
     }
 
     private void setGlobalMode(boolean value) {
-        advancedShowAllProjectsCheckBox.setSelected(value);
-        advancedShowAllProjectsCheckBox.setEnabled(!value);
         globalMode = value;
     }
 
@@ -397,6 +413,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             }
         });
 
+        boolean showAllEnabled = advancedShowAllProjectsCheckBox.isEnabled();
         try {
             treeBuilderList.setEnabled(false);
             advancedLogicalPackageTree.setEnabled(false);
@@ -406,7 +423,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         } finally {
             ph.finish();
             okButton.setEnabled(true);
-            advancedShowAllProjectsCheckBox.setEnabled(!globalMode);
+            advancedShowAllProjectsCheckBox.setEnabled(showAllEnabled);
             advancedLogicalPackageTree.setEnabled(true);
             treeBuilderList.setEnabled(true);
         }
