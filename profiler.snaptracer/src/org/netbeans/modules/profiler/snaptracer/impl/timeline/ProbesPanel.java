@@ -55,7 +55,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -64,12 +63,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.TracerProbe;
+import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.modules.profiler.snaptracer.impl.probes.ProbePresenter;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderButton;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderLabel;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.ScrollBar;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
@@ -78,13 +78,6 @@ import org.openide.util.NbBundle;
  */
 final class ProbesPanel extends JPanel {
     
-    private static final String INCREMENT_IMAGE_PATH =
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/increment.png"; // NOI18N
-    private static final String DECREMENT_IMAGE_PATH =
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/decrement.png"; // NOI18N
-    private static final String RESET_IMAGE_PATH =
-            "org/netbeans/modules/profiler/snaptracer/impl/resources/reset.png"; // NOI18N
-
     private final ListPanel listPanel;
     private final JViewport viewport;
     private final HeaderButton increaseB;
@@ -136,8 +129,7 @@ final class ProbesPanel extends JPanel {
                                      HORIZONTAL).getPreferredSize().height));
         bottomPanel.setOpaque(false);
 
-        increaseB = new HeaderButton(null, new ImageIcon(ImageUtilities.loadImage(
-                                                         INCREMENT_IMAGE_PATH))) {
+        increaseB = new HeaderButton(null, Icons.getIcon(TracerIcons.INCREMENT)) {
             protected void performAction(ActionEvent e) {
                 chart.increaseRowHeights((e.getModifiers() & Toolkit.getDefaultToolkit().
                                          getMenuShortcutKeyMask()) == 0);
@@ -147,8 +139,7 @@ final class ProbesPanel extends JPanel {
                 "TOOLTIP_IncreaseRowsHeight")); // NOI18N
         bottomPanel.add(increaseB);
 
-        decreaseB = new HeaderButton(null, new ImageIcon(ImageUtilities.loadImage(
-                                                         DECREMENT_IMAGE_PATH))) {
+        decreaseB = new HeaderButton(null, Icons.getIcon(TracerIcons.DECREMENT)) {
             protected void performAction(ActionEvent e) {
                 chart.decreaseRowHeights((e.getModifiers() & Toolkit.getDefaultToolkit().
                                          getMenuShortcutKeyMask()) == 0);
@@ -158,8 +149,7 @@ final class ProbesPanel extends JPanel {
                 "TOOLTIP_DecreaseRowsHeight")); // NOI18N
         bottomPanel.add(decreaseB);
 
-        resetB = new HeaderButton(null, new ImageIcon(ImageUtilities.loadImage(
-                                                      RESET_IMAGE_PATH))) {
+        resetB = new HeaderButton(null, Icons.getIcon(TracerIcons.RESET)) {
             protected void performAction(ActionEvent e) {
                 chart.resetRowHeights();
             }
