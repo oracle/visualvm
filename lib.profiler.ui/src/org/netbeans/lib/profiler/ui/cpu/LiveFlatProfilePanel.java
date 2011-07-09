@@ -50,6 +50,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
@@ -106,9 +107,17 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
 
         setupFlatCollector();
     }
+    
+    public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler) {
+        this(runner, actionsHandler, Collections.EMPTY_LIST);
+    }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public void setAdditionalStats(Collection<StatisticalModule> stats) {
+        statModules = stats;
+    }
+    
     public int getSortingColumn() {
         return fpCollectorPanel.getSortingColumn();
     }
@@ -131,14 +140,6 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
 
     public void handleRemove() {
         fpCollectorPanel.handleRemove();
-
-        //    CPUResultsDispatcher.getInstance().removePlugin(drillDown);
-        //    CPUResultsDispatcher.getInstance().removePlugin(fpCollector);
-        //    if (statModules != null) {
-        //      for (Iterator it = statModules.iterator(); it.hasNext();) {
-        //        ((StatisticalModule) it.next()).unregister(CPUResultsDispatcher.getInstance());
-        //      }
-        //    }
     }
 
     /**
@@ -154,33 +155,6 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
         fpCollectorPanel.handleShutdown();
     }
 
-    //  private DrillDownPanel createDrilldownPanel() {
-    ////    if (drilldownContext.isValid()) {
-    ////      drillDown = new DrillDown(drilldownContext);
-    //
-    //    if (!drillDown.isValid()) return null;
-    //
-    //    drillDown.addListener(new DrillDownListener() {
-    //      public void dataChanged() {
-    //      }
-    //      public void drillDownPathChanged(java.util.List newDrillDownPath) {
-    //        updateLiveResults();
-    //      }
-    //    });
-    //    DrillDownPanel ddPanel = new DrillDownPanel(this.drillDown);
-    //
-    ////    if (statModules != null) {
-    ////      for (Iterator it = statModules.iterator(); it.hasNext();) {
-    ////        StatisticalModule module = (StatisticalModule)it.next();
-    ////        if (module instanceof DrillDownStatsModule) {
-    ////          ddPanel.addSnippet((DrillDownStatsModule)module);
-    ////        }
-    ////      }
-    ////    }
-    //
-    //
-    //    return ddPanel;
-    //  }
     public boolean hasValidDrillDown() {
         return false;
     }
@@ -200,12 +174,6 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
 
     public void updateLiveResults() {
         fpCollectorPanel.updateLiveResults();
-
-        //    if (fpCollectorPanel.hasData()) {
-        //      ((CardLayout)resultsTable.getLayout()).show(resultsTable, "RESULTS");
-        //    } else {
-        //      ((CardLayout)resultsTable.getLayout()).show(resultsTable, "NORESULTS");
-        //    }
     }
 
     public void exportData(int exportedFileType, ExportDataDumper eDD, String viewName) {
@@ -232,38 +200,10 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
     }
 
     private void setupFlatCollector() {
-        //    fpCollector = new FlatProfileCollector();
-        //
-        //    fpCollector.addDataChangeListener(new PropertyChangeListener() {
-        //      public void propertyChange(final PropertyChangeEvent evt) {
-        //        Runnable runner = new Runnable() {
-        //          public void run() {
-        //            FlatProfileContainer fpc = (FlatProfileContainer)evt.getNewValue();
-        //            if (fpc != null) {
-        //              String selectedRowString = fpCollectorPanel.getSelectedRowString();
-        //              fpCollectorPanel.setDataToDisplay(fpc);
-        //              fpCollectorPanel.prepareResults(true);
-        //
-        //              fpCollectorPanel.setSelectedRowString(selectedRowString);
-        //              ((CardLayout)resultsTable.getLayout()).show(resultsTable, "RESULTS");
-        //            } else {
-        //              ((CardLayout)resultsTable.getLayout()).show(resultsTable, "NORESULTS");
-        //            }
-        //          }
-        //        };
-        //        if (EventQueue.isDispatchThread()) {
-        //          runner.run();
-        //        } else {
-        //          EventQueue.invokeLater(runner);
-        //        }
-        //      }
-        //    });
         fpCollectorPanel = new LiveFlatProfileCollectorPanel(runner, actionsHandler, handler);
         resultsTable.add(fpCollectorPanel, "RESULTS"); // NOI18N
                                                        //    ((CardLayout)resultsTable.getLayout()).show(resultsTable, "NORESULTS");
 
         ((CardLayout) resultsTable.getLayout()).show(resultsTable, "RESULTS"); // NOI18N
-
-        //    CPUResultsDispatcher.getInstance().addPlugin(fpCollector);
     }
 }
