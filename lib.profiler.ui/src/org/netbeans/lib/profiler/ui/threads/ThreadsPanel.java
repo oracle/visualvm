@@ -52,7 +52,6 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.CellTipManager;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.JExtendedTable;
-import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -70,6 +69,9 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -278,12 +280,9 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
             }); // NOI18N
 
         scrollBar = new ThreadsScrollBar();
-        zoomInButton = new JButton(new ImageIcon(ThreadsPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/zoomIn.png"))); // NOI18N
-        zoomOutButton = new JButton(new ImageIcon(ThreadsPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/zoomOut.png"))); // NOI18N
-        scaleToFitButton = new JButton(new ImageIcon(getClass()
-                                                         .getResource(scaleToFit
-                                                                      ? "/org/netbeans/lib/profiler/ui/resources/zoom.png"
-                                                                      : "/org/netbeans/lib/profiler/ui/resources/scaleToFit.png"))); // NOI18N
+        zoomInButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_IN));
+        zoomOutButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_OUT));
+        scaleToFitButton = new JButton(scaleToFit ? Icons.getIcon(GeneralIcons.ZOOM) : Icons.getIcon(GeneralIcons.SCALE_TO_FIT));
         comboModel = new DefaultComboBoxModel(new Object[] { VIEW_THREADS_ALL, VIEW_THREADS_LIVE, VIEW_THREADS_FINISHED });
         comboModelWithSelection = new DefaultComboBoxModel(new Object[] {
                                                                VIEW_THREADS_ALL, VIEW_THREADS_LIVE, VIEW_THREADS_FINISHED,
@@ -450,8 +449,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         enableThreadsMonitoringLabel1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 3));
         enableThreadsMonitoringLabel1.setForeground(Color.DARK_GRAY);
 
-        enableThreadsMonitoringButton = new JButton(new ImageIcon(getClass()
-                                                                      .getResource("/org/netbeans/lib/profiler/ui/resources/threadsView.png"))); // NOI18N
+        enableThreadsMonitoringButton = new JButton(Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
         enableThreadsMonitoringButton.setContentAreaFilled(false);
         enableThreadsMonitoringButton.setMargin(new Insets(3, 3, 0, 0));
         enableThreadsMonitoringButton.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -623,12 +621,11 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         if (e.getSource() == scaleToFitButton) {
             if (!scaleToFit) {
                 scrollBar.setVisible(true);
-                scaleToFitButton.setIcon(new ImageIcon(ThreadsPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/zoom.png"))); // NOI18N
+                scaleToFitButton.setIcon(Icons.getIcon(GeneralIcons.ZOOM)); // NOI18N
                 scaleToFit = true;
             } else {
                 scaleToFit = false;
-                scaleToFitButton.setIcon(new ImageIcon(getClass()
-                                                           .getResource("/org/netbeans/lib/profiler/ui/resources/scaleToFit.png"))); // NOI18N
+                scaleToFitButton.setIcon(Icons.getIcon(GeneralIcons.SCALE_TO_FIT)); // NOI18N
                 scrollBar.setVisible(false);
                 scrollBar.setValues(0, 0, 0, 0);
             }

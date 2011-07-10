@@ -47,12 +47,13 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CallableSystemAction;
 import javax.swing.Action;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 
 
 /**
@@ -105,27 +106,15 @@ public final class RerunAction extends CallableSystemAction implements Profiling
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(NbBundle.getMessage(RerunAction.class,
-                                                                                                 "MSG_ReRunOnProfile"), //NOI18N
-                                                                             NbBundle.getMessage(RerunAction.class,
-                                                                                                 "CAPTION_Question"),
-                                                                             NotifyDescriptor.YES_NO_OPTION // NOI18N
-                );
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(NbBundle.getMessage(RerunAction.class,
+                        "MSG_ReRunOnProfile"), NbBundle.getMessage(RerunAction.class, "CAPTION_Question"))) { // NOI18N
                     return;
                 }
 
                 Profiler.getDefault().stopApp();
             } else {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(NbBundle.getMessage(RerunAction.class,
-                                                                                                 "MSG_ReRunOnAttach"), //NOI18N
-                                                                             NbBundle.getMessage(RerunAction.class,
-                                                                                                 "CAPTION_Question"),
-                                                                             NotifyDescriptor.YES_NO_OPTION // NOI18N
-                );
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(NbBundle.getMessage(RerunAction.class,
+                        "MSG_ReRunOnAttach"), NbBundle.getMessage(RerunAction.class, "CAPTION_Question"))) { //NOI18N
                     return;
                 }
 
@@ -156,6 +145,6 @@ public final class RerunAction extends CallableSystemAction implements Profiling
     }
 
     protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/rerun.png"; //NOI18N
+        return Icons.getResource(GeneralIcons.RERUN);
     }
 }

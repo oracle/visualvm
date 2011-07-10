@@ -43,7 +43,6 @@
 
 package org.netbeans.lib.profiler.ui.components.table;
 
-import org.netbeans.lib.profiler.ui.components.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -52,6 +51,8 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**
@@ -140,8 +141,8 @@ public abstract class SortableTableModel extends AbstractTableModel {
 
     private CustomSortableHeaderRenderer headerRenderer;
     private HeaderListener headerListener;
-    private ImageIcon sortAscIcon = new ImageIcon(SortableTableModel.class.getResource("/org/netbeans/lib/profiler/ui/resources/sortAsc.png")); //NOI18N
-    private ImageIcon sortDescIcon = new ImageIcon(SortableTableModel.class.getResource("/org/netbeans/lib/profiler/ui/resources/sortDesc.png")); //NOI18N
+    private ImageIcon sortAscIcon = Icons.getImageIcon(GeneralIcons.SORT_ASCENDING);
+    private ImageIcon sortDescIcon = Icons.getImageIcon(GeneralIcons.SORT_DESCENDING);
     private JTableHeader tableHeader;
     private int lastFocusedColumn = -1;
 
