@@ -50,6 +50,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.GoToSource;
 
 
 /**
@@ -97,7 +98,7 @@ public class SnapshotLivenessResultsPanel extends LivenessResultsPanel implement
 
         if (source == popupShowStacks) {
             actionsHandler.showStacksForClass(selectedClassId, getSortingColumn(), getSortingOrder());
-        } else if (source == popupShowSource) {
+        } else if (source == popupShowSource && popupShowSource != null) {
             showSourceForClass(selectedClassId);
         }
     }
@@ -118,13 +119,15 @@ public class SnapshotLivenessResultsPanel extends LivenessResultsPanel implement
         if (popup == null) {
             popup = new JPopupMenu();
 
-            Font boldfont = popup.getFont().deriveFont(Font.BOLD);
+            if (GoToSource.isAvailable()) {
+                Font boldfont = popup.getFont().deriveFont(Font.BOLD);
 
-            popupShowSource = new JMenuItem();
-            popupShowSource.setText(GO_SOURCE_POPUP_ITEM);
-            popupShowSource.setFont(boldfont);
-            popup.add(popupShowSource);
-            popupShowSource.addActionListener(this);
+                popupShowSource = new JMenuItem();
+                popupShowSource.setText(GO_SOURCE_POPUP_ITEM);
+                popupShowSource.setFont(boldfont);
+                popup.add(popupShowSource);
+                popupShowSource.addActionListener(this);
+            }
 
             if (snapshot.containsStacks()) {
                 popup.addSeparator();

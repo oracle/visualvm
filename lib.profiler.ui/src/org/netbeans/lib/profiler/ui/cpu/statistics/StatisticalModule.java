@@ -63,7 +63,7 @@ public abstract class StatisticalModule extends JPanel {
     }
 
     public abstract void refresh(RuntimeCPUCCTNode appNode);
-
+    
     protected int getSelectedMethodId() {
         return mId;
     }

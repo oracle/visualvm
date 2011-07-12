@@ -44,11 +44,11 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**
@@ -75,7 +75,7 @@ public final class FindPreviousAction extends AbstractAction {
         this.findPerformer = findPerformer;
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
-        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/actions/resources/find_previous.png", false));
+        putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.FIND_PREVIOUS));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
