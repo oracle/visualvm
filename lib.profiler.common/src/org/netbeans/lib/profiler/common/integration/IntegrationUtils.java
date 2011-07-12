@@ -117,17 +117,18 @@ public class IntegrationUtils {
                                                              boolean formatAsHTML) {
         return getExportEnvVariableValueString(targetPlatform, getNativePathEnvVariableString(targetPlatform),
                                                getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)
-                                               + getPathSeparator(targetPlatform)
+                                               + getClassPathSeparator(targetPlatform)
                                                + getEnvVariableReference(getNativePathEnvVariableString(targetPlatform),
                                                                          targetPlatform), formatAsHTML);
     }
 
     public static String getAssignEnvVariableValueString(String targetPlatform, String variableName, String variableValue) {
+        variableValue = variableValue.trim();
         if (isWindowsPlatform(targetPlatform)) {
             return getExportCommandString(targetPlatform) + " " + variableName + "=" + variableValue; //NOI18N
         }
 
-        return variableName + "=" + variableValue; //NOI18N
+        return variableName + "=" + (variableValue.contains(" ") ? "\"" + variableValue + "\"" : variableValue); //NOI18N
     }
 
     // Returns batch file extension bat / sh according to current / selected OS
@@ -406,8 +407,11 @@ public class IntegrationUtils {
         return null;
     }
 
-    // Returns ";" or ":" according to provided platform
-    public static String getPathSeparator(String targetPlatform) {
+    /**
+     * The separator used in the classpath construction
+     * @return Returns ";" or ":" according to provided platform
+     */ 
+    public static String getClassPathSeparator(String targetPlatform) {
         if (isWindowsPlatform(targetPlatform)) {
             return ";"; //NOI18N
         }
@@ -450,7 +454,9 @@ public class IntegrationUtils {
     public static String getProfilerAgentCommandLineArgsWithoutQuotes(String targetPlatform, String targetJVM, boolean isRemote,
                                                                       int portNumber) {
         StringBuilder args = new StringBuilder();
-        if (targetJVM.equals(PLATFORM_JAVA_60) && (targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS))) {
+        
+        if ((targetJVM.equals(PLATFORM_JAVA_60) || targetJVM.equals(PLATFORM_JAVA_70)) && 
+            (targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS))) {
             args.append(" -XX:+UseLinuxPosixThreadCPUClocks "); // NOI18N
         }
         args.append("-agentpath:").append(getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)). // NOI18N
