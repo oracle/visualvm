@@ -88,7 +88,7 @@ public class InstancesListController extends AbstractController {
 
         public String getSize();
         
-        public long getID();
+        public String getID();
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -139,8 +139,8 @@ public class InstancesListController extends AbstractController {
         }
 
         @Override
-        public long getID() {
-            return getJavaClass().getJavaClassId();
+        public String getID() {
+            return "0x"+Long.toHexString(getJavaClass().getJavaClassId());
         }
 
         public JavaClass getJavaClassByID(long javaclassId) {
@@ -320,11 +320,6 @@ public class InstancesListController extends AbstractController {
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
-        @Override
-        public long getID() {
-            return getSelectedInstance().getInstanceId();
-        }
-        
         public TreePath getInstancePath(Instance instance) {
             TreePath instancePath = null;
 
@@ -349,6 +344,11 @@ public class InstancesListController extends AbstractController {
             return false;
         }
 
+        @Override
+        public String getID() {
+            return ""; // NOI18N;
+        }
+        
         public String getReachableSize() {
             return ""; // NOI18N
         }
@@ -463,8 +463,8 @@ public class InstancesListController extends AbstractController {
         }
 
         @Override
-        public long getID() {
-            return getInstance().getInstanceId();
+        public String getID() {
+            return "0x"+Long.toHexString(getInstance().getInstanceId());
         }
 
         public TreePath getInstancePath(Instance inst) {
