@@ -640,13 +640,14 @@ public class InstancesListControllerUI extends JTitledPanel {
         columnRenderers[0] = null;
 
         // objectid
-        columnRenderers[1] = null;
+        columnWidths[1 - 1] = maxWidth;
+        columnRenderers[1] = dataCellRenderer;
         
-        columnWidths[2 - 2] = maxWidth;
+        columnWidths[2 - 1] = maxWidth;
         columnRenderers[2] = dataCellRenderer;
 
         if (retainedSizeSupported) {
-            columnWidths[3 - 2] = maxWidth;
+            columnWidths[3 - 1] = maxWidth;
             columnRenderers[3] = dataCellRenderer;
         }
         
