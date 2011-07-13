@@ -43,7 +43,10 @@ package org.netbeans.modules.profiler.spi.project;
 
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.project.ProfilingSettingsSupport.SettingsCustomizer;
+import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  * Provider of support for project-specific information for the Select Profiling Task dialog.
@@ -69,6 +72,22 @@ public abstract class ProfilingSettingsSupportProvider {
     
     //    public abstract SettingsConfigurator getSettingsConfigurator();
     
+    /**
+     * Returns display name of the project-only filter or null if the filter
+     * filter is not available for a project.
+     * 
+     * @return display name of the project-only filter or null
+     */
+    public abstract String getProjectOnlyFilterName();
+    
+    /**
+     * Returns display name of the project & subprojects filter or null if the
+     * filter is not available for a project.
+     * 
+     * @return display name of the project & subprojects filter or null
+     */
+    public abstract String getProjectSubprojectsFilterName();
+    
     
     public static class Basic extends ProfilingSettingsSupportProvider {
 
@@ -87,9 +106,21 @@ public abstract class ProfilingSettingsSupportProvider {
 //            return null;;
 //        }
         
+        @Override
+        public String getProjectOnlyFilterName() {
+            return null;
+        }
+        
+        @Override
+        public String getProjectSubprojectsFilterName() {
+            return null;
+        }
+        
     }
     
     public static class Default extends Basic {
+        
+        private final Lookup.Provider project;
 
         @Override
         public float getProfilingOverhead(ProfilingSettings settings) {
@@ -124,6 +155,28 @@ public abstract class ProfilingSettingsSupportProvider {
             }
 
             return o;
+        }
+        
+        @Override
+        public String getProjectOnlyFilterName() {
+            return NbBundle.getMessage(ProfilingSettingsSupportProvider.class,
+                    "ProfilingSettingsSupportProvider_ProfileProjectClassesString"); // NOI18N
+        }
+        
+        @Override
+        public String getProjectSubprojectsFilterName() {
+            return !ProjectUtilities.hasSubprojects(project) ? null :
+                    NbBundle.getMessage(ProfilingSettingsSupportProvider.class,
+                    "ProfilingSettingsSupportProvider_ProfileProjectSubprojectClassesString"); // NOI18N
+        }
+        
+        
+        protected final Lookup.Provider getProject() {
+            return project;
+        }
+        
+        public Default(Lookup.Provider project) {
+            this.project = project;
         }
         
     }

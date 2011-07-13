@@ -82,6 +82,14 @@ public final class ProfilingSettingsSupport {
 //        return provider.getSettingsConfigurator();
 //    }
     
+    public String getProjectOnlyFilterName() {
+        return provider.getProjectOnlyFilterName();
+    }
+    
+    public String getProjectSubprojectsFilterName() {
+        return provider.getProjectSubprojectsFilterName();
+    }
+    
     
     private ProfilingSettingsSupport(ProfilingSettingsSupportProvider provider) {
         this.provider = provider;
