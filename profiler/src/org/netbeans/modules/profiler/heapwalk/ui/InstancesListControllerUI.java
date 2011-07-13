@@ -201,7 +201,7 @@ public class InstancesListControllerUI extends JTitledPanel {
                     case 0:
                         return node;
                     case 1:
-                        return "0x" + Long.toHexString(node.getID());
+                        return node.getID();
                     case 2:
                         return node.getSize();
                     case 3:
