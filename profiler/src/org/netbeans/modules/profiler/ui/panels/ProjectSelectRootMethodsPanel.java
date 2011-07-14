@@ -43,15 +43,11 @@
 package org.netbeans.modules.profiler.ui.panels;
 
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -70,7 +66,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -81,9 +76,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
 import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.util.lookup.Lookups;
 
@@ -98,12 +96,14 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     // I18N String constants
     private static final String OK_BUTTON_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
             "SelectRootMethodsPanel_OkButtonText"); // NOI18N
-    private static final String REMOVE_SELECTED_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_RemoveSelectedItemText"); // NOI18N
-    private static final String REMOVE_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_RemoveAllItemText"); // NOI18N
-    private static final String SELECT_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_SelectAllItemText"); // NOI18N
+//    private static final String REMOVE_SELECTED_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
+//            "SelectRootMethodsPanel_RemoveSelectedItemText"); // NOI18N
+//    private static final String REMOVE_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
+//            "SelectRootMethodsPanel_RemoveAllItemText"); // NOI18N
+//    private static final String SELECT_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
+//            "SelectRootMethodsPanel_SelectAllItemText"); // NOI18N
+    private static final String NO_SELECTION_PROVIDES = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
+            "SelectRootMethodsPanel_NoSelectionProviders"); // NOI18N
     // -----
     protected static final Dimension PREFERRED_TOPTREE_DIMENSION = new Dimension(500, 250);
 
@@ -112,7 +112,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     private JButton okButton;
     private JCheckBox advancedShowAllProjectsCheckBox;
     private JComboBox treeBuilderList;
-    private Project currentProject;
+    private Lookup.Provider currentProject;
     private RequestProcessor rp = new RequestProcessor("SRM-UI Processor", 1); // NOI18N
     private RootSelectorTree advancedLogicalPackageTree;
     private volatile boolean changingBuilderList = false;
@@ -151,13 +151,15 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
      * @param currentSelection The current root method selection (valid for the profiling session)
      * @return Returns the array of newly selected root methods or <b>null</b> to signal that no root methods were selected
      */
-    public ClientUtils.SourceCodeSelection[] getRootMethods(final Project project,
+    public ClientUtils.SourceCodeSelection[] getRootMethods(final Lookup.Provider project,
             final ClientUtils.SourceCodeSelection[] currentSelection) {
         this.currentProject = project;
 
         advancedLogicalPackageTree.reset();
-
+        
         setGlobalMode(project == null);
+        advancedShowAllProjectsCheckBox.setSelected(project == null);
+        advancedShowAllProjectsCheckBox.setEnabled(ProjectUtilities.getOpenedProjects().length > 1);
 
         PropertyChangeListener pcl = new PropertyChangeListener() {
 
@@ -178,8 +180,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             });
 
             if (advancedLogicalPackageTree.getBuilderTypes().isEmpty()) {
-                NotifyDescriptor nd = new NotifyDescriptor.Message("SelectRootMethodsPanel_NoSelectionProviders"); // NOI18N
-                DialogDisplayer.getDefault().notify(nd);
+                ProfilerDialogs.displayWarning(NO_SELECTION_PROVIDES);
                 return null;
             }
 
@@ -194,7 +195,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
                 dd.setAdditionalOptions(additionalOptions);
             }
 
-            final Dialog d = ProfilerDialogs.createDialog(dd);
+            final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
             d.pack(); // To properly layout HTML hint area
             d.setVisible(true);
 
@@ -354,12 +355,26 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private Object[] getAdditionalOptions() {
-        return null;
+        return new Object[] { new JButton(NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_AdvancedButtonText")) { //NOI18N
+            protected void fireActionPerformed(ActionEvent e) {
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        final ClientUtils.SourceCodeSelection[] methods =
+                                RootMethodsPanel.getSelectedRootMethods(
+                                advancedLogicalPackageTree.getSelection(), currentProject);
+                        if (methods != null) updateSelector(new Runnable() {
+                            public void run() {
+                                advancedLogicalPackageTree.setContext(getContext());
+                                advancedLogicalPackageTree.setSelection(methods); // TODO: seems to add methods instead of set methods!!!
+                            }
+                        });
+                    }
+                });
+            }
+        }};
     }
 
     private void setGlobalMode(boolean value) {
-        advancedShowAllProjectsCheckBox.setSelected(value);
-        advancedShowAllProjectsCheckBox.setEnabled(!value);
         globalMode = value;
     }
 
@@ -383,16 +398,22 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         }
     }
 
-    private Project[] relevantProjects() {
-        return advancedShowAllProjectsCheckBox.isSelected() ? OpenProjects.getDefault().getOpenProjects()
-                : new Project[]{currentProject};
+    private Lookup.Provider[] relevantProjects() {
+        return advancedShowAllProjectsCheckBox.isSelected() ? ProjectUtilities.getOpenedProjects()
+                : new Lookup.Provider[]{currentProject};
     }
 
     private void updateSelector(Runnable updater) {
-        ProgressHandle ph = IDEUtils.indeterminateProgress(NbBundle.getMessage(this.getClass(),
-                "SelectRootMethodsPanel_ParsingProjectStructureMessage"),
-                500); // NOI18N
+        final ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
+                "SelectRootMethodsPanel_ParsingProjectStructureMessage")); // NOI18N
+        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() {
+                ph.setInitialDelay(500);
+                ph.start();
+            }
+        });
 
+        boolean showAllEnabled = advancedShowAllProjectsCheckBox.isEnabled();
         try {
             treeBuilderList.setEnabled(false);
             advancedLogicalPackageTree.setEnabled(false);
@@ -402,7 +423,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         } finally {
             ph.finish();
             okButton.setEnabled(true);
-            advancedShowAllProjectsCheckBox.setEnabled(!globalMode);
+            advancedShowAllProjectsCheckBox.setEnabled(showAllEnabled);
             advancedLogicalPackageTree.setEnabled(true);
             treeBuilderList.setEnabled(true);
         }

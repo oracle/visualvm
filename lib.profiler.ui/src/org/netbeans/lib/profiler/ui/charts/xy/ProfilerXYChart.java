@@ -57,6 +57,8 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *
@@ -73,18 +75,10 @@ public class ProfilerXYChart extends SynchronousXYChart {
     private static final String SCALE_TO_FIT_STRING = messages.getString("ProfilerXYChart_ScaleToFitString"); // NOI18N
     // -----
 
-    private static final Icon ZOOM_IN_ICON =
-            new ImageIcon(ProfilerXYChart.class.getResource(
-            "/org/netbeans/lib/profiler/ui/resources/zoomIn.png")); // NOI18N
-    private static final Icon ZOOM_OUT_ICON =
-            new ImageIcon(ProfilerXYChart.class.getResource(
-            "/org/netbeans/lib/profiler/ui/resources/zoomOut.png")); // NOI18N
-    private static final Icon FIXED_SCALE_ICON =
-            new ImageIcon(ProfilerXYChart.class.getResource(
-            "/org/netbeans/lib/profiler/ui/resources/zoom.png")); // NOI18N
-    private static final Icon SCALE_TO_FIT_ICON =
-            new ImageIcon(ProfilerXYChart.class.getResource(
-            "/org/netbeans/lib/profiler/ui/resources/scaleToFit.png")); // NOI18N
+    private static final Icon ZOOM_IN_ICON = Icons.getIcon(GeneralIcons.ZOOM_IN);
+    private static final Icon ZOOM_OUT_ICON = Icons.getIcon(GeneralIcons.ZOOM_OUT);
+    private static final Icon FIXED_SCALE_ICON = Icons.getIcon(GeneralIcons.ZOOM);
+    private static final Icon SCALE_TO_FIT_ICON = Icons.getIcon(GeneralIcons.SCALE_TO_FIT);
 
 
     private ZoomInAction zoomInAction;
