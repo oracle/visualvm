@@ -111,6 +111,7 @@ made subject to such option by the copyright holder.
             </module-dependencies>
             <friend-packages>
                 <friend>org.netbeans.lib.profiler.ui</friend>
+                <friend>org.netbeans.modules.autoproject.profiler</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.attach</friend>
