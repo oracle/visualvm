@@ -91,11 +91,8 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.attach.impl</friend>
-                <friend>org.netbeans.modules.profiler.attach.spi</friend>
-                <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.generic</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.sunas</friend>
