@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.SessionSettings;
@@ -54,6 +53,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import org.openide.util.Lookup;
 
 
 /**
@@ -75,7 +75,7 @@ class GestureSubmitter {
         logUsage("CONFIG", paramList); // NOI18N
     }
 
-    static void logProfileApp(Project profiledProject, SessionSettings session) {
+    static void logProfileApp(Lookup.Provider profiledProject, SessionSettings session) {
         List<Object> paramList = new ArrayList<Object>();
 
         fillProjectParam(profiledProject, paramList);
@@ -84,7 +84,7 @@ class GestureSubmitter {
         logUsage("PROFILE_APP", paramList); // NOI18N
     }
 
-    static void logProfileClass(Project profiledProject, SessionSettings session) {
+    static void logProfileClass(Lookup.Provider profiledProject, SessionSettings session) {
         List<Object> paramList = new ArrayList<Object>();
 
         fillProjectParam(profiledProject, paramList);
@@ -93,7 +93,7 @@ class GestureSubmitter {
         logUsage("PROFILE_CLASS", paramList); // NOI18N
     }
 
-    static void logAttach(Project profiledProject, AttachSettings attach) {
+    static void logAttach(Lookup.Provider profiledProject, AttachSettings attach) {
         List<Object> paramList = new ArrayList<Object>();
 
         fillProjectParam(profiledProject, paramList);
@@ -102,7 +102,7 @@ class GestureSubmitter {
         logUsage("ATTACH", paramList); // NOI18N
     }
 
-    private static void fillProjectParam(Project profiledProject, List<Object> paramList) {
+    private static void fillProjectParam(Lookup.Provider profiledProject, List<Object> paramList) {
         String param = ""; // NOI18N
         if (profiledProject != null) {
             param = profiledProject.getClass().getName();
