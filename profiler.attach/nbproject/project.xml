@@ -6,15 +6,6 @@
             <code-name-base>org.netbeans.modules.profiler.attach</code-name-base>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>org.apache.tools.ant.module</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>3</release-version>
-                        <specification-version>3.30</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.netbeans.api.progress</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -42,16 +33,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.java.platform</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.9</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.utilities</code-name-base>
+                    <code-name-base>org.netbeans.modules.profiler.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -76,14 +58,6 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.openide.execution</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.12</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.openide.filesystems</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -92,27 +66,11 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.openide.loaders</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.0</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.openide.modules</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
                         <specification-version>7.3</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.nodes</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.4</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -133,17 +91,16 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
-                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.attach.impl</friend>
-                <friend>org.netbeans.modules.profiler.attach.spi</friend>
-                <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.generic</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.jboss</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.sunas</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.tomcat</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.weblogic</friend>
-                <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.j2se.impl</friend>
+                <friend>org.netbeans.modules.profiler.nbimpl</friend>
+                <friend>org.netbeans.modules.profiler.stp</friend>
                 <package>org.netbeans.modules.profiler.attach</package>
                 <package>org.netbeans.modules.profiler.attach.panels</package>
                 <package>org.netbeans.modules.profiler.attach.panels.components</package>
