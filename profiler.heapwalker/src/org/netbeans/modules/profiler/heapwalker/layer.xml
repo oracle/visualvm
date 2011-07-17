@@ -13,7 +13,7 @@
         </folder>
     </folder>
     <folder name="Loaders">
-        <folder name="text">
+        <folder name="application">
             <folder name="x-netbeans-profiler-hprof">
                 <folder name="Factories">
                     <file name="HprofDataLoader.instance">
