@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.ui.panels;
 import org.netbeans.lib.profiler.jps.JpsProxy;
 import org.netbeans.lib.profiler.jps.RunningVM;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
@@ -55,6 +54,7 @@ import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.DialogDisplayer;
 
 
 /**
@@ -212,7 +212,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         DialogDescriptor dd = new DialogDescriptor(pidSelect, SELECT_PROCESS_DIALOG_CAPTION, true,
                                                    new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                    DialogDescriptor.BOTTOM_ALIGN, null, null);
-        Dialog d = ProfilerDialogs.createDialog(dd);
+        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
 
         if (dd.getValue() == okButton) {

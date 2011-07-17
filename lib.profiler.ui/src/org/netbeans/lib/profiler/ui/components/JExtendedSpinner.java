@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.ui.components;
 
 import java.awt.Font;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.UIManager;
 
@@ -60,6 +61,17 @@ import javax.swing.UIManager;
  * @author Jiri Sedlacek
  */
 public class JExtendedSpinner extends JSpinner {
+    
+    private static int defaultSpinnerHeight = -1;
+    
+    public static int getDefaultSpinnerHeight() {
+        if (defaultSpinnerHeight == -1) {
+            defaultSpinnerHeight = new JTextField().getPreferredSize().height;
+        }
+
+        return defaultSpinnerHeight;
+    }
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public JExtendedSpinner() {
