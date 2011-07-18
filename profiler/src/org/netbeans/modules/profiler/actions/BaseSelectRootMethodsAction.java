@@ -40,16 +40,12 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
@@ -58,9 +54,11 @@ import org.openide.util.NbBundle;
 import org.openide.util.actions.NodeAction;
 import java.util.ArrayList;
 import java.util.List;
+import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.ui.panels.ClassSelectRootMethodsPanel;
-import org.openide.filesystems.FileObject;
-
+import org.openide.util.Lookup;
 
 /**
  * Base class for actions providing functionality to select a profiling root
@@ -75,17 +73,15 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
     // -----
     // I18N String constants
     private static final String NO_CLASS_FOUND_MSG = NbBundle.getMessage(BaseSelectRootMethodsAction.class,
-                                                                         "SelectRootMethodsAction_NoClassFoundMsg"); // NOI18N
-                                                                                                                     // -----
+            "SelectRootMethodsAction_NoClassFoundMsg"); // NOI18N
+    // -----
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     public BaseSelectRootMethodsAction() {
         putValue("noIconInMenu", Boolean.TRUE); //NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public HelpCtx getHelpCtx() {
         return HelpCtx.DEFAULT_HELP;
     }
@@ -116,60 +112,58 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
         }
 
         new NBSwingWorker() {
-                String className = null;
 
-                protected void doInBackground() {
-                    className = getFileClassName(dobj.getPrimaryFile());
-                }
+            String className = null;
 
-                protected void done() {
-                    if (className != null) {
-                        Project project = FileOwnerQuery.getOwner(dobj.getPrimaryFile());
-                        ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
-                                                                                      .getProfilingSettings();
-                        List<ProfilingSettings> cpuSettings = new ArrayList();
+            @Override
+            protected void doInBackground() {
+                className = getFileClassName(JavaProfilerSource.createFrom(dobj.getPrimaryFile()));
+            }
 
-                        for (ProfilingSettings settings : projectSettings) {
-                            if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
-                                cpuSettings.add(settings);
-                            }
+            @Override
+            protected void done() {
+                if (className != null) {
+                    Lookup.Provider project = ProjectUtilities.getProject(dobj.getPrimaryFile());
+                    ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project).getProfilingSettings();
+                    List<ProfilingSettings> cpuSettings = new ArrayList();
+
+                    for (ProfilingSettings settings : projectSettings) {
+                        if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
+                            cpuSettings.add(settings);
                         }
-
-                        ProfilingSettings settings = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
-                                                                             cpuSettings.toArray(new ProfilingSettings[cpuSettings
-                                                                                                                       .size()]),
-                                                                             null);
-
-                        if (settings == null) {
-                            return; // cancelled by the user
-                        }
-
-                        ClientUtils.SourceCodeSelection[] rootMethodsSelection = ClassSelectRootMethodsPanel.getDefault()
-                                                                                                               .getRootMethods(project,
-                                                                                                                               dobj.getPrimaryFile(),
-                                                                                                                               settings
-                                                                                                                               .getInstrumentationRootMethods());
-
-                        if (rootMethodsSelection == null) {
-                            return;
-                        }
-
-                        settings.addRootMethods(rootMethodsSelection);
-
-                        if (cpuSettings.contains(settings)) {
-                            ProfilingSettingsManager.getDefault().storeProfilingSettings(projectSettings, settings, project);
-                        } else {
-                            ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
-                            System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
-                            newProjectSettings[projectSettings.length] = settings;
-                            ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
-                        }
-                    } else {
-                        NetBeansProfiler.getDefaultNB().displayError(NO_CLASS_FOUND_MSG);
                     }
+
+                    ProfilingSettings settings = IDEUtils.selectSettings(ProfilingSettings.PROFILE_CPU_PART,
+                            cpuSettings.toArray(new ProfilingSettings[cpuSettings.size()]),
+                            null);
+
+                    if (settings == null) {
+                        return; // cancelled by the user
+                    }
+
+                    ClientUtils.SourceCodeSelection[] rootMethodsSelection = ClassSelectRootMethodsPanel.getDefault().getRootMethods(dobj.getPrimaryFile(),
+                            settings.getInstrumentationRootMethods());
+
+                    if (rootMethodsSelection == null) {
+                        return;
+                    }
+
+                    settings.addRootMethods(rootMethodsSelection);
+
+                    if (cpuSettings.contains(settings)) {
+                        ProfilingSettingsManager.storeProfilingSettings(projectSettings, settings, project);
+                    } else {
+                        ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
+                        System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
+                        newProjectSettings[projectSettings.length] = settings;
+                        ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settings, project);
+                    }
+                } else {
+                    ProfilerDialogs.displayError(NO_CLASS_FOUND_MSG);
                 }
-            }.execute();
+            }
+        }.execute();
     }
 
-    abstract protected String getFileClassName(FileObject file);
+    abstract protected String getFileClassName(JavaProfilerSource source);
 }

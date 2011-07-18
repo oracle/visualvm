@@ -43,18 +43,12 @@
 
 package org.netbeans.modules.profiler.attach.providers;
 
-import org.netbeans.api.java.platform.JavaPlatform;
-import org.netbeans.api.java.platform.JavaPlatformManager;
-import org.netbeans.api.java.platform.Specification;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileStateInvalidException;
-import org.openide.modules.SpecificationVersion;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import org.netbeans.modules.profiler.api.JavaPlatform;
 
 
 /**
@@ -76,7 +70,7 @@ public class TargetPlatform {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private SpecificationVersion version;
+    private String version;
     private String displayName;
     private String javaHome;
     private boolean defaultFlag;
@@ -92,26 +86,12 @@ public class TargetPlatform {
         this.defaultFlag = setDefault;
 
         try {
+            String javaExe = platform.getPlatformJavaFile();
             this.displayName = platform.getDisplayName();
-            this.version = platform.getSpecification().getVersion();
-
-            FileObject folder = platform.getInstallFolders().iterator().next();
-            final String hostOS = System.getProperty("os.name"); // NOI18N
-            this.javaHome = URLDecoder.decode(folder.getURL().getPath(), "utf8"); // NOI18N
-
-            if (this.javaHome.endsWith("/")) { // NOI18N
-                this.javaHome = this.javaHome.substring(0, this.javaHome.length() - 1);
-            }
-
-            if (hostOS.contains("Windows") && this.javaHome.startsWith("/")) { // NOI18N
-                this.javaHome = this.javaHome.substring(1).replace('/', '\\'); // NOI18N
-            }
+            this.version = platform.getVersion();
+            this.javaHome = new File(javaExe).getParentFile().getParent();
 
             validFlag = true;
-        } catch (FileStateInvalidException ex) {
-            validFlag = false;
-        } catch (UnsupportedEncodingException e) {
-            validFlag = false;
         } catch (Exception e) {
             validFlag = false;
         }
@@ -145,17 +125,17 @@ public class TargetPlatform {
     }
 
     public TargetPlatformEnum getAsEnum() {
-        if (this.version.toString().startsWith("1.5") || this.version.toString().startsWith("5")) { // NOI18N
+        if (this.version.startsWith("1.5") || this.version.startsWith("5")) { // NOI18N
 
             return TargetPlatformEnum.JDK5;
         }
 
-        if (this.version.toString().startsWith("1.6") || this.version.toString().startsWith("6")) { // NOI18N
+        if (this.version.startsWith("1.6") || this.version.startsWith("6")) { // NOI18N
 
             return TargetPlatformEnum.JDK6;
         }
 
-        if (this.version.toString().startsWith("1.7") || this.version.toString().startsWith("7")) { // NOI18N
+        if (this.version.startsWith("1.7") || this.version.startsWith("7")) { // NOI18N
 
             return TargetPlatformEnum.JDK7;
         }
@@ -208,7 +188,7 @@ public class TargetPlatform {
             supportedPlatforms = new LinkedList();
 
             try {
-                JavaPlatform defaultPlatform = JavaPlatformManager.getDefault().getDefaultPlatform();
+                JavaPlatform defaultPlatform = JavaPlatform.getDefaultPlatform();
 
                 if (defaultPlatform != null) {
                     supportedPlatforms.add(new TargetPlatform(defaultPlatform, true));
@@ -218,10 +198,10 @@ public class TargetPlatform {
                 e.printStackTrace();
             }
 
-            JavaPlatform[] platforms = JavaPlatformManager.getDefault().getPlatforms(null, new Specification("j2se", null)); // NOI18N
+            List<JavaPlatform> platforms = JavaPlatform.getPlatforms();
 
-            for (int i = 0; i < platforms.length; i++) {
-                TargetPlatform platform = new TargetPlatform(platforms[i]);
+            for (JavaPlatform jp : platforms) {
+                TargetPlatform platform = new TargetPlatform(jp);
 
                 if (!platform.isValid() || supportedPlatforms.contains(platform)) {
                     continue;

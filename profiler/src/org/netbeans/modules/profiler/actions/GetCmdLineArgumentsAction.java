@@ -50,7 +50,6 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
@@ -59,6 +58,8 @@ import java.text.MessageFormat;
 import javax.swing.*;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.openide.DialogDisplayer;
 
 
 /**
@@ -142,15 +143,14 @@ public final class GetCmdLineArgumentsAction extends AbstractAction implements P
             p.add(new JScrollPane(textArea), BorderLayout.CENTER);
             p.setPreferredSize(new Dimension(600, 200));
 
-            ProfilerDialogs.createDialog(new DialogDescriptor(p,
+            DialogDisplayer.getDefault().createDialog(new DialogDescriptor(p,
                                                               NbBundle.getMessage(GetCmdLineArgumentsAction.class,
                                                                                   "CAPTION_JVMandMainClassCommandLineArguments"), // NOI18N
                                                               true, new Object[] { DialogDescriptor.CLOSED_OPTION },
                                                               DialogDescriptor.CLOSED_OPTION, DialogDescriptor.BOTTOM_ALIGN,
                                                               null, null)).setVisible(true);
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
-            Profiler.getDefault()
-                    .displayWarning(MessageFormat.format(NbBundle.getMessage(GetCmdLineArgumentsAction.class,
+            ProfilerDialogs.displayWarning(MessageFormat.format(NbBundle.getMessage(GetCmdLineArgumentsAction.class,
                                                                              "MSG_NotAvailableNow"),
                                                          new Object[] { e.getMessage() })); // NOI18N
         }
