@@ -36,12 +36,4 @@
             </file>
         </folder>
     </folder>
-    <folder name="Services">
-        <folder name="MIMEResolver">
-            <file name="HprofResolver.xml" url="HprofResolver.xml">
-                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.heapwalker.Bundle#Services/MIMEResolver/HprofResolver.xml"/>
-                <attr name="position" intvalue="99700"/>
-            </file>
-        </folder>
-    </folder>
 </filesystem>
