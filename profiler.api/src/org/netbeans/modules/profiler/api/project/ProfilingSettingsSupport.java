@@ -97,7 +97,7 @@ public final class ProfilingSettingsSupport {
     
     private static synchronized ProfilingSettingsSupport defaultImpl() {
         if (DEFAULT == null)
-            DEFAULT = new ProfilingSettingsSupport(new ProfilingSettingsSupportProvider.Basic());
+            DEFAULT = new ProfilingSettingsSupport(new ProfilingSettingsSupportProvider.Basic(null));
         return DEFAULT;
     }
     

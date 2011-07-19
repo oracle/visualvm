@@ -90,10 +90,42 @@ public abstract class ProfilingSettingsSupportProvider {
     
     
     public static class Basic extends ProfilingSettingsSupportProvider {
+        
+        private final Lookup.Provider project;
 
         @Override
         public float getProfilingOverhead(ProfilingSettings settings) {
-            return -1;
+            float o = 0.0f;
+            int profilingType = settings.getProfilingType();
+
+            if (ProfilingSettings.isMonitorSettings(settings)) {
+                //} else if (ProfilingSettings.isAnalyzerSettings(settings)) {
+            } else if (ProfilingSettings.isCPUSettings(settings)) {
+                if (profilingType == ProfilingSettings.PROFILE_CPU_SAMPLING) {
+                    o += 0.05f; // sample app
+                } else if (profilingType == ProfilingSettings.PROFILE_CPU_ENTIRE) {
+                    o += project == null ? 0.85f : 0.5f; // entire app
+                } else if (profilingType == ProfilingSettings.PROFILE_CPU_PART) {
+                    o += 0.2f; // part of app
+                }
+
+                if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter()) &&
+                    profilingType != ProfilingSettings.PROFILE_CPU_SAMPLING) {
+                    o += 0.5f; // profile all classes
+                }
+            } else if (ProfilingSettings.isMemorySettings(settings)) {
+                if (profilingType == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
+                    o += 0.5f; // object allocations
+                } else if (profilingType == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
+                    o += 0.7f; // object liveness
+                }
+
+                if (settings.getAllocStackTraceLimit() != 0) {
+                    o += 0.3f; // record allocation stack traces
+                }
+            }
+
+            return Math.min(o, 1);
         }
 
         @Override
@@ -116,47 +148,18 @@ public abstract class ProfilingSettingsSupportProvider {
             return null;
         }
         
+        protected final Lookup.Provider getProject() {
+            return project;
+        }
+        
+        public Basic(Lookup.Provider project) {
+            this.project = project;
+        }
+        
     }
     
     public static class Default extends Basic {
-        
-        private final Lookup.Provider project;
 
-        @Override
-        public float getProfilingOverhead(ProfilingSettings settings) {
-            float o = 0.0f;
-            int profilingType = settings.getProfilingType();
-
-            if (ProfilingSettings.isMonitorSettings(settings)) {
-                //} else if (ProfilingSettings.isAnalyzerSettings(settings)) {
-            } else if (ProfilingSettings.isCPUSettings(settings)) {
-                if (profilingType == ProfilingSettings.PROFILE_CPU_SAMPLING) {
-                    o += 0.05f; // sample app
-                } else if (profilingType == ProfilingSettings.PROFILE_CPU_ENTIRE) {
-                    o += 0.5f; // entire app
-                } else if (profilingType == ProfilingSettings.PROFILE_CPU_PART) {
-                    o += 0.2f; // part of app
-                }
-
-                if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter()) &&
-                    profilingType != ProfilingSettings.PROFILE_CPU_SAMPLING) {
-                    o += 0.5f; // profile all classes
-                }
-            } else if (ProfilingSettings.isMemorySettings(settings)) {
-                if (profilingType == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
-                    o += 0.5f; // object allocations
-                } else if (profilingType == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
-                    o += 0.7f; // object liveness
-                }
-
-                if (settings.getAllocStackTraceLimit() != 0) {
-                    o += 0.3f; // record allocation stack traces
-                }
-            }
-
-            return o;
-        }
-        
         @Override
         public String getProjectOnlyFilterName() {
             return NbBundle.getMessage(ProfilingSettingsSupportProvider.class,
@@ -165,18 +168,13 @@ public abstract class ProfilingSettingsSupportProvider {
         
         @Override
         public String getProjectSubprojectsFilterName() {
-            return !ProjectUtilities.hasSubprojects(project) ? null :
+            return !ProjectUtilities.hasSubprojects(getProject()) ? null :
                     NbBundle.getMessage(ProfilingSettingsSupportProvider.class,
                     "ProfilingSettingsSupportProvider_ProfileProjectSubprojectClassesString"); // NOI18N
         }
         
-        
-        protected final Lookup.Provider getProject() {
-            return project;
-        }
-        
         public Default(Lookup.Provider project) {
-            this.project = project;
+            super(project);
         }
         
     }
