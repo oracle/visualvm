@@ -18,6 +18,7 @@
                 <folder name="Factories">
                     <file name="HprofDataLoader.instance">
                         <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/heapwalk/ui/icons/snapshotDataObject.png"/>
+                        <attr name="position" intvalue="10"/>
                         <attr name="weight" intvalue="100"/>
                         <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.heapwalker.HprofDataObject"/>
                         <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
