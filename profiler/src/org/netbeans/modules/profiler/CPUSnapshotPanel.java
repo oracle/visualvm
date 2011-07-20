@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
@@ -58,11 +57,9 @@ import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.modules.profiler.actions.FindNextAction;
 import org.netbeans.modules.profiler.actions.FindPreviousAction;
 import org.netbeans.modules.profiler.ui.FindDialog;
-import org.netbeans.modules.profiler.ui.Utils;
-import org.netbeans.modules.profiler.ui.stp.ProfilingSettingsManager;
+import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.actions.FindAction;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.SystemAction;
 import java.awt.*;
@@ -82,6 +79,12 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
 
@@ -101,18 +104,18 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void addMethodToRoots(final String className, final String methodName, final String methodSig) {
-            Project project = loadedSnapshot.getProject();
-            ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
+            Lookup.Provider project = loadedSnapshot.getProject();
+            ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project)
                                                                           .getProfilingSettings();
             List<ProfilingSettings> cpuSettings = new ArrayList();
 
             for (ProfilingSettings settings : projectSettings) {
-                if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
                     cpuSettings.add(settings);
                 }
             }
 
-            ProfilingSettings settings = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
+            ProfilingSettings settings = IDEUtils.selectSettings(ProfilingSettings.PROFILE_CPU_PART,
                                                                  cpuSettings.toArray(new ProfilingSettings[cpuSettings.size()]),
                                                                  null);
 
@@ -123,12 +126,12 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             settings.addRootMethod(className, methodName, methodSig);
 
             if (cpuSettings.contains(settings)) {
-                ProfilingSettingsManager.getDefault().storeProfilingSettings(projectSettings, settings, project);
+                ProfilingSettingsManager.storeProfilingSettings(projectSettings, settings, project);
             } else {
                 ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
                 System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
                 newProjectSettings[projectSettings.length] = settings;
-                ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
+                ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settings, project);
             }
         }
 
@@ -169,7 +172,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
-            NetBeansProfiler.getDefaultNB().openJavaSource(loadedSnapshot.getProject(), className, methodName, methodSig);
+            GoToSource.openSource(loadedSnapshot.getProject(), className, methodName, methodSig);
         }
 
         public void showSubtreeCallGraph(CPUResultsSnapshot s, CCTNode node, int view, int sortingColumn, boolean sortingOrder) {
@@ -313,17 +316,17 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private static final String FIND_IN_CALLTREE_STRING = MessageFormat.format(FIND_IN_STATEMENT, new Object[] { CALLTREE_STRING });
 
     // -----
-    private static final ImageIcon CLASSES_ICON = Utils.CLASS_ICON;
-    private static final ImageIcon METHODS_ICON = Utils.METHODS_ICON;
-    private static final ImageIcon PACKAGES_ICON = Utils.PACKAGE_ICON;
-    private static final ImageIcon CALL_TREE_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/callTreeTab.png", false);
-    private static final ImageIcon HOTSPOTS_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/hotspotsTab.png", false);
-    private static final ImageIcon COMBINED_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/combinedTab.png", false);
-    private static final ImageIcon INFO_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/infoTab.png", false);
-    private static final ImageIcon BACK_TRACES_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/backTracesTab.png", false);
-    private static final ImageIcon SUBTREE_TAB_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/subtree.png", false);
-    private static final ImageIcon SLAVE_DOWN_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/slaveDown.png", false);
-    private static final ImageIcon SLAVE_UP_ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/slaveUp.png", false);
+    private static final Icon CLASSES_ICON = Icons.getIcon(LanguageIcons.CLASS);
+    private static final Icon METHODS_ICON = Icons.getIcon(LanguageIcons.METHODS);
+    private static final Icon PACKAGES_ICON = Icons.getIcon(LanguageIcons.PACKAGE);
+    private static final Icon CALL_TREE_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_CALL_TREE);
+    private static final Icon HOTSPOTS_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS);
+    private static final Icon COMBINED_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_COMBINED);
+    private static final Icon INFO_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_INFO);
+    private static final Icon BACK_TRACES_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_BACK_TRACES);
+    private static final Icon SUBTREE_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_SUBTREE);
+    private static final Icon SLAVE_DOWN_ICON = Icons.getIcon(GeneralIcons.SLAVE_DOWN);
+    private static final Icon SLAVE_UP_ICON = Icons.getIcon(GeneralIcons.SLAVE_UP);
     private static final double SPLIT_HALF = 0.5d;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -581,7 +584,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         
         if (findActionPresenter instanceof AbstractButton) {
             AbstractButton ab = (AbstractButton)findActionPresenter;
-            ab.setIcon(Utils.FIND_ACTION_ICON);
+            ab.setIcon(Icons.getIcon(GeneralIcons.FIND));
             ab.setText(""); // NOI18N
             ab.setToolTipText(FIND_ACTION_TOOLTIP);
         }
@@ -837,7 +840,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 
@@ -929,7 +932,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 
@@ -1021,7 +1024,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            NetBeansProfiler.getDefaultNB().displayInfoAndWait(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
         }
     }
 

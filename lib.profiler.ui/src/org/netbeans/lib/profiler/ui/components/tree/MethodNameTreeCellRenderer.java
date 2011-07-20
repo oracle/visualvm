@@ -48,6 +48,8 @@ import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import java.awt.Component;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -59,9 +61,8 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private ImageIcon allThreadsIcon = new ImageIcon(MethodNameTreeCellRenderer.class
-                                                         .getResource("/org/netbeans/lib/profiler/ui/resources/allThreads.png")); //NOI18N
-    private ImageIcon threadIcon = new ImageIcon(MethodNameTreeCellRenderer.class.getResource("/org/netbeans/lib/profiler/ui/resources/thread.png")); //NOI18N
+    private Icon allThreadsIcon = Icons.getIcon(ProfilerIcons.ALL_THREADS);
+    private Icon threadIcon = Icons.getIcon(ProfilerIcons.THREAD);
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 

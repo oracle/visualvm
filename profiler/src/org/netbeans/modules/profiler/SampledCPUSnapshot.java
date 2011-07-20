@@ -55,6 +55,7 @@ import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableE
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.modules.profiler.LoadedSnapshot.SamplesInputStream;
 import org.netbeans.modules.profiler.LoadedSnapshot.ThreadsSample;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.openide.filesystems.FileObject;
 
 /** SampledCPUSnapshot provides access to NPSS file
@@ -192,16 +193,17 @@ public final class SampledCPUSnapshot {
     }
 
     private void printThreads(final StringBuilder sb, ThreadInfo[] threads) {
+        boolean goToSourceAvailable = GoToSource.isAvailable();
         sb.append("<pre>"); // NOI18N
         for (ThreadInfo thread : threads) {
             if (thread != null) {
-                print16Thread(sb, thread);
+                print16Thread(sb, thread, goToSourceAvailable);
             }
         }
         sb.append("</pre>"); // NOI18N
     }
 
-    private void print16Thread(final StringBuilder sb, final ThreadInfo thread) {
+    private void print16Thread(final StringBuilder sb, final ThreadInfo thread, boolean goToSourceAvailable) {
         MonitorInfo[] monitors = thread.getLockedMonitors();
         sb.append("&nbsp;<b>");   // NOI18N
         sb.append("\"" + thread.getThreadName() + // NOI18N
@@ -216,10 +218,14 @@ public final class SampledCPUSnapshot {
             String className = st.getClassName();
             String method = st.getMethodName();
             int lineNo = st.getLineNumber();
-            String stackUrl = OPEN_THREADS_URL+className+"|"+method+"|"+lineNo; // NOI18N
-            String stackElHref = "<a href=\""+stackUrl+"\">"+stackElementText+"</a>";    // NOI18N
+            
+            String stackEl = stackElementText;
+            if (goToSourceAvailable) {
+                String stackUrl = OPEN_THREADS_URL+className+"|"+method+"|"+lineNo; // NOI18N
+                stackEl = "<a href=\""+stackUrl+"\">"+stackElementText+"</a>";    // NOI18N
+            }
 
-            sb.append("\tat " + stackElHref + "<br>");    // NOI18N
+            sb.append("\tat " + stackEl + "<br>");    // NOI18N
             if (index == 0) {
                 if ("java.lang.Object".equals(st.getClassName()) &&     // NOI18N
                         "wait".equals(st.getMethodName())) {                // NOI18N

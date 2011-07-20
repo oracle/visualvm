@@ -43,15 +43,14 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
-import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.JavaPlatform;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 
 
 /**
@@ -91,27 +90,15 @@ public final class RunCalibrationAction extends AbstractAction {
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(NbBundle.getMessage(RunCalibrationAction.class,
-                                                                                                 "MSG_CalibrationOnProfile"), //NOI18N
-                                                                             NbBundle.getMessage(RunCalibrationAction.class,
-                                                                                                 "CAPTION_Question"),
-                                                                             NotifyDescriptor.YES_NO_OPTION // NOI18N
-                );
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(NbBundle.getMessage(RunCalibrationAction.class,
+                        "MSG_CalibrationOnProfile"), NbBundle.getMessage(RunCalibrationAction.class, "CAPTION_Question"))) { //NOI18N
                     return;
                 }
 
                 terminate = true;
             } else {
-                final NotifyDescriptor d = new NotifyDescriptor.Confirmation(NbBundle.getMessage(RunCalibrationAction.class,
-                                                                                                 "MSG_CalibrationOnAttach"), //NOI18N
-                                                                             NbBundle.getMessage(RunCalibrationAction.class,
-                                                                                                 "CAPTION_Question"),
-                                                                             NotifyDescriptor.YES_NO_OPTION // NOI18N
-                );
-
-                if (ProfilerDialogs.notify(d) != NotifyDescriptor.YES_OPTION) {
+                if (!ProfilerDialogs.displayConfirmation(NbBundle.getMessage(RunCalibrationAction.class,
+                        "MSG_CalibrationOnAttach"), NbBundle.getMessage(RunCalibrationAction.class, "CAPTION_Question"))) { //NOI18N
                     return;
                 }
 
@@ -129,7 +116,7 @@ public final class RunCalibrationAction extends AbstractAction {
         }
 
         final JavaPlatform calibratePlatform = platform;
-        IDEUtils.getProfilerRequestProcessor().post(new Runnable() {
+        ProfilerUtils.getProfilerRequestProcessor().post(new Runnable() {
                 public void run() {
                     if (doDetach) {
                         Profiler.getDefault().detachFromApp();
@@ -138,11 +125,10 @@ public final class RunCalibrationAction extends AbstractAction {
                     }
 
                     if (!Profiler.getDefault()
-                                     .runCalibration(false, IDEUtils.getPlatformJavaFile(calibratePlatform),
-                                                         IDEUtils.getPlatformJDKVersion(calibratePlatform),
-                                                         IDEUtils.getPlatformArchitecture(calibratePlatform))) {
-                        Profiler.getDefault()
-                                .displayError(NbBundle.getMessage(RunCalibrationAction.class, "MSG_CalibrationFailed")); //NOI18N
+                                     .runCalibration(false, calibratePlatform.getPlatformJavaFile(),
+                                                         calibratePlatform.getPlatformJDKVersion(),
+                                                         calibratePlatform.getPlatformArchitecture())) {
+                        ProfilerDialogs.displayError(NbBundle.getMessage(RunCalibrationAction.class, "MSG_CalibrationFailed")); //NOI18N
                     }
                 }
             }, 0, Thread.MAX_PRIORITY);
