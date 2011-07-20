@@ -64,6 +64,9 @@ import org.netbeans.modules.profiler.actions.*;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObject;
+import org.openide.loaders.DataObjectNotFoundException;
+import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -77,8 +80,6 @@ import java.awt.event.*;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -86,8 +87,6 @@ import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.*;
@@ -1236,12 +1235,12 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         private void deleteSnapshots(FileObject[] selectedSnapshots) {
             for (int i = 0; i < selectedSnapshots.length; i++) {
                 FileObject selectedSnapshotFile = selectedSnapshots[i];
-                String selectedSnapshotFileExt = selectedSnapshotFile.getExt();
-
-                if (selectedSnapshotFileExt.equalsIgnoreCase(ResultsManager.SNAPSHOT_EXTENSION)) {
-                    ResultsManager.getDefault().deleteSnapshot(selectedSnapshots[i]);
-                } else if (selectedSnapshotFileExt.equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
-// TTTTT            HeapWalkerManager.getDefault().deleteHeapDump(FileUtil.toFile(selectedSnapshotFile));
+                try {
+                    DataObject.find(selectedSnapshotFile).delete();
+                } catch (DataObjectNotFoundException ex) {
+                    Exceptions.printStackTrace(ex);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
                 }
             }
         }

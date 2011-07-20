@@ -87,4 +87,9 @@ public class HprofDataObject extends MultiDataObject implements OpenCookie {
             }
         });
     }
+
+    @Override
+    protected void handleDelete() throws IOException {
+        HeapWalkerManager.getDefault().deleteHeapDump(FileUtil.toFile(getPrimaryFile()));
+    }
 }
