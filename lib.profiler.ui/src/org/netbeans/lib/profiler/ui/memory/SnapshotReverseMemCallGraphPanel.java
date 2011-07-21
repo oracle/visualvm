@@ -71,6 +71,8 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -109,8 +111,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         noContentPanel.setLayout(new BorderLayout());
         noContentPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        JLabel noContentIcon = new JLabel(new javax.swing.ImageIcon(getClass()
-                                                                        .getResource("/org/netbeans/lib/profiler/ui/resources/takeSnapshotMem.png"))); // NOI18N
+        JLabel noContentIcon = new JLabel(Icons.getIcon(ProfilerIcons.SNAPSHOT_MEMORY_32));
         noContentIcon.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 5));
         noContentIcon.setVerticalAlignment(SwingConstants.TOP);
         noContentIcon.setEnabled(false);

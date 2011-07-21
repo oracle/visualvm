@@ -121,7 +121,12 @@ public class SimpleFilter {
 
         SimpleFilter simpleFilter = (SimpleFilter) o;
 
-        if (!filterName.equals(simpleFilter.filterName)) {
+        if (filterName == null && simpleFilter.filterName != null ||
+            filterName != null && simpleFilter.filterName == null) {
+            return false;
+        }
+        if (filterName != null && simpleFilter.filterName != null &&
+            !filterName.equals(simpleFilter.filterName)) {
             return false;
         }
 

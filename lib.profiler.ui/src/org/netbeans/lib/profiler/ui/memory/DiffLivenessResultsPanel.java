@@ -55,6 +55,7 @@ import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
+import org.netbeans.modules.profiler.api.GoToSource;
 
 
 /**
@@ -88,7 +89,7 @@ public class DiffLivenessResultsPanel extends SnapshotLivenessResultsPanel {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == popupShowSource) {
+        if (e.getSource() == popupShowSource && popupShowSource != null) {
             performDefaultAction(-1);
         }
     }
@@ -101,13 +102,15 @@ public class DiffLivenessResultsPanel extends SnapshotLivenessResultsPanel {
         if (popup == null) {
             popup = new JPopupMenu();
 
-            Font boldfont = popup.getFont().deriveFont(Font.BOLD);
+            if (GoToSource.isAvailable()) {
+                Font boldfont = popup.getFont().deriveFont(Font.BOLD);
 
-            popupShowSource = new JMenuItem();
-            popupShowSource.setText(GO_SOURCE_POPUP_ITEM);
-            popupShowSource.setFont(boldfont);
-            popup.add(popupShowSource);
-            popupShowSource.addActionListener(this);
+                popupShowSource = new JMenuItem();
+                popupShowSource.setText(GO_SOURCE_POPUP_ITEM);
+                popupShowSource.setFont(boldfont);
+                popup.add(popupShowSource);
+                popupShowSource.addActionListener(this);
+            }
         }
 
         return popup;
