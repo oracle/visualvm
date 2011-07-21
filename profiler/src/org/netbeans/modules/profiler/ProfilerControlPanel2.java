@@ -1285,8 +1285,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         }
 
         private void refreshList() {
-            final int[] selIdx = new int[] {-1};
-            listModel.removeAllElements();
+            final Object[] sel = list.getSelectedValues();
             
             org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker() {
                 private final java.util.List modelElements = new ArrayList<Object>();
@@ -1298,24 +1297,20 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
                     FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject);
                     modelElements.addAll(Arrays.asList(heapdumpsOnDisk));
-
-                    if (selIdx[0] != -1) { // keep selected index, if there was selection previously and there are remaining items
-
-                        if (selIdx[0] >= modelElements.size()) {
-                            selIdx[0] = modelElements.size() - 1;
-                        }
-                    }
                 }
 
                 @Override
                 protected void done() {
+                    DefaultListModel newListModel = new DefaultListModel();
+                    for(Object element : modelElements)
+                        newListModel.addElement(element);
+                    list.setModel(newListModel);
                     listModel.removeAllElements();
-                    for(Object e : modelElements) {
-                        listModel.addElement(e);
-                    }
+                    listModel = newListModel;
                     list.setEnabled(true);
-                    if (selIdx[0] != -1) {
-                        list.setSelectedIndex(selIdx[0]);
+                    for (Object s : sel) {
+                        int i = listModel.indexOf(s);
+                        if (i != -1) list.addSelectionInterval(i, i);
                     }
                 }
 
