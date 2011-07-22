@@ -158,6 +158,7 @@ public interface CommonConstants {
     // Internally they are translated into INSTR_RECURSIVE and INSTR_RECURSIVE_SAMPLED, respectively
     public static final int CPU_INSTR_FULL = 0;
     public static final int CPU_INSTR_SAMPLED = 1;
+    public static final int CPU_SAMPLED = 2;
 
     // Target app instrumentation schemes for CPU profiling
     public static final int INSTRSCHEME_LAZY = 1; // Lazy scheme (B in the NB Profiler papers/report)
