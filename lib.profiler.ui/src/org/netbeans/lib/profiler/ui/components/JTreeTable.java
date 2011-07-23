@@ -62,6 +62,8 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**
@@ -435,8 +437,8 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     protected int lastRow = -1;
     private AbstractTreeTableModel treeTableModel;
     private CustomSortableHeaderRenderer headerRenderer;
-    private ImageIcon sortAscIcon = new ImageIcon(JTreeTable.class.getResource("/org/netbeans/lib/profiler/ui/resources/sortAsc.png")); //NOI18N
-    private ImageIcon sortDescIcon = new ImageIcon(JTreeTable.class.getResource("/org/netbeans/lib/profiler/ui/resources/sortDesc.png")); //NOI18N
+    private ImageIcon sortAscIcon = Icons.getImageIcon(GeneralIcons.SORT_ASCENDING);
+    private ImageIcon sortDescIcon = Icons.getImageIcon(GeneralIcons.SORT_DESCENDING);
     private JTableHeader tableHeader;
     private String internalFindString;
 
