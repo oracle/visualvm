@@ -39,38 +39,12 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api;
-
-import org.openide.util.Lookup;
-import org.openide.util.lookup.Lookups;
-import org.openide.util.lookup.ProxyLookup;
+package org.netbeans.modules.profiler.api.java;
 
 /**
- * IDE agnostic project definition wrapper.<br/>
- * Basically, a simple {@linkplain Lookup.Provider} which contains, as a part 
- * of its lookup, the real project implementation.
- * 
+ *
  * @author Jaroslav Bachorik
  */
-abstract public class ProfilerProject implements Lookup.Provider {
-    final private Object lkpLock = new Object();
-    // @GuardedBy lkpLock
-    private Lookup lkp;
-    private Lookup.Provider provider;
+public class SourceClassInfoCache {
     
-    protected ProfilerProject(Lookup.Provider project) {
-        this.provider = project;
-    }
-
-    @Override
-    public Lookup getLookup() {
-        synchronized(lkpLock) {
-            if (lkp == null) {
-                lkp = new ProxyLookup(provider.getLookup(), Lookups.fixed(provider, this), additionalLookup());
-            }
-            return lkp;
-        }
-    }
-    
-    abstract protected Lookup additionalLookup();
 }

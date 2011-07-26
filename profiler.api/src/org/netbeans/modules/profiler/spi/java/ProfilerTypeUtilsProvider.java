@@ -42,9 +42,8 @@
 package org.netbeans.modules.profiler.spi.java;
 
 import java.util.Collection;
-import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
-import org.openide.filesystems.FileObject;
-import org.openide.util.Lookup;
+import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 
 /**
  * An SPI for {@linkplain ProfilerTypeUtils} functionality
@@ -52,24 +51,16 @@ import org.openide.util.Lookup;
  */
 public interface ProfilerTypeUtilsProvider {
     /**
-     * Retrieves a list of subclasses for the given class name
-     * @param className The class name to check for subclasses
-     * @param project The project to search the subclasses in
-     * @return Returns an array of subclasses for the class specified by the class name
+     * 
+     * @param className A fully qualified class name
+     * @param project The project to resolve the class for
+     * @return Returns a resolved class or NULL
      */
-    String[] getSubclasses(String className, Lookup.Provider project);
-
+    SourceClassInfo resolveClass(String className, JavaProfilerProject project);
+    
     /**
      * @param project The project to search the main classes in
      * @return Returns a list of all main classes present in the project
      */
-    Collection<String> getMainClasses(Lookup.Provider project);
-
-    /**
-     * Finds the defining file for the given class name
-     * @param className The class name to get the defining file for
-     * @param project The project to search the defining file in
-     * @return Returns the defining file for the given class name or NULL
-     */
-    FileObject findFile(String className, Lookup.Provider project);
+    Collection<SourceClassInfo> getMainClasses(JavaProfilerProject project);
 }

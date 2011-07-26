@@ -43,8 +43,8 @@ package org.netbeans.modules.profiler.spi.java;
 
 import java.util.Collections;
 import java.util.Set;
-import org.netbeans.modules.profiler.api.java.JavaProfilerSource.ClassInfo;
-import org.netbeans.modules.profiler.api.java.JavaProfilerSource.MethodInfo;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
+import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -65,32 +65,32 @@ public interface AbstractJavaProfilerSource {
         }
 
         @Override
-        public ClassInfo getTopLevelClass(FileObject fo) {
+        public SourceClassInfo getTopLevelClass(FileObject fo) {
             return null;
         }
 
         @Override
-        public Set<ClassInfo> getClasses(FileObject fo) {
+        public Set<SourceClassInfo> getClasses(FileObject fo) {
             return Collections.EMPTY_SET;
         }
 
         @Override
-        public Set<ClassInfo> getMainClasses(FileObject fo) {
+        public Set<SourceClassInfo> getMainClasses(FileObject fo) {
             return Collections.EMPTY_SET;
         }
 
         @Override
-        public Set<MethodInfo> getConstructors(FileObject fo) {
+        public Set<SourceMethodInfo> getConstructors(FileObject fo) {
             return Collections.EMPTY_SET;
         }
 
         @Override
-        public ClassInfo getEnclosingClass(FileObject fo, int position) {
+        public SourceClassInfo getEnclosingClass(FileObject fo, int position) {
             return null;
         }
 
         @Override
-        public MethodInfo getEnclosingMethod(FileObject fo, int position) {
+        public SourceMethodInfo getEnclosingMethod(FileObject fo, int position) {
             return null;
         }
 
@@ -120,12 +120,12 @@ public interface AbstractJavaProfilerSource {
         }
 
         @Override
-        public MethodInfo resolveMethodAtPosition(FileObject fo, int position) {
+        public SourceMethodInfo resolveMethodAtPosition(FileObject fo, int position) {
             return null;
         }
 
         @Override
-        public ClassInfo resolveClassAtPosition(FileObject fo, int position, boolean resolveField) {
+        public SourceClassInfo resolveClassAtPosition(FileObject fo, int position, boolean resolveField) {
             return null;
         }
     };
@@ -146,28 +146,28 @@ public interface AbstractJavaProfilerSource {
      * @param fo The source file. Must not be NULL
      * @return Returns {@linkplain ClassInfo} of a top level class
      */
-    ClassInfo getTopLevelClass(FileObject fo);
+    SourceClassInfo getTopLevelClass(FileObject fo);
     
     /**
      * Lists all top level classes contained in the source
      * @param fo The source file. Must not be NULL
      * @return Returns a set of {@linkplain ClassInfo} instances from a source
      */
-    Set<ClassInfo> getClasses(FileObject fo);
+    Set<SourceClassInfo> getClasses(FileObject fo);
 
     /**
      * Lists all main classes contained in the source
      * @param fo The source file. Must not be NULL
      * @return Returns a set of {@linkplain ClassInfo} instances from a source
      */
-    Set<ClassInfo> getMainClasses(FileObject fo);
+    Set<SourceClassInfo> getMainClasses(FileObject fo);
     
     /**
      * Lists all constructors contained in the source
      * @param fo The source file. Must not be NULL
      * @return Returns a set of {@linkplain MethodInfo} instances from the source
      */
-    Set<MethodInfo> getConstructors(FileObject fo);
+    Set<SourceMethodInfo> getConstructors(FileObject fo);
 
     /**
      * Finds a class present on the given position in the source
@@ -175,7 +175,7 @@ public interface AbstractJavaProfilerSource {
      * @param position The position in the source
      * @return Returns a {@linkplain ClassInfo} for the class present on the given position
      */
-    ClassInfo getEnclosingClass(FileObject fo, final int position);
+    SourceClassInfo getEnclosingClass(FileObject fo, final int position);
 
     /**
      * Finds a method present on the given position in the source
@@ -183,7 +183,7 @@ public interface AbstractJavaProfilerSource {
      * @param position The position in the source
      * @return Returns a {@linkplain MethodInfo} for the method present on the given position
      */
-    MethodInfo getEnclosingMethod(FileObject fo, final int position);
+    SourceMethodInfo getEnclosingMethod(FileObject fo, final int position);
 
     /**
      * Checks whether the source represents any or all of the provided superclasses/interfaces
@@ -235,7 +235,7 @@ public interface AbstractJavaProfilerSource {
      * @param position The position to check for method definition or invocation
      * @return Returns the {@linkplain MethodInfo} for the method definition or invocation at the given position or NULL if there is none
      */
-    MethodInfo resolveMethodAtPosition(FileObject fo, int position);
+    SourceMethodInfo resolveMethodAtPosition(FileObject fo, int position);
     
     /**
      * Resolves a class at the given position<br/>
@@ -246,5 +246,5 @@ public interface AbstractJavaProfilerSource {
      * @param resolveField Should the class be resolved from a variable type too?
      * @return Returns the {@linkplain ClassInfo} for the class definition or reference at the given position or NULL if there is none
      */
-    ClassInfo resolveClassAtPosition(FileObject fo, int position, boolean resolveField);
+    SourceClassInfo resolveClassAtPosition(FileObject fo, int position, boolean resolveField);
 }

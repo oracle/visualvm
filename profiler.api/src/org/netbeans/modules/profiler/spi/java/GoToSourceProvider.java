@@ -42,8 +42,8 @@
 
 package org.netbeans.modules.profiler.spi.java;
 
+import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Lookup;
 
 /**
  *
@@ -59,7 +59,7 @@ public abstract class GoToSourceProvider {
      * @param line The line number or {@linkplain Integer#MIN_VALUE}
      * @return Returns TRUE if the infrastructure was able to open the source code, FALSE otherwise
      */
-    public abstract boolean openSource(Lookup.Provider project, String className, String methodName, String signature, int line);
+    public abstract boolean openSource(JavaProfilerProject project, String className, String methodName, String signature, int line);
     
     /**
      * Implementors will provide a specific functionality to open a source code file on a given position

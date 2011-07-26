@@ -50,6 +50,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.swing.JPanel;
@@ -59,6 +60,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.openide.util.Lookup;
 
 
@@ -143,12 +145,14 @@ public class MainClassChooser extends JPanel {
     }
 
     private void initClassesView(final Lookup.Provider project) {
-        possibleMainClasses = null;
+        possibleMainClasses = new ArrayList<String>();
         jMainClassList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jMainClassList.setListData(getWarmupList());
         RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    possibleMainClasses = JavaProfilerProject.createFrom(project).getTypeUtils().getMainClasses();
+                    for(SourceClassInfo sci : JavaProfilerProject.createFrom(project).getMainClasses()) {
+                        possibleMainClasses.add(sci.getQualifiedName());
+                    }
 
                     if (possibleMainClasses.isEmpty()) {
                         jMainClassList.setListData(new String[] {

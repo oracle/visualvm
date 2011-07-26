@@ -808,149 +808,111 @@ public abstract class NetBeansProfiler extends Profiler {
     public boolean attachToApp(final ProfilingSettings profilingSettings, final AttachSettings attachSettings) {
         profilingMode = MODE_ATTACH;
 
-        final OutputParameter<Boolean> methodResults = new OutputParameter<Boolean>(Boolean.TRUE);
-
-        new NBSwingWorker(false) {
-                private ProgressHandle ph = null;
-
-                @Override
-                protected void doInBackground() {
-                    if (getProfilingState() != PROFILING_INACTIVE) {
-                        if (lastMode == MODE_ATTACH) {
-                            detachFromApp(); // if attached, detach
-                        } else if (targetAppRunner.targetJVMIsAlive()) {
-                            targetAppRunner.terminateTargetJVM(); // otherwise kill current app if running
-                        }
-                    }
-
-                    // remember profiling settings
-                    lastProfilingSettings = profilingSettings;
-                    lastSessionSettings = null;
-                    lastMode = MODE_ATTACH;
-
-                    final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
-                    profilingSettings.applySettings(sharedSettings); // can override the session settings
-                    attachSettings.applySettings(sharedSettings);
-
-                    //getThreadsManager().setSupportsSleepingStateMonitoring(
-                    // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                    printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
-                    printDebugMsg("profiling settings --------------------------------", false); //NOI18N
-                    printDebugMsg(profilingSettings.debug(), false);
-                    printDebugMsg("attach settings -----------------------------------", false); //NOI18N
-                    printDebugMsg(attachSettings.debug(), false);
-                    printDebugMsg("instrumentation filter ----------------------------", false); //NOI18N
-                    printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
-                    printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
-                    flushDebugMsgs();
-
-                    GestureSubmitter.logAttach(getProfiledProject(), attachSettings);
-                    GestureSubmitter.logConfig(profilingSettings);
-
-                    changeStateTo(PROFILING_STARTED);
-
-                    cleanupBeforeProfiling(sharedSettings);
-
-                    setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
-
-                    CommonUtils.runInEventDispatchThread(new Runnable() {
-                            public void run() {
-                                openWindowsOnProfilingStart();
-                            }
-                        });
-
-                    if (attachSettings.isDirect()) { // Previously known as "attach on startup"
-                                                     // The VM is already started with all necessary options and waiting for us to connect.
-                                                     // Remote profiling case fits here too - it's distinguished in ProfilerClient using attachSettings.isRemote()
-                                                     // perform the selected instrumentation - it will really start right after the target app starts
-
-                        boolean success = false;
-
-                        if (prepareInstrumentation(profilingSettings)) {
-                            success = targetAppRunner.initiateSession(1, false) && targetAppRunner.attachToTargetVMOnStartup();
-                        }
-
-                        if (!success) {
-                            changeStateTo(PROFILING_INACTIVE);
-                            // change state back to inactive and fire, return false
-                            methodResults.setValue(false);
-
-                            return;
-                        }
-                    } else if (attachSettings.isDynamic16()) {
-                        String jar = getLibsDir() + "/jfluid-server-15.jar"; // NOI18N
-                        String pid = String.valueOf(attachSettings.getPid());
-                        String options = String.valueOf(attachSettings.getPort());
-                        boolean success = false;
-
-                        try {
-                            loadAgentIntoTargetJVM(jar, options, pid);
-
-                            if (prepareInstrumentation(profilingSettings)) {
-                                success = targetAppRunner.initiateSession(2, false) && targetAppRunner.attachToTargetVM();
-                            }
-                        } catch (Exception ex) {
-                            ProfilerDialogs.displayError(ex.getMessage());
-                            ProfilerLogger.log(ex);
-                        }
-
-                        if (!success) {
-                            changeStateTo(PROFILING_INACTIVE);
-                            // change state back to inactive and fire, return false
-                            methodResults.setValue(false);
-
-                            return;
-                        }
-                    } else {
-                        throw new IllegalArgumentException("Invalid settings " + attachSettings); // NOI18N
-                    }
-
-                    if (targetAppRunner.targetAppIsRunning()) {
-                        getThreadsManager()
-                            .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                        monitor.monitorVM(targetAppRunner);
-
-                        if (threadsMonitoringEnabled) {
-                            CommonUtils.runInEventDispatchThread(new Runnable() {
-                                    public void run() {
-                                        ThreadsWindow.getDefault().showThreads();
-                                    }
-                                });
-                        }
-
-                        methodResults.setValue(true);
-
-                        return;
-                    } else {
-                        methodResults.setValue(false);
-
-                        return;
-                    }
+        ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(NetBeansProfiler.class, "NetBeansProfiler_StartingSession")); // NOI18N
+        ph.setInitialDelay(500);
+        
+        ph.start();
+        
+        try {
+            if (getProfilingState() != PROFILING_INACTIVE) {
+                if (lastMode == MODE_ATTACH) {
+                    detachFromApp(); // if attached, detach
+                } else if (targetAppRunner.targetJVMIsAlive()) {
+                    targetAppRunner.terminateTargetJVM(); // otherwise kill current app if running
                 }
+            }
 
-                private void loadAgentIntoTargetJVM(final String jar, final String options, final String pid)
+            // remember profiling settings
+            lastProfilingSettings = profilingSettings;
+            lastSessionSettings = null;
+            lastMode = MODE_ATTACH;
+            
+            final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
+            profilingSettings.applySettings(sharedSettings); // can override the session settings
+            attachSettings.applySettings(sharedSettings);
+
+            //getThreadsManager().setSupportsSleepingStateMonitoring(
+            // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
+            printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
+            printDebugMsg("profiling settings --------------------------------", false); //NOI18N
+            printDebugMsg(profilingSettings.debug(), false);
+            printDebugMsg("attach settings -----------------------------------", false); //NOI18N
+            printDebugMsg(attachSettings.debug(), false);
+            printDebugMsg("instrumentation filter ----------------------------", false); //NOI18N
+            printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
+            printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
+            flushDebugMsgs();
+            
+            GestureSubmitter.logAttach(getProfiledProject(), attachSettings);
+            GestureSubmitter.logConfig(profilingSettings);
+            
+            changeStateTo(PROFILING_STARTED);
+            
+            cleanupBeforeProfiling(sharedSettings);
+            
+            setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
+            
+            CommonUtils.runInEventDispatchThread(new Runnable() {
+
+                public void run() {
+                    openWindowsOnProfilingStart();
+                }
+            });
+            
+            if (attachSettings.isDirect()) { // Previously known as "attach on startup"
+                // The VM is already started with all necessary options and waiting for us to connect.
+                // Remote profiling case fits here too - it's distinguished in ProfilerClient using attachSettings.isRemote()
+                // perform the selected instrumentation - it will really start right after the target app starts
+
+                boolean success = false;
+                
+                if (prepareInstrumentation(profilingSettings)) {
+                    success = targetAppRunner.initiateSession(1, false) && targetAppRunner.attachToTargetVMOnStartup();
+                }
+                
+                if (!success) {
+                    changeStateTo(PROFILING_INACTIVE);
+                    // change state back to inactive and fire, return false
+
+                    return false;
+                }
+            } else if (attachSettings.isDynamic16()) {
+                String jar = getLibsDir() + "/jfluid-server-15.jar"; // NOI18N
+                String pid = String.valueOf(attachSettings.getPid());
+                String options = String.valueOf(attachSettings.getPort());
+                boolean success = false;
+                
+                try {
+                    loadAgentIntoTargetJVM(jar, options, pid);
+                    
+                    if (prepareInstrumentation(profilingSettings)) {
+                        success = targetAppRunner.initiateSession(2, false) && targetAppRunner.attachToTargetVM();
+                    }
+                } catch (Exception ex) {
+                    ProfilerDialogs.displayError(ex.getMessage());
+                    ProfilerLogger.log(ex);
+                }
+                
+                if (!success) {
+                    changeStateTo(PROFILING_INACTIVE);
+                    // change state back to inactive and fire, return false
+
+                    return false;
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid settings " + attachSettings); // NOI18N
+            }
+            
+            return connectToApp();
+        } finally {
+            ph.finish();
+        }
+    }
+    
+    private static void loadAgentIntoTargetJVM(final String jar, final String options, final String pid)
                                             throws AttachNotSupportedException, IOException, AgentLoadException, AgentInitializationException  {
-                    VirtualMachine virtualMachine = VirtualMachine.attach(pid);
-                    virtualMachine.loadAgent(jar,options);
-                }
-
-                @Override
-                protected void nonResponding() {
-                    ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
-                                                                                "NetBeansProfiler_StartingSession")); // NOI18N
-                    ph.start();
-                }
-
-                @Override
-                protected void done() {
-                    if (ph != null) {
-                        ph.finish();
-                        ph = null;
-                    }
-                }
-            }.execute();
-
-        return methodResults.getValue();
+        VirtualMachine virtualMachine = VirtualMachine.attach(pid);
+        virtualMachine.loadAgent(jar,options);
     }
 
     // -- NetBeansProfiler-only public methods -----------------------------------------------------------------------------
@@ -1025,6 +987,7 @@ public abstract class NetBeansProfiler extends Profiler {
      * @param sessionSettings   Session settings for profiling
      * @return true if connected successfully, false otherwise
      */
+    @Override
     public boolean connectToStartedApp(final ProfilingSettings profilingSettings, final SessionSettings sessionSettings) {
         profilingMode = MODE_PROFILE;
 
@@ -1032,112 +995,114 @@ public abstract class NetBeansProfiler extends Profiler {
         lastSessionSettings = sessionSettings;
         lastMode = MODE_PROFILE;
 
-        final OutputParameter<Boolean> methodResult = new OutputParameter<Boolean>(Boolean.TRUE);
+        ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(NetBeansProfiler.class, "NetBeansProfiler_StartingSession")); // NOI18N
+        try {
+            ph.setInitialDelay(500);
+            ph.start();
+            
+            if (targetAppRunner.targetJVMIsAlive()) {
+                targetAppRunner.terminateTargetJVM();
+            }
+            
+            final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
+            
+            sessionSettings.applySettings(sharedSettings);
+            profilingSettings.applySettings(sharedSettings); // can override the session settings
+            sharedSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
 
-        new NBSwingWorker(false) {
-                private ProgressHandle ph = null;
-
-                @Override
-                protected void doInBackground() {
-                    if (targetAppRunner.targetJVMIsAlive()) {
-                        targetAppRunner.terminateTargetJVM();
+            //getThreadsManager().setSupportsSleepingStateMonitoring(
+            // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
+            printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
+            printDebugMsg("profiling settings -------------------------------", false); //NOI18N
+            printDebugMsg(profilingSettings.debug(), false);
+            printDebugMsg("session settings ---------------------------------", false); //NOI18N
+            printDebugMsg(sessionSettings.debug(), false);
+            printDebugMsg("instrumentation filter ---------------------------", false); // NOI18N
+            printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
+            printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
+            flushDebugMsgs();
+            
+            GestureSubmitter.logProfileApp(getProfiledProject(), sessionSettings);
+            GestureSubmitter.logConfig(profilingSettings);
+            
+            if (prepareProfilingSession(profilingSettings, sessionSettings)) {
+                RequestProcessor.getDefault().post(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        // should propagate the result of the following operation somehow; current workflow doesn't allow it
+                        if (tryInitiateSession()) {
+                            connectToApp();
+                        }
                     }
-
-                    final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
-
-                    sessionSettings.applySettings(sharedSettings);
-                    profilingSettings.applySettings(sharedSettings); // can override the session settings
-                    sharedSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
-
-                    //getThreadsManager().setSupportsSleepingStateMonitoring(
-                    // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                    printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
-                    printDebugMsg("profiling settings -------------------------------", false); //NOI18N
-                    printDebugMsg(profilingSettings.debug(), false);
-                    printDebugMsg("session settings ---------------------------------", false); //NOI18N
-                    printDebugMsg(sessionSettings.debug(), false);
-                    printDebugMsg("instrumentation filter ---------------------------", false); // NOI18N
-                    printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
-                    printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
-                    flushDebugMsgs();
-
-                    GestureSubmitter.logProfileApp(getProfiledProject(), sessionSettings);
-                    GestureSubmitter.logConfig(profilingSettings);
-
-                    changeStateTo(PROFILING_STARTED);
-
-                    cleanupBeforeProfiling(sharedSettings);
-
-                    setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
-
-                    CommonUtils.runInEventDispatchThread(new Runnable() {
-                            public void run() {
-                                openWindowsOnProfilingStart();
-                            }
-                        });
-
-                    if (!CalibrationDataFileIO.validateCalibrationInput(sessionSettings.getJavaVersionString(),
-                                                                            sessionSettings.getJavaExecutable())) {
-                        ProfilerDialogs.displayError(CALIBRATION_MISSING_SHORT_MESSAGE, null, CALIBRATION_MISSING_MESSAGE);
-                        changeStateTo(PROFILING_INACTIVE);
-                        methodResult.setValue(Boolean.FALSE);
-
-                        return; // failed, cannot proceed
-                    }
-
-                    // perform the selected instrumentation
-                    if (!prepareInstrumentation(profilingSettings)) {
-                        methodResult.setValue(Boolean.FALSE);
-
-                        return; // failed, cannot proceed
-                    }
-
-                    if (!targetAppRunner.initiateSession(0, false) || !targetAppRunner.connectToStartedVMAndStartTA()) {
-                        changeStateTo(PROFILING_INACTIVE);
-                        methodResult.setValue(Boolean.FALSE);
-
-                        return; // failed, cannot proceed
-                    }
-
-                    if (targetAppRunner.targetAppIsRunning()) {
-                        getThreadsManager()
-                            .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-                        CommonUtils.runInEventDispatchThread(new Runnable() {
-                                public void run() {
-                                    monitor.monitorVM(targetAppRunner);
-                                }
-                            });
-                        methodResult.setValue(Boolean.TRUE);
-
-                        return;
-                    } else {
-                        // TODO: notify the user???
-                        changeStateTo(PROFILING_INACTIVE);
-                        methodResult.setValue(Boolean.FALSE);
-
-                        return; // failed, cannot proceed
-                    }
-                }
-
-                @Override
-                protected void nonResponding() {
-                    ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
-                                                                                "NetBeansProfiler_StartingSession")); // NOI18N
-                    ph.start();
-                }
-
-                @Override
-                protected void done() {
-                    if (ph != null) {
-                        ph.finish();
-                        ph = null;
-                    }
-                }
-            }.execute();
-
-        return methodResult.getValue();
+                });
+                
+                return true;
+            }
+            
+            return false;
+        } finally {
+            ph.finish();
+        }
     }
 
+    private boolean prepareProfilingSession(ProfilingSettings profilingSettings, SessionSettings sessionSettings) {
+        changeStateTo(PROFILING_STARTED);
+
+        cleanupBeforeProfiling(targetAppRunner.getProfilerEngineSettings());
+
+        setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
+
+        CommonUtils.runInEventDispatchThread(new Runnable() {
+                public void run() {
+                    openWindowsOnProfilingStart();
+                }
+            });
+
+        if (!CalibrationDataFileIO.validateCalibrationInput(sessionSettings.getJavaVersionString(),
+                                                                sessionSettings.getJavaExecutable())) {
+            ProfilerDialogs.displayError(CALIBRATION_MISSING_SHORT_MESSAGE, null, CALIBRATION_MISSING_MESSAGE);
+            changeStateTo(PROFILING_INACTIVE);
+
+            return false; // failed, cannot proceed
+        }
+
+        // perform the selected instrumentation
+        if (!prepareInstrumentation(profilingSettings)) {
+            return false; // failed, cannot proceed
+        }
+        
+        return true;
+    }
+    
+    private boolean tryInitiateSession() {
+        if (!targetAppRunner.initiateSession(0, false) || !targetAppRunner.connectToStartedVMAndStartTA()) {
+            changeStateTo(PROFILING_INACTIVE);
+
+            return false; // failed, cannot proceed
+        }
+        return true;
+    }
+    
+    private boolean connectToApp() {
+        if (targetAppRunner.targetAppIsRunning()) {
+            getThreadsManager()
+                .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(targetAppRunner.getProfilerEngineSettings().getTargetJDKVersionString()));
+            CommonUtils.runInEventDispatchThread(new Runnable() {
+                    public void run() {
+                        monitor.monitorVM(targetAppRunner);
+                    }
+                });
+
+            return true;
+        } else {
+            // TODO: notify the user???
+            changeStateTo(PROFILING_INACTIVE);
+
+            return false; // failed, cannot proceed
+        }
+    }
+    
     public void detachFromApp() {
         setTransitionState();
 
@@ -1494,8 +1459,12 @@ public abstract class NetBeansProfiler extends Profiler {
     public void setProfiledProject(Lookup.Provider project, FileObject singleFile) {
         profiledProject = project;
         profiledSingleFile = singleFile;
-
-        ProfilerControlPanel2.getDefault().setProfiledProject(profiledProject);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ProfilerControlPanel2.getDefault().setProfiledProject(profiledProject);
+            }
+        });
     }
 
     public Lookup.Provider getProfiledProject() {
