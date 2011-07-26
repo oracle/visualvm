@@ -56,7 +56,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.modules.profiler.api.EditorSupport;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
-import org.netbeans.modules.profiler.api.java.JavaProfilerSource.MethodInfo;
+import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.openide.util.Lookup;
@@ -133,7 +133,7 @@ public final class AddRootMethodAction extends NodeAction {
                         }
 
                         // Get method at cursor
-                        MethodInfo resolvedMethod = src.resolveMethodAtPosition(currentOffsetInEditor);
+                        SourceMethodInfo resolvedMethod = src.resolveMethodAtPosition(currentOffsetInEditor);
 
                         if (resolvedMethod == null) {
                             ProfilerDialogs.displayWarning(NbBundle.getMessage(AddRootMethodAction.class,

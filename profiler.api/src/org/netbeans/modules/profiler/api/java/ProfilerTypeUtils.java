@@ -42,8 +42,9 @@
 package org.netbeans.modules.profiler.api.java;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.netbeans.modules.profiler.spi.java.ProfilerTypeUtilsProvider;
-import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
@@ -51,9 +52,11 @@ import org.openide.util.Lookup;
  * 
  * @author Jaroslav Bachorik
  */
-final public class ProfilerTypeUtils {
-    final private Lookup.Provider project;
-    ProfilerTypeUtils(Lookup.Provider project) {
+final class ProfilerTypeUtils {
+    final private JavaProfilerProject project;
+    final private Map<String, SourceClassInfo> classInfos = new HashMap<String, SourceClassInfo>();
+    
+    ProfilerTypeUtils(JavaProfilerProject project) {
         this.project = project;
     }
     
@@ -61,35 +64,23 @@ final public class ProfilerTypeUtils {
         return Lookup.getDefault().lookup(ProfilerTypeUtilsProvider.class);
     }
     
-    /**
-     * Retrieves a list of subclasses for the given class name
-     * @param className The class name to check for subclasses
-     * @return Returns an array of subclasses for the class specified by the class name
-     */
-    public String[] getSubclasses(String className) {
-        ProfilerTypeUtilsProvider typeUtils = getProvider();
-        assert typeUtils != null;
-        
-        return typeUtils.getSubclasses(className, project);
-    }
-    
-    /**
-     * Finds the defining file for the given class name
-     * @param className The class name to get the defining file for
-     * @return Returns the defining file for the given class name or NULL
-     */
-    public FileObject findFile(String className) {
-        ProfilerTypeUtilsProvider typeUtils = getProvider();
-        assert typeUtils != null;
-        
-        return typeUtils.findFile(className, project);
+    public SourceClassInfo resolveClass(String className) {
+        SourceClassInfo ci;
+        synchronized(classInfos) {
+            ci = classInfos.get(className);
+            if (ci == null) {
+                ci = getProvider().resolveClass(className, project);
+                classInfos.put(className, ci);
+            }
+        }
+        return ci;
     }
     
     /**
      * 
      * @return Returns a list of all main classes present in the project
      */
-    public Collection<String> getMainClasses() {
+    public Collection<SourceClassInfo> getMainClasses() {
         ProfilerTypeUtilsProvider typeUtils = getProvider();
         assert typeUtils  != null;
         

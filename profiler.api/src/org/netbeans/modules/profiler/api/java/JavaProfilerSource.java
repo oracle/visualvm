@@ -57,58 +57,6 @@ final public class JavaProfilerSource extends ProfilerSource {
     final private AbstractJavaProfilerSource impl;
     
     /**
-     * A simplified java class descriptor
-     */
-    public static interface ClassInfo {
-        /**
-         * 
-         * @return Returns the class simple name (the last part of the FQN)
-         */
-        String getSimpleName();
-        /**
-         * 
-         * @return Returns the class FQN
-         */
-        String getQualifiedName();
-        /**
-         * 
-         * @return Returns the VM internal class name
-         */
-        String getVMName();
-    }
-    /**
-     * A simplified java method descriptor
-     */
-    public static interface MethodInfo {
-        /**
-         * 
-         * @return Returns the containing class FQN
-         */
-        String getClassName();
-        /**
-         * 
-         * @return Returns the method name
-         */
-        String getName();
-        /**
-         * 
-         * @return Returns the method signature
-         */
-        String getSignature();
-        /**
-         * 
-         * @return Returns the VM internal method name
-         */
-        String getVMName();
-        
-        /**
-         * 
-         * @return Returns TRUE if the method is executable (eg. main(String[]) or JSP main method)
-         */
-        boolean isExecutable();
-    }
-    
-    /**
      * Factory method for obtaining a {@linkplain JavaProfilerSource} from a file or NULL
      * @return Returns a {@linkplain JavaProfilerSource} instance or NULL
      */
@@ -148,7 +96,7 @@ final public class JavaProfilerSource extends ProfilerSource {
      * 
      * @return Returns {@linkplain ClassInfo} of a top level class
      */
-    public ClassInfo getTopLevelClass() {
+    public SourceClassInfo getTopLevelClass() {
         return impl.getTopLevelClass(getFile());
     }
     
@@ -156,7 +104,7 @@ final public class JavaProfilerSource extends ProfilerSource {
      * List all top level classes contained in the source
      * @return Returns a set of {@linkplain ClassInfo} instances from a source
      */
-    public Set<ClassInfo> getClasses() {
+    public Set<SourceClassInfo> getClasses() {
         return impl.getClasses(getFile());
     }
     
@@ -164,7 +112,7 @@ final public class JavaProfilerSource extends ProfilerSource {
      * Lists all main classes contained in the source
      * @return Returns a set of {@linkplain ClassInfo} instances from a source
      */
-    public Set<ClassInfo> getMainClasses() {
+    public Set<SourceClassInfo> getMainClasses() {
         return impl.getMainClasses(getFile());
     }
     
@@ -172,7 +120,7 @@ final public class JavaProfilerSource extends ProfilerSource {
      * Lists all constructors contained in the source
      * @return Returns a set of {@linkplain MethodInfo} instances from the source
      */
-    public Set<MethodInfo> getConstructors() {
+    public Set<SourceMethodInfo> getConstructors() {
         return impl.getConstructors(getFile());
     }
     
@@ -181,7 +129,7 @@ final public class JavaProfilerSource extends ProfilerSource {
      * @param position The position in the source
      * @return Returns a {@linkplain ClassInfo} for the class present on the given position
      */
-    public ClassInfo getEnclosingClass(final int position) {
+    public SourceClassInfo getEnclosingClass(final int position) {
         return impl.getEnclosingClass(getFile(), position);
     }
     
@@ -190,7 +138,7 @@ final public class JavaProfilerSource extends ProfilerSource {
      * @param position The position in the source
      * @return Returns a {@linkplain MethodInfo} for the method present on the given position
      */
-    public MethodInfo getEnclosingMethod(final int position) {
+    public SourceMethodInfo getEnclosingMethod(final int position) {
         return impl.getEnclosingMethod(getFile(), position);
     }
     
@@ -248,7 +196,7 @@ final public class JavaProfilerSource extends ProfilerSource {
      * @param position The position to check for method definition or invocation
      * @return Returns the {@linkplain MethodInfo} for the method definition or invocation at the given position or NULL if there is none
      */
-    public MethodInfo resolveMethodAtPosition(int position) {
+    public SourceMethodInfo resolveMethodAtPosition(int position) {
         return impl.resolveMethodAtPosition(getFile(), position);
     }
 
@@ -260,7 +208,7 @@ final public class JavaProfilerSource extends ProfilerSource {
      * @param resolveField Should the class be resolved from a variable type too?
      * @return Returns the {@linkplain ClassInfo} for the class definition or reference at the given position or NULL if there is none
      */
-    public ClassInfo resolveClassAtPosition(int position, boolean resolveField) {
+    public SourceClassInfo resolveClassAtPosition(int position, boolean resolveField) {
         return impl.resolveClassAtPosition(getFile(), position, resolveField);
     }
 

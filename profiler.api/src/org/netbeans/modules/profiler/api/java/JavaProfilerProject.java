@@ -41,19 +41,17 @@
  */
 package org.netbeans.modules.profiler.api.java;
 
+import java.util.Collection;
 import org.netbeans.modules.profiler.api.ProfilerProject;
+import org.openide.util.Lookup;
 import org.openide.util.Lookup.Provider;
+import org.openide.util.lookup.Lookups;
 
 /**
  * Java based project representation
  * @author Jaroslav Bachorik
  */
 final public class JavaProfilerProject extends ProfilerProject {
-    final private Object lazyInitLock = new Object();
-    
-    // @GuardedBy lazyInitLock
-    private ProfilerTypeUtils typeUtils = null;
-    
     /**
      * Factory method for obtaining a {@linkplain JavaProfilerProject} from an IDE project
      * @param nbProject The IDE project
@@ -71,16 +69,24 @@ final public class JavaProfilerProject extends ProfilerProject {
         super(project);
     }
     
+    public SourceClassInfo resolveClass(String className) {
+        return getTypeUtils().resolveClass(className);
+    }
+    
+    public Collection<SourceClassInfo> getMainClasses() {
+        return getTypeUtils().getMainClasses();
+    }
+    
     /**
      * Accessor to the {@linkplain ProfilerTypeUtils}
      * @return Returns the associated {@linkplain ProfilerTypeUtils} instance
      */
-    public ProfilerTypeUtils getTypeUtils() {
-        synchronized(lazyInitLock) {
-            if (typeUtils == null) {
-                typeUtils = new ProfilerTypeUtils(this);
-            }
-        }
-        return typeUtils;
+    private ProfilerTypeUtils getTypeUtils() {
+        return getLookup().lookup(ProfilerTypeUtils.class);
+    }
+
+    @Override
+    protected Lookup additionalLookup() {
+        return Lookups.fixed(new ProfilerTypeUtils(this));
     }
 }

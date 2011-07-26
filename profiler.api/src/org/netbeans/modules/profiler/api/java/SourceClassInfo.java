@@ -39,38 +39,78 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.api;
+package org.netbeans.modules.profiler.api.java;
 
-import org.openide.util.Lookup;
-import org.openide.util.lookup.Lookups;
-import org.openide.util.lookup.ProxyLookup;
+import java.util.Set;
+import org.openide.filesystems.FileObject;
 
 /**
- * IDE agnostic project definition wrapper.<br/>
- * Basically, a simple {@linkplain Lookup.Provider} which contains, as a part 
- * of its lookup, the real project implementation.
- * 
+ * A simplified java class descriptor
+ */
+/**
+ *
  * @author Jaroslav Bachorik
  */
-abstract public class ProfilerProject implements Lookup.Provider {
-    final private Object lkpLock = new Object();
-    // @GuardedBy lkpLock
-    private Lookup lkp;
-    private Lookup.Provider provider;
+abstract public class SourceClassInfo {
+    private String simpleName, qualName, vmName;
     
-    protected ProfilerProject(Lookup.Provider project) {
-        this.provider = project;
+    public SourceClassInfo(String name, String fqn, String vmName) {
+        this.simpleName = name;
+        this.qualName = fqn;
+        this.vmName = vmName;
     }
 
     @Override
-    public Lookup getLookup() {
-        synchronized(lkpLock) {
-            if (lkp == null) {
-                lkp = new ProxyLookup(provider.getLookup(), Lookups.fixed(provider, this), additionalLookup());
-            }
-            return lkp;
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
         }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SourceClassInfo other = (SourceClassInfo) obj;
+        if ((this.vmName == null) ? (other.vmName != null) : !this.vmName.equals(other.vmName)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 53 * hash + (this.vmName != null ? this.vmName.hashCode() : 0);
+        return hash;
     }
     
-    abstract protected Lookup additionalLookup();
+    /**
+     *
+     * @return Returns the class simple name (the last part of the FQN)
+     */
+    final public String getSimpleName() {
+        return simpleName;
+    }
+
+    /**
+     *
+     * @return Returns the class FQN
+     */
+    final public String getQualifiedName() {
+        return qualName;
+    }
+
+    /**
+     *
+     * @return Returns the VM internal class name
+     */
+    final public String getVMName() {
+        return vmName;
+    }
+    
+    abstract public FileObject getFile();
+    abstract public Set<SourceMethodInfo> getMethods(boolean all);
+    abstract public Set<SourceClassInfo> getSubclasses();
+    abstract public Set<SourceClassInfo> getInnerClases();
+    abstract public Set<SourceMethodInfo> getConstructors();
+    abstract public SourceClassInfo getSuperType();
+    abstract public Set<SourceClassInfo> getInterfaces();
 }

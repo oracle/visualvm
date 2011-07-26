@@ -42,6 +42,7 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.modules.profiler.api.EditorSupport;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
 
 /**
@@ -63,7 +64,7 @@ final public class SelectJavaRootMethodsAction extends BaseSelectRootMethodsActi
         }
 
         // Try to get class at cursor or type of field at cursor
-        JavaProfilerSource.ClassInfo resolvedClass = source.resolveClassAtPosition(currentOffsetInEditor, true);
+        SourceClassInfo resolvedClass = source.resolveClassAtPosition(currentOffsetInEditor, true);
 
         if ((resolvedClass != null)) {
             className = resolvedClass.getVMName();
