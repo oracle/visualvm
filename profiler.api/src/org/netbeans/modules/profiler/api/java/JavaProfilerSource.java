@@ -61,10 +61,12 @@ final public class JavaProfilerSource extends ProfilerSource {
      * @return Returns a {@linkplain JavaProfilerSource} instance or NULL
      */
     public static JavaProfilerSource createFrom(FileObject fo) {
-        if (fo == null) return null;
+        if (fo == null || !fo.isValid()) return null;
         
         Lookup lkp = MimeLookup.getLookup(fo.getMIMEType());
         AbstractJavaProfilerSource impl = lkp.lookup(AbstractJavaProfilerSource.class);
+        if (impl == null && fo.isData() && fo.hasExt("java")) // NOI18N
+            impl = Lookup.getDefault().lookup(AbstractJavaProfilerSource.class);
         if (impl == null) {
             return null;
         }
