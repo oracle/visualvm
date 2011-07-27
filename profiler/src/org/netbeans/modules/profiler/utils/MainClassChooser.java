@@ -59,7 +59,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
+import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.openide.util.Lookup;
 
@@ -150,7 +150,7 @@ public class MainClassChooser extends JPanel {
         jMainClassList.setListData(getWarmupList());
         RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    for(SourceClassInfo sci : JavaProfilerProject.createFrom(project).getMainClasses()) {
+                    for(SourceClassInfo sci : ProfilerTypeUtils.getMainClasses(project)) {
                         possibleMainClasses.add(sci.getQualifiedName());
                     }
 

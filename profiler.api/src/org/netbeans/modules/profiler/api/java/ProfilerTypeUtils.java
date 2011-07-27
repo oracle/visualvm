@@ -42,8 +42,7 @@
 package org.netbeans.modules.profiler.api.java;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 import org.netbeans.modules.profiler.spi.java.ProfilerTypeUtilsProvider;
 import org.openide.util.Lookup;
 
@@ -52,38 +51,23 @@ import org.openide.util.Lookup;
  * 
  * @author Jaroslav Bachorik
  */
-final class ProfilerTypeUtils {
-    final private JavaProfilerProject project;
-    final private Map<String, SourceClassInfo> classInfos = new HashMap<String, SourceClassInfo>();
-    
-    ProfilerTypeUtils(JavaProfilerProject project) {
-        this.project = project;
+final public class ProfilerTypeUtils {
+    private static ProfilerTypeUtilsProvider getProvider(Lookup.Provider project) {
+        return project.getLookup().lookup(ProfilerTypeUtilsProvider.class);
     }
     
-    private ProfilerTypeUtilsProvider getProvider() {
-        return Lookup.getDefault().lookup(ProfilerTypeUtilsProvider.class);
-    }
-    
-    public SourceClassInfo resolveClass(String className) {
-        SourceClassInfo ci;
-        synchronized(classInfos) {
-            ci = classInfos.get(className);
-            if (ci == null) {
-                ci = getProvider().resolveClass(className, project);
-                classInfos.put(className, ci);
-            }
-        }
-        return ci;
+    public static SourceClassInfo resolveClass(String className, Lookup.Provider project) {
+        ProfilerTypeUtilsProvider p = getProvider(project);
+        return p != null ? p.resolveClass(className) : null;
     }
     
     /**
      * 
      * @return Returns a list of all main classes present in the project
      */
-    public Collection<SourceClassInfo> getMainClasses() {
-        ProfilerTypeUtilsProvider typeUtils = getProvider();
-        assert typeUtils  != null;
+    public static Collection<SourceClassInfo> getMainClasses(Lookup.Provider project) {
+        ProfilerTypeUtilsProvider p = getProvider(project);
         
-        return typeUtils.getMainClasses(project);
+        return p != null ? p.getMainClasses() : Collections.EMPTY_LIST;
     }
 }

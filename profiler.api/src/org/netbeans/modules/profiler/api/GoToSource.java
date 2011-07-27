@@ -46,7 +46,6 @@ import org.netbeans.modules.profiler.spi.java.GoToSourceProvider;
 import java.text.MessageFormat;
 import java.util.Collection;
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
@@ -98,7 +97,7 @@ final public class GoToSource {
      * @param signature The signature or NULL
      */
     public static void openSource(Lookup.Provider project, String className, String methodName, String methodSig) {
-        openSource(JavaProfilerProject.createFrom(project), className, methodName, methodSig, -1);
+        openSource(project, className, methodName, methodSig, -1);
     }
 
     /**
@@ -109,10 +108,10 @@ final public class GoToSource {
      * @param line The line number or {@linkplain Integer#MIN_VALUE}
      */
     public static void openSource(Lookup.Provider project, String className, String methodName, int line) {
-        openSource(JavaProfilerProject.createFrom(project), className, methodName, null, line);
+        openSource(project, className, methodName, null, line);
     }
 
-    private static void openSource(final JavaProfilerProject project, final String className, final String methodName, final String signature, final int line) {
+    private static void openSource(final Lookup.Provider project, final String className, final String methodName, final String signature, final int line) {
         srcOpenerRP.post(new Runnable() {
             
             @Override
@@ -122,7 +121,7 @@ final public class GoToSource {
         });
     }
     
-    private static void openSourceImpl(final JavaProfilerProject project, final String className, final String methodName, final String signature, final int line) {
+    private static void openSourceImpl(final Lookup.Provider project, final String className, final String methodName, final String signature, final int line) {
         // *** logging stuff ***
         ProfilerLogger.debug("Open Source: Project: " + project); // NOI18N
         ProfilerLogger.debug("Open Source: Class name: " + className); // NOI18N

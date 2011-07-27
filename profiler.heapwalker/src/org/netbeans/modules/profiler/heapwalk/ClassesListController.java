@@ -65,7 +65,7 @@ import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
+import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -473,8 +473,7 @@ public class ClassesListController extends AbstractController {
 
             HashSet subclasses = new HashSet();
 
-            JavaProfilerProject prj = JavaProfilerProject.createFrom(project);
-            SourceClassInfo sci = prj.resolveClass(className);
+            SourceClassInfo sci = ProfilerTypeUtils.resolveClass(className, project);
             Collection<SourceClassInfo> impls = sci != null ? sci.getSubclasses() : Collections.EMPTY_LIST;
 
             for (SourceClassInfo ci : impls) {

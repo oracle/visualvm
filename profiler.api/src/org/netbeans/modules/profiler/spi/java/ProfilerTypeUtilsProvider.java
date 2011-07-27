@@ -42,25 +42,22 @@
 package org.netbeans.modules.profiler.spi.java;
 
 import java.util.Collection;
-import org.netbeans.modules.profiler.api.java.JavaProfilerProject;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 
 /**
  * An SPI for {@linkplain ProfilerTypeUtils} functionality
  * @author Jaroslav Bachorik
  */
-public interface ProfilerTypeUtilsProvider {
+public abstract class ProfilerTypeUtilsProvider {
     /**
      * 
      * @param className A fully qualified class name
-     * @param project The project to resolve the class for
      * @return Returns a resolved class or NULL
      */
-    SourceClassInfo resolveClass(String className, JavaProfilerProject project);
+    abstract public SourceClassInfo resolveClass(String className);
     
     /**
-     * @param project The project to search the main classes in
      * @return Returns a list of all main classes present in the project
      */
-    Collection<SourceClassInfo> getMainClasses(JavaProfilerProject project);
+    abstract public Collection<SourceClassInfo> getMainClasses();
 }
