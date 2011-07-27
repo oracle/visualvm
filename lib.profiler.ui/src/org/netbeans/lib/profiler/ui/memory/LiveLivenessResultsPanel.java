@@ -62,6 +62,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
 import org.netbeans.lib.profiler.utils.StringUtils;
+import org.netbeans.modules.profiler.api.GoToSource;
 
 
 /**
@@ -179,7 +180,7 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
 
             deinstrumentMemoryProfiledClasses(newlyUnprofiledClasses);
             prepareResults();
-        } else if (source == popupShowSource) {
+        } else if (source == popupShowSource && popupShowSource != null) {
             showSourceForClass(selectedClassId);
         } else if (source == popupShowStacks) {
             actionsHandler.showStacksForClass(selectedClassId, getSortingColumn(), getSortingOrder());
@@ -356,18 +357,20 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
         if (popup == null) {
             popup = new JPopupMenu();
 
-            Font boldfont = popup.getFont().deriveFont(Font.BOLD);
+            if (GoToSource.isAvailable()) {
+                Font boldfont = popup.getFont().deriveFont(Font.BOLD);
 
-            popupShowSource = new JMenuItem();
-            popupRemoveProfForClass = new JMenuItem();
-            popupRemoveProfForClassesBelow = new JMenuItem();
+                popupShowSource = new JMenuItem();
+                popupRemoveProfForClass = new JMenuItem();
+                popupRemoveProfForClassesBelow = new JMenuItem();
 
-            popupShowSource.setText(GO_SOURCE_POPUP_ITEM_NAME);
-            popupShowSource.setFont(boldfont);
-            popupRemoveProfForClass.setText(STOP_CLASS_POPUP_ITEM_NAME);
-            popupRemoveProfForClassesBelow.setText(STOP_BELOW_LINE_POPUP_ITEM_NAME);
+                popupShowSource.setText(GO_SOURCE_POPUP_ITEM_NAME);
+                popupShowSource.setFont(boldfont);
+                popupRemoveProfForClass.setText(STOP_CLASS_POPUP_ITEM_NAME);
+                popupRemoveProfForClassesBelow.setText(STOP_BELOW_LINE_POPUP_ITEM_NAME);
 
-            popup.add(popupShowSource);
+                popup.add(popupShowSource);
+            }
 
             if (runner.getProfilerEngineSettings().getAllocStackTraceLimit() != 0) {
                 popup.addSeparator();
@@ -381,7 +384,7 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
             popup.add(popupRemoveProfForClass);
             popup.add(popupRemoveProfForClassesBelow);
 
-            popupShowSource.addActionListener(this);
+            if (popupShowSource != null) popupShowSource.addActionListener(this);
             popupRemoveProfForClass.addActionListener(this);
             popupRemoveProfForClassesBelow.addActionListener(this);
 
