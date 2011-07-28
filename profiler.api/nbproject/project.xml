@@ -129,7 +129,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.ppoints</friend>
                 <friend>org.netbeans.modules.profiler.projectsupport</friend>
                 <friend>org.netbeans.modules.profiler.selector.java</friend>
-                <friend>org.netbeans.modules.profiler.selector.spi</friend>
+                <friend>org.netbeans.modules.profiler.selector.api</friend>
                 <friend>org.netbeans.modules.profiler.snaptracer</friend>
                 <friend>org.netbeans.modules.profiler.stp</friend>
                 <package>org.netbeans.modules.profiler.api</package>

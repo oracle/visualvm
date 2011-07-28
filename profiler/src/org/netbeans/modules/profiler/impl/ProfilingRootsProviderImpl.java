@@ -55,7 +55,6 @@ public final class ProfilingRootsProviderImpl extends ProfilingRootsProvider {
 
     @Override
     public SourceCodeSelection[] selectRoots(SourceCodeSelection[] currentRoots, Provider project) {
-        //return RootMethodsPanel.getSelectedRootMethods(currentRoots, project);
         return ProjectSelectRootMethodsPanel.getDefault().getRootMethods(project, currentRoots);
     }
     

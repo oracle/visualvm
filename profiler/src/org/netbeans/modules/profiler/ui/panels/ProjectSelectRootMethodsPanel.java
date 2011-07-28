@@ -66,6 +66,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -80,6 +81,8 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
+import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
+import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
 import org.openide.DialogDisplayer;
 import org.openide.util.HelpCtx;
@@ -140,8 +143,8 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-    public static boolean canBeShown() {
-        return RootSelectorTree.canBeShown();
+    public static boolean canBeShown(Lookup ctx) {
+        return RootSelectorTree.canBeShown(ctx);
     }
 
     /**
@@ -163,6 +166,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
         PropertyChangeListener pcl = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 refreshBuilderList();
             }
@@ -173,6 +177,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
             updateSelector(new Runnable() {
 
+                @Override
                 public void run() {
                     advancedLogicalPackageTree.setContext(getContext());
                     advancedLogicalPackageTree.setSelection(currentSelection);
@@ -210,9 +215,6 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         } finally {
             advancedLogicalPackageTree.removePropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
         }
-
-    //    this.currentSelectionSet.clear();
-    //    return rootMethods;
     }
 
     protected void initComponents(final Container container) {
@@ -224,22 +226,27 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
             ProfilerProgressDisplayer pd = null;
 
+            @Override
             public synchronized void showProgress(String message) {
                 pd = ProfilerProgressDisplayer.showProgress(message);
             }
 
+            @Override
             public synchronized void showProgress(String message, ProgressController controller) {
                 pd = ProfilerProgressDisplayer.showProgress(message, controller);
             }
 
+            @Override
             public synchronized void showProgress(String caption, String message, ProgressController controller) {
                 pd = ProfilerProgressDisplayer.showProgress(caption, message, controller);
             }
 
+            @Override
             public synchronized boolean isOpened() {
                 return pd != null;
             }
 
+            @Override
             public synchronized void close() {
                 if (pd != null) {
                     pd.close();
@@ -257,6 +264,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         treeBuilderList = new JComboBox();
         treeBuilderList.addItemListener(new ItemListener() {
 
+            @Override
             public void itemStateChanged(final ItemEvent e) {
                 if (changingBuilderList) {
                     return;
@@ -265,6 +273,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     rp.post(new Runnable() {
 
+                        @Override
                         public void run() {
                             advancedLogicalPackageTree.setBuilderType((Type) e.getItem());
                         }
@@ -277,6 +286,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
         hintArea = new HTMLTextArea() {
 
+            @Override
             public Dimension getPreferredSize() { // Workaround to force the text area not to consume horizontal space to fit the contents to just one line
 
                 return new Dimension(1, super.getPreferredSize().height);
@@ -302,9 +312,11 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         advancedShowAllProjectsCheckBox.setText(NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_ShowAllProjectsLabel")); // NOI18N
         advancedShowAllProjectsCheckBox.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 rp.post(new Runnable() {
 
+                    @Override
                     public void run() {
                         refreshBuilderList();
                         updateSelectorProjects();
@@ -356,13 +368,16 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
     private Object[] getAdditionalOptions() {
         return new Object[] { new JButton(NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_AdvancedButtonText")) { //NOI18N
+            @Override
             protected void fireActionPerformed(ActionEvent e) {
                 RequestProcessor.getDefault().post(new Runnable() {
+                    @Override
                     public void run() {
                         final ClientUtils.SourceCodeSelection[] methods =
                                 RootMethodsPanel.getSelectedRootMethods(
                                 advancedLogicalPackageTree.getSelection(), currentProject);
                         if (methods != null) updateSelector(new Runnable() {
+                            @Override
                             public void run() {
                                 advancedLogicalPackageTree.setContext(getContext());
                                 advancedLogicalPackageTree.setSelection(methods); // TODO: seems to add methods instead of set methods!!!
@@ -407,6 +422,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         final ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
                 "SelectRootMethodsPanel_ParsingProjectStructureMessage")); // NOI18N
         CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            @Override
             public void run() {
                 ph.setInitialDelay(500);
                 ph.start();
@@ -432,6 +448,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     private void updateSelectorProjects() {
         updateSelector(new Runnable() {
 
+            @Override
             public void run() {
                 advancedLogicalPackageTree.setContext(getContext());
             }
@@ -439,6 +456,11 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private Lookup getContext() {
-        return Lookups.fixed((Object[]) relevantProjects());
+        List<SelectionTreeBuilder> builders = new ArrayList<SelectionTreeBuilder>();
+        
+        for(Lookup.Provider p : relevantProjects()) {
+            builders.addAll(SelectionTreeBuilderFactory.buildersFor(p));
+        }
+        return Lookups.fixed((Object[]) builders.toArray(new SelectionTreeBuilder[builders.size()]));
     }
 }

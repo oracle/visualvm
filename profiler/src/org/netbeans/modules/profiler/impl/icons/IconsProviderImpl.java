@@ -165,7 +165,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         
         cache.put(LanguageIcons.CLASS, "class.png");
         cache.put(LanguageIcons.CONSTRUCTOR_PACKAGE, "constructorPackage.png");
-        cache.put(LanguageIcons.CONSTRUCTOR_PRIVATE, "constructorPrivate.gif");
+        cache.put(LanguageIcons.CONSTRUCTOR_PRIVATE, "constructorPrivate.png");
         cache.put(LanguageIcons.CONSTRUCTOR_PROTECTED, "constructorProtected.png");
         cache.put(LanguageIcons.CONSTRUCTOR_PUBLIC, "constructorPublic.png");
         cache.put(LanguageIcons.CONSTRUCTORS, "constructors.png");

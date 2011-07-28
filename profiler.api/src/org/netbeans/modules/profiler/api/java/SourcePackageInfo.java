@@ -39,34 +39,41 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi.java;
+package org.netbeans.modules.profiler.api.java;
 
 import java.util.Collection;
-import org.netbeans.modules.profiler.api.java.SourceClassInfo;
-import org.netbeans.modules.profiler.api.java.SourcePackageInfo;
 
 /**
- * An SPI for {@linkplain ProfilerTypeUtils} functionality
+ *
  * @author Jaroslav Bachorik
  */
-public abstract class ProfilerTypeUtilsProvider {
-    /**
-     * 
-     * @param className A fully qualified class name
-     * @return Returns a resolved class or NULL
-     */
-    abstract public SourceClassInfo resolveClass(String className);
+abstract public class SourcePackageInfo {
+    public static enum Scope {
+        SOURCE, DEPENDENCIES
+    }
     
-    /**
-     * @return Returns a list of all main classes present in the project
-     */
-    abstract public Collection<SourceClassInfo> getMainClasses();
+    private String simpleName;
+    private String fqn;
+    private Scope scope;
+
+    public SourcePackageInfo(String simpleName, String fqn, Scope scope) {
+        this.simpleName = simpleName;
+        this.fqn = fqn;
+        this.scope = scope;
+    }
+
+    public String getBinaryName() {
+        return fqn;
+    }
+
+    public String getSimpleName() {
+        return simpleName;
+    }
+
+    public Scope getScope() {
+        return scope;
+    }
     
-    /**
-     * 
-     * @param subprojects A flag indicating whether subprojects should be taken into account
-     * @param scope A {@linkplain SourcePackageInfo.Scope} - SOURCE or DEPENDENCIES
-     * @return Returns a list of project's packages
-     */
-    abstract public Collection<SourcePackageInfo> getPackages(boolean subprojects, SourcePackageInfo.Scope scope);
+    abstract public Collection<SourcePackageInfo> getSubpackages();
+    abstract public Collection<SourceClassInfo> getClasses();
 }
