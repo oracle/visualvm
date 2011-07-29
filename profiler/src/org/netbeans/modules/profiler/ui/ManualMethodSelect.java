@@ -53,6 +53,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.openide.DialogDisplayer;
 import org.openide.util.HelpCtx;
 
 
@@ -87,6 +88,9 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
     // I18N String constants
     private static final String SELECT_METHODS_DIALOG_CAPTION = NbBundle.getMessage(ManualMethodSelect.class,
                                                                                     "ManualMethodSelect_SelectMethodsDialogCaption" //NOI18N
+    );
+    private static final String EDIT_METHOD_DIALOG_CAPTION = NbBundle.getMessage(ManualMethodSelect.class,
+                                                                                    "ManualMethodSelect_EditMethodDialogCaption" //NOI18N
     );
     private static final String OK_BUTTON_TEXT = NbBundle.getMessage(ManualMethodSelect.class, "ManualMethodSelect_OKButtonText"); //NOI18N
     private static final String CLASS_NAME_LABEL_TEXT = NbBundle.getMessage(ManualMethodSelect.class,
@@ -232,17 +236,28 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
     public HelpCtx getHelpCtx() {
         return HELP_CTX;
     }
-
+    
     public static ClientUtils.SourceCodeSelection selectMethod() {
+        return selectMethod(null);
+    }
+
+    public static ClientUtils.SourceCodeSelection selectMethod(ClientUtils.SourceCodeSelection method) {
         if (mms == null) {
             mms = new ManualMethodSelect();
         }
+        
+        if (method != null) {
+            mms.setClassName(method.getClassName());
+            mms.setMethodName(method.getMethodName());
+            mms.setMethodSignature(method.getMethodSignature());
+        }
 
-        final DialogDescriptor dd = new DialogDescriptor(mms, SELECT_METHODS_DIALOG_CAPTION, true,
+        final DialogDescriptor dd = new DialogDescriptor(mms, method == null ? SELECT_METHODS_DIALOG_CAPTION :
+                                                         EDIT_METHOD_DIALOG_CAPTION, true,
                                                          new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                          DialogDescriptor.BOTTOM_ALIGN, null, null);
 
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.pack(); // To properly layout HTML hint area
         d.setVisible(true);
 
@@ -252,9 +267,17 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
             return null;
         }
     }
+    
+    private void setClassName(String cName) {
+        className.setText(cName.trim());
+    }
 
     private String getClassName() {
         return className.getText().trim(); //NOI18N
+    }
+    
+    private void setMethodName(String mName) {
+        methodName.setText(mName.trim());
     }
 
     private String getMethodName() {
@@ -265,6 +288,10 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
         } else {
             return ret;
         }
+    }
+    
+    private void setMethodSignature(String mSignature) {
+        methodSignature.setText(mSignature.trim());
     }
 
     private String getMethodSignature() {
@@ -283,17 +310,21 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
 
     private void updateEnabledState() {
         boolean enabled = true;
+        
+        String clssName = className.getText().trim();
+        boolean wildcard = clssName.endsWith(".*") || clssName.endsWith(".**");
 
         // package/class name cannot be empty
-        if ("".equals(className.getText().trim())) {
+        if ("".equals(clssName)) {
             enabled = false; //NOI18N
         }
+        
         // method name cannot be empty
-        else if ("".equals(methodName.getText().trim())) {
+        else if (!wildcard && "".equals(methodName.getText().trim())) {
             enabled = false; //NOI18N
         }
         // method signature cannot be empty
-        else if ("".equals(methodSignature.getText().trim())) {
+        else if (!wildcard && "".equals(methodSignature.getText().trim())) {
             enabled = false; //NOI18N
         }
         // try to format method as a kind of heuristics if provided info is correct

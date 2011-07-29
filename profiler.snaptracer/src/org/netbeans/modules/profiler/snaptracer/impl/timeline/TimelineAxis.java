@@ -88,6 +88,8 @@ import org.netbeans.modules.profiler.snaptracer.impl.swing.HeaderPanel;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.LegendFont;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.TimelineMarksPainter;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.openide.util.ImageUtilities;
 
 /**
@@ -247,10 +249,8 @@ final class TimelineAxis extends JPanel {
 
     private static class MarksComponent extends JComponent {
 
-        private static final Image MARK = ImageUtilities.loadImage(
-                "org/netbeans/modules/profiler/snaptracer/impl/resources/mark.png");  // NOI18N
-        private static final Image MARK_HIGHL = ImageUtilities.loadImage(
-                "org/netbeans/modules/profiler/snaptracer/impl/resources/markHighl.png");  // NOI18N
+        private static final Image MARK = Icons.getImage(TracerIcons.MARK);
+        private static final Image MARK_HIGHL = Icons.getImage(TracerIcons.MARK_HIGHLIGHT);
         private static final int MARK_EXTENT = MARK.getWidth(null) / 2;
         private static final int MARK_HEIGHT = MARK.getHeight(null);
 

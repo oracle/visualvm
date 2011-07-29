@@ -43,22 +43,22 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.openide.actions.FindAction;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.util.actions.CallbackSystemAction;
 import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.Lookup;
 
 
 /**
@@ -79,7 +79,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
     private static final String LIVENESS_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
                                                                             "SnapshotDiffWindow_LivenessAccessDescr"); // NOI18N
                                                                                                                        // -----
-    private static final Image WINDOW_ICON_MEMORY = ImageUtilities.loadImage("org/netbeans/modules/profiler/actions/resources/compareSnapshots.png"); // NOI18N
+    private static final Image WINDOW_ICON_MEMORY = Icons.getImage(ProfilerIcons.SNAPSHOTS_COMPARE);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -101,7 +101,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
      * @param ls The diff to display
      */
     public SnapshotsDiffWindow(ResultsSnapshot ls, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2, int sortingColumn,
-                               boolean sortingOrder, Project project) {
+                               boolean sortingOrder, Lookup.Provider project) {
         setLayout(new BorderLayout());
         setFocusable(true);
         setRequestFocusEnabled(true);
@@ -123,7 +123,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
     }
 
     public static synchronized SnapshotsDiffWindow get(ResultsSnapshot ls, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
-                                                       int sortingColumn, boolean sortingOrder, Project project) {
+                                                       int sortingColumn, boolean sortingOrder, Lookup.Provider project) {
         return new SnapshotsDiffWindow(ls, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
     }
 
@@ -147,7 +147,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
 
     // -- Private methods --------------------------------------------------------------------------------------------------
     private void displayMemoryAllocDiff(MemoryResultsSnapshot diff, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
-                                        int sortingColumn, boolean sortingOrder, Project project) {
+                                        int sortingColumn, boolean sortingOrder, Lookup.Provider project) {
         MemoryDiffPanel allocDiffPanel = new MemoryDiffPanel(getLookup(), diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         updateFind(true, allocDiffPanel);
         add(allocDiffPanel, BorderLayout.CENTER);
@@ -156,7 +156,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
     }
 
     private void displayMemoryLivenessDiff(MemoryResultsSnapshot diff, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
-                                           int sortingColumn, boolean sortingOrder, Project project) {
+                                           int sortingColumn, boolean sortingOrder, Lookup.Provider project) {
         MemoryDiffPanel livenessDiffPanel = new MemoryDiffPanel(getLookup(), diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         updateFind(true, livenessDiffPanel);
         add(livenessDiffPanel, BorderLayout.CENTER);
