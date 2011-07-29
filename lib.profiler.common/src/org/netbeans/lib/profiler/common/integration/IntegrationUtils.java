@@ -117,7 +117,7 @@ public class IntegrationUtils {
                                                              boolean formatAsHTML) {
         return getExportEnvVariableValueString(targetPlatform, getNativePathEnvVariableString(targetPlatform),
                                                getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)
-                                               + getPathSeparator(targetPlatform)
+                                               + getClassPathSeparator(targetPlatform)
                                                + getEnvVariableReference(getNativePathEnvVariableString(targetPlatform),
                                                                          targetPlatform), formatAsHTML);
     }
@@ -407,8 +407,11 @@ public class IntegrationUtils {
         return null;
     }
 
-    // Returns ";" or ":" according to provided platform
-    public static String getPathSeparator(String targetPlatform) {
+    /**
+     * The separator used in the classpath construction
+     * @return Returns ";" or ":" according to provided platform
+     */ 
+    public static String getClassPathSeparator(String targetPlatform) {
         if (isWindowsPlatform(targetPlatform)) {
             return ";"; //NOI18N
         }
