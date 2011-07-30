@@ -74,6 +74,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNodeBacked;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -120,8 +122,8 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private AbstractTreeTableModel abstractTreeTableModel;
     private EnhancedTreeCellRenderer enhancedTreeCellRenderer = new MethodNameTreeCellRenderer();
     private ExtendedTreeTableModel treeTableModel;
-    private ImageIcon leafIcon = new ImageIcon(SubtreeCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/leaf.png")); // NOI18N
-    private ImageIcon nodeIcon = new ImageIcon(SubtreeCallGraphPanel.class.getResource("/org/netbeans/lib/profiler/ui/resources/node.png")); // NOI18N
+    private Icon leafIcon = Icons.getIcon(ProfilerIcons.NODE_LEAF);
+    private Icon nodeIcon = Icons.getIcon(ProfilerIcons.NODE_FORWARD);
     private int minNamesColumnWidth; // minimal width of classnames columns
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -221,7 +223,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     public void setDataToDisplay(CPUResultsSnapshot snapshot, PrestimeCPUCCTNode node, int view) {
         super.setDataToDisplay(snapshot, view);
         this.rootNode = node;
-        popupShowSource.setEnabled(isShowSourceAvailable());
+        if (popupShowSource != null) popupShowSource.setEnabled(isShowSourceAvailable());
         popupAddToRoots.setEnabled(isAddToRootsAvailable());
     }
 
