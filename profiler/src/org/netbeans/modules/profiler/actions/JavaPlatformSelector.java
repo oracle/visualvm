@@ -43,20 +43,16 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.java.platform.JavaPlatform;
-import org.netbeans.api.java.platform.JavaPlatformManager;
-import org.netbeans.api.java.platform.PlatformsCustomizer;
-import org.netbeans.api.java.platform.Specification;
+import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.utils.MiscUtils;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
-import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.openide.DialogDisplayer;
 
 
 /**
@@ -70,7 +66,7 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
     public static class JPListModel extends AbstractListModel {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private java.util.List platforms;
+        private java.util.List<JavaPlatform> platforms;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -81,7 +77,7 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public Object getElementAt(int index) {
-            return ((JavaPlatform) platforms.get(index)).getDisplayName();
+            return platforms.get(index).getDisplayName();
         }
 
         public int getSize() {
@@ -150,27 +146,12 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
         return defaultPlatform;
     }
 
-    public static java.util.List getSupportedPlatforms() {
-        JavaPlatform[] platforms = JavaPlatformManager.getDefault().getPlatforms(null, new Specification("j2se", null)); // NOI18N
-        ArrayList ret = new ArrayList();
-
-        for (int i = 0; i < platforms.length; i++) {
-            JavaPlatform platform = platforms[i];
-
-            if (MiscUtils.isSupportedJVM(platform.getSystemProperties())) {
-                ret.add(platforms[i]);
-            }
-        }
-
-        return ret;
-    }
-
     public JavaPlatform selectPlatformForCalibration() {
-        java.util.List platforms = getSupportedPlatforms();
+        java.util.List<JavaPlatform> platforms = JavaPlatform.getPlatforms();
 
         if (platforms.size() == 0) {
-            Profiler.getDefault().displayError(NO_SUPPORTED_PLATFORM_MSG);
-            PlatformsCustomizer.showCustomizer(null);
+            ProfilerDialogs.displayError(NO_SUPPORTED_PLATFORM_MSG);
+            JavaPlatform.showCustomizer();
 
             return null;
         }
@@ -186,7 +167,7 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
                                                    DialogDescriptor.BOTTOM_ALIGN, null, null);
         list.setSelectedIndex(0);
         validateOKButton();
-        Dialog selectDialog = ProfilerDialogs.createDialog(dd);
+        Dialog selectDialog = DialogDisplayer.getDefault().createDialog(dd);
         selectDialog.getAccessibleContext().setAccessibleDescription(SELECT_PLATFORM_CALIBRATE_DIALOG_CAPTION);
         selectDialog.setVisible(true);
 
@@ -200,11 +181,11 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
     }
 
     public JavaPlatform selectPlatformToUse() {
-        java.util.List platforms = getSupportedPlatforms();
+        java.util.List platforms = JavaPlatform.getPlatforms();
 
         if (platforms.size() == 0) {
-            Profiler.getDefault().displayError(NO_SUPPORTED_PLATFORM_MSG);
-            PlatformsCustomizer.showCustomizer(null);
+            ProfilerDialogs.displayError(NO_SUPPORTED_PLATFORM_MSG);
+            JavaPlatform.showCustomizer();
 
             return null;
         }
@@ -222,7 +203,7 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
                                                    DialogDescriptor.BOTTOM_ALIGN, null, null);
         list.setSelectedIndex(0);
         validateOKButton();
-        ProfilerDialogs.createDialog(dd).setVisible(true);
+        DialogDisplayer.getDefault().createDialog(dd).setVisible(true);
 
         if (dd.getValue() == okButton) {
             int idx = list.getSelectedIndex();

@@ -45,6 +45,8 @@ package org.netbeans.modules.profiler.snaptracer;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.openide.util.ImageUtilities;
 
 /**
@@ -53,9 +55,6 @@ import org.openide.util.ImageUtilities;
  * @author Jiri Sedlacek
  */
 public final class TracerProbeDescriptor implements Positionable {
-
-    private static final String IMAGE_PATH =
-        "org/netbeans/modules/profiler/snaptracer/impl/resources/probe.png"; // NOI18N
 
     private final String name;
     private final String description;
@@ -77,7 +76,7 @@ public final class TracerProbeDescriptor implements Positionable {
                                  int preferredPosition, boolean available) {
         this.name = name;
         this.description = description;
-        this.icon = icon != null ? icon : new ImageIcon(ImageUtilities.loadImage(IMAGE_PATH));
+        this.icon = icon != null ? icon : Icons.getIcon(TracerIcons.PROBE);
         this.preferredPosition = preferredPosition;
         this.available = available;
     }
