@@ -44,7 +44,7 @@ package org.netbeans.modules.profiler.api.java;
 import java.util.Collection;
 
 /**
- *
+ * A java package wrapper
  * @author Jaroslav Bachorik
  */
 abstract public class SourcePackageInfo {
