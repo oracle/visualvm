@@ -41,8 +41,7 @@
  */
 package org.netbeans.modules.profiler.api.java;
 
-import java.util.Set;
-import javax.lang.model.element.Modifier;
+import java.lang.reflect.Modifier;
 
 /**
  * A simplified java method descriptor
@@ -54,9 +53,9 @@ import javax.lang.model.element.Modifier;
 public class SourceMethodInfo {
     private String className, name, signature, vmName;
     private boolean execFlag;
-    final private Set<Modifier> modifiers;
+    final private int modifiers;
 
-    public SourceMethodInfo(String className, String name, String signature, String vmName, boolean execFlag, Set<Modifier> modifiers) {
+    public SourceMethodInfo(String className, String name, String signature, String vmName, boolean execFlag, int modifiers) {
         this.className = className;
         this.name = name;
         this.signature = signature;
@@ -135,7 +134,11 @@ public class SourceMethodInfo {
         return execFlag;
     }
     
-    final public Set<Modifier> getModifiers() {
+    /**
+     * 
+     * @return Returns method's modifiers in the {@linkplain Modifier} format
+     */
+    final public int getModifiers() {
         return modifiers;
     }
     

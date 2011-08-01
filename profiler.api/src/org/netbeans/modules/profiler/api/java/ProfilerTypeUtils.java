@@ -56,18 +56,37 @@ final public class ProfilerTypeUtils {
         return project.getLookup().lookup(ProfilerTypeUtilsProvider.class);
     }
     
+    /**
+     * Resolves a class given its FQN
+     * @param className The class FQN
+     * @param project A project to resolve the class in
+     * @return Returns a resolved {@linkplain SourceClassInfo} or null
+     */
     public static SourceClassInfo resolveClass(String className, Lookup.Provider project) {
         ProfilerTypeUtilsProvider p = getProvider(project);
         return p != null ? p.resolveClass(className) : null;
     }
     
     /**
-     * 
+     * @param project A project to get the main classes for
      * @return Returns a list of all main classes present in the project
      */
     public static Collection<SourceClassInfo> getMainClasses(Lookup.Provider project) {
         ProfilerTypeUtilsProvider p = getProvider(project);
         
         return p != null ? p.getMainClasses() : Collections.EMPTY_LIST;
+    }
+    
+    /**
+     * Retrieves project's packages
+     * @param subprojects Flag indicating whether subprojects should be taken into account
+     * @param scope A {@linkplain SourcePackageInfo.Scope} - SOURCE or DEPENDENCIES
+     * @param project A project to get the packages for
+     * @return Returns a list of project's packages
+     */
+    public static Collection<SourcePackageInfo> getPackages(boolean subprojects, SourcePackageInfo.Scope scope, Lookup.Provider project) {
+        ProfilerTypeUtilsProvider p = getProvider(project);
+        
+        return p != null ? p.getPackages(subprojects, scope) : Collections.EMPTY_LIST;
     }
 }

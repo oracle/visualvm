@@ -42,6 +42,7 @@
 package org.netbeans.modules.profiler.api.java;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -52,6 +53,8 @@ import org.openide.filesystems.FileObject;
  * @author Jaroslav Bachorik
  */
 abstract public class SourceClassInfo {
+    final private static Pattern anonymousInnerClassPattern = Pattern.compile(".*?\\$[0-9]*$");
+    
     private String simpleName, qualName, vmName;
     
     public SourceClassInfo(String name, String fqn, String vmName) {
@@ -105,6 +108,14 @@ abstract public class SourceClassInfo {
     final public String getVMName() {
         return vmName;
     }
+
+    /**
+     * 
+     * @return Returns true if the class is an anonymous inner class, false otherwise
+     */
+    public boolean isAnonymous() {
+        return isAnonymous(qualName);
+    }
     
     abstract public FileObject getFile();
     abstract public Set<SourceMethodInfo> getMethods(boolean all);
@@ -113,4 +124,8 @@ abstract public class SourceClassInfo {
     abstract public Set<SourceMethodInfo> getConstructors();
     abstract public SourceClassInfo getSuperType();
     abstract public Set<SourceClassInfo> getInterfaces();
+    
+    final protected boolean isAnonymous(String className) {
+        return anonymousInnerClassPattern.matcher(className).matches();
+    }
 }
