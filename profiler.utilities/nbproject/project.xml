@@ -13,7 +13,7 @@
                         <specification-version>8.15</specification-version>
                     </run-dependency>
                 </dependency>
-                </module-dependencies>
+            </module-dependencies>
             <test-dependencies>
                 <test-type>
                     <name>unit</name>
@@ -33,6 +33,7 @@
                 <friend>org.netbeans.modules.profiler.categorization.api</friend>
                 <friend>org.netbeans.modules.profiler.drilldown</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
+                <friend>org.netbeans.modules.profiler.nbimpl</friend>
                 <friend>org.netbeans.modules.profiler.ppoints</friend>
                 <friend>org.netbeans.modules.profiler.selector.ui</friend>
                 <friend>org.netbeans.modules.profiler.stp</friend>
