@@ -58,6 +58,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.JTextComponent;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**
@@ -79,8 +81,7 @@ public class FilterComponent extends JPanel {
     private static class ArrowSignIcon implements Icon {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private final ImageIcon popupArrowIcon = new ImageIcon(getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/popupArrow.png")); // NOI18N
+        private final Icon popupArrowIcon = Icons.getIcon(GeneralIcons.POPUP_ARROW);
         private Icon icon;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -408,11 +409,9 @@ public class FilterComponent extends JPanel {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final ImageIcon setFilterIcon = new ImageIcon(getClass()
-                                                              .getResource("/org/netbeans/lib/profiler/ui/resources/setFilter.png")); // NOI18N
+    private final Icon setFilterIcon = Icons.getIcon(GeneralIcons.SET_FILTER);
     private final Icon setFilterRolloverIcon = new ButtonBorderIcon(setFilterIcon);
-    private final ImageIcon clearFilterIcon = new ImageIcon(getClass()
-                                                                .getResource("/org/netbeans/lib/profiler/ui/resources/clearFilter.png")); // NOI18N
+    private final Icon clearFilterIcon = Icons.getIcon(GeneralIcons.CLEAR_FILTER);
     private final Icon clearFilterRolloverIcon = new ButtonBorderIcon(clearFilterIcon);
     private Color textFieldForeground;
     private JButton clearFilterButton;

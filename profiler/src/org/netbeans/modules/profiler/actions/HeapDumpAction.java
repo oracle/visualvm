@@ -52,12 +52,8 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
-import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.heapwalk.HeapWalker;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -83,6 +79,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.DialogDisplayer;
+import org.openide.windows.WindowManager;
 
 
 /**
@@ -251,7 +254,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
                         JFileChooser directoryChooser = HeapDumpAction.getSnapshotDirectoryChooser();
                         directoryChooser.setCurrentDirectory(new File(getCustomDirectory()));
 
-                        if (directoryChooser.showOpenDialog(IDEUtils.getMainWindow()) == 0) {
+                        if (directoryChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == 0) {
                             File file = directoryChooser.getSelectedFile();
 
                             if (file != null) {
@@ -345,14 +348,14 @@ public final class HeapDumpAction extends ProfilingAwareAction {
     }
 
     protected String iconResource() {
-        return "org/netbeans/modules/profiler/actions/resources/dumpHeap.png"; //NOI18N
+        return Icons.getResource(ProfilerIcons.SNAPSHOT_HEAP);
     }
 
     private String getCurrentHeapDumpFilename(String targetFolder) {
         try {
             String fileName = TAKEN_HEAPDUMP_PREFIX + System.currentTimeMillis();
             FileObject folder = (targetFolder == null)
-                                ? IDEUtils.getProjectSettingsFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
+                                ? ProjectStorage.getSettingsFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
                                 : FileUtil.toFileObject(FileUtil.normalizeFile(new File(targetFolder)));
 
             return FileUtil.toFile(folder).getAbsolutePath() + File.separator
@@ -412,7 +415,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         DialogDescriptor desc = new DialogDescriptor(targetSelector, DESTINATION_DIALOG_CAPTION, true,
                                                      new Object[] { targetSelector.getOKButton(), DialogDescriptor.CANCEL_OPTION },
                                                      DialogDescriptor.OK_OPTION, 0, null, null);
-        Object res = ProfilerDialogs.notify(desc);
+        Object res = DialogDisplayer.getDefault().notify(desc);
 
         if (!res.equals(targetSelector.getOKButton())) {
             return SELECTING_TARGET_CANCELLED;
@@ -432,22 +435,20 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
     // askForDestination == false ? dump to project : ask for destination (project vs. external file)
     private void takeHeapDump(final boolean askForDestination) {
-        IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
-                    NetBeansProfiler nbProfiler = NetBeansProfiler.getDefaultNB();
-
-                    TargetAppRunner targetApp = nbProfiler.getTargetAppRunner();
+                    TargetAppRunner targetApp = Profiler.getDefault().getTargetAppRunner();
 
                     // not supported for JDK other than 1.6 & 1.7 & 1.5.0_12 and up
                     if (!targetApp.hasSupportedJDKForHeapDump()) {
-                        nbProfiler.displayWarning(REQUIRED_JDK_MSG);
+                        ProfilerDialogs.displayWarning(REQUIRED_JDK_MSG);
 
                         return;
                     }
 
                     // not supported for remote attach
                     if (targetApp.getProfilingSessionStatus().remoteProfiling) {
-                        nbProfiler.displayWarning(REMOTE_UNSUPPORTED_MSG);
+                        ProfilerDialogs.displayWarning(REMOTE_UNSUPPORTED_MSG);
 
                         return;
                     }
@@ -463,7 +464,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
                         // Cannot resolve destination file
                         if (dumpFileName == null) {
-                            nbProfiler.displayError(WRONG_DESTINATION_MSG);
+                            ProfilerDialogs.displayError(WRONG_DESTINATION_MSG);
 
                             return;
                         }
@@ -489,26 +490,21 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
                             if (askForDestination) {
                                 // Heapdump saved, open in HeapWalker?
-                                ProfilerDialogs.DNSAConfirmation dnsa = new ProfilerDialogs.DNSAConfirmation("HeapDumpAction.heapdumpSaved", //NOI18N
-                                                                                                             SAVED_DIALOG_TEXT,
-                                                                                                             SAVED_DIALOG_CAPTION,
-                                                                                                             ProfilerDialogs.DNSAConfirmation.YES_NO_OPTION);
-                                dnsa.setDNSADefault(false);
-
-                                if (ProfilerDialogs.notify(dnsa).equals(ProfilerDialogs.DNSAConfirmation.YES_OPTION)) {
-                                    HeapWalkerManager.getDefault().openHeapWalker(new File(dumpFileName));
+                                if (ProfilerDialogs.displayConfirmationDNSA(SAVED_DIALOG_TEXT,
+                                        SAVED_DIALOG_CAPTION, null, "HeapDumpAction.heapdumpSaved", false)) { //NOI18N
+                                    ResultsManager.getDefault().openSnapshot(new File(dumpFileName));
                                 }
                             } else {
                                 if (ProfilerIDESettings.getInstance().getAutoOpenSnapshot()) {
-                                    HeapWalkerManager.getDefault().openHeapWalker(new File(dumpFileName));
+                                    ResultsManager.getDefault().openSnapshot(new File(dumpFileName));
                                 }
                             }
                         } else {
                             // Saving heapdump failed
-                            nbProfiler.displayError(DUMPING_FAILED_MSG);
+                            ProfilerDialogs.displayError(DUMPING_FAILED_MSG);
                         }
                     } catch (Exception e) {
-                        nbProfiler.displayError(e.getMessage());
+                        ProfilerDialogs.displayError(e.getMessage());
                         ProfilerLogger.log(e);
                     }
                 }
