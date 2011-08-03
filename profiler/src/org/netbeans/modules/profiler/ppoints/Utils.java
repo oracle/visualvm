@@ -86,6 +86,8 @@ import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
@@ -869,6 +871,14 @@ public class Utils {
         } else {
             return fullDateFormatHiRes.format(date);
         }
+    }
+    
+    public static Font getTitledBorderFont(TitledBorder tb) {
+        Font font = tb.getTitleFont();
+        if (font == null) font = UIManager.getFont("TitledBorder.font"); // NOI18N
+        if (font == null) font = new JLabel().getFont();
+        if (font == null) font = UIManager.getFont("Label.font"); // NOI18N
+        return font;
     }
 
     public static void openLocation(CodeProfilingPoint.Location location) {
