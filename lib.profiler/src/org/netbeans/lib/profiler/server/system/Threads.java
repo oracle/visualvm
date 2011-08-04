@@ -82,7 +82,7 @@ public class Threads {
     public static native void recordAdditionalProfilerOwnThread(Thread specialThread);
 
     /**
-     * Record profiler's own threads. If excludeSpecialThread is true, recocrd all the Java threads currently existing
+     * Record profiler's own threads. If excludeSpecialThread is true, record all the Java threads currently existing
      * in this JVM, minus specialThread. Otherwise, record only the specialThread. Returns the number of recorded threads.
      */
     public static native int recordProfilerOwnThreads(boolean excludeSpecialThread, Thread specialThread);

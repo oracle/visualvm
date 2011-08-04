@@ -42,26 +42,18 @@
 package org.netbeans.test.profiler.utils;
 
 import java.awt.Component;
-import java.awt.event.MouseEvent;
-import javax.swing.JCheckBox;
-import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.NbDialogOperator;
 import org.netbeans.jemmy.ComponentChooser;
-import org.netbeans.jemmy.operators.ButtonOperator;
 import org.netbeans.jemmy.operators.ComponentOperator;
 import org.netbeans.jemmy.operators.ContainerOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
-import org.netbeans.jemmy.operators.JComponentOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JRadioButtonOperator;
-import org.netbeans.jemmy.util.NameComponentChooser;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.ui.components.ComponentMorpher;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
-import org.netbeans.modules.profiler.ui.stp.SelectProfilingTask;
 
 /**
  * Operator for profiler dialog. Should be able to set the profiler session.
