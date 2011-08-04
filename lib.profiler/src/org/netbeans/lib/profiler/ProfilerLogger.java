@@ -45,7 +45,6 @@ package org.netbeans.lib.profiler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

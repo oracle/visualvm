@@ -55,6 +55,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.netbeans.modules.profiler.api.GoToSource;
 
 
 /**
@@ -87,7 +88,7 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == popupShowSource) {
+        if (e.getSource() == popupShowSource && popupShowSource != null) {
             performDefaultAction(-1);
         }
     }
@@ -197,13 +198,15 @@ public class DiffAllocResultsPanel extends SnapshotAllocResultsPanel {
         if (memoryResPopupMenu == null) {
             memoryResPopupMenu = new JPopupMenu();
 
-            Font boldfont = memoryResPopupMenu.getFont().deriveFont(Font.BOLD);
+            if (GoToSource.isAvailable()) {
+                Font boldfont = memoryResPopupMenu.getFont().deriveFont(Font.BOLD);
 
-            popupShowSource = new JMenuItem();
-            popupShowSource.setFont(boldfont);
-            popupShowSource.setText(GO_SOURCE_POPUP_ITEM_NAME);
-            memoryResPopupMenu.add(popupShowSource);
-            popupShowSource.addActionListener(this);
+                popupShowSource = new JMenuItem();
+                popupShowSource.setFont(boldfont);
+                popupShowSource.setText(GO_SOURCE_POPUP_ITEM_NAME);
+                memoryResPopupMenu.add(popupShowSource);
+                popupShowSource.addActionListener(this);
+            }
         }
 
         return memoryResPopupMenu;
