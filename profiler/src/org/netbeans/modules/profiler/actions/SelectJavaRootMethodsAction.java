@@ -41,8 +41,9 @@
  */
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
-import org.openide.filesystems.FileObject;
+import org.netbeans.modules.profiler.api.EditorSupport;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
+import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
 
 /**
  * Action enabled on Java sources allowing to select root method(s) for Profiling of Part of Application.
@@ -51,33 +52,34 @@ import org.openide.filesystems.FileObject;
 final public class SelectJavaRootMethodsAction extends BaseSelectRootMethodsAction {
 
     @Override
-    protected String getFileClassName(FileObject file) {
+    protected String getFileClassName(JavaProfilerSource source) {
+        if (source == null)  return null;
+        
         String className = null;
         // Read current offset in editor
-        int currentOffsetInEditor = SourceUtils.getCurrentOffsetInEditor();
+        int currentOffsetInEditor = EditorSupport.getCurrentOffset();
 
         if (currentOffsetInEditor == -1) {
             return null;
         }
 
         // Try to get class at cursor or type of field at cursor
-        SourceUtils.ResolvedClass resolvedClass = SourceUtils.resolveClassAtPosition(file,
-                currentOffsetInEditor, true);
+        SourceClassInfo resolvedClass = source.resolveClassAtPosition(currentOffsetInEditor, true);
 
-        if ((resolvedClass != null) && (resolvedClass.getJClass() != null)) {
-            className = resolvedClass.getVMClassName();
+        if ((resolvedClass != null)) {
+            className = resolvedClass.getVMName();
 
         //      NetBeansProfiler.getDefaultNB().displayInfo("<html><br><b>Will open root method selector for class at cursor:</b><br><br><code>" + resolvedClass.getVMClassName() + "</code></html>");
         }
 
         if (className == null) {
             // Try to get method enclosing cursor position
-            className = SourceUtils.getEnclosingClassName(file, currentOffsetInEditor);
+            className = source.getEnclosingClass(currentOffsetInEditor).getVMName();
         }
 
         if (className == null) {
             // Get toplevel class
-            className = SourceUtils.getToplevelClassName(file);
+            className = source.getTopLevelClass().getVMName();
         }
         return className;
     }

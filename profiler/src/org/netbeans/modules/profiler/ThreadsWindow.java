@@ -50,11 +50,8 @@ import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -63,7 +60,10 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.ui.threads.ThreadsTablePanel;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /** An IDE TopComponent to display profiling results.
@@ -98,7 +98,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     private static final String HELP_CTX_KEY = "ThreadsWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static ThreadsWindow defaultInstance;
-    private static final Image windowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/threadsWindow.png"); // NOI18N
+    private static final Image windowIcon = Icons.getImage(ProfilerIcons.WINDOW_THREADS);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -221,7 +221,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
 
     public static void closeIfOpened() {
         if (defaultInstance != null) {
-            IDEUtils.runInEventDispatchThread(new Runnable() {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         if (defaultInstance.isOpened()) {
                             defaultInstance.close();

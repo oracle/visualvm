@@ -43,8 +43,6 @@
 
 package org.netbeans.modules.profiler.ui.panels;
 
-import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -52,10 +50,8 @@ import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.modules.profiler.ui.ManualMethodSelect;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -64,8 +60,10 @@ import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.openide.DialogDisplayer;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 
 
 /**
@@ -80,10 +78,10 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     // I18N String constants
     private static final String ROOT_METHODS_LABEL_TEXT = NbBundle.getMessage(RootMethodsPanel.class,
                                                                               "RootMethodsPanel_RootMethodsLabelText"); //NOI18N
-    private static final String ADD_FROM_PROJECTBUTTON_TEXT = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                                  "RootMethodsPanel_AddButtonText"); //NOI18N
     private static final String ADD_MANUAL_BUTTON_TEXT = NbBundle.getMessage(RootMethodsPanel.class,
                                                                              "RootMethodsPanel_AddManualButtonText"); //NOI18N
+    private static final String EDIT_BUTTON_TEXT = NbBundle.getMessage(RootMethodsPanel.class,
+                                                                             "RootMethodsPanel_EditButtonText"); //NOI18N
     private static final String REMOVE_BUTTON_TEXT = NbBundle.getMessage(RootMethodsPanel.class,
                                                                          "RootMethodsPanel_RemoveButtonText"); //NOI18N
     private static final String MESSAGE_AREA_TEXT = NbBundle.getMessage(RootMethodsPanel.class, "RootMethodsPanel_MessageAreaText"); //NOI18N
@@ -91,10 +89,10 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                                                                                           "RootMethodsPanel_SpecifyRootMethodsDialogCaption"); //NOI18N
     private static final String ROOTS_LIST_ACCESS_NAME = NbBundle.getMessage(RootMethodsPanel.class,
                                                                              "RootMethodsPanel_RootsListAccessName"); //NOI18N
-    private static final String ADD_FROM_PROJECT_BUTTON_ACCESS_DESCR = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                                           "RootMethodsPanel_AddFromProjectButtonAccessDescr"); //NOI18N
     private static final String ADD_MANUALLY_BUTTON_ACCESS_DESCR = NbBundle.getMessage(RootMethodsPanel.class,
                                                                                        "RootMethodsPanel_AddManuallyButtonAccessDescr"); //NOI18N
+    private static final String EDIT_BUTTON_ACCESS_DESCR = NbBundle.getMessage(RootMethodsPanel.class,
+                                                                                       "RootMethodsPanel_EditButtonAccessDescr"); //NOI18N
     private static final String REMOVE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(RootMethodsPanel.class,
                                                                                  "RootMethodsPanel_RemoveButtonAccessDescr"); //NOI18N
     private static final String INCORRECT_MANUAL_ROOT_MSG = NbBundle.getMessage(RootMethodsPanel.class,
@@ -112,11 +110,12 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     private ArrayList selectedRoots = new ArrayList();
     private DefaultListModel rootsListModel;
     private HTMLTextArea hintArea;
-    private JButton addFromProjectButton;
-    private JButton addManualButton;
+//    private JButton addFromProjectButton;
+    private JButton addButton;
+    private JButton editButton;
     private JButton removeButton;
     private JList rootsList;
-    private Project project;
+    private Lookup.Provider project;
     private boolean globalAttach = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -136,11 +135,11 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     }
 
     public static ClientUtils.SourceCodeSelection[] getSelectedRootMethods(ClientUtils.SourceCodeSelection[] roots,
-                                                                           Project project) {
+                                                                           Lookup.Provider project) {
         final RootMethodsPanel rm = getDefault();
         rm.project = project;
         rm.globalAttach = rm.project == null;
-        rm.addFromProjectButton.setEnabled(!rm.globalAttach || (OpenProjects.getDefault().getOpenProjects().length > 0));
+//        rm.addFromProjectButton.setEnabled(!rm.globalAttach || (ProjectUtilities.getOpenedProjects().length > 0));
         rm.refreshList(roots);
 
         return performDisplay(rm);
@@ -150,7 +149,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        if (e.getSource() == addFromProjectButton) {
+        /*if (e.getSource() == addFromProjectButton) {
             RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
                         final ClientUtils.SourceCodeSelection[] sel = ProjectSelectRootMethodsPanel.getDefault()
@@ -165,7 +164,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                         }
                     }
                 });
-        } else if (e.getSource() == addManualButton) {
+        } else*/ if (e.getSource() == addButton) {
             final ClientUtils.SourceCodeSelection scs = ManualMethodSelect.selectMethod();
             
             if (scs != null) {
@@ -179,16 +178,40 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                         rootsList.setSelectedValue(newItem, true);
                     }
                 } catch (Exception ex) {
-                    NetBeansProfiler.getDefaultNB().displayError(INCORRECT_MANUAL_ROOT_MSG);
+                    ProfilerDialogs.displayError(INCORRECT_MANUAL_ROOT_MSG);
+                }
+            }
+        } else if (e.getSource() == editButton) {
+            ClientUtils.SourceCodeSelection sel = 
+                    (ClientUtils.SourceCodeSelection)selectedRoots.get(rootsList.getSelectedIndex());
+            ClientUtils.SourceCodeSelection scs = ManualMethodSelect.selectMethod(sel);
+            
+            if (scs != null) {
+                String newItem = null;
+                try {
+                    newItem = formatterFactory.getFormatter().formatMethodName(scs).toFormatted();
+                    if (!selectedRoots.contains(scs)) {
+                        selectedRoots.remove(sel);
+                        selectedRoots.add(scs);
+
+                        rootsListModel.addElement(newItem);
+                        rootsList.setSelectedValue(newItem, true);
+                    }
+                } catch (Exception ex) {
+                    ProfilerDialogs.displayError(INCORRECT_MANUAL_ROOT_MSG);
                 }
             }
         } else if (e.getSource() == removeButton) {
             final int[] selectedSessionIndices = rootsList.getSelectedIndices();
-
-            for (int i = selectedSessionIndices.length - 1; i >= 0; i--) {
-                rootsListModel.remove(selectedSessionIndices[i]);
-                selectedRoots.remove(selectedSessionIndices[i]);
-            }
+            
+            Object[] selectedItems = rootsList.getSelectedValues();
+            for (Object selectedItem : selectedItems)
+                rootsListModel.removeElement(selectedItem);
+            
+            ArrayList selRoots = new ArrayList();
+            for (int i : selectedSessionIndices)
+                selRoots.add(selectedRoots.get(i));
+            selectedRoots.removeAll(selRoots);
 
             int toSelect = -1;
 
@@ -225,11 +248,11 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     // ---------------------------------------------------------------------------
     private static ClientUtils.SourceCodeSelection[] performDisplay(final RootMethodsPanel rm) {
         final DialogDescriptor dd = new DialogDescriptor(rm, SPECIFY_ROOT_METHODS_DIALOG_CAPTION);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
 
-        if (rm.addFromProjectButton.isEnabled()) {
-            rm.addFromProjectButton.grabFocus();
-        }
+//        if (rm.addFromProjectButton.isEnabled()) {
+//            rm.addFromProjectButton.grabFocus();
+//        }
 
         d.setVisible(true);
 
@@ -277,8 +300,9 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
         rootsList = new JList();
 
         JPanel buttonPanel = new JPanel();
-        addFromProjectButton = new JButton();
-        addManualButton = new JButton();
+//        addFromProjectButton = new JButton();
+        addButton = new JButton();
+        editButton = new JButton();
         removeButton = new JButton();
         hintArea = new HTMLTextArea() {
                 public Dimension getPreferredSize() { // Workaround to force the text area not to consume horizontal space to fit the contents to just one line
@@ -318,13 +342,17 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
 
         buttonPanel.setOpaque(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(addFromProjectButton, ADD_FROM_PROJECTBUTTON_TEXT);
-        addFromProjectButton.getAccessibleContext().setAccessibleDescription(ADD_FROM_PROJECT_BUTTON_ACCESS_DESCR);
-        buttonPanel.add(addFromProjectButton);
+//        org.openide.awt.Mnemonics.setLocalizedText(addFromProjectButton, ADD_FROM_PROJECTBUTTON_TEXT);
+//        addFromProjectButton.getAccessibleContext().setAccessibleDescription(ADD_FROM_PROJECT_BUTTON_ACCESS_DESCR);
+//        buttonPanel.add(addFromProjectButton);
 
-        org.openide.awt.Mnemonics.setLocalizedText(addManualButton, ADD_MANUAL_BUTTON_TEXT);
-        addManualButton.getAccessibleContext().setAccessibleDescription(ADD_MANUALLY_BUTTON_ACCESS_DESCR);
-        buttonPanel.add(addManualButton);
+        org.openide.awt.Mnemonics.setLocalizedText(addButton, ADD_MANUAL_BUTTON_TEXT);
+        addButton.getAccessibleContext().setAccessibleDescription(ADD_MANUALLY_BUTTON_ACCESS_DESCR);
+        buttonPanel.add(addButton);
+        
+        org.openide.awt.Mnemonics.setLocalizedText(editButton, EDIT_BUTTON_TEXT);
+        editButton.getAccessibleContext().setAccessibleDescription(EDIT_BUTTON_ACCESS_DESCR);
+        buttonPanel.add(editButton);
 
         org.openide.awt.Mnemonics.setLocalizedText(removeButton, REMOVE_BUTTON_TEXT);
         removeButton.getAccessibleContext().setAccessibleDescription(REMOVE_BUTTON_ACCESS_DESCR);
@@ -357,8 +385,9 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         add(hintArea, gridBagConstraints);
 
-        addFromProjectButton.addActionListener(this);
-        addManualButton.addActionListener(this);
+//        addFromProjectButton.addActionListener(this);
+        addButton.addActionListener(this);
+        editButton.addActionListener(this);
         removeButton.addActionListener(this);
         rootsList.addListSelectionListener(this);
     }
@@ -382,6 +411,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     }
 
     private void updateButtons() {
+        editButton.setEnabled(rootsList.getSelectedIndices().length == 1);
         removeButton.setEnabled(rootsList.getSelectedIndices().length > 0);
     }
 

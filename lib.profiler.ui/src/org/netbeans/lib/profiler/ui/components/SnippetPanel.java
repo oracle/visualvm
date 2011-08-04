@@ -55,6 +55,8 @@ import javax.accessibility.AccessibleContext;
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 public class SnippetPanel extends JPanel implements MouseListener, KeyListener, FocusListener {
@@ -119,8 +121,8 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
         private final int TITLE_X_OFFSET = 5;
         private final int TITLE_Y_OFFSET = 2;
 
-        private final ImageIcon collapsedIcon = new ImageIcon(TitleUI.class.getResource("collapsedSnippet.png")); //NOI18N
-        private final ImageIcon expandedIcon = new ImageIcon(TitleUI.class.getResource("expandedSnippet.png")); //NOI18N
+        private final ImageIcon collapsedIcon = Icons.getImageIcon(GeneralIcons.COLLAPSED_SNIPPET);
+        private final ImageIcon expandedIcon = Icons.getImageIcon(GeneralIcons.EXPANDED_SNIPPET);
         private final JLabel plainPainter = new JLabel();
         private final JLabel boldPainter = new JLabel();
         private final Font plainFont = plainPainter.getFont().deriveFont(Font.PLAIN);

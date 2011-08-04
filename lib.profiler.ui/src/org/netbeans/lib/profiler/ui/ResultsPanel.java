@@ -54,6 +54,8 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**
@@ -97,8 +99,7 @@ public abstract class ResultsPanel extends JPanel {
     public abstract void prepareResults();
 
     protected JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
-        final JButton cornerButton = new JButton(new ImageIcon(getClass()
-                                                                   .getResource("/org/netbeans/lib/profiler/ui/resources/hideColumn.png"))); // NOI18N
+        final JButton cornerButton = new JButton(Icons.getIcon(GeneralIcons.HIDE_COLUMN));
         cornerButton.setToolTipText(CORNER_BUTTON_TOOLTIP);
         cornerButton.setDefaultCapable(false);
 

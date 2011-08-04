@@ -75,4 +75,11 @@ public class NpsDataObject extends MultiDataObject implements OpenCookie {
         LoadedSnapshot imported = ResultsManager.getDefault().loadSnapshot(getPrimaryFile());
         ResultsManager.getDefault().openSnapshot(imported);
     }
+
+    @Override
+    protected void handleDelete() throws IOException {
+        ResultsManager.getDefault().deleteSnapshot(getPrimaryFile());
+    }
+    
+    
 }

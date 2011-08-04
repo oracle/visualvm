@@ -48,24 +48,26 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import org.netbeans.api.editor.mimelookup.MimeLookup;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.project.Project;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
+import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
 import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
-import org.netbeans.modules.profiler.selector.ui.SelectionTreeView;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.util.HelpCtx;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 
@@ -149,14 +151,15 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
         container.add(advancedLogicalPackageTreeScrollPane, gridBagConstraints);
     }
 
-    public ClientUtils.SourceCodeSelection[] getRootMethods(final Project project, final FileObject javaFile,
+    public ClientUtils.SourceCodeSelection[] getRootMethods(final FileObject javaFile,
             final ClientUtils.SourceCodeSelection[] currentSelection) {
         advancedLogicalPackageTree.reset();
 
         updateSelector(new Runnable() {
 
             public void run() {
-                advancedLogicalPackageTree.setContext(Lookups.fixed(javaFile));
+                List<SelectionTreeBuilder> builders = SelectionTreeBuilderFactory.buildersFor(javaFile);
+                advancedLogicalPackageTree.setContext(Lookups.fixed((Object[])builders.toArray(new SelectionTreeBuilder[builders.size()])));
                 advancedLogicalPackageTree.setSelection(currentSelection);
 
                 List<Type> builderTypes = advancedLogicalPackageTree.getBuilderTypes();
@@ -177,7 +180,7 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
 //                dd.setAdditionalOptions(additionalOptions);
 //            }
 
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.pack(); // To properly layout HTML hint area
         d.setVisible(true);
 
@@ -189,9 +192,14 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
     }
 
     private void updateSelector(Runnable updater) {
-        ProgressHandle ph = IDEUtils.indeterminateProgress(NbBundle.getMessage(this.getClass(),
-                "SelectRootMethodsPanel_ParsingProjectStructureMessage"),
-                500); // NOI18N
+        final ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
+                "SelectRootMethodsPanel_ParsingProjectStructureMessage")); // NOI18N
+        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() {
+                ph.setInitialDelay(500);
+                ph.start();
+            }
+        });
 
         try {
             advancedLogicalPackageTree.setEnabled(false);
