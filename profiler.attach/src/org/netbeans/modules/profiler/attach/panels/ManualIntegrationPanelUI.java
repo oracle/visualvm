@@ -226,7 +226,7 @@ private void generateRemotePackActionPerformed(java.awt.event.ActionEvent evt) {
 
         label.setText(MessageFormat.format(NbBundle.getMessage(ManualIntegrationPanel.class, "TargetJVMWizardPanelUI_SelectJvmString"), new Object[]{model.getApplication()})); // NOI18N
 
-        generateRemotePack.setVisible(model.isRemote());
+        generateRemotePack.setVisible(model.isAvailable());
     }
 
     private void showIntegrationHints() {

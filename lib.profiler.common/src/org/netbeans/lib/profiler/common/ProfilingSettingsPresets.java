@@ -63,7 +63,8 @@ public class ProfilingSettingsPresets {
             setProfilingType(type);
             setSettingsName(CPU_PRESET_NAME);
 
-            setCPUProfilingType(CommonConstants.CPU_INSTR_FULL);
+            setCPUProfilingType(type == ProfilingSettings.PROFILE_CPU_SAMPLING ?
+                    CommonConstants.CPU_SAMPLED : CommonConstants.CPU_INSTR_FULL);
             setInstrumentGetterSetterMethods(false);
             setInstrumentEmptyMethods(false);
             setInstrumentMethodInvoke(true);
@@ -76,6 +77,8 @@ public class ProfilingSettingsPresets {
             } else if (type == ProfilingSettings.PROFILE_CPU_PART) {
                 setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
                 setInstrumentSpawnedThreads(false);
+            } else if (type == ProfilingSettings.PROFILE_CPU_SAMPLING) {
+                setSamplingFrequency(10);
             }
         }
     }
@@ -113,7 +116,7 @@ public class ProfilingSettingsPresets {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static ProfilingSettings createCPUPreset() {
-        return createCPUPreset(ProfilingSettings.PROFILE_CPU_ENTIRE);
+        return createCPUPreset(ProfilingSettings.PROFILE_CPU_SAMPLING);
     }
 
     public static ProfilingSettings createCPUPreset(int type) {
