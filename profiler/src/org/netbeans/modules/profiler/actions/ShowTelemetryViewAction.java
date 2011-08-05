@@ -49,6 +49,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /**
@@ -68,8 +70,8 @@ public final class ShowTelemetryViewAction extends AbstractAction {
     public ShowTelemetryViewAction() {
         putValue(Action.NAME, NAME_STRING);
         putValue(Action.SHORT_DESCRIPTION, SHORT_DESCRIPTION_STRING);
-        putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/telemetryWindow.png", false));
-        putValue("iconBase", "org/netbeans/modules/profiler/resources/telemetryWindow.png"); // NOI18N
+        putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.WINDOW_TELEMETRY));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.WINDOW_TELEMETRY)); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
