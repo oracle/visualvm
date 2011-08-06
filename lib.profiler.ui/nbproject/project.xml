@@ -91,9 +91,7 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.modules.appui</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
                 <friend>com.sun.tools.visualvm.uisupport</friend>
-                <friend>org.netbeans.modules.javafx.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
-                <friend>org.netbeans.modules.profiler.api</friend>
                 <friend>org.netbeans.modules.profiler.attach</friend>
                 <friend>org.netbeans.modules.profiler.categorization.api</friend>
                 <friend>org.netbeans.modules.profiler.drilldown</friend>
@@ -104,7 +102,6 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler.nbimpl</friend>
                 <friend>org.netbeans.modules.profiler.options</friend>
                 <friend>org.netbeans.modules.profiler.ppoints</friend>
-                <friend>org.netbeans.modules.profiler.selector.java</friend>
                 <friend>org.netbeans.modules.profiler.selector.api</friend>
                 <friend>org.netbeans.modules.profiler.selector.ui</friend>
                 <friend>org.netbeans.modules.profiler.snaptracer</friend>
