@@ -52,6 +52,7 @@ import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.netbeans.modules.profiler.api.GoToSource;
 
 
 /**
@@ -96,7 +97,7 @@ public class SnapshotAllocResultsPanel extends AllocResultsPanel implements Acti
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == popupShowStacks) {
             actionsHandler.showStacksForClass(selectedClassId, getSortingColumn(), getSortingOrder());
-        } else if (e.getSource() == popupShowSource) {
+        } else if (e.getSource() == popupShowSource && popupShowSource != null) {
             showSourceForClass(selectedClassId);
         }
     }
@@ -113,13 +114,15 @@ public class SnapshotAllocResultsPanel extends AllocResultsPanel implements Acti
         if (memoryResPopupMenu == null) {
             memoryResPopupMenu = new JPopupMenu();
 
-            Font boldfont = memoryResPopupMenu.getFont().deriveFont(Font.BOLD);
+            if (GoToSource.isAvailable()) {
+                Font boldfont = memoryResPopupMenu.getFont().deriveFont(Font.BOLD);
 
-            popupShowSource = new JMenuItem();
-            popupShowSource.setFont(boldfont);
-            popupShowSource.setText(GO_SOURCE_POPUP_ITEM_NAME);
-            memoryResPopupMenu.add(popupShowSource);
-            popupShowSource.addActionListener(this);
+                popupShowSource = new JMenuItem();
+                popupShowSource.setFont(boldfont);
+                popupShowSource.setText(GO_SOURCE_POPUP_ITEM_NAME);
+                memoryResPopupMenu.add(popupShowSource);
+                popupShowSource.addActionListener(this);
+            }
 
             if (snapshot.containsStacks()) {
                 memoryResPopupMenu.addSeparator();

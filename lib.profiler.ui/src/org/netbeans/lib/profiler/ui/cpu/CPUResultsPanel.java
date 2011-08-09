@@ -55,6 +55,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreePath;
+import org.netbeans.modules.profiler.api.GoToSource;
 
 
 /**
@@ -140,7 +141,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
 
         currentView = view;
 
-        popupShowSource.setEnabled(isShowSourceAvailable());
+        if (popupShowSource != null) popupShowSource.setEnabled(isShowSourceAvailable());
         popupAddToRoots.setEnabled(isAddToRootsAvailable());
 
         actionsHandler.viewChanged(view); // notify the actions handler about this
@@ -169,7 +170,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
     // Popup menu behavior
     protected JPopupMenu createPopupMenu() {
         JPopupMenu popup = new JPopupMenu();
-        popupShowSource = new JMenuItem();
+        if (GoToSource.isAvailable()) popupShowSource = new JMenuItem();
         popupAddToRoots = new JMenuItem();
         popupFind = new JMenuItem();
 
@@ -181,9 +182,11 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
             }
         };
 
-        popupShowSource.setFont(boldfont);
-        popupShowSource.setText(GO_TO_SOURCE_ITEM_NAME);
-        popup.add(popupShowSource);
+        if (popupShowSource != null) {
+            popupShowSource.setFont(boldfont);
+            popupShowSource.setText(GO_TO_SOURCE_ITEM_NAME);
+            popup.add(popupShowSource);
+        }
 
         boolean separator = false;
 
@@ -218,7 +221,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
         popupAddToRoots.setText(ROOT_METHODS_ITEM_NAME);
         popup.add(popupAddToRoots);
 
-        popupShowSource.addActionListener(menuListener);
+        if (popupShowSource != null) popupShowSource.addActionListener(menuListener);
         popupAddToRoots.addActionListener(menuListener);
         popupFind.addActionListener(menuListener);
 
@@ -269,7 +272,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
     void menuActionPerformed(ActionEvent evt) {
         Object src = evt.getSource();
 
-        if (src == popupShowSource) {
+        if (src == popupShowSource && popupShowSource != null) {
             performDefaultAction();
         } else if (src == popupShowReverse) {
             int threadId = 0;
