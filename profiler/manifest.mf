@@ -1,8 +1,7 @@
 Manifest-Version: 1.0
-OpenIDE-Module: org.netbeans.modules.profiler/1
+OpenIDE-Module: org.netbeans.modules.profiler/2
 OpenIDE-Module-Layer: org/netbeans/modules/profiler/mf-layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/Bundle.properties
 OpenIDE-Module-Install: org/netbeans/modules/profiler/ProfilerModule.class
-OpenIDE-Module-Specification-Version: 1.23
-OpenIDE-Module-Provides: org.netbeans.modules.profiler, org.netbeans.lib.profiler.common.Profiler
+OpenIDE-Module-Specification-Version: 2.0
 

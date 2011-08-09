@@ -54,9 +54,7 @@ import org.netbeans.lib.profiler.ui.graphs.GraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.MemoryGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.SurvivingGenerationsGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.ThreadsGraphPanel;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.awt.event.ActionEvent;
@@ -70,7 +68,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 
 /** An IDE TopComponent to display profiling results.
@@ -340,7 +341,7 @@ public final class TelemetryWindow extends TopComponent {
     private static final String HELP_CTX_KEY = "TelemetryWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static TelemetryWindow defaultInstance;
-    private static final Image windowIcon = ImageUtilities.loadImage("org/netbeans/modules/profiler/resources/telemetryWindow.png"); // NOI18N
+    private static final Image windowIcon = Icons.getImage(ProfilerIcons.WINDOW_TELEMETRY);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -418,7 +419,7 @@ public final class TelemetryWindow extends TopComponent {
 
     public static void closeIfOpened() {
         if (defaultInstance != null) {
-            IDEUtils.runInEventDispatchThread(new Runnable() {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
                         if (defaultInstance.isOpened()) {
                             defaultInstance.close();

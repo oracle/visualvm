@@ -241,20 +241,8 @@ public class TargetAppRunner implements CommonConstants {
      * Attaches to a running application. It is expected that prepareForAttach method is called before this one
      * to prepare the target app environment for attaching.
      *
-     * @param tvmDir The working directory for the target application
      * @throws IOException in case sending signal to target app failed
      */
-    public boolean attachToTargetJVM(File tvmDir) throws IOException {
-        if (connectToStartedVMAndStartTA(1, false)) {
-            status.runningInAttachedMode = true;
-            notifyListeners(EVENT_ATTACHED);
-
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public boolean attachToTargetVM() {
         if (connectToStartedVMAndStartTA(1, false)) {
             status.runningInAttachedMode = true;

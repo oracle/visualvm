@@ -150,6 +150,8 @@ public abstract class Profiler {
     public abstract DefinedFilterSets getDefinedFilterSets();
 
     public abstract GlobalFilters getGlobalFilters();
+    
+    public abstract void saveFilters();
 
     public abstract GlobalProfilingSettings getGlobalProfilingSettings();
 
@@ -174,21 +176,6 @@ public abstract class Profiler {
     public abstract boolean connectToStartedApp(ProfilingSettings profilingSettings, SessionSettings sessionSettings);
 
     public abstract void detachFromApp();
-
-    /** Displays a user-level message with error. Can be run from any thread.
-     * @param message The error message to display
-     */
-    public abstract void displayError(String message);
-
-    /** Displays a user-level message with information.  Can be run from any thread.
-     * @param message The message to display
-     */
-    public abstract void displayInfo(String message);
-
-    /** Displays a user-level message with warning.  Can be run from any thread.
-     * @param message The warning message to display
-     */
-    public abstract void displayWarning(String message);
 
     public abstract void instrumentSelectedRoots(ClientUtils.SourceCodeSelection[] rootMethods)
                                           throws ClassNotFoundException, InstrumentationException, BadLocationException,
@@ -241,59 +228,41 @@ public abstract class Profiler {
         }
     }
 
-    public boolean prepareInstrumentation(ProfilingSettings profilingSettings) {
-        try {
-            final ProfilerClient client = getTargetAppRunner().getProfilerClient();
-            final int oldInstrType = client.getStatus().currentInstrType;
+    public boolean prepareInstrumentation(ProfilingSettings profilingSettings)
+            throws ClientUtils.TargetAppOrVMTerminated, InstrumentationException,
+            BadLocationException, ClassNotFoundException, IOException, ClassFormatError {
+        final ProfilerClient client = getTargetAppRunner().getProfilerClient();
+        final int oldInstrType = client.getStatus().currentInstrType;
 
-            switch (profilingSettings.getProfilingType()) {
-                case ProfilingSettings.PROFILE_MONITOR:
-                    client.initiateMonitoring();
+        switch (profilingSettings.getProfilingType()) {
+            case ProfilingSettings.PROFILE_MONITOR:
+                client.initiateMonitoring();
 
-                    break;
-                case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
-                    client.initiateMemoryProfInstrumentation(CommonConstants.INSTR_OBJECT_ALLOCATIONS);
+                break;
+            case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
+                client.initiateMemoryProfInstrumentation(CommonConstants.INSTR_OBJECT_ALLOCATIONS);
 
-                    break;
-                case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
-                    client.initiateMemoryProfInstrumentation(CommonConstants.INSTR_OBJECT_LIVENESS);
+                break;
+            case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
+                client.initiateMemoryProfInstrumentation(CommonConstants.INSTR_OBJECT_LIVENESS);
 
-                    break;
-                case ProfilingSettings.PROFILE_CPU_ENTIRE:
-                case ProfilingSettings.PROFILE_CPU_PART:
-                    instrumentSelectedRoots(profilingSettings.getInstrumentationMethods());
+                break;
+            case ProfilingSettings.PROFILE_CPU_ENTIRE:
+            case ProfilingSettings.PROFILE_CPU_PART:
+                instrumentSelectedRoots(profilingSettings.getInstrumentationMethods());
 
-                    break;
-                case ProfilingSettings.PROFILE_CPU_STOPWATCH:
+                break;
+            case ProfilingSettings.PROFILE_CPU_STOPWATCH:
 
-                    SourceCodeSelection[] fragment = new SourceCodeSelection[] { profilingSettings.getCodeFragmentSelection() };
-                    client.initiateCodeRegionInstrumentation(fragment);
+                SourceCodeSelection[] fragment = new SourceCodeSelection[] { profilingSettings.getCodeFragmentSelection() };
+                client.initiateCodeRegionInstrumentation(fragment);
 
-                    break;
-            }
-
-            fireInstrumentationChanged(oldInstrType, client.getStatus().currentInstrType);
-
-            return true;
-        } catch (ClientUtils.TargetAppOrVMTerminated e) {
-            displayError(e.getMessage());
-            e.printStackTrace(System.err);
-        } catch (InstrumentationException e) {
-            displayError(e.getMessage());
-            e.printStackTrace(System.err);
-        } catch (BadLocationException e) {
-            displayError(e.getMessage());
-            e.printStackTrace(System.err);
-        } catch (ClassNotFoundException e) {
-            displayError(e.getMessage());
-            e.printStackTrace(System.err);
-        } catch (IOException e) {
-            displayError(e.getMessage());
-        } catch (ClassFormatError e) {
-            displayError(e.getMessage());
+                break;
         }
 
-        return false;
+        fireInstrumentationChanged(oldInstrType, client.getStatus().currentInstrType);
+
+        return true;
     }
 
     public final boolean profilingInProgress() {
