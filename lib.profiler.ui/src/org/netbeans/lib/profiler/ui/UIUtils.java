@@ -69,6 +69,7 @@ public final class UIUtils {
 
     // Used to mark explicit expand/collapse on JTree which shouldn't be handled by automatic expander
     public static final String PROP_EXPANSION_TRANSACTION = "expansion_transaction"; // NOI18N
+    public static Dimension DIMENSION_SMALLEST = new Dimension(0, 0);
 
     private static final Logger LOGGER = Logger.getLogger(UIUtils.class.getName());
     public static final float ALTERNATE_ROW_DARKER_FACTOR = 0.96f;
@@ -78,7 +79,28 @@ public final class UIUtils {
     private static Color unfocusedSelFg;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public static JPanel createFillerPanel() {
+        JPanel fillerPanel = new JPanel(new FlowLayout(0, 0, FlowLayout.LEADING)) {
+            public Dimension getPreferredSize() {
+                return DIMENSION_SMALLEST;
+            }
+        };
 
+        fillerPanel.setOpaque(false);
+
+        return fillerPanel;
+    }
+
+    public static JSeparator createHorizontalSeparator() {
+        JSeparator horizontalSeparator = new JSeparator() {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+        };
+
+        return horizontalSeparator;
+    }
+    
     /** Determines if current L&F is AquaLookAndFeel */
     public static boolean isAquaLookAndFeel() {
         // is current L&F some kind of AquaLookAndFeel?

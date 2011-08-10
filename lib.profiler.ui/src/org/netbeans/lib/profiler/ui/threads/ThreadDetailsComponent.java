@@ -55,6 +55,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /** A component that shows details for single thread.
@@ -773,8 +775,7 @@ public class ThreadDetailsComponent extends JPanel {
         threadDescriptionIconPanel.setLayout(new BorderLayout());
         threadDescriptionIconPanel.setBorder(new EmptyBorder(new Insets(0, 5, 5, 0)));
 
-        JLabel threadDescriptionIcon = new JLabel(new ImageIcon(getClass()
-                                                                    .getResource("/org/netbeans/lib/profiler/ui/resources/infoIcon.png"))); // NOI18N
+        JLabel threadDescriptionIcon = new JLabel(Icons.getIcon(GeneralIcons.INFO));
 
         threadDescriptionIconPanel.add(threadDescriptionIcon, BorderLayout.NORTH);
         descriptionPanel.add(threadDescriptionIconPanel, BorderLayout.WEST);

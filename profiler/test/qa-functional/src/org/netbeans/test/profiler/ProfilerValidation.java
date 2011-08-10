@@ -307,7 +307,7 @@ public class ProfilerValidation extends JellyTestCase {
 	    collectedResults = new TopComponentOperator( Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",
                                                         "CPUSnapshotPanel_PanelTitle") ); //"CPU"
 	}
-        collectedResults.saveDocument();
+        collectedResults.save();
         // call "Profile|Stop Profiling Session"
         new Action(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
                                         "LBL_StopAction"), null).perform();

@@ -51,6 +51,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.openide.DialogDisplayer;
 
 /**
  * Panel that allows the user to select which CPU data to export.
@@ -83,7 +84,7 @@ public final class ChooseExportTypePanel extends javax.swing.JPanel implements A
     final ChooseExportTypePanel cetp = getDefault ();
 
     final DialogDescriptor dd = new DialogDescriptor(cetp, CHOOSE_EXPORT_TYPE_DIALOG_CAPTION);
-    final Dialog d = ProfilerDialogs.createDialog(dd);
+    final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
     d.setVisible(true);
 
     if (dd.getValue() == NotifyDescriptor.OK_OPTION) {
