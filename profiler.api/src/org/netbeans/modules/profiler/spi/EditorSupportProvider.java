@@ -83,6 +83,11 @@ public abstract class EditorSupportProvider {
         public int getLineForOffset(FileObject file, int offset) {
             return -1;
         }
+        
+        @Override
+        public int getOffsetForLine(FileObject file, int line) {
+            return -1;
+        }
 
         @Override
         public ProfilerProject getCurrentProject() {
@@ -92,7 +97,7 @@ public abstract class EditorSupportProvider {
         @Override
         public int[] getSelectionOffsets() {
             return new int[]{-1, -1};
-        }        
+        }
     };
    
     /**
@@ -129,6 +134,11 @@ public abstract class EditorSupportProvider {
      * @return Returns the line number within the active editor document or -1
      */
     public abstract int getLineForOffset(FileObject file, int offset);
+    /**
+     * Calculates the offset for a given line number
+     * @return Returns the offset for the provided file and line number or -1
+     */
+    public abstract int getOffsetForLine(FileObject file, int line);
     /**
      * Returns the project the currently activated document belongs to
      * @return The most active project or null
