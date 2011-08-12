@@ -130,6 +130,14 @@ final public class EditorSupport {
     }
     
     /**
+     * Calculates the offset for a given line number
+     * @return Returns the offset for the provided file and line number or -1
+     */
+    public static int getOffsetForLine(FileObject file, int line) {
+        return getSupport().getOffsetForLine(file, line);
+    }
+    
+    /**
      * Returns the tuple of start/end selection offset in the currently activated editor
      * @return Tuple [startOffset, endOffset] or [-1, -1] if there is no selection
      */
