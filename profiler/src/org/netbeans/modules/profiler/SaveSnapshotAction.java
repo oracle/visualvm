@@ -43,11 +43,11 @@
 
 package org.netbeans.modules.profiler;
 
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 class SaveSnapshotAction extends AbstractAction {
@@ -58,8 +58,6 @@ class SaveSnapshotAction extends AbstractAction {
     private static final String ACTION_NAME = NbBundle.getMessage(SaveSnapshotAction.class, "SaveSnapshotAction_ActionName"); // NOI18N
     private static final String ACTION_DESCR = NbBundle.getMessage(SaveSnapshotAction.class, "SaveSnapshotAction_ActionDescr"); // NOI18N
                                                                                                                                 // -----
-    private static final ImageIcon ICON = ImageUtilities.loadImageIcon("org/netbeans/modules/profiler/resources/save.png", false); // NOI18N
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private LoadedSnapshot snapshot;
@@ -69,8 +67,8 @@ class SaveSnapshotAction extends AbstractAction {
     public SaveSnapshotAction(LoadedSnapshot snapshot) {
         putValue(Action.NAME, ACTION_NAME);
         putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
-        putValue(Action.SMALL_ICON, ICON);
-        putValue("iconBase", "org/netbeans/modules/profiler/resources/save.png"); // NOI18N
+        putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE));
+        putValue("iconBase", Icons.getResource(GeneralIcons.SAVE)); // NOI18N
         this.snapshot = snapshot;
         updateState();
     }

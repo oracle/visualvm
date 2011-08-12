@@ -54,6 +54,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.openide.DialogDisplayer;
 
 
 /**
@@ -97,7 +98,7 @@ public class FindDialog extends JPanel {
         final DialogDescriptor dd = new DialogDescriptor(findDialog, FIND_IN_RESULTS_DIALOG_CAPTION, true,
                                                          new Object[] { findDialog.findButton, DialogDescriptor.CANCEL_OPTION },
                                                          findDialog.findButton, DialogDescriptor.BOTTOM_ALIGN, null, null);
-        final Dialog d = ProfilerDialogs.createDialog(dd);
+        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
 
         if (dd.getValue() == findDialog.findButton) {

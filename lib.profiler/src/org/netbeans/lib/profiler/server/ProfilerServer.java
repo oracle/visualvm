@@ -1242,13 +1242,13 @@ public class ProfilerServer extends Thread implements CommonConstants {
             if (serverTimeout == 0) {
                 System.out.println(MessageFormat.format(WAITING_ON_PORT_MSG,
                                                         new Object[] { "" + serverPort, // NOI18N
-                                                                       "" + CommonConstants.CURRENT_AGENT_VERSION // NOI18N
+                                                                       "" + CURRENT_AGENT_VERSION // NOI18N
                                                         }));
             } else {
                 System.out.println(MessageFormat.format(WAITING_ON_PORT_TIMEOUT_MSG,
                                                         new Object[] { "" + serverPort, // NOI18N
                                                                        "" + serverTimeout, // NOI18N
-                                                                       "" + CommonConstants.CURRENT_AGENT_VERSION // NOI18N
+                                                                       "" + CURRENT_AGENT_VERSION // NOI18N
                                                         }));
             }
 
@@ -1468,7 +1468,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 ProfilerRuntimeCPU.setTimerTypes(sucipCmd.getAbsoluteTimerOn(), sucipCmd.getThreadCPUTimerOn());
                 status.instrScheme = sucipCmd.getInstrScheme();
                 ProfilerRuntimeCPUCodeRegion.setCPUResBufSize(sucipCmd.getCodeRegionCPUResBufSize());
-                ProfilerRuntimeCPU.enableFirstTimeMethodInvoke(status.instrScheme != CommonConstants.INSTRSCHEME_TOTAL);
+                ProfilerRuntimeCPU.enableFirstTimeMethodInvoke(status.instrScheme != INSTRSCHEME_TOTAL);
                 setRemoteProfiling(sucipCmd.getRemoteProfiling());
                 sendSimpleResponseToClient(true, null);
 
