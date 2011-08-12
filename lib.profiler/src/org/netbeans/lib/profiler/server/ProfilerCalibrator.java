@@ -444,9 +444,9 @@ class ProfilerCalibrator extends ProfilerRuntime {
                 byte eventType = buf[curPos];
 
                 // Now that the implementation is stable, there is not much need in the following checks
-                if (inner && (eventType != CommonConstants.METHOD_EXIT)) {
+                if (inner && (eventType != METHOD_EXIT)) {
                     System.out.println("Problem with inner! " + (int) eventType + ", curPos = " + curPos); // NOI18N
-                } else if (!inner && (eventType != CommonConstants.METHOD_ENTRY)) {
+                } else if (!inner && (eventType != METHOD_ENTRY)) {
                     System.out.println("Problem with outer! " + (int) eventType + ", curPos = " + curPos); // NOI18N
                 }
 
