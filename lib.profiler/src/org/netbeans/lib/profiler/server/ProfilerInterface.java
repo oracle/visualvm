@@ -907,7 +907,7 @@ public class ProfilerInterface implements CommonConstants {
                     } else {
                         // in total inst scheme for CPU profiling we instrument everything
                         boolean rootWasLoaded = ((instrType == INSTR_RECURSIVE_FULL) || (instrType == INSTR_RECURSIVE_SAMPLED))
-                                                && (status.instrScheme == CommonConstants.INSTRSCHEME_TOTAL);
+                                                && (status.instrScheme == INSTRSCHEME_TOTAL);
 
                         // No root classes have been loaded - check if it's one of them
                         if (!rootWasLoaded && !isRootClass(className)) {
