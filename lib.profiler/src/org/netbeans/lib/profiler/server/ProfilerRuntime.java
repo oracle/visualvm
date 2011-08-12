@@ -171,7 +171,7 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_MONITOR, timeStamp, monitor);
+        Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_MONITOR, timeStamp, monitor);
         ti.inProfilingRuntimeMethod--;
     }
 
@@ -203,7 +203,7 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_RUNNING, timeStamp, null);
+        Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_RUNNING, timeStamp, null);
         ti.inProfilingRuntimeMethod--;
     }
 
@@ -283,7 +283,7 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_SLEEPING, timeStamp, null);
+        Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_SLEEPING, timeStamp, null);
         ti.inProfilingRuntimeMethod--;
     }
 
@@ -315,7 +315,7 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_RUNNING, timeStamp, null);
+        Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_RUNNING, timeStamp, null);
         ti.inProfilingRuntimeMethod--;
     }
 
@@ -347,7 +347,7 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_WAIT, timeStamp, null);
+        Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_WAIT, timeStamp, null);
         ti.inProfilingRuntimeMethod--;
     }
 
@@ -379,7 +379,7 @@ public class ProfilerRuntime implements CommonConstants {
             }
         }
 
-        Monitors.recordThreadStateChange(ti.thread, CommonConstants.THREAD_STATUS_RUNNING, timeStamp, null);
+        Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_RUNNING, timeStamp, null);
         ti.inProfilingRuntimeMethod--;
     }
 
