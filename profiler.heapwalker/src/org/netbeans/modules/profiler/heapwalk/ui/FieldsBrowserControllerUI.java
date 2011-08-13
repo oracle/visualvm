@@ -637,26 +637,27 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         treeCellRenderer.setClosedIcon(null);
         treeCellRenderer.setOpenIcon(null);
 
-        LabelTableCellRenderer dataCellRenderer = new LabelTableCellRenderer(JLabel.TRAILING);
+        LabelTableCellRenderer dataCellRendererL = new LabelTableCellRenderer(JLabel.LEADING);
+        LabelTableCellRenderer dataCellRendererT = new LabelTableCellRenderer(JLabel.TRAILING);
 
         // method / class / package name
         columnRenderers[0] = null;
 
         columnWidths[1 - 1] = unitWidth * 18;
-        columnRenderers[1] = dataCellRenderer;
+        columnRenderers[1] = dataCellRendererL;
 
         columnWidths[2 - 1] = unitWidth * 28;
-        columnRenderers[2] = dataCellRenderer;
+        columnRenderers[2] = dataCellRendererL;
 
         columnWidths[3 - 1] = unitWidth * 14;
-        columnRenderers[3] = dataCellRenderer;
+        columnRenderers[3] = dataCellRendererT;
 
         columnWidths[4 - 1] = unitWidth * 7;
-        columnRenderers[4] = dataCellRenderer;
+        columnRenderers[4] = dataCellRendererT;
 
         if (retainedSizeSupported) {
             columnWidths[5 - 1] = unitWidth * 7;
-            columnRenderers[5] = dataCellRenderer;
+            columnRenderers[5] = dataCellRendererT;
         }
     }
 
