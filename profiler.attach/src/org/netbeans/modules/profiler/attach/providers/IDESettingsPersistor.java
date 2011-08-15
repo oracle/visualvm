@@ -52,7 +52,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
-import org.netbeans.modules.profiler.utilities.queries.SettingsFolderQuery;
+import org.netbeans.modules.profiler.api.GlobalStorage;
 
 
 /**
@@ -85,7 +85,7 @@ public abstract class IDESettingsPersistor implements SettingsPersistor {
         FileObject settingsFO = null;
 
         try {
-            settingsFO = SettingsFolderQuery.getDefault().getSettingsFolder(true);
+            settingsFO = GlobalStorage.getSettingsFolder(true);
         } catch (IOException e) {
             // IGNORE
         }

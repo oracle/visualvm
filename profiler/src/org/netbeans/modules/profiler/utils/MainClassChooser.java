@@ -50,6 +50,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.swing.JPanel;
@@ -58,7 +59,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
+import org.openide.util.Lookup;
 
 
 /**
@@ -88,14 +91,14 @@ public class MainClassChooser extends JPanel {
     /**
      * Creates new form MainClassChooser
      */
-    public MainClassChooser(FileObject[] sourcesRoots) {
-        this(sourcesRoots, null);
+    public MainClassChooser(Lookup.Provider project) {
+        this(project, null);
     }
 
-    public MainClassChooser(FileObject[] sourcesRoots, String subtitle) {
+    public MainClassChooser(Lookup.Provider project, String subtitle) {
         dialogSubtitle = subtitle;
         initComponents();
-        initClassesView(sourcesRoots);
+        initClassesView(project);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -141,13 +144,15 @@ public class MainClassChooser extends JPanel {
         return new Object[] { NbBundle.getMessage(MainClassChooser.class, "LBL_ChooseMainClass_WARMUP_MESSAGE") }; // NOI18N
     }
 
-    private void initClassesView(final FileObject[] sourcesRoots) {
-        possibleMainClasses = null;
+    private void initClassesView(final Lookup.Provider project) {
+        possibleMainClasses = new ArrayList<String>();
         jMainClassList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jMainClassList.setListData(getWarmupList());
         RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    possibleMainClasses = SourceUtils.findMainClasses(sourcesRoots);
+                    for(SourceClassInfo sci : ProfilerTypeUtils.getMainClasses(project)) {
+                        possibleMainClasses.add(sci.getQualifiedName());
+                    }
 
                     if (possibleMainClasses.isEmpty()) {
                         jMainClassList.setListData(new String[] {
