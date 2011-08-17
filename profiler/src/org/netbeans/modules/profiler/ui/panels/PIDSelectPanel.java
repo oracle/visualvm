@@ -45,8 +45,6 @@ package org.netbeans.modules.profiler.ui.panels;
 
 import org.netbeans.lib.profiler.jps.JpsProxy;
 import org.netbeans.lib.profiler.jps.RunningVM;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
@@ -55,6 +53,8 @@ import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.openide.DialogDisplayer;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -212,7 +212,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         DialogDescriptor dd = new DialogDescriptor(pidSelect, SELECT_PROCESS_DIALOG_CAPTION, true,
                                                    new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                    DialogDescriptor.BOTTOM_ALIGN, null, null);
-        Dialog d = ProfilerDialogs.createDialog(dd);
+        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
 
         if (dd.getValue() == okButton) {
@@ -223,30 +223,36 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
     }
 
     private void refreshCombo() {
-        okButton.setEnabled(false);
-        combo.setEnabled(false);
-        combo.setModel(new DefaultComboBoxModel(new Object[] { PROCESSES_LIST_ITEM_TEXT }));
-        new NBSwingWorker() {
-                private RunningVM[] vms = JpsProxy.getRunningVMs();
-                private Object[] ar = new Object[((vms == null) ? 0 : vms.length) + 1];
-
-                protected void doInBackground() {
-                    if (vms == null) {
-                        ar[0] = ERROR_GETTING_PROCESSES_ITEM_TEXT;
-                    } else if (vms.length == 0) {
-                        ar[0] = NO_PROCESSES_ITEM_TEXT;
-                    } else {
-                        ar[0] = SELECT_PROCESS_ITEM_TEXT;
-                        System.arraycopy(vms, 0, ar, 1, vms.length);
-                    }
-                }
-
-                protected void done() {
-                    combo.setEnabled(true);
-                    combo.setModel(new DefaultComboBoxModel(ar));
-                    updateInfo();
-                }
-            }.execute();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                okButton.setEnabled(false);
+                combo.setEnabled(false);
+                combo.setModel(new DefaultComboBoxModel(new Object[] { PROCESSES_LIST_ITEM_TEXT }));
+                
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        RunningVM[] vms = JpsProxy.getRunningVMs();
+                        final Object[] ar = new Object[((vms == null) ? 0 : vms.length) + 1];
+                        if (vms == null) {
+                            ar[0] = ERROR_GETTING_PROCESSES_ITEM_TEXT;
+                        } else if (vms.length == 0) {
+                            ar[0] = NO_PROCESSES_ITEM_TEXT;
+                        } else {
+                            ar[0] = SELECT_PROCESS_ITEM_TEXT;
+                            System.arraycopy(vms, 0, ar, 1, vms.length);
+                        }
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                combo.setEnabled(true);
+                                combo.setModel(new DefaultComboBoxModel(ar));
+                                updateInfo();
+                            }
+                        });
+                   } 
+                });
+            }
+        });
+        
     }
 
     private void updateInfo() {

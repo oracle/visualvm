@@ -46,8 +46,6 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -58,6 +56,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.openide.windows.WindowManager;
 
 
 /**
@@ -145,7 +145,7 @@ public final class LoadSnapshotAction extends AbstractAction {
                 }
             });
 
-        if (chooser.showOpenDialog(IDEUtils.getMainWindow()) == JFileChooser.APPROVE_OPTION) {
+        if (chooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             final File[] files = chooser.getSelectedFiles();
             final ArrayList<FileObject> snapshotsFOArr = new ArrayList();
             final ArrayList<File> heapdumpsFArr = new ArrayList();
@@ -166,8 +166,7 @@ public final class LoadSnapshotAction extends AbstractAction {
                                                           .loadSnapshots(snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
                 ResultsManager.getDefault().openSnapshots(imported);
             } else if (!handleHeapdumps) {
-                NetBeansProfiler.getDefaultNB()
-                        .displayError(MessageFormat
+                ProfilerDialogs.displayError(MessageFormat
                         .format(CANNOT_OPEN_SNAPSHOT_MSG, null));
 
             }
@@ -175,7 +174,9 @@ public final class LoadSnapshotAction extends AbstractAction {
             if (!heapdumpsFArr.isEmpty()) {
                 RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
-                            HeapWalkerManager.getDefault().openHeapWalkers(heapdumpsFArr.toArray(new File[heapdumpsFArr.size()]));
+                            for (File heapDump : heapdumpsFArr) {
+                                ResultsManager.getDefault().openSnapshot(heapDump);
+                            }
                         }
                     });
 
