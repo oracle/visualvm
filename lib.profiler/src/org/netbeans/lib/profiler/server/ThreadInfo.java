@@ -73,6 +73,7 @@ public class ThreadInfo {
 
     // ThreadInfo hash table
     private static ThreadInfo[] threadInfos = new ThreadInfo[1]; // To avoid null checks - important!
+    private static final Object threadInfosLock = new Object();
     private static int threadInfosSize;
     private static int nThreads;
     private static boolean hasDeadThreads;
@@ -288,7 +289,7 @@ public class ThreadInfo {
     }
 
     static void changeAllThreadsInProfRuntimeMethodStatus(int val) {
-        synchronized (threadInfos) {
+        synchronized (threadInfosLock) {
             for (int i = 0; i < threadInfos.length; i++) {
                 ThreadInfo ti = threadInfos[i];
 
@@ -304,7 +305,7 @@ public class ThreadInfo {
     static void resetThreadInfoTable() {
         ThreadInfo[] oldTIs = threadInfos;
 
-        synchronized (threadInfos) {
+        synchronized (threadInfosLock) {
             nProfiledAppThreads = 0;
             lastThreadInfo = dummyThreadInfo; // To avoid null checks
 
@@ -394,7 +395,7 @@ public class ThreadInfo {
     }
 
     private static ThreadInfo newThreadInfo(Thread thread) {
-        synchronized (threadInfos) {
+        synchronized (threadInfosLock) {
             ThreadInfo ti = getThreadInfoOrNull(thread);
 
             if (ti != null) {
