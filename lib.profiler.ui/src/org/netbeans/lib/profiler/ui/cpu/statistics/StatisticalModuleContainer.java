@@ -60,7 +60,7 @@ import java.util.Set;
 public class StatisticalModuleContainer implements CPUCCTProvider.Listener {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Set /*<StatisticalModule>*/ modules = new HashSet();
+    private final Set /*<StatisticalModule>*/ modules = new HashSet();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
