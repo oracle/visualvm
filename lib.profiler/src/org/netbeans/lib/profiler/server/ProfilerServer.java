@@ -376,13 +376,13 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static volatile boolean startTargetApp;
     private static volatile boolean targetAppMainThreadComplete;
     private static volatile Exception startupException;
-    private static Object targetAppRunningLock;
+    private static final Object targetAppRunningLock = new Object();
     private static Thread mainThread;
 
     // Management of execution of some commands in a separate thread
     private static SeparateCmdExecutionThread separateCmdExecutionThread;
     private static ShutdownWaitThread shutdownWaitThread;
-    static Object execInSeparateThreadLock;
+    static final Object execInSeparateThreadLock = new Object();
     static int execInSeparateThreadOpCode;
     private static volatile boolean preemptExit = true;
     private static boolean shutdownOK = false;
@@ -399,7 +399,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static int _activateCode;
     private static int _timeOut = 0;
     private static Response lastResponse;
-    private static Object responseLock = new Object();
+    private static final Object responseLock = new Object();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -926,8 +926,6 @@ public class ProfilerServer extends Thread implements CommonConstants {
         status = null;
         startTargetApp = false;
         startupException = null;
-        targetAppRunningLock = new Object();
-        execInSeparateThreadLock = new Object();
 
         // Preload this class, to avoid possible strange problems that may happen in case of wire protocol errors, that in
         // turn may cause loading of this class, that in turn may invoke classLoadHook, etc.

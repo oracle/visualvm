@@ -43,7 +43,7 @@ package simple.cpu;
 public class WaitingTest {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    public static Object mutex = new Object();
+    public static final Object mutex = new Object();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
