@@ -371,14 +371,14 @@ public class ProfilerClient implements CommonConstants {
     private InitiateInstrumentationCommand commandOnStartup = null;
     private Instrumentor instrumentor;
     private MemoryCCTProvider memCctProvider;
-    private Object execInSeparateThreadLock = new Object();
+    private final Object execInSeparateThreadLock = new Object();
     final private Object forceObtainedResultsDumpLock = new Object(); // To make dump processing and other commands mutually
                                                                 // exclusive
 
     /*instrMethodGroupFromRootComplete, */
-    private Object instrumentationLock = new Object(); // To make sure all instrumentation-related operations
+    private final Object instrumentationLock = new Object(); // To make sure all instrumentation-related operations
                                                        // happen serially
-    private Object responseLock = new Object();
+    private final Object responseLock = new Object();
     private ObjectInputStream socketIn;
     private ObjectOutputStream socketOut;
     private ProfilerEngineSettings settings;

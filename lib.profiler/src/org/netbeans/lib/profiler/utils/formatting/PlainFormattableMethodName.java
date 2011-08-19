@@ -363,11 +363,11 @@ public class PlainFormattableMethodName implements Formattable {
 
     public String toFormatted() {
         switch (verbosity) {
-            case 1:return getFormattedClass();
-            case 2:return getFormattedMethod();
-            case 3:return getFormattedClassAndMethod();
-            case 4:return getFullFormattedMethod();
-            case 5:return getFullFormattedClassAndMethod();
+            case DefaultMethodNameFormatter.VERBOSITY_CLASS:return getFormattedClass();
+            case DefaultMethodNameFormatter.VERBOSITY_METHOD:return getFormattedMethod();
+            case DefaultMethodNameFormatter.VERBOSITY_CLASSMETHOD:return getFormattedClassAndMethod();
+            case DefaultMethodNameFormatter.VERBOSITY_FULLMETHOD:return getFullFormattedMethod();
+            case DefaultMethodNameFormatter.VERBOSITY_FULLCLASSMETHOD:return getFullFormattedClassAndMethod();
             default:return getFullFormattedClassAndMethod();
         }
     }
