@@ -115,7 +115,6 @@ made subject to such option by the copyright holder.
     <target name="netbeans-extra">
        <ant dir="release/remote-pack-defs" target="profiler-server-all" inheritall="false">
            <property name="cluster" location="${cluster}"/>
-           <property name="dest.dir" location="${build.dir}/build"/>
        </ant>
     </target>
 

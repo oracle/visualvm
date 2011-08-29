@@ -51,6 +51,7 @@ made subject to such option by the copyright holder.
   -->
   
   <property name="lib.dir" value="${cluster}/lib"/>
+  <property name="dest.dir" value="../../build"/>
   <property name="build.dir" value="${dest.dir}/nb-profiler-server"/>
   <property name="profiler.cluster" value=".."/>
   
