@@ -395,25 +395,32 @@ public class ClassesListController extends AbstractController {
     }
     
     private List diffClasses;
+    private boolean comparingSnapshot = false;
     public void compareAction() {
+        if (comparingSnapshot) return;
+        comparingSnapshot = true;
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                JFileChooser ch = new JFileChooser();
-                if (ch.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    File dumpFile = ch.getSelectedFile();
-                    try {
-                        showDiffProgress();
-                        Heap currentHeap = classesController.getHeapFragmentWalker().getHeapFragment();
-                        Heap diffHeap = HeapFactory.createHeap(dumpFile);
-                        diffClasses = createDiffClasses(diffHeap, currentHeap);
-                    } catch (FileNotFoundException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } finally {
-                        hideDiffProgress();
+                try {
+                    HeapFragmentWalker hfw = classesController.getHeapFragmentWalker();
+                    File dumpFile = CompareSnapshotsHelper.selectSnapshot(hfw);
+                    if (dumpFile != null) {
+                        try {
+                            showDiffProgress();
+                            Heap currentHeap = hfw.getHeapFragment();
+                            Heap diffHeap = HeapFactory.createHeap(dumpFile);
+                            diffClasses = createDiffClasses(diffHeap, currentHeap);
+                        } catch (FileNotFoundException ex) {
+                            Exceptions.printStackTrace(ex);
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        } finally {
+                            hideDiffProgress();
+                        }
+                        updateData();
                     }
-                    updateData();
+                } finally {
+                    comparingSnapshot = false;
                 }
             }
         });
