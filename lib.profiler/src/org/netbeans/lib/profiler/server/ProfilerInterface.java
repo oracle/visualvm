@@ -92,15 +92,15 @@ public class ProfilerInterface implements CommonConstants {
         }
     }
 
-    private static class InitiateInstThread extends Thread {
+    private static class InitiateProfilingThread extends Thread {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private InitiateInstrumentationCommand cmd;
+        private InitiateProfilingCommand cmd;
         private boolean targetAppRunning;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        InitiateInstThread(InitiateInstrumentationCommand cmd, boolean targetAppRunning) {
+        InitiateProfilingThread(InitiateProfilingCommand cmd, boolean targetAppRunning) {
             ThreadInfo.addProfilerServerThread(this);
             this.setName(PROFILER_SPECIAL_EXEC_THREAD_NAME + " 2"); // NOI18N
             this.cmd = cmd;
@@ -529,7 +529,7 @@ public class ProfilerInterface implements CommonConstants {
             });
     }
 
-    public static void initiateInstrumentation(final InitiateInstrumentationCommand cmd, final boolean targetAppRunning)
+    public static void initiateProfiling(final InitiateProfilingCommand cmd, final boolean targetAppRunning)
                                         throws Exception {
         int instrType = cmd.getInstrType();
         String instrClassName = cmd.getRootClassName();
@@ -565,7 +565,7 @@ public class ProfilerInterface implements CommonConstants {
 
         // We have to perform the following operations in a separate thread, since they may involve further dialog with
         // the tool (client), whereas this thread has to return quickly to send the "OK" response to the tool.
-        new InitiateInstThread(cmd, targetAppRunning).start();
+        new InitiateProfilingThread(cmd, targetAppRunning).start();
     }
 
     public static void instrumentMethods(InstrumentMethodGroupCommand cmd)
@@ -1253,7 +1253,7 @@ public class ProfilerInterface implements CommonConstants {
     
     private static void cacheLoadedClasses(Class[] nonSystemClasses, int nonSystemIndex) {
         if (DEBUG) System.out.println("Caching "+nonSystemIndex+" classes");
-        nonSystemClasses[nonSystemIndex++] = ProfilerInterface.InitiateInstThread.class;
+        nonSystemClasses[nonSystemIndex++] = ProfilerInterface.InitiateProfilingThread.class;
         Classes.cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
     }
 
