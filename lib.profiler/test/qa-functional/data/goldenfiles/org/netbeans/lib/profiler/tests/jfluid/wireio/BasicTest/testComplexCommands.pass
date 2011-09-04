@@ -8,6 +8,6 @@ Server start to listen on port 5140
  received command METHOD_LOADED, className: java.lang.String, classLoaderId: 7, methodName: toString(), methodSignature: 
  received command EVENT_BUFFER_DUMPED, bufSize: 1024
  received command SET_CHANGEABLE_INSTR_PARAMS, nProfiledThreadsLimit: 32, samplingInterval: 10, objAllocStackSamplingInterval: 5, objAllocStackSamplingDepth: 10, runGCOnGetResultsInMemoryProfiling: true, waitTrackingEnabled: true, sleepTrackingEnabled: true, threadsSamplingEnabled: true
- received command INITIATE_INSTRUMENTATION, instrType = 0
+ received command INITIATE_PROFILING, instrType = 0
  received command InstrumentMethodGroupCommand 1 classes.
  received command GET_DEFINING_CLASSLOADER, className: java.lang.String, classLoaderId: 1
