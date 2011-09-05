@@ -245,7 +245,6 @@ public class StackTraceSnapshotBuilder {
         filter = f;
         setDefaultTiming();
         ccgb = b;
-        ccgb.setMethodInfoMapper(mapper);
         status = s;
         methodInfos.add(new MethodInfo("Thread","")); // NOI18N
     }
