@@ -197,7 +197,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                 ccgb[0] = (CPUCallGraphBuilder) listener;
             }
         });
-        builder = new StackTraceSnapshotBuilder(ccgb[0],null,client.getStatus());
+        builder = new StackTraceSnapshotBuilder(ccgb[0],client.getSettings().getInstrumentationFilter(),client.getStatus());
     }
     
     private static Thread.State getThreadState(int threadState) {
