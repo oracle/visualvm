@@ -414,6 +414,38 @@ public class ProfilerRuntime implements CommonConstants {
         }
     }
 
+    protected static void writeThreadCreationEvent(Thread thread, int threadId) {
+        String threadName = thread.getName();
+        String threadClassName = thread.getClass().getName();
+        int fullInfoLen = ((threadName.length() + threadClassName.length()) * 2) + 7;
+        synchronized (eventBuffer) {
+            if ((globalEvBufPos + fullInfoLen) > globalEvBufPosThreshold) {
+                sendingBuffer = true;
+                externalActionsHandler.handleEventBufferDump(eventBuffer, 0, globalEvBufPos);
+                globalEvBufPos = 0;
+                sendingBuffer = false;
+            }
+
+            eventBuffer[globalEvBufPos++] = NEW_THREAD;
+
+            eventBuffer[globalEvBufPos++] = (byte) ((threadId >> 8) & 0xFF);
+            eventBuffer[globalEvBufPos++] = (byte) ((threadId) & 0xFF);
+
+            byte[] name = threadName.getBytes();
+            int len = name.length;
+            eventBuffer[globalEvBufPos++] = (byte) ((len >> 8) & 0xFF);
+            eventBuffer[globalEvBufPos++] = (byte) ((len) & 0xFF);
+            System.arraycopy(name, 0, eventBuffer, globalEvBufPos, len);
+            globalEvBufPos += len;
+            name = threadClassName.getBytes();
+            len = name.length;
+            eventBuffer[globalEvBufPos++] = (byte) ((len >> 8) & 0xFF);
+            eventBuffer[globalEvBufPos++] = (byte) ((len) & 0xFF);
+            System.arraycopy(name, 0, eventBuffer, globalEvBufPos, len);
+            globalEvBufPos += len;
+        }
+    }
+
     // -------------------------------- Thread-related stuff ------------------------------------------
     protected static void changeAllThreadsInProfRuntimeMethodStatus(int val) {
         ThreadInfo.changeAllThreadsInProfRuntimeMethodStatus(val);
@@ -442,6 +474,10 @@ public class ProfilerRuntime implements CommonConstants {
             case INSTR_RECURSIVE_SAMPLED:
                 ProfilerRuntimeCPU.resetProfilerCollectors();
 
+                break;
+            case INSTR_NONE_SAMPLING:
+                ProfilerRuntimeSampler.resetProfilerCollectors();
+                
                 break;
             case INSTR_CODE_REGION:
                 ProfilerRuntimeCPUCodeRegion.resetProfilerCollectors();

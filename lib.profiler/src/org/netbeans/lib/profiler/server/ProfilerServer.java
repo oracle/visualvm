@@ -653,7 +653,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             }
 
             resultsNotified = true;
-            profilerServer.sendSimpleCmdToClient(Command.RESULTS_AVAILABLE);
+            profilerServer.sendComplexCmdToClient(new ResultsAvailableCommand(ProfilerInterface.getBufferFileName()));
         }
     }
 

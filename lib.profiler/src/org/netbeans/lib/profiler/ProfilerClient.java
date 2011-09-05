@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -302,6 +304,17 @@ public class ProfilerClient implements CommonConstants {
 
                     break;
                 case Command.RESULTS_AVAILABLE:
+                    ResultsAvailableCommand raCmd = (ResultsAvailableCommand) cmd;
+                    String bufferName = raCmd.getEventBufferFileName();
+                    if (bufferName.length() > 0) {
+                        if (!EventBufferProcessor.bufFileExists()) {
+                            if (!EventBufferProcessor.setEventBufferFile(bufferName)) {
+                                appStatusHandler.displayError(MessageFormat.format(CANNOT_OPEN_SERVER_TEMPFILE_MSG,
+                                                                                   new Object[] { raCmd.getEventBufferFileName() }));
+                            }
+                        }
+                        JMethodIdTable.reset();
+                    }
                     resultsStart = System.currentTimeMillis();
 
                     break;
@@ -738,7 +751,7 @@ public class ProfilerClient implements CommonConstants {
     public void deinstrumentMemoryProfiledClasses(boolean[] unprofiledClassStatusArray)
                                            throws InstrumentationException, ClientUtils.TargetAppOrVMTerminated {
         synchronized (instrumentationLock) {
-            if (getCurrentInstrType() == INSTR_NONE) {
+            if (getCurrentInstrType() == INSTR_NONE || getCurrentInstrType() == INSTR_NONE_SAMPLING) {
                 return;
             }
 
@@ -1032,6 +1045,26 @@ public class ProfilerClient implements CommonConstants {
         }
     }
 
+    public void initiateCPUSampling() throws ClientUtils.TargetAppOrVMTerminated, InstrumentationException {
+         synchronized (instrumentationLock) {
+            removeAllInstrumentation();
+            InitiateProfilingCommand cmd = new InitiateProfilingCommand(INSTR_NONE_SAMPLING);
+            commandOnStartup = cmd;
+            status.setTimerTypes(settings.getAbsoluteTimerOn(), settings.getThreadCPUTimerOn());
+            setCurrentInstrType(INSTR_NONE_SAMPLING);
+
+            if (status.targetAppRunning) {
+                sendSetInstrumentationParamsCmd(false);
+
+                String errorMessage = sendCommandAndGetResponse(commandOnStartup);
+
+                if (errorMessage != null) {
+                    appStatusHandler.displayWarning(errorMessage);
+                }
+            }            
+         }
+    }
+
     public synchronized boolean memoryResultsExist() {
         return (getMemoryCCTProvider() != null) && (getMemoryCCTProvider().getStacksForClasses() != null);
     }
@@ -1055,7 +1088,7 @@ public class ProfilerClient implements CommonConstants {
     public void removeAllInstrumentation(boolean cleanupClient)
                                   throws InstrumentationException {
         synchronized (instrumentationLock) {
-            if (getCurrentInstrType() == INSTR_NONE) {
+            if (getCurrentInstrType() == INSTR_NONE || getCurrentInstrType() == INSTR_NONE_SAMPLING) {
                 return;
             }
 
@@ -1811,20 +1844,6 @@ public class ProfilerClient implements CommonConstants {
                     }
                 }
 
-                if (currentInstrTypeIsRecursiveCPUProfiling() || currentInstrTypeIsMemoryProfiling()) {
-                    if (!EventBufferProcessor.bufFileExists()) {
-                        if (!EventBufferProcessor.setEventBufferFile(cmd.getEventBufferFileName())) {
-                            appStatusHandler.displayError(MessageFormat.format(CANNOT_OPEN_SERVER_TEMPFILE_MSG,
-                                                                               new Object[] { cmd.getEventBufferFileName() }));
-                            sendComplexRespToServer(new InstrumentMethodGroupResponse(null));
-
-                            return;
-                        }
-                    }
-
-                    JMethodIdTable.reset();
-                }
-
                 appStatusHandler.pauseLiveUpdates();
 
                 if (status.targetAppRunning) {
@@ -1865,8 +1884,6 @@ public class ProfilerClient implements CommonConstants {
                     } else {
                         MiscUtils.printErrorMessage("problem in instrumentMethodGroupFromRoot: " + ex); // NOI18N
                     }
-                } catch (Exception e) {
-                    MiscUtils.printErrorMessage("in instrumentMethodGroupFromRoot(), caught exception: " + e); // NOI18N
                 }
 
                 //if (imgr != null ! imgr.isEmpty()) {
@@ -1933,6 +1950,7 @@ public class ProfilerClient implements CommonConstants {
             //  - remote profiling
             //  - explicite Get results (forceObtainedResultsDumpCalled)
             //  - CPU or Code Fragment profiling
+            //  - CPU sampling
             EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
             EventBufferResultsProvider.getDefault().dataReady(bufSize, instrType);
             handlingEventBufferDump = false;

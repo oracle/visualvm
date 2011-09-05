@@ -682,6 +682,7 @@ public final class ResultsManager {
                         break;
                     case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
                     case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED:
+                    case ProfilerEngineSettings.INSTR_NONE_SAMPLING:
                         snapshot = client.getCPUProfilingResultsSnapshot(reqeustData);
 
                         break;

@@ -69,6 +69,7 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final CPUDataFrameProcessor cpuDataProcessor = new CPUDataFrameProcessor();
+    private final CPUSamplingDataFrameProcessor cpuSamplingDataProcessor = new CPUSamplingDataFrameProcessor();
     private final MemoryDataFrameProcessor memoryDataProcessor = new MemoryDataFrameProcessor();
     private final Object cpuDataProcessorQLengthLock = new Object();
     private final Object memDataProcessorQLengthLock = new Object();
@@ -95,6 +96,9 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
         if (cpuDataProcessor != null) {
             cpuDataProcessor.addListener(listener);
         }
+        if (cpuSamplingDataProcessor != null) {
+            cpuSamplingDataProcessor.addListener(listener);
+        }
     }
 
     public void addListener(final MemoryProfilingResultsListener listener) {
@@ -104,7 +108,7 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
     }
 
     public synchronized void dataFrameReceived(final byte[] buffer, final int instrumentationType) {
-        if (!cpuDataProcessor.hasListeners() && !memoryDataProcessor.hasListeners()) {
+        if (!cpuDataProcessor.hasListeners() && !memoryDataProcessor.hasListeners() && !cpuSamplingDataProcessor.hasListeners()) {
             return; // no consumers
         }
 
@@ -173,6 +177,37 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
 
                 break;
             }
+            case CommonConstants.INSTR_NONE_SAMPLING: {
+                synchronized (cpuDataProcessorQLengthLock) {
+                    cpuDataProcessorQLength++;
+
+                    if (cpuDataProcessorQLength > QLengthUpperBound) {
+                        try {
+                            cpuDataProcessorQLengthLock.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+
+                    getExecutor().submit(new Runnable() {
+                            public void run() {
+                                try {
+                                    cpuSamplingDataProcessor.processDataFrame(buffer);
+                                } finally {
+                                    synchronized (cpuDataProcessorQLengthLock) {
+                                        cpuDataProcessorQLength--;
+
+                                        if (cpuDataProcessorQLength < QLengthLowerBound) {
+                                            cpuDataProcessorQLengthLock.notifyAll();
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                }
+
+                break;
+            }                
             default:ProfilerLogger.warning("Unknown instrumentation type (" + instrumentationType + ") in dataframe"); // NOI18N
         }
     }
@@ -186,6 +221,10 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
             cpuDataProcessor.removeAllListeners();
         }
 
+        if (cpuSamplingDataProcessor != null) {
+            cpuSamplingDataProcessor.removeAllListeners();
+        }
+
         if (memoryDataProcessor != null) {
             memoryDataProcessor.removeAllListeners();
         }
@@ -194,6 +233,9 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
     public void removeListener(final CPUProfilingResultListener listener) {
         if (cpuDataProcessor != null) {
             cpuDataProcessor.removeListener(listener);
+        }
+        if (cpuSamplingDataProcessor != null) {
+            cpuSamplingDataProcessor.removeListener(listener);
         }
     }
 
@@ -232,12 +274,17 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
 
     private synchronized void fireReset() {
         cpuDataProcessor.reset();
+        cpuSamplingDataProcessor.reset();
         memoryDataProcessor.reset();
     }
 
     private synchronized void fireShutdown() {
         if (cpuDataProcessor != null) {
             cpuDataProcessor.shutdown();
+        }
+
+        if (cpuSamplingDataProcessor != null) {
+            cpuSamplingDataProcessor.shutdown();
         }
 
         if (memoryDataProcessor != null) {
@@ -247,6 +294,7 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
 
     private synchronized void fireStartup(ProfilerClient client) {
         cpuDataProcessor.startup(client);
+        cpuSamplingDataProcessor.startup(client);
         memoryDataProcessor.startup(client);
     }
 }

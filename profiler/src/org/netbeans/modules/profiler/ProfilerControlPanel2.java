@@ -378,6 +378,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         ;
 
                         break;
+                    case CommonConstants.INSTR_NONE_SAMPLING:
                     case CommonConstants.INSTR_NONE:
                         instrStatusText = NOTHING_INSTRUMENTED_MSG;
 
