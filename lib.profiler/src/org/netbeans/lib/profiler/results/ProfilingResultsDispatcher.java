@@ -293,8 +293,11 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
     }
 
     private synchronized void fireStartup(ProfilerClient client) {
-        cpuDataProcessor.startup(client);
-        cpuSamplingDataProcessor.startup(client);
+        if (client.getCurrentInstrType() == CommonConstants.INSTR_NONE_SAMPLING) {
+            cpuSamplingDataProcessor.startup(client);
+        } else {
+            cpuDataProcessor.startup(client);
+        }
         memoryDataProcessor.startup(client);
     }
 }
