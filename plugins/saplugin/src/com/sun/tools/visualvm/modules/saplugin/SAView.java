@@ -150,14 +150,14 @@ public class SAView extends DataSourceView implements PropertyChangeListener, Da
                 "Oop Inspector", true), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(oopInspector.getDetailsView(), DataViewComponent.TOP_RIGHT);
 
-        codeviewer = new CodeViewer("Memory Viewer", 10);
+        codeviewer = new CodeViewer("Code Viewer", 10);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(
-                "Memory Viewer", true), DataViewComponent.BOTTOM_LEFT);
+                "Code Viewer", true), DataViewComponent.BOTTOM_LEFT);
         dvc.addDetailsView(codeviewer.getDetailsView(), DataViewComponent.BOTTOM_LEFT);
 
-        findPointer = new FindPanel("Find Panel", 10, 1);
-        findInHeap = new FindPanel("Find Address in Heap", 20, 2);
-        findInCode = new FindPanel("Find Address in CodeCache", 30, 3);
+        findPointer = new FindPanel("Find Pointer", 10, 1);
+        findInHeap = new FindPanel("Find Value in Heap", 20, 2);
+        findInCode = new FindPanel("Find Value in CodeCache", 30, 3);
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(
                 "Find Panel", true), DataViewComponent.BOTTOM_RIGHT);
         dvc.addDetailsView(findPointer.getDetailsView(), DataViewComponent.BOTTOM_RIGHT);
