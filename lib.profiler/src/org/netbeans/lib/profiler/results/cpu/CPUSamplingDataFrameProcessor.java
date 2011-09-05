@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -95,6 +96,9 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                                      | (((long) buffer[position++] & 0xFF) << 32) | (((long) buffer[position++] & 0xFF) << 24)
                                      | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
                                      | ((long) buffer[position++] & 0xFF);
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("Thread dump start: Timestamps:"+currentTimestamp); // NOI18N
+                    }
                     break;
                 case CommonConstants.NEW_THREAD: {
                     int threadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
@@ -121,6 +125,9 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                     ThreadInfo lastInfo = lastThreadsDump.get(threadIdObj);
                     assert lastInfo != null;
                     currentThreadsDump.put(threadIdObj,lastInfo);
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("Thread info identical: tId:"+threadId); // NOI18N
+                    }
                     break;
                 }
                 case CommonConstants.THREAD_INFO: {
@@ -141,9 +148,15 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                         info = new ThreadInfo(null,threadId,state,methodIds);                        
                     }
                     currentThreadsDump.put(Integer.valueOf(threadId),info);
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("Thread info: tId:"+threadId+" state:"+state+" mIds:"+Arrays.toString(methodIds)); // NOI18N
+                    }
                     break;  
                 }
                 case CommonConstants.THREAD_DUMP_END: {
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("Thread dump end"); // NOI18N
+                    }
                     lastThreadsDump = currentThreadsDump;
                     threadDumps.add(new ThreadDump(currentTimestamp,currentThreadsDump));
                     break;
