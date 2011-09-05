@@ -473,27 +473,51 @@ public final class ResultsManager {
 
         return true;
     }
-
-    public FileObject[] listSavedHeapdumps(Lookup.Provider project) {
+    
+    private static final String HPROF_HEADER = "JAVA PROFILE 1.0"; // NOI18H
+    private static final long MIN_HPROF_SIZE = 1024*1024L;
+    public static boolean checkHprofFile(File file) {
         try {
-            FileObject profilerFolder = ProjectStorage.getSettingsFolder(project, false);
+            if (file.isFile() && file.canRead() && file.length()>MIN_HPROF_SIZE) { // heap dump must be 1M and bigger
+                byte[] prefix = new byte[HPROF_HEADER.length()+4];
+                RandomAccessFile raf = new RandomAccessFile(file,"r");  // NOI18H
+                raf.readFully(prefix);
+                if (new String(prefix).startsWith(HPROF_HEADER)) {
+                    return true;
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            return false;
+        } catch (IOException ex) {
+            return false;
+        }
+        return false;
+    }
 
-            if (profilerFolder == null) {
+    public FileObject[] listSavedHeapdumps(Lookup.Provider project, File directory) {
+        try {
+            FileObject snapshotsFolder = null;
+                    
+            if (project == null && directory != null) {
+                snapshotsFolder = FileUtil.toFileObject(directory);
+            } else {
+                snapshotsFolder = ProjectStorage.getSettingsFolder(project, false);
+            }
+
+            if (snapshotsFolder == null) {
                 return new FileObject[0];
             }
 
-            profilerFolder.refresh();
+            snapshotsFolder.refresh();
 
-            FileObject[] children = profilerFolder.getChildren();
+            FileObject[] children = snapshotsFolder.getChildren();
 
             ArrayList /*<FileObject>*/ files = new ArrayList /*<FileObject>*/();
 
             for (int i = 0; i < children.length; i++) {
                 FileObject child = children[i];
-
-                if (child.getExt().equalsIgnoreCase(HEAPDUMP_EXTENSION)) {
+                if (checkHprofFile(FileUtil.toFile(children[i])))
                     files.add(child);
-                }
             }
 
             Collections.sort(files,

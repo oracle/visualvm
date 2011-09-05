@@ -1303,7 +1303,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                     FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(displayedProject);
                     modelElements.addAll(Arrays.asList(snapshotsOnDisk));
 
-                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject);
+                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject, null);
                     modelElements.addAll(Arrays.asList(heapdumpsOnDisk));
                 }
 
