@@ -140,7 +140,7 @@ public class BasicTest extends CommonWireIOTestCase {
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
-            cmd = new InitiateInstrumentationCommand(CommonConstants.CPU_INSTR_FULL, "java.lang.String");
+            cmd = new InitiateProfilingCommand(CommonConstants.CPU_INSTR_FULL, "java.lang.String");
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 

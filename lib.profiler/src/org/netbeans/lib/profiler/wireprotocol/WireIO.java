@@ -133,8 +133,8 @@ public class WireIO {
                         cmd = new RootClassLoadedCommand();
 
                         break;
-                    case Command.INITIATE_INSTRUMENTATION:
-                        cmd = new InitiateInstrumentationCommand();
+                    case Command.INITIATE_PROFILING:
+                        cmd = new InitiateProfilingCommand();
 
                         break;
                     case Command.SET_CHANGEABLE_INSTR_PARAMS:

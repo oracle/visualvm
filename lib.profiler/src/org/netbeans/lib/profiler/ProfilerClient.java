@@ -368,7 +368,7 @@ public class ProfilerClient implements CommonConstants {
     private CPUCCTProvider cpuCctProvider;
     private Command execInSeparateThreadCmd;
     private FlatProfileProvider flatProvider;
-    private InitiateInstrumentationCommand commandOnStartup = null;
+    private InitiateProfilingCommand commandOnStartup = null;
     private Instrumentor instrumentor;
     private MemoryCCTProvider memCctProvider;
     private final Object execInSeparateThreadLock = new Object();
@@ -878,7 +878,7 @@ public class ProfilerClient implements CommonConstants {
             instrumentor.setSavedSourceCodeSelection(s);
 
             String className = instrumentor.getRootClassNames()[ProfilingSessionStatus.CODE_REGION_CLASS_IDX].replace('/', '.'); // NOI18N
-            InitiateInstrumentationCommand cmd = new InitiateInstrumentationCommand(INSTR_CODE_REGION, className, false,
+            InitiateProfilingCommand cmd = new InitiateProfilingCommand(INSTR_CODE_REGION, className, false,
                                                                                     status.startProfilingPointsActive);
             commandOnStartup = cmd;
 
@@ -899,7 +899,7 @@ public class ProfilerClient implements CommonConstants {
     public void initiateMonitoring()  throws ClientUtils.TargetAppOrVMTerminated, InstrumentationException {
          synchronized (instrumentationLock) {
             removeAllInstrumentation();
-            InitiateInstrumentationCommand cmd = new InitiateInstrumentationCommand(INSTR_NONE, null);
+            InitiateProfilingCommand cmd = new InitiateProfilingCommand(INSTR_NONE);
             commandOnStartup = cmd;
             // just to be consistent, since removeAllInstrumentation()
             // sets instrumentation type to INSTR_NONE
@@ -937,7 +937,7 @@ public class ProfilerClient implements CommonConstants {
             // load event. However, if the same cmd that we build here is then re-used as commandOnStartup, it should again
             // contain rootClassName.
             String[] rootClassNames = new String[]{settings.getMainClassName()};
-            InitiateInstrumentationCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames, false,
+            InitiateProfilingCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames, false,
                                                                                     status.startProfilingPointsActive);
             commandOnStartup = cmd;
 
@@ -994,7 +994,7 @@ public class ProfilerClient implements CommonConstants {
 
             String[] rootClassNames = instrumentor.getRootClassNames();
             int instrType = (settings.getCPUProfilingType() == CPU_INSTR_FULL) ? INSTR_RECURSIVE_FULL : INSTR_RECURSIVE_SAMPLED;
-            InitiateInstrumentationCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames,
+            InitiateProfilingCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames,
                                                                                     instrSpawnedThreads,
                                                                                     status.startProfilingPointsActive);
             commandOnStartup = cmd;
@@ -1236,7 +1236,7 @@ public class ProfilerClient implements CommonConstants {
 
             commandOnStartup = null;
         } else {
-            // Needed to e.g. prevent initiateInstrumentation() called later from attempting to
+            // Needed to e.g. prevent initiateProfiling() called later from attempting to
             // remove instrumentation from VM.
             setCurrentInstrType(INSTR_NONE);
         }
@@ -1685,7 +1685,7 @@ public class ProfilerClient implements CommonConstants {
             serverClassesInitialized = false;
             // Note that here we can't use normal getCmd(), since this shared object could already have been initialized with
             // real data.
-            error = sendCommandAndGetResponse(new InitiateInstrumentationCommand(INSTR_RECURSIVE_FULL,
+            error = sendCommandAndGetResponse(new InitiateProfilingCommand(INSTR_RECURSIVE_FULL,
                                                                                  "*FAKE_CLASS_FOR_INTERNAL_TEST*") // NOI18N
             );
 
@@ -2027,7 +2027,7 @@ public class ProfilerClient implements CommonConstants {
         }
     }
     
-    private InitiateInstrumentationCommand createInitiateInstrumnetation(int instrType, String[] classNames,
+    private InitiateProfilingCommand createInitiateInstrumnetation(int instrType, String[] classNames,
                                           boolean instrSpawnedThreads, boolean startProfilingPointsActive) {
         RuntimeProfilingPoint points[] = settings.getRuntimeProfilingPoints();
         String[] profilingPointHandlers = new String[points.length];
@@ -2041,7 +2041,7 @@ public class ProfilerClient implements CommonConstants {
             profilingPointHandlers[i] = point.getServerHandlerClass();
             profilingPointInfos[i] = point.getServerInfo();
         }
-        return new InitiateInstrumentationCommand(instrType,classNames,
+        return new InitiateProfilingCommand(instrType,classNames,
                         profilingPointIDs,profilingPointHandlers,profilingPointInfos,
                         instrSpawnedThreads,startProfilingPointsActive);
     }
