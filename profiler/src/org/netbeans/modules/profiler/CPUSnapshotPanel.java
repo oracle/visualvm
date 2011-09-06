@@ -717,9 +717,13 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         currentAggregationMode = view;
+        flatPanel.clearSelection();
         flatPanel.changeView(view);
+        cctPanel.clearSelection();
         cctPanel.changeView(view);
+        combinedCCT.clearSelection();
         combinedCCT.changeView(view);
+        combinedFlat.clearSelection();
         combinedFlat.changeView(view);
         //viewTypeHasChanged();
         viewChanged(view);

@@ -52,7 +52,6 @@ import org.openide.nodes.Node;
 import org.openide.nodes.Children;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -77,7 +76,7 @@ public class NpssDataObject extends MultiDataObject implements OpenCookie {
 
     @Override
     public void open() {
-        RequestProcessor.getDefault().post(new Runnable() {
+        TracerSupportImpl.getInstance().perform(new Runnable() {
 
             @Override
             public void run() {
