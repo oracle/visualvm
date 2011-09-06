@@ -71,7 +71,7 @@ public class Command {
     public static final int SUSPEND_TARGET_APP = 10;
     public static final int RESUME_TARGET_APP = 11;
     public static final int TERMINATE_TARGET_JVM = 12;
-    public static final int INITIATE_INSTRUMENTATION = 13;
+    public static final int INITIATE_PROFILING = 13;
     public static final int MESSAGE = 14;
     public static final int SHUTDOWN_OK = 15; // profiled VM can proceed with shutdown
     public static final int GET_THREAD_LIVENESS_STATUS = 16;
@@ -149,8 +149,8 @@ public class Command {
                 return "RESUME_TARGET_APP"; // NOI18N
             case TERMINATE_TARGET_JVM:
                 return "TERMINATE_TARGET_JVM"; // NOI18N
-            case INITIATE_INSTRUMENTATION:
-                return "INITIATE_INSTRUMENTATION"; // NOI18N
+            case INITIATE_PROFILING:
+                return "INITIATE_PROFILING"; // NOI18N
             case MESSAGE:
                 return "MESSAGE"; // NOI18N
             case SHUTDOWN_OK:

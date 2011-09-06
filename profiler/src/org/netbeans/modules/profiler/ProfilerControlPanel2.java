@@ -378,6 +378,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         ;
 
                         break;
+                    case CommonConstants.INSTR_NONE_SAMPLING:
                     case CommonConstants.INSTR_NONE:
                         instrStatusText = NOTHING_INSTRUMENTED_MSG;
 
@@ -1302,7 +1303,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                     FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(displayedProject);
                     modelElements.addAll(Arrays.asList(snapshotsOnDisk));
 
-                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject);
+                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject, null);
                     modelElements.addAll(Arrays.asList(heapdumpsOnDisk));
                 }
 
