@@ -168,6 +168,10 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public void clearSelection() {
+        resTable.clearSelection();
+    }
+    
     public void setCPUSelectionHandler(CPUSelectionHandler handler) {
         selectionHandler = handler;
     }

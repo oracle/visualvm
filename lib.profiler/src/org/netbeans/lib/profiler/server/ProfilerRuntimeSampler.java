@@ -88,10 +88,10 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                 writeThreadDumpStart(timestamp);
                 for (int i = 0; i < newThreads[0].length; i++) {
                     Thread t = newThreads[0][i];
+                    int[] mids = newMethodIds[0][i];
                     
-                    if (!ThreadInfo.isProfilerServerThread(t)) {
+                    if (!ThreadInfo.isProfilerServerThread(t) && mids.length>0) {
                         int status = newStates[0][i];
-                        int[] mids = newMethodIds[0][i];
                         Long ltid = Long.valueOf(t.getId());
                         Integer index = (Integer) arrayOffsetMap.get(ltid);
                         Integer tid = (Integer) threadIdMap.get(ltid);

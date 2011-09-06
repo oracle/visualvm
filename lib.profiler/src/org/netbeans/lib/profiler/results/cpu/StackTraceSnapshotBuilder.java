@@ -197,6 +197,7 @@ public class StackTraceSnapshotBuilder {
     final List<String> threadNames = new ArrayList<String>();
     final List<byte[]> threadCompactData = new ArrayList<byte[]>();
     final List<MethodInfo> methodInfos = new ArrayList<MethodInfo>();
+    final Map<MethodInfo,Integer> methodInfoMap = new HashMap<MethodInfo,Integer>();
     final MethodInfoMapper mapper = new MethodInfoMapper() {
         
         @Override
@@ -246,7 +247,7 @@ public class StackTraceSnapshotBuilder {
         setDefaultTiming();
         ccgb = b;
         status = s;
-        methodInfos.add(new MethodInfo("Thread","")); // NOI18N
+        registerNewMethodInfo(new MethodInfo("Thread","")); // NOI18N
     }
     
     public StackTraceSnapshotBuilder(int batchSize, InstrumentationFilter f) {
@@ -468,40 +469,44 @@ public class StackTraceSnapshotBuilder {
         while(reverseIt.hasPrevious()) {
             StackTraceElement element = reverseIt.previous();
             MethodInfo mi = new MethodInfo(element);
-            if (!methodInfos.contains(mi)) {
-                methodInfos.add(mi);
+            Integer mId = methodInfoMap.get(mi);
+            if (mId == null) {
+                mId = registerNewMethodInfo(mi);
                 if (status != null) status.updateInstrMethodsInfo(mi.className,0,mi.methodName,"");
             }
             
-            int index = methodInfos.indexOf(mi);
-            if (index == -1) {
-                System.err.println("*** Not found: " + mi);
-                throw new IllegalStateException();
-            }
             if (asRoot && !inRoot) {
                 inRoot = true;
-                ccgb.methodEntry(index, threadId, CPUCallGraphBuilder.METHODTYPE_ROOT, timestamp, threadtimestamp);
+                ccgb.methodEntry(mId.intValue(), threadId, CPUCallGraphBuilder.METHODTYPE_ROOT, timestamp, threadtimestamp);
             } else {
-                ccgb.methodEntry(index, threadId, CPUCallGraphBuilder.METHODTYPE_NORMAL, timestamp, threadtimestamp);
+                ccgb.methodEntry(mId.intValue(), threadId, CPUCallGraphBuilder.METHODTYPE_NORMAL, timestamp, threadtimestamp);
             }
             
         }
+    }
+
+    private Integer registerNewMethodInfo(final MethodInfo mi) {
+        Integer index = Integer.valueOf(methodInfos.size());
+        
+        methodInfos.add(mi);
+        methodInfoMap.put(mi,index);
+        return index;
     }
     
     private void addMethodExits(int threadId, List<StackTraceElement> elements, long timestamp, long threadtimestamp, boolean asRoot) throws IllegalStateException {
         int rootIndex = elements.size();
         for (StackTraceElement element : elements) {
             MethodInfo mi = new MethodInfo(element);
-            int index = methodInfos.indexOf(mi);
-            if (index == -1) {
+            Integer index = methodInfoMap.get(mi);
+            if (index == null) {
                 System.err.println("*** Not found: " + mi);
                 throw new IllegalStateException();
             }
             
             if (asRoot && --rootIndex == 0) {
-                ccgb.methodExit(index, threadId, CPUCallGraphBuilder.METHODTYPE_ROOT, timestamp, threadtimestamp);
+                ccgb.methodExit(index.intValue(), threadId, CPUCallGraphBuilder.METHODTYPE_ROOT, timestamp, threadtimestamp);
             } else {
-                ccgb.methodExit(index, threadId, CPUCallGraphBuilder.METHODTYPE_NORMAL, timestamp, threadtimestamp);
+                ccgb.methodExit(index.intValue(), threadId, CPUCallGraphBuilder.METHODTYPE_NORMAL, timestamp, threadtimestamp);
             }
         }
     }
@@ -556,6 +561,7 @@ public class StackTraceSnapshotBuilder {
         synchronized (lock) {
             ccgb.reset();
             methodInfos.clear();
+            methodInfoMap.clear();
             threadIds.clear();
             threadNames.clear();
             stackTraceCount = 0;
