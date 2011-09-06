@@ -52,14 +52,13 @@ import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Set;
@@ -72,6 +71,7 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.DialogDisplayer;
+import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
@@ -138,8 +138,11 @@ public class CompareSnapshotsHelper {
             listModel.removeAllElements();
 
             // Add saved snapshots
-            FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(heapWalker.getHeapDumpProject());
-            FileObject snapshotFile = (heapWalker.getHeapDumpFile() != null) ? FileUtil.toFileObject(heapWalker.getHeapDumpFile()) : null;
+            final Lookup.Provider project = heapWalker.getHeapDumpProject();
+            File heapdumpFile = heapWalker.getHeapDumpFile();
+            final File heapdumpDir = heapdumpFile != null ? heapdumpFile.getParentFile() : null;
+            FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(project, heapdumpDir);
+            FileObject snapshotFile = (heapdumpFile != null) ? FileUtil.toFileObject(heapdumpFile) : null;
 
             for (int i = 0; i < snapshotsOnDisk.length; i++) {
                 if (((snapshotFile == null) || !snapshotsOnDisk[i].equals(snapshotFile))) {
@@ -149,7 +152,47 @@ public class CompareSnapshotsHelper {
 
             if (listModel.getSize() == 0) {
                 listModel.addElement(NO_COMPARABLE_SNAPSHOTS_FOUND_MSG);
+                fromFileRadio.setSelected(true);
+                externalFileField.addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && externalFileField.isShowing()) {
+                            externalFileField.removeHierarchyListener(this);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    externalFileField.requestFocusInWindow();
+                                }
+                            });
+                        }
+                    }
+                });
+            } else {
+                projectSnapshotsList.setSelectedIndex(0);
+                projectSnapshotsList.addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && externalFileField.isShowing()) {
+                            projectSnapshotsList.removeHierarchyListener(this);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    projectSnapshotsList.requestFocusInWindow();
+                                }
+                            });
+                        }
+                    }
+                });
             }
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (project != null) {
+                        org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, FROM_PROJECT_RADIO_TEXT);
+                        fromProjectRadio.setToolTipText(null);
+                    } else {
+                        org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, FROM_CURRENT_LOCATION_RADIO_TEXT);
+                        fromProjectRadio.setToolTipText(heapdumpDir != null ?
+                                heapdumpDir.getAbsolutePath() : null);
+                    }
+                }
+            });
         }
 
         private void initComponents() {
@@ -442,6 +485,8 @@ public class CompareSnapshotsHelper {
                                                                              "CompareSnapshotsHelper_SelectSnapshotString"); // NOI18N
     private static final String FROM_PROJECT_RADIO_TEXT = NbBundle.getMessage(CompareSnapshotsHelper.class,
                                                                               "CompareSnapshotsHelper_FromProjectRadioText"); // NOI18N
+    private static final String FROM_CURRENT_LOCATION_RADIO_TEXT = NbBundle.getMessage(CompareSnapshotsHelper.class,
+                                                                              "CompareSnapshotsHelper_FromCurrentLocationRadioText"); // NOI18N
     private static final String FROM_FILE_RADIO_TEXT = NbBundle.getMessage(CompareSnapshotsHelper.class,
                                                                            "CompareSnapshotsHelper_FromFileRadioText"); // NOI18N
     private static final String BROWSE_BUTTON_TEXT = NbBundle.getMessage(CompareSnapshotsHelper.class,
@@ -497,7 +542,7 @@ public class CompareSnapshotsHelper {
             snapshotFileChooser.setDialogTitle(OPEN_CHOOSER_CAPTION);
             snapshotFileChooser.setFileFilter(new FileFilter() {
                     public boolean accept(File f) {
-                        return f.isDirectory() || checkHprofFile(f);
+                        return f.isDirectory() || ResultsManager.checkHprofFile(f);
                     }
 
                     public String getDescription() {
@@ -509,26 +554,6 @@ public class CompareSnapshotsHelper {
         return snapshotFileChooser;
     }
     
-    private static final String HPROF_HEADER = "JAVA PROFILE 1.0"; // NOI18H
-    private static final long MIN_HPROF_SIZE = 1024*1024L;
-    private static boolean checkHprofFile(File file) {
-        try {
-            if (file.isFile() && file.canRead() && file.length()>MIN_HPROF_SIZE) { // heap dump must be 1M and bigger
-                byte[] prefix = new byte[HPROF_HEADER.length()+4];
-                RandomAccessFile raf = new RandomAccessFile(file,"r");  // NOI18H
-                raf.readFully(prefix);
-                if (new String(prefix).startsWith(HPROF_HEADER)) {
-                    return true;
-                }
-            }
-        } catch (FileNotFoundException ex) {
-            return false;
-        } catch (IOException ex) {
-            return false;
-        }
-        return false;
-    }
-
     private SelectSecondSnapshotPanel getSecondSnapshotSelector() {
         if (secondSnapshotSelector == null) {
             secondSnapshotSelector = new SelectSecondSnapshotPanel();

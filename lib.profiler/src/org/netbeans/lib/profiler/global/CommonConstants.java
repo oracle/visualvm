@@ -132,6 +132,10 @@ public interface CommonConstants {
     public static final byte METHOD_EXIT_SLEEP = 25;
     public static final byte BUFFEREVENT_PROFILEPOINT_HIT = 26;
     public static final byte SERVLET_DO_METHOD = 27;
+    public static final byte THREAD_DUMP_START = 28;
+    public static final byte THREAD_DUMP_END = 29;
+    public static final byte THREAD_INFO_IDENTICAL = 30;
+    public static final byte THREAD_INFO = 31;
 
     // The following are used when storing unstamped method entry/exit events in the "compact" format, when both
     // event code and method id are packed in a single char. See more comments in ProfilerRuntimeCPUSampledInstr.java
@@ -146,16 +150,19 @@ public interface CommonConstants {
     // Target app instrumentation types
     public static final int INSTR_NONE = 0; // no instrumentation performed => no profiling data
     public static final int INSTR_CODE_REGION = 1; // instrument code region for CPU data
-    public static final int INSTR_RECURSIVE_FULL = 2; // instrument for CPU data, full instrumentation (timestamps for each method entry/exit)
-    public static final int INSTR_RECURSIVE_SAMPLED = 3; // instrument for CPU data, sampled data obtained (timestamps at periodic intervals only)
-    public static final int INSTR_OBJECT_ALLOCATIONS = 4; // instrument for Memory data, allocations only
-    public static final int INSTR_OBJECT_LIVENESS = 5; // instrument for Memory data, complete
+    public static final int INSTR_NONE_SAMPLING = 2; // no instrumentation performed, CPU sampling will be used
+    public static final int INSTR_RECURSIVE_FULL = 3; // instrument for CPU data, full instrumentation (timestamps for each method entry/exit)
+    public static final int INSTR_RECURSIVE_SAMPLED = 4; // instrument for CPU data, sampled data obtained (timestamps at periodic intervals only)
+    public static final int INSTR_OBJECT_ALLOCATIONS = 5; // instrument for Memory data, allocations only
+    public static final int INSTR_OBJECT_LIVENESS = 6; // instrument for Memory data, complete
                                                        // These are just helpful constants, not actual instrumentation types
-    public static final int INSTR_MEMORY_BASE = 4;
-    public static final int INSTR_MAXNUMBER = 6;
+    public static final int INSTR_MEMORY_BASE = 5;
+    public static final int INSTR_MAXNUMBER = 7;
 
     // Constants used to distinguish between "full" and "sampled" CPU instrumentation in the settings.
     // Internally they are translated into INSTR_RECURSIVE and INSTR_RECURSIVE_SAMPLED, respectively
+    // CPU_SAMPLED is used for pure sampling without instrumentation, internally CPU_SAMPLED is 
+    // translated to INSTR_NONE_SAMPLING
     public static final int CPU_INSTR_FULL = 0;
     public static final int CPU_INSTR_SAMPLED = 1;
     public static final int CPU_SAMPLED = 2;
@@ -267,5 +274,6 @@ public interface CommonConstants {
     public static final int AGENT_VERSION_67_BETA = 9;
     public static final int AGENT_VERSION_69 = 10;
     public static final int AGENT_VERSION_610_M2 = 11;
-    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_610_M2;
+    public static final int AGENT_VERSION_71 = 12;
+    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_71;
 }

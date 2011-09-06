@@ -152,7 +152,7 @@ public class MarkingEngine {
         ClientUtils.SourceCodeSelection method = null;
 
         synchronized (markGuard) {
-            if (marks == null || status == null) {
+            if (marks == null || marks.length == 0 || status == null) {
                 return Mark.DEFAULT;
             }
 
