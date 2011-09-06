@@ -76,6 +76,14 @@ public class Stacks {
      */
     public static native byte[] getMethodNamesForJMethodIds(int nMethods, int[] methodIds, int[] packedArrayOffsets);
 
+    /**
+     * Get information about the stacks of all live threads
+     * @param threads used to return all threads
+     * @param states used to return thread's states
+     * @param frames used to return jMethodIds of frames of all threads
+     */
+    public static native void getAllStackTraces(Thread[][] threads, int[][] states, int[][][] frames);
+    
     /** Clear the above stack frame buffer permanently. */
     public static native void clearNativeStackFrameBuffer();
 

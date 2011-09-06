@@ -133,8 +133,8 @@ public class WireIO {
                         cmd = new RootClassLoadedCommand();
 
                         break;
-                    case Command.INITIATE_INSTRUMENTATION:
-                        cmd = new InitiateInstrumentationCommand();
+                    case Command.INITIATE_PROFILING:
+                        cmd = new InitiateProfilingCommand();
 
                         break;
                     case Command.SET_CHANGEABLE_INSTR_PARAMS:
@@ -160,6 +160,10 @@ public class WireIO {
                     case Command.GET_DEFINING_CLASS_LOADER:
                         cmd = new GetDefiningClassLoaderCommand();
 
+                        break;
+                    case Command.RESULTS_AVAILABLE:
+                        cmd = new ResultsAvailableCommand();
+                        
                         break;
                     case Command.TAKE_HEAP_DUMP:
                         cmd = new TakeHeapDumpCommand();
