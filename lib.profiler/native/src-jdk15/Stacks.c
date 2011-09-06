@@ -71,6 +71,7 @@
 #include "org_netbeans_lib_profiler_server_system_Stacks.h"
 
 #include "common_functions.h"
+#include "Threads.h"
 
 #define NEEDS_CONVERSION (sizeof(jmethodID)!=sizeof(jint))
 #define NO_OF_BASE_BITS 2
@@ -79,8 +80,12 @@
 #define OFFSET_MASK ((1L<<NO_OF_MASK_BITS)-1)
 #define BASE_ADDRESS_MASK (~OFFSET_MASK)
 
+#define MAX_FRAMES 100
+
 static jvmtiFrameInfo *_stack_frames_buffer = NULL;
 static jint *_stack_id_buffer = NULL;
+static jclass threadType = NULL;
+static jclass intArrType = NULL;
 static long base_addresses[NO_OF_BASE_ADDRESS]={-1L,-1L,-1L,-1L};
 
 static jint convert_jmethodID_to_jint(jmethodID jmethod) {
@@ -331,4 +336,69 @@ JNIEXPORT jbyteArray JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks
     free(byteData);
 
     return ret;
+}
+
+
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Stacks
+ * Method:    getAllStackTraces
+ * Signature: ([[Ljava/lang/Thread;[[I[[[I)V
+ */
+JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_getAllStackTraces
+  (JNIEnv *env, jclass clz, jobjectArray threads, jobjectArray states, jobjectArray frames)
+{
+    jobjectArray jthreadArr;
+    jobjectArray statesArr;
+    jobjectArray methodIdArrArr;
+    jvmtiStackInfo *stack_info;
+    jint *state_buffer;
+    jint thread_count;
+    int ti;
+    jvmtiError err;
+
+    err = (*_jvmti)->GetAllStackTraces(_jvmti, MAX_FRAMES, &stack_info, &thread_count); 
+    if (err != JVMTI_ERROR_NONE) {
+       return;
+    }
+    if (threadType == NULL) {
+        threadType = (*env)->FindClass(env, "java/lang/Thread");
+        threadType = (*env)->NewGlobalRef(env, threadType);
+    }
+    if (intArrType == NULL) {
+        intArrType = (*env)->FindClass(env, "[I");
+        intArrType = (*env)->NewGlobalRef(env, intArrType);
+    }
+    jthreadArr = (*env)->NewObjectArray(env, thread_count, threadType, NULL);
+    (*env)->SetObjectArrayElement(env, threads, 0, jthreadArr);
+    statesArr = (*env)->NewIntArray(env, thread_count);
+    (*env)->SetObjectArrayElement(env, states, 0, statesArr);
+    methodIdArrArr = (*env)->NewObjectArray(env, thread_count, intArrType, NULL);
+    (*env)->SetObjectArrayElement(env, frames, 0, methodIdArrArr);    
+    state_buffer = calloc(thread_count, sizeof(jint));
+    
+    for (ti = 0; ti < thread_count; ti++) {
+       jvmtiStackInfo *infop = &stack_info[ti];
+       jthread thread = infop->thread;
+       jint state = infop->state;
+       jvmtiFrameInfo *frames = infop->frame_buffer;
+       jobjectArray jmethodIdArr;
+       jint *id_buffer;
+       int fi;
+
+       (*env)->SetObjectArrayElement(env, jthreadArr, ti, thread);
+       state_buffer[ti] = convert_JVMTI_thread_status_to_jfluid_status(state);
+       
+       jmethodIdArr = (*env)->NewIntArray(env, infop->frame_count);
+       (*env)->SetObjectArrayElement(env, methodIdArrArr, ti, jmethodIdArr);    
+       id_buffer = calloc(infop->frame_count, sizeof(jint));
+       for (fi = 0; fi < infop->frame_count; fi++) {
+          id_buffer[fi] = convert_jmethodID_to_jint(frames[fi].method);
+       }
+       (*env)->SetIntArrayRegion(env, jmethodIdArr, 0, infop->frame_count, id_buffer);
+       free(id_buffer);
+    }
+    (*env)->SetIntArrayRegion(env, statesArr, 0, thread_count, state_buffer);
+    
+    /* this one Deallocate call frees all data allocated by GetAllStackTraces */
+    err = (*_jvmti)->Deallocate(_jvmti, (unsigned char*)stack_info); 
 }
