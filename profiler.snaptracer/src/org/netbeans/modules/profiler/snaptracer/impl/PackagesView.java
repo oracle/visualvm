@@ -64,7 +64,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.snaptracer.Positionable;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -85,7 +84,7 @@ final class PackagesView {
     // --- Implementation ------------------------------------------------------
 
     private void loadPackages(final JComponent view) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        TracerSupportImpl.getInstance().perform(new Runnable() {
             public void run() {
                 final List<TracerPackage> packages = model.getPackages();
                 if (packages != null) {

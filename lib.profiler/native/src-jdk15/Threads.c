@@ -44,6 +44,7 @@
 /*
  * author Ian Formanek 
  *        Misha Dmitriev
+ *        Tomas Hurka
  */
 
 #ifdef WIN32
@@ -110,7 +111,19 @@ static jthread *profThreads = NULL;
 static jthread mainThread = NULL, singleProfThread = NULL, additionalProfThread = NULL;
 static jclass threadType = NULL;
 
-jint convert_JVMTI_thread_status_to_jfluid_status(jint jvmtiThrStatus);
+
+jint convert_JVMTI_thread_status_to_jfluid_status(jint jvmtiThreadStatus) {
+    jint status = jvmtiThreadStatus & JF_THREAD_STATE_MASK;
+  
+    if      (status == JF_THREAD_STATE_RUNNABLE)      return THREAD_STATUS_RUNNING;
+    else if (status == JF_THREAD_STATE_BLOCKED)       return THREAD_STATUS_MONITOR;
+    else if (status == JF_THREAD_STATE_WAITING)       return THREAD_STATUS_WAIT;
+    else if (status == JF_THREAD_STATE_TIMED_WAITING) return THREAD_STATUS_WAIT;
+    else if (status == JF_THREAD_STATE_SLEEPING)      return THREAD_STATUS_SLEEPING;
+    else if (status == JF_THREAD_STATE_NEW)           return THREAD_STATUS_ZOMBIE;
+    else if (status == JF_THREAD_STATE_TERMINATED)    return THREAD_STATUS_ZOMBIE;
+    else                                              return THREAD_STATUS_UNKNOWN;
+}
 
 
 static int isProfilerThread(JNIEnv *env, jthread thread) {
@@ -422,18 +435,4 @@ JNIEXPORT jstring JNICALL Java_org_netbeans_lib_profiler_server_system_Threads_g
 {
     jstring ret = (*env)->NewStringUTF(env, "*NOT PROVIDED IN THIS JVM VERSION*");
     return ret;
-}
-
-
-jint convert_JVMTI_thread_status_to_jfluid_status(jint jvmtiThreadStatus) {
-    jint status = jvmtiThreadStatus & JF_THREAD_STATE_MASK;
-  
-    if      (status == JF_THREAD_STATE_RUNNABLE)      return THREAD_STATUS_RUNNING;
-    else if (status == JF_THREAD_STATE_BLOCKED)       return THREAD_STATUS_MONITOR;
-    else if (status == JF_THREAD_STATE_WAITING)       return THREAD_STATUS_WAIT;
-    else if (status == JF_THREAD_STATE_TIMED_WAITING) return THREAD_STATUS_WAIT;
-    else if (status == JF_THREAD_STATE_SLEEPING)      return THREAD_STATUS_SLEEPING;
-    else if (status == JF_THREAD_STATE_NEW)           return THREAD_STATUS_ZOMBIE;
-    else if (status == JF_THREAD_STATE_TERMINATED)    return THREAD_STATUS_ZOMBIE;
-    else                                              return THREAD_STATUS_UNKNOWN;
 }
