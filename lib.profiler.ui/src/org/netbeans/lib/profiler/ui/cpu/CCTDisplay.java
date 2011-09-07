@@ -191,6 +191,10 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         percentFormat.setMaximumFractionDigits(1);
         percentFormat.setMinimumFractionDigits(0);
     }
+    
+    public void clearSelection() {
+        treeTable.clearSelection();
+    }
 
     private StringBuffer getCSVHeader(String separator) {
         String newLine = "\r\n"; // NOI18N

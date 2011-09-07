@@ -80,6 +80,7 @@ import java.awt.event.*;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -88,6 +89,7 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Set;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -376,6 +378,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         ;
 
                         break;
+                    case CommonConstants.INSTR_NONE_SAMPLING:
                     case CommonConstants.INSTR_NONE:
                         instrStatusText = NOTHING_INSTRUMENTED_MSG;
 
@@ -945,10 +948,15 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                 c.setIcon(memoryIcon);
 
                                 String fileName = fo.getName();
-
-//  TTTT                          if (HeapWalkerManager.getDefault().isHeapWalkerOpened(FileUtil.toFile(fo))) {
-//                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
-//                                }
+                                
+                                Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
+                                for (TopComponent tc : tcs) {
+                                    Object o = tc.getClientProperty("HeapDumpFileName"); // NOI18N
+                                    if (o != null && FileUtil.toFile(fo).equals(new File(o.toString()))) {
+                                        c.setFont(c.getFont().deriveFont(Font.BOLD));
+                                        break;
+                                    }
+                                }
 
                                 if (fileName.startsWith("heapdump-")) { // NOI18N
 
@@ -1295,7 +1303,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                     FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(displayedProject);
                     modelElements.addAll(Arrays.asList(snapshotsOnDisk));
 
-                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject);
+                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject, null);
                     modelElements.addAll(Arrays.asList(heapdumpsOnDisk));
                 }
 

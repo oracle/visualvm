@@ -72,7 +72,7 @@ public class EventBufferManager implements CommonConstants {
     private MappedByteBuffer mapByteBuf;
     private ProfilerServer profilerServer;
     private RandomAccessFile raFile;
-    private String bufFileName;
+    private String bufFileName = "";
     private boolean bufFileOk;
     private boolean remoteProfiling;
 
