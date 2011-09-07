@@ -149,6 +149,8 @@ public class SnapshotInfoPanel extends JPanel {
     private static final String LINES_DEF_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_LinesDefString"); // NOI18N
     private static final String INSTRUMENTATION_PROF_TYPE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
                                                                                        "SnapshotInfoPanel_InstrumentationProfTypeString"); // NOI18N
+    private static final String SAMPLED_INSTR_PROF_TYPE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
+                                                                               "SnapshotInfoPanel_SampledInstrProfTypeString"); // NOI18N
     private static final String SAMPLED_PROF_TYPE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
                                                                                "SnapshotInfoPanel_SampledProfTypeString"); // NOI18N
     private static final String TOTAL_PROF_SCHEME_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
@@ -347,7 +349,9 @@ public class SnapshotInfoPanel extends JPanel {
             case CommonConstants.CPU_INSTR_FULL:
                 return INSTRUMENTATION_PROF_TYPE_STRING;
             case CommonConstants.CPU_INSTR_SAMPLED:
-                return SAMPLED_PROF_TYPE_STRING;
+                return SAMPLED_INSTR_PROF_TYPE_STRING;
+            case CommonConstants.CPU_SAMPLED:
+                return SAMPLED_INSTR_PROF_TYPE_STRING;                
             default:
                 return INVALID_STRING;
         }

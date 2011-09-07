@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -302,6 +304,17 @@ public class ProfilerClient implements CommonConstants {
 
                     break;
                 case Command.RESULTS_AVAILABLE:
+                    ResultsAvailableCommand raCmd = (ResultsAvailableCommand) cmd;
+                    String bufferName = raCmd.getEventBufferFileName();
+                    if (bufferName.length() > 0) {
+                        if (!EventBufferProcessor.bufFileExists()) {
+                            if (!EventBufferProcessor.setEventBufferFile(bufferName)) {
+                                appStatusHandler.displayError(MessageFormat.format(CANNOT_OPEN_SERVER_TEMPFILE_MSG,
+                                                                                   new Object[] { raCmd.getEventBufferFileName() }));
+                            }
+                        }
+                        JMethodIdTable.reset();
+                    }
                     resultsStart = System.currentTimeMillis();
 
                     break;
@@ -368,7 +381,7 @@ public class ProfilerClient implements CommonConstants {
     private CPUCCTProvider cpuCctProvider;
     private Command execInSeparateThreadCmd;
     private FlatProfileProvider flatProvider;
-    private InitiateInstrumentationCommand commandOnStartup = null;
+    private InitiateProfilingCommand commandOnStartup = null;
     private Instrumentor instrumentor;
     private MemoryCCTProvider memCctProvider;
     private final Object execInSeparateThreadLock = new Object();
@@ -738,7 +751,7 @@ public class ProfilerClient implements CommonConstants {
     public void deinstrumentMemoryProfiledClasses(boolean[] unprofiledClassStatusArray)
                                            throws InstrumentationException, ClientUtils.TargetAppOrVMTerminated {
         synchronized (instrumentationLock) {
-            if (getCurrentInstrType() == INSTR_NONE) {
+            if (getCurrentInstrType() == INSTR_NONE || getCurrentInstrType() == INSTR_NONE_SAMPLING) {
                 return;
             }
 
@@ -878,7 +891,7 @@ public class ProfilerClient implements CommonConstants {
             instrumentor.setSavedSourceCodeSelection(s);
 
             String className = instrumentor.getRootClassNames()[ProfilingSessionStatus.CODE_REGION_CLASS_IDX].replace('/', '.'); // NOI18N
-            InitiateInstrumentationCommand cmd = new InitiateInstrumentationCommand(INSTR_CODE_REGION, className, false,
+            InitiateProfilingCommand cmd = new InitiateProfilingCommand(INSTR_CODE_REGION, className, false,
                                                                                     status.startProfilingPointsActive);
             commandOnStartup = cmd;
 
@@ -899,7 +912,7 @@ public class ProfilerClient implements CommonConstants {
     public void initiateMonitoring()  throws ClientUtils.TargetAppOrVMTerminated, InstrumentationException {
          synchronized (instrumentationLock) {
             removeAllInstrumentation();
-            InitiateInstrumentationCommand cmd = new InitiateInstrumentationCommand(INSTR_NONE, null);
+            InitiateProfilingCommand cmd = new InitiateProfilingCommand(INSTR_NONE);
             commandOnStartup = cmd;
             // just to be consistent, since removeAllInstrumentation()
             // sets instrumentation type to INSTR_NONE
@@ -937,7 +950,7 @@ public class ProfilerClient implements CommonConstants {
             // load event. However, if the same cmd that we build here is then re-used as commandOnStartup, it should again
             // contain rootClassName.
             String[] rootClassNames = new String[]{settings.getMainClassName()};
-            InitiateInstrumentationCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames, false,
+            InitiateProfilingCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames, false,
                                                                                     status.startProfilingPointsActive);
             commandOnStartup = cmd;
 
@@ -994,7 +1007,7 @@ public class ProfilerClient implements CommonConstants {
 
             String[] rootClassNames = instrumentor.getRootClassNames();
             int instrType = (settings.getCPUProfilingType() == CPU_INSTR_FULL) ? INSTR_RECURSIVE_FULL : INSTR_RECURSIVE_SAMPLED;
-            InitiateInstrumentationCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames,
+            InitiateProfilingCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames,
                                                                                     instrSpawnedThreads,
                                                                                     status.startProfilingPointsActive);
             commandOnStartup = cmd;
@@ -1032,6 +1045,26 @@ public class ProfilerClient implements CommonConstants {
         }
     }
 
+    public void initiateCPUSampling() throws ClientUtils.TargetAppOrVMTerminated, InstrumentationException {
+         synchronized (instrumentationLock) {
+            removeAllInstrumentation();
+            InitiateProfilingCommand cmd = new InitiateProfilingCommand(INSTR_NONE_SAMPLING);
+            commandOnStartup = cmd;
+            status.setTimerTypes(settings.getAbsoluteTimerOn(), settings.getThreadCPUTimerOn());
+            setCurrentInstrType(INSTR_NONE_SAMPLING);
+
+            if (status.targetAppRunning) {
+                sendSetInstrumentationParamsCmd(false);
+
+                String errorMessage = sendCommandAndGetResponse(commandOnStartup);
+
+                if (errorMessage != null) {
+                    appStatusHandler.displayWarning(errorMessage);
+                }
+            }            
+         }
+    }
+
     public synchronized boolean memoryResultsExist() {
         return (getMemoryCCTProvider() != null) && (getMemoryCCTProvider().getStacksForClasses() != null);
     }
@@ -1055,7 +1088,7 @@ public class ProfilerClient implements CommonConstants {
     public void removeAllInstrumentation(boolean cleanupClient)
                                   throws InstrumentationException {
         synchronized (instrumentationLock) {
-            if (getCurrentInstrType() == INSTR_NONE) {
+            if (getCurrentInstrType() == INSTR_NONE || getCurrentInstrType() == INSTR_NONE_SAMPLING) {
                 return;
             }
 
@@ -1236,7 +1269,7 @@ public class ProfilerClient implements CommonConstants {
 
             commandOnStartup = null;
         } else {
-            // Needed to e.g. prevent initiateInstrumentation() called later from attempting to
+            // Needed to e.g. prevent initiateProfiling() called later from attempting to
             // remove instrumentation from VM.
             setCurrentInstrType(INSTR_NONE);
         }
@@ -1685,7 +1718,7 @@ public class ProfilerClient implements CommonConstants {
             serverClassesInitialized = false;
             // Note that here we can't use normal getCmd(), since this shared object could already have been initialized with
             // real data.
-            error = sendCommandAndGetResponse(new InitiateInstrumentationCommand(INSTR_RECURSIVE_FULL,
+            error = sendCommandAndGetResponse(new InitiateProfilingCommand(INSTR_RECURSIVE_FULL,
                                                                                  "*FAKE_CLASS_FOR_INTERNAL_TEST*") // NOI18N
             );
 
@@ -1811,20 +1844,6 @@ public class ProfilerClient implements CommonConstants {
                     }
                 }
 
-                if (currentInstrTypeIsRecursiveCPUProfiling() || currentInstrTypeIsMemoryProfiling()) {
-                    if (!EventBufferProcessor.bufFileExists()) {
-                        if (!EventBufferProcessor.setEventBufferFile(cmd.getEventBufferFileName())) {
-                            appStatusHandler.displayError(MessageFormat.format(CANNOT_OPEN_SERVER_TEMPFILE_MSG,
-                                                                               new Object[] { cmd.getEventBufferFileName() }));
-                            sendComplexRespToServer(new InstrumentMethodGroupResponse(null));
-
-                            return;
-                        }
-                    }
-
-                    JMethodIdTable.reset();
-                }
-
                 appStatusHandler.pauseLiveUpdates();
 
                 if (status.targetAppRunning) {
@@ -1865,8 +1884,6 @@ public class ProfilerClient implements CommonConstants {
                     } else {
                         MiscUtils.printErrorMessage("problem in instrumentMethodGroupFromRoot: " + ex); // NOI18N
                     }
-                } catch (Exception e) {
-                    MiscUtils.printErrorMessage("in instrumentMethodGroupFromRoot(), caught exception: " + e); // NOI18N
                 }
 
                 //if (imgr != null ! imgr.isEmpty()) {
@@ -1933,6 +1950,7 @@ public class ProfilerClient implements CommonConstants {
             //  - remote profiling
             //  - explicite Get results (forceObtainedResultsDumpCalled)
             //  - CPU or Code Fragment profiling
+            //  - CPU sampling
             EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
             EventBufferResultsProvider.getDefault().dataReady(bufSize, instrType);
             handlingEventBufferDump = false;
@@ -2027,7 +2045,7 @@ public class ProfilerClient implements CommonConstants {
         }
     }
     
-    private InitiateInstrumentationCommand createInitiateInstrumnetation(int instrType, String[] classNames,
+    private InitiateProfilingCommand createInitiateInstrumnetation(int instrType, String[] classNames,
                                           boolean instrSpawnedThreads, boolean startProfilingPointsActive) {
         RuntimeProfilingPoint points[] = settings.getRuntimeProfilingPoints();
         String[] profilingPointHandlers = new String[points.length];
@@ -2041,7 +2059,7 @@ public class ProfilerClient implements CommonConstants {
             profilingPointHandlers[i] = point.getServerHandlerClass();
             profilingPointInfos[i] = point.getServerInfo();
         }
-        return new InitiateInstrumentationCommand(instrType,classNames,
+        return new InitiateProfilingCommand(instrType,classNames,
                         profilingPointIDs,profilingPointHandlers,profilingPointInfos,
                         instrSpawnedThreads,startProfilingPointsActive);
     }
