@@ -31,7 +31,7 @@ import java.awt.Image;
 import java.util.Set;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-
+import static com.sun.tools.visualvm.application.type.NetBeansApplicationTypeFactory.PRODUCT_VERSION_PROPERTY;
 
 /**
  * This {@link ApplicationType} represents application based on
@@ -43,15 +43,19 @@ public class NetBeansBasedApplicationType extends ApplicationType {
     String name;
     String branding;
     Set<String> clusters;
+    String fullVersionString;
     
     NetBeansBasedApplicationType(Application app,Jvm jvm,Set<String> cls, String br) {
         application = app;
         clusters = cls;
         branding = br;
+        if (jvm.isGetSystemPropertiesSupported()) {
+            fullVersionString = jvm.getSystemProperties().getProperty(PRODUCT_VERSION_PROPERTY);
+        }
     }
     
     /**
-     * Returns set of BetBeans' clusters.
+     * Returns set of NetBeans' clusters.
      *
      */
     public Set<String> getClusters() {
@@ -62,6 +66,18 @@ public class NetBeansBasedApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getName() {
+        if (fullVersionString != null) {
+            int index = fullVersionString.indexOf("(");
+            if (index != -1) {
+                return fullVersionString.substring(0,index-1).trim();
+            }
+            index = fullVersionString.lastIndexOf(" ");
+            String buildNo = fullVersionString.substring(index+1);
+            if (buildNo.length()>19 && buildNo.charAt(8)=='-') {
+                return fullVersionString.substring(0,index-1);
+            }
+            return fullVersionString;
+        }
         return NbBundle.getMessage(NetBeansBasedApplicationType.class, "LBL_NbPlatformApplication"); // NOI18N
     }
     
@@ -76,6 +92,9 @@ public class NetBeansBasedApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getDescription() {
+        if (fullVersionString != null) {
+            return fullVersionString;
+        }
         return NbBundle.getMessage(NetBeansBasedApplicationType.class, "DESCR_NetBeansBasedApplicationType"); // NOI18N
     }
     

@@ -48,6 +48,7 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
     private static final String MAIN_CLASS = "org.netbeans.Main"; // NOI18N
     private static final Pattern NBCLUSTER_PATTERN = Pattern.compile("nb[0-9]+\\.[0-9]+");    // NOI18N
     static final String NB_CLUSTER = "nb";    // NOI18N
+    static final String PRODUCT_VERSION_PROPERTY="netbeans.productversion";  // NOI18N
     
     private boolean isNetBeans(Jvm jvm, String mainClass) {
         if (MAIN_CLASS.equals(mainClass)) {

@@ -29,22 +29,36 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
 import java.awt.Image;
 import java.util.Iterator;
+import java.util.Properties;
+import java.util.Scanner;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import static com.sun.tools.visualvm.application.type.NetBeansApplicationTypeFactory.NB_CLUSTER;
+import static com.sun.tools.visualvm.application.type.NetBeansApplicationTypeFactory.PRODUCT_VERSION_PROPERTY;
 
 /**
  * This {@link ApplicationType} represents NetBeans application from version 4.0.
  * @author Tomas Hurka
  */
 public class NetBeansApplicationType extends ApplicationType {
+    private static final String BUILD_NUMBER_PROPERTY="netbeans.buildnumber";
+    private static final String[] BUILD_NUMBERS={
+                                    "201006101454","6.9",
+                                    "201007282301","6.9.1",
+                                    "201104080000","7.0",
+                                    "201107282000","7.0.1"
+                                };
+    private static final String VERSION_REG="\\d{1,2}\\.\\d{1,2}(\\.\\d{1,2})?";
     Application application;
     String name;
     Set<String> clusters;
+    Jvm jvm;
     
-    NetBeansApplicationType(Application app,Jvm jvm,Set<String> cls) {
+    NetBeansApplicationType(Application app,Jvm vm,Set<String> cls) {
         application = app;
+        jvm = vm;
         clusters = cls;
     }
     
@@ -60,7 +74,7 @@ public class NetBeansApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getName() {
-        return "NetBeans " + getVersion();    // NOI18N
+        return "NetBeans IDE " + getVersion();    // NOI18N
     }
     
     /**
@@ -78,6 +92,14 @@ public class NetBeansApplicationType extends ApplicationType {
                 }
             }
             if (cluster.equals(NB_CLUSTER)) {
+                //6.9+ does not have version in nb cluster
+                // try to use system properties
+                if (jvm.isGetSystemPropertiesSupported()) {
+                    String ver = getVersionFromSysProps(jvm.getSystemProperties());
+                    if (ver != null) {
+                        return ver;
+                    }
+                }
                 return "6.9+";  // NOI18N
             }
         }
@@ -88,6 +110,13 @@ public class NetBeansApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getDescription() {
+        if (jvm.isGetSystemPropertiesSupported()) {
+            String versionString = jvm.getSystemProperties().getProperty(PRODUCT_VERSION_PROPERTY);
+            
+            if (versionString != null) {
+                return versionString;
+            }
+        }
         return NbBundle.getMessage(NetBeansApplicationType.class, "DESCR_NetBeansApplicationType");   // NOI18N
     }
     
@@ -97,5 +126,30 @@ public class NetBeansApplicationType extends ApplicationType {
     public Image getIcon() {
         String iconPath = "com/sun/tools/visualvm/application/type/resources/NetBeans.png"; // NOI18N
         return ImageUtilities.loadImage(iconPath, true);
+    }
+
+    private String getVersionFromSysProps(Properties properties) {
+        String versionString = properties.getProperty(PRODUCT_VERSION_PROPERTY);
+        
+        if (versionString != null) {
+            Scanner s = new Scanner(versionString);
+            if ("NetBeans".equals(s.next())) {  // NOI18N
+                if ("IDE".equals(s.next())) {   // NOI18N
+                    return s.next();
+                }
+            }
+            String ver = s.findInLine(VERSION_REG);
+            if (ver != null) {
+                return ver;
+            }
+        } else {
+            String buildNumber = properties.getProperty(BUILD_NUMBER_PROPERTY);
+            for (int i=0; i<BUILD_NUMBERS.length; i+=2) {
+                if (BUILD_NUMBERS[i].equals(buildNumber)) {
+                    return BUILD_NUMBERS[i+1];
+                }
+            }
+        }
+        return null;
     }
 }
