@@ -11,7 +11,7 @@ Server start to listen on port 5140
  received command SUSPEND_TARGET_APP
  received command RESUME_TARGET_APP
  received command TERMINATE_TARGET_JVM
- received command INITIATE_INSTRUMENTATION
+ received command INITIATE_PROFILING
  received command MESSAGE
  received command SHUTDOWN_OK
  received command GET_THREAD_LIVENESS_STATUS
