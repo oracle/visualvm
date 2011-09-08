@@ -399,7 +399,7 @@ public class OverviewController extends AbstractController {
                 ThreadObjectGCRoot threadRoot = (ThreadObjectGCRoot)root;
                 StackTraceElement[] stackTrace = threadRoot.getStackTrace();
                 
-                if (stackTrace.length>=1) {
+                if (stackTrace!=null && stackTrace.length>=1) {
                     StackTraceElement ste = stackTrace[0];
                     
                     if (OutOfMemoryError.class.getName().equals(ste.getClassName()) && "<init>".equals(ste.getMethodName())) {
