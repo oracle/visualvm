@@ -109,7 +109,7 @@ public class CalibrationDataFileIO {
         File savedDataFile = new File(fn);
 
         if (!savedDataFile.exists()) {
-            errorMessage = CALIBRATION_FILE_NOT_EXIST_MSG;
+            errorMessage = MessageFormat.format(CALIBRATION_FILE_NOT_EXIST_MSG, new Object[] { savedDataFile.toString() });
 
             return 1;
         }
