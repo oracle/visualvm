@@ -544,12 +544,32 @@ public class OverviewController extends AbstractController {
     }
 
     private String getThreadName(final Instance threadInstance) {
-        PrimitiveArrayInstance chars = (PrimitiveArrayInstance)threadInstance.getValueOfField("name");  // NOI18N
-        List<String> charsList = chars.getValues();
-        char charArr[] = new char[charsList.size()];
-        int j = 0;
+        Object threadName = threadInstance.getValueOfField("name");  // NOI18N
+        PrimitiveArrayInstance chars;
+        int offset = 0;
+        int len;
         
-        for(String ch: charsList) {
+        if (threadName instanceof PrimitiveArrayInstance) {
+            chars = (PrimitiveArrayInstance)threadName;
+            len = chars.getLength();
+        } else {
+            Instance stringInstance = (Instance)threadName;
+            assert stringInstance.getJavaClass().getName().equals(String.class.getName());
+
+            chars = (PrimitiveArrayInstance) stringInstance.getValueOfField("value"); // NOI18N
+            if (chars != null) {
+                offset = ((Integer) stringInstance.getValueOfField("offset")).intValue(); // NOI18N
+                len = ((Integer) stringInstance.getValueOfField("count")).intValue(); // NOI18N
+            } else {
+                return "*null*"; // NOI18N
+            }
+        }
+        List<String> charsList = chars.getValues();
+        List<String> stringList = charsList.subList(offset, offset+len);
+        char charArr[] = new char[stringList.size()];
+        int j = 0;
+
+        for(String ch:stringList) {
             charArr[j++] = ch.charAt(0);
         }
         return new String(charArr);
