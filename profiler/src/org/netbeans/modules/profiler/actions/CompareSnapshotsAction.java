@@ -55,6 +55,8 @@ import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -71,6 +73,7 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.DialogDisplayer;
+import org.openide.util.Lookup;
 import org.openide.windows.WindowManager;
 
 
@@ -373,6 +376,7 @@ public class CompareSnapshotsAction extends AbstractAction {
             listModel.removeAllElements();
 
             // Add opened but not-yet-saved snapshots
+            // TODO: check that this works correctly in VisualVM!
             LoadedSnapshot[] loadedSnapshots = ResultsManager.getDefault().getLoadedSnapshots();
 
             for (int i = 0; i < loadedSnapshots.length; i++) {
@@ -383,9 +387,12 @@ public class CompareSnapshotsAction extends AbstractAction {
             }
 
             // Add saved snapshots
-            FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(snapshot.getProject());
-            FileObject snapshotFile = (snapshot.getFile() != null) ? FileUtil.toFileObject(snapshot.getFile()) : null;
-
+            final Lookup.Provider project = snapshot.getProject();
+            File snapFile = snapshot.getFile();
+            final File snapshotDir = snapFile != null ? snapFile.getParentFile() : null;
+            FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(project, snapshotDir);
+            FileObject snapshotFile = (snapFile != null) ? FileUtil.toFileObject(snapFile) : null;
+            
             for (int i = 0; i < snapshotsOnDisk.length; i++) {
                 if (((snapshotFile == null) || !snapshotsOnDisk[i].equals(snapshotFile))
                         && areComparableSnapshots(snapshot, snapshotsOnDisk[i])) {
@@ -395,7 +402,47 @@ public class CompareSnapshotsAction extends AbstractAction {
 
             if (listModel.getSize() == 0) {
                 listModel.addElement(NO_COMPARABLE_SNAPSHOTS_FOUND_MSG);
+                fromFileRadio.setSelected(true);
+                externalFileField.addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && externalFileField.isShowing()) {
+                            externalFileField.removeHierarchyListener(this);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    externalFileField.requestFocusInWindow();
+                                }
+                            });
+                        }
+                    }
+                });
+            } else {
+                projectSnapshotsList.setSelectedIndex(0);
+                projectSnapshotsList.addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && externalFileField.isShowing()) {
+                            projectSnapshotsList.removeHierarchyListener(this);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    projectSnapshotsList.requestFocusInWindow();
+                                }
+                            });
+                        }
+                    }
+                });
             }
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (project != null) {
+                        org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, FROM_PROJECT_RADIO_TEXT);
+                        fromProjectRadio.setToolTipText(null);
+                    } else {
+                        org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, FROM_CURRENT_LOCATION_RADIO_TEXT);
+                        fromProjectRadio.setToolTipText(snapshotDir != null ?
+                                snapshotDir.getAbsolutePath() : null);
+                    }
+                }
+            });
         }
 
         private void initComponents() {
@@ -777,6 +824,8 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                                               "CompareSnapshotsAction_SelectSnapshotsString"); // NOI18N
     private static final String FROM_PROJECT_RADIO_TEXT = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                               "CompareSnapshotsAction_FromProjectRadioText"); // NOI18N
+    private static final String FROM_CURRENT_LOCATION_RADIO_TEXT = NbBundle.getMessage(CompareSnapshotsAction.class,
+                                                                              "CompareSnapshotsAction_FromCurrentLocationRadioText"); // NOI18N
     private static final String ONLY_COMPARABLE_LISTED_STRING = NbBundle.getMessage(CompareSnapshotsAction.class,
                                                                                     "CompareSnapshotsAction_OnlyComparableListedString"); // NOI18N
     private static final String FROM_FILE_RADIO_TEXT = NbBundle.getMessage(CompareSnapshotsAction.class,
