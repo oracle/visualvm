@@ -862,6 +862,7 @@ public final class LiveResultsWindow extends TopComponent
         switch (currentInstrType) {
             case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
             case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED:
+            case ProfilerEngineSettings.INSTR_NONE_SAMPLING:
 
             //        return client.getCPUCallGraphBuilder().resultsExist(); // TODO
             case ProfilerEngineSettings.INSTR_OBJECT_ALLOCATIONS:
@@ -986,7 +987,8 @@ public final class LiveResultsWindow extends TopComponent
                 break;
             }
             case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
-            case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED: {
+            case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED: 
+            case ProfilerEngineSettings.INSTR_NONE_SAMPLING: {
                 Lookup.Provider project = NetBeansProfiler.getDefaultNB().getProfiledProject();
 
                 final LiveFlatProfilePanel cpuPanel = new LiveFlatProfilePanel(runner, cpuActionsHandler);

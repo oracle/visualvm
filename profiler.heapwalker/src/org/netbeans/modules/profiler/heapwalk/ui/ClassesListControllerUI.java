@@ -224,6 +224,8 @@ public class ClassesListControllerUI extends JTitledPanel {
                                                                  "ClassesListControllerUI_ViewTitle"); // NOI18N
     private static final String NO_INSTANCES_MSG = NbBundle.getMessage(ClassesListControllerUI.class,
                                                                        "ClassesListControllerUI_NoInstancesMsg"); // NOI18N
+    private static final String NO_CLASS_IN_BASE_MSG = NbBundle.getMessage(ClassesListControllerUI.class,
+                                                                       "ClassesListControllerUI_NoClassInBaseMsg"); // NOI18N
     private static final String FILTER_STARTS_WITH = NbBundle.getMessage(ClassesListControllerUI.class,
                                                                          "ClassesListControllerUI_FilterStartsWith"); // NOI18N
     private static final String FILTER_CONTAINS = NbBundle.getMessage(ClassesListControllerUI.class,
@@ -937,7 +939,9 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     private void showInstancesForClass(JavaClass jClass) {
-        if (jClass.getInstancesCount() == 0) {
+        if (classesListController.isDiff() && jClass == null) {
+            ProfilerDialogs.displayInfo(NO_CLASS_IN_BASE_MSG);
+        } else if (jClass.getInstancesCount() == 0) {
             ProfilerDialogs.displayInfo(MessageFormat.format(NO_INSTANCES_MSG, new Object[] { jClass.getName() }));
         } else {
             classesListController.getClassesController().getHeapFragmentWalker().showInstancesForClass(jClass);

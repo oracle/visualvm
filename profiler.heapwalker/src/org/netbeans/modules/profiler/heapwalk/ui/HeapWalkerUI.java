@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 
 import org.netbeans.modules.profiler.heapwalk.HeapWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
@@ -119,5 +118,7 @@ public class HeapWalkerUI extends TopComponent {
         setName(heapWalker.getName());
         setIcon(Icons.getImage(ProfilerIcons.MEMORY));
         getAccessibleContext().setAccessibleDescription(COMPONENT_DESCR);
+        
+        putClientProperty("HeapDumpFileName", heapWalker.getHeapDumpFile().toURI().getPath()); // NOI18N
     }
 }
