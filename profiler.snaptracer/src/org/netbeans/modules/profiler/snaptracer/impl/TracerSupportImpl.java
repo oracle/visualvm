@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Set;
 import org.netbeans.modules.profiler.snaptracer.Positionable;
 import org.netbeans.modules.profiler.snaptracer.impl.packages.TestPackageProvider;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -61,12 +62,16 @@ import org.netbeans.modules.profiler.snaptracer.impl.packages.TestPackageProvide
 public final class TracerSupportImpl {
 
     private static TracerSupportImpl INSTANCE;
+    private static RequestProcessor PROCESSOR;
 
     private final Set<TracerPackageProvider> providers;
 
 
     public static synchronized TracerSupportImpl getInstance() {
-        if (INSTANCE == null) INSTANCE = new TracerSupportImpl();
+        if (INSTANCE == null) {
+            INSTANCE = new TracerSupportImpl();
+            PROCESSOR = new RequestProcessor("Tracer Processor", 5); // NOI18N
+        }
         return INSTANCE;
     }
 
@@ -93,6 +98,11 @@ public final class TracerSupportImpl {
             packages.addAll(Arrays.asList(provider.getPackages(snapshot)));
         Collections.sort(packages, Positionable.COMPARATOR);
         return packages;
+    }
+    
+    
+    public void perform(Runnable task) {
+        PROCESSOR.post(task);
     }
 
 
