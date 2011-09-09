@@ -52,7 +52,6 @@ import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
@@ -123,7 +122,7 @@ public class ProfilerXYChart extends SynchronousXYChart {
 
     private class ZoomInAction extends AbstractAction {
 
-        private static final int ONE_SECOND_WIDTH_THRESHOLD = 200;
+//        private static final int ONE_SECOND_WIDTH_THRESHOLD = 200;
 
         public ZoomInAction() {
             super();
@@ -144,15 +143,16 @@ public class ProfilerXYChart extends SynchronousXYChart {
 
         private void updateAction() {
             Timeline timeline = ((SynchronousXYItemsModel)getItemsModel()).getTimeline();
-            setEnabled(timeline.getTimestampsCount() > 1 && !fitsWidth() &&
-                       getViewWidth(1000) < ONE_SECOND_WIDTH_THRESHOLD);
+            setEnabled(timeline.getTimestampsCount() > 1 && !fitsWidth() /*&&
+                       getViewWidth(1000) < ONE_SECOND_WIDTH_THRESHOLD*/);
+            // #165429 - don't disable zoom icons until mouse zoom is also disabled
         }
 
     }
 
     private class ZoomOutAction extends AbstractAction {
 
-        private static final float USED_CHART_WIDTH_THRESHOLD = 0.33f;
+//        private static final float USED_CHART_WIDTH_THRESHOLD = 0.33f;
 
         public ZoomOutAction() {
             super();
@@ -173,8 +173,9 @@ public class ProfilerXYChart extends SynchronousXYChart {
 
         private void updateAction() {
             Timeline timeline = ((SynchronousXYItemsModel)getItemsModel()).getTimeline();
-            setEnabled(timeline.getTimestampsCount() > 0 && !fitsWidth() &&
-                       getContentsWidth() > getWidth() * USED_CHART_WIDTH_THRESHOLD);
+            setEnabled(timeline.getTimestampsCount() > 1 && !fitsWidth() /*&&
+                       getContentsWidth() > getWidth() * USED_CHART_WIDTH_THRESHOLD*/);
+            // #165429 - don't disable zoom icons until mouse zoom is also disabled
         }
 
     }
