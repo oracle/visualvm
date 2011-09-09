@@ -563,6 +563,9 @@ public class ProfilerInterface implements CommonConstants {
         }
 
         switch (instrType) {
+            case INSTR_NONE:
+                // do nothing
+                break;
             case INSTR_RECURSIVE_FULL:
             case INSTR_RECURSIVE_SAMPLED:
             case INSTR_OBJECT_ALLOCATIONS:

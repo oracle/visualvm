@@ -670,6 +670,8 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
                 int clickedLine = resTable.rowAtPoint(e.getPoint());
 
                 if (clickedLine != -1) {
+                    if (resTable.getSelectedRowCount() == 1)
+                        resTable.getSelectionModel().setSelectionInterval(clickedLine, clickedLine);
                     if ((e.getModifiers() & InputEvent.BUTTON3_MASK) != 0) {
                         popupMenu.show(e.getComponent(), e.getX(), e.getY());
                     } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {

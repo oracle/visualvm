@@ -250,6 +250,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                         clickedLine = table.rowAtPoint(e.getPoint());
 
                         if (clickedLine != -1) {
+                            resTable.getSelectionModel().setSelectionInterval(clickedLine, clickedLine);
                             //selectedClassId = sortedClassIds[clickedLine];
                             selectedClassId = sortedClassIds[((Integer) filteredToFullIndexes.get(clickedLine)).intValue()];
 
