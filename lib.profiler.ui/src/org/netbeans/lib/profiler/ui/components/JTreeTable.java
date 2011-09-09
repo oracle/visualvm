@@ -872,7 +872,16 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     }
 
     public void processMouseEvent(MouseEvent e) {
-        super.processMouseEvent(e);
+        if (e instanceof MouseWheelEvent) {
+            Component target = JTreeTable.this.getParent();
+            if (target == null || !(target instanceof JViewport))
+                target = JTreeTable.this;
+            MouseEvent mwe = SwingUtilities.convertMouseEvent(
+                    JTreeTable.this, (MouseWheelEvent)e, target);
+            target.dispatchEvent((MouseWheelEvent)mwe);
+        } else {
+            super.processMouseEvent((MouseEvent)e);
+        }
     }
 
     public void resetTreeCellOffsetX() {

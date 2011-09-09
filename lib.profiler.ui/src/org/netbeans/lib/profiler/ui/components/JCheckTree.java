@@ -56,11 +56,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeModel;
@@ -244,7 +247,16 @@ public class JCheckTree extends JExtendedTree {
     }
 
     public void processMouseEvent(MouseEvent e) {
-        super.processMouseEvent(e);
+        if (e instanceof MouseWheelEvent) {
+            Component target = JCheckTree.this.getParent();
+            if (target == null || !(target instanceof JViewport))
+                target = JCheckTree.this;
+            MouseEvent mwe = SwingUtilities.convertMouseEvent(
+                    JCheckTree.this, (MouseWheelEvent)e, target);
+            target.dispatchEvent((MouseWheelEvent)mwe);
+        } else {
+            super.processMouseEvent((MouseEvent)e);
+        }
     }
 
     public void removeCheckTreeListener(CheckTreeListener listener) {
