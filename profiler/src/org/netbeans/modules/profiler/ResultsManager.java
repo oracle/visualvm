@@ -543,17 +543,23 @@ public final class ResultsManager {
         }
     }
 
-    public FileObject[] listSavedSnapshots(Lookup.Provider project) {
+    public FileObject[] listSavedSnapshots(Lookup.Provider project, File directory) {
         try {
-            FileObject profilerFolder = ProjectStorage.getSettingsFolder(project, false);
+            FileObject snapshotsFolder = null;
+                    
+            if (project == null && directory != null) {
+                snapshotsFolder = FileUtil.toFileObject(directory);
+            } else {
+                snapshotsFolder = ProjectStorage.getSettingsFolder(project, false);
+            }
 
-            if (profilerFolder == null) {
+            if (snapshotsFolder == null) {
                 return new FileObject[0];
             }
 
-            profilerFolder.refresh();
+            snapshotsFolder.refresh();
 
-            FileObject[] children = profilerFolder.getChildren();
+            FileObject[] children = snapshotsFolder.getChildren();
 
             ArrayList /*<FileObject>*/ files = new ArrayList /*<FileObject>*/();
 
