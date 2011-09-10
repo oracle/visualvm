@@ -583,6 +583,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
                             treeTable.getTree().clearSelection();
                         }
                     } else {
+                        treeTable.getTree().setSelectionPath(popupPath);
                         PrestimeCPUCCTNode node = (PrestimeCPUCCTNode) popupPath.getLastPathComponent();
 
                         enableDisablePopup(node);
