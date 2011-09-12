@@ -25,10 +25,11 @@ abstract class SamplingThread extends Thread {
     
     //~ Methods --------------------------------------------------------------------------------------------------------------
 
-    SamplingThread(int samplingInterval) {
+    SamplingThread(int interval) {
         ThreadInfo.addProfilerServerThread(this);
         setPriority(Thread.MAX_PRIORITY);
         setDaemon(true);
+        samplingInterval = interval;
         if (isSolaris) {
             samplingInterval *= 1000000; // Convert into nanos - the Solaris hires timer resolution
         } else if (isLinux) {
