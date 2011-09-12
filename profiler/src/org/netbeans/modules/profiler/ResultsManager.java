@@ -482,6 +482,7 @@ public final class ResultsManager {
                 byte[] prefix = new byte[HPROF_HEADER.length()+4];
                 RandomAccessFile raf = new RandomAccessFile(file,"r");  // NOI18H
                 raf.readFully(prefix);
+                raf.close();
                 if (new String(prefix).startsWith(HPROF_HEADER)) {
                     return true;
                 }
