@@ -1252,7 +1252,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 }
             }
             if (!success) {
-                refreshList();
                 ProfilerDialogs.displayError(NbBundle.getMessage(ProfilerControlPanel2.class,
                         "ProfilerControlPanel2_SnapshotsNotDeletedMsg")); // NOI18N
             }
