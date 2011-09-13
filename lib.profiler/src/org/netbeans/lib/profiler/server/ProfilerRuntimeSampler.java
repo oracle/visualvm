@@ -229,7 +229,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
     }
 
     static void initialize() {
-        sampling = new Sampling(500);
+        sampling = new Sampling(10);
         sampling.start();
     }
 
