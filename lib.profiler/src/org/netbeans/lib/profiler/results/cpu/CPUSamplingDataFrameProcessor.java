@@ -111,7 +111,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                     position += strLen;
                     
                     if (LOGGER.isLoggable(Level.FINEST)) {
-                        LOGGER.log(Level.FINEST, "Creating new thread , tId={0}", threadId); // NOI18N
+                        LOGGER.finest("Creating new thread: tId="+threadId+" name="+threadName); // NOI18N
                     }
                     
                     currentThreadId = threadId;
