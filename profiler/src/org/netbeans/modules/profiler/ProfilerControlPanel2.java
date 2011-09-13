@@ -1241,15 +1241,19 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         }
 
         private void deleteSnapshots(FileObject[] selectedSnapshots) {
+            boolean success = true;
             for (int i = 0; i < selectedSnapshots.length; i++) {
                 FileObject selectedSnapshotFile = selectedSnapshots[i];
                 try {
                     DataObject.find(selectedSnapshotFile).delete();
-                } catch (DataObjectNotFoundException ex) {
-                    Exceptions.printStackTrace(ex);
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
+                } catch (Throwable t) {
+                    success = false;
+                    t.printStackTrace();
                 }
+            }
+            if (!success) {
+                ProfilerDialogs.displayError(NbBundle.getMessage(ProfilerControlPanel2.class,
+                        "ProfilerControlPanel2_SnapshotsNotDeletedMsg")); // NOI18N
             }
         }
 
