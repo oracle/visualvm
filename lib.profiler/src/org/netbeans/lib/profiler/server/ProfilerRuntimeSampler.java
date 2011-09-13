@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.server;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.server.system.Stacks;
 import org.netbeans.lib.profiler.server.system.Timers;
 
@@ -96,17 +97,19 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                         Integer index = (Integer) arrayOffsetMap.get(ltid);
                         Integer tid = (Integer) threadIdMap.get(ltid);
 
-                        newArrayOffsetMap.put(ltid, Integer.valueOf(i));
                         if (index != null) {
                             if (status == states[index.intValue()] && Arrays.equals(mids,methodIds[index.intValue()])) {
                                 writeThreadInfoNoChange(tid);
                             }
                             writeThreadInfo(tid,status,mids);
-                        } else { // new thread
+                        } else if (status != CommonConstants.THREAD_STATUS_ZOMBIE) { // new thread
                             tid = Integer.valueOf(++threadCount);
                             ProfilerRuntime.writeThreadCreationEvent(t,tid.intValue());
                             writeThreadInfo(tid,status,mids);
+                        } else { // new thread which is not started yet
+                            continue; 
                         }
+                        newArrayOffsetMap.put(ltid, Integer.valueOf(i));
                         newThreadIdMap.put(ltid,tid);
                     }
                 }
