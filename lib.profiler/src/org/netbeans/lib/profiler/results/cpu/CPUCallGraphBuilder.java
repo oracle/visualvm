@@ -783,6 +783,9 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         if (client != null) {
             timingAdjuster = TimingAdjusterOld.getInstance(client.getStatus());
         }
+        if (factory == null) {
+            factory = new CPUCCTNodeFactory(isCollectingTwoTimeStamps());
+        } 
         threadInfos.beginTrans(true);
     }
 
@@ -811,7 +814,6 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
     protected void doStartup(final ProfilerClient profilerClient) {
         instrFilter = profilerClient.getSettings().getInstrumentationFilter();
-        factory = new CPUCCTNodeFactory(isCollectingTwoTimeStamps());
         
         setMethodInfoMapper(new MethodInfoMapper() {
             final private String INVALID_MID=ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle").getString("MSG_INVALID_METHODID"); // NOI18N
