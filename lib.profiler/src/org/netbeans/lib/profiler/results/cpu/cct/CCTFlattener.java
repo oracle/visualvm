@@ -192,7 +192,9 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.log(Level.FINEST, "Processing runtime node: {0}.{1}; filtered={2}", new Object[]{status.getInstrMethodClasses()[node.getMethodId()], status.getInstrMethodNames()[node.getMethodId()], filteredOut}); // NOI18N
+            LOGGER.log(Level.FINEST, "Processing runtime node: {0}.{1}; filtered={2}, time={3}, CPU time={4}", // NOI18N
+                       new Object[]{status.getInstrMethodClasses()[node.getMethodId()], status.getInstrMethodNames()[node.getMethodId()], 
+                       filteredOut, node.getNetTime0(), node.getNetTime1()});
 
             String parentInfo = (currentParent != null)
                                 ? (status.getInstrMethodClasses()[currentParent.getMethodId()] + "."
