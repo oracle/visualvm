@@ -103,7 +103,10 @@ public final class Utils {
 
 
     public static Color getSystemSelection() {
-        return UIManager.getColor("List.selectionBackground"); // NOI18N
+        Color sel = UIManager.getColor("List.selectionBackground"); // NOI18N
+        if (sel == null) sel = UIManager.getColor("nimbusSelectionBackground"); // NOI18N
+        if (sel == null) sel = new Color(0, 0, 200);
+        return sel;
     }
 
 
