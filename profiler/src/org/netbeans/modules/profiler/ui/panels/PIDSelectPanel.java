@@ -46,6 +46,7 @@ package org.netbeans.modules.profiler.ui.panels;
 import org.netbeans.lib.profiler.jps.JpsProxy;
 import org.netbeans.lib.profiler.jps.RunningVM;
 import org.openide.DialogDescriptor;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -54,8 +55,6 @@ import java.text.MessageFormat;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.DialogDisplayer;
-import org.openide.util.RequestProcessor;
-
 
 /**
  * A panel that allows to select a process PID from a combo box of all running processes
@@ -223,36 +222,35 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
     }
 
     private void refreshCombo() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                okButton.setEnabled(false);
-                combo.setEnabled(false);
-                combo.setModel(new DefaultComboBoxModel(new Object[] { PROCESSES_LIST_ITEM_TEXT }));
-                
-                RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() {
-                        RunningVM[] vms = JpsProxy.getRunningVMs();
-                        final Object[] ar = new Object[((vms == null) ? 0 : vms.length) + 1];
-                        if (vms == null) {
-                            ar[0] = ERROR_GETTING_PROCESSES_ITEM_TEXT;
-                        } else if (vms.length == 0) {
-                            ar[0] = NO_PROCESSES_ITEM_TEXT;
-                        } else {
-                            ar[0] = SELECT_PROCESS_ITEM_TEXT;
-                            System.arraycopy(vms, 0, ar, 1, vms.length);
-                        }
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                combo.setEnabled(true);
-                                combo.setModel(new DefaultComboBoxModel(ar));
-                                updateInfo();
-                            }
-                        });
-                   } 
-                });
-            }
-        });
+        okButton.setEnabled(false);
+        combo.setEnabled(false);
+        combo.setModel(new DefaultComboBoxModel(new Object[] { PROCESSES_LIST_ITEM_TEXT }));
         
+        new SwingWorker<Object[],Object>() {
+            protected Object[] doInBackground() throws Exception {
+                RunningVM[] vms = JpsProxy.getRunningVMs();
+                Object[] ar = new Object[((vms == null) ? 0 : vms.length) + 1];
+                if (vms == null) {
+                    ar[0] = ERROR_GETTING_PROCESSES_ITEM_TEXT;
+                } else if (vms.length == 0) {
+                    ar[0] = NO_PROCESSES_ITEM_TEXT;
+                } else {
+                    ar[0] = SELECT_PROCESS_ITEM_TEXT;
+                    System.arraycopy(vms, 0, ar, 1, vms.length);
+                }
+                return ar;
+            }
+            
+            protected void done() {
+                try {
+                    combo.setEnabled(true);
+                    combo.setModel(new DefaultComboBoxModel(get()));
+                    updateInfo();
+                } catch (Exception ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        }.execute();       
     }
 
     private void updateInfo() {
