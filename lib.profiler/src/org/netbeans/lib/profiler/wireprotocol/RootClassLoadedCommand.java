@@ -58,7 +58,6 @@ import java.io.ObjectOutputStream;
 public class RootClassLoadedCommand extends Command {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private String eventBufferFileName;
     private int[] allLoadedClassLoaderIds;
     private String[] allLoadedClassNames;
     private byte[][] cachedClassFileBytes;
@@ -68,14 +67,13 @@ public class RootClassLoadedCommand extends Command {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public RootClassLoadedCommand(String[] allLoadedClassNames, int[] loaderIds, byte[][] cachedClassFileBytes, int classCount,
-                                  int[] parentLoaderIds, String eventBufferFileName) {
+                                  int[] parentLoaderIds) {
         super(ROOT_CLASS_LOADED);
         this.allLoadedClassNames = allLoadedClassNames;
         this.allLoadedClassLoaderIds = loaderIds;
         this.cachedClassFileBytes = cachedClassFileBytes;
         this.classCount = classCount;
         this.parentLoaderIds = parentLoaderIds;
-        this.eventBufferFileName = eventBufferFileName;
     }
 
     // Custom serialization support
@@ -100,10 +98,6 @@ public class RootClassLoadedCommand extends Command {
         return res;
     }
 
-    public String getEventBufferFileName() {
-        return eventBufferFileName;
-    }
-
     public int[] getParentLoaderIds() {
         // Return a copy, just in case, since this instance of parentLoaderIds is reused when this command is received
         int[] newParentLoaderIds = new int[parentLoaderIds.length];
@@ -114,7 +108,7 @@ public class RootClassLoadedCommand extends Command {
 
     // for debugging
     public String toString() {
-        return super.toString() + ", eventBufferFileName: " + eventBufferFileName; // NOI18N
+        return super.toString();
     }
 
     void readObject(ObjectInputStream in) throws IOException {
@@ -156,8 +150,6 @@ public class RootClassLoadedCommand extends Command {
         for (int i = 0; i < len; i++) {
             parentLoaderIds[i] = in.readInt();
         }
-
-        eventBufferFileName = in.readUTF();
     }
 
     void writeObject(ObjectOutputStream out) throws IOException {
@@ -199,12 +191,10 @@ public class RootClassLoadedCommand extends Command {
             out.writeInt(parentLoaderIds[i]);
         }
 
-        out.writeUTF(eventBufferFileName);
         // Free memory
         allLoadedClassNames = null;
         allLoadedClassLoaderIds = null;
         cachedClassFileBytes = null;
         parentLoaderIds = null;
-        eventBufferFileName = null;
     }
 }

@@ -252,6 +252,10 @@ public abstract class Profiler {
                 instrumentSelectedRoots(profilingSettings.getInstrumentationMethods());
 
                 break;
+            case ProfilingSettings.PROFILE_CPU_SAMPLING:
+                client.initiateCPUSampling();
+                break;
+                
             case ProfilingSettings.PROFILE_CPU_STOPWATCH:
 
                 SourceCodeSelection[] fragment = new SourceCodeSelection[] { profilingSettings.getCodeFragmentSelection() };

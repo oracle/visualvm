@@ -101,6 +101,11 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
     }
 
     protected String getLabel1Text(Object node, String value) {
+        if (node instanceof PrestimeCPUCCTNode) {
+            if (((PrestimeCPUCCTNode)node).isThreadNode())
+                return ""; //NOI18N
+        }
+        
         int bracketIndex = value.indexOf('('); //NOI18N
         int dotIndex = value.lastIndexOf('.'); //NOI18N
 
@@ -117,6 +122,11 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
     }
 
     protected String getLabel2Text(Object node, String value) {
+        if (node instanceof PrestimeCPUCCTNode) {
+            if (((PrestimeCPUCCTNode)node).isThreadNode())
+                return value;
+        }
+        
         int bracketIndex = value.indexOf('('); //NOI18N
         int dotIndex = value.lastIndexOf('.'); //NOI18N
 
@@ -133,6 +143,11 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
     }
 
     protected String getLabel3Text(Object node, String value) {
+        if (node instanceof PrestimeCPUCCTNode) {
+            if (((PrestimeCPUCCTNode)node).isThreadNode())
+                return ""; //NOI18N
+        }
+        
         int bracketIndex = value.indexOf('('); //NOI18N
 
         if (bracketIndex != -1) {

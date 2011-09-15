@@ -271,9 +271,18 @@ public class JExtendedTable extends JTable implements CellTipAware, MouseListene
         mouseMoved(e);
         CellTipManager.sharedInstance().setEnabled(false);
     }
-
-    public void processMouseEvent(MouseEvent e) {
-        super.processMouseEvent(e);
+    
+    public void processMouseEvent(final MouseEvent e) {
+        if (e instanceof MouseWheelEvent) {
+            Component target = JExtendedTable.this.getParent();
+            if (target == null || !(target instanceof JViewport))
+                target = JExtendedTable.this;
+            MouseEvent mwe = SwingUtilities.convertMouseEvent(
+                    JExtendedTable.this, (MouseWheelEvent)e, target);
+            target.dispatchEvent((MouseWheelEvent)mwe);
+        } else {
+            super.processMouseEvent((MouseEvent)e);
+        }
     }
 
     public void selectRowByContents(String rowString, int columnIndex, boolean setVisible) {

@@ -58,9 +58,9 @@ import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.netbeans.modules.profiler.heapwalk.InstancesListController;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
@@ -118,7 +118,7 @@ public class InstancesListControllerUI extends JTitledPanel {
 
                 if (selectedRow != -1) {
                     Rectangle rowBounds = instancesListTable.getCellRect(selectedRow, 0, true);
-                    tablePopup.show(instancesListTable, rowBounds.x + (rowBounds.width / 2), rowBounds.y + (rowBounds.height / 2));
+                    showTablePopup(instancesListTable, rowBounds.x + (rowBounds.width / 2), rowBounds.y + (rowBounds.height / 2));
                 }
             } else if (KeyStroke.getAWTKeyStroke(e.getKeyCode(), e.getModifiers()).equals(COPY_ID_KEYSTROKE)) {
                 copyIdToClipboard();
@@ -138,13 +138,13 @@ public class InstancesListControllerUI extends JTitledPanel {
         public void mousePressed(final MouseEvent e) {
             final int row = instancesListTable.rowAtPoint(e.getPoint());
             updateSelection(row);
-            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+            if (e.isPopupTrigger()) showTablePopup(e.getComponent(), e.getX(), e.getY());
         }
 
         public void mouseReleased(MouseEvent e) {
             int row = instancesListTable.rowAtPoint(e.getPoint());
             updateSelection(row);
-            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+            if (e.isPopupTrigger()) showTablePopup(e.getComponent(), e.getX(), e.getY());
         }
     }
     
@@ -579,11 +579,19 @@ public class InstancesListControllerUI extends JTitledPanel {
 
         return popup;
     }
+    
+    private void showTablePopup(Component invoker, int x, int y) {
+        if (instancesListController.getSelectedInstance() != null)
+            tablePopup.show(invoker, x, y);
+    }
 
     private void copyIdToClipboard() {
+        Instance instance = instancesListController.getSelectedInstance();
+        if (instance == null) return;
+        
         Clipboard clipboard = Lookup.getDefault().lookup(Clipboard.class);
 
-        clipboard.setContents(new StringSelection("0x" + Long.toHexString(instancesListController.getSelectedInstance().getInstanceId())), new ClipboardOwner() {
+        clipboard.setContents(new StringSelection("0x" + Long.toHexString(instance.getInstanceId())), new ClipboardOwner() {
 
             @Override
             public void lostOwnership(Clipboard clipboard, Transferable contents) {

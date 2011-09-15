@@ -321,6 +321,7 @@ public class LiveReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                                 treeTable.getTree().clearSelection();
                             }
                         } else {
+                            treeTable.getTree().setSelectionPath(treePath);
                             if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
                                 popupMenu.show(e.getComponent(), e.getX(), e.getY());
                             } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {

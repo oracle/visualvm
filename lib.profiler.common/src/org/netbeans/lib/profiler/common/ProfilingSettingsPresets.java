@@ -79,6 +79,7 @@ public class ProfilingSettingsPresets {
                 setInstrumentSpawnedThreads(false);
             } else if (type == ProfilingSettings.PROFILE_CPU_SAMPLING) {
                 setSamplingFrequency(10);
+                setThreadCPUTimerOn(true);
             }
         }
     }

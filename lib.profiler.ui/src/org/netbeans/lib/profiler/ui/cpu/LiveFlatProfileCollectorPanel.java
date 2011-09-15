@@ -166,7 +166,8 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
 
     public boolean supports(int instrumentationType) {
         return (instrumentationType == CommonConstants.INSTR_RECURSIVE_FULL)
-               || (instrumentationType == CommonConstants.INSTR_RECURSIVE_SAMPLED);
+               || (instrumentationType == CommonConstants.INSTR_RECURSIVE_SAMPLED)
+               || (instrumentationType == CommonConstants.INSTR_NONE_SAMPLING);
     }
 
     public void updateLiveResults() {

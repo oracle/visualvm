@@ -43,11 +43,6 @@
 
 package org.netbeans.lib.profiler.server;
 
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.server.system.Threads;
-import org.netbeans.lib.profiler.server.system.Timers;
-
-
 /**
  * This class contains the actual methods for sampled instrumentation recursive CPU profiling, calls to which are injected
  * into the target application (TA) bytecodes when they are instrumented.
@@ -64,94 +59,18 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
     //------------------------------------------- Support classes --------------------------------------------------
 
     /** A thread that periodically sets the sample flag for worker threads */
-    static class SamplingThread extends Thread {
-        //~ Static fields/initializers -------------------------------------------------------------------------------------------
+    static class TimeSampler extends SamplingThread {
 
-        private static final boolean isSolaris = Platform.isSolaris();
-        private static final boolean isLinux = Platform.isLinux();
-        private static final boolean isUnix = isSolaris || isLinux;
-        private static final int VIOLATION_THRESHOLD = 10;
-        private static final boolean DEBUG = false;
-
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private volatile boolean terminated;
-        private int count;
-
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        SamplingThread() {
-            Threads.recordAdditionalProfilerOwnThread(this);
-            setPriority(Thread.MAX_PRIORITY);
-            setDaemon(true);
+        TimeSampler(int sampilingInterval) {
+            super(sampilingInterval);
             setName(PROFILER_SPECIAL_EXEC_THREAD_NAME + " 9"); // NOI18N
+       }
+        
+        void sample() {
+            ThreadInfo.setSampleDueForAllThreads();
         }
 
-        public void run() {
-            if (isSolaris) {
-                samplingInterval *= 1000000; // Convert into nanos - the Solaris hires timer resolution
-            } else if (isLinux) {
-                samplingInterval *= 1000; // Convert into microseconds - the Linux hires timer resolution
-            }
-
-            int adjustedSamplingInterval = samplingInterval;
-            int upperBound = (samplingInterval * 5) / 4;
-            int lowerBound = samplingInterval / 10;
-            int violationCount = VIOLATION_THRESHOLD;
-
-            long startTime = Timers.getCurrentTimeInCounts();
-
-            while (!terminated) {
-                if (!isUnix) {
-                    try {
-                        Thread.sleep(samplingInterval);
-                    } catch (InterruptedException ex) { /* Should not happen */
-                    }
-                } else { // Solaris and Linux
-
-                    long time = Timers.getCurrentTimeInCounts();
-                    // On Solaris, the resolution of Thread.sleep(), which boils down to the select(3C) system call, seems to be
-                    // around 20 ms. So we have to use our own call, which eventually calls nanosleep() and takes an argument in nanos.
-                    // On Linux (at least version 7.3 + patches, which I tried), nanosleep() seems to have a 20 ms resolution (or even
-                    // give 20 ms no matter what?), which is a documented bug (see 'man nanosleep'). Well, maybe it improves in future...
-                    Timers.osSleep(adjustedSamplingInterval);
-                    time = Timers.getCurrentTimeInCounts() - time;
-
-                    if ((time > upperBound) && (adjustedSamplingInterval > lowerBound)) {
-                        if (violationCount > 0) {
-                            violationCount--;
-                        } else {
-                            adjustedSamplingInterval = (adjustedSamplingInterval * 95) / 100;
-                            violationCount = VIOLATION_THRESHOLD;
-                        }
-                    }
-                }
-
-                ThreadInfo.setSampleDueForAllThreads();
-
-                if (DEBUG) {
-                    count++;
-                }
-            }
-
-            if (DEBUG && isUnix) {
-                long time = ((Timers.getCurrentTimeInCounts() - startTime) * 1000) / Timers.getNoOfCountsInSecond();
-                System.out.println("JFluid sampling thread: elapsed time: " + time + " ms, avg interval: "
-                                   + (((double) time) / count) + "ms, adjusted interval: " + adjustedSamplingInterval
-                                   + " OS units"); // NOI18N
-            }
-        }
-
-        public void terminate() {
-            terminated = true;
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) { /* Should not happen */
-            }
-        }
     }
-
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     protected static int samplingInterval = 10;
@@ -445,7 +364,7 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
 
     protected static void createNewDataStructures() {
         ProfilerRuntimeCPU.createNewDataStructures();
-        st = new SamplingThread();
+        st = new TimeSampler(samplingInterval);
         st.start();
     }
 

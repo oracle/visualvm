@@ -84,7 +84,7 @@ public class ProfilerInterface implements CommonConstants {
 
         public void run() {
             RootClassLoadedCommand cmd = new RootClassLoadedCommand(new String[] { "*FAKE_CLASS_1*", "*FAKE_CLASS_2*" }, // NOI18N
-                                                                    new int[] { 0, 0 }, null, 2, new int[] { -1 }, ""); // NOI18N
+                                                                    new int[] { 0, 0 }, null, 2, new int[] { -1 }); // NOI18N
             profilerServer.sendComplexCmdToClient(cmd);
 
             InstrumentMethodGroupResponse imgr = (InstrumentMethodGroupResponse) profilerServer.getLastResponse();
@@ -92,15 +92,15 @@ public class ProfilerInterface implements CommonConstants {
         }
     }
 
-    private static class InitiateInstThread extends Thread {
+    private static class InitiateProfilingThread extends Thread {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private InitiateInstrumentationCommand cmd;
+        private InitiateProfilingCommand cmd;
         private boolean targetAppRunning;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        InitiateInstThread(InitiateInstrumentationCommand cmd, boolean targetAppRunning) {
+        InitiateProfilingThread(InitiateProfilingCommand cmd, boolean targetAppRunning) {
             ThreadInfo.addProfilerServerThread(this);
             this.setName(PROFILER_SPECIAL_EXEC_THREAD_NAME + " 2"); // NOI18N
             this.cmd = cmd;
@@ -121,92 +121,22 @@ public class ProfilerInterface implements CommonConstants {
 
                 int instrType = cmd.getInstrType();
                 setCurrentInstrType(instrType);
-                if (instrType != INSTR_NONE) {
-                    rootClassNames = cmd.getRootClassNames();
-                    status.startProfilingPointsActive = cmd.isStartProfilingPointsActive();
-
-                    status.profilingPointIDs = cmd.getProfilingPointIDs();
-
-                    String[] handlers = cmd.getProfilingPointHandlers();
-                    String[] infos = cmd.getProfilingPointInfos();
-                    status.profilingPointHandlers = ProfilingPointServerHandler.getInstances(handlers, infos);
-                    computeRootWildcard();
-                    rootClassLoaded = false;
-
-                    // the following code is needed to avoid issue 59660: Remote profiling can cause the agent to hang if CPU
-                    // or Code Fragment profiling is used
-                    // see http://profiler.netbeans.org/issues/show_bug.cgi?id=59660
-                    // and http://profiler.netbeans.org/issues/show_bug.cgi?id=61968
-                    try {
-                        Class.forName("java.util.LinkedHashMap"); // NOI18N
-                        Class.forName("java.util.LinkedHashMap$LinkedHashIterator"); // NOI18N
-                        Class.forName("java.util.LinkedHashMap$KeyIterator"); // NOI18N
-                                                                              // for take heap dump
-
-                        Class.forName("java.lang.reflect.InvocationTargetException"); // NOI18N
-                        Class.forName("java.lang.InterruptedException");    // NOI18N
-                        Class.forName("java.util.zip.Deflater");    // NOI18N compressed remote profiling
-                        Class.forName("java.lang.ClassFormatError"); // NOI18N class caching
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace(System.err);
-                    }
-
-                    // The following code is needed to enforce native method bind for Thread.sleep before instrumentation, so
-                    // that the NativeMethodBind it can be disabled as first thing in instrumentation
-                    // this is needed as a workaround for JDK bug:
-                    // CR 6318850 Updated P3 hotspot/jvmti RedefineClasses() and NativeMethodBind event crash
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-                    } // ignore
-
-                    synchronized (this) {
-                        try {
-                            wait(1);
-                        } catch (InterruptedException e) {
-                        } // ignore
-                    }
-
-                    Classes.enableClassLoadHook();
-
-                    boolean instrSpawnedThreads = cmd.getInstrSpawnedThreads();
-
-                    if (targetAppRunning || hasAnyCoreClassNames(cmd.getRootClassNames()) || instrSpawnedThreads
-                            || (instrType == INSTR_OBJECT_ALLOCATIONS) || (instrType == INSTR_OBJECT_LIVENESS)) {
-                        getLoadedClasses(); // Init loadedClassesArray
-
-                        boolean loadedRootClassesExist = false;
-
-                        switch (instrType) {
-                            case INSTR_RECURSIVE_FULL:
-                            case INSTR_RECURSIVE_SAMPLED:
-                                // This will look into loadedClassesArray to check if there are any root classes already loaded
-                                loadedRootClassesExist = instrSpawnedThreads ? true : checkForLoadedRootClasses();
-
-                                break;
-                            case INSTR_CODE_REGION:
-                                loadedRootClassesExist = checkForLoadedRootClasses();
-
-                                break;
-                            case INSTR_OBJECT_ALLOCATIONS:
-                            case INSTR_OBJECT_LIVENESS:
-                                loadedRootClassesExist = true;
-
-                                break;
-                        }
-
-                        if (loadedRootClassesExist) { // Root class(es) has been loaded or none is needed - start
-                                                      // instrumentation-related operations right away
-                            sendRootClassLoadedCommand(false);
-
-                            if (!getAndInstrumentClasses(true)) {
-                                disableProfilerHooks();
-                            }
-
-                            rootClassLoaded = true; // See the comment in classLoadHook why it's worth setting rootClassLoaded
-                                                    // to true after the first instrumentation, not before
-                        }
-                    }
+                switch (instrType) {
+                    case INSTR_NONE:
+                        // do nothing
+                        break;
+                    case INSTR_NONE_SAMPLING:
+                        ProfilerRuntimeSampler.initialize();
+                        break;
+                    case INSTR_CODE_REGION:
+                    case INSTR_RECURSIVE_FULL:
+                    case INSTR_RECURSIVE_SAMPLED:
+                    case INSTR_OBJECT_ALLOCATIONS:
+                    case INSTR_OBJECT_LIVENESS:
+                        initiateInstrumentation(instrType);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Instr. type: "+instrType);
                 }
                 initInstrumentationThread = null;
             } finally {
@@ -214,6 +144,93 @@ public class ProfilerInterface implements CommonConstants {
             }
 
             ThreadInfo.removeProfilerServerThread(this);
+        }
+
+        private void initiateInstrumentation(final int instrType) {
+            String[] handlers = cmd.getProfilingPointHandlers();
+            String[] infos = cmd.getProfilingPointInfos();
+            
+            rootClassNames = cmd.getRootClassNames();
+            status.startProfilingPointsActive = cmd.isStartProfilingPointsActive();
+            status.profilingPointIDs = cmd.getProfilingPointIDs();
+            status.profilingPointHandlers = ProfilingPointServerHandler.getInstances(handlers, infos);
+            computeRootWildcard();
+            rootClassLoaded = false;
+
+            // the following code is needed to avoid issue 59660: Remote profiling can cause the agent to hang if CPU
+            // or Code Fragment profiling is used
+            // see http://profiler.netbeans.org/issues/show_bug.cgi?id=59660
+            // and http://profiler.netbeans.org/issues/show_bug.cgi?id=61968
+            try {
+                Class.forName("java.util.LinkedHashMap"); // NOI18N
+                Class.forName("java.util.LinkedHashMap$LinkedHashIterator"); // NOI18N
+                Class.forName("java.util.LinkedHashMap$KeyIterator"); // NOI18N
+                                                                      // for take heap dump
+
+                Class.forName("java.lang.reflect.InvocationTargetException"); // NOI18N
+                Class.forName("java.lang.InterruptedException");    // NOI18N
+                Class.forName("java.util.zip.Deflater");    // NOI18N compressed remote profiling
+                Class.forName("java.lang.ClassFormatError"); // NOI18N class caching
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace(System.err);
+            }
+
+            // The following code is needed to enforce native method bind for Thread.sleep before instrumentation, so
+            // that the NativeMethodBind it can be disabled as first thing in instrumentation
+            // this is needed as a workaround for JDK bug:
+            // CR 6318850 Updated P3 hotspot/jvmti RedefineClasses() and NativeMethodBind event crash
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+            } // ignore
+
+            synchronized (this) {
+                try {
+                    wait(1);
+                } catch (InterruptedException e) {
+                } // ignore
+            }
+
+            Classes.enableClassLoadHook();
+
+            boolean instrSpawnedThreads = cmd.getInstrSpawnedThreads();
+
+            if (targetAppRunning || hasAnyCoreClassNames(cmd.getRootClassNames()) || instrSpawnedThreads
+                    || (instrType == INSTR_OBJECT_ALLOCATIONS) || (instrType == INSTR_OBJECT_LIVENESS)) {
+                getLoadedClasses(); // Init loadedClassesArray
+
+                boolean loadedRootClassesExist = false;
+
+                switch (instrType) {
+                    case INSTR_RECURSIVE_FULL:
+                    case INSTR_RECURSIVE_SAMPLED:
+                        // This will look into loadedClassesArray to check if there are any root classes already loaded
+                        loadedRootClassesExist = instrSpawnedThreads ? true : checkForLoadedRootClasses();
+
+                        break;
+                    case INSTR_CODE_REGION:
+                        loadedRootClassesExist = checkForLoadedRootClasses();
+
+                        break;
+                    case INSTR_OBJECT_ALLOCATIONS:
+                    case INSTR_OBJECT_LIVENESS:
+                        loadedRootClassesExist = true;
+
+                        break;
+                }
+
+                if (loadedRootClassesExist) { // Root class(es) has been loaded or none is needed - start
+                                              // instrumentation-related operations right away
+                    sendRootClassLoadedCommand(false);
+
+                    if (!getAndInstrumentClasses(true)) {
+                        disableProfilerHooks();
+                    }
+
+                    rootClassLoaded = true; // See the comment in classLoadHook why it's worth setting rootClassLoaded
+                                            // to true after the first instrumentation, not before
+                }
+            }
         }
 
         private static void computeRootWildcard() {
@@ -408,6 +425,10 @@ public class ProfilerInterface implements CommonConstants {
         disableProfilerHooks();
 
         switch (instrType) {
+            case INSTR_NONE_SAMPLING:
+                ProfilerRuntimeSampler.shutdown();
+                break;
+                
             case INSTR_CODE_REGION:
                 ProfilerRuntimeCPUCodeRegion.enableProfiling(false);
 
@@ -529,7 +550,7 @@ public class ProfilerInterface implements CommonConstants {
             });
     }
 
-    public static void initiateInstrumentation(final InitiateInstrumentationCommand cmd, final boolean targetAppRunning)
+    public static void initiateProfiling(final InitiateProfilingCommand cmd, final boolean targetAppRunning)
                                         throws Exception {
         int instrType = cmd.getInstrType();
         String instrClassName = cmd.getRootClassName();
@@ -542,6 +563,9 @@ public class ProfilerInterface implements CommonConstants {
         }
 
         switch (instrType) {
+            case INSTR_NONE:
+                // do nothing
+                break;
             case INSTR_RECURSIVE_FULL:
             case INSTR_RECURSIVE_SAMPLED:
             case INSTR_OBJECT_ALLOCATIONS:
@@ -561,11 +585,17 @@ public class ProfilerInterface implements CommonConstants {
                 ProfilerRuntimeCPUCodeRegion.resetProfilerCollectors();
 
                 break;
+            case INSTR_NONE_SAMPLING:
+                evBufManager.openBufferFile(EVENT_BUFFER_SIZE_IN_BYTES);
+                ProfilerRuntime.createEventBuffer(EVENT_BUFFER_SIZE_IN_BYTES);
+                break;
+            default:
+                throw new IllegalArgumentException("Instr. type: "+instrType);
         }
 
         // We have to perform the following operations in a separate thread, since they may involve further dialog with
         // the tool (client), whereas this thread has to return quickly to send the "OK" response to the tool.
-        new InitiateInstThread(cmd, targetAppRunning).start();
+        new InitiateProfilingThread(cmd, targetAppRunning).start();
     }
 
     public static void instrumentMethods(InstrumentMethodGroupCommand cmd)
@@ -608,6 +638,13 @@ public class ProfilerInterface implements CommonConstants {
         targetAppSuspended = true;
     }
 
+    static String getBufferFileName() {
+        if (evBufManager != null) {
+            return evBufManager.getBufferFileName();
+        }
+        return "";
+    }
+    
     private static boolean getAndInstrumentClasses(boolean rootClassInstrumentation) {
         Response r = profilerServer.getLastResponse();
 
@@ -1253,7 +1290,7 @@ public class ProfilerInterface implements CommonConstants {
     
     private static void cacheLoadedClasses(Class[] nonSystemClasses, int nonSystemIndex) {
         if (DEBUG) System.out.println("Caching "+nonSystemIndex+" classes");
-        nonSystemClasses[nonSystemIndex++] = ProfilerInterface.InitiateInstThread.class;
+        nonSystemClasses[nonSystemIndex++] = ProfilerInterface.InitiateProfilingThread.class;
         Classes.cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
     }
 
@@ -1286,14 +1323,8 @@ public class ProfilerInterface implements CommonConstants {
 
             idx++;
         }
-
-        String bufferFileName = ((getCurrentInstrType() == INSTR_RECURSIVE_FULL)
-                                || (getCurrentInstrType() == INSTR_RECURSIVE_SAMPLED)
-                                || (getCurrentInstrType() == INSTR_OBJECT_ALLOCATIONS)
-                                || (getCurrentInstrType() == INSTR_OBJECT_LIVENESS)) ? evBufManager.getBufferFileName() : " "; // NOI18N
-
         RootClassLoadedCommand cmd = new RootClassLoadedCommand(loadedClassNames, loaders, cachedClassFileBytes, idx,
-                                                                ClassLoaderManager.getParentLoaderIdTable(), bufferFileName);
+                                                                ClassLoaderManager.getParentLoaderIdTable());
         profilerServer.sendComplexCmdToClient(cmd);
         loadedClassesArray = null; // Free memory
         loadedClassesLoaders = null; // Ditto

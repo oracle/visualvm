@@ -168,6 +168,10 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public void clearSelection() {
+        resTable.clearSelection();
+    }
+    
     public void setCPUSelectionHandler(CPUSelectionHandler handler) {
         selectionHandler = handler;
     }
@@ -883,6 +887,8 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                             callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                         }
                     } else {
+                        resTable.getSelectionModel().setSelectionInterval(line, line);
+                        
                         if (popupShowSource != null) popupShowSource.setVisible(true);
 
                         if (popupShowReverse != null) {

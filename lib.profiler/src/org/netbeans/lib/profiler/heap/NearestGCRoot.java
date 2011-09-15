@@ -114,8 +114,10 @@ class NearestGCRoot {
         referenceClasses = new HashSet();
         for (int i=0; i<REF_CLASSES.length; i++) {
             JavaClass ref = heap.getJavaClassByName(REF_CLASSES[i]);
-            referenceClasses.add(ref);
-            referenceClasses.addAll(ref.getSubClasses());
+            if (ref != null) {
+                referenceClasses.add(ref);
+                referenceClasses.addAll(ref.getSubClasses());
+            }
         }
         referentFiled = computeReferentFiled();
         heap.computeReferences(); // make sure references are computed first

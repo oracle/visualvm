@@ -50,6 +50,7 @@ import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
 import org.netbeans.lib.profiler.ui.components.tree.TreeCellRendererPersistent;
 import org.netbeans.lib.profiler.ui.components.treetable.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -489,6 +490,13 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
         // Create the tree. It will be used as a renderer and editor.
         tree = new TreeTableCellRenderer(treeTableModel);
         setTreeUIVariables();
+        tree.setTransferHandler(new TransferHandler() {
+            public void exportToClipboard(JComponent comp, Clipboard clip, int action)
+                                                  throws IllegalStateException {
+                JTreeTable.this.getTransferHandler().exportToClipboard(
+                        JTreeTable.this, clip, action);
+            }
+        });
 
         // Install a tableModel representing the visible rows in the tree.
         treeTableModelAdapter = new TreeTableModelAdapter(treeTableModel, this);
@@ -864,7 +872,16 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     }
 
     public void processMouseEvent(MouseEvent e) {
-        super.processMouseEvent(e);
+        if (e instanceof MouseWheelEvent) {
+            Component target = JTreeTable.this.getParent();
+            if (target == null || !(target instanceof JViewport))
+                target = JTreeTable.this;
+            MouseEvent mwe = SwingUtilities.convertMouseEvent(
+                    JTreeTable.this, (MouseWheelEvent)e, target);
+            target.dispatchEvent((MouseWheelEvent)mwe);
+        } else {
+            super.processMouseEvent((MouseEvent)e);
+        }
     }
 
     public void resetTreeCellOffsetX() {

@@ -55,7 +55,7 @@ import java.io.ObjectOutputStream;
  * @author Adrian Mos
  * @author Ian Formanek
  */
-public class InitiateInstrumentationCommand extends Command {
+public class InitiateProfilingCommand extends Command {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -69,10 +69,10 @@ public class InitiateInstrumentationCommand extends Command {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public InitiateInstrumentationCommand(int instrType, String[] classNames,
+    public InitiateProfilingCommand(int instrType, String[] classNames,
                                           int[] ppIDs, String[] ppHandlers, String[] ppInfos,
                                           boolean instrSpawnedThreads, boolean startProfilingPointsActive) {
-        super(INITIATE_INSTRUMENTATION);
+        super(INITIATE_PROFILING);
         if ((classNames == null)) {
             classNames = new String[] { " " }; // NOI18N
         } else if (classNames[0] == null) {
@@ -89,7 +89,7 @@ public class InitiateInstrumentationCommand extends Command {
     }
     
     /** Legacy support for single root instrumentation */
-    public InitiateInstrumentationCommand(int instrType, String className, boolean instrSpawnedThreads,
+    public InitiateProfilingCommand(int instrType, String className, boolean instrSpawnedThreads,
                                           boolean startProfilingPointsActive) {
         this(instrType,
              className==null ? new String[]{" "} : new String[]{className},
@@ -99,13 +99,17 @@ public class InitiateInstrumentationCommand extends Command {
 
 
     /** This is a special method only called to setup the connection in ProfilerClient.connectToServer() - see comments there */
-    public InitiateInstrumentationCommand(int instrType, String className) {
+    public InitiateProfilingCommand(int instrType, String className) {
         this(instrType,className,false,false);
     }
 
+    public InitiateProfilingCommand(int instrType) {
+        this(instrType,null);
+    }
+
     // Custom serialzation support
-    InitiateInstrumentationCommand() {
-        super(INITIATE_INSTRUMENTATION);
+    InitiateProfilingCommand() {
+        super(INITIATE_PROFILING);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

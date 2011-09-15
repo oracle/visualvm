@@ -111,8 +111,7 @@ public class BasicTest extends CommonWireIOTestCase {
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
-            cmd = new RootClassLoadedCommand(new String[] { "java.lang.String" }, new int[1], new byte[1][0], 1, new int[1],
-                                             "file name");
+            cmd = new RootClassLoadedCommand(new String[] { "java.lang.String" }, new int[1], new byte[1][0], 1, new int[1]);
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
@@ -140,7 +139,7 @@ public class BasicTest extends CommonWireIOTestCase {
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
-            cmd = new InitiateInstrumentationCommand(CommonConstants.CPU_INSTR_FULL, "java.lang.String");
+            cmd = new InitiateProfilingCommand(CommonConstants.CPU_INSTR_FULL, "java.lang.String");
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 

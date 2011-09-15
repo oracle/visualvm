@@ -58,12 +58,12 @@ import java.io.IOException;
 public class JMethodIdTable {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    static class JMethodIdTableEntry {
+    public static class JMethodIdTableEntry {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        String className;
-        String methodName;
-        String methodSig;
+        public String className;
+        public String methodName;
+        public String methodSig;
         int methodId;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ public class JMethodIdTable {
         }
     }
 
-    synchronized JMethodIdTableEntry getEntry(int methodId) {
+    synchronized public JMethodIdTableEntry getEntry(int methodId) {
         int pos = hash(methodId) % size;
 
         while ((entries[pos] != null) && (entries[pos].methodId != methodId)) {
@@ -201,7 +201,7 @@ public class JMethodIdTable {
         return entries[pos];
     }
 
-    synchronized void getNamesForMethodIds(ProfilerClient profilerClient)
+    synchronized public void getNamesForMethodIds(ProfilerClient profilerClient)
                                     throws ClientUtils.TargetAppOrVMTerminated {
         if (staticTable) {
             throw new IllegalStateException("Attempt to update snapshot JMethodIdTable"); // NOI18N
@@ -239,7 +239,7 @@ public class JMethodIdTable {
         completeEntry(methodId, className, methodName, methodSig);
     }
 
-    synchronized void checkMethodId(int methodId) {
+    synchronized public void checkMethodId(int methodId) {
         int pos = hash(methodId) % size;
 
         while (entries[pos] != null) {

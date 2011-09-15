@@ -49,18 +49,16 @@ import org.netbeans.lib.profiler.ui.components.tree.TreeCellRendererPersistent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
+import java.awt.event.MouseWheelEvent;
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JToolTip;
 import javax.swing.JTree;
+import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -150,7 +148,16 @@ public class JExtendedTree extends JTree implements CellTipAware {
     }
 
     public void processMouseEvent(MouseEvent e) {
-        super.processMouseEvent(e);
+        if (e instanceof MouseWheelEvent) {
+            Component target = JExtendedTree.this.getParent();
+            if (target == null || !(target instanceof JViewport))
+                target = JExtendedTree.this;
+            MouseEvent mwe = SwingUtilities.convertMouseEvent(
+                    JExtendedTree.this, (MouseWheelEvent)e, target);
+            target.dispatchEvent((MouseWheelEvent)mwe);
+        } else {
+            super.processMouseEvent((MouseEvent)e);
+        }
     }
 
     protected JToolTip createCellTip() {

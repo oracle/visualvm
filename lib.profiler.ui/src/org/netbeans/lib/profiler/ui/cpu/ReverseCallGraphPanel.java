@@ -545,6 +545,7 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
                             treeTable.getTree().clearSelection();
                         }
                     } else {
+                        treeTable.getTree().setSelectionPath(popupPath);
                         if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
                             callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                         } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {

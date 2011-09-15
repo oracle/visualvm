@@ -345,7 +345,7 @@ public class InstrumentationTest extends CommonProfilerTestCase implements NbPer
         }
 
         RootClassLoadedCommand cmd = new RootClassLoadedCommand(classNames, loadersIDs, classesBytes, classNames.length,
-                                                                parentloadersIDs, null);
+                                                                parentloadersIDs);
         log("Start instrumenting ...");
 
         InstrumentMethodGroupResponse resp = null;

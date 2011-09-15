@@ -54,7 +54,6 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
@@ -65,7 +64,7 @@ import org.openide.windows.WindowManager;
 public final class IdeSnapshotAction implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        TracerSupportImpl.getInstance().perform(new Runnable() {
             public void run() {
                 final IdeSnapshot snapshot = snapshot();
                 if (snapshot == null) {

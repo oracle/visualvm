@@ -63,7 +63,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractButton;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
@@ -212,6 +211,7 @@ public class ClassesListController extends AbstractController {
     private static final class DiffJavaClass implements JavaClass {
         
         private final String name;
+        private String id;
         private long allInstancesSize;
         private int instanceSize;
         private int instancesCount;
@@ -245,9 +245,21 @@ public class ClassesListController extends AbstractController {
             String id = jc.getName();
             try {
                 id += jc.getClassLoader().getJavaClass().getName();
+                // TODO: use more precise identification, URLClassLoaders have unique fields etc.
             } catch (Exception e) {
                 
             }
+            if (jc instanceof DiffJavaClass)
+                ((DiffJavaClass)jc).setID(id);
+            return id;
+        }
+        
+        private synchronized void setID(String id) {
+            this.id = id;
+        }
+        
+        synchronized String getID() {
+            if (id == null) createID(this);
             return id;
         }
         
@@ -260,6 +272,16 @@ public class ClassesListController extends AbstractController {
             instanceSize += djc.instanceSize;
             allInstancesSize += djc.allInstancesSize;
             real = djc.real;
+        }
+        
+        public boolean equals(Object o) {
+            if (o instanceof DiffJavaClass)
+                return getID().equals(((DiffJavaClass)o).getID());
+            else return false;
+        }
+        
+        public int hashCode() {
+            return getID().hashCode();
         }
 
         public Object getValueOfStaticField(String name) {
@@ -333,8 +355,7 @@ public class ClassesListController extends AbstractController {
         List filteredClasses;
 
         if ((filterType == FILTER_SUBCLASS) && !((filterStrings == null) || filterStrings[0].equals(""))) { // NOI18N
-            // TODO: support diffClasses !!!
-            filteredClasses = getFilteredClasses(getSubclasses(heap, filterStrings, fragmentWalker.getHeapDumpProject()), null,
+            filteredClasses = getFilteredClasses(getSubclasses(heap, diffClasses, filterStrings, fragmentWalker.getHeapDumpProject()), null,
                                                  CommonConstants.FILTER_NONE, showZeroInstances, showZeroSize);
         } else {
             List classes = diffClasses == null ? heap.getAllClasses() : diffClasses;
@@ -523,7 +544,7 @@ public class ClassesListController extends AbstractController {
         return filteredClasses;
     }
 
-    private static List getSubclasses(Heap heap, String[] filterStrings, Lookup.Provider project) {
+    private static List getSubclasses(Heap heap, List diffClasses, String[] filterStrings, Lookup.Provider project) {
         HashSet subclasses = new HashSet();
 
         for (int i = 0; i < filterStrings.length; i++) {
@@ -545,8 +566,18 @@ public class ClassesListController extends AbstractController {
                 }
             }
         }
-
-        return new ArrayList(subclasses);
+        
+        if (diffClasses != null) {
+            ArrayList ret = new ArrayList();
+            for (Object o : subclasses) {
+                int i = diffClasses.indexOf(
+                        DiffJavaClass.createExternal((JavaClass)o));
+                if (i != -1) ret.add(diffClasses.get(i));
+            }
+            return ret;
+        } else {
+            return new ArrayList(subclasses);
+        }
     }
 
     private static boolean passesFilter(String value, String filter, int type) {

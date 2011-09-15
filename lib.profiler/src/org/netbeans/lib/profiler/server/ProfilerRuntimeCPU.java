@@ -488,38 +488,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     }
 
     static void writeThreadCreationEvent(ThreadInfo ti) {
-        Thread thread = ti.thread;
-        String threadName = thread.getName();
-        String threadClassName = thread.getClass().getName();
-        int fullInfoLen = ((threadName.length() + threadClassName.length()) * 2) + 7;
-
-        synchronized (eventBuffer) {
-            if ((globalEvBufPos + fullInfoLen) > globalEvBufPosThreshold) {
-                sendingBuffer = true;
-                externalActionsHandler.handleEventBufferDump(eventBuffer, 0, globalEvBufPos);
-                globalEvBufPos = 0;
-                sendingBuffer = false;
-            }
-
-            eventBuffer[globalEvBufPos++] = NEW_THREAD;
-
-            int threadId = ti.getThreadId();
-            eventBuffer[globalEvBufPos++] = (byte) ((threadId >> 8) & 0xFF);
-            eventBuffer[globalEvBufPos++] = (byte) ((threadId) & 0xFF);
-
-            byte[] name = threadName.getBytes();
-            int len = name.length;
-            eventBuffer[globalEvBufPos++] = (byte) ((len >> 8) & 0xFF);
-            eventBuffer[globalEvBufPos++] = (byte) ((len) & 0xFF);
-            System.arraycopy(name, 0, eventBuffer, globalEvBufPos, len);
-            globalEvBufPos += len;
-            name = threadClassName.getBytes();
-            len = name.length;
-            eventBuffer[globalEvBufPos++] = (byte) ((len >> 8) & 0xFF);
-            eventBuffer[globalEvBufPos++] = (byte) ((len) & 0xFF);
-            System.arraycopy(name, 0, eventBuffer, globalEvBufPos, len);
-            globalEvBufPos += len;
-        }
+        writeThreadCreationEvent(ti.thread, ti.getThreadId());
     }
 
     // ---------------------------------- Writing profiler events --------------------------------------

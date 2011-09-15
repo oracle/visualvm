@@ -378,6 +378,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         ;
 
                         break;
+                    case CommonConstants.INSTR_NONE_SAMPLING:
                     case CommonConstants.INSTR_NONE:
                         instrStatusText = NOTHING_INSTRUMENTED_MSG;
 
@@ -1240,15 +1241,19 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         }
 
         private void deleteSnapshots(FileObject[] selectedSnapshots) {
+            boolean success = true;
             for (int i = 0; i < selectedSnapshots.length; i++) {
                 FileObject selectedSnapshotFile = selectedSnapshots[i];
                 try {
                     DataObject.find(selectedSnapshotFile).delete();
-                } catch (DataObjectNotFoundException ex) {
-                    Exceptions.printStackTrace(ex);
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
+                } catch (Throwable t) {
+                    success = false;
+                    t.printStackTrace();
                 }
+            }
+            if (!success) {
+                ProfilerDialogs.displayError(NbBundle.getMessage(ProfilerControlPanel2.class,
+                        "ProfilerControlPanel2_SnapshotsNotDeletedMsg")); // NOI18N
             }
         }
 
@@ -1299,10 +1304,10 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 
                 @Override
                 protected void doInBackground() {
-                    FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(displayedProject);
+                    FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(displayedProject, null);
                     modelElements.addAll(Arrays.asList(snapshotsOnDisk));
 
-                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject);
+                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject, null);
                     modelElements.addAll(Arrays.asList(heapdumpsOnDisk));
                 }
 

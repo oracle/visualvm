@@ -65,7 +65,6 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.snaptracer.Positionable;
 import org.openide.util.Exceptions;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -141,14 +140,14 @@ final class TracerModel {
 
     void addDescriptor(final TracerPackage p,
                        final TracerProbeDescriptor d) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        TracerSupportImpl.getInstance().perform(new Runnable() {
             public void run() { addProbe(p, d); }
         });
     }
 
     void removeDescriptor(final TracerPackage p,
                           final TracerProbeDescriptor d) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        TracerSupportImpl.getInstance().perform(new Runnable() {
             public void run() { removeProbe(p, d); }
         });
     }

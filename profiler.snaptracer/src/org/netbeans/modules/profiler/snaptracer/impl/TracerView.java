@@ -69,7 +69,6 @@ import org.netbeans.modules.profiler.SnapshotResultsWindow;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -125,7 +124,7 @@ final class TracerView {
         
         component.add(container, BorderLayout.NORTH);
 
-        RequestProcessor.getDefault().post(new Runnable() {
+        TracerSupportImpl.getInstance().perform(new Runnable() {
             public void run() {
                 // add all registered probes to the timeline
                 initProbes();
@@ -165,7 +164,7 @@ final class TracerView {
                 progress.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 addContents(component, progress);
 
-                RequestProcessor.getDefault().post(new Runnable() {
+                TracerSupportImpl.getInstance().perform(new Runnable() {
                     public void run() {
                         controller.performSession();
                         controller.performAfterSession(new Runnable() {

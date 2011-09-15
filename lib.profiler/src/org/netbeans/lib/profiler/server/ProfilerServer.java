@@ -653,7 +653,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             }
 
             resultsNotified = true;
-            profilerServer.sendSimpleCmdToClient(Command.RESULTS_AVAILABLE);
+            profilerServer.sendComplexCmdToClient(new ResultsAvailableCommand(ProfilerInterface.getBufferFileName()));
         }
     }
 
@@ -1383,7 +1383,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 sendComplexResponseToClient(Monitors.getMonitoredNumbers());
 
                 break;
-            case Command.INITIATE_INSTRUMENTATION:
+            case Command.INITIATE_PROFILING:
 
                 // Bugfix 69645: Take snapshot is not enabled after modifying profiling from CPU to memory
                 // http://profiler.netbeans.org/issues/show_bug.cgi?id=69645
@@ -1392,7 +1392,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 }
 
                 try {
-                    ProfilerInterface.initiateInstrumentation((InitiateInstrumentationCommand) cmd, status.targetAppRunning);
+                    ProfilerInterface.initiateProfiling((InitiateProfilingCommand) cmd, status.targetAppRunning);
                     sendSimpleResponseToClient(true, null);
                 } catch (Exception ex) {
                     sendSimpleResponseToClient(false, ex.getMessage());

@@ -51,7 +51,8 @@ import javax.swing.*;
 import org.netbeans.lib.profiler.global.Platform;
 
 
-public class CellTipManager implements MouseListener, MouseMotionListener {
+public class CellTipManager implements MouseListener, MouseMotionListener, MouseWheelListener {
+
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private class MoveBeforeEnterListener extends MouseMotionAdapter {
@@ -295,6 +296,13 @@ public class CellTipManager implements MouseListener, MouseMotionListener {
 
     public void mouseReleased(MouseEvent event) {
     }
+    
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (cellTipComponent instanceof CellTipAware)
+            ((CellTipAware)cellTipComponent).processMouseEvent(
+                    SwingUtilities.convertMouseEvent(
+                    (Component)e.getSource(), e, cellTipComponent));
+    }
 
     public void registerComponent(JComponent component) {
         if (Platform.isMac()) return; // CellTips don't work reliably on Mac (see Issue 89216) => disabled
@@ -398,6 +406,7 @@ public class CellTipManager implements MouseListener, MouseMotionListener {
         if (cellTipPopup != null) {
             if (cellTipWindow != null) {
                 cellTipWindow.removeMouseListener(this);
+                cellTipWindow.removeMouseWheelListener(this);
                 cellTipWindow = null;
             }
 
@@ -506,6 +515,7 @@ public class CellTipManager implements MouseListener, MouseMotionListener {
 
             if ((cellTipWindow != null) && (cellTipWindow != componentWindow)) {
                 cellTipWindow.addMouseListener(this);
+                cellTipWindow.addMouseWheelListener(this);
             } else {
                 cellTipWindow = null;
             }

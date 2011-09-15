@@ -66,10 +66,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableModel;
+import org.netbeans.modules.profiler.snaptracer.impl.TracerSupportImpl;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
@@ -112,7 +112,7 @@ public final class DataExport {
     private static void doExportData(final TableModel model, final String title,
                                      final File file, final Filter filter) {
         
-        RequestProcessor.getDefault().post(new Runnable() {
+        TracerSupportImpl.getInstance().perform(new Runnable() {
             public void run() {
                 Writer writer = null;
                 TracerProgressObject progress = null;

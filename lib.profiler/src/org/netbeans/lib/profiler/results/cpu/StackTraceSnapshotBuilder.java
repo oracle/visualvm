@@ -133,14 +133,15 @@ public class StackTraceSnapshotBuilder {
     static class SampledThreadInfo {
         private StackTraceElement[] stackTrace;
         private Thread.State state;
-        private java.lang.management.ThreadInfo threadInfo;
-        
-        SampledThreadInfo(java.lang.management.ThreadInfo info, InstrumentationFilter filter) {
-            Thread.State newState = info.getThreadState();
-            StackTraceElement[] st = info.getStackTrace();
-            threadInfo = info;
-            
-            if (newState == Thread.State.RUNNABLE && containsKnownBlockingMethod(st)) { // known blocking method -> change state to waiting
+        private String threadName;
+        private long threadId;
+ 
+        SampledThreadInfo(String tn, long tid, Thread.State ts, StackTraceElement[] st, InstrumentationFilter filter) {
+            threadName = tn;
+            threadId = tid;
+            state = ts;
+            stackTrace = st;
+            if (state == Thread.State.RUNNABLE && containsKnownBlockingMethod(st)) { // known blocking method -> change state to waiting
                 state = Thread.State.WAITING;
             }
             if (filter != null) {
@@ -162,6 +163,10 @@ public class StackTraceSnapshotBuilder {
             }
         }
         
+        SampledThreadInfo(java.lang.management.ThreadInfo info, InstrumentationFilter filter) {
+            this(info.getThreadName(), info.getThreadId(), info.getThreadState(), info.getStackTrace(), filter);
+        }
+        
         private static boolean containsKnownBlockingMethod(StackTraceElement[] stackTrace) {
             if (stackTrace.length > 0) {
                 MethodInfo firstFrame = new MethodInfo(stackTrace[0]);
@@ -171,25 +176,19 @@ public class StackTraceSnapshotBuilder {
         }
 
         private StackTraceElement[] getStackTrace() {
-            if (stackTrace != null) {
-                return stackTrace;
-            }
-            return threadInfo.getStackTrace();
+            return stackTrace;
         }
 
         State getThreadState() {
-            if (state != null) {
-                return state;
-            }
-            return threadInfo.getThreadState();
+            return state;
         }
 
         private String getThreadName() {
-            return threadInfo.getThreadName();
+            return threadName;
         }
 
         private long getThreadId() {
-            return threadInfo.getThreadId();
+            return threadId;
         }
         
     }
@@ -198,6 +197,7 @@ public class StackTraceSnapshotBuilder {
     final List<String> threadNames = new ArrayList<String>();
     final List<byte[]> threadCompactData = new ArrayList<byte[]>();
     final List<MethodInfo> methodInfos = new ArrayList<MethodInfo>();
+    final Map<MethodInfo,Integer> methodInfoMap = new HashMap<MethodInfo,Integer>();
     final MethodInfoMapper mapper = new MethodInfoMapper() {
         
         @Override
@@ -226,6 +226,7 @@ public class StackTraceSnapshotBuilder {
         }
     };
     final CPUCallGraphBuilder ccgb;
+    final ProfilingSessionStatus status;
     final Object lock = new Object();
     final Object stampLock = new Object();
     // @GuardedBy stampLock
@@ -240,11 +241,21 @@ public class StackTraceSnapshotBuilder {
         this(1, null);
     }
     
+    StackTraceSnapshotBuilder(CPUCallGraphBuilder b, InstrumentationFilter f, ProfilingSessionStatus s) {
+        //        builderBatchSize = batchSize;
+        filter = f;
+        setDefaultTiming();
+        ccgb = b;
+        status = s;
+        registerNewMethodInfo(new MethodInfo("Thread","")); // NOI18N
+    }
+    
     public StackTraceSnapshotBuilder(int batchSize, InstrumentationFilter f) {
         //        builderBatchSize = batchSize;
         filter = f;
         setDefaultTiming();
         ccgb = new StackTraceCallGraphBuilder(mapper);
+        status = null;
     }
     
     final public void setIgnoredThreads(Set<String> ignoredThreadNames) {
@@ -254,20 +265,27 @@ public class StackTraceSnapshotBuilder {
         }
     }
     
-    final public void addStacktrace(java.lang.management.ThreadInfo[] threads, long dumpTimeStamp) throws IllegalStateException {
-        long timediff;
+    final void addStacktrace(SampledThreadInfo[] threads, long dumpTimeStamp) throws IllegalStateException {
+        long timediff = processDumpTimeStamp(dumpTimeStamp);
         
-        synchronized(stampLock) {
-            if (dumpTimeStamp <= currentDumpTimeStamp) {
-                // issue #171756 - ignore misplaced samples
-                // montonicity of System.nanoTime is not presently guaranteed (CR 6458294)
-                // throw new IllegalStateException("Adding stacktrace with timestamp " + dumpTimeStamp + " is not allowed after a stacktrace with timestamp " + currentDumpTimeStamp + " has been added");
-                return;
+        if (timediff < 0) return;
+        synchronized (lock) {
+            Map<Long,SampledThreadInfo> tinfoMap = new HashMap();
+            
+            for (SampledThreadInfo tinfo : threads) {
+                tinfoMap.put(tinfo.getThreadId(),tinfo);
             }
-            timediff = dumpTimeStamp - currentDumpTimeStamp;
-            currentDumpTimeStamp = dumpTimeStamp;
+            processThreadDump(timediff, dumpTimeStamp, tinfoMap);
+            //            if (stackTraceCount%builderBatchSize == 0) {
+            //                ccgb.doBatchStop();
+            //            }
         }
+    }
+    
+    final public void addStacktrace(java.lang.management.ThreadInfo[] threads, long dumpTimeStamp) throws IllegalStateException {
+        long timediff = processDumpTimeStamp(dumpTimeStamp);
         
+        if (timediff < 0) return;
         synchronized (lock) {
             Map<Long,SampledThreadInfo> tinfoMap = new HashMap();
             
@@ -279,49 +297,68 @@ public class StackTraceSnapshotBuilder {
                     tinfoMap.put(tinfo.getThreadId(),new SampledThreadInfo(tinfo,filter));
                 }
             }
-            
-            for (SampledThreadInfo tinfo : tinfoMap.values()) {
-                String tname = tinfo.getThreadName();
-                
-                if (ignoredThreadNames.contains(tname)) continue;
-                
-                long threadId = tinfo.getThreadId();
-                if (!threadIds.contains(threadId)) {
-                    threadIds.add(threadId);
-                    threadNames.add(tname);
-                    ccgb.newThread((int) threadId, tname, "<none>");
-                    threadtimes.put(threadId,dumpTimeStamp);
-                }
-                StackTraceElement[] newElements = tinfo.getStackTrace();
-                Thread.State newState = tinfo.getThreadState();
-                SampledThreadInfo oldTinfo = lastStackTrace.get().get(threadId);
-                StackTraceElement[] oldElements = NO_STACK_TRACE;
-                Thread.State oldState = Thread.State.NEW;
-                
-                if (oldTinfo != null) {
-                    oldElements = oldTinfo.getStackTrace();
-                    oldState = oldTinfo.getThreadState();
-                }
-                processDiffs((int) threadId, oldElements, newElements, dumpTimeStamp, timediff, oldState, newState);
-            }
-            
-            for (SampledThreadInfo oldTinfo : lastStackTrace.get().values()) {
-                if (ignoredThreadNames.contains(oldTinfo.getThreadName())) continue;
-                
-                if (!tinfoMap.containsKey(oldTinfo.getThreadId())) {
-                    Thread.State oldState = oldTinfo.getThreadState();
-                    Thread.State newState = Thread.State.TERMINATED;
-                    processDiffs((int) oldTinfo.getThreadId(), oldTinfo.getStackTrace(), NO_STACK_TRACE, dumpTimeStamp, timediff, oldState, newState);
-                }
-            }
-            
-            lastStackTrace.set(tinfoMap);
-            
-            stackTraceCount++;
+            processThreadDump(timediff, dumpTimeStamp, tinfoMap);
             //            if (stackTraceCount%builderBatchSize == 0) {
             //                ccgb.doBatchStop();
             //            }
         }
+    }
+
+    private void processThreadDump(final long timediff, final long dumpTimeStamp, final Map<Long, SampledThreadInfo> tinfoMap) throws IllegalStateException {
+        
+        for (SampledThreadInfo tinfo : tinfoMap.values()) {
+            String tname = tinfo.getThreadName();
+            
+            if (ignoredThreadNames.contains(tname)) continue;
+            
+            long threadId = tinfo.getThreadId();
+            if (!threadIds.contains(threadId)) {
+                threadIds.add(threadId);
+                threadNames.add(tname);
+                ccgb.newThread((int) threadId, tname, "<none>");
+                threadtimes.put(threadId,dumpTimeStamp);
+            }
+            StackTraceElement[] newElements = tinfo.getStackTrace();
+            Thread.State newState = tinfo.getThreadState();
+            SampledThreadInfo oldTinfo = lastStackTrace.get().get(threadId);
+            StackTraceElement[] oldElements = NO_STACK_TRACE;
+            Thread.State oldState = Thread.State.NEW;
+            
+            if (oldTinfo != null) {
+                oldElements = oldTinfo.getStackTrace();
+                oldState = oldTinfo.getThreadState();
+            }
+            processDiffs((int) threadId, oldElements, newElements, dumpTimeStamp, timediff, oldState, newState);
+        }
+        
+        for (SampledThreadInfo oldTinfo : lastStackTrace.get().values()) {
+            if (ignoredThreadNames.contains(oldTinfo.getThreadName())) continue;
+            
+            if (!tinfoMap.containsKey(oldTinfo.getThreadId())) {
+                Thread.State oldState = oldTinfo.getThreadState();
+                Thread.State newState = Thread.State.TERMINATED;
+                processDiffs((int) oldTinfo.getThreadId(), oldTinfo.getStackTrace(), NO_STACK_TRACE, dumpTimeStamp, timediff, oldState, newState);
+            }
+        }
+        
+        lastStackTrace.set(tinfoMap);
+        
+        stackTraceCount++;
+    }
+
+    private long processDumpTimeStamp(long dumpTimeStamp) {
+        long timediff;
+        synchronized(stampLock) {
+            if (dumpTimeStamp <= currentDumpTimeStamp) {
+                // issue #171756 - ignore misplaced samples
+                // montonicity of System.nanoTime is not presently guaranteed (CR 6458294)
+                // throw new IllegalStateException("Adding stacktrace with timestamp " + dumpTimeStamp + " is not allowed after a stacktrace with timestamp " + currentDumpTimeStamp + " has been added");
+                return -1;
+            }
+            timediff = dumpTimeStamp - currentDumpTimeStamp;
+            currentDumpTimeStamp = dumpTimeStamp;
+        }
+        return timediff;
     }
     
     private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp, long timediff, Thread.State oldState, Thread.State newState) throws IllegalStateException {
@@ -432,39 +469,44 @@ public class StackTraceSnapshotBuilder {
         while(reverseIt.hasPrevious()) {
             StackTraceElement element = reverseIt.previous();
             MethodInfo mi = new MethodInfo(element);
-            if (!methodInfos.contains(mi)) {
-                methodInfos.add(mi);
+            Integer mId = methodInfoMap.get(mi);
+            if (mId == null) {
+                mId = registerNewMethodInfo(mi);
+                if (status != null) status.updateInstrMethodsInfo(mi.className,0,mi.methodName,"");
             }
             
-            int index = methodInfos.indexOf(mi);
-            if (index == -1) {
-                System.err.println("*** Not found: " + mi);
-                throw new IllegalStateException();
-            }
             if (asRoot && !inRoot) {
                 inRoot = true;
-                ccgb.methodEntry(index, threadId, CPUCallGraphBuilder.METHODTYPE_ROOT, timestamp, threadtimestamp);
+                ccgb.methodEntry(mId.intValue(), threadId, CPUCallGraphBuilder.METHODTYPE_ROOT, timestamp, threadtimestamp);
             } else {
-                ccgb.methodEntry(index, threadId, CPUCallGraphBuilder.METHODTYPE_NORMAL, timestamp, threadtimestamp);
+                ccgb.methodEntry(mId.intValue(), threadId, CPUCallGraphBuilder.METHODTYPE_NORMAL, timestamp, threadtimestamp);
             }
             
         }
+    }
+
+    private Integer registerNewMethodInfo(final MethodInfo mi) {
+        Integer index = Integer.valueOf(methodInfos.size());
+        
+        methodInfos.add(mi);
+        methodInfoMap.put(mi,index);
+        return index;
     }
     
     private void addMethodExits(int threadId, List<StackTraceElement> elements, long timestamp, long threadtimestamp, boolean asRoot) throws IllegalStateException {
         int rootIndex = elements.size();
         for (StackTraceElement element : elements) {
             MethodInfo mi = new MethodInfo(element);
-            int index = methodInfos.indexOf(mi);
-            if (index == -1) {
+            Integer index = methodInfoMap.get(mi);
+            if (index == null) {
                 System.err.println("*** Not found: " + mi);
                 throw new IllegalStateException();
             }
             
             if (asRoot && --rootIndex == 0) {
-                ccgb.methodExit(index, threadId, CPUCallGraphBuilder.METHODTYPE_ROOT, timestamp, threadtimestamp);
+                ccgb.methodExit(index.intValue(), threadId, CPUCallGraphBuilder.METHODTYPE_ROOT, timestamp, threadtimestamp);
             } else {
-                ccgb.methodExit(index, threadId, CPUCallGraphBuilder.METHODTYPE_NORMAL, timestamp, threadtimestamp);
+                ccgb.methodExit(index.intValue(), threadId, CPUCallGraphBuilder.METHODTYPE_NORMAL, timestamp, threadtimestamp);
             }
         }
     }
@@ -519,6 +561,7 @@ public class StackTraceSnapshotBuilder {
         synchronized (lock) {
             ccgb.reset();
             methodInfos.clear();
+            methodInfoMap.clear();
             threadIds.clear();
             threadNames.clear();
             stackTraceCount = 0;

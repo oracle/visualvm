@@ -1867,6 +1867,7 @@ public abstract class NetBeansProfiler extends Profiler {
             switch (profilingSettings.getProfilingType()) {
                 case ProfilingSettings.PROFILE_CPU_ENTIRE:
                 case ProfilingSettings.PROFILE_CPU_PART:
+                case ProfilingSettings.PROFILE_CPU_SAMPLING:
                 case ProfilingSettings.PROFILE_CPU_STOPWATCH: {
                     cctProvider = Lookup.getDefault().lookup(CPUCCTProvider.class);
                     cctListeners = Lookup.getDefault().lookupAll(CPUCCTProvider.Listener.class);
@@ -1920,24 +1921,28 @@ public abstract class NetBeansProfiler extends Profiler {
             fpb.setContext(client, tc, filter);
 
             Collection listeners = null;
+            switch (profilingSettings.getProfilingType()) {
+                case ProfilingSettings.PROFILE_CPU_PART:
+                case ProfilingSettings.PROFILE_CPU_ENTIRE:
+                case ProfilingSettings.PROFILE_CPU_SAMPLING: {
+                    listeners = Lookup.getDefault().lookupAll(CPUProfilingResultListener.class);
 
-            if ((profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_PART)
-                    || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_CPU_ENTIRE)) {
-                listeners = Lookup.getDefault().lookupAll(CPUProfilingResultListener.class);
-
-                for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-                    CPUProfilingResultListener listener = (CPUProfilingResultListener) iter.next();
-                    ProfilingResultsDispatcher.getDefault().addListener(listener);
-                    listener.startup(targetAppRunner.getProfilerClient());
+                    for (Iterator iter = listeners.iterator(); iter.hasNext();) {
+                        CPUProfilingResultListener listener = (CPUProfilingResultListener) iter.next();
+                        ProfilingResultsDispatcher.getDefault().addListener(listener);
+                        listener.startup(targetAppRunner.getProfilerClient());
+                    }
+                    break;
                 }
-            } else if ((profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS)
-                           || (profilingSettings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS)) {
-                listeners = Lookup.getDefault().lookupAll(MemoryProfilingResultsListener.class);
+                case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
+                case ProfilingSettings.PROFILE_MEMORY_LIVENESS: {
+                    listeners = Lookup.getDefault().lookupAll(MemoryProfilingResultsListener.class);
 
-                for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-                    MemoryProfilingResultsListener listener = (MemoryProfilingResultsListener) iter.next();
-                    ProfilingResultsDispatcher.getDefault().addListener(listener);
-                    listener.startup(targetAppRunner.getProfilerClient());
+                    for (Iterator iter = listeners.iterator(); iter.hasNext();) {
+                        MemoryProfilingResultsListener listener = (MemoryProfilingResultsListener) iter.next();
+                        ProfilingResultsDispatcher.getDefault().addListener(listener);
+                        listener.startup(targetAppRunner.getProfilerClient());
+                    }
                 }
             }
 

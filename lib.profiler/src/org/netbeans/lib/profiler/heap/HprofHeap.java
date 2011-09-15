@@ -284,6 +284,9 @@ class HprofHeap implements Heap {
         if (systemClass != null) {
             Instance props = (Instance) systemClass.getValueOfStaticField("props"); //NOI18N
 
+            if (props == null) {
+                props = (Instance) systemClass.getValueOfStaticField("systemProperties"); //NOI18N
+            }
             if (props != null) {
                 return HprofProxy.getProperties(props);
             }

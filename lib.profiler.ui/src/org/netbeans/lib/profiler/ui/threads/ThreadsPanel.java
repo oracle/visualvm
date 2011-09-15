@@ -535,6 +535,8 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
                     int clickedLine = table.rowAtPoint(e.getPoint());
 
                     if (clickedLine != -1) {
+                        if (table.getSelectedRowCount() == 1)
+                            table.getSelectionModel().setSelectionInterval(clickedLine, clickedLine);
                         if ((e.getModifiers() & InputEvent.BUTTON3_MASK) != 0) {
                             popupMenu.show(e.getComponent(), e.getX(), e.getY());
                         } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
