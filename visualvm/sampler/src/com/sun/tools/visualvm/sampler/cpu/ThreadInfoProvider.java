@@ -58,6 +58,10 @@ public final class ThreadInfoProvider {
         return status;
     }
 
+    public ThreadMXBean getThreadMXBean() {
+        return threadBean;
+    }
+    
     private String initialize(Application application) {
         if (application.getState() != Stateful.STATE_AVAILABLE) {
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable"); // NOI18N
@@ -98,4 +102,5 @@ public final class ThreadInfoProvider {
         }
         return threadBean.dumpAllThreads(false,false);
     }
+
 }

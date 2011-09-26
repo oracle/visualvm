@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.sampler;
 
 import com.sun.tools.visualvm.sampler.cpu.ThreadInfoProvider;
+import com.sun.tools.visualvm.sampler.cpu.ThreadsCPU;
 import com.sun.tools.visualvm.sampler.memory.MemorySettingsSupport;
 import com.sun.tools.visualvm.sampler.cpu.CPUSettingsSupport;
 import com.sun.tools.visualvm.application.Application;
@@ -483,7 +484,8 @@ final class SamplerImpl {
             public void run() {
                 ThreadInfoProvider ti = new ThreadInfoProvider(application);
                 final String status = ti.getStatus();
-
+                ThreadsCPU tcpu;
+                
                 if (status != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -545,7 +547,15 @@ final class SamplerImpl {
                             tds.takeThreadDump(application, openView);
                         }
                     };
-                cpuSampler = new CPUSamplerSupport(ti, snapshotDumper, threadDumper) {
+                    
+                tcpu = new ThreadsCPU(ti.getThreadMXBean(), JmxModelFactory.getJmxModelFor(application).getMBeanServerConnection());
+                try {
+                    tcpu.getThreadsCPUInfo();
+                } catch (Exception ex) {
+                    tcpu = null;
+                    throw new RuntimeException(ex);
+                }
+                cpuSampler = new CPUSamplerSupport(ti, tcpu, snapshotDumper, threadDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {
