@@ -1393,19 +1393,16 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         private void updateCombo() {
             Lookup.Provider[] projects = ProjectUtilities.getSortedProjects(ProjectUtilities.getOpenedProjects());
-            Vector items = new Vector(projects.length + 1);
-
-            for (int i = 0; i < projects.length; i++) {
-                items.add(projects[i]);
-            }
+            java.util.List items = new ArrayList(projects.length + 1);
+            items.addAll(Arrays.asList(projects));
 
             items.add(0, GLOBAL_COMBO_ITEM_STRING);
 
             DefaultComboBoxModel comboModel = (DefaultComboBoxModel) combo.getModel();
             comboModel.removeAllElements();
 
-            for (int i = 0; i < items.size(); i++) {
-                comboModel.addElement(items.get(i));
+            for (Object item : items) {
+                comboModel.addElement(item);
             }
 
             if ((displayedProject != null) && (comboModel.getIndexOf(displayedProject) != -1)) {

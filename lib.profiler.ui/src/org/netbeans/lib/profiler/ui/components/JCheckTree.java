@@ -59,7 +59,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Vector;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArraySet;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
@@ -176,7 +177,7 @@ public class JCheckTree extends JExtendedTree {
     // ---------------------------------------------------------------------------
 
     // --- CheckTreeListener implementation --------------------------------------
-    private Vector checkTreeListeners = new Vector();
+    private Collection<CheckTreeListener> checkTreeListeners = new CopyOnWriteArraySet<CheckTreeListener>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -211,7 +212,7 @@ public class JCheckTree extends JExtendedTree {
     }
 
     public void addCheckTreeListener(CheckTreeListener listener) {
-        if ((listener != null) && !checkTreeListeners.contains(listener)) {
+        if (listener != null) {
             checkTreeListeners.add(listener);
         }
     }
@@ -412,15 +413,15 @@ public class JCheckTree extends JExtendedTree {
 
     private void fireCheckTreeChanged(Collection changedNodes) {
         if (changedNodes.size() > 0) {
-            for (int i = 0; i < checkTreeListeners.size(); i++) {
-                ((CheckTreeListener) checkTreeListeners.get(i)).checkTreeChanged(changedNodes);
+            for (CheckTreeListener  l : checkTreeListeners) {
+                l.checkTreeChanged(changedNodes);
             }
         }
     }
 
     private void fireNodeToggled(TreePath path, boolean before) {
-        for (int i = 0; i < checkTreeListeners.size(); i++) {
-            ((CheckTreeListener) checkTreeListeners.get(i)).checkNodeToggled(path, before);
+        for (CheckTreeListener  l : checkTreeListeners) {
+            l.checkNodeToggled(path, before);
         }
     }
 
