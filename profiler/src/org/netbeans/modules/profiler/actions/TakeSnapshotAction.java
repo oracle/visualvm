@@ -48,9 +48,12 @@ import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 
 /**
@@ -58,7 +61,7 @@ import org.openide.util.NbBundle;
  *
  * @author Ian Formanek
  */
-public final class TakeSnapshotAction extends ProfilingAwareAction implements ResultsListener {
+public final class TakeSnapshotAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final int[] ENABLED_STATES = new int[] {
@@ -68,10 +71,31 @@ public final class TakeSnapshotAction extends ProfilingAwareAction implements Re
     private static final String NAME_STRING = NbBundle.getMessage(TakeSnapshotAction.class, "LBL_TakeSnapshotAction"); // NOI18N
     private static final String SHORT_DESCRIPTION_STRING = NbBundle.getMessage(TakeSnapshotAction.class, "HINT_TakeSnapshotAction"); // NOI18N
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
+    /*
+     * The following code is an externalization of various listeners registered
+     * in the global lookup and needing access to an enclosing instance of
+     * TakeSnapshotAction.
+     * The enclosing instance will use the FQN registration to obtain the shared instance
+     * of the listener implementation and inject itself as a delegate into the listener.
+     */
+    @ServiceProvider(service=ResultsListener.class)
+    public static final class Listener extends Delegate<TakeSnapshotAction> implements ResultsListener {
 
+        @Override
+        public void resultsAvailable() {
+            if (getDelegate() != null) getDelegate().firePropertyChange(PROP_ENABLED, null, null);
+        }
+
+        @Override
+        public void resultsReset() {
+            if (getDelegate() != null) getDelegate().firePropertyChange(PROP_ENABLED, null, null);
+        }
+        
+    }
+    
+    //~ Constructors -------------------------------------------------------------------------------------------------------------
     public TakeSnapshotAction() {
-        ResultsManager.getDefault().addResultsListener(this);
+        Lookup.getDefault().lookup(Listener.class).setDelegate(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -99,14 +123,7 @@ public final class TakeSnapshotAction extends ProfilingAwareAction implements Re
             });
     }
 
-    public void resultsAvailable() {
-        firePropertyChange(PROP_ENABLED, null, null);
-    }
-
-    public void resultsReset() {
-        firePropertyChange(PROP_ENABLED, null, null);
-    }
-
+    @Override
     protected int[] enabledStates() {
         return ENABLED_STATES;
     }

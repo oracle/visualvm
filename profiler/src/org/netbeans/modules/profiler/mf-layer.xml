@@ -301,16 +301,22 @@ made subject to such option by the copyright holder.
             <file name="org-netbeans-modules-profiler-actions-ShowThreadsViewAction.instance"/>
 
             <file name="org-netbeans-modules-profiler-actions-RerunAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-StopAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-StopAction.instance">
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.StopAction.getInstance"/>
+            </file>
             <file name="org-netbeans-modules-profiler-actions-RunGCAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-HeapDumpAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-ModifyProfilingAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-TakeSnapshotAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-ResetResultsAction.instance">
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.ResetResultsAction.getInstance"/>
+            </file>
             <file name="org-netbeans-modules-profiler-actions-InternalStatsAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-RunCalibrationAction.instance"/>
             <file name="org-netbeans-modules-profiler-actions-GetCmdLineArgumentsAction.instance"/>
-            <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance"/>
+            <file name="org-netbeans-modules-profiler-actions-TelemetryOverviewAction.instance">
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.profiler.actions.TelemetryOverviewAction.getInstance"/>
+            </file>
         </folder>
     </folder>
 

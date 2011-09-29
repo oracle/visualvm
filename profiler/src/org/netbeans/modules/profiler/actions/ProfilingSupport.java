@@ -318,7 +318,7 @@ public final class ProfilingSupport {
         RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     try {
-                        TargetAppRunner.getDefault().getAppStatusHandler().pauseLiveUpdates();
+                        Profiler.getDefault().getTargetAppRunner().getAppStatusHandler().pauseLiveUpdates();
 
                         final boolean attach = (Profiler.getDefault().getProfilingMode() == Profiler.MODE_ATTACH);
 
@@ -336,7 +336,7 @@ public final class ProfilingSupport {
                         }
                     } finally {
                         setProfilingActionInvoked(false);
-                        TargetAppRunner.getDefault().getAppStatusHandler().resumeLiveUpdates();
+                        Profiler.getDefault().getTargetAppRunner().getAppStatusHandler().resumeLiveUpdates();
                     }
                 }
             });
