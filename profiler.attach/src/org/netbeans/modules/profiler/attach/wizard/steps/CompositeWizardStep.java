@@ -43,9 +43,9 @@
 
 package org.netbeans.modules.profiler.attach.wizard.steps;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 import javax.swing.event.ChangeListener;
 import org.netbeans.modules.profiler.attach.wizard.WizardContext;
 import org.netbeans.modules.profiler.attach.wizard.functors.ConditionalFunctor;
@@ -62,7 +62,7 @@ public class CompositeWizardStep implements WizardStep {
 
     protected int currentIndex;
     private ConditionalFunctor condition;
-    private List /*<WizardStep>*/ steps;
+    private List<WizardStep> steps;
     private String title;
     private WizardContext context;
     private WizardStep nullStep = new NullWizardStep();
@@ -80,7 +80,7 @@ public class CompositeWizardStep implements WizardStep {
 
     public CompositeWizardStep(WizardContext context, String title, ConditionalFunctor functor) {
         this.title = title;
-        this.steps = new Vector(50);
+        this.steps = new ArrayList<WizardStep>(50);
         this.condition = functor;
         this.currentIndex = 0;
         this.context = context;
