@@ -50,18 +50,18 @@ import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainerFree;
 import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class CCTFlattener extends CPUCCTVisitorAdapter {
+public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Logger LOGGER = Logger.getLogger(CCTFlattener.class.getName());
@@ -99,7 +99,26 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
         }
     }
 
-    public void afterWalk() {
+    @Override
+    public void onStart() {
+        ProfilingSessionStatus status = client.getStatus();
+        nMethods = status.getNInstrMethods();
+        timePM0 = new long[nMethods];
+        timePM1 = new long[status.collectingTwoTimeStamps() ? nMethods : 0];
+        invPM = new int[nMethods];
+        invDiff = new int[nMethods];
+        nCalleeInvocations = new int[nMethods];
+        parentStack.clear();
+
+//        currentFilter = (CCTResultsFilter)Lookup.getDefault().lookup(CCTResultsFilter.class);
+        
+        synchronized (containerGuard) {
+            container = null;
+        }
+    }
+
+    @Override
+    public void onStop() {
         ProfilingSessionStatus status = client.getStatus();
 
         // Now convert the data into microseconds
@@ -153,25 +172,9 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
         parentStack.clear();
 //        currentFilter = null;
     }
-
-    public void beforeWalk() {
-        ProfilingSessionStatus status = client.getStatus();
-        nMethods = status.getNInstrMethods();
-        timePM0 = new long[nMethods];
-        timePM1 = new long[status.collectingTwoTimeStamps() ? nMethods : 0];
-        invPM = new int[nMethods];
-        invDiff = new int[nMethods];
-        nCalleeInvocations = new int[nMethods];
-        parentStack.clear();
-
-//        currentFilter = (CCTResultsFilter)Lookup.getDefault().lookup(CCTResultsFilter.class);
-        
-        synchronized (containerGuard) {
-            container = null;
-        }
-    }
-
-    public void visit(MethodCPUCCTNode node) {
+    
+    @Override
+    public void onNode(MethodCPUCCTNode node) {
         ProfilingSessionStatus status = client.getStatus();
         InstrumentationFilter filter = client.getSettings().getInstrumentationFilter();
 
@@ -227,15 +230,11 @@ public class CCTFlattener extends CPUCCTVisitorAdapter {
 
             currentParent = node;
         }
-
-        parentStack.push(currentParent);
+        parentStack.push(node);
     }
 
-    public void visitPost(MethodCPUCCTNode node) {
+    @Override
+    public void onBackout(MethodCPUCCTNode node) {
         parentStack.pop();
-    }
-
-    public void visitPost(ThreadCPUCCTNode node) {
-        parentStack.clear();
     }
 }
