@@ -170,7 +170,7 @@ public final class ProfilerModule extends ModuleInstall {
                         // perform any shutdown
                         ((NetBeansProfiler) Profiler.getDefault()).shutdown();
 
-                        new ResetResultsAction().actionPerformed(null); // cleanup client data
+                        ResetResultsAction.getInstance().actionPerformed(null); // cleanup client data
                     }
                 });
         } catch (Exception e) {

@@ -46,7 +46,7 @@ package org.netbeans.lib.profiler.ui.charts;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.swing.*;
@@ -74,9 +74,9 @@ public class PieChart extends JComponent implements ComponentListener, ChartMode
     private Image offScreenImage;
     private Insets insets = new Insets(0, 0, 0, 0);
     private PieChartModel model;
-    private Vector arcs = new Vector();
-    private Vector bottoms = new Vector();
-    private Vector selectedItems = new Vector();
+    private java.util.List<Arc2D> arcs = new ArrayList<Arc2D>();
+    private java.util.List<Area> bottoms = new ArrayList<Area>();
+    private java.util.List<Integer> selectedItems = new ArrayList<Integer>();
     private boolean draw3D = true; // (chartHeight > 0)
     private boolean offScreenImageInvalid;
     private boolean offScreenImageSizeInvalid;
@@ -122,8 +122,6 @@ public class PieChart extends JComponent implements ComponentListener, ChartMode
             offScreenImageInvalid = true;
             repaint();
         }
-
-        ;
     }
 
     public int getItemIndexAt(int x, int y) {
@@ -132,17 +130,18 @@ public class PieChart extends JComponent implements ComponentListener, ChartMode
         y -= insets.top;
 
         // test arcs
-        for (int i = 0; i < arcs.size(); i++) {
-            if (((Arc2D) arcs.get(i)).contains(x, y)) {
+        int i = 0;
+        for (Arc2D a : arcs) {
+            if (a.contains(x, y)) {
                 return i;
             }
+            i++;
         }
 
         // test 3D bottoms
+        i = 0;
         if (draw3D) {
-            for (int i = 0; i < bottoms.size(); i++) {
-                Area area = (Area) bottoms.get(i);
-
+            for (Area area : bottoms) {
                 if (area == null) {
                     continue;
                 } else if (area.contains(x, y)) {

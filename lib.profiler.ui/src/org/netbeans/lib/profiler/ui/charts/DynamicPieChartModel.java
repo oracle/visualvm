@@ -44,9 +44,6 @@
 package org.netbeans.lib.profiler.ui.charts;
 
 import java.awt.Color;
-import java.util.Iterator;
-import java.util.Vector;
-
 
 /**
  *

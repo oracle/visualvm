@@ -48,8 +48,10 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArraySet;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -428,14 +430,14 @@ public class FilterComponent extends JPanel {
     private PopupItemsListener popupItemsListener;
     private String filterString = EMPTY_STRING;
     private String textFieldEmptyText = DEFAULT_TEXTFIELD_STRING;
-    private Vector filterNames;
+    private java.util.List<String> filterNames;
 
     //private Vector filterStringsBuffers; // Originally used as separate buffers for each filter type
-    private Vector filterStringsBuffer; // One buffer for all used filter strings
-    private Vector filterTypes;
-    private Vector listeners;
-    private Vector rolloverIcons;
-    private Vector standardIcons;
+    private Collection<String> filterStringsBuffer; // One buffer for all used filter strings
+    private java.util.List filterTypes;
+    private Collection<FilterListener> listeners;
+    private java.util.List<Icon> rolloverIcons;
+    private java.util.List<Icon> standardIcons;
     private boolean internalChange = false;
     private boolean textFieldEmptyFlag = true;
     private boolean validRegExpFlag = true;
@@ -450,16 +452,16 @@ public class FilterComponent extends JPanel {
     public FilterComponent() {
         super();
 
-        listeners = new Vector();
+        listeners = new CopyOnWriteArraySet<FilterListener>();
 
         popupItemsListener = new PopupItemsListener();
 
-        standardIcons = new Vector();
-        rolloverIcons = new Vector();
-        filterNames = new Vector();
-        filterTypes = new Vector();
+        standardIcons = new ArrayList<Icon>();
+        rolloverIcons = new ArrayList<Icon>();
+        filterNames = new ArrayList<String>();
+        filterTypes = new ArrayList();
         //filterStringsBuffers = new Vector();
-        filterStringsBuffer = new Vector();
+        filterStringsBuffer = new ArrayList<String>();
 
         //tmpBufferComboItems = new Vector();
         lastFilterType = -1;
@@ -555,9 +557,7 @@ public class FilterComponent extends JPanel {
 
     //--- FilterListener interface -----
     public void addFilterListener(FilterListener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     public JSeparator addSeparatorItem() {
@@ -579,9 +579,7 @@ public class FilterComponent extends JPanel {
     }
 
     public void removeFilterListener(FilterListener listener) {
-        if (listeners.contains(listener)) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
     }
 
     private JMenuItem getFilterMenuItemByIndex(int index) {
@@ -739,8 +737,8 @@ public class FilterComponent extends JPanel {
 
     private void fireFilterChanged() {
         if (validRegExpFlag) {
-            for (int i = 0; i < listeners.size(); i++) {
-                ((FilterListener) (listeners.elementAt(i))).filterChanged();
+            for (FilterListener l : listeners) {
+                l.filterChanged();
             }
         }
 
@@ -905,8 +903,8 @@ public class FilterComponent extends JPanel {
         String currentFilterString = filterStringCombo.getText();
         filterStringCombo.removeAllItems();
 
-        for (int i = filterStringsBuffer.size() - 1; i >= 0; i--) {
-            filterStringCombo.addItem(filterStringsBuffer.get(i));
+        for (String s : filterStringsBuffer) {
+            filterStringCombo.addItem(s);
         }
 
         /*int index = getIndexByCurrentFilterType();
