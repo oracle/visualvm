@@ -59,7 +59,6 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -85,7 +84,6 @@ import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**

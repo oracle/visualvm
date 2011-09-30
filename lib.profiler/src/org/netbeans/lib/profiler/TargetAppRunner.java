@@ -60,9 +60,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 
 /**
@@ -140,7 +139,6 @@ public class TargetAppRunner implements CommonConstants {
     }
                                                                                                                              // -----
     private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.TargetAppRunner") != null; // NOI18N
-    private static TargetAppRunner defaultTAR; // Ok only while we don't have multiple profiling sessions
     private static final int EVENT_STARTED = 0;
     private static final int EVENT_STOPPED = 1;
     private static final int EVENT_SUSPENDED = 2;
@@ -159,11 +157,39 @@ public class TargetAppRunner implements CommonConstants {
     private ProfilerEngineSettings settings;
     private ProfilingPointsProcessor profilingPointProcessor;
     private ProfilingSessionStatus status;
-    private Vector listeners = new Vector();
+    private Collection<ProfilingEventListener> listeners = new CopyOnWriteArraySet<ProfilingEventListener>();
     private boolean targetAppIsSuspended;
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
+    /**
+     * A trampoline for getting the only one allowed instance.<br/>
+     * <p>
+     * The shared instance is effectively created by <b>org.netbeans.lib.common.Profiler</b>
+     * but due to the dependency direction <b>TargetAppRunner</b> knows nothing about that class.
+     * </p>
+     * <p>
+     * As such we need an inversion of control mechanism to be able to obtain the only
+     * allowed shared instance of <b>TargetAppRunner</b> from the only allowed creator - that is
+     * <b>org.netbeans.lib.common.Profiler</b>.
+     * </p>
+     * <p>
+     * The <b>org.netbeans.lib.common.Profiler</b> will register an <i>Accessor</i> implementation
+     * in <b>META-INF/services</b> and <b>TargetAppRunner</b> will obtain it using 
+     * the standard {@linkplain ServiceLoader} mechanism.
+     */
+    public static interface Accessor {
+        TargetAppRunner getInstance();
+    }
 
+    private static final Accessor accessor;
+    
+    static {
+        ServiceLoader<Accessor> accLoader = ServiceLoader.load(Accessor.class);
+        Iterator<Accessor> it = accLoader.iterator();
+        accessor = it.hasNext() ? it.next() : null;
+    }
+    
+    //~ Constructors -------------------------------------------------------------------------------------------------------------    
+    
     public TargetAppRunner(ProfilerEngineSettings settings, AppStatusHandler ash, ProfilingPointsProcessor ppp) {
         this.settings = settings;
         status = new ProfilingSessionStatus();
@@ -193,13 +219,12 @@ public class TargetAppRunner implements CommonConstants {
                     }
                 }
             });
-        defaultTAR = this;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static TargetAppRunner getDefault() {
-        return defaultTAR;
+        return accessor != null ? accessor.getInstance() : null;
     }
 
     public AppStatusHandler getAppStatusHandler() {
@@ -602,48 +627,36 @@ public class TargetAppRunner implements CommonConstants {
     }
 
     private void notifyListeners(int event) {
-        Vector targets = null;
+        for (ProfilingEventListener target : listeners) {
+            switch (event) {
+                case EVENT_STARTED:
+                    target.targetAppStarted();
 
-        synchronized (this) {
-            if (listeners != null) {
-                targets = (java.util.Vector) listeners.clone();
-            }
-        }
+                    break;
+                case EVENT_STOPPED:
+                    target.targetAppStopped();
 
-        if (targets != null) {
-            for (int i = 0; i < targets.size(); i++) {
-                ProfilingEventListener target = (ProfilingEventListener) targets.elementAt(i);
+                    break;
+                case EVENT_SUSPENDED:
+                    target.targetAppSuspended();
 
-                switch (event) {
-                    case EVENT_STARTED:
-                        target.targetAppStarted();
+                    break;
+                case EVENT_RESUMED:
+                    target.targetAppResumed();
 
-                        break;
-                    case EVENT_STOPPED:
-                        target.targetAppStopped();
+                    break;
+                case EVENT_TERMINATED:
+                    target.targetVMTerminated();
 
-                        break;
-                    case EVENT_SUSPENDED:
-                        target.targetAppSuspended();
+                    break;
+                case EVENT_ATTACHED:
+                    target.attachedToTarget();
 
-                        break;
-                    case EVENT_RESUMED:
-                        target.targetAppResumed();
+                    break;
+                case EVENT_DETACHED:
+                    target.detachedFromTarget();
 
-                        break;
-                    case EVENT_TERMINATED:
-                        target.targetVMTerminated();
-
-                        break;
-                    case EVENT_ATTACHED:
-                        target.attachedToTarget();
-
-                        break;
-                    case EVENT_DETACHED:
-                        target.detachedFromTarget();
-
-                        break;
-                }
+                    break;
             }
         }
     }
