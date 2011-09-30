@@ -44,8 +44,8 @@
 package org.netbeans.lib.profiler.ui.charts;
 
 import java.awt.Color;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 
 /**
@@ -55,7 +55,7 @@ import java.util.Vector;
 public abstract class AbstractPieChartModel implements PieChartModel {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Vector listeners; // Data change listeners
+    private Collection<ChartModelListener> listeners = new CopyOnWriteArraySet<ChartModelListener>(); // Data change listeners
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -79,13 +79,7 @@ public abstract class AbstractPieChartModel implements PieChartModel {
      * @param listener ChartModel listener to add
      */
     public synchronized void addChartModelListener(ChartModelListener listener) {
-        if (listeners == null) {
-            listeners = new Vector();
-        }
-
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     /**
@@ -93,29 +87,15 @@ public abstract class AbstractPieChartModel implements PieChartModel {
      * @param listener ChartModel listener to remove
      */
     public synchronized void removeChartModelListener(ChartModelListener listener) {
-        if (listeners != null) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
     }
 
     /**
      * Notifies all listeners about the data change.
      */
     protected void fireChartDataChanged() {
-        if (listeners == null) {
-            return;
-        }
-
-        Vector toNotify;
-
-        synchronized (this) {
-            toNotify = ((Vector) listeners.clone());
-        }
-
-        Iterator iterator = toNotify.iterator();
-
-        while (iterator.hasNext()) {
-            ((ChartModelListener) iterator.next()).chartDataChanged();
+        for(ChartModelListener l : listeners) {
+            l.chartDataChanged();
         }
     }
 }

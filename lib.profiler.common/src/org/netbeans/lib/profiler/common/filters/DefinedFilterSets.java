@@ -43,8 +43,9 @@
 
 package org.netbeans.lib.profiler.common.filters;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 
 /**
@@ -55,13 +56,13 @@ import java.util.Vector;
 public final class DefinedFilterSets {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final Vector definedFilterSets;
+    private final List definedFilterSets;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of DefinedFilterSets */
     public DefinedFilterSets() {
-        definedFilterSets = new Vector();
+        definedFilterSets = new ArrayList();
     }
 
     public DefinedFilterSets(final DefinedFilterSets filterSets) {
