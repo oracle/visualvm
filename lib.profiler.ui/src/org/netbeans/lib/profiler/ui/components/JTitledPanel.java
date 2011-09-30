@@ -68,7 +68,8 @@ import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Vector;
+import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArraySet;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.GrayFilter;
@@ -308,7 +309,7 @@ public class JTitledPanel extends JPanel {
     private JPanel contentPanel;
     private JPanel titlePanel;
     private String title;
-    private Vector actionListeners;
+    private Collection<ActionListener> actionListeners = new CopyOnWriteArraySet<ActionListener>();
     private boolean showButtons;
     private int state;
 
@@ -324,7 +325,6 @@ public class JTitledPanel extends JPanel {
 
     public JTitledPanel(String title, Icon icon, boolean showButtons) {
         super();
-        actionListeners = new Vector();
         this.title = title;
         this.icon = icon;
         this.showButtons = showButtons;
@@ -430,9 +430,7 @@ public class JTitledPanel extends JPanel {
     }
 
     public void addActionListener(ActionListener listener) {
-        if (!actionListeners.contains(listener)) {
-            actionListeners.add(listener);
-        }
+        actionListeners.add(listener);
     }
 
     public boolean areButtonsEnabled() {
@@ -519,8 +517,8 @@ public class JTitledPanel extends JPanel {
     }
 
     private void fireActionPerformed() {
-        for (int i = 0; i < actionListeners.size(); i++) {
-            ((ActionListener) actionListeners.get(i)).actionPerformed(new ActionEvent(this, getState(), ""));
+        for (ActionListener l : actionListeners) {
+            l.actionPerformed(new ActionEvent(this, getState(), ""));
         }
     }
 
