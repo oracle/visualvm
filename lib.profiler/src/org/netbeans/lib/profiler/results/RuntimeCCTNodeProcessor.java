@@ -195,7 +195,9 @@ final public class RuntimeCCTNodeProcessor {
                 stack.add(new SimpleItem(stack, n, plugins));
             }
             for(Plugin p : plugins) {
-                p.onNode(instance);
+                if (p != null) {
+                    p.onNode(instance);
+                }
             }
         }
     }
@@ -208,7 +210,9 @@ final public class RuntimeCCTNodeProcessor {
         @Override
         void process() {
             for(Plugin p : plugins) {
-                p.onBackout(instance);
+                if (p != null) {
+                    p.onBackout(instance);
+                }
             }
         }
     }
@@ -218,14 +222,17 @@ final public class RuntimeCCTNodeProcessor {
     public static void process(RuntimeCCTNode root, Plugin ... plugins) {
         Deque<Item<RuntimeCCTNode>> nodeStack = new ArrayDeque<Item<RuntimeCCTNode>>();
         
-        
         for(Plugin p : plugins) {
-            p.onStart();
+            if (p != null) {
+                p.onStart();
+            }
         }
         nodeStack.push(new SimpleItem(nodeStack, root, plugins));
         processStack(nodeStack, plugins);
         for(Plugin p : plugins) {
-            p.onStop();
+            if (p != null) {
+                p.onStop();
+            }
         }
     }
     
