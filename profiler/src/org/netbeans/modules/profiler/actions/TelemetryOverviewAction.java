@@ -44,9 +44,7 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.modules.profiler.TelemetryOverviewPanel;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -67,11 +65,20 @@ public final class TelemetryOverviewAction extends AbstractAction {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public TelemetryOverviewAction() {
+    private static TelemetryOverviewAction instance;
+    
+    private TelemetryOverviewAction() {
         putValue(Action.NAME, NAME_STRING);
         putValue(Action.SHORT_DESCRIPTION, SHORT_DESCRIPTION_STRING);
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.WINDOW_TELEMETRY_OVERVIEW));
         putValue("iconBase", Icons.getResource(ProfilerIcons.WINDOW_TELEMETRY_OVERVIEW)); // NOI18N
+    }
+    
+    public static synchronized TelemetryOverviewAction getInstance() {
+        if (instance == null) {
+            instance = new TelemetryOverviewAction();
+        }
+        return instance;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

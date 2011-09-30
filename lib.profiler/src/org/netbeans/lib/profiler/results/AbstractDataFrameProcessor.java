@@ -87,14 +87,15 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     public void processDataFrame(byte[] buffer) {
         synchronized(this) {
             if (!processorLives) return;
-            
-            try {
-                fireBatchStart();
-                doProcessDataFrame(buffer);
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error while processing data frame", e);
-            } finally {
-                fireBatchStop();
+            synchronized (client) {
+                try {
+                    fireBatchStart();
+                    doProcessDataFrame(buffer);
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Error while processing data frame", e);
+                } finally {
+                    fireBatchStop();
+                }
             }
         }
     }
