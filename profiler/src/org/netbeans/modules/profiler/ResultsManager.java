@@ -190,13 +190,18 @@ public final class ResultsManager {
     private File exportDir;
     private HashMap<FileObject, ProfilingSettings> settingsCache = new HashMap<FileObject, ProfilingSettings>();
     private HashMap<FileObject, Integer> typeCache = new HashMap<FileObject, Integer>();
-    private Vector resultsListeners;
-    private Vector snapshotListeners;
     private Window mainWindow;
     private boolean resultsAvailable = false;
+    
+    private Lookup.Result<SnapshotsListener> snapshotListeners;
+    private Lookup.Result<ResultsListener> resultsListeners;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-    private ResultsManager() {}
+    private ResultsManager() {
+        Lookup l = Lookup.getDefault();
+        snapshotListeners = l.lookupResult(SnapshotsListener.class);
+        resultsListeners = l.lookupResult(ResultsListener.class);
+    }
 
     private static class Singleton {
         final private static ResultsManager INSTANCE = new ResultsManager();
@@ -252,27 +257,6 @@ public final class ResultsManager {
         }
 
         return type.intValue();
-    }
-
-    public void addResultsListener(final ResultsListener listener) {
-        if (resultsListeners == null) {
-            resultsListeners = new Vector();
-        }
-
-        if (!resultsListeners.contains(listener)) {
-            resultsListeners.add(listener);
-        }
-    }
-
-    // ProfilingStateListener stuff
-    public void addSnapshotsListener(final SnapshotsListener profilingStateListener) {
-        if (snapshotListeners == null) {
-            snapshotListeners = new Vector();
-        }
-
-        if (!snapshotListeners.contains(profilingStateListener)) {
-            snapshotListeners.add(profilingStateListener);
-        }
     }
 
     public void cctEstablished(RuntimeCCTNode runtimeCCTNode) {
@@ -755,18 +739,6 @@ public final class ResultsManager {
         return null;
     }
 
-    public void removeResultsListener(final ResultsListener listener) {
-        if (resultsListeners != null) {
-            resultsListeners.remove(listener);
-        }
-    }
-
-    public void removeSnapshotsListener(final SnapshotsListener profilingStateListener) {
-        if (snapshotListeners != null) {
-            snapshotListeners.remove(profilingStateListener);
-        }
-    }
-
     /**
      * This should be called when the app is restarted or "Reset Collected Results" is invoked (because once this happened,
      * there are all sorts of data that's going to be deleted/changed, and an attempt to do something with old results displayed
@@ -892,129 +864,87 @@ public final class ResultsManager {
     }
 
     protected void fireResultsAvailable() {
-        if (resultsListeners == null) {
+        if (resultsListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) resultsListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((ResultsListener) iterator.next()).resultsAvailable();
-                    }
+            public void run() {
+                for(ResultsListener rl : resultsListeners.allInstances()) {
+                    rl.resultsAvailable();
                 }
-            });
+            }
+        });
     }
 
     protected void fireResultsReset() {
-        if (resultsListeners == null) {
+        if (resultsListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) resultsListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((ResultsListener) iterator.next()).resultsReset();
-                    }
+            public void run() {
+                for(ResultsListener rl : resultsListeners.allInstances()) {
+                    rl.resultsReset();
                 }
-            });
+            }
+        });
     }
 
     protected void fireSnapshotLoaded(final LoadedSnapshot snapshot) {
-        if (snapshotListeners == null) {
+        if (snapshotListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) snapshotListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((SnapshotsListener) iterator.next()).snapshotLoaded(snapshot);
-                    }
+            public void run() {
+                for(SnapshotsListener sl : snapshotListeners.allInstances()) {
+                    sl.snapshotLoaded(snapshot);
                 }
-            });
+            }
+        });
     }
 
     protected void fireSnapshotRemoved(final LoadedSnapshot snapshot) {
-        if (snapshotListeners == null) {
+        if (snapshotListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) snapshotListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((SnapshotsListener) iterator.next()).snapshotRemoved(snapshot);
-                    }
+            public void run() {
+                for(SnapshotsListener sl : snapshotListeners.allInstances()) {
+                    sl.snapshotRemoved(snapshot);
                 }
-            });
+            }
+        });
     }
 
     protected void fireSnapshotSaved(final LoadedSnapshot snapshot) {
-        if (snapshotListeners == null) {
+        if (snapshotListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) snapshotListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((SnapshotsListener) iterator.next()).snapshotSaved(snapshot);
-                    }
+            public void run() {
+                for(SnapshotsListener sl : snapshotListeners.allInstances()) {
+                    sl.snapshotSaved(snapshot);
                 }
-            });
+            }
+        });
     }
 
     protected void fireSnapshotTaken(final LoadedSnapshot snapshot) {
-        if (snapshotListeners == null) {
+        if (snapshotListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) snapshotListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((SnapshotsListener) iterator.next()).snapshotTaken(snapshot);
-                    }
+            public void run() {
+                for(SnapshotsListener sl : snapshotListeners.allInstances()) {
+                    sl.snapshotTaken(snapshot);
                 }
-            });
+            }
+        });
     }
 
     void resultsBecameAvailable() {

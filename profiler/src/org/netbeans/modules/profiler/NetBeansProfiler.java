@@ -524,11 +524,13 @@ public abstract class NetBeansProfiler extends Profiler {
     // TODO [release] set to obtain from property
     //  static boolean DEBUG = true; // System.getProperty("org.netbeans.modules.profiler.NetBeansProfiler") != null;
     private final ProfilerIDESettings ideSettings = ProfilerIDESettings.getInstance();
-    private final ProfilingMonitor monitor = new ProfilingMonitor();
-    private final TargetAppRunner targetAppRunner;
+    
+    private ProfilingMonitor monitor = null;
+    private TargetAppRunner targetAppRunner;
     private DefinedFilterSets definedFilterSets;
     private FileObject profiledSingleFile;
-
+    final private ProfilerEngineSettings sharedSettings;
+    
     private GlobalFilters globalFilters;
     private final Object setupLock = new Object();
     private ProfilingSettings lastProfilingSettings;
@@ -552,11 +554,11 @@ public abstract class NetBeansProfiler extends Profiler {
     private int profilingState = PROFILING_INACTIVE;
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
+    
     public NetBeansProfiler() {
         boolean initFailed = false;
 
-        final ProfilerEngineSettings sharedSettings = new ProfilerEngineSettings();
+        sharedSettings = new ProfilerEngineSettings();
 
         try {
             String libsDir = getLibsDir();
@@ -581,75 +583,13 @@ public abstract class NetBeansProfiler extends Profiler {
             initFailed = true;
         }
 
-        // Initialize shared TargetAppRunner instance
-        targetAppRunner = new TargetAppRunner(sharedSettings, new IDEAppStatusHandler(), getProfilingPointsManager());
-        targetAppRunner.addProfilingEventListener(new ProfilingEventListener() {
-                public void targetAppStarted() {
-                    if (calibrating) {
-                        return;
-                    }
-
-                    changeStateTo(PROFILING_RUNNING);
-                }
-
-                public void targetAppStopped() {
-                    if (calibrating) {
-                        return;
-                    }
-
-                    changeStateTo(PROFILING_STOPPED);
-                }
-
-                public void targetAppSuspended() {
-                    if (calibrating) {
-                        return;
-                    }
-
-                    changeStateTo(PROFILING_PAUSED);
-                }
-
-                public void targetAppResumed() {
-                    if (calibrating) {
-                        return;
-                    }
-
-                    changeStateTo(PROFILING_RUNNING);
-                }
-
-                public void attachedToTarget() {
-                    if (calibrating) {
-                        return;
-                    }
-
-                    changeStateTo(PROFILING_RUNNING);
-                }
-
-                public void detachedFromTarget() {
-                    if (calibrating) {
-                        return;
-                    }
-
-                    monitor.stopDisplayingVM();
-                    changeStateTo(PROFILING_INACTIVE);
-                }
-
-                public void targetVMTerminated() {
-                    if (calibrating) {
-                        return;
-                    }
-
-                    monitor.stopDisplayingVM();
-                    changeStateTo(PROFILING_INACTIVE);
-                }
-            });
-
+        
         if (!initFailed) {
             initialized = true;
         }
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public static NetBeansProfiler getDefaultNB() {
         return (NetBeansProfiler) getDefault();
     }
@@ -664,8 +604,8 @@ public abstract class NetBeansProfiler extends Profiler {
     public int getAgentState(String host, int port, int agentId) {
         if (profilingState /*!= PROFILING_INACTIVE*/ == PROFILING_RUNNING) {
             // profiling currently in progress, check port and id
-            if (port == targetAppRunner.getProfilerEngineSettings().getPortNo()) {
-                if (targetAppRunner.getProfilerClient().getCurrentAgentId() == agentId) {
+            if (port == getTargetAppRunner().getProfilerEngineSettings().getPortNo()) {
+                if (getTargetAppRunner().getProfilerClient().getCurrentAgentId() == agentId) {
                     return CommonConstants.AGENT_STATE_CONNECTED;
                 } else {
                     return CommonConstants.AGENT_STATE_DIFFERENT_ID;
@@ -755,11 +695,85 @@ public abstract class NetBeansProfiler extends Profiler {
         return profilingState;
     }
 
-    public TargetAppRunner getTargetAppRunner() {
-        return targetAppRunner;
+    @Override
+    public synchronized TargetAppRunner getTargetAppRunner() {
+        if (initialized) {
+            if (targetAppRunner == null) {
+                // Initialize shared TargetAppRunner instance
+                targetAppRunner = new TargetAppRunner(sharedSettings, new IDEAppStatusHandler(), getProfilingPointsManager());
+                targetAppRunner.addProfilingEventListener(new ProfilingEventListener() {
+                    @Override
+                    public void targetAppStarted() {
+                        if (calibrating) {
+                            return;
+                        }
+
+                        changeStateTo(PROFILING_RUNNING);
+                    }
+
+                    @Override
+                    public void targetAppStopped() {
+                        if (calibrating) {
+                            return;
+                        }
+
+                        changeStateTo(PROFILING_STOPPED);
+                    }
+
+                    @Override
+                    public void targetAppSuspended() {
+                        if (calibrating) {
+                            return;
+                        }
+
+                        changeStateTo(PROFILING_PAUSED);
+                    }
+
+                    @Override
+                    public void targetAppResumed() {
+                        if (calibrating) {
+                            return;
+                        }
+
+                        changeStateTo(PROFILING_RUNNING);
+                    }
+
+                    @Override
+                    public void attachedToTarget() {
+                        if (calibrating) {
+                            return;
+                        }
+
+                        changeStateTo(PROFILING_RUNNING);
+                    }
+
+                    @Override
+                    public void detachedFromTarget() {
+                        if (calibrating) {
+                            return;
+                        }
+
+                        getMonitor().stopDisplayingVM();
+                        changeStateTo(PROFILING_INACTIVE);
+                    }
+
+                    @Override
+                    public void targetVMTerminated() {
+                        if (calibrating) {
+                            return;
+                        }
+
+                        getMonitor().stopDisplayingVM();
+                        changeStateTo(PROFILING_INACTIVE);
+                    }
+                });
+            }
+            return targetAppRunner;
+        }
+        return null;
     }
 
-    public ThreadsDataManager getThreadsManager() {
+    public synchronized ThreadsDataManager getThreadsManager() {
         if (threadsManager == null) {
             threadsManager = new ThreadsDataManager();
         }
@@ -782,7 +796,7 @@ public abstract class NetBeansProfiler extends Profiler {
         return threadsMonitoringEnabled;
     }
 
-    public VMTelemetryModels getVMTelemetryModels() {
+    public synchronized VMTelemetryModels getVMTelemetryModels() {
         if (vmTelemetryModels == null) {
             vmTelemetryModels = new VMTelemetryModels(getVMTelemetryManager());
         }
@@ -790,7 +804,7 @@ public abstract class NetBeansProfiler extends Profiler {
         return vmTelemetryModels;
     }
 
-    public VMTelemetryDataManager getVMTelemetryManager() {
+    public synchronized VMTelemetryDataManager getVMTelemetryManager() {
         if (vmTelemetryManager == null) {
             vmTelemetryManager = new VMTelemetryDataManager();
         }
@@ -817,8 +831,8 @@ public abstract class NetBeansProfiler extends Profiler {
             if (getProfilingState() != PROFILING_INACTIVE) {
                 if (lastMode == MODE_ATTACH) {
                     detachFromApp(); // if attached, detach
-                } else if (targetAppRunner.targetJVMIsAlive()) {
-                    targetAppRunner.terminateTargetJVM(); // otherwise kill current app if running
+                } else if (getTargetAppRunner().targetJVMIsAlive()) {
+                    getTargetAppRunner().terminateTargetJVM(); // otherwise kill current app if running
                 }
             }
 
@@ -827,9 +841,9 @@ public abstract class NetBeansProfiler extends Profiler {
             lastSessionSettings = null;
             lastMode = MODE_ATTACH;
             
-            final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
-            profilingSettings.applySettings(sharedSettings); // can override the session settings
-            attachSettings.applySettings(sharedSettings);
+            final ProfilerEngineSettings sSettings = getTargetAppRunner().getProfilerEngineSettings();
+            profilingSettings.applySettings(sSettings); // can override the session settings
+            attachSettings.applySettings(sSettings);
 
             //getThreadsManager().setSupportsSleepingStateMonitoring(
             // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
@@ -839,7 +853,7 @@ public abstract class NetBeansProfiler extends Profiler {
             printDebugMsg("attach settings -----------------------------------", false); //NOI18N
             printDebugMsg(attachSettings.debug(), false);
             printDebugMsg("instrumentation filter ----------------------------", false); //NOI18N
-            printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
+            printDebugMsg(sSettings.getInstrumentationFilter().debug(), false); //NOI18N
             printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
             flushDebugMsgs();
             
@@ -848,7 +862,7 @@ public abstract class NetBeansProfiler extends Profiler {
             
             changeStateTo(PROFILING_STARTED);
             
-            cleanupBeforeProfiling(sharedSettings);
+            cleanupBeforeProfiling(sSettings);
             
             setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
             
@@ -867,7 +881,7 @@ public abstract class NetBeansProfiler extends Profiler {
                 boolean success = false;
                 
                 if (prepareInstrumentation(profilingSettings)) {
-                    success = targetAppRunner.initiateSession(1, false) && targetAppRunner.attachToTargetVMOnStartup();
+                    success = getTargetAppRunner().initiateSession(1, false) && getTargetAppRunner().attachToTargetVMOnStartup();
                 }
                 
                 if (!success) {
@@ -886,7 +900,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     loadAgentIntoTargetJVM(jar, options, pid);
                     
                     if (prepareInstrumentation(profilingSettings)) {
-                        success = targetAppRunner.initiateSession(2, false) && targetAppRunner.attachToTargetVM();
+                        success = getTargetAppRunner().initiateSession(2, false) && getTargetAppRunner().attachToTargetVM();
                     }
                 } catch (Exception ex) {
                     ProfilerDialogs.displayError(ex.getMessage());
@@ -918,7 +932,7 @@ public abstract class NetBeansProfiler extends Profiler {
     // -- NetBeansProfiler-only public methods -----------------------------------------------------------------------------
     public void checkAndUpdateState() {
         // TODO: check & refactor to remove this
-        final boolean targetVMAlive = targetAppRunner.targetJVMIsAlive();
+        final boolean targetVMAlive = getTargetAppRunner().targetJVMIsAlive();
 
         if (!targetVMAlive) {
             changeStateTo(PROFILING_INACTIVE);
@@ -926,7 +940,7 @@ public abstract class NetBeansProfiler extends Profiler {
             return;
         }
 
-        final boolean running = targetAppRunner.targetAppIsRunning();
+        final boolean running = getTargetAppRunner().targetAppIsRunning();
 
         if (!running) {
             changeStateTo(PROFILING_STOPPED);
@@ -934,7 +948,7 @@ public abstract class NetBeansProfiler extends Profiler {
             return;
         }
 
-        final boolean suspended = targetAppRunner.targetAppSuspended();
+        final boolean suspended = getTargetAppRunner().targetAppSuspended();
 
         if (suspended) {
             changeStateTo(PROFILING_PAUSED);
@@ -1000,15 +1014,15 @@ public abstract class NetBeansProfiler extends Profiler {
             ph.setInitialDelay(500);
             ph.start();
             
-            if (targetAppRunner.targetJVMIsAlive()) {
-                targetAppRunner.terminateTargetJVM();
+            if (getTargetAppRunner().targetJVMIsAlive()) {
+                getTargetAppRunner().terminateTargetJVM();
             }
             
-            final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
+            final ProfilerEngineSettings sSettings = getTargetAppRunner().getProfilerEngineSettings();
             
-            sessionSettings.applySettings(sharedSettings);
-            profilingSettings.applySettings(sharedSettings); // can override the session settings
-            sharedSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
+            sessionSettings.applySettings(sSettings);
+            profilingSettings.applySettings(sSettings); // can override the session settings
+            sSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
 
             //getThreadsManager().setSupportsSleepingStateMonitoring(
             // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
@@ -1018,7 +1032,7 @@ public abstract class NetBeansProfiler extends Profiler {
             printDebugMsg("session settings ---------------------------------", false); //NOI18N
             printDebugMsg(sessionSettings.debug(), false);
             printDebugMsg("instrumentation filter ---------------------------", false); // NOI18N
-            printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
+            printDebugMsg(sSettings.getInstrumentationFilter().debug(), false); //NOI18N
             printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
             flushDebugMsgs();
             
@@ -1049,7 +1063,7 @@ public abstract class NetBeansProfiler extends Profiler {
     private boolean prepareProfilingSession(ProfilingSettings profilingSettings, SessionSettings sessionSettings) {
         changeStateTo(PROFILING_STARTED);
 
-        cleanupBeforeProfiling(targetAppRunner.getProfilerEngineSettings());
+        cleanupBeforeProfiling(getTargetAppRunner().getProfilerEngineSettings());
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
@@ -1085,12 +1099,12 @@ public abstract class NetBeansProfiler extends Profiler {
     }
     
     private boolean connectToApp() {
-        if (targetAppRunner.targetAppIsRunning()) {
+        if (getTargetAppRunner().targetAppIsRunning()) {
             getThreadsManager()
-                .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(targetAppRunner.getProfilerEngineSettings().getTargetJDKVersionString()));
+                .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(getTargetAppRunner().getProfilerEngineSettings().getTargetJDKVersionString()));
             CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
-                        monitor.monitorVM(targetAppRunner);
+                        getMonitor().monitorVM(getTargetAppRunner());
                     }
                 });
 
@@ -1106,16 +1120,16 @@ public abstract class NetBeansProfiler extends Profiler {
     public void detachFromApp() {
         setTransitionState();
 
-        if (targetAppRunner.getProfilingSessionStatus().currentInstrType != CommonConstants.INSTR_NONE) {
+        if (getTargetAppRunner().getProfilingSessionStatus().currentInstrType != CommonConstants.INSTR_NONE) {
             //      if (LiveResultsWindow.hasDefault()) LiveResultsWindow.getDefault().reset(); // see issue http://www.netbeans.org/issues/show_bug.cgi?id=68213
             try {
-                targetAppRunner.getProfilerClient().removeAllInstrumentation(false); // remove only the server side instrumentation
+                getTargetAppRunner().getProfilerClient().removeAllInstrumentation(false); // remove only the server side instrumentation
             } catch (InstrumentationException e) {
                 ProfilerDialogs.displayError(e.getMessage());
             }
         }
 
-        targetAppRunner.detachFromTargetJVM();
+        getTargetAppRunner().detachFromTargetJVM();
 
         //    targetAppRunner.getProfilerClient().resetClientData();
         // TODO reset all profilingresultslisteners
@@ -1126,7 +1140,7 @@ public abstract class NetBeansProfiler extends Profiler {
     public void instrumentSelectedRoots(ClientUtils.SourceCodeSelection[] rootMethods)
                                  throws ClassNotFoundException, InstrumentationException, BadLocationException, IOException,
                                         ClassFormatError, ClientUtils.TargetAppOrVMTerminated {
-        final ProfilerClient client = targetAppRunner.getProfilerClient();
+        final ProfilerClient client = getTargetAppRunner().getProfilerClient();
 
         if (rootMethods.length == 0) {
             ClientUtils.SourceCodeSelection selection = new ClientUtils.SourceCodeSelection(1); // spawned threads recursively
@@ -1174,7 +1188,7 @@ public abstract class NetBeansProfiler extends Profiler {
             return;
         }
 
-        final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
+        final ProfilerEngineSettings sharedSettings = getTargetAppRunner().getProfilerEngineSettings();
         profilingSettings.applySettings(sharedSettings);
 
         printDebugMsg("Profiler.modifyCurrentProfiling: ***************************************************", false); //NOI18N
@@ -1201,7 +1215,7 @@ public abstract class NetBeansProfiler extends Profiler {
                 @Override
                 public void run() {
                     changeStateTo(PROFILING_IN_TRANSITION);
-                    targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
+                    getTargetAppRunner().getAppStatusHandler().pauseLiveUpdates();
                     ResultsManager.getDefault().reset();
 
                     try {
@@ -1209,7 +1223,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     } catch (InterruptedException e) {
                     }
 
-                    waitDialog = targetAppRunner.getAppStatusHandler()
+                    waitDialog = getTargetAppRunner().getAppStatusHandler()
                                                 .getAsyncDialogInstance(MODIFYING_INSTRUMENTATION_MSG, true, false);
 
                     if (waitDialog != null) {
@@ -1244,7 +1258,7 @@ public abstract class NetBeansProfiler extends Profiler {
                             }
                         }
 
-                        targetAppRunner.getAppStatusHandler().resumeLiveUpdates();
+                        getTargetAppRunner().getAppStatusHandler().resumeLiveUpdates();
                     }
                 }
             });
@@ -1298,15 +1312,15 @@ public abstract class NetBeansProfiler extends Profiler {
         lastSessionSettings = sessionSettings;
         lastMode = MODE_PROFILE;
 
-        if (targetAppRunner.targetJVMIsAlive()) {
-            targetAppRunner.terminateTargetJVM();
+        if (getTargetAppRunner().targetJVMIsAlive()) {
+            getTargetAppRunner().terminateTargetJVM();
         }
 
-        final ProfilerEngineSettings sharedSettings = targetAppRunner.getProfilerEngineSettings();
+        final ProfilerEngineSettings sSettings = getTargetAppRunner().getProfilerEngineSettings();
 
-        sessionSettings.applySettings(sharedSettings);
-        profilingSettings.applySettings(sharedSettings); // can override the session settings
-        sharedSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
+        sessionSettings.applySettings(sSettings);
+        profilingSettings.applySettings(sSettings); // can override the session settings
+        sSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
 
         //getThreadsManager().setSupportsSleepingStateMonitoring(
         // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
@@ -1316,7 +1330,7 @@ public abstract class NetBeansProfiler extends Profiler {
         printDebugMsg("Profiler.profileClass: session settings ---------------------------------", false); //NOI18N
         printDebugMsg(sessionSettings.debug(), false);
         printDebugMsg("Profiler.profileClass: **************************************************", false); //NOI18N
-        printDebugMsg("Instrumentation filter:\n" + sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
+        printDebugMsg("Instrumentation filter:\n" + sSettings.getInstrumentationFilter().debug(), false); //NOI18N
         flushDebugMsgs();
 
         GestureSubmitter.logProfileClass(getProfiledProject(), sessionSettings);
@@ -1325,7 +1339,7 @@ public abstract class NetBeansProfiler extends Profiler {
         changeStateTo(PROFILING_STARTED);
 
         //    System.err.println("--------------------------------------------- 2: "+ (System.currentTimeMillis() - time));
-        cleanupBeforeProfiling(sharedSettings);
+        cleanupBeforeProfiling(sSettings);
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
         //    System.err.println("------------------------------------------ 3: "+ (System.currentTimeMillis() - time));
@@ -1357,8 +1371,8 @@ public abstract class NetBeansProfiler extends Profiler {
 
                         // and run the target application
                         //        System.err.println("---------------------------- 6: "+ (System.currentTimeMillis() - time));
-                        success = success && targetAppRunner.startTargetVM() && targetAppRunner.initiateSession(0, false)
-                                  && targetAppRunner.connectToStartedVMAndStartTA();
+                        success = success && getTargetAppRunner().startTargetVM() && getTargetAppRunner().initiateSession(0, false)
+                                  && getTargetAppRunner().connectToStartedVMAndStartTA();
 
                         if (!success) {
                             changeStateTo(PROFILING_INACTIVE);
@@ -1367,13 +1381,13 @@ public abstract class NetBeansProfiler extends Profiler {
                         }
 
                         // System.err.println("---------------------------- 7: "+ (System.currentTimeMillis() - time));
-                        if (targetAppRunner.targetAppIsRunning()) {
+                        if (getTargetAppRunner().targetAppIsRunning()) {
                             getThreadsManager()
-                                .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
+                                .setSupportsSleepingStateMonitoring(Platform.supportsThreadSleepingStateMonitoring(sSettings.getTargetJDKVersionString()));
                             CommonUtils.runInEventDispatchThread(new Runnable() {
                                     public void run() {
                                         // System.err.println("------------ 8: "+ (System.currentTimeMillis() - time));
-                                        monitor.monitorVM(targetAppRunner);
+                                        getMonitor().monitorVM(getTargetAppRunner());
 
                                         // System.err.println("------------------------ 9: "+ (System.currentTimeMillis() - time));
                                         // System.err.println("------------------------ 11: "+ (System.currentTimeMillis() - time));
@@ -1396,7 +1410,7 @@ public abstract class NetBeansProfiler extends Profiler {
     public boolean runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) {
         calibrating = true;
 
-        ProfilerEngineSettings pes = targetAppRunner.getProfilerEngineSettings();
+        ProfilerEngineSettings pes = getTargetAppRunner().getProfilerEngineSettings();
 
         int savedPort = pes.getPortNo();
         InstrumentationFilter savedInstrFilter = pes.getInstrumentationFilter();
@@ -1418,29 +1432,29 @@ public abstract class NetBeansProfiler extends Profiler {
         boolean result = false;
 
         if (checkForSaved) {
-            result = targetAppRunner.readSavedCalibrationData();
+            result = getTargetAppRunner().readSavedCalibrationData();
 
             if (!result) {
                 ProfilerDialogs.displayInfo(INITIAL_CALIBRATION_MSG);
-                result = targetAppRunner.calibrateInstrumentationCode();
+                result = getTargetAppRunner().calibrateInstrumentationCode();
             }
 
             boolean shouldCalibrate = false;
-            targetAppRunner.getProfilingSessionStatus().beginTrans(false);
+            getTargetAppRunner().getProfilingSessionStatus().beginTrans(false);
             try {
                 // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
                 // ---> recalibrate <---
                 shouldCalibrate = Platform.isLinux() &&
                                   Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
-                                  targetAppRunner.getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
+                                  getTargetAppRunner().getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
             } finally {
-                targetAppRunner.getProfilingSessionStatus().endTrans();
+                getTargetAppRunner().getProfilingSessionStatus().endTrans();
             }
             if (shouldCalibrate) {
-                result = targetAppRunner.calibrateInstrumentationCode();
+                result = getTargetAppRunner().calibrateInstrumentationCode();
             }
         } else {
-            result = targetAppRunner.calibrateInstrumentationCode();
+            result = getTargetAppRunner().calibrateInstrumentationCode();
         }
 
         calibrating = false;
@@ -1488,6 +1502,13 @@ public abstract class NetBeansProfiler extends Profiler {
         profilingSettings.setInstrumentationMarkerMethods(marks);
 
         return prepareInstrumentationImpl(profilingSettings);
+    }
+    
+    private synchronized ProfilingMonitor getMonitor() {
+        if (monitor == null) {
+            monitor = new ProfilingMonitor();
+        }
+        return monitor;
     }
     
     private boolean prepareInstrumentationImpl(ProfilingSettings profilingSettings) {
@@ -1578,7 +1599,7 @@ public abstract class NetBeansProfiler extends Profiler {
     }
 
     public void shutdown() {
-        monitor.stopUpdateThread();
+        getMonitor().stopUpdateThread();
     }
 
     // (synchronous - blocking) Used for stopping a server from a blocking state ready for direct attach (org.netbeans.modules.j2ee.deployment.profiler.spi.Profiler.shutdown())
@@ -1681,7 +1702,7 @@ public abstract class NetBeansProfiler extends Profiler {
 
     // checks if there is a profiling session currently in progress communicating over specified port
     private boolean isProfilingRunningOnPort(int port) {
-        return (profilingState == PROFILING_RUNNING) && (port == targetAppRunner.getProfilerEngineSettings().getPortNo());
+        return (profilingState == PROFILING_RUNNING) && (port == getTargetAppRunner().getProfilerEngineSettings().getPortNo());
     }
 
     private void setTransitionState() {
@@ -1930,7 +1951,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     for (Iterator iter = listeners.iterator(); iter.hasNext();) {
                         CPUProfilingResultListener listener = (CPUProfilingResultListener) iter.next();
                         ProfilingResultsDispatcher.getDefault().addListener(listener);
-                        listener.startup(targetAppRunner.getProfilerClient());
+                        listener.startup(getTargetAppRunner().getProfilerClient());
                     }
                     break;
                 }
@@ -1941,7 +1962,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     for (Iterator iter = listeners.iterator(); iter.hasNext();) {
                         MemoryProfilingResultsListener listener = (MemoryProfilingResultsListener) iter.next();
                         ProfilingResultsDispatcher.getDefault().addListener(listener);
-                        listener.startup(targetAppRunner.getProfilerClient());
+                        listener.startup(getTargetAppRunner().getProfilerClient());
                     }
                 }
             }
