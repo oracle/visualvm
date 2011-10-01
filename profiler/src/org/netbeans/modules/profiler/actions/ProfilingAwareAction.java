@@ -75,7 +75,9 @@ public abstract class ProfilingAwareAction extends CallableSystemAction implemen
 
         boolean shouldBeEnabled = false;
         lastProfilingState = Profiler.getDefault().getProfilingState();
-        lastInstrumentation = Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType();
+        lastInstrumentation = lastProfilingState != Profiler.PROFILING_INACTIVE ? 
+                                Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType() :
+                                CommonConstants.INSTR_NONE;
 
         final int[] enabledStates = enabledStates();
 
@@ -120,7 +122,7 @@ public abstract class ProfilingAwareAction extends CallableSystemAction implemen
         if (lastProfilingState != Profiler.getDefault().getProfilingState()) {
             boolean shouldBeEnabled = isEnabled();
             firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
-        } else if (lastInstrumentation != Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType()) { // for actions that require instrumentation we need to check if it has not changed
+        } else if (lastProfilingState != Profiler.PROFILING_INACTIVE && lastInstrumentation != Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType()) { // for actions that require instrumentation we need to check if it has not changed
 
             boolean shouldBeEnabled = isEnabled();
             firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);

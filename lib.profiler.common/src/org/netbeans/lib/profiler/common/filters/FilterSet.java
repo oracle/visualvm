@@ -45,10 +45,7 @@ package org.netbeans.lib.profiler.common.filters;
 
 
 //import org.openide.util.NbBundle;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
 
 
 /**
@@ -265,7 +262,7 @@ public final class FilterSet {
         filterSetName = getProperty(props, prefix + itemPrefix + "name", DEFAULT_FILTERSET_NAME); //NOI18N
         filterSetType = Boolean.valueOf(getProperty(props, prefix + itemPrefix + "type", "false")).booleanValue(); //NOI18N
 
-        final Vector activeFilters = new Vector();
+        final List activeFilters = new ArrayList();
         String activeFilterName;
 
         while ((activeFilterName = (String) props.get(prefix + itemPrefix + "active_filter-" + activeFilters.size())) != null) { //NOI18N

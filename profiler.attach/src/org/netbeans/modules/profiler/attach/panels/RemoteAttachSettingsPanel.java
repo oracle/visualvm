@@ -43,9 +43,9 @@
 
 package org.netbeans.modules.profiler.attach.panels;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import org.netbeans.lib.profiler.common.AttachSettings;
@@ -63,23 +63,24 @@ public class RemoteAttachSettingsPanel extends AttachWizardPanel {
     public class Model {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private Collection availableOsList;
+        private List<String> availableOsList;
         private String remoteHost;
         private String remoteOs;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public Model() {
-            this.availableOsList = new Vector();
-            this.availableOsList.add(IntegrationUtils.PLATFORM_WINDOWS_OS);
-            this.availableOsList.add(IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS);
-            this.availableOsList.add(IntegrationUtils.PLATFORM_LINUX_OS);
-            this.availableOsList.add(IntegrationUtils.PLATFORM_LINUX_AMD64_OS);
-            this.availableOsList.add(IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS);
-            this.availableOsList.add(IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS);
-            this.availableOsList.add(IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS);
-            this.availableOsList.add(IntegrationUtils.PLATFORM_SOLARIS_AMD64_OS);
-            this.availableOsList.add(IntegrationUtils.PLATFORM_MAC_OS);
+            this.availableOsList = new ArrayList<String>(Arrays.asList(
+                IntegrationUtils.PLATFORM_WINDOWS_OS,
+                IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS,
+                IntegrationUtils.PLATFORM_LINUX_OS,
+                IntegrationUtils.PLATFORM_LINUX_AMD64_OS,
+                IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS,
+                IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS,
+                IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS,
+                IntegrationUtils.PLATFORM_SOLARIS_AMD64_OS,
+                IntegrationUtils.PLATFORM_MAC_OS)
+            );
 
             this.remoteOs = null;
             this.remoteHost = null;
@@ -87,14 +88,8 @@ public class RemoteAttachSettingsPanel extends AttachWizardPanel {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public Vector getAvailableOsList() {
-            Vector immutable = new Vector();
-
-            for (Iterator it = this.availableOsList.iterator(); it.hasNext();) {
-                immutable.add(it.next());
-            }
-
-            return immutable;
+        public Object[] getAvailableOsList() {
+            return availableOsList.toArray(new Object[availableOsList.size()]);
         }
 
         public void setRemoteHost(String host) {
