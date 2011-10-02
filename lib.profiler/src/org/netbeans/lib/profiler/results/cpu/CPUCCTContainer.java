@@ -53,6 +53,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 
 
 /**
@@ -624,10 +625,10 @@ public class CPUCCTContainer {
             default:ProfilerLogger.warning("Unknown filtered status (" + locals.filterStatus + ") for " + locals.node); // NOI18N
         }
 
-        locals.nChildren = (locals.node.getChildren() != null) ? locals.node.getChildren().size() : 0;
+        locals.nChildren = (locals.node.getChildren() != null) ? locals.node.getChildren().length : 0;
 
         for (int i = 0; i < locals.nChildren; i++) {
-            addChild(new AddChildLocalVars((TimedCPUCCTNode) locals.node.getChildren().getChildAt(i), locals.compParent));
+            addChild(new AddChildLocalVars((TimedCPUCCTNode) locals.node.getChildren()[i], locals.compParent));
         }
 
         if (locals.newChild != null) {
@@ -816,10 +817,10 @@ public class CPUCCTContainer {
         TimedCPUCCTNode newRoot = (TimedCPUCCTNode) rootNode.clone();
 
         //    threadTimeCompensation0 = threadTimeCompensation1 = 0;
-        int nChildren = (rootNode.getChildren() != null) ? rootNode.getChildren().size() : 0;
+        int nChildren = (rootNode.getChildren() != null) ? rootNode.getChildren().length : 0;
 
         for (int i = 0; i < nChildren; i++) {
-            addChild(new AddChildLocalVars((TimedCPUCCTNode) rootNode.getChildren().getChildAt(i), newRoot));
+            addChild(new AddChildLocalVars((TimedCPUCCTNode) rootNode.getChildren()[i], newRoot));
         }
 
         //    long time0, time1;
@@ -873,7 +874,7 @@ public class CPUCCTContainer {
 
         locals.nodeChildren = locals.rtNode.getChildren();
 
-        locals.nChildren = (locals.nodeChildren != null) ? locals.nodeChildren.size() : 0;
+        locals.nChildren = (locals.nodeChildren != null) ? locals.nodeChildren.length : 0;
         locals.nextNodeOfs = locals.dataOfs + nodeSize + (locals.nChildren * childOfsSize);
 
         locals.nCallsFromThisNode += locals.rtNode.getNCallsDiff();
@@ -882,7 +883,7 @@ public class CPUCCTContainer {
             locals.childCounter = 0;
 
             for (locals.i = 0; locals.i < locals.nChildren; locals.i++) {
-                locals.aNode = locals.nodeChildren.getChildAt(locals.i);
+                locals.aNode = (RuntimeCPUCCTNode)locals.nodeChildren[locals.i];
 
                 if (locals.aNode instanceof MethodCPUCCTNode) { // TODO replace "instanceof" by a visitor implementation
                     setChildOfsForNodeOfs(locals.dataOfs, locals.childCounter, locals.nextNodeOfs);
@@ -988,7 +989,7 @@ public class CPUCCTContainer {
         private long thisNodeTotalTime1InTimerUnits;
         private int nCallsFromThisNode;
         private int totalNCallsFromThisNode;
-        private RuntimeCPUCCTNode.Children nodeChildren;
+        private RuntimeCCTNode[] nodeChildren;
         private int nChildren;
         private int nextNodeOfs;
         private int childCounter;
@@ -1005,7 +1006,7 @@ public class CPUCCTContainer {
     private void generateNodeBase(TimedCPUCCTNode rtNode, int nodeDataOfs) {
         int methodId = (rtNode instanceof MethodCPUCCTNode) ? ((MethodCPUCCTNode) rtNode).getMethodId() : 0;
         int nCalls = rtNode.getNCalls();
-        int nChildren = (rtNode.getChildren() != null) ? rtNode.getChildren().size() : 0;
+        int nChildren = (rtNode.getChildren() != null) ? rtNode.getChildren().length : 0;
 
         setMethodIdForNodeOfs(nodeDataOfs, methodId);
         setNCallsForNodeOfs(nodeDataOfs, nCalls);
