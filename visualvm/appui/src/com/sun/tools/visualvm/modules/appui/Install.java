@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.appui;
 
+import org.openide.filesystems.FileUtil;
 import org.openide.modules.ModuleInstall;
 import com.sun.tools.visualvm.modules.appui.proxysettings.ProxySettingsHack;
 
@@ -38,6 +39,8 @@ public class Install extends ModuleInstall {
     public void restored() {
         // Initialize opening warning dialog on Proxy Settings
         ProxySettingsHack.hackProxySettings();
+        // workaround for bug #454
+        FileUtil.getConfigFile("Modules").getChildren();
     }
     
 }
