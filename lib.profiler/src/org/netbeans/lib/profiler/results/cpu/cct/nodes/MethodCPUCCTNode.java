@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.*;
 
 
@@ -53,7 +54,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.*;
 public class MethodCPUCCTNode extends TimedCPUCCTNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    public static class Locator extends RuntimeCPUCCTNodeVisitorAdaptor {
+    public static class Locator {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private MethodCPUCCTNode cctNodeCandidate = null;
@@ -66,24 +67,13 @@ public class MethodCPUCCTNode extends TimedCPUCCTNode {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public static MethodCPUCCTNode locate(int methodId, RuntimeCPUCCTNode.Children nodes) {
-            Locator instance = new Locator();
-
-            return instance.doLocate(methodId, nodes);
-        }
-
-        public void visit(MethodCPUCCTNode node) {
-            if (node.getMethodId() == locatedMethodId) {
-                cctNodeCandidate = node;
+        public static MethodCPUCCTNode locate(int methodId, RuntimeCCTNode[] nodes) {
+            for(RuntimeCCTNode n : nodes) {
+                if (n instanceof MethodCPUCCTNode && ((MethodCPUCCTNode)n).getMethodId() == methodId)  {
+                    return (MethodCPUCCTNode)n;
+                }
             }
-        }
-
-        private MethodCPUCCTNode doLocate(int methodId, RuntimeCPUCCTNode.Children nodes) {
-            cctNodeCandidate = null;
-            locatedMethodId = methodId;
-            nodes.accept(this);
-
-            return cctNodeCandidate;
+            return null;
         }
     }
 
@@ -107,10 +97,6 @@ public class MethodCPUCCTNode extends TimedCPUCCTNode {
 
     public boolean isRoot() {
         return false;
-    }
-
-    public void accept(RuntimeCPUCCTNodeVisitor visitor) {
-        visitor.visit(this);
     }
 
     protected TimedCPUCCTNode createSelfInstance() {

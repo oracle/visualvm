@@ -43,8 +43,9 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
-import org.netbeans.lib.profiler.results.cpu.cct.*;
 import java.lang.ref.WeakReference;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
 
 /**
@@ -65,16 +66,6 @@ public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
             return (children != null) ? children[i] : null;
         }
 
-        public void accept(RuntimeCPUCCTNodeVisitor visitor) {
-            if (children == null) {
-                return;
-            }
-
-            for (int i = 0; i < children.length; i++) {
-                children[i].accept(visitor);
-            }
-        }
-
         public void attachNode(RuntimeCPUCCTNode node) {
             addChildEntry();
             children[children.length - 1] = node;
@@ -93,11 +84,15 @@ public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
                 children = newch;
             }
         }
+        
+        public RuntimeCPUCCTNode[] toArray() {
+            return children == null ? new RuntimeCPUCCTNode[0] : children;
+        }
     }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final Children children;
+    private final ArrayChildren children;
     private final WeakReference factoryRef;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -115,14 +110,14 @@ public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public synchronized Children getChildren() {
-        return children;
+    public RuntimeCCTNode[] getChildren() {
+        return children.toArray();
     }
 
     public void attachNodeAsChild(RuntimeCPUCCTNode node) {
         children.attachNode(node);
     }
-
+    
     protected CPUCCTNodeFactory getFactory() {
         return (factoryRef != null) ? (CPUCCTNodeFactory) factoryRef.get() : null;
     }

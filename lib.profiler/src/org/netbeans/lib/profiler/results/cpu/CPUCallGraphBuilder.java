@@ -51,7 +51,6 @@ import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
-import org.netbeans.lib.profiler.results.cpu.cct.RuntimeCPUCCTNodeVisitorAdaptor;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
@@ -65,6 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
+import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 
 
 /**
@@ -74,7 +74,7 @@ import java.util.logging.Level;
  */
 public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProfilingResultListener, CPUCCTProvider {
 
-    private class DebugInfoCollector extends RuntimeCPUCCTNodeVisitorAdaptor {
+    private class DebugInfoCollector extends RuntimeCCTNodeProcessor.PluginAdapter {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private StringBuffer buffer = new StringBuffer();
@@ -92,28 +92,28 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
         public synchronized String getInfo(RuntimeCPUCCTNode node) {
             buffer = new StringBuffer();
-            node.accept(this);
+            RuntimeCCTNodeProcessor.process(node, this);
 
             return buffer.toString();
         }
 
-        public void visit(MethodCPUCCTNode node) {
+        @Override
+        public void onNode(MethodCPUCCTNode node) {
             buffer.append(debugMethod(node.getMethodId()));
         }
-
-        public void visit(ServletRequestCPUCCTNode node) {
+        @Override
+        public void onNode(ServletRequestCPUCCTNode node) {
             buffer.append("Boundary"); // NOI18N
         }
-
-        public void visit(ThreadCPUCCTNode node) {
+        
+        @Override
+        public void onNode(ThreadCPUCCTNode node) {
             buffer.append("threadId = ").append(node.getThreadId()); // NOI18N
         }
-
-        public void visit(MarkedCPUCCTNode node) {
+        
+        @Override
+        public void onNode(MarkedCPUCCTNode node) {
             buffer.append("Category ").append(node.getMark()); // NOI18N
-        }
-
-        public void visit(SimpleCPUCCTNode node) {
         }
     }
 
@@ -920,7 +920,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         for (int i = ti.stackTopIdx; i >= 0; i--) {
             DebugInfoCollector collector = new DebugInfoCollector();
             TimedCPUCCTNode frame = ti.stack[i];
-            frame.accept(collector);
+            RuntimeCCTNodeProcessor.process(frame, collector);
             buffer.append(collector.getInfo(frame)).append('\n'); // NOI18N
         }
 
