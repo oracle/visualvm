@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.RuntimeCPUCCTNodeVisitor;
 
 
 /**
@@ -59,20 +58,13 @@ public interface RuntimeCPUCCTNode extends RuntimeCCTNode {
 
         RuntimeCPUCCTNode getChildAt(int i);
 
-        void accept(RuntimeCPUCCTNodeVisitor visitor);
-
         void attachNode(RuntimeCPUCCTNode node);
 
         int size();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    Children getChildren();
-
     boolean isRoot();
-
-    void accept(RuntimeCPUCCTNodeVisitor visitor);
 
     void attachNodeAsChild(RuntimeCPUCCTNode node);
 }
