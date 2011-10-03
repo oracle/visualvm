@@ -65,7 +65,6 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
-import org.openide.util.lookup.ServiceProviders;
 
 
 /**
@@ -400,11 +399,13 @@ public final class SnapshotResultsWindow extends TopComponent {
     }
 
     private void updateSaveState() {
-        saveSupport.setSaveEnabled(!snapshot.isSaved());
-        setActivatedNodes(new Node[] { saveSupport });
+        if (snapshot != null) { // snapshot == null means the window has been closed (#202992)
+            saveSupport.setSaveEnabled(!snapshot.isSaved());
+            setActivatedNodes(new Node[] { saveSupport });
 
-        if (displayedPanel != null) {
-            displayedPanel.updateSavedState();
+            if (displayedPanel != null) {
+                displayedPanel.updateSavedState();
+            }
         }
     }
 }
