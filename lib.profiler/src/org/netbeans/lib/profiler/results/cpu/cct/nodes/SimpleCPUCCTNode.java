@@ -68,8 +68,4 @@ public class SimpleCPUCCTNode extends BaseCPUCCTNode {
     public boolean isRoot() {
         return root;
     }
-
-    public void accept(RuntimeCPUCCTNodeVisitor visitor) {
-        visitor.visit(this);
-    }
 }

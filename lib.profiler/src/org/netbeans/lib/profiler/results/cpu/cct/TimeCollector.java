@@ -46,16 +46,18 @@ package org.netbeans.lib.profiler.results.cpu.cct;
 import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.marker.Mark;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkBasedNodeVisitor;
 import java.util.HashMap;
 import java.util.Map;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
+import org.netbeans.lib.profiler.results.cpu.marking.MarkAwareNodeProcessorPlugin;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class TimeCollector extends MarkBasedNodeVisitor {
+public class TimeCollector extends MarkAwareNodeProcessorPlugin {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class TimingData {
@@ -110,20 +112,22 @@ public class TimeCollector extends MarkBasedNodeVisitor {
         return (time > 0) ? time : 0;
     }
 
-    public void beforeWalk() {
-        super.beforeWalk();
+    @Override
+    public void onStart() {
+        super.onStart();
         timing.clear();
     }
 
-    public void endTrans() {
+    @Override
+    public void onStop() {
         if (isReset()) {
             this.timing = new HashMap();
         }
-
-        super.endTrans();
+        super.onStop();
     }
 
-    public void visit(final MethodCPUCCTNode node) {
+    @Override
+    public void onNode(MethodCPUCCTNode node) {
         if (isReset()) {
             return;
         }

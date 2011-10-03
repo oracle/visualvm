@@ -69,7 +69,7 @@ public class RuntimeMemoryCCTNode implements Cloneable, RuntimeCCTNode {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    /** Children nodes in the forward stack trace tree. This fiels can have three different values depending on the
+    /** Children nodes in the forward stack trace tree. This field can have three different values depending on the
      * number of children:
      *   null if there are no children
      *   instance of RuntimeMemoryCCTNode if there is exactly one child
@@ -130,6 +130,18 @@ public class RuntimeMemoryCCTNode implements Cloneable, RuntimeCCTNode {
             RuntimeMemoryCCTNode[] ar = addChildEntry();
             ar[ar.length - 1] = node;
         }
+    }
+
+    @Override
+    public RuntimeCCTNode[] getChildren() {
+        if (children == null) {
+            return new RuntimeCCTNode[0];
+        } else if (children instanceof RuntimeCCTNode) {
+            return new RuntimeCCTNode[]{(RuntimeCCTNode)children};
+        } else if (children instanceof RuntimeCCTNode[]) {
+            return (RuntimeCCTNode[])children;
+        }
+        return new RuntimeCCTNode[0];
     }
 
     public Object clone() {

@@ -44,9 +44,8 @@
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
 import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
-import org.netbeans.lib.profiler.results.cpu.cct.RuntimeCPUCCTNodeVisitor;
-import org.netbeans.lib.profiler.results.cpu.cct.RuntimeCPUCCTNodeVisitorAdaptor;
 import org.netbeans.lib.profiler.marker.Mark;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 
 
 /**
@@ -56,7 +55,7 @@ import org.netbeans.lib.profiler.marker.Mark;
 public class MarkedCPUCCTNode extends TimedCPUCCTNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    public static class Locator extends RuntimeCPUCCTNodeVisitorAdaptor {
+    public static class Locator {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private MarkedCPUCCTNode candidate = null;
@@ -69,24 +68,13 @@ public class MarkedCPUCCTNode extends TimedCPUCCTNode {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public static MarkedCPUCCTNode locate(Mark mark, RuntimeCPUCCTNode.Children nodes) {
-            Locator instance = new Locator();
-
-            return instance.doLocate(mark, nodes);
-        }
-
-        public void visit(MarkedCPUCCTNode node) {
-            if (node.getMark().equals(searchMark)) {
-                candidate = node;
+        public static MarkedCPUCCTNode locate(Mark mark, RuntimeCCTNode[] nodes) {
+            for(RuntimeCCTNode n : nodes) {
+                if (n instanceof MarkedCPUCCTNode && ((MarkedCPUCCTNode)n).getMark().equals(mark)) {
+                    return (MarkedCPUCCTNode)n;
+                }
             }
-        }
-
-        private MarkedCPUCCTNode doLocate(Mark mark, RuntimeCPUCCTNode.Children nodes) {
-            candidate = null;
-            searchMark = mark;
-            nodes.accept(this);
-
-            return candidate;
+            return null;
         }
     }
 
@@ -111,11 +99,7 @@ public class MarkedCPUCCTNode extends TimedCPUCCTNode {
     public boolean isRoot() {
         return false;
     }
-
-    public void accept(RuntimeCPUCCTNodeVisitor visitor) {
-        visitor.visit(this);
-    }
-
+    
     public boolean equals(Object otherNode) {
         if (otherNode == null) {
             return false;

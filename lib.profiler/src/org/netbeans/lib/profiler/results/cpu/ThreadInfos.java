@@ -78,7 +78,7 @@ class ThreadInfos {
                 return true;
             }
             for (int i = 0; i < threadInfos.length; i++) {
-                if ((threadInfos[i] != null) && (threadInfos[i].stack != null) && (threadInfos[i].stack[0] != null) && (threadInfos[i].stack[0].getChildren() != null) && (threadInfos[i].stack[0].getChildren().size() > 0)) {
+                if ((threadInfos[i] != null) && (threadInfos[i].stack != null) && (threadInfos[i].stack[0] != null) && (threadInfos[i].stack[0].getChildren() != null) && (threadInfos[i].stack[0].getChildren().length > 0)) {
                     return false;
                 }
             }

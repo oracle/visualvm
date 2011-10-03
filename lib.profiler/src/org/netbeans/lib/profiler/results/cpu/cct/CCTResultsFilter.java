@@ -53,13 +53,14 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
+public final class CCTResultsFilter extends RuntimeCCTNodeProcessor.PluginAdapter {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
     public static interface Evaluator {
@@ -104,8 +105,7 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
     }
 
     @Override
-    public void beforeWalk() {
-        super.beforeWalk();
+    public void onStart() {
         evaluators.clear();
         
         for(Iterator iter = evaluatorProviders.iterator();iter.hasNext();) {
@@ -114,9 +114,8 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
     }
 
     @Override
-    public void afterWalk() {
+    public void onStop() {
         evaluators.clear();
-        super.afterWalk();
     }
 
     public void reset() {
@@ -124,7 +123,7 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
     }
 
     @Override
-    public void visit(ThreadCPUCCTNode node) {
+    public void onNode(ThreadCPUCCTNode node) {
         LOGGER.finest("visiting thread node");
         passFlagStack.push(Boolean.valueOf(passingFilter));
         passingFilter = true;
@@ -135,11 +134,10 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
         }
 
         LOGGER.log(Level.FINEST, "Evaluator result: {0}", passingFilter);
-        super.visit(node);
     }
-
+    
     @Override
-    public void visit(MarkedCPUCCTNode node) {
+    public void onNode(MarkedCPUCCTNode node) {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.log(Level.FINEST, "Entering a node marked {0}", node.getMark().getId()); // NOI18N
         }
@@ -152,18 +150,15 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
             passingFilter = passingFilter && evaluator.evaluate(node.getMark());
         }
     }
-
+    
     @Override
-    public void visitPost(ThreadCPUCCTNode node) {
-        super.visitPost(node);
-
+    public void onBackout(ThreadCPUCCTNode node) {
         if (!passFlagStack.isEmpty()) {
             passingFilter = ((Boolean) passFlagStack.pop()).booleanValue();
         }
     }
-
-    @Override
-    public void visitPost(MarkedCPUCCTNode node) {
+    
+    public void onBackout(MarkedCPUCCTNode node) {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.log(Level.FINEST, "Leaving a node marked {0}", node.getMark().getId()); // NOI18N
         }
@@ -171,7 +166,7 @@ public final class CCTResultsFilter extends CPUCCTVisitorAdapter {
         if (!passFlagStack.isEmpty()) {
             passingFilter = ((Boolean) passFlagStack.pop()).booleanValue();
         }
-    }
+    }    
 
     private void doReset() {
         passingFilter = false;
