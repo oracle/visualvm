@@ -43,7 +43,8 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
-import org.netbeans.lib.profiler.results.cpu.cct.*;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
 
 /**
@@ -53,7 +54,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.*;
 public class ServletRequestCPUCCTNode extends TimedCPUCCTNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    public static class Locator extends RuntimeCPUCCTNodeVisitorAdaptor {
+    public static class Locator {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private ServletRequestCPUCCTNode cctNodeCandidate = null;
@@ -67,25 +68,16 @@ public class ServletRequestCPUCCTNode extends TimedCPUCCTNode {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public static ServletRequestCPUCCTNode locate(int requestType, String servletPath, RuntimeCPUCCTNode.Children nodes) {
-            Locator instance = new Locator();
-
-            return instance.doLocate(requestType, servletPath, nodes);
-        }
-
-        public void visit(ServletRequestCPUCCTNode node) {
-            if (node.getServletPath().equals(servletPath) && (node.getRequestType() == requestType)) {
-                cctNodeCandidate = node;
+        public static ServletRequestCPUCCTNode locate(int requestType, String servletPath, RuntimeCCTNode[] nodes) {
+            for(RuntimeCCTNode n : nodes) {
+                if (n instanceof ServletRequestCPUCCTNode) {
+                    ServletRequestCPUCCTNode sn = (ServletRequestCPUCCTNode)n;
+                    if (sn.getServletPath().equals(servletPath) && sn.getRequestType() == requestType) {
+                        return sn;
+                    }
+                }
             }
-        }
-
-        private ServletRequestCPUCCTNode doLocate(int requestType, String servletPath, RuntimeCPUCCTNode.Children nodes) {
-            cctNodeCandidate = null;
-            this.requestType = requestType;
-            this.servletPath = servletPath;
-            nodes.accept(this);
-
-            return cctNodeCandidate;
+            return null;
         }
     }
 
@@ -120,10 +112,6 @@ public class ServletRequestCPUCCTNode extends TimedCPUCCTNode {
 
     public String getServletPath() {
         return servletPath;
-    }
-
-    public void accept(RuntimeCPUCCTNodeVisitor visitor) {
-        visitor.visit(this);
     }
 
     public boolean equals(Object otherNode) {
