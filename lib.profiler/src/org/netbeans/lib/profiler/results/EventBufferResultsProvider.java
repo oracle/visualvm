@@ -44,12 +44,12 @@
 package org.netbeans.lib.profiler.results;
 
 import org.netbeans.lib.profiler.ProfilerClient;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.wireprotocol.EventBufferDumpedCommand;
 
 
 /**
@@ -64,7 +64,7 @@ public class EventBufferResultsProvider implements ProfilingResultsProvider {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final Set listeners = Collections.synchronizedSet(new HashSet());
+    private final Set listeners = new CopyOnWriteArraySet();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -82,13 +82,12 @@ public class EventBufferResultsProvider implements ProfilingResultsProvider {
         listeners.add(dispatcher);
     }
 
-    public void dataReady(int buffsize, int instrumentationType) {
+    public void processData(EventBufferDumpedCommand cmd, int instrumentationType) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("Profiling data ready "+buffsize); // NOI18N
+            LOGGER.finest("Profiling data ready "+cmd.getBufSize()); // NOI18N
         }
 
-        byte[] data = new byte[buffsize];
-        System.arraycopy(EventBufferProcessor.buf, 0, data, 0, buffsize);
+        byte[] data = EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
         fireProcessData(data, instrumentationType);
     }
 

@@ -131,10 +131,7 @@ public class ProfilerClient implements CommonConstants {
                         case Command.EVENT_BUFFER_DUMPED:
                             EventBufferDumpedCommand bufferDumpedCmd = ((EventBufferDumpedCommand) cmd);
                             
-                            EventBufferProcessor.readDataAndPrepareForProcessing(bufferDumpedCmd);
-                            EventBufferResultsProvider.getDefault().dataReady(bufferDumpedCmd.getBufSize(), getCurrentInstrType());
-                            sendSimpleRespToServer(true, null);
-
+                            EventBufferResultsProvider.getDefault().processData(bufferDumpedCmd, getCurrentInstrType());
                             break;
                         case Command.CLASS_LOADER_UNLOADING:
 
@@ -1181,6 +1178,16 @@ public class ProfilerClient implements CommonConstants {
             }
         }
     }
+    
+    /**
+     * Used from {@linkplain EventBufferProcessor} to send ACK before dispatching
+     * the data buffer for processing. <br/>
+     * Probably should be implemented more concisely but it would require substantial
+     * changes in the profiler client design.
+     */
+    public void sendACK() {
+        sendSimpleRespToServer(true, null);
+    }
 
     /**
      * This method is called both when the application is started by the tool, and when the tool attaches to a running
@@ -1953,10 +1960,8 @@ public class ProfilerClient implements CommonConstants {
             //  - explicite Get results (forceObtainedResultsDumpCalled)
             //  - CPU or Code Fragment profiling
             //  - CPU sampling
-            EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
-            EventBufferResultsProvider.getDefault().dataReady(bufSize, instrType);
+            EventBufferResultsProvider.getDefault().processData(cmd, instrType);
             handlingEventBufferDump = false;
-            sendSimpleRespToServer(true, null);
             forceObtainedResultsDumpCalled = false;
         }
     }
