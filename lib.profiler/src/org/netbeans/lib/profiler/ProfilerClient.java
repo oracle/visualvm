@@ -509,11 +509,10 @@ public class ProfilerClient implements CommonConstants {
                 System.arraycopy(status.getInstrMethodNames(), 0, instrMethodNames, 0, len);
                 instrMethodSigs = new String[len];
                 System.arraycopy(status.getInstrMethodSignatures(), 0, instrMethodSigs, 0, len);
+                return new CPUResultsSnapshot(resultsStart, System.currentTimeMillis(), cpuCctProvider, twoTimeStamps, instrClassNames, instrMethodNames, instrMethodSigs, len);
             } finally {
                 status.endTrans();
             }
-
-            return new CPUResultsSnapshot(resultsStart, System.currentTimeMillis(), cpuCctProvider, twoTimeStamps, instrClassNames, instrMethodNames, instrMethodSigs, len);
         }
     }
 
