@@ -31,8 +31,10 @@
 #include <process.h>
 #include <commdlg.h>
 #include <tchar.h>
+#include <shlwapi.h>
 
 // #define DEBUG 1
+#define ENV_USER_PROFILE "USERPROFILE"
 
 static char* getUserHomeFromRegistry(char* userhome);
 static char* GetStringValue(HKEY key, const char *name);
@@ -226,6 +228,17 @@ int WINAPI
         return retCode;
     }
 }
+char* getUserHomeFromShlwAPI(char* userhome) {
+    if (SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, userhome) == S_OK) {
+        return userhome;
+    }
+    return NULL;
+}
+
+char* getUserHomeFromEnv() {
+    // Get the value of the ENV_USER_PROFILE environment variable.
+    return getenv(ENV_USER_PROFILE);
+}
     
 char* getUserHomeFromRegistry(char* userhome)
 {
@@ -301,7 +314,14 @@ void parseConfigFile(const char* path) {
             *userdir = '\0';
             if (strstr(q, "${HOME}") == q) {
                 char userhome[MAX_PATH];
-                strcpy(userdir, getUserHomeFromRegistry(userhome));
+                char* computed_userhome = getUserHomeFromShlwAPI(userhome);                
+                if (computed_userhome == NULL) {
+                    computed_userhome = getUserHomeFromRegistry(userhome);
+                }
+                if (computed_userhome == NULL) {
+                    computed_userhome = getUserHomeFromEnv();
+                }
+                strcpy(userdir, computed_userhome);
                 q = q + strlen("${HOME}");
             }
             char *r = NULL;
