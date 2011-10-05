@@ -47,31 +47,17 @@ import org.netbeans.lib.profiler.client.AppStatusHandler.AsyncDialog;
 
 
 public class TestAsyncDialog implements AsyncDialog {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private boolean closed = false;
-    private boolean opened = false;
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public synchronized boolean isDisplayed() {
-        return opened && !closed;
-    }
-
-    public boolean cancelPressed() {
-        return false;
-    }
-
+   
     public synchronized void close() {
         //        if (closed)
         //            return;
-        closed = true;
+//        closed = true;
 
         //        notifyAll();
     }
 
     public synchronized void display() {
-        opened = true;
+//        opened = true;
 
         //        while (!closed) {
         //            try {
