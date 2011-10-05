@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.results;
 
 import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.wireprotocol.EventBufferDumpedCommand;
 
 
 /**
@@ -78,7 +77,7 @@ public interface ProfilingResultsProvider {
 
     void addDispatcher(ProfilingResultsProvider.Dispatcher dispatcher);
 
-    void processData(EventBufferDumpedCommand cmd, int instrumentationType);
+    void dataReady(int buffsize, int instrumentationType);
 
     void removeDispatcher(ProfilingResultsProvider.Dispatcher dispatcher);
 
