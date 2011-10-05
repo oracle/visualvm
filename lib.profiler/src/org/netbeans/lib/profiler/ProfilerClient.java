@@ -131,10 +131,7 @@ public class ProfilerClient implements CommonConstants {
                         case Command.EVENT_BUFFER_DUMPED:
                             EventBufferDumpedCommand bufferDumpedCmd = ((EventBufferDumpedCommand) cmd);
                             
-                            EventBufferProcessor.readDataAndPrepareForProcessing(bufferDumpedCmd);
-                            EventBufferResultsProvider.getDefault().dataReady(bufferDumpedCmd.getBufSize(), getCurrentInstrType());
-                            sendSimpleRespToServer(true, null);
-
+                            EventBufferResultsProvider.getDefault().processData(bufferDumpedCmd, getCurrentInstrType());
                             break;
                         case Command.CLASS_LOADER_UNLOADING:
 
@@ -512,11 +509,10 @@ public class ProfilerClient implements CommonConstants {
                 System.arraycopy(status.getInstrMethodNames(), 0, instrMethodNames, 0, len);
                 instrMethodSigs = new String[len];
                 System.arraycopy(status.getInstrMethodSignatures(), 0, instrMethodSigs, 0, len);
+                return new CPUResultsSnapshot(resultsStart, System.currentTimeMillis(), cpuCctProvider, twoTimeStamps, instrClassNames, instrMethodNames, instrMethodSigs, len);
             } finally {
                 status.endTrans();
             }
-
-            return new CPUResultsSnapshot(resultsStart, System.currentTimeMillis(), cpuCctProvider, twoTimeStamps, instrClassNames, instrMethodNames, instrMethodSigs, len);
         }
     }
 
@@ -1180,6 +1176,16 @@ public class ProfilerClient implements CommonConstants {
                 appStatusHandler.displayWarning(errorMessage);
             }
         }
+    }
+    
+    /**
+     * Used from {@linkplain EventBufferProcessor} to send ACK before dispatching
+     * the data buffer for processing. <br/>
+     * Probably should be implemented more concisely but it would require substantial
+     * changes in the profiler client design.
+     */
+    public void sendACK() {
+        sendSimpleRespToServer(true, null);
     }
 
     /**
@@ -1953,10 +1959,8 @@ public class ProfilerClient implements CommonConstants {
             //  - explicite Get results (forceObtainedResultsDumpCalled)
             //  - CPU or Code Fragment profiling
             //  - CPU sampling
-            EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
-            EventBufferResultsProvider.getDefault().dataReady(bufSize, instrType);
+            EventBufferResultsProvider.getDefault().processData(cmd, instrType);
             handlingEventBufferDump = false;
-            sendSimpleRespToServer(true, null);
             forceObtainedResultsDumpCalled = false;
         }
     }

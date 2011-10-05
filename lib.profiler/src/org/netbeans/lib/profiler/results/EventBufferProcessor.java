@@ -68,16 +68,17 @@ import org.netbeans.lib.profiler.wireprotocol.EventBufferDumpedCommand;
 public class EventBufferProcessor implements CommonConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    protected static ProfilingSessionStatus status;
-    protected static ProfilerClient profilerClient;
-    protected static byte[] buf;
-    protected static MappedByteBuffer mapByteBuf;
-    protected static File bufFile;
-    protected static RandomAccessFile raFile;
-    protected static FileChannel bufFileChannel;
-    protected static boolean bufFileExists;
-    protected static long startDataProcessingTime;
-    protected static long dataProcessingTime;
+    private static ProfilingSessionStatus status;
+    private static ProfilerClient profilerClient;
+    private static MappedByteBuffer mapByteBuf;
+    private static File bufFile;
+    private static RandomAccessFile raFile;
+    private static FileChannel bufFileChannel;
+    private static boolean bufFileExists;
+    private static long startDataProcessingTime;
+    private static long dataProcessingTime;
+    
+    final private static Object bufLock = new Object();
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -101,9 +102,11 @@ public class EventBufferProcessor implements CommonConstants {
             bufFile = new File(fileName);
             raFile = new RandomAccessFile(bufFile, "rw"); // NOI18N
             bufFileChannel = raFile.getChannel();
-            mapByteBuf = bufFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, EVENT_BUFFER_SIZE_IN_BYTES);
-            mapByteBuf.rewind();
-            mapByteBuf.mark();
+            synchronized(bufLock) {
+                mapByteBuf = bufFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, EVENT_BUFFER_SIZE_IN_BYTES);
+                mapByteBuf.rewind();
+                mapByteBuf.mark();
+            }
             bufFileExists = true;
         } catch (FileNotFoundException ex1) {
             return false;
@@ -127,21 +130,30 @@ public class EventBufferProcessor implements CommonConstants {
         status = profilerClient.getStatus();
     }
 
-    public static synchronized void readDataAndPrepareForProcessing(EventBufferDumpedCommand cmd) {
-        if (!status.remoteProfiling) {
-            int bufSizeInBytes = cmd.getBufSize();
-            if ((buf == null) || (buf.length < bufSizeInBytes)) {
-                buf = new byte[bufSizeInBytes];
+    private static final byte[] EMPTY_BUF = new byte[0];
+    public static byte[] readDataAndPrepareForProcessing(EventBufferDumpedCommand cmd) {
+        byte[] buf = EMPTY_BUF;
+        try {
+            if (!status.remoteProfiling) {
+                int bufSizeInBytes = cmd.getBufSize();
+                if ((buf == null) || (buf.length < bufSizeInBytes)) {
+                    buf = new byte[bufSizeInBytes];
+                }
+                synchronized (bufLock) {
+                    mapByteBuf.reset();
+                    mapByteBuf.get(buf, 0, bufSizeInBytes);
+                }
+            } else {
+                buf = cmd.getBuffer();
+                assert buf != null;
             }
-            mapByteBuf.reset();
-            mapByteBuf.get(buf, 0, bufSizeInBytes);
-        } else {
-            buf = cmd.getBuffer();
-            assert buf != null;
+            startDataProcessingTime = System.currentTimeMillis();
+            return buf;
+        } finally {
+            profilerClient.sendACK();
         }
-        startDataProcessingTime = System.currentTimeMillis();
     }
-
+    
     public static void removeEventBufferFile() {
         if ((status != null) && status.remoteProfiling) {
             return; // This may be called "uniformly" even during monitoring, when status isn't initialized
