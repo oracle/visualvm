@@ -80,8 +80,6 @@ import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
 import org.netbeans.lib.profiler.wireprotocol.WireIO;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.utils.OutputParameter;
 import org.openide.DialogDescriptor;
 import org.openide.ErrorManager;
 import org.openide.awt.StatusDisplayer;
@@ -96,13 +94,11 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -118,9 +114,9 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -152,220 +148,103 @@ import org.openide.DialogDisplayer;
  */
 public abstract class NetBeansProfiler extends Profiler {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
+    
     public static final class ProgressPanel implements AppStatusHandler.AsyncDialog {
-        //~ Static fields/initializers -------------------------------------------------------------------------------------------
-
+        
         private static final int DEFAULT_WIDTH = 350;
         private static final int DEFAULT_HEIGHT = 100;
-        private static final RequestProcessor commandQueue = new RequestProcessor("Async dialog command queue", 1); // NOI18N
-
-        //~ Enumerations ---------------------------------------------------------------------------------------------------------
-
-        private enum DialogState {//~ Enumeration constant initializers --------------------------------------------------------------------------------
-
-            CLOSED, NOT_OPENED, NOT_OPENED_CLOSED, OPEN;
-        }
-
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
+        
+        private volatile boolean opened;
+        private volatile boolean closed;
         private Dialog dialog;
-        private final Object dialogStateLock = new Object();
-        private final Object dialogInitLock = new Object();
-
-        //@GuardedBy dialogStatusLock
-        private DialogState dialogState = DialogState.NOT_OPENED;
-        private String message;
-        private boolean cancelAllowed;
-        private boolean cancelled = false;
-        //@GuardedBy dialogInitLock
-        private boolean instantiated;
-        private boolean showProgress;
-
-        //~ Constructors ---------------------------------------------------------------------------------------------------------
-
-        ProgressPanel(final String message, final boolean showProgress, final boolean cancelAllowed) {
+        
+        private final String message;
+        private final boolean showProgress;
+        private final Runnable cancelHandler;
+        
+        
+        private ProgressPanel(String message, boolean showProgress, Runnable cancelHandler) {
             this.message = message;
             this.showProgress = showProgress;
-            this.cancelAllowed = cancelAllowed;
-            this.dialogState = DialogState.NOT_OPENED;
+            this.cancelHandler = cancelHandler;
         }
 
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public boolean isDisplayed() {
-            synchronized (dialogStateLock) {
-                return dialogState == DialogState.OPEN;
-            }
-
-            //      return dialog.isVisible();
-        }
-
-        public boolean cancelPressed() {
-            return cancelled;
-        }
-
-        public synchronized void close() {
-            // run the close command on a separate serializing queue
-            commandQueue.post(new Runnable() {
-                    public void run() {
-                        dialogClose();
-                    }
-                });
-        }
-
-        /**
-         * This method is called to display the asynchronous wait dialog. It should block
-         * until the user explicitely cancels or method AsyncDialog.close is called
-         */
-        public synchronized void display() {
-            // run the display command on a separate serializing queue
-            commandQueue.post(new Runnable() {
-                    public void run() {
-                        instantiate();
-                        dialogShow();
-                    }
-                });
-        }
-
-        private void dialogClose() {
-            synchronized (dialogStateLock) {
-                if (dialogState == DialogState.OPEN) {
-                    LOGGER.finest("Closing async dialog"); // NOI18N
-
-                    if (dialog.isShowing()) {
-                        dialogCloseImpl(dialog);
-                    }
-
-                    dialogState = DialogState.CLOSED;
-                } else if (dialogState == DialogState.NOT_OPENED) {
-                    LOGGER.fine("Attempting to close async dialog without opening it first"); // NOI18N
-                    dialogState = DialogState.NOT_OPENED_CLOSED;
+        @Override
+        public void close() {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (!opened) closed = true;
+                    else dialog.setVisible(false);
                 }
-            }
+            });
+        }
+
+        @Override
+        public void display() {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    initUI();
+//                    RequestProcessor.getDefault().post(new Runnable() {
+//                        public void run() {
+                            if (!closed) dialog.setVisible(true);
+//                        }
+//                    });
+                }
+            });
         }
         
-        private static void dialogCloseImpl(final Dialog dialog) {
-            final CountDownLatch latch = new CountDownLatch(1);
+        private void initUI() {
+            JPanel panel = new JPanel(new BorderLayout(10, 10));
+            panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+            panel.add(new JLabel(message), BorderLayout.NORTH);
 
-            final ComponentListener listener = new ComponentAdapter() {
-                @Override
-                public void componentHidden(ComponentEvent e) {
-                    latch.countDown();
-                }
+            Dimension ps = panel.getPreferredSize();
+            ps.setSize(Math.max(ps.getWidth(), DEFAULT_WIDTH),
+                       Math.max(ps.getHeight(), showProgress ? DEFAULT_HEIGHT : ps.getHeight()));
+            panel.setPreferredSize(ps);
 
-                @Override
-                public void componentShown(ComponentEvent e) {
-                    super.componentShown(e);
-                }
-            };
-
-            dialog.addComponentListener(listener);
-            CommonUtils.runInEventDispatchThread(new Runnable() {
-                    public void run() {
-                        dialog.setVisible(false);
-                    }
-                });
-
-            try {
-                latch.await();
-                dialog.removeComponentListener(listener);
-            } catch (InterruptedException e) {
+            if (showProgress) {
+                JProgressBar progress = new JProgressBar();
+                progress.setIndeterminate(true);
+                panel.add(progress, BorderLayout.SOUTH);
             }
-        }
-
-        private void dialogShow() {
-            synchronized (dialogStateLock) {
-                if ((dialogState == DialogState.NOT_OPENED) || (dialogState == DialogState.CLOSED)) {
-                    LOGGER.finest("Showing async dialog"); // NOI18N
-
-                    Level lvl = LOGGER.getLevel();
-                    dialogShowImpl(dialog);
-                    dialogState = DialogState.OPEN;
-                } else if (dialogState == DialogState.NOT_OPENED_CLOSED) {
-                    LOGGER.fine("Async dialog has been closed before being opened. Setting to CLOSED"); // NOI18N
-                    dialogState = DialogState.CLOSED;
+            
+            Object[] cancelOpts = cancelHandler != null ? new Object[]
+                    { DialogDescriptor.CANCEL_OPTION } : new Object[] {};
+            DialogDescriptor descriptor = new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true,
+                                                               cancelOpts, DialogDescriptor.CANCEL_OPTION,
+                                                               DialogDescriptor.RIGHT_ALIGN, null,
+                                                               new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    cancelHandler.run();
                 }
-            }
-        }
-        
-        private static void dialogShowImpl(final Dialog dialog) {
-            final CountDownLatch latch = new CountDownLatch(1);
-
-            final ComponentListener listener = new ComponentAdapter() {
-                @Override
-                public void componentHidden(ComponentEvent e) {
-                    super.componentHidden(e);
-                }
-
-                @Override
-                public void componentShown(ComponentEvent e) {
-                    latch.countDown();
-                }
-            };
-
-            dialog.addComponentListener(listener);
-            CommonUtils.runInEventDispatchThread(new Runnable() {
-                    public void run() {
-                        dialog.setVisible(true);
-                    }
-                });
-
-            try {
-                latch.await();
-                dialog.removeComponentListener(listener);
-            } catch (InterruptedException e) {
-            }
-        }
-
-        private void instantiate() {
-            synchronized(dialogInitLock) {
-                if (instantiated) {
-                    return;
-                }
-
-                JPanel panel = new JPanel();
-                panel.setLayout(new BorderLayout(10, 10));
-                panel.setBorder(new EmptyBorder(15, 15, 15, 15));
-                panel.add(new JLabel(message), BorderLayout.NORTH);
-
-                final Dimension ps = panel.getPreferredSize();
-                ps.setSize(Math.max(ps.getWidth(), DEFAULT_WIDTH),
-                           Math.max(ps.getHeight(), showProgress ? DEFAULT_HEIGHT : ps.getHeight()));
-                panel.setPreferredSize(ps);
-
-                if (showProgress) {
-                    final JProgressBar progress = new JProgressBar();
-                    progress.setIndeterminate(true);
-                    panel.add(progress, BorderLayout.SOUTH);
-                }
-
-                dialog = DialogDisplayer.getDefault().createDialog(new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true,
-                                                                           cancelAllowed
-                                                                           ? new Object[] { DialogDescriptor.CANCEL_OPTION }
-                                                                           : new Object[] {  }, DialogDescriptor.CANCEL_OPTION,
-                                                                           DialogDescriptor.RIGHT_ALIGN, null,
-                                                                           new ActionListener() {
-                        public void actionPerformed(final ActionEvent e) {
-                            cancelled = true;
-
-                            synchronized (dialogStateLock) {
-                                assert dialogState == DialogState.OPEN;
-                                LOGGER.finest("Closing async dialog (cancel)"); // NOI18N
-                                dialogState = DialogState.CLOSED;
+            });
+            descriptor.setClosingOptions(cancelOpts);
+            dialog = DialogDisplayer.getDefault().createDialog(descriptor);
+            dialog.addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && dialog.isShowing()) {
+                        dialog.removeHierarchyListener(this);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                opened = true;
+                                if (closed) dialog.setVisible(false);
                             }
-                        }
-                    }));
-                instantiated = true;
-            }
+                        });
+                    }
+                }
+            });
+            if (dialog instanceof JDialog)
+                ((JDialog)dialog).setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         }
+        
     }
     
     // -- NetBeansProfiler-only callback classes ---------------------------------------------------------------------------
     private final class IDEAppStatusHandler implements AppStatusHandler {
         //~ Methods --------------------------------------------------------------------------------------------------------------
-        public AppStatusHandler.AsyncDialog getAsyncDialogInstance(final String message, final boolean showProgress, final boolean cancelAllowed) {
-            return new ProgressPanel(message, showProgress, cancelAllowed);
+        public AppStatusHandler.AsyncDialog getAsyncDialogInstance(String message, boolean showProgress, Runnable cancelHandler) {
+            return new ProgressPanel(message, showProgress, cancelHandler);
         }
 
         public boolean confirmWaitForConnectionReply() {
@@ -515,8 +394,6 @@ public abstract class NetBeansProfiler extends Profiler {
     private static boolean initialized = false;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    AppStatusHandler.AsyncDialog waitDialog = null;
 
     //--- Modifying instrumentation progress -------------------------------------
     boolean shouldDisplayDialog = true;
@@ -1223,40 +1100,15 @@ public abstract class NetBeansProfiler extends Profiler {
                     } catch (InterruptedException e) {
                     }
 
-                    waitDialog = getTargetAppRunner().getAppStatusHandler()
-                                                .getAsyncDialogInstance(MODIFYING_INSTRUMENTATION_MSG, true, false);
-
-                    if (waitDialog != null) {
-                        final AppStatusHandler.AsyncDialog dialog = waitDialog;
-
-                        if (EventQueue.isDispatchThread()) {
-                            dialog.display();
-                        } else {
-                            EventQueue.invokeLater(new Runnable() {
-                                    public void run() {
-                                        dialog.display();
-                                    }
-                                });
-                        }
-                    }
+                    AppStatusHandler.AsyncDialog waitDialog = getTargetAppRunner().getAppStatusHandler()
+                                                .getAsyncDialogInstance(MODIFYING_INSTRUMENTATION_MSG, true, null);
+                    waitDialog.display();
 
                     try {
                         prepareInstrumentation(profilingSettings);
                         changeStateTo(PROFILING_RUNNING);
                     } finally {
-                        if (waitDialog != null) {
-                            final AppStatusHandler.AsyncDialog dialog = waitDialog;
-
-                            if (EventQueue.isDispatchThread()) {
-                                dialog.close();
-                            } else {
-                                EventQueue.invokeLater(new Runnable() {
-                                        public void run() {
-                                            dialog.close();
-                                        }
-                                    });
-                            }
-                        }
+                        waitDialog.close();
 
                         getTargetAppRunner().getAppStatusHandler().resumeLiveUpdates();
                     }
@@ -1742,18 +1594,6 @@ public abstract class NetBeansProfiler extends Profiler {
 
         ClassRepository.clearCache();
         ClassRepository.initClassPaths(sharedSettings.getWorkingDir(), sharedSettings.getVMClassPaths());
-    }
-
-    private void closeWaitDialog() {
-        if (waitDialogOpen) {
-            waitDialog.close();
-            waitDialogOpen = false;
-        }
-    }
-
-    private void displayWaitDialog() {
-        waitDialogOpen = true;
-        waitDialog.display();
     }
 
     private void displayWarningAboutEntireAppProfiling() {

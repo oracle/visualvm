@@ -66,11 +66,6 @@ public interface AppStatusHandler {
     public static interface AsyncDialog {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        /** Checks if this dialog is being displayed (is visible) */
-        public boolean isDisplayed();
-
-        public boolean cancelPressed();
-
         public void close();
 
         /**
@@ -92,7 +87,7 @@ public interface AppStatusHandler {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public AsyncDialog getAsyncDialogInstance(String message, boolean showProgress, boolean cancelAllowed);
+    public AsyncDialog getAsyncDialogInstance(String message, boolean showProgress, Runnable cancelHandler);
 
     // The following methods should display messages asynchronously, i.e. they shouldn't block the current
     // thread waiting for the user pressing OK.
