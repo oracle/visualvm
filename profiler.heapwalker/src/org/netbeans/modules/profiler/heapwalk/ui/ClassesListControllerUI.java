@@ -402,20 +402,29 @@ public class ClassesListControllerUI extends JTitledPanel {
         RequestProcessor.getDefault().post(new Runnable() {
             @Override
             public void run() {
-                classListInitToken.acquireUninterruptibly();
-                for (int i = 0; i < displayCache.length; i++) {
-                    if (displayCache[i][4].equals(javaClass)) {
-                        final int rowIndex = i;
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                classesListTable.setRowSelectionInterval(rowIndex, rowIndex);
-                                classesListTable.ensureRowVisible(rowIndex);
-                                classListInitToken.release();
-                            }
-                        });
-
-                        break;
+                try {
+                    classListInitToken.acquireUninterruptibly();
+                    for (int i = 0; i < displayCache.length; i++) {
+                        if (displayCache[i][4].equals(javaClass)) {
+                            final int rowIndex = i;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        classesListTable.setRowSelectionInterval(rowIndex, rowIndex);
+                                        classesListTable.ensureRowVisible(rowIndex);
+                                    } finally {
+                                        classListInitToken.release();
+                                    }
+                                }
+                            });
+                            
+                            break;
+                        }
                     }
+                } catch (Throwable e) {
+                    classListInitToken.release();
+                    e.printStackTrace();
                 }
             }
         });
@@ -865,59 +874,70 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         CommonUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
-                final AtomicBoolean initInProgress = new AtomicBoolean(false);
-                
-                RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                if (contents != null && initInProgress.get())
-                                    contents.show(contentsPanel, NO_DATA);
-                            }
-                        });
-                    }
-                }, 100);
+                try {
+                    final AtomicBoolean initInProgress = new AtomicBoolean(false);
 
-                saveSelection();
-
-                BrowserUtils.performTask(new Runnable() {
-                    public void run() {
-                        initInProgress.set(true);
-                        
-                        final Object[][] displayCache2 = classesListController.getData(
-                                 FilterComponent.getFilterStrings(filterValue), filterType,
-                                 showZeroInstances, showZeroSize, sortingColumn, sortingOrder, columnCount);
-
-                        initInProgress.set(false);
-
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                if (isDiff != classesListController.isDiff()) {
-                                    isDiff = !isDiff;
-                                    CustomBarCellRenderer customBarCellRenderer = isDiff ?
-                                            new DiffBarCellRenderer(classesListController.minDiff, classesListController.maxDiff) :
-                                            new CustomBarCellRenderer(0, 100);
-                                    columnRenderers[1] = customBarCellRenderer;
-                                    
-                                    TableCellRenderer dataCellRenderer = isDiff ?
-                                            new LabelTableCellRenderer(JLabel.TRAILING) :
-                                            new LabelBracketTableCellRenderer(JLabel.TRAILING);
-                                    columnRenderers[2] = dataCellRenderer;
-                                    columnRenderers[3] = dataCellRenderer;
-                                    setColumnsData(false);
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    if (contents != null && initInProgress.get())
+                                        contents.show(contentsPanel, NO_DATA);
                                 }
-                                
-                                displayCache = displayCache2;
-                                classesListTableModel.fireTableDataChanged();
-                                restoreSelection();
-                                if (contents != null) contents.show(contentsPanel, DATA);
+                            });
+                        }
+                    }, 100);
+
+                    saveSelection();
+
+                    BrowserUtils.performTask(new Runnable() {
+                        public void run() {
+                            try {
+                                initInProgress.set(true);
+
+                                final Object[][] displayCache2 = classesListController.getData(
+                                         FilterComponent.getFilterStrings(filterValue), filterType,
+                                         showZeroInstances, showZeroSize, sortingColumn, sortingOrder, columnCount);
+
+                                initInProgress.set(false);
+
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        try {
+                                            if (isDiff != classesListController.isDiff()) {
+                                                isDiff = !isDiff;
+                                                CustomBarCellRenderer customBarCellRenderer = isDiff ?
+                                                        new DiffBarCellRenderer(classesListController.minDiff, classesListController.maxDiff) :
+                                                        new CustomBarCellRenderer(0, 100);
+                                                columnRenderers[1] = customBarCellRenderer;
+
+                                                TableCellRenderer dataCellRenderer = isDiff ?
+                                                        new LabelTableCellRenderer(JLabel.TRAILING) :
+                                                        new LabelBracketTableCellRenderer(JLabel.TRAILING);
+                                                columnRenderers[2] = dataCellRenderer;
+                                                columnRenderers[3] = dataCellRenderer;
+                                                setColumnsData(false);
+                                            }
+
+                                            displayCache = displayCache2;
+                                            classesListTableModel.fireTableDataChanged();
+                                            restoreSelection();
+                                            if (contents != null) contents.show(contentsPanel, DATA);
+                                        } finally {
+                                            classListInitToken.release();
+                                        }
+                                    }
+                                });
+                            } catch (Throwable t) {
                                 classListInitToken.release();
+                                t.printStackTrace();
                             }
-                        });
-
-                    }
-                });
-
+                        }
+                    });
+                } catch (Throwable t) {
+                    classListInitToken.release();
+                    t.printStackTrace();
+                } 
             }
         });
     }
