@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.results.cpu.MethodInfo;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 

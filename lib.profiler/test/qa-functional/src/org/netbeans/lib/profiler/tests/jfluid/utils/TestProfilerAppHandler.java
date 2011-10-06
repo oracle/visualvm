@@ -60,7 +60,7 @@ public class TestProfilerAppHandler implements AppStatusHandler {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public AsyncDialog getAsyncDialogInstance(String message, boolean showProgress, boolean cancelAllowed) {
+    public AsyncDialog getAsyncDialogInstance(String message, boolean showProgress, Runnable cancelHandler) {
         return new TestAsyncDialog();
     }
 

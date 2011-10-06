@@ -150,7 +150,6 @@ public class TargetAppRunner implements CommonConstants {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     // Required for dialog shown during calibration
-    private AppStatusHandler.AsyncDialog waitDialog;
     private AppStatusHandler appStatusHandler;
     private Process runningAppProcess;
     private ProfilerClient profilerClient;
@@ -301,7 +300,8 @@ public class TargetAppRunner implements CommonConstants {
     public boolean calibrateInstrumentationCode() {
         status.targetJDKVersionString = settings.getTargetJDKVersionString();
 
-        waitDialog = appStatusHandler.getAsyncDialogInstance(PERFORMING_CALIBRATION_MSG, false, false);
+        AppStatusHandler.AsyncDialog waitDialog =
+                appStatusHandler.getAsyncDialogInstance(PERFORMING_CALIBRATION_MSG, false, null);
         waitDialog.display();
 
         boolean res = false;
@@ -315,9 +315,7 @@ public class TargetAppRunner implements CommonConstants {
 
             return true;
         } finally {
-            if (waitDialog != null) {
-                waitDialog.close();
-            }
+            waitDialog.close();
 
             if (res) {
                 StringBuffer s = new StringBuffer();
