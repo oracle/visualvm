@@ -82,6 +82,7 @@
             <zipfileset dir="${netbeans.dest.dir}" filemode="755" prefix="${app.name}">
                 <include name="**/lib/nbexec*"/>
                 <include name="profiler*/lib/deployed/**/hpux*/lib*.sl"/>
+                <include name="profiler*/lib/deployed/**/lib*.so"/>
             </zipfileset>
 
             <zipfileset dir="${netbeans.dest.dir}" prefix="${app.name}">
@@ -91,6 +92,9 @@
                     </not>
                     <not>
                 	<filename name="profiler*/lib/deployed/**/hpux*/lib*.sl"/>
+                    </not>
+                    <not>
+                	<filename name="profiler*/lib/deployed/**/lib*.so"/>
                     </not>
                     <selector refid="zip.platform.included.files"/>
                     <not>
