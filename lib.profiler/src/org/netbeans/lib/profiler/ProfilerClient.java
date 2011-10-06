@@ -43,8 +43,6 @@
 
 package org.netbeans.lib.profiler;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -69,7 +67,6 @@ import org.netbeans.lib.profiler.results.memory.*;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.wireprotocol.*;
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -512,11 +509,10 @@ public class ProfilerClient implements CommonConstants {
                 System.arraycopy(status.getInstrMethodNames(), 0, instrMethodNames, 0, len);
                 instrMethodSigs = new String[len];
                 System.arraycopy(status.getInstrMethodSignatures(), 0, instrMethodSigs, 0, len);
+                return new CPUResultsSnapshot(resultsStart, System.currentTimeMillis(), cpuCctProvider, twoTimeStamps, instrClassNames, instrMethodNames, instrMethodSigs, len);
             } finally {
                 status.endTrans();
             }
-
-            return new CPUResultsSnapshot(resultsStart, System.currentTimeMillis(), cpuCctProvider, twoTimeStamps, instrClassNames, instrMethodNames, instrMethodSigs, len);
         }
     }
 
@@ -1598,7 +1594,6 @@ public class ProfilerClient implements CommonConstants {
     }
 
     private boolean connectToServer(int attachMode, boolean calibrationOnlyRun) {
-        AppStatusHandler.AsyncDialog waitDialog;
         status.targetAppRunning = false;
         targetVMAlive = false;
         terminateOrDetachCommandIssued = false;
@@ -1614,18 +1609,26 @@ public class ProfilerClient implements CommonConstants {
 
         final String host = taHost;
         final int port = settings.getPortNo();
-        waitDialog = appStatusHandler.getAsyncDialogInstance(CONNECT_VM_MSG, true, true);
-        waitDialog.display();
-
-        boolean waitForDisplayAndCloseIt = true;
-        boolean waitForConnection = true;
+        
+        final boolean[] waitForConnection = new boolean[1];
+        waitForConnection[0] = true;
         int noOfCycles = 600; // Timeout is set to 150 sec
-
+        
+        Runnable cancelHandler = new Runnable() {
+            public void run() {
+                waitForConnection[0] = false;
+                serverListener.cancel(); 
+            }
+        };
+        AppStatusHandler.AsyncDialog waitDialog =
+                appStatusHandler.getAsyncDialogInstance(CONNECT_VM_MSG, true, cancelHandler);
+        
         try {
             serverListener = new ServerListener();
+            waitDialog.display();
             serverListener.start();
 
-            while (waitForConnection) {
+            while (waitForConnection[0]) {
                 try {
                     clientSocket = new Socket(host, port);
                     clientSocket.setSoTimeout(0); // ATTENTION: timeout may be found useful eventually...
@@ -1634,7 +1637,7 @@ public class ProfilerClient implements CommonConstants {
                     socketIn = new ObjectInputStream(clientSocket.getInputStream());
                     wireIO = new WireIO(socketOut, socketIn);
 
-                    waitForConnection = false;
+                    waitForConnection[0] = false;
                     targetVMAlive = true; // This is in fact an assumption
                     serverListener.startRunning();
                 } catch (ConnectException ex) {
@@ -1644,14 +1647,9 @@ public class ProfilerClient implements CommonConstants {
                     } catch (InterruptedException iex) {
                     }
 
-                    if (waitDialog.cancelPressed()) {
-                        waitForConnection = false;
-                        serverListener.cancel();
-                    }
-
                     if (--noOfCycles == 0) {
                         MiscUtils.printWarningMessage("timed out while trying to connect to the target JVM."); // NOI18N
-                        waitForConnection = false;
+                        waitForConnection[0] = false;
                         serverListener.cancel();
                     }
                 }
@@ -1832,9 +1830,8 @@ public class ProfilerClient implements CommonConstants {
     }
 
     private void instrumentMethodGroupFromRoot(final RootClassLoadedCommand cmd) {
-        AppStatusHandler.AsyncDialog waitDialog = null;
-
         synchronized (instrumentationLock) {
+            AppStatusHandler.AsyncDialog waitDialog = null;
             try {
                 InstrumentMethodGroupResponse imgr = null;
 
@@ -1849,21 +1846,8 @@ public class ProfilerClient implements CommonConstants {
                 appStatusHandler.pauseLiveUpdates();
 
                 if (status.targetAppRunning) {
-                    waitDialog = appStatusHandler.getAsyncDialogInstance(PERFORMING_INSTRUMENTATION_STRING, true, false);
+                    waitDialog = appStatusHandler.getAsyncDialogInstance(PERFORMING_INSTRUMENTATION_STRING, true, null);
                     waitDialog.display();
-
-                    //          if (waitDialog != null) {
-                    //            final AppStatusHandler.AsyncDialog dialog = waitDialog;
-                    //            if (EventQueue.isDispatchThread()) {
-                    //              dialog.display();
-                    //            } else {
-                    //              EventQueue.invokeLater(new Runnable() {
-                    //                public void run() {
-                    //                  dialog.display();
-                    //                }
-                    //              });
-                    //            }
-                    //          }
                 }
 
                 // If the application is not running yet, it means that instrumentation is performed on startup. In that case,
@@ -1895,17 +1879,7 @@ public class ProfilerClient implements CommonConstants {
                 sendComplexRespToServer(imgr);
             } finally {
                 if (waitDialog != null) {
-                    final AppStatusHandler.AsyncDialog dialog = waitDialog;
-
-                    if (EventQueue.isDispatchThread()) {
-                        dialog.close();
-                    } else {
-                        EventQueue.invokeLater(new Runnable() {
-                                public void run() {
-                                    dialog.close();
-                                }
-                            });
-                    }
+                    waitDialog.close();
                 }
 
                 appStatusHandler.resumeLiveUpdates();
