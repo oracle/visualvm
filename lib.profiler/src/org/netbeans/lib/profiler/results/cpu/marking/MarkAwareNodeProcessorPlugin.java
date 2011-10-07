@@ -37,7 +37,8 @@
  */
 package org.netbeans.lib.profiler.results.cpu.marking;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import org.netbeans.lib.profiler.global.TransactionalSupport;
 import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
@@ -50,7 +51,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 public class MarkAwareNodeProcessorPlugin extends RuntimeCCTNodeProcessor.PluginAdapter implements MarkingEngine.StateObserver {
     volatile boolean resetFlag = false;
     private Mark parentMark = null;
-    private Stack markStack;
+    private Deque<Mark> markStack = new ArrayDeque<Mark>();
     private final TransactionalSupport transaction = new TransactionalSupport();
     
     @Override
@@ -85,7 +86,7 @@ public class MarkAwareNodeProcessorPlugin extends RuntimeCCTNodeProcessor.Plugin
 
     public void endTrans() {
         if (resetFlag) {
-            this.markStack = new Stack();
+            markStack.clear();
             resetFlag = false;
         }
 

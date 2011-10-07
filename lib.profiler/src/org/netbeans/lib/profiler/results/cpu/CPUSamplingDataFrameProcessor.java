@@ -239,7 +239,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                         JMethodIdTableEntry entry = methodIdTable.getEntry(methodId);
                         String method = formatter.formatMethodName(entry.className, entry.methodName, entry.methodSig).toFormatted();
                         String className = entry.className.replace('/','.');
-                        el = new StackTraceElement(className, method, null, -1);
+                        el = new StackTraceElement(className, method, entry.methodSig, -1);
                         stackTraceElements.put(Integer.valueOf(methodId),el);
                     }
                     stackTrace[i] = el;
