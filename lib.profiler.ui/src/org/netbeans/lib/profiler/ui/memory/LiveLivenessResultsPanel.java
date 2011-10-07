@@ -135,51 +135,71 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
         Object source = e.getSource();
 
         if (source == popupRemoveProfForClass) {
-            MemoryCCTProvider olcgb = runner.getProfilerClient().getMemoryCCTProvider();
-            boolean[] newlyUnprofiledClasses = new boolean[sortedClassIds.length];
-            int line = ((Integer) filteredToFullIndexes.get(clickedLine)).intValue();
+            new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    MemoryCCTProvider olcgb = runner.getProfilerClient().getMemoryCCTProvider();
+                    boolean[] newlyUnprofiledClasses = new boolean[sortedClassIds.length];
+                    int line = ((Integer) filteredToFullIndexes.get(clickedLine)).intValue();
 
-            if (!olcgb.classMarkedUnprofiled(sortedClassIds[line])) {
-                olcgb.markClassUnprofiled(sortedClassIds[line]);
-                newlyUnprofiledClasses[sortedClassIds[line]] = true;
+                    if (!olcgb.classMarkedUnprofiled(sortedClassIds[line])) {
+                        olcgb.markClassUnprofiled(sortedClassIds[line]);
+                        newlyUnprofiledClasses[sortedClassIds[line]] = true;
 
-                if (line < nTrackedAllocObjects.length) { // The following arrays may actually be smaller
-                    nTrackedAllocObjects[line] = 0;
-                    nTrackedLiveObjects[line] = 0;
-                    trackedLiveObjectsSize[line] = 0;
-                    avgObjectAge[line] = 0;
-                    maxSurvGen[line] = 0;
+                        if (line < nTrackedAllocObjects.length) { // The following arrays may actually be smaller
+                            nTrackedAllocObjects[line] = 0;
+                            nTrackedLiveObjects[line] = 0;
+                            trackedLiveObjectsSize[line] = 0;
+                            avgObjectAge[line] = 0;
+                            maxSurvGen[line] = 0;
+                        }
+
+                        nTotalAllocObjects[line] = 0;
+
+                        deinstrumentMemoryProfiledClasses(newlyUnprofiledClasses);
+                    }
+                    return null;
                 }
 
-                nTotalAllocObjects[line] = 0;
-
-                deinstrumentMemoryProfiledClasses(newlyUnprofiledClasses);
-            }
-
-            prepareResults();
+                @Override
+                protected void done() {
+                    prepareResults();
+                }
+            }.execute();
         } else if (source == popupRemoveProfForClassesBelow) {
-            int line = clickedLine;
-            MemoryCCTProvider olcgb = runner.getProfilerClient().getMemoryCCTProvider();
-            boolean[] newlyUnprofiledClasses = new boolean[sortedClassIds.length];
-            int nClasses = filteredToFullIndexes.size();
+            new SwingWorker() {
 
-            for (int i = line + 1; i < nClasses; i++) {
-                int index = ((Integer) filteredToFullIndexes.get(i)).intValue();
+                @Override
+                protected Object doInBackground() throws Exception {
+                    int line = clickedLine;
+                    MemoryCCTProvider olcgb = runner.getProfilerClient().getMemoryCCTProvider();
+                    boolean[] newlyUnprofiledClasses = new boolean[sortedClassIds.length];
+                    int nClasses = filteredToFullIndexes.size();
 
-                if (!olcgb.classMarkedUnprofiled(sortedClassIds[index])) {
-                    olcgb.markClassUnprofiled(sortedClassIds[index]);
-                    newlyUnprofiledClasses[sortedClassIds[index]] = true;
-                    nTrackedAllocObjects[index] = 0;
-                    nTrackedLiveObjects[index] = 0;
-                    trackedLiveObjectsSize[index] = 0;
-                    avgObjectAge[index] = 0;
-                    maxSurvGen[index] = 0;
-                    nTotalAllocObjects[index] = 0;
+                    for (int i = line + 1; i < nClasses; i++) {
+                        int index = ((Integer) filteredToFullIndexes.get(i)).intValue();
+
+                        if (!olcgb.classMarkedUnprofiled(sortedClassIds[index])) {
+                            olcgb.markClassUnprofiled(sortedClassIds[index]);
+                            newlyUnprofiledClasses[sortedClassIds[index]] = true;
+                            nTrackedAllocObjects[index] = 0;
+                            nTrackedLiveObjects[index] = 0;
+                            trackedLiveObjectsSize[index] = 0;
+                            avgObjectAge[index] = 0;
+                            maxSurvGen[index] = 0;
+                            nTotalAllocObjects[index] = 0;
+                        }
+                    }
+                    deinstrumentMemoryProfiledClasses(newlyUnprofiledClasses);
+                    
+                    return null;
                 }
-            }
 
-            deinstrumentMemoryProfiledClasses(newlyUnprofiledClasses);
-            prepareResults();
+                @Override
+                protected void done() {
+                    prepareResults();
+                }
+            }.execute();
         } else if (source == popupShowSource && popupShowSource != null) {
             showSourceForClass(selectedClassId);
         } else if (source == popupShowStacks) {

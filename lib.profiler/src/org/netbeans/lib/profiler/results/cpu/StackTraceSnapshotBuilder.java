@@ -84,15 +84,22 @@ public class StackTraceSnapshotBuilder {
         
         final String className;
         final String methodName;
+        final String signature;
         
         MethodInfo(String className, String methodName) {
             this.className = className;
             this.methodName = methodName;
+            signature = "";
         }
         
         MethodInfo(StackTraceElement element) {
             className = element.getClassName();
             methodName = element.getMethodName() + (element.isNativeMethod() ? "[native]" : ""); // NOI18N
+            if (element.getLineNumber() == -1) {
+                signature = element.getFileName();
+            } else {
+                signature = ""; // NOI18N
+            }
         }
         
         @Override
@@ -212,7 +219,7 @@ public class StackTraceSnapshotBuilder {
         
         @Override
         public String getInstrMethodSignature(int methodId) {
-            return "";
+            return methodInfos.get(methodId).signature;
         }
         
         @Override
@@ -472,7 +479,14 @@ public class StackTraceSnapshotBuilder {
             Integer mId = methodInfoMap.get(mi);
             if (mId == null) {
                 mId = registerNewMethodInfo(mi);
-                if (status != null) status.updateInstrMethodsInfo(mi.className,0,mi.methodName,"");
+                if (status != null) {
+                    String method = mi.methodName;
+                    int index = method.indexOf('(');
+                    if (index > 0) {
+                        method = method.substring(0,index);
+                    }
+                    status.updateInstrMethodsInfo(mi.className,0,method,mi.signature);
+                }
             }
             
             if (asRoot && !inRoot) {
