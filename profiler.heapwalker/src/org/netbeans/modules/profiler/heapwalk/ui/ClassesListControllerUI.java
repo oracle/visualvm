@@ -78,6 +78,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -393,26 +394,40 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     // --- Public interface ------------------------------------------------------
-    public void selectClass(JavaClass javaClass) {
+    public void selectClass(final JavaClass javaClass) {
         //    if (isShowing()) {
         if ((displayCache == null) || (displayCache.length == 0)) {
             return;
         }
-
-        for (int i = 0; i < displayCache.length; i++) {
-            if (displayCache[i][4].equals(javaClass)) {
-                classesListTable.setRowSelectionInterval(i, i);
-
-                final int rowIndex = i;
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            classesListTable.ensureRowVisible(rowIndex);
+        RequestProcessor.getDefault().post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    classListInitToken.acquireUninterruptibly();
+                    for (int i = 0; i < displayCache.length; i++) {
+                        if (displayCache[i][4].equals(javaClass)) {
+                            final int rowIndex = i;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        classesListTable.setRowSelectionInterval(rowIndex, rowIndex);
+                                        classesListTable.ensureRowVisible(rowIndex);
+                                    } finally {
+                                        classListInitToken.release();
+                                    }
+                                }
+                            });
+                            
+                            break;
                         }
-                    });
-
-                break;
+                    }
+                } catch (Throwable e) {
+                    classListInitToken.release();
+                    e.printStackTrace();
+                }
             }
-        }
+        });
 
         //      needsSelectInstance = false;
         //    } else {
@@ -841,63 +856,88 @@ public class ClassesListControllerUI extends JTitledPanel {
             });
     }
 
+    /**
+     * #192918
+     * This semaphore guards access to the class list model.
+     * 
+     * "initData" method takes the only one permission from this semaphore and 
+     * returns it after "classListTableModel" has been refreshed.
+     * All other methods wishing to directly or indirectly modify the "classListTableModel" (eg. setClass())
+     * must try to obtain a permission from a thread *DIFFERENT FROM EDT* as "initData()" method defers
+     * parts of its execution via SwingUtilities.invokeLater() and obtaining the permission form EDT
+     * will lead to inevitable deadlock.
+     */
+    final Semaphore classListInitToken = new Semaphore(1);
     private void initData() {
+        classListInitToken.acquireUninterruptibly();
         if (displayCache == null) displayCache = new Object[0][columnCount + 1];
 
         CommonUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
-                final AtomicBoolean initInProgress = new AtomicBoolean(false);
-                
-                RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                if (contents != null && initInProgress.get())
-                                    contents.show(contentsPanel, NO_DATA);
-                            }
-                        });
-                    }
-                }, 100);
+                try {
+                    final AtomicBoolean initInProgress = new AtomicBoolean(false);
 
-                saveSelection();
-
-                BrowserUtils.performTask(new Runnable() {
-                    public void run() {
-                        initInProgress.set(true);
-                        
-                        final Object[][] displayCache2 = classesListController.getData(
-                                 FilterComponent.getFilterStrings(filterValue), filterType,
-                                 showZeroInstances, showZeroSize, sortingColumn, sortingOrder, columnCount);
-
-                        initInProgress.set(false);
-
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                if (isDiff != classesListController.isDiff()) {
-                                    isDiff = !isDiff;
-                                    CustomBarCellRenderer customBarCellRenderer = isDiff ?
-                                            new DiffBarCellRenderer(classesListController.minDiff, classesListController.maxDiff) :
-                                            new CustomBarCellRenderer(0, 100);
-                                    columnRenderers[1] = customBarCellRenderer;
-                                    
-                                    TableCellRenderer dataCellRenderer = isDiff ?
-                                            new LabelTableCellRenderer(JLabel.TRAILING) :
-                                            new LabelBracketTableCellRenderer(JLabel.TRAILING);
-                                    columnRenderers[2] = dataCellRenderer;
-                                    columnRenderers[3] = dataCellRenderer;
-                                    setColumnsData(false);
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    if (contents != null && initInProgress.get())
+                                        contents.show(contentsPanel, NO_DATA);
                                 }
-                                
-                                displayCache = displayCache2;
-                                classesListTableModel.fireTableDataChanged();
-                                restoreSelection();
-                                if (contents != null) contents.show(contentsPanel, DATA);
+                            });
+                        }
+                    }, 100);
+
+                    saveSelection();
+
+                    BrowserUtils.performTask(new Runnable() {
+                        public void run() {
+                            try {
+                                initInProgress.set(true);
+
+                                final Object[][] displayCache2 = classesListController.getData(
+                                         FilterComponent.getFilterStrings(filterValue), filterType,
+                                         showZeroInstances, showZeroSize, sortingColumn, sortingOrder, columnCount);
+
+                                initInProgress.set(false);
+
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        try {
+                                            if (isDiff != classesListController.isDiff()) {
+                                                isDiff = !isDiff;
+                                                CustomBarCellRenderer customBarCellRenderer = isDiff ?
+                                                        new DiffBarCellRenderer(classesListController.minDiff, classesListController.maxDiff) :
+                                                        new CustomBarCellRenderer(0, 100);
+                                                columnRenderers[1] = customBarCellRenderer;
+
+                                                TableCellRenderer dataCellRenderer = isDiff ?
+                                                        new LabelTableCellRenderer(JLabel.TRAILING) :
+                                                        new LabelBracketTableCellRenderer(JLabel.TRAILING);
+                                                columnRenderers[2] = dataCellRenderer;
+                                                columnRenderers[3] = dataCellRenderer;
+                                                setColumnsData(false);
+                                            }
+
+                                            displayCache = displayCache2;
+                                            classesListTableModel.fireTableDataChanged();
+                                            restoreSelection();
+                                            if (contents != null) contents.show(contentsPanel, DATA);
+                                        } finally {
+                                            classListInitToken.release();
+                                        }
+                                    }
+                                });
+                            } catch (Throwable t) {
+                                classListInitToken.release();
+                                t.printStackTrace();
                             }
-                        });
-
-                    }
-                });
-
+                        }
+                    });
+                } catch (Throwable t) {
+                    classListInitToken.release();
+                    t.printStackTrace();
+                } 
             }
         });
     }

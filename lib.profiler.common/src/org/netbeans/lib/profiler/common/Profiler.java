@@ -78,17 +78,6 @@ import org.openide.util.Lookup;
  * @author Ian Formanek
  */
 public abstract class Profiler {
-    /**
-     * IoC pattern for obtaining the {@linkplain TargetAppRunner} singleton
-     * created by the profiler.<br/>
-     * This class must be registered in <b>META-INF/services</b> for proper
-     * profiler functionality.
-     */
-    public static class TARAccessor implements TargetAppRunner.Accessor {
-        public TargetAppRunner getInstance() {
-            return Profiler.getDefault().getTargetAppRunner();
-        }
-    }
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // Profiling states
