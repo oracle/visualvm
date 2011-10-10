@@ -60,9 +60,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 
 /**
@@ -152,18 +151,17 @@ public class TargetAppRunner implements CommonConstants {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     // Required for dialog shown during calibration
-    private AppStatusHandler.AsyncDialog waitDialog;
     private AppStatusHandler appStatusHandler;
     private Process runningAppProcess;
     private ProfilerClient profilerClient;
     private ProfilerEngineSettings settings;
     private ProfilingPointsProcessor profilingPointProcessor;
     private ProfilingSessionStatus status;
-    private Vector listeners = new Vector();
+    private Collection<ProfilingEventListener> listeners = new CopyOnWriteArraySet<ProfilingEventListener>();
     private boolean targetAppIsSuspended;
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
+    //~ Constructors -------------------------------------------------------------------------------------------------------------    
+    
     public TargetAppRunner(ProfilerEngineSettings settings, AppStatusHandler ash, ProfilingPointsProcessor ppp) {
         this.settings = settings;
         status = new ProfilingSessionStatus();
@@ -276,7 +274,8 @@ public class TargetAppRunner implements CommonConstants {
     public boolean calibrateInstrumentationCode() {
         status.targetJDKVersionString = settings.getTargetJDKVersionString();
 
-        waitDialog = appStatusHandler.getAsyncDialogInstance(PERFORMING_CALIBRATION_MSG, false, false);
+        AppStatusHandler.AsyncDialog waitDialog =
+                appStatusHandler.getAsyncDialogInstance(PERFORMING_CALIBRATION_MSG, false, null);
         waitDialog.display();
 
         boolean res = false;
@@ -290,9 +289,7 @@ public class TargetAppRunner implements CommonConstants {
 
             return true;
         } finally {
-            if (waitDialog != null) {
-                waitDialog.close();
-            }
+            waitDialog.close();
 
             if (res) {
                 StringBuffer s = new StringBuffer();
@@ -602,48 +599,36 @@ public class TargetAppRunner implements CommonConstants {
     }
 
     private void notifyListeners(int event) {
-        Vector targets = null;
+        for (ProfilingEventListener target : listeners) {
+            switch (event) {
+                case EVENT_STARTED:
+                    target.targetAppStarted();
 
-        synchronized (this) {
-            if (listeners != null) {
-                targets = (java.util.Vector) listeners.clone();
-            }
-        }
+                    break;
+                case EVENT_STOPPED:
+                    target.targetAppStopped();
 
-        if (targets != null) {
-            for (int i = 0; i < targets.size(); i++) {
-                ProfilingEventListener target = (ProfilingEventListener) targets.elementAt(i);
+                    break;
+                case EVENT_SUSPENDED:
+                    target.targetAppSuspended();
 
-                switch (event) {
-                    case EVENT_STARTED:
-                        target.targetAppStarted();
+                    break;
+                case EVENT_RESUMED:
+                    target.targetAppResumed();
 
-                        break;
-                    case EVENT_STOPPED:
-                        target.targetAppStopped();
+                    break;
+                case EVENT_TERMINATED:
+                    target.targetVMTerminated();
 
-                        break;
-                    case EVENT_SUSPENDED:
-                        target.targetAppSuspended();
+                    break;
+                case EVENT_ATTACHED:
+                    target.attachedToTarget();
 
-                        break;
-                    case EVENT_RESUMED:
-                        target.targetAppResumed();
+                    break;
+                case EVENT_DETACHED:
+                    target.detachedFromTarget();
 
-                        break;
-                    case EVENT_TERMINATED:
-                        target.targetVMTerminated();
-
-                        break;
-                    case EVENT_ATTACHED:
-                        target.attachedToTarget();
-
-                        break;
-                    case EVENT_DETACHED:
-                        target.detachedFromTarget();
-
-                        break;
-                }
+                    break;
             }
         }
     }

@@ -90,7 +90,7 @@ public final class ProfilerDialogsProviderImpl extends ProfilerDialogsProvider {
 
     @Override
     public Boolean displayConfirmationDNSA(String message, String caption, String dnsaMessage, boolean cancellable, String key, boolean dnsaDefault) {
-        ProfilerDialogs.DNSAConfirmationChecked dnsa = new ProfilerDialogs.DNSAConfirmationChecked(
+        ProfilerDialogs.DNSAConfirmation dnsa = new ProfilerDialogs.DNSAConfirmation(
                 key, message, cancellable ? NotifyDescriptor.YES_NO_CANCEL_OPTION : NotifyDescriptor.YES_NO_OPTION);
         if (caption != null) dnsa.setTitle(caption);
         if (dnsaMessage != null) dnsa.setDNSAMessage(dnsaMessage);

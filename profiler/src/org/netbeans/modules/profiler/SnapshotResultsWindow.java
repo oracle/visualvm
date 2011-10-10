@@ -43,13 +43,13 @@
 
 package org.netbeans.modules.profiler;
 
+import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.actions.FindAction;
 import org.openide.cookies.SaveCookie;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CallbackSystemAction;
 import org.openide.util.actions.SystemAction;
@@ -63,6 +63,8 @@ import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.Lookup;
+import org.openide.util.lookup.ServiceProvider;
 
 
 /**
@@ -71,9 +73,39 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
-public final class SnapshotResultsWindow extends TopComponent implements SnapshotsListener {
+public final class SnapshotResultsWindow extends TopComponent {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
+    
+    /* 
+     * The following code is an externalization of various listeners registered
+     * in the global lookup and needing access to an enclosing instance of
+     * SnapshotResultsWindow. 
+     * The enclosing instance will use the FQN registration to obtain the shared instance
+     * of the listener implementation and inject itself as a delegate into the listener.
+     */
+    @ServiceProvider(service=SnapshotsListener.class)   
+    public static class SnapshotListener extends Delegate<SnapshotResultsWindow> implements SnapshotsListener {
+        @Override
+        public void snapshotLoaded(LoadedSnapshot snapshot) {
+            // ignore
+        }
 
+        @Override
+        public void snapshotRemoved(LoadedSnapshot snapshot) {
+            // ignore
+        }
+
+        @Override
+        public void snapshotSaved(LoadedSnapshot snapshot) {
+            if (getDelegate() != null) getDelegate().updateSaveState();
+        }
+
+        @Override
+        public void snapshotTaken(LoadedSnapshot snapshot) {
+            // ignore
+        }
+    }
+    
     public static interface FindPerformer {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
@@ -164,7 +196,6 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
      */
     public SnapshotResultsWindow(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
         this.snapshot = ls;
-        ResultsManager.getDefault().addSnapshotsListener(this);
         updateSaveState();
 
         setLayout(new BorderLayout());
@@ -189,6 +220,7 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
 
                 break;
         }
+        Lookup.getDefault().lookup(SnapshotListener.class).setDelegate(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -288,22 +320,6 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
         }
     }
 
-    public void snapshotLoaded(LoadedSnapshot snapshot) {
-        // ignore
-    }
-
-    public void snapshotRemoved(LoadedSnapshot snapshot) {
-        // ignore
-    }
-
-    public void snapshotSaved(LoadedSnapshot snapshot) {
-        updateSaveState();
-    }
-
-    public void snapshotTaken(LoadedSnapshot snapshot) {
-        // ignore
-    }
-
     public void updateTitle() {
         if (snapshot.isSaved()) {
             setName(tabName);
@@ -319,7 +335,6 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
         }
 
         ResultsManager.getDefault().closeSnapshot(snapshot);
-        ResultsManager.getDefault().removeSnapshotsListener(this);
         snapshot = null;
     }
 
@@ -384,11 +399,13 @@ public final class SnapshotResultsWindow extends TopComponent implements Snapsho
     }
 
     private void updateSaveState() {
-        saveSupport.setSaveEnabled(!snapshot.isSaved());
-        setActivatedNodes(new Node[] { saveSupport });
+        if (snapshot != null) { // snapshot == null means the window has been closed (#202992)
+            saveSupport.setSaveEnabled(!snapshot.isSaved());
+            setActivatedNodes(new Node[] { saveSupport });
 
-        if (displayedPanel != null) {
-            displayedPanel.updateSavedState();
+            if (displayedPanel != null) {
+                displayedPanel.updateSavedState();
+            }
         }
     }
 }
