@@ -69,8 +69,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArraySet;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -148,8 +149,8 @@ public class StatisticsPanel extends JPanel {
             filler.setOpaque(false);
             nameLabel = new KeyboardAwareLabel(new Runnable() {
                     public void run() {
-                        for (int i = 0; i < listeners.size(); i++) {
-                            ((Listener) listeners.get(i)).itemClicked(index);
+                        for (Listener l : listeners) {
+                            l.itemClicked(index);
                         }
                     }
                 });
@@ -176,8 +177,8 @@ public class StatisticsPanel extends JPanel {
                     public void mouseClicked(MouseEvent e) {
                         int clickedItem = pieChart.getItemIndexAt(e.getX(), e.getY());
 
-                        for (int i = 0; i < listeners.size(); i++) {
-                            ((Listener) listeners.get(i)).itemClicked(clickedItem);
+                        for (Listener l : listeners) {
+                            l.itemClicked(clickedItem);
                         }
                     }
 
@@ -463,7 +464,7 @@ public class StatisticsPanel extends JPanel {
     private NavPanel navPanel;
     private PieChart pieChart;
     private Runnable navigationBackPerformer;
-    private Vector listeners = new Vector();
+    private Collection<Listener> listeners = new CopyOnWriteArraySet<Listener>();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -485,9 +486,7 @@ public class StatisticsPanel extends JPanel {
 
     // --- Listener stuff --------------------------------------------------------
     public void addListener(Listener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     // --- Public interface ------------------------------------------------------

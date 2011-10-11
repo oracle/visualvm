@@ -224,7 +224,8 @@ public abstract class Profiler {
         if (!profilingStateListeners.contains(profilingStateListener)) {
             profilingStateListeners.add(profilingStateListener);
             profilingStateListener.profilingStateChanged(new ProfilingStateEvent(-1, currentProfilingState, defaultProfiler));
-            profilingStateListener.instrumentationChanged(-1, getTargetAppRunner().getProfilerClient().getCurrentInstrType());
+            // should not add listeners in the middle of profiling session
+            // profilingStateListener.instrumentationChanged(-1, getTargetAppRunner().getProfilerClient().getCurrentInstrType());
         }
     }
 

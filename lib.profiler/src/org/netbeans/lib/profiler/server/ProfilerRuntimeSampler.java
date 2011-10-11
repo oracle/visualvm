@@ -85,40 +85,42 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
             Stacks.getAllStackTraces(newThreads, newStates, newMethodIds);
             timestamp = Timers.getCurrentTimeInCounts();
             
-            synchronized (eventBuffer) {
-                writeThreadDumpStart(timestamp);
-                for (int i = 0; i < newThreads[0].length; i++) {
-                    Thread t = newThreads[0][i];
-                    int[] mids = newMethodIds[0][i];
-                    
-                    if (!ThreadInfo.isProfilerServerThread(t) && mids.length>0) {
-                        int status = newStates[0][i];
-                        Long ltid = Long.valueOf(t.getId());
-                        Integer index = (Integer) arrayOffsetMap.get(ltid);
-                        Integer tid = (Integer) threadIdMap.get(ltid);
+            if (newThreads[0] != null) { // ignore samples without data
+                synchronized (eventBuffer) {
+                    writeThreadDumpStart(timestamp);
+                    for (int i = 0; i < newThreads[0].length; i++) {
+                        Thread t = newThreads[0][i];
+                        int[] mids = newMethodIds[0][i];
 
-                        if (index != null) {
-                            if (status == states[index.intValue()] && Arrays.equals(mids,methodIds[index.intValue()])) {
-                                writeThreadInfoNoChange(tid);
+                        if (!ThreadInfo.isProfilerServerThread(t) && mids.length>0) {
+                            int status = newStates[0][i];
+                            Long ltid = Long.valueOf(t.getId());
+                            Integer index = (Integer) arrayOffsetMap.get(ltid);
+                            Integer tid = (Integer) threadIdMap.get(ltid);
+
+                            if (index != null) {
+                                if (status == states[index.intValue()] && Arrays.equals(mids,methodIds[index.intValue()])) {
+                                    writeThreadInfoNoChange(tid);
+                                }
+                                writeThreadInfo(tid,status,mids);
+                            } else if (status != CommonConstants.THREAD_STATUS_ZOMBIE) { // new thread
+                                tid = Integer.valueOf(++threadCount);
+                                ProfilerRuntime.writeThreadCreationEvent(t,tid.intValue());
+                                writeThreadInfo(tid,status,mids);
+                            } else { // new thread which is not started yet
+                                continue; 
                             }
-                            writeThreadInfo(tid,status,mids);
-                        } else if (status != CommonConstants.THREAD_STATUS_ZOMBIE) { // new thread
-                            tid = Integer.valueOf(++threadCount);
-                            ProfilerRuntime.writeThreadCreationEvent(t,tid.intValue());
-                            writeThreadInfo(tid,status,mids);
-                        } else { // new thread which is not started yet
-                            continue; 
+                            newArrayOffsetMap.put(ltid, Integer.valueOf(i));
+                            newThreadIdMap.put(ltid,tid);
                         }
-                        newArrayOffsetMap.put(ltid, Integer.valueOf(i));
-                        newThreadIdMap.put(ltid,tid);
                     }
+                    writeThreadDumpEnd();
                 }
-                writeThreadDumpEnd();
+                arrayOffsetMap = newArrayOffsetMap;
+                threadIdMap = newThreadIdMap;
+                states = newStates[0];
+                methodIds = newMethodIds[0];
             }
-            arrayOffsetMap = newArrayOffsetMap;
-            threadIdMap = newThreadIdMap;
-            states = newStates[0];
-            methodIds = newMethodIds[0];
         }
 
         private void resetProfilerCollectors() {

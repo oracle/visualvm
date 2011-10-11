@@ -117,7 +117,9 @@ import org.netbeans.lib.profiler.ui.LiveResultsWindowContributor;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.util.lookup.ServiceProvider;
 
 
 /**
@@ -127,13 +129,33 @@ import org.netbeans.modules.profiler.utilities.ProfilerUtils;
  * @author Ian Formanek
  */
 public final class LiveResultsWindow extends TopComponent
-                                     implements ResultsListener,
-                                                ProfilingStateListener,
+                                     implements ProfilingStateListener,
                                                 SaveViewAction.ViewProvider,
                                                 ExportAction.ExportProvider {
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
+    /* 
+     * The following code is an externalization of various listeners registered
+     * in the global lookup and needing access to an enclosing instance of
+     * LiveResultsWindow. 
+     * The enclosing instance will use the FQN registration to obtain the shared instance
+     * of the listener implementation and inject itself as a delegate into the listener.
+     */
+    @ServiceProvider(service=ResultsListener.class)
+    public static class Listener extends Delegate<LiveResultsWindow> implements ResultsListener {
+
+        @Override
+        public void resultsAvailable() {
+        }
+
+        @Override
+        public void resultsReset() {
+            if (getDelegate() != null) getDelegate().reset();
+        }
+        
+    }
+    
     public static final class EmptyLiveResultsPanel extends JPanel implements LiveResultsPanel {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
@@ -459,6 +481,7 @@ public final class LiveResultsWindow extends TopComponent
         CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
                 initUI();
+                Lookup.getDefault().lookup(Listener.class).setDelegate(LiveResultsWindow.this);
             }
         });
     }
@@ -536,7 +559,6 @@ public final class LiveResultsWindow extends TopComponent
         setRequestFocusEnabled(true);
 
         Profiler.getDefault().addProfilingStateListener(this);
-        ResultsManager.getDefault().addResultsListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -738,13 +760,6 @@ public final class LiveResultsWindow extends TopComponent
         }
     }
 
-    public void resultsAvailable() {
-    }
-
-    public void resultsReset() {
-        reset();
-    }
-
     public void threadsMonitoringChanged() {
         // ignore
     }
@@ -934,7 +949,7 @@ public final class LiveResultsWindow extends TopComponent
         toolBar.add(autoToggle);
         toolBar.add(updateNowButton);
         toolBar.add(runGCButton);
-        toolBar.add(new ResetResultsAction());
+        toolBar.add(ResetResultsAction.getInstance());
         toolBar.addSeparator();
         toolBar.add(((Presenter.Toolbar) SystemAction.get(TakeSnapshotAction.class)).getToolbarPresenter());
         toolBar.addSeparator();
