@@ -37,7 +37,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
@@ -49,7 +48,6 @@ import org.openide.windows.TopComponent;
  * @author Jiri Sedlacek
  */
 class DataSourceWindow extends TopComponent implements PropertyChangeListener {
-    private final static Logger LOGGER = Logger.getLogger(DataSourceWindow.class.getName());
 
     private static final RequestProcessor PROCESSOR =
             new RequestProcessor("DataSourceWindow Processor", 5); // NOI18N
@@ -61,20 +59,10 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     private JPanel multiViewContainer;
     private AlertListener alertListener;
 
-    // Doesn't need to be called from EDT
     public DataSourceWindow(DataSource dataSource) {
         this.dataSource = dataSource;
-        
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    initAppearance();
-                    initComponents();
-                }
-            });
-        } catch (Exception e) {
-            LOGGER.severe("Failed to create window for " + dataSource); // NOI18N
-        }
+        initAppearance();
+        initComponents();
     }
     
     

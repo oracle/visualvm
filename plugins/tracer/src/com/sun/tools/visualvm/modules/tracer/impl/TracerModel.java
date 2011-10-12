@@ -70,11 +70,21 @@ final class TracerModel {
 
     TracerModel(DataSource dataSource) {
         this.dataSource = dataSource;
-        timelineSupport = new TimelineSupport(new TimelineSupport.DescriptorResolver() {
-            public TracerProbeDescriptor getDescriptor(TracerProbe p) {
-                return TracerModel.this.getDescriptor(p);
-            }
-        });
+        final TimelineSupport[] timelineSupportArr = new TimelineSupport[1];
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    timelineSupportArr[0] = new TimelineSupport(new TimelineSupport.DescriptorResolver() {
+                    public TracerProbeDescriptor getDescriptor(TracerProbe p) {
+                        return TracerModel.this.getDescriptor(p);
+                    }
+                });
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.severe("Failed to create TimelineSupport for " + dataSource); // NOI18N
+        }
+        timelineSupport = timelineSupportArr[0];
     }
 
 
