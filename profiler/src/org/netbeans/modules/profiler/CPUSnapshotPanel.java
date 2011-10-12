@@ -792,7 +792,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             found = flatPanel.findFirst();
         } else if (tabs.getSelectedComponent() == combined) {
             if ((combinedViewTracker.getLastFocusOwner() == null)
-                    || (combinedViewTracker.getLastFocusOwner() == combinedCCT.getResultsViewReference())) {
+                    || (combinedViewTracker.getLastFocusOwner() == combinedFlat.getResultsViewReference())) {
                 if (!combinedCCT.isFindStringDefined()) {
                     String findString = FindDialog.getFindString();
 

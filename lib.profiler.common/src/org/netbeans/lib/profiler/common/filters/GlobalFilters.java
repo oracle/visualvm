@@ -43,8 +43,9 @@
 
 package org.netbeans.lib.profiler.common.filters;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 
 /**
@@ -117,8 +118,8 @@ public final class GlobalFilters {
     }
 
     public void load(final Map props) {
-        final Vector filterNamesVect = new Vector();
-        final Vector filterValuesVect = new Vector();
+        final List filterNamesVect = new ArrayList();
+        final List filterValuesVect = new ArrayList();
 
         String filterName;
 

@@ -43,10 +43,11 @@
 
 package org.netbeans.lib.profiler.ui.components.treetable;
 
+import java.util.ArrayList;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.ui.components.JTreeTable;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
@@ -148,13 +149,13 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     }
 
     /**
-     * Returns a vector of open paths in the tree, can be used to
+     * Returns a list of open paths in the tree, can be used to
      * re-open the paths in a tree after a call to 'treeStructureChanged'
      * (which causes all open paths to collapse)
      */
-    public Vector getExpandedPaths() {
+    public List getExpandedPaths() {
         Enumeration expanded = tree.getExpandedDescendants(getRootPath());
-        Vector paths = new Vector();
+        List paths = new ArrayList();
 
         if (expanded != null) {
             while (expanded.hasMoreElements()) {
@@ -208,15 +209,12 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     /**
      * Restores the given open paths on the treeModel.
      *
-     * @param paths a Vector of TreePaths which are going to be opened.
+     * @param paths a List of TreePaths which are going to be opened.
      */
-    public void restoreExpandedPaths(Vector paths) {
-        Enumeration e = paths.elements();
-
+    public void restoreExpandedPaths(List paths) {
         tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, Boolean.TRUE); // NOI18N
-        while (e.hasMoreElements()) {
-            TreePath path = (TreePath) e.nextElement();
-            tree.expandPath(path);
+        for (Object p : paths) {
+            tree.expandPath((TreePath)p);
         }
         tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, Boolean.FALSE); // NOI18N
     }
@@ -224,7 +222,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     public void updateTreeTable() {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    Vector pathState = getExpandedPaths();
+                    List pathState = getExpandedPaths();
 
                     TreePath[] selectedPaths = tree.getSelectionPaths();
                     treeTableModel.fireTreeStructureChanged(this,
