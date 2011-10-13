@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler;
 import org.netbeans.modules.profiler.utilities.Delegate;
 import javax.swing.event.ChangeEvent;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import java.util.Arrays;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.MonitoredData;
@@ -62,7 +61,6 @@ import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.SnippetPanel;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.*;
-import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
@@ -87,6 +85,8 @@ import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -116,6 +116,8 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Ian Formanek
  */
 public final class ProfilerControlPanel2 extends TopComponent implements ProfilingStateListener {
+    final private static Logger LOGGER = Logger.getLogger(ProfilerControlPanel2.class.getName());
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     /*
@@ -1979,7 +1981,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             version = (Integer) in.readObject();
         } catch (Exception e) {
             ProfilerLogger.severe("Error while deserializing Profiler CP2: " + e.getMessage()); // NOI18N
-            NetBeansProfiler.profilerErrorManager.notify(ErrorManager.INFORMATIONAL, e);
+            LOGGER.log(Level.WARNING, null, e);
 
             return; // unsupported storage format
         }
