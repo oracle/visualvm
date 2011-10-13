@@ -140,10 +140,10 @@ public class HeapDumpWatch {
 
         try {
             if (ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
-                    this.getClass(), "OOME_PROTECTION_OPEN_HEAPDUMP"))) { // NOI18N
+                    HeapDumpWatch.class, "HeapDumpWatch_OOME_PROTECTION_OPEN_HEAPDUMP"))) { // NOI18N
                 ResultsManager.getDefault().openSnapshot(heapDump);
             } else if (ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
-                    this.getClass(), "OOME_PROTECTION_REMOVE_HEAPDUMP"))) { // NOI18N
+                    HeapDumpWatch.class, "HeapDumpWatch_OOME_PROTECTION_REMOVE_HEAPDUMP"))) { // NOI18N
                 heapDump.delete();
                 ProfilerControlPanel2.getDefault().refreshSnapshotsList();
             }

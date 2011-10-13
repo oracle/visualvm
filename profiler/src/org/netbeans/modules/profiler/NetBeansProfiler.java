@@ -81,7 +81,6 @@ import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
 import org.netbeans.lib.profiler.wireprotocol.WireIO;
 import org.openide.DialogDescriptor;
-import org.openide.ErrorManager;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -256,14 +255,14 @@ public abstract class NetBeansProfiler extends Profiler {
         // The following methods should display messages asynchronously, i.e. they shouldn't block the current
         // thread waiting for the user pressing OK.
         public void displayError(final String msg) {
-            printDebugMsg("IDEAppStatusHandler - error: " + msg); //NOI18N
+            LOGGER.log(Level.WARNING, "IDEAppStatusHandler - error: {)}", msg); //NOI18N
             ProfilerDialogs.displayError(msg);
         }
 
         // These method SHOULD wait for the user to press ok, since they may be used in a sequence of displayed
         // panels, and the next one shouldn't be displayed before the previous one is read and understood.
         public void displayErrorAndWaitForConfirm(final String msg) {
-            printDebugMsg("IDEAppStatusHandler - errorAndWaitForConfirm: " + msg); //NOI18N
+            LOGGER.log(Level.WARNING, "IDEAppStatusHandler - errorAndWaitForConfirm: {0}", msg); //NOI18N
             ProfilerDialogs.displayError(msg);
         }
 
@@ -284,12 +283,12 @@ public abstract class NetBeansProfiler extends Profiler {
         }
 
         public void displayWarning(final String msg) {
-            printDebugMsg("IDEAppStatusHandler - warning: " + msg); //NOI18N
+            LOGGER.log(Level.WARNING, "IDEAppStatusHandler - warning: {0}" ,msg); //NOI18N
             ProfilerDialogs.displayWarning(msg);
         }
 
         public void displayWarningAndWaitForConfirm(final String msg) {
-            printDebugMsg("IDEAppStatusHandler - warningAndWaitForConfirm: " + msg); //NOI18N
+            LOGGER.log(Level.WARNING, "IDEAppStatusHandler - warningAndWaitForConfirm: {0}", msg); //NOI18N
             ProfilerDialogs.displayWarning(msg);
         }
 
@@ -340,12 +339,6 @@ public abstract class NetBeansProfiler extends Profiler {
 
     private static final Logger LOGGER = Logger.getLogger(NetBeansProfiler.class.getName());
 
-    static {
-        if ((LOGGER.getLevel() == null) || (LOGGER.getLevel().intValue() > Level.CONFIG.intValue())) {
-            LOGGER.setLevel(Level.CONFIG); // artificialy set the logger level to debugging; should be removed later on
-        }
-    }
-
     // -----
     // I18N String constants
     private static final String CALIBRATION_FAILED_MESSAGE = NbBundle.getMessage(ProfilerModule.class,
@@ -387,7 +380,6 @@ public abstract class NetBeansProfiler extends Profiler {
     private static final String MODIFYING_INSTRUMENTATION_MSG = NbBundle.getMessage(NetBeansProfiler.class,
                                                                                     "NetBeansProfiler_ModifyingInstrumentationMsg"); //NOI18N
                                                                                                                                      // -----
-    static final ErrorManager profilerErrorManager = ErrorManager.getDefault().getInstance("org.netbeans.modules.profiler"); //NOI18N
     private static final String GLOBAL_FILTERS_FILENAME = "filters"; //NOI18N
     private static final String DEFINED_FILTERSETS_FILENAME = "filtersets"; //NOI18N
     private static final String DEFAULT_FILE_SUFFIX = "-default"; //NOI18N
@@ -423,7 +415,6 @@ public abstract class NetBeansProfiler extends Profiler {
     // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
     // TODO: implement better approach for refreshing profiling points and remove this code
 //    private boolean processesProfilingPoints;
-    private boolean silent;
     private boolean threadsMonitoringEnabled = false;
     private boolean waitDialogOpen = false;
     private int lastMode = MODE_PROFILE;
@@ -454,9 +445,7 @@ public abstract class NetBeansProfiler extends Profiler {
             ProfilerDialogs.displayError(e.getMessage());
             initFailed = true;
         } catch (IOException e) {
-            ErrorManager.getDefault()
-                        .annotate(e, MessageFormat.format(ENGINE_INIT_FAILED_MSG, new Object[] { e.getLocalizedMessage() }));
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+            LOGGER.log(Level.SEVERE, MessageFormat.format(ENGINE_INIT_FAILED_MSG, new Object[] { e.getLocalizedMessage() }), e);
             initFailed = true;
         }
 
@@ -724,18 +713,10 @@ public abstract class NetBeansProfiler extends Profiler {
 
             //getThreadsManager().setSupportsSleepingStateMonitoring(
             // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-            printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
-            printDebugMsg("profiling settings --------------------------------", false); //NOI18N
-            printDebugMsg(profilingSettings.debug(), false);
-            printDebugMsg("attach settings -----------------------------------", false); //NOI18N
-            printDebugMsg(attachSettings.debug(), false);
-            printDebugMsg("instrumentation filter ----------------------------", false); //NOI18N
-            printDebugMsg(sSettings.getInstrumentationFilter().debug(), false); //NOI18N
-            printDebugMsg("Profiler.attachToApp: ***************************************************", false); //NOI18N
-            flushDebugMsgs();
+            logActionConfig("attachToApp", profilingSettings, null, attachSettings, sSettings.getInstrumentationFilter()); // NOI18N
             
             GestureSubmitter.logAttach(getProfiledProject(), attachSettings);
-            GestureSubmitter.logConfig(profilingSettings);
+            GestureSubmitter.logConfig(profilingSettings, sSettings.getInstrumentationFilter());
             
             changeStateTo(PROFILING_STARTED);
             
@@ -903,18 +884,10 @@ public abstract class NetBeansProfiler extends Profiler {
 
             //getThreadsManager().setSupportsSleepingStateMonitoring(
             // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-            printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
-            printDebugMsg("profiling settings -------------------------------", false); //NOI18N
-            printDebugMsg(profilingSettings.debug(), false);
-            printDebugMsg("session settings ---------------------------------", false); //NOI18N
-            printDebugMsg(sessionSettings.debug(), false);
-            printDebugMsg("instrumentation filter ---------------------------", false); // NOI18N
-            printDebugMsg(sSettings.getInstrumentationFilter().debug(), false); //NOI18N
-            printDebugMsg("Profiler.connectToStartedApp: **************************************************", false); //NOI18N
-            flushDebugMsgs();
+            logActionConfig("connectToStartedApp", profilingSettings, sessionSettings, null, sSettings.getInstrumentationFilter()); // NOI18N
             
             GestureSubmitter.logProfileApp(getProfiledProject(), sessionSettings);
-            GestureSubmitter.logConfig(profilingSettings);
+            GestureSubmitter.logConfig(profilingSettings, sSettings.getInstrumentationFilter());
             
             if (prepareProfilingSession(profilingSettings, sessionSettings)) {
                 RequestProcessor.getDefault().post(new Runnable() {
@@ -1031,29 +1004,22 @@ public abstract class NetBeansProfiler extends Profiler {
     public void log(int severity, final String message) {
         switch (severity) {
             case Profiler.INFORMATIONAL:
-                severity = ErrorManager.INFORMATIONAL;
+                LOGGER.log(Level.INFO, message);
 
                 break;
             case Profiler.WARNING:
-                severity = ErrorManager.WARNING;
+                LOGGER.log(Level.WARNING, message);
 
                 break;
             case Profiler.EXCEPTION:
-                severity = ErrorManager.EXCEPTION;
-
-                break;
             case Profiler.ERROR:
-                severity = ErrorManager.ERROR;
+                LOGGER.log(Level.SEVERE, message);
 
                 break;
             default:
-                severity = ErrorManager.UNKNOWN;
+                LOGGER.log(Level.FINEST, message);
 
                 break;
-        }
-
-        if (profilerErrorManager.isLoggable(severity)) {
-            profilerErrorManager.log(severity, message);
         }
     }
 
@@ -1068,15 +1034,9 @@ public abstract class NetBeansProfiler extends Profiler {
         final ProfilerEngineSettings sharedSettings = getTargetAppRunner().getProfilerEngineSettings();
         profilingSettings.applySettings(sharedSettings);
 
-        printDebugMsg("Profiler.modifyCurrentProfiling: ***************************************************", false); //NOI18N
-        printDebugMsg("profiling settings --------------------------------", false); //NOI18N
-        printDebugMsg(profilingSettings.debug(), false);
-        printDebugMsg("instrumentation filter ----------------------------", false); // NOI18N
-        printDebugMsg(sharedSettings.getInstrumentationFilter().debug(), false); //NOI18N
-        printDebugMsg("Profiler.modifyCurrentProfiling: ***************************************************", false); //NOI18N
-        flushDebugMsgs();
-
-        GestureSubmitter.logConfig(profilingSettings);
+        logActionConfig("modifyCurrentProfiling", profilingSettings, null, null, sharedSettings.getInstrumentationFilter()); //NOI18N
+        
+        GestureSubmitter.logConfig(profilingSettings, sharedSettings.getInstrumentationFilter());
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
@@ -1119,25 +1079,17 @@ public abstract class NetBeansProfiler extends Profiler {
     public void notifyException(final int severity, final Exception e) {
         switch (severity) {
             case Profiler.INFORMATIONAL:
-                profilerErrorManager.notify(ErrorManager.INFORMATIONAL, e);
+                LOGGER.log(Level.INFO, null, e);
 
-                return;
+                break;
             case Profiler.WARNING:
-                profilerErrorManager.notify(ErrorManager.WARNING, e);
+                LOGGER.log(Level.WARNING, null, e);
 
-                return;
-            case Profiler.EXCEPTION:
-                profilerErrorManager.notify(ErrorManager.EXCEPTION, e);
-
-                return;
-            case Profiler.ERROR:
-                profilerErrorManager.notify(ErrorManager.ERROR, e);
-
-                return;
+                break;
             default:
-                profilerErrorManager.notify(ErrorManager.UNKNOWN, e);
+                LOGGER.log(Level.SEVERE, null, e);
 
-                return;
+                break;
         }
     }
 
@@ -1176,17 +1128,10 @@ public abstract class NetBeansProfiler extends Profiler {
 
         //getThreadsManager().setSupportsSleepingStateMonitoring(
         // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
-        printDebugMsg("Profiler.profileClass: **************************************************", false); //NOI18N
-        printDebugMsg("Profiler.profileClass: profiling settings -------------------------------", false); //NOI18N
-        printDebugMsg(profilingSettings.debug(), false);
-        printDebugMsg("Profiler.profileClass: session settings ---------------------------------", false); //NOI18N
-        printDebugMsg(sessionSettings.debug(), false);
-        printDebugMsg("Profiler.profileClass: **************************************************", false); //NOI18N
-        printDebugMsg("Instrumentation filter:\n" + sSettings.getInstrumentationFilter().debug(), false); //NOI18N
-        flushDebugMsgs();
+        logActionConfig("profileClass", profilingSettings, sessionSettings, null, sSettings.getInstrumentationFilter()); //NOI18N
 
         GestureSubmitter.logProfileClass(getProfiledProject(), sessionSettings);
-        GestureSubmitter.logConfig(profilingSettings);
+        GestureSubmitter.logConfig(profilingSettings, sSettings.getInstrumentationFilter());
 
         changeStateTo(PROFILING_STARTED);
 
@@ -1339,10 +1284,6 @@ public abstract class NetBeansProfiler extends Profiler {
 
     public FileObject getProfiledSingleFile() {
         return profiledSingleFile;
-    }
-
-    public void setSilent(boolean value) {
-        silent = value;
     }
 
     @Override
@@ -1600,16 +1541,6 @@ public abstract class NetBeansProfiler extends Profiler {
         ProfilerDialogs.displayWarning(ENTIRE_APPLICATION_PROFILING_WARNING);
     }
 
-    private void flushDebugMsgs() {
-        String msg = logMsgs.toString();
-
-        if (LOGGER.isLoggable(Level.CONFIG) && !silent) {
-            LOGGER.config(msg);
-        } else { // just log
-            profilerErrorManager.log(msg);
-        }
-    }
-
     // -- Package-Private stuff --------------------------------------------------------------------------------------------
     private void loadGlobalFilters() {
         try {
@@ -1703,18 +1634,6 @@ public abstract class NetBeansProfiler extends Profiler {
         final ProfilerControlPanel2 controlPanel2 = ProfilerControlPanel2.getDefault();
         controlPanel2.open();
         controlPanel2.requestActive();
-    }
-
-    private void printDebugMsg(String msg) {
-        printDebugMsg(msg, true);
-    }
-
-    private void printDebugMsg(String msg, boolean flush) {
-        logMsgs.append(msg).append('\n');
-
-        if (flush) {
-            flushDebugMsgs();
-        }
     }
 
     private void setupDispatcher(ProfilingSettings profilingSettings) {
@@ -1907,5 +1826,29 @@ public abstract class NetBeansProfiler extends Profiler {
         }
 
         return false;
+    }
+    
+    private static void logActionConfig(String actionTitle, ProfilingSettings ps, SessionSettings ss, AttachSettings as, InstrumentationFilter f) {
+        assert actionTitle != null;
+        assert ps != null;
+        assert ss != null || as != null;
+        assert f != null;
+        
+        LOGGER.log(Level.CONFIG, 
+            "*** Profiler Action = {0}\n" + //NOI18N
+            ">>> Profiling Settings = \n" + // NOI18N
+            "{1}\n" +// NOI18N
+            ">>> {2} Settings = \n" + // NOI18N
+            "{3}\n" + // NOI18N
+            ">>> Instrumentation Filter = \n" + //NOI18N
+            "{4}", // NOI18N
+            new Object[]{
+                actionTitle,
+                ps.debug(),
+                (ss != null ? "Session" : (as != null ? "Attach" : null)),  // NOI18N
+                (ss != null ? ss.debug() : (as != null ? as.debug() : null)),                    
+                f.debug()
+            }
+        );
     }
 }

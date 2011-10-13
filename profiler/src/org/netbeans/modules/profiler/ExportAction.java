@@ -48,6 +48,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -62,7 +64,6 @@ import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -73,7 +74,8 @@ import org.openide.windows.WindowManager;
  * @author cyhelsky
  */
 public final class ExportAction extends AbstractAction {
-
+    private static final Logger LOGGER = Logger.getLogger(ExportAction.class.getName());
+    
 //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
     public static interface ExportProvider {
@@ -357,8 +359,7 @@ public final class ExportAction extends AbstractAction {
                 saveFile=null;
                 ResultsManager.getDefault().saveSnapshot(snapshot, fo);
             } catch (IOException e1) {
-                ErrorManager.getDefault().annotate(e1, MessageFormat.format(SNAPSHOT_CREATE_FAILED_MSG, new Object[] { e1.getMessage() }));
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e1);
+                LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_CREATE_FAILED_MSG, new Object[] { e1.getMessage() }), e1);
             }
         } else {
             final File file = saveFile.getSelectedFile();
