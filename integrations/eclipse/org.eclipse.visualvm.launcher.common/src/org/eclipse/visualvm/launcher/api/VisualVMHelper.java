@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -37,6 +38,23 @@ import org.eclipse.visualvm.launcher.Activator;
 import org.eclipse.visualvm.launcher.preferences.PreferenceConstants;
 
 public final class VisualVMHelper {
+	private static class SpecVersion {
+		int major, minor, update;
+		
+		public SpecVersion(String specString) {
+			StringTokenizer st = new StringTokenizer(specString, ".");
+			if (st.hasMoreTokens()) {
+				major = Integer.parseInt(st.nextToken());
+			}
+			if (st.hasMoreTokens()) {
+				minor = Integer.parseInt(st.nextToken());
+			}
+			if (st.hasMoreTokens()) {
+				update = Integer.parseInt(st.nextToken());
+			}
+		}
+	}
+	
 	public static long getNextID() {
 		return System.nanoTime();
 	}
@@ -46,8 +64,8 @@ public final class VisualVMHelper {
 	}
 	
 	public static void openInVisualVM(long id) throws IOException {
-		String jv = getJavaVersion();
-		if (jv == null || !jv.startsWith("1.6")) {
+		SpecVersion sv = getJavaVersion();
+		if (sv == null || (sv.major == 1 && sv.minor < 6)) {
 			try {
 				final Display d = Display.getDefault();
 				d.asyncExec(new Runnable() {
@@ -73,21 +91,21 @@ public final class VisualVMHelper {
 		});
 	}
 	
-	private static String getJavaVersion() {
+	private static SpecVersion getJavaVersion() {
 		try {
 			String javaCmd = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_JAVAHOME) + File.separator + "bin" + File.separator + "java";
 			Process prc = Runtime.getRuntime().exec(
 				new String[] {
 						javaCmd,
 						"-version"
-				}
+				} 
 			);
 			
 			String version = getJavaVersion(prc.getErrorStream());
 			if (version == null) {
 				version = getJavaVersion(prc.getInputStream());
 			}
-			return version;
+			return new SpecVersion(version);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
