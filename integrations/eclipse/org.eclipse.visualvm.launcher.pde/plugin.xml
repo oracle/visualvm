@@ -13,6 +13,16 @@
             sourcePathComputerId="org.eclipse.visualvm.launch.core.pde.sourcePathComputer"
             type="org.eclipse.pde.ui.RuntimeWorkbench">
       </launchDelegate>
+      <launchDelegate
+            delegate="org.eclipse.visualvm.launcher.pde.VisualVMJUnitPluginDelegate"
+            delegateDescription="The VisualVM Launcher supports running and debugging JUnit tests and initiating their monitoring in VisualVM"
+            id="org.eclipse.visualvm.launch.junitplugin"
+            modes="run,debug"
+            name="VisualVM"
+            sourceLocatorId="org.eclipse.visualvm.launch.core.junitplugin.sourceLocator"
+            sourcePathComputerId="org.eclipse.visualvm.launch.core.junitplugin.sourcePathComputer"
+            type="org.eclipse.pde.ui.JunitLaunchConfig">
+      </launchDelegate>
    </extension>
 
 </plugin>
