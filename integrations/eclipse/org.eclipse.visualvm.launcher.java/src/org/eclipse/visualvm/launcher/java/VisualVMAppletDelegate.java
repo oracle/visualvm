@@ -34,6 +34,7 @@ import org.eclipse.jdt.internal.launching.JavaAppletLaunchConfigurationDelegate;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.visualvm.launcher.api.VisualVMHelper;
 
+@SuppressWarnings("restriction")
 public class VisualVMAppletDelegate extends JavaAppletLaunchConfigurationDelegate {
 	volatile private long usedId = -1;
 
