@@ -1831,7 +1831,6 @@ public abstract class NetBeansProfiler extends Profiler {
     private static void logActionConfig(String actionTitle, ProfilingSettings ps, SessionSettings ss, AttachSettings as, InstrumentationFilter f) {
         assert actionTitle != null;
         assert ps != null;
-        assert ss != null || as != null;
         assert f != null;
         
         LOGGER.log(Level.CONFIG, 
