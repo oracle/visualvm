@@ -48,6 +48,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -234,6 +235,13 @@ public final class ExportAction extends AbstractAction {
                     return EXPORT_DIALOG_NPS_FILTER;
                 }
             });
+            // If there is snapshot, .nps must be selected as file filter
+            FileFilter[] currentFilters = fileChooser.getChoosableFileFilters();
+            for (int i = 0; i < currentFilters.length; i++) {
+                if (currentFilters[i].getDescription().equals(EXPORT_DIALOG_NPS_FILTER)) {
+                    fileChooser.setFileFilter(currentFilters[i]);
+                }
+            }
         }
     }
 
