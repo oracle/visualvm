@@ -124,6 +124,7 @@ public final class ExportAction extends AbstractAction {
     private static final String EXPORT_ACTION_DESCRIPTION = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportActionDescr"); //NOI18N
     private static final String OVERWRITE_FILE_CAPTION = NbBundle.getMessage(ExportAction.class, "ExportAction_OverwriteFileCaption"); //NOI18N
     private static final String OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_OverwriteFileMsg"); //NOI18N
+    private static final String INVALID_LOCATION_FOR_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_InvalidLocationForFileMsg"); //NOI18N
     private static final String CANNOT_OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_CannotOverwriteFileMsg"); //NOI18N
     private static final String EXPORT_DIALOG_TITLE = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogTitle"); //NOI18N
     private static final String EXPORT_DIALOG_BUTTON = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogButton"); //NOI18N
@@ -259,7 +260,7 @@ public final class ExportAction extends AbstractAction {
 
             if (!file.delete()) {
                 ProfilerDialogs.displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
-                return false;
+                return false; // Insufficient rights to overwrite file
             }
         }
 
@@ -355,7 +356,12 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
             try {
-                FileObject fo = FileUtil.toFileObject(FileUtil.normalizeFile(saveFile.folder)).createData(saveFile.fileName, saveFile.fileExt);
+                FileObject fo = FileUtil.toFileObject(FileUtil.normalizeFile(saveFile.folder));
+                if (fo==null) {
+                    ProfilerDialogs.displayError(INVALID_LOCATION_FOR_FILE_MSG);
+                    return;
+                }
+                fo.createData(saveFile.fileName, saveFile.fileExt);
                 saveFile=null;
                 ResultsManager.getDefault().saveSnapshot(snapshot, fo);
             } catch (IOException e1) {
