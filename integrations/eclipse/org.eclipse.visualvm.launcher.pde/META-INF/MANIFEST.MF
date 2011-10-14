@@ -8,6 +8,8 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.visualvm.launcher.common;bundle-version="1.0.0",
  org.eclipse.debug.core
 Import-Package: org.eclipse.core.runtime,
+ org.eclipse.jdt.junit.launcher,
  org.eclipse.jdt.launching,
+ org.eclipse.pde.launching,
  org.eclipse.pde.ui.launcher,
  org.eclipse.visualvm.launcher.api

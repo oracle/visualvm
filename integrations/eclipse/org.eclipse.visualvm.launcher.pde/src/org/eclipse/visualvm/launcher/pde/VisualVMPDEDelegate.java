@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.launching.IVMRunner;
-import org.eclipse.pde.ui.launcher.EclipseApplicationLaunchConfiguration;
+import org.eclipse.pde.launching.EclipseApplicationLaunchConfiguration;
 import org.eclipse.visualvm.launcher.api.VisualVMHelper;
 
 public class VisualVMPDEDelegate extends EclipseApplicationLaunchConfiguration {
