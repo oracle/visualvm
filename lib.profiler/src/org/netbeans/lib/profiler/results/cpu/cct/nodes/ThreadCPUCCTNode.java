@@ -72,11 +72,7 @@ public class ThreadCPUCCTNode extends TimedCPUCCTNode {
     public int getThreadId() {
         return threadId;
     }
-
-    public void accept(RuntimeCPUCCTNodeVisitor visitor) {
-        visitor.visit(this);
-    }
-
+    
     protected TimedCPUCCTNode createSelfInstance() {
         CPUCCTNodeFactory factory = getFactory();
 

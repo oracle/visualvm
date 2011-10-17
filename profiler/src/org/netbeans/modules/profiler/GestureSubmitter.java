@@ -53,6 +53,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
+import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.openide.util.Lookup;
 
 
@@ -65,12 +69,14 @@ class GestureSubmitter {
 
     private static final Logger USG_LOGGER = Logger.getLogger("org.netbeans.ui.metrics.profiler"); // NOI18N
 
+    private static final MethodNameFormatter formatter = MethodNameFormatterFactory.getDefault().getFormatter();
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    static void logConfig(ProfilingSettings settings) {
+    static void logConfig(ProfilingSettings settings, InstrumentationFilter filter) {
         List<Object> paramList = new ArrayList<Object>();
 
-        fillParamsForProfiling(settings, paramList);
+        fillParamsForProfiling(settings, filter, paramList);
 
         logUsage("CONFIG", paramList); // NOI18N
     }
@@ -116,7 +122,7 @@ class GestureSubmitter {
         paramList.add(as.isRemote() ? "ATTACH_REMOTE" : "ATTACH_LOCAL"); // NOI18N
     }
 
-    private static void fillParamsForProfiling(ProfilingSettings ps, List<Object> paramList) {
+    private static void fillParamsForProfiling(ProfilingSettings ps, InstrumentationFilter filter, List<Object> paramList) {
         switch (ps.getProfilingType()) {
             case ProfilingSettings.PROFILE_CPU_ENTIRE:
                 paramList.add("TYPE_CPU_ENTIRE"); // NOI18N
@@ -159,6 +165,19 @@ class GestureSubmitter {
                 break;
         }
 
+        ClientUtils.SourceCodeSelection[] rootMethods = ps.getInstrumentationRootMethods();
+        if (rootMethods != null && rootMethods.length > 0) {
+            StringBuilder sb = new StringBuilder("PROFILING_ROOTS={"); // NOI18N
+            for(ClientUtils.SourceCodeSelection scc : rootMethods) {
+                sb.append(formatter.formatMethodName(scc)).append(","); // NOI18N
+            }
+            sb.append("}");
+            paramList.add(sb.toString());
+        }
+        if (filter != null) {
+            StringBuilder sb = new StringBuilder("PROFILING_FILTER={\n").append(filter.debug()).append("}"); // NOI18N
+            paramList.add(sb.toString());
+        }
         paramList.add(ps.getProfileUnderlyingFramework() ? "FRAMEWORK_YES" : "FRAMEWORK_NO");
         paramList.add(ps.getExcludeWaitTime() ? "WAIT_EXCLUDE" : "WAIT_INCLUDE"); // NOI18N
         paramList.add(ps.getInstrumentMethodInvoke() ? "REFL_INVOKE_YES" : "REFL_INVOKE_NO"); // NOI18N

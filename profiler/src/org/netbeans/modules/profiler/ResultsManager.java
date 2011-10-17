@@ -61,7 +61,6 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.openide.DialogDisplayer;
-import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -72,6 +71,8 @@ import java.awt.*;
 import java.io.*;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
@@ -88,6 +89,8 @@ import org.openide.util.Lookup;
  * @author Ian Formanek
  */
 public final class ResultsManager {
+    final private static Logger LOGGER = Logger.getLogger(ResultsManager.class.getName());
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     //  /**
@@ -190,13 +193,18 @@ public final class ResultsManager {
     private File exportDir;
     private HashMap<FileObject, ProfilingSettings> settingsCache = new HashMap<FileObject, ProfilingSettings>();
     private HashMap<FileObject, Integer> typeCache = new HashMap<FileObject, Integer>();
-    private Vector resultsListeners;
-    private Vector snapshotListeners;
     private Window mainWindow;
     private boolean resultsAvailable = false;
+    
+    private Lookup.Result<SnapshotsListener> snapshotListeners;
+    private Lookup.Result<ResultsListener> resultsListeners;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-    private ResultsManager() {}
+    private ResultsManager() {
+        Lookup l = Lookup.getDefault();
+        snapshotListeners = l.lookupResult(SnapshotsListener.class);
+        resultsListeners = l.lookupResult(ResultsListener.class);
+    }
 
     private static class Singleton {
         final private static ResultsManager INSTANCE = new ResultsManager();
@@ -226,7 +234,7 @@ public final class ResultsManager {
         try {
             return loadSnapshotFromFileObject(fo);
         } catch (IOException e) {
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+            LOGGER.log(Level.SEVERE, null, e);
 
             return null;
         }
@@ -252,27 +260,6 @@ public final class ResultsManager {
         }
 
         return type.intValue();
-    }
-
-    public void addResultsListener(final ResultsListener listener) {
-        if (resultsListeners == null) {
-            resultsListeners = new Vector();
-        }
-
-        if (!resultsListeners.contains(listener)) {
-            resultsListeners.add(listener);
-        }
-    }
-
-    // ProfilingStateListener stuff
-    public void addSnapshotsListener(final SnapshotsListener profilingStateListener) {
-        if (snapshotListeners == null) {
-            snapshotListeners = new Vector();
-        }
-
-        if (!snapshotListeners.contains(profilingStateListener)) {
-            snapshotListeners.add(profilingStateListener);
-        }
     }
 
     public void cctEstablished(RuntimeCCTNode runtimeCCTNode) {
@@ -310,8 +297,7 @@ public final class ResultsManager {
                 s2 = loadSnapshotFromFileObject(snapshot2FO);
             }
         } catch (Exception e) {
-            ErrorManager.getDefault().annotate(e, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }));
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+            LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }), e);
 
             return;
         }
@@ -352,9 +338,7 @@ public final class ResultsManager {
         try {
             snapshotFile.delete();
         } catch (IOException e) {
-            ErrorManager.getDefault()
-                        .annotate(e, MessageFormat.format(SNAPSHOT_DELETE_FAILED_MSG, new Object[] { e.getMessage() }));
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+            LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_DELETE_FAILED_MSG, new Object[] { e.getMessage() }), e);
 
             return; // do not proceed with removing the snapshot from internal structures
         }
@@ -536,9 +520,7 @@ public final class ResultsManager {
 
             return ret;
         } catch (IOException e) {
-            ErrorManager.getDefault()
-                        .annotate(e, MessageFormat.format(OBTAIN_SAVED_SNAPSHOTS_FAILED_MSG, new Object[] { e.getMessage() }));
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+            LOGGER.log(Level.SEVERE, MessageFormat.format(OBTAIN_SAVED_SNAPSHOTS_FAILED_MSG, new Object[] { e.getMessage() }), e);
 
             return new FileObject[0];
         }
@@ -587,9 +569,7 @@ public final class ResultsManager {
 
             return ret;
         } catch (IOException e) {
-            ErrorManager.getDefault()
-                        .annotate(e, MessageFormat.format(OBTAIN_SAVED_SNAPSHOTS_FAILED_MSG, new Object[] { e.getMessage() }));
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+            LOGGER.log(Level.SEVERE, MessageFormat.format(OBTAIN_SAVED_SNAPSHOTS_FAILED_MSG, new Object[] { e.getMessage() }), e);
 
             return new FileObject[0];
         }
@@ -599,8 +579,7 @@ public final class ResultsManager {
         try {
             return loadSnapshotImpl(selectedFile);
         } catch (IOException e) {
-            ErrorManager.getDefault().annotate(e, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }));
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+            LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }), e);
 
             return null;
         }
@@ -615,9 +594,7 @@ public final class ResultsManager {
                     ret[i] = loadSnapshotImpl(selectedFiles[i]);
                 }
             } catch (IOException e) {
-                ErrorManager.getDefault()
-                            .annotate(e, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }));
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+                LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }), e);
             }
         }
 
@@ -723,11 +700,9 @@ public final class ResultsManager {
                         break;
                 }
             } catch (ClientUtils.TargetAppOrVMTerminated e1) {
-                ErrorManager.getDefault().annotate(e1, PROFILED_APP_TERMINATED_MSG);
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e1);
+                LOGGER.log(Level.SEVERE, PROFILED_APP_TERMINATED_MSG, e1);
             } catch (CPUResultsSnapshot.NoDataAvailableException e2) {
-                ErrorManager.getDefault().annotate(e2, DATA_NOT_AVAILABLE_MSG);
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e2);
+                LOGGER.log(Level.SEVERE, DATA_NOT_AVAILABLE_MSG, e2);
             } catch (OutOfMemoryError e) {
                 try {
                     reset(); // reset the client data
@@ -737,8 +712,7 @@ public final class ResultsManager {
                     runner.getProfilerClient().resetClientData();
                 }
 
-                ErrorManager.getDefault().annotate(e, OUT_OF_MEMORY_MSG);
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+                LOGGER.log(Level.SEVERE, OUT_OF_MEMORY_MSG, e);
             }
         } finally {
             if (snapshot != null) {
@@ -753,18 +727,6 @@ public final class ResultsManager {
         }
 
         return null;
-    }
-
-    public void removeResultsListener(final ResultsListener listener) {
-        if (resultsListeners != null) {
-            resultsListeners.remove(listener);
-        }
-    }
-
-    public void removeSnapshotsListener(final SnapshotsListener profilingStateListener) {
-        if (snapshotListeners != null) {
-            snapshotListeners.remove(profilingStateListener);
-        }
     }
 
     /**
@@ -845,9 +807,7 @@ public final class ResultsManager {
         try {
             saveDir = ProjectStorage.getSettingsFolder(p, true);
         } catch (IOException e) {
-            ErrorManager.getDefault()
-                        .annotate(e, MessageFormat.format(CANT_FIND_SNAPSHOT_LOCATION_MSG, new Object[] { e.getMessage() }));
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+            LOGGER.log(Level.SEVERE, MessageFormat.format(CANT_FIND_SNAPSHOT_LOCATION_MSG, new Object[] { e.getMessage() }), e);
 
             return false;
         }
@@ -855,9 +815,7 @@ public final class ResultsManager {
         try {
             profFile = saveDir.createData(getDefaultSnapshotFileName(ls), SNAPSHOT_EXTENSION);
         } catch (IOException e) {
-            ErrorManager.getDefault()
-                        .annotate(e, MessageFormat.format(SNAPSHOT_CREATE_IN_PROJECT_FAILED_MSG, new Object[] { e.getMessage() }));
-            ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+            LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_CREATE_IN_PROJECT_FAILED_MSG, new Object[] { e.getMessage() }), e);
 
             return false;
         }
@@ -892,129 +850,87 @@ public final class ResultsManager {
     }
 
     protected void fireResultsAvailable() {
-        if (resultsListeners == null) {
+        if (resultsListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) resultsListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((ResultsListener) iterator.next()).resultsAvailable();
-                    }
+            public void run() {
+                for(ResultsListener rl : resultsListeners.allInstances()) {
+                    rl.resultsAvailable();
                 }
-            });
+            }
+        });
     }
 
     protected void fireResultsReset() {
-        if (resultsListeners == null) {
+        if (resultsListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) resultsListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((ResultsListener) iterator.next()).resultsReset();
-                    }
+            public void run() {
+                for(ResultsListener rl : resultsListeners.allInstances()) {
+                    rl.resultsReset();
                 }
-            });
+            }
+        });
     }
 
     protected void fireSnapshotLoaded(final LoadedSnapshot snapshot) {
-        if (snapshotListeners == null) {
+        if (snapshotListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) snapshotListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((SnapshotsListener) iterator.next()).snapshotLoaded(snapshot);
-                    }
+            public void run() {
+                for(SnapshotsListener sl : snapshotListeners.allInstances()) {
+                    sl.snapshotLoaded(snapshot);
                 }
-            });
+            }
+        });
     }
 
     protected void fireSnapshotRemoved(final LoadedSnapshot snapshot) {
-        if (snapshotListeners == null) {
+        if (snapshotListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) snapshotListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((SnapshotsListener) iterator.next()).snapshotRemoved(snapshot);
-                    }
+            public void run() {
+                for(SnapshotsListener sl : snapshotListeners.allInstances()) {
+                    sl.snapshotRemoved(snapshot);
                 }
-            });
+            }
+        });
     }
 
     protected void fireSnapshotSaved(final LoadedSnapshot snapshot) {
-        if (snapshotListeners == null) {
+        if (snapshotListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) snapshotListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((SnapshotsListener) iterator.next()).snapshotSaved(snapshot);
-                    }
+            public void run() {
+                for(SnapshotsListener sl : snapshotListeners.allInstances()) {
+                    sl.snapshotSaved(snapshot);
                 }
-            });
+            }
+        });
     }
 
     protected void fireSnapshotTaken(final LoadedSnapshot snapshot) {
-        if (snapshotListeners == null) {
+        if (snapshotListeners.allClasses().isEmpty()) {
             return;
         }
 
-        final Vector toNotify;
-
-        synchronized (this) {
-            toNotify = (Vector) snapshotListeners.clone();
-        }
-
-        final Iterator iterator = toNotify.iterator();
         CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    while (iterator.hasNext()) {
-                        ((SnapshotsListener) iterator.next()).snapshotTaken(snapshot);
-                    }
+            public void run() {
+                for(SnapshotsListener sl : snapshotListeners.allInstances()) {
+                    sl.snapshotTaken(snapshot);
                 }
-            });
+            }
+        });
     }
 
     void resultsBecameAvailable() {
@@ -1108,9 +1024,7 @@ public final class ResultsManager {
             try {
                 existingFile.delete();
             } catch (IOException e) {
-                ErrorManager.getDefault()
-                            .annotate(e, MessageFormat.format(FILE_DELETE_FAILED_MSG, new Object[] { e.getMessage() }));
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+                LOGGER.log(Level.SEVERE, MessageFormat.format(FILE_DELETE_FAILED_MSG, new Object[] { e.getMessage() }), e);
 
                 return false;
             }
@@ -1124,9 +1038,7 @@ public final class ResultsManager {
             try {
                 FileUtil.copyFile(selectedSnapshot, targetFolder, fileName, fileExt);
             } catch (IOException e) {
-                ErrorManager.getDefault()
-                            .annotate(e, MessageFormat.format(SNAPSHOT_EXPORT_FAILED_MSG, new Object[] { e.getMessage() }));
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e);
+                LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_EXPORT_FAILED_MSG, new Object[] { e.getMessage() }), e);
             }
         }
     }

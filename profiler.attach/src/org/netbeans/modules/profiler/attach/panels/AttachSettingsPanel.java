@@ -49,6 +49,8 @@ import org.openide.util.Lookup;
 import org.openide.util.Lookup.Result;
 import org.openide.util.NbBundle;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -383,7 +385,7 @@ public class AttachSettingsPanel extends AttachWizardPanel {
     public class TargetGroup {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private List /*<Target>*/ targetList;
+        private List<Target> targetList;
         private String name;
         private boolean dirty;
         private boolean nullGroup;
@@ -398,11 +400,7 @@ public class AttachSettingsPanel extends AttachWizardPanel {
         public TargetGroup(String name, Target[] targets, boolean singular) {
             this.name = name;
             this.singular = singular;
-            this.targetList = new Vector();
-
-            for (int i = 0; i < targets.length; i++) {
-                this.targetList.add(targets[i]);
-            }
+            this.targetList = new ArrayList<Target>(Arrays.asList(targets));
 
             Collections.sort(this.targetList);
             this.nullGroup = false;

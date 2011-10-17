@@ -49,4 +49,5 @@ package org.netbeans.lib.profiler.results;
  * @author Jaroslav Bachorik
  */
 public interface RuntimeCCTNode {
+    RuntimeCCTNode[] getChildren();
 }

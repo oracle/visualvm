@@ -65,321 +65,332 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
         int position = 0;
         boolean collectingTwoTimeStamps = (client != null) ? client.getStatus().collectingTwoTimeStamps() : false;
 
-        while (position < buffer.length) {
-            byte eventType = buffer[position++];
+        try {
+            while (position < buffer.length) {
+                byte eventType = buffer[position++];
 
-            if ((eventType & CommonConstants.COMPACT_EVENT_FORMAT_BYTE_MASK) != 0) {
-                char charEvent = (char) ((((int) eventType & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
+                if ((eventType & CommonConstants.COMPACT_EVENT_FORMAT_BYTE_MASK) != 0) {
+                    char charEvent = (char) ((((int) eventType & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
 
-                if ((byte) (eventType & CommonConstants.METHOD_EXIT_COMPACT_BYTE_MASK) == CommonConstants.METHOD_EXIT_COMPACT_BYTE_MASK) {
-                    fireMethodExitUnstamped(charEvent & CommonConstants.COMPACT_EVENT_METHOD_ID_MASK, currentThreadId,
-                                            CPUProfilingResultListener.METHODTYPE_NORMAL);
-                } else {
-                    fireMethodEntryUnstamped(charEvent & CommonConstants.COMPACT_EVENT_METHOD_ID_MASK, currentThreadId,
-                                             CPUProfilingResultListener.METHODTYPE_NORMAL);
+                    if ((byte) (eventType & CommonConstants.METHOD_EXIT_COMPACT_BYTE_MASK) == CommonConstants.METHOD_EXIT_COMPACT_BYTE_MASK) {
+                        fireMethodExitUnstamped(charEvent & CommonConstants.COMPACT_EVENT_METHOD_ID_MASK, currentThreadId,
+                                                CPUProfilingResultListener.METHODTYPE_NORMAL);
+                    } else {
+                        fireMethodEntryUnstamped(charEvent & CommonConstants.COMPACT_EVENT_METHOD_ID_MASK, currentThreadId,
+                                                 CPUProfilingResultListener.METHODTYPE_NORMAL);
+                    }
+
+                    continue;
                 }
 
-                continue;
-            }
+                if (!((eventType == CommonConstants.BUFFEREVENT_PROFILEPOINT_HIT) || (eventType == CommonConstants.SERVLET_DO_METHOD)
+                        || (eventType == CommonConstants.SET_FOLLOWING_EVENTS_THREAD) || (eventType == CommonConstants.NEW_THREAD)
+                        || (eventType == CommonConstants.RESET_COLLECTORS))) {
+                    int methodId = -1;
+                    long timeStamp0 = 0;
+                    long timeStamp1 = 0;
 
-            if (!((eventType == CommonConstants.BUFFEREVENT_PROFILEPOINT_HIT) || (eventType == CommonConstants.SERVLET_DO_METHOD)
-                    || (eventType == CommonConstants.SET_FOLLOWING_EVENTS_THREAD) || (eventType == CommonConstants.NEW_THREAD)
-                    || (eventType == CommonConstants.RESET_COLLECTORS))) {
-                int methodId = -1;
-                long timeStamp0 = 0;
-                long timeStamp1 = 0;
-
-                if ((eventType != CommonConstants.ADJUST_TIME // those events do not carry methodId
-                    ) && (eventType != CommonConstants.METHOD_ENTRY_WAIT) && (eventType != CommonConstants.METHOD_EXIT_WAIT)
-                        && (eventType != CommonConstants.METHOD_ENTRY_MONITOR)
-                        && (eventType != CommonConstants.METHOD_EXIT_MONITOR)
-                        && (eventType != CommonConstants.METHOD_ENTRY_SLEEP) && (eventType != CommonConstants.METHOD_EXIT_SLEEP)) {
-                    methodId = (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
-                }
-
-                if ((eventType != CommonConstants.METHOD_ENTRY_UNSTAMPED) && (eventType != CommonConstants.METHOD_EXIT_UNSTAMPED)
-                        && (eventType != CommonConstants.MARKER_ENTRY_UNSTAMPED)
-                        && (eventType != CommonConstants.MARKER_EXIT_UNSTAMPED)) {
-                    timeStamp0 = (((long) buffer[position++] & 0xFF) << 48) | (((long) buffer[position++] & 0xFF) << 40)
-                                 | (((long) buffer[position++] & 0xFF) << 32) | (((long) buffer[position++] & 0xFF) << 24)
-                                 | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
-                                 | ((long) buffer[position++] & 0xFF);
-
-                    if ((eventType != CommonConstants.METHOD_ENTRY_WAIT) && (eventType != CommonConstants.METHOD_EXIT_WAIT)
+                    if ((eventType != CommonConstants.ADJUST_TIME // those events do not carry methodId
+                        ) && (eventType != CommonConstants.METHOD_ENTRY_WAIT) && (eventType != CommonConstants.METHOD_EXIT_WAIT)
                             && (eventType != CommonConstants.METHOD_ENTRY_MONITOR)
                             && (eventType != CommonConstants.METHOD_EXIT_MONITOR)
-                            && (eventType != CommonConstants.METHOD_ENTRY_SLEEP)
-                            && (eventType != CommonConstants.METHOD_EXIT_SLEEP)) {
-                        if (collectingTwoTimeStamps) {
-                            timeStamp1 = (((long) buffer[position++] & 0xFF) << 48) | (((long) buffer[position++] & 0xFF) << 40)
-                                         | (((long) buffer[position++] & 0xFF) << 32)
-                                         | (((long) buffer[position++] & 0xFF) << 24)
-                                         | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
-                                         | ((long) buffer[position++] & 0xFF);
+                            && (eventType != CommonConstants.METHOD_ENTRY_SLEEP) && (eventType != CommonConstants.METHOD_EXIT_SLEEP)) {
+                        methodId = (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
+                    }
+
+                    if ((eventType != CommonConstants.METHOD_ENTRY_UNSTAMPED) && (eventType != CommonConstants.METHOD_EXIT_UNSTAMPED)
+                            && (eventType != CommonConstants.MARKER_ENTRY_UNSTAMPED)
+                            && (eventType != CommonConstants.MARKER_EXIT_UNSTAMPED)) {
+                        timeStamp0 = (((long) buffer[position++] & 0xFF) << 48) | (((long) buffer[position++] & 0xFF) << 40)
+                                     | (((long) buffer[position++] & 0xFF) << 32) | (((long) buffer[position++] & 0xFF) << 24)
+                                     | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
+                                     | ((long) buffer[position++] & 0xFF);
+
+                        if ((eventType != CommonConstants.METHOD_ENTRY_WAIT) && (eventType != CommonConstants.METHOD_EXIT_WAIT)
+                                && (eventType != CommonConstants.METHOD_ENTRY_MONITOR)
+                                && (eventType != CommonConstants.METHOD_EXIT_MONITOR)
+                                && (eventType != CommonConstants.METHOD_ENTRY_SLEEP)
+                                && (eventType != CommonConstants.METHOD_EXIT_SLEEP)) {
+                            if (collectingTwoTimeStamps) {
+                                timeStamp1 = (((long) buffer[position++] & 0xFF) << 48) | (((long) buffer[position++] & 0xFF) << 40)
+                                             | (((long) buffer[position++] & 0xFF) << 32)
+                                             | (((long) buffer[position++] & 0xFF) << 24)
+                                             | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
+                                             | ((long) buffer[position++] & 0xFF);
+                            }
                         }
                     }
-                }
 
-                switch (eventType) {
-                    case CommonConstants.MARKER_ENTRY_UNSTAMPED: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Marker entry unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                    switch (eventType) {
+                        case CommonConstants.MARKER_ENTRY_UNSTAMPED: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Marker entry unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
+
+                            fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER);
+
+                            break;
                         }
+                        case CommonConstants.METHOD_ENTRY_UNSTAMPED: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Method entry unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
 
-                        fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER);
+                            fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_ENTRY_UNSTAMPED: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Method entry unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            break;
                         }
+                        case CommonConstants.MARKER_EXIT_UNSTAMPED: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Marker exit unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
 
-                        fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL);
+                            fireMethodExitUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER);
 
-                        break;
-                    }
-                    case CommonConstants.MARKER_EXIT_UNSTAMPED: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Marker exit unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            break;
                         }
+                        case CommonConstants.METHOD_EXIT_UNSTAMPED: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Method exit unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
 
-                        fireMethodExitUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER);
+                            fireMethodExitUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_EXIT_UNSTAMPED: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Method exit unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            break;
                         }
+                        case CommonConstants.MARKER_ENTRY: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Marker entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
 
-                        fireMethodExitUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL);
+                            fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, timeStamp0,
+                                            timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.MARKER_ENTRY: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Marker entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            break;
                         }
+                        case CommonConstants.ROOT_ENTRY: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Root entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
 
-                        fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, timeStamp0,
-                                        timeStamp1);
+                            fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_ROOT, timeStamp0,
+                                            timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.ROOT_ENTRY: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Root entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            break;
                         }
+                        case CommonConstants.METHOD_ENTRY: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Method entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
 
-                        fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_ROOT, timeStamp0,
-                                        timeStamp1);
+                            fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL, timeStamp0,
+                                            timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_ENTRY: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Method entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            break;
                         }
+                        case CommonConstants.MARKER_EXIT: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Marker exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
 
-                        fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL, timeStamp0,
-                                        timeStamp1);
+                            fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, timeStamp0,
+                                           timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.MARKER_EXIT: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Marker exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            break;
                         }
+                        case CommonConstants.ROOT_EXIT: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Root exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
 
-                        fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, timeStamp0,
-                                       timeStamp1);
+                            fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_ROOT, timeStamp0,
+                                           timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.ROOT_EXIT: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Root exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            break;
                         }
+                        case CommonConstants.METHOD_EXIT: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Method exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            }
 
-                        fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_ROOT, timeStamp0,
-                                       timeStamp1);
+                            fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL, timeStamp0,
+                                           timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_EXIT: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Method exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                            break;
                         }
+                        case CommonConstants.ADJUST_TIME: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Adjust time , tId={0}", currentThreadId); // NOI18N
+                            }
 
-                        fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL, timeStamp0,
-                                       timeStamp1);
+                            fireAdjustTime(currentThreadId, timeStamp0, timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.ADJUST_TIME: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Adjust time , tId={0}", currentThreadId); // NOI18N
+                            break;
                         }
+                        case CommonConstants.METHOD_ENTRY_MONITOR: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Monitor entry , tId={0}", currentThreadId); // NOI18N
+                            }
 
-                        fireAdjustTime(currentThreadId, timeStamp0, timeStamp1);
+                            fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_ENTRY_MONITOR: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Monitor entry , tId={0}", currentThreadId); // NOI18N
+                            break;
                         }
+                        case CommonConstants.METHOD_EXIT_MONITOR: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Monitor exit , tId={0}", currentThreadId); // NOI18N
+                            }
 
-                        fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1);
+                            fireMonitorExit(currentThreadId, timeStamp0, timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_EXIT_MONITOR: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Monitor exit , tId={0}", currentThreadId); // NOI18N
+                            break;
                         }
+                        case CommonConstants.METHOD_ENTRY_SLEEP: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Sleep entry , tId={0}", currentThreadId); // NOI18N
+                            }
 
-                        fireMonitorExit(currentThreadId, timeStamp0, timeStamp1);
+                            fireSleepEntry(currentThreadId, timeStamp0, timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_ENTRY_SLEEP: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Sleep entry , tId={0}", currentThreadId); // NOI18N
+                            break;
                         }
+                        case CommonConstants.METHOD_EXIT_SLEEP: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Sleep exit , tId={0}", currentThreadId); // NOI18N
+                            }
 
-                        fireSleepEntry(currentThreadId, timeStamp0, timeStamp1);
+                            fireSleepExit(currentThreadId, timeStamp0, timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_EXIT_SLEEP: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Sleep exit , tId={0}", currentThreadId); // NOI18N
+                            break;
                         }
+                        case CommonConstants.METHOD_ENTRY_WAIT: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Wait entry , tId={0}", currentThreadId); // NOI18N
+                            }
 
-                        fireSleepExit(currentThreadId, timeStamp0, timeStamp1);
+                            fireWaitEntry(currentThreadId, timeStamp0, timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_ENTRY_WAIT: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Wait entry , tId={0}", currentThreadId); // NOI18N
+                            break;
                         }
+                        case CommonConstants.METHOD_EXIT_WAIT: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Wait exit , tId={0}", currentThreadId); // NOI18N
+                            }
 
-                        fireWaitEntry(currentThreadId, timeStamp0, timeStamp1);
+                            fireWaitExit(currentThreadId, timeStamp0, timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.METHOD_EXIT_WAIT: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Wait exit , tId={0}", currentThreadId); // NOI18N
+                            break;
                         }
+                        case CommonConstants.THREADS_SUSPENDED: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.finest("Threads suspend"); // NOI18N
+                            }
 
-                        fireWaitExit(currentThreadId, timeStamp0, timeStamp1);
+                            fireThreadsSuspend(timeStamp0, timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.THREADS_SUSPENDED: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Threads suspend"); // NOI18N
+                            break;
                         }
+                        case CommonConstants.THREADS_RESUMED: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.finest("Threads resume"); // NOI18N
+                            }
 
-                        fireThreadsSuspend(timeStamp0, timeStamp1);
+                            fireThreadsResumed(timeStamp0, timeStamp1);
 
-                        break;
-                    }
-                    case CommonConstants.THREADS_RESUMED: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Threads resume"); // NOI18N
+                            break;
                         }
+                        default: {
+                            LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CPUDataFrameProcessor: {0} at {1}", // NOI18N
+                                                    new Object[]{(int) eventType, position});
 
-                        fireThreadsResumed(timeStamp0, timeStamp1);
-
-                        break;
-                    }
-                    default: {
-                        LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CPUDataFrameProcessor: {0} at {1}", // NOI18N
-                                                new Object[]{(int) eventType, position});
-
-                        break;
-                    }
-                }
-            } else {
-                switch (eventType) {
-                    case CommonConstants.BUFFEREVENT_PROFILEPOINT_HIT: {
-                        int id = (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
-                        long timeStamp = (((long) buffer[position++] & 0xFF) << 48) | (((long) buffer[position++] & 0xFF) << 40)
-                                         | (((long) buffer[position++] & 0xFF) << 32)
-                                         | (((long) buffer[position++] & 0xFF) << 24)
-                                         | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
-                                         | ((long) buffer[position++] & 0xFF);
-                        int threadId = (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
-                        fireProfilingPoint(threadId, id, timeStamp);
-
-                        break;
-                    }
-                    case CommonConstants.SET_FOLLOWING_EVENTS_THREAD: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Change current thread , tId={0}", currentThreadId); // NOI18N
+                            break;
                         }
-
-                        currentThreadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
-
-                        break;
                     }
-                    case CommonConstants.NEW_THREAD: {
-                        int threadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
-                        int strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
-                        String threadName = new String(buffer, position, strLen);
-                        position += strLen;
-                        strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
+                } else {
+                    switch (eventType) {
+                        case CommonConstants.BUFFEREVENT_PROFILEPOINT_HIT: {
+                            int id = (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
+                            long timeStamp = (((long) buffer[position++] & 0xFF) << 48) | (((long) buffer[position++] & 0xFF) << 40)
+                                             | (((long) buffer[position++] & 0xFF) << 32)
+                                             | (((long) buffer[position++] & 0xFF) << 24)
+                                             | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
+                                             | ((long) buffer[position++] & 0xFF);
+                            int threadId = (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
+                            fireProfilingPoint(threadId, id, timeStamp);
 
-                        String threadClassName = new String(buffer, position, strLen);
-                        position += strLen;
-
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Creating new thread , tId={0}", threadId); // NOI18N
+                            break;
                         }
+                        case CommonConstants.SET_FOLLOWING_EVENTS_THREAD: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Change current thread , tId={0}", currentThreadId); // NOI18N
+                            }
 
-                        fireNewThread(threadId, threadName, threadClassName);
-                        currentThreadId = threadId;
+                            currentThreadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
 
-                        break;
-                    }
-                    case CommonConstants.SERVLET_DO_METHOD: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Servlet track start , tId={0}", currentThreadId); // NOI18N
+                            break;
                         }
+                        case CommonConstants.NEW_THREAD: {
+                            int threadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
+                            int strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
+                            String threadName = new String(buffer, position, strLen);
+                            position += strLen;
+                            strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
 
-                        byte requestType = buffer[position++];
-                        int strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
-                        String servletPath = new String(buffer, position, strLen);
-                        position += strLen;
+                            String threadClassName = new String(buffer, position, strLen);
+                            position += strLen;
 
-                        int sessionId = (((int) buffer[position++] & 0xFF) << 24) | (((int) buffer[position++] & 0xFF) << 16)
-                                        | (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
-                        fireServletRequest(currentThreadId, requestType, servletPath, sessionId);
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Creating new thread , tId={0}", threadId); // NOI18N
+                            }
 
-                        break;
-                    }
-                    case CommonConstants.RESET_COLLECTORS: {
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("Profiling data reset"); // NOI18N
+                            fireNewThread(threadId, threadName, threadClassName);
+                            currentThreadId = threadId;
+
+                            break;
                         }
+                        case CommonConstants.SERVLET_DO_METHOD: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Servlet track start , tId={0}", currentThreadId); // NOI18N
+                            }
 
-                        fireReset();
+                            byte requestType = buffer[position++];
+                            int strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
+                            String servletPath = new String(buffer, position, strLen);
+                            position += strLen;
 
-                        break;
-                    }
-                    default: {
-                        LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CallGraphBuilder: {0} at {1}", // NOI18N
-                                                  new Object[]{(int) eventType, position});
+                            int sessionId = (((int) buffer[position++] & 0xFF) << 24) | (((int) buffer[position++] & 0xFF) << 16)
+                                            | (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
+                            fireServletRequest(currentThreadId, requestType, servletPath, sessionId);
 
-                        break;
+                            break;
+                        }
+                        case CommonConstants.RESET_COLLECTORS: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.finest("Profiling data reset"); // NOI18N
+                            }
+
+                            fireReset();
+
+                            break;
+                        }
+                        default: {
+                            LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CallGraphBuilder: {0} at {1}", // NOI18N
+                                                      new Object[]{(int) eventType, position});
+
+                            break;
+                        }
                     }
                 }
             }
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("AIOOBE in dataframe [");
+            for(byte b : buffer) {
+                sb.append(b).append(",");
+            }
+            sb.append("]\n");
+            LOGGER.severe(sb.toString());
+            throw aioobe;
         }
     }
 
