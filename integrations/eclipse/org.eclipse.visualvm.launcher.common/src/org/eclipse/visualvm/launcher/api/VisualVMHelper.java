@@ -39,7 +39,7 @@ import org.eclipse.visualvm.launcher.preferences.PreferenceConstants;
 
 public final class VisualVMHelper {
 	private static class SpecVersion {
-		int major, minor, update;
+		int major, minor;
 		
 		public SpecVersion(String specString) {
 			StringTokenizer st = new StringTokenizer(specString, ".");
@@ -48,9 +48,6 @@ public final class VisualVMHelper {
 			}
 			if (st.hasMoreTokens()) {
 				minor = Integer.parseInt(st.nextToken());
-			}
-			if (st.hasMoreTokens()) {
-				update = Integer.parseInt(st.nextToken());
 			}
 		}
 	}
