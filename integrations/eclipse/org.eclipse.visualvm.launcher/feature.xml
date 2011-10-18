@@ -2,7 +2,7 @@
 <feature
       id="VisualVM_Launcher"
       label="VisualVM Launcher Feature"
-      version="1.1"
+      version="1.1.1"
       provider-name="Oracle Corporation">
 
    <description>
@@ -406,7 +406,7 @@ as provided by Sun in the LICENSE file that accompanied this code.&quot;
          id="org.eclipse.visualvm.launcher.common"
          download-size="0"
          install-size="0"
-         version="1.1.0"/>
+         version="1.1.1"/>
 
    <plugin
          id="org.eclipse.visualvm.launcher.java"
