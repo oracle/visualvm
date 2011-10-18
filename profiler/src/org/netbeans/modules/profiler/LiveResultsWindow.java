@@ -147,10 +147,12 @@ public final class LiveResultsWindow extends TopComponent
 
         @Override
         public void resultsAvailable() {
+            getDefault().resultsAvailableinTA = true;
         }
 
         @Override
         public void resultsReset() {
+            getDefault().resultsAvailableinTA = false;
             if (getDelegate() != null) getDelegate().reset();
         }
         
@@ -470,7 +472,8 @@ public final class LiveResultsWindow extends TopComponent
     private boolean autoRefresh = true;
     private volatile boolean profilerRunning = false;
     private volatile boolean resultsAvailable = false;
-
+    private volatile boolean resultsAvailableinTA = false;
+    
     private static class Singleton {
         final private static LiveResultsWindow INSTANCE = new LiveResultsWindow();
     }
@@ -849,11 +852,14 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     // -- Private implementation -------------------------------------------------------------------------------------------
-    private static boolean callForceObtainedResultsDump(final ProfilerClient client) {
+    private boolean callForceObtainedResultsDump(final ProfilerClient client) {
         return callForceObtainedResultsDump(client, true);
     }
 
-    private static boolean callForceObtainedResultsDump(final ProfilerClient client, final boolean refreshDisplay) {
+    private boolean callForceObtainedResultsDump(final ProfilerClient client, final boolean refreshDisplay) {
+        if (!resultsAvailableinTA) { // if the results are not available in profiled application, return immediatelly
+            return false;
+        }
         if (refreshDisplay) {
             resultsDumpForced.set(true);
         }
