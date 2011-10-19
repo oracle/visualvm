@@ -43,8 +43,8 @@
 
 package org.netbeans.modules.profiler.attach.panels.components;
 
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
@@ -58,7 +58,7 @@ public class ButtonGroupEx extends ButtonGroup {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     // the list of buttons participating in this group
-    protected Vector buttons = new Vector();
+    private Collection<AbstractButton> buttons1 = new ArrayList<AbstractButton>();
 
     /**
      * The current selection.
@@ -81,11 +81,7 @@ public class ButtonGroupEx extends ButtonGroup {
      * @since 1.3
      */
     public int getButtonCount() {
-        if (buttons == null) {
-            return 0;
-        } else {
-            return buttons.size();
-        }
+        return buttons1.size();
     }
 
     /**
@@ -134,7 +130,7 @@ public class ButtonGroupEx extends ButtonGroup {
             return;
         }
 
-        buttons.addElement(b);
+        buttons1.add(b);
 
         if (b.isSelected()) {
             if (selection == null) {
@@ -150,8 +146,7 @@ public class ButtonGroupEx extends ButtonGroup {
     public void clearSelection() {
         selection = null;
 
-        for (Iterator it = buttons.iterator(); it.hasNext();) {
-            AbstractButton btn = (AbstractButton) it.next();
+        for (AbstractButton btn : buttons1) {
             btn.setSelected(false);
         }
     }
@@ -165,7 +160,7 @@ public class ButtonGroupEx extends ButtonGroup {
             return;
         }
 
-        buttons.removeElement(b);
+        buttons1.remove(b);
 
         if (b.getModel() == selection) {
             selection = null;

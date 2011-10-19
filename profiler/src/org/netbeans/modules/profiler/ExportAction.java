@@ -48,6 +48,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -62,7 +65,6 @@ import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -73,7 +75,8 @@ import org.openide.windows.WindowManager;
  * @author cyhelsky
  */
 public final class ExportAction extends AbstractAction {
-
+    private static final Logger LOGGER = Logger.getLogger(ExportAction.class.getName());
+    
 //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
     public static interface ExportProvider {
@@ -122,6 +125,7 @@ public final class ExportAction extends AbstractAction {
     private static final String EXPORT_ACTION_DESCRIPTION = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportActionDescr"); //NOI18N
     private static final String OVERWRITE_FILE_CAPTION = NbBundle.getMessage(ExportAction.class, "ExportAction_OverwriteFileCaption"); //NOI18N
     private static final String OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_OverwriteFileMsg"); //NOI18N
+    private static final String INVALID_LOCATION_FOR_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_InvalidLocationForFileMsg"); //NOI18N
     private static final String CANNOT_OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_CannotOverwriteFileMsg"); //NOI18N
     private static final String EXPORT_DIALOG_TITLE = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogTitle"); //NOI18N
     private static final String EXPORT_DIALOG_BUTTON = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogButton"); //NOI18N
@@ -231,6 +235,13 @@ public final class ExportAction extends AbstractAction {
                     return EXPORT_DIALOG_NPS_FILTER;
                 }
             });
+            // If there is snapshot, .nps must be selected as file filter
+            FileFilter[] currentFilters = fileChooser.getChoosableFileFilters();
+            for (int i = 0; i < currentFilters.length; i++) {
+                if (currentFilters[i].getDescription().equals(EXPORT_DIALOG_NPS_FILTER)) {
+                    fileChooser.setFileFilter(currentFilters[i]);
+                }
+            }
         }
     }
 
@@ -257,7 +268,7 @@ public final class ExportAction extends AbstractAction {
 
             if (!file.delete()) {
                 ProfilerDialogs.displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
-                return false;
+                return false; // Insufficient rights to overwrite file
             }
         }
 
@@ -353,12 +364,16 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
             try {
-                FileObject fo = FileUtil.toFileObject(FileUtil.normalizeFile(saveFile.folder)).createData(saveFile.fileName, saveFile.fileExt);
+                FileObject fo = FileUtil.toFileObject(FileUtil.normalizeFile(saveFile.folder));
+                if (fo==null) {
+                    ProfilerDialogs.displayError(INVALID_LOCATION_FOR_FILE_MSG);
+                    return;
+                }
+                fo.createData(saveFile.fileName, saveFile.fileExt);
                 saveFile=null;
                 ResultsManager.getDefault().saveSnapshot(snapshot, fo);
             } catch (IOException e1) {
-                ErrorManager.getDefault().annotate(e1, MessageFormat.format(SNAPSHOT_CREATE_FAILED_MSG, new Object[] { e1.getMessage() }));
-                ErrorManager.getDefault().notify(ErrorManager.ERROR, e1);
+                LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_CREATE_FAILED_MSG, new Object[] { e1.getMessage() }), e1);
             }
         } else {
             final File file = saveFile.getSelectedFile();

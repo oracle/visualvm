@@ -46,13 +46,13 @@ package org.netbeans.lib.profiler.results.cpu;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.CCTFlattener;
-import org.netbeans.lib.profiler.results.cpu.cct.CompositeCPUCCTWalker;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 
 //import org.netbeans.lib.profiler.results.cpu.cct.NodeMarker;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.SimpleCPUCCTNode;
 
 
 /**
@@ -69,7 +69,7 @@ public class FlatProfileBuilder implements FlatProfileProvider, CPUCCTProvider.L
     private CCTFlattener flattener;
     private FlatProfileContainer lastFlatProfile = null;
     private ProfilerClient client;
-    private RuntimeCPUCCTNode appNode;
+    private SimpleCPUCCTNode appNode;
 
     private TimeCollector collector = null;
     private CCTResultsFilter filter = null;
@@ -99,8 +99,8 @@ public class FlatProfileBuilder implements FlatProfileProvider, CPUCCTProvider.L
     public synchronized void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
         if (empty) return;
         
-        if (appRootNode instanceof RuntimeCPUCCTNode) {
-            appNode = (RuntimeCPUCCTNode) appRootNode;
+        if (appRootNode instanceof SimpleCPUCCTNode) {
+            appNode = (SimpleCPUCCTNode) appRootNode;
         } else {
             appNode = null;
         }
@@ -118,19 +118,12 @@ public class FlatProfileBuilder implements FlatProfileProvider, CPUCCTProvider.L
         client.getStatus().beginTrans(false);
 
         try {
-            CompositeCPUCCTWalker walker = new CompositeCPUCCTWalker();
-            int index = 0;
-
-            if (filter != null) {
-                walker.add(index++, filter);
-            }
-            walker.add(index++, flattener);
-
-            if (collector != null) {
-                walker.add(index++ , collector);
-            }
-
-            walker.walk(appNode);
+            RuntimeCCTNodeProcessor.process(
+                appNode, 
+                filter,
+                flattener,
+                collector
+            );
 
             lastFlatProfile = flattener.getFlatProfile();
 

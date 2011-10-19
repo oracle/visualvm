@@ -43,17 +43,23 @@
 
 package org.netbeans.modules.profiler.actions;
 
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.openide.util.NbBundle;
-import java.awt.event.ActionEvent;
-import javax.swing.*;
+import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
+import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
+import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.modules.profiler.ResultsListener;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 
 /**
@@ -61,10 +67,32 @@ import org.netbeans.modules.profiler.utilities.ProfilerUtils;
  *
  * @author Ian Formanek
  */
-public final class ResetResultsAction extends AbstractAction {
+public final class ResetResultsAction extends AbstractAction implements ProfilingStateListener {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
+    
+    /* 
+     * The following code is an externalization of various listeners registered
+     * in the global lookup and needing access to an enclosing instance of
+     * ResetResultsAction. 
+     * The enclosing instance will use the FQN registration to obtain the shared instance
+     * of the listener implementation and inject itself as a delegate into the listener.
+     */
+    @ServiceProvider(service=ResultsListener.class)
+    public static final class Listener extends Delegate<ResetResultsAction> implements ResultsListener {
+        @Override
+        public void resultsAvailable() {
+            if (getDelegate() != null) getDelegate().updateEnabledState();
+        }
 
-    public ResetResultsAction() {
+        @Override
+        public void resultsReset() { 
+            if (getDelegate() != null) getDelegate().updateEnabledState();
+        }
+    }
+    
+    private static ResetResultsAction instance;
+    
+    private ResetResultsAction() {
         putValue(Action.NAME, NbBundle.getMessage(ResetResultsAction.class, "LBL_ResetResultsAction" // NOI18N
         ));
         putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ResetResultsAction.class, "HINT_ResetResultsAction" // NOI18N
@@ -73,27 +101,38 @@ public final class ResetResultsAction extends AbstractAction {
         putValue("iconBase", Icons.getResource(ProfilerIcons.RESET_RESULTS)); // NOI18N
         
         updateEnabledState();
-        ResultsManager.getDefault().addResultsListener(new ResultsListener() {
-
-            public void resultsAvailable() {
-                updateEnabledState();
-            }
-
-            public void resultsReset() { 
-                updateEnabledState();
-            }
-            
-        });
+        
+        Lookup.getDefault().lookup(Listener.class).setDelegate(this);
+        Profiler.getDefault().addProfilingStateListener(this);
+    }
+    
+    public static synchronized ResetResultsAction getInstance() {
+        if (instance == null) {
+            instance = new ResetResultsAction();
+        }
+        return instance;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {
+    } // ignore
+
+    public void profilingStateChanged(final ProfilingStateEvent e) {
+        updateEnabledState();
+    }
+
+    public void threadsMonitoringChanged() {
+    } // ignore
+    
     /**
      * Invoked when an action occurs.
      */
+    @Override
     public void actionPerformed(final ActionEvent e) {
         
         ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+            @Override
             public void run() {
                 ResultsManager.getDefault().reset();
         

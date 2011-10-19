@@ -43,9 +43,9 @@
 
 package org.netbeans.modules.profiler;
 
+import org.netbeans.modules.profiler.utilities.Delegate;
 import javax.swing.event.ChangeEvent;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import java.util.Arrays;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.MonitoredData;
@@ -61,12 +61,9 @@ import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.SnippetPanel;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.*;
-import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
-import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -87,10 +84,10 @@ import java.io.ObjectOutput;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -109,6 +106,7 @@ import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.Lookup;
+import org.openide.util.lookup.ServiceProvider;
 
 
 /**
@@ -117,10 +115,53 @@ import org.openide.util.Lookup;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
-public final class ProfilerControlPanel2 extends TopComponent implements ProfilingStateListener, SnapshotsListener,
-                                                                         ResultsListener {
+public final class ProfilerControlPanel2 extends TopComponent implements ProfilingStateListener {
+    final private static Logger LOGGER = Logger.getLogger(ProfilerControlPanel2.class.getName());
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
+    /*
+     * The following code is an externalization of various listeners registered
+     * in the global lookup and needing access to an enclosing instance of
+     * ProfilerControlPanel2.
+     * The enclosing instance will use the FQN registration to obtain the shared instance
+     * of the listener implementation and inject itself as a delegate into the listener.
+     */
+    @ServiceProvider(service=SnapshotsListener.class)
+    public static final class Listener extends Delegate<ProfilerControlPanel2> implements SnapshotsListener, ResultsListener {
+        @Override
+        public void resultsAvailable() {
+            //    ((TakeSnapshotAction)TakeSnapshotAction.get(TakeSnapshotAction.class)).performAction();
+            if (getDelegate() != null) getDelegate().resultsSnippet.resultsAvailable();
+        }
+
+        @Override
+        public void resultsReset() {
+            if (getDelegate() != null) getDelegate().resultsSnippet.resultsReset();
+        }
+
+        @Override
+        public void snapshotLoaded(LoadedSnapshot snapshot) {
+            if (getDelegate() != null) getDelegate().snapshotsSnippet.snapshotLoaded(snapshot);
+        }
+
+        @Override
+        public void snapshotRemoved(LoadedSnapshot snapshot) {
+            if (getDelegate() != null) getDelegate().resultsSnippet.snapshotRemoved(snapshot);
+            if (getDelegate() != null) getDelegate().snapshotsSnippet.snapshotRemoved(snapshot);
+        }
+
+        @Override
+        public void snapshotSaved(LoadedSnapshot snapshot) {
+            if (getDelegate() != null) getDelegate().snapshotsSnippet.snapshotSaved(snapshot);
+        }
+
+        @Override
+        public void snapshotTaken(LoadedSnapshot snapshot) {
+            if (getDelegate() != null) getDelegate().resultsSnippet.snapshotTaken(snapshot);
+        }
+    }
+    
     public static final class VerticalLayout implements LayoutManager {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
@@ -342,7 +383,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         void refreshStatus() {
             final int state = Profiler.getDefault().getProfilingState();
 
-            final TargetAppRunner targetAppRunner = TargetAppRunner.getDefault();
+            final TargetAppRunner targetAppRunner = Profiler.getDefault().getTargetAppRunner();
 
             String instrStatusText = ""; // NOI18N
 
@@ -471,7 +512,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             rerunButton.setBorder(myRolloverBorder);
             add(rerunButton);
 
-            JButton stopButton = new JButton(new StopAction()) {
+            JButton stopButton = new JButton(StopAction.getInstance()) {
                 public void setText(String text) {}
                 public void setIcon(Icon icon) {
                     super.setIcon(icon);
@@ -487,7 +528,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             stopButton.setBorder(myRolloverBorder);
             add(stopButton);
 
-            JButton resetButton = new JButton(new ResetResultsAction());
+            JButton resetButton = new JButton(ResetResultsAction.getInstance());
             resetButton.setText(null);
             UIUtils.fixButtonUI(resetButton);
             resetButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) resetButton
@@ -520,7 +561,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             modifyButton.setBorder(myRolloverBorder);
             add(modifyButton);
 
-            JButton telemetryButton = new JButton(new TelemetryOverviewAction());
+            JButton telemetryButton = new JButton(TelemetryOverviewAction.getInstance());
             telemetryButton.setText(null);
             UIUtils.fixButtonUI(telemetryButton);
             telemetryButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) telemetryButton
@@ -686,7 +727,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
             displayedIcon = CPU;
 
-            resetResultsButton = new JButton(new ResetResultsAction()) {
+            resetResultsButton = new JButton(ResetResultsAction.getInstance()) {
                 public void setIcon(Icon icon) {
                     super.setIcon(icon);
                     setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon)getIcon()).getImage()))));
@@ -754,7 +795,10 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         public void refreshStatus() {
             updateResultsButtons();
             
-            int instr = Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType();
+            int state = Profiler.getDefault().getProfilingState();
+            int instr = state != Profiler.PROFILING_INACTIVE ? 
+                            Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType() :
+                            CommonConstants.INSTR_NONE;
             int newMode;
 
             switch (instr) {
@@ -813,7 +857,10 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         
         private void updateResultsButtons() {
             int state = Profiler.getDefault().getProfilingState();
-            int instr = Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType();
+            int instr = state != Profiler.PROFILING_INACTIVE ? 
+                            Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType() :
+                            CommonConstants.INSTR_NONE;
+            
             boolean enabled = ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING));
             enabled = enabled && (instr != CommonConstants.INSTR_NONE); // no live results & snapshots for monitoring
             
@@ -1348,19 +1395,16 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         private void updateCombo() {
             Lookup.Provider[] projects = ProjectUtilities.getSortedProjects(ProjectUtilities.getOpenedProjects());
-            Vector items = new Vector(projects.length + 1);
-
-            for (int i = 0; i < projects.length; i++) {
-                items.add(projects[i]);
-            }
+            java.util.List items = new ArrayList(projects.length + 1);
+            items.addAll(Arrays.asList(projects));
 
             items.add(0, GLOBAL_COMBO_ITEM_STRING);
 
             DefaultComboBoxModel comboModel = (DefaultComboBoxModel) combo.getModel();
             comboModel.removeAllElements();
 
-            for (int i = 0; i < items.size(); i++) {
-                comboModel.addElement(items.get(i));
+            for (Object item : items) {
+                comboModel.addElement(item);
             }
 
             if ((displayedProject != null) && (comboModel.getIndexOf(displayedProject) != -1)) {
@@ -1481,7 +1525,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 profileValueLabel.setText(configuration);
             }
 
-            String newHost = TargetAppRunner.getDefault().getProfilerEngineSettings().getRemoteHost();
+            String newHost = Profiler.getDefault().getTargetAppRunner().getProfilerEngineSettings().getRemoteHost();
 
             if (newHost == null) {
                 newHost = ""; // NOI18N
@@ -1811,8 +1855,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         add(scrollPane, BorderLayout.CENTER);
         
         Profiler.getDefault().addProfilingStateListener(this);
-        ResultsManager.getDefault().addSnapshotsListener(this);
-        ResultsManager.getDefault().addResultsListener(this);
 
         addComponentListener(new ComponentAdapter() {
                 public void componentResized(ComponentEvent e) {
@@ -1825,6 +1867,8 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         setFocusable(true);
         setRequestFocusEnabled(true);
+        
+        Lookup.getDefault().lookup(Listener.class).setDelegate(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -1937,7 +1981,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             version = (Integer) in.readObject();
         } catch (Exception e) {
             ProfilerLogger.severe("Error while deserializing Profiler CP2: " + e.getMessage()); // NOI18N
-            NetBeansProfiler.profilerErrorManager.notify(ErrorManager.INFORMATIONAL, e);
+            LOGGER.log(Level.WARNING, null, e);
 
             return; // unsupported storage format
         }
@@ -1961,32 +2005,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         if (snapshotsSnippet != null) {
             snapshotsSnippet.refreshList();
         }
-    }
-
-    public void resultsAvailable() {
-        //    ((TakeSnapshotAction)TakeSnapshotAction.get(TakeSnapshotAction.class)).performAction();
-        resultsSnippet.resultsAvailable();
-    }
-
-    public void resultsReset() {
-        resultsSnippet.resultsReset();
-    }
-
-    public void snapshotLoaded(LoadedSnapshot snapshot) {
-        snapshotsSnippet.snapshotLoaded(snapshot);
-    }
-
-    public void snapshotRemoved(LoadedSnapshot snapshot) {
-        resultsSnippet.snapshotRemoved(snapshot);
-        snapshotsSnippet.snapshotRemoved(snapshot);
-    }
-
-    public void snapshotSaved(LoadedSnapshot snapshot) {
-        snapshotsSnippet.snapshotSaved(snapshot);
-    }
-
-    public void snapshotTaken(LoadedSnapshot snapshot) {
-        resultsSnippet.snapshotTaken(snapshot);
     }
 
     public void threadsMonitoringChanged() {
