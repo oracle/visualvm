@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.heapdump.impl;
 
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.heapdump.HeapDump;
@@ -59,7 +60,7 @@ class HeapDumpView extends DataSourceView {
     }
     
     private HeapDumpView(HeapDump heapDump, DataSourceDescriptor descriptor) {
-        super(heapDump, descriptor.getName(), descriptor.getIcon(), 0, true);
+        super(heapDump, descriptor.getName(), descriptor.getIcon(), 0, isClosableView(heapDump));
     }
     
         
@@ -70,6 +71,27 @@ class HeapDumpView extends DataSourceView {
                 new DataViewComponent.MasterViewConfiguration(true));
         
         return dvc;
+    }
+    
+    private static boolean isClosableView(HeapDump heapDump) {
+        // HeapDump invisible
+        if (!heapDump.isVisible()) return false;
+        
+        // HeapDump not in DataSources tree
+        DataSource owner = heapDump.getOwner();
+        if (owner == null) return false;
+        
+        while (owner != null && owner != DataSource.ROOT) {
+            // Subtree containing HeapDump invisible
+            if (!owner.isVisible()) return false;
+            owner = owner.getOwner();
+        }
+        
+        // HeapDump visible in DataSources tree
+        if (owner == DataSource.ROOT) return true;
+        
+        // HeapDump not in DataSources tree
+        return false;
     }
     
     
