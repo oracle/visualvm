@@ -48,7 +48,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -113,7 +112,11 @@ public final class ExportAction extends AbstractAction {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         File getSelectedFile() {
-            return new File(folder + File.separator + fileName+ "." + fileExt);
+            String folderPath=folder.getAbsolutePath();
+            if (folderPath.endsWith(File.separator)) {
+                folderPath=folderPath.substring(0, folderPath.length()-1);
+            }
+            return new File(folderPath + File.separator + fileName+ "." + fileExt);
         }
     }
 
@@ -277,7 +280,7 @@ public final class ExportAction extends AbstractAction {
 
     private SelectedFile selectExportTargetFile(final ExportProvider exportProvider) {
         File targetDir;
-        String targetName;
+        String targetName=null;
         String defaultName = exportProvider.getViewName();
 
         // 1. let the user choose file or directory
@@ -310,22 +313,23 @@ public final class ExportAction extends AbstractAction {
             exportedFileType=MODE_CSV;
         }
 
-        exportDir = chooser.getCurrentDirectory();
         if (file.isDirectory()) { // save to selected directory under default name
+            exportDir = file;
             targetDir = file;
             targetName = defaultName;
         } else { // save to selected file
-            targetDir = exportDir;
+            targetDir = fileChooser.getCurrentDirectory();
             String fName = file.getName();
 
             // divide the file name into name and extension
-            int idx = fName.lastIndexOf("."); // NOI18N
-
-            if (idx == -1) { // no extension
-                targetName = fName; // extension from source file
-            } else { // extension exists
-                targetName = fName.substring(0, idx);
-                targetExt = fName.substring(idx + 1);
+            if (fName.endsWith("."+targetExt)) {
+                int idx = fName.lastIndexOf("."); // NOI18N
+                if (idx == -1) { // no extension
+                    targetName = fName; // extension from source file
+                } else { // extension exists
+                    targetName = fName.substring(0, idx);
+                }
+                
             }
         }
 
@@ -364,12 +368,15 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
             try {
-                FileObject fo = FileUtil.toFileObject(FileUtil.normalizeFile(saveFile.folder));
+                if (!(file.getAbsolutePath().toLowerCase().endsWith("."+FILE_EXTENSION_NPS))) {
+                    ProfilerDialogs.displayError(INVALID_LOCATION_FOR_FILE_MSG);
+                    return;
+                }
+                FileObject fo=FileUtil.createData(file);
                 if (fo==null) {
                     ProfilerDialogs.displayError(INVALID_LOCATION_FOR_FILE_MSG);
                     return;
                 }
-                fo.createData(saveFile.fileName, saveFile.fileExt);
                 saveFile=null;
                 ResultsManager.getDefault().saveSnapshot(snapshot, fo);
             } catch (IOException e1) {
