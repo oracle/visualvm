@@ -293,7 +293,18 @@ public class ProfilerClient implements CommonConstants {
 
                     break;
                 case Command.EVENT_BUFFER_DUMPED:
-                    readAndProcessProfilingResults((EventBufferDumpedCommand) cmd);
+                    EventBufferDumpedCommand ebdCmd = (EventBufferDumpedCommand) cmd;
+                    String bufferName = ebdCmd.getEventBufferFileName();
+                    if (bufferName.length() > 0) {
+                        if (!EventBufferProcessor.bufFileExists()) {
+                            if (!EventBufferProcessor.setEventBufferFile(bufferName)) {
+                                appStatusHandler.displayError(MessageFormat.format(CANNOT_OPEN_SERVER_TEMPFILE_MSG,
+                                                                                   new Object[] { ebdCmd.getEventBufferFileName() }));
+                            }
+                        }
+                        JMethodIdTable.reset();
+                    }
+                    readAndProcessProfilingResults(ebdCmd);
 
                     break;
                 case Command.CLASS_LOADER_UNLOADING:
@@ -301,17 +312,6 @@ public class ProfilerClient implements CommonConstants {
 
                     break;
                 case Command.RESULTS_AVAILABLE:
-                    ResultsAvailableCommand raCmd = (ResultsAvailableCommand) cmd;
-                    String bufferName = raCmd.getEventBufferFileName();
-                    if (bufferName.length() > 0) {
-                        if (!EventBufferProcessor.bufFileExists()) {
-                            if (!EventBufferProcessor.setEventBufferFile(bufferName)) {
-                                appStatusHandler.displayError(MessageFormat.format(CANNOT_OPEN_SERVER_TEMPFILE_MSG,
-                                                                                   new Object[] { raCmd.getEventBufferFileName() }));
-                            }
-                        }
-                        JMethodIdTable.reset();
-                    }
                     resultsStart = System.currentTimeMillis();
 
                     break;
