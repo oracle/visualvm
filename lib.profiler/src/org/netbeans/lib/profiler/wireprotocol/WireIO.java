@@ -161,10 +161,6 @@ public class WireIO {
                         cmd = new GetDefiningClassLoaderCommand();
 
                         break;
-                    case Command.RESULTS_AVAILABLE:
-                        cmd = new ResultsAvailableCommand();
-                        
-                        break;
                     case Command.TAKE_HEAP_DUMP:
                         cmd = new TakeHeapDumpCommand();
 
