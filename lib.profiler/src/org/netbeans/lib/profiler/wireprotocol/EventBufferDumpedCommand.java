@@ -100,6 +100,11 @@ public class EventBufferDumpedCommand extends Command {
         return buffer;
     }
 
+    // For debugging
+    public String toString() {
+        return super.toString() + ", bufSize: " + bufSize + (eventBufferFileName.length()>0 ? ", eventBufferFileName:" + eventBufferFileName : ""); // NOI18N
+    }
+
     public String getEventBufferFileName() {
         return eventBufferFileName;
     }
