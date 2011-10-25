@@ -1695,7 +1695,7 @@ public class ProfilerClient implements CommonConstants {
                 return res;
             }
 
-            boolean terminateOnError = attachMode == 1; // in case of direct attach we don't want to have a JVM process hanging around waiting for the client to connect
+            boolean terminateOnError = attachMode != 2; // in case of direct attach we don't want to have a JVM process hanging around waiting for the client to connect
                                                         // Get VM properties
 
             synchronized (this) {
