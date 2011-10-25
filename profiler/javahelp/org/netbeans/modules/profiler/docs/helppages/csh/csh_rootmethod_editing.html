@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright © 1997, 2011, Oracle and/or its affiliates. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <title>Analyze Performance: Edit Profiling Roots (Advanced)</title>
+        <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    </head>
+    <body>
+
+        <h2>Analyze Performance: Edit Profiling Roots (Advanced)</h2>
+        <p><small><a href="#seealso">See Also</a></small></p>
+        <p>When analyzing application performance, you can choose to limit the source code that is instrumented by 
+        specifying a root method. When you profile an application by instrumenting a root method, profiling data 
+        is collected when one of the application's threads enters and leaves the root method.</p>
+                
+        <p>The advanced Edit Profiling Roots dialog box provides more advanced options
+            for adding, editing and removing the root methods that are specified
+            in the Edit Profiling Roots dialog box. 
+        You open this dialog box by clicking Advanced in the Edit Profiling Roots dialog box.</p>
+        
+        <p>The dialog box lists the profiling root methods that will be instrumented
+        when you analyze the application performance. 
+        You can perform the following tasks in the dialog.</p>
+        
+        <p>To define the profiling root you need to specify the following details.</p>
+        <ul>
+            <li><b>Add.</b> Click Add to specify a class and method that you want to instrument.</li>
+            <li><b>Edit.</b> Select a root method and click Edit to modify the selected class and method.</li>
+            <li><b>Remove.</b> Select a root method and click Remove to remove the method from the list
+                of methods that are instrumented.</li>
+        </ul>
+        
+        <p><b>Notes:</b></p>
+        <ul class="note">
+            <li>You may need to first mount the file system or a JAR file that contains your root
+            method's class, e.g. if this class does not belong to your application's
+            classpath. That is the case, for example, when profiling code running on
+            top of a Web/Java EE server.</li>
+            <li>If you choose a given method as a root when a thread is already 
+            executing it, profiling will not start. To begin profiling, a "fresh" call 
+            to the root method is required.
+            Once partial application profiling is initiated, profiling data 
+            is not collected until one of the application's threads enters the profiling root method.</li>
+        </ul>
+        
+        
+        <p>For more, see the following NetBeans FAQ:
+            <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://wiki.netbeans.org/wiki/view/FaqProfilerProfilingRootMethods">
+                <param name="text" value="<html><u>How does profiling via root methods work?</u></html>">
+                <param name="textFontSize" value="medium">
+                <param name="textColor" value="blue">
+            </object>
+        </p>
+        
+
+        <dl>
+            <dt><a name="seealso">See Also</a></dt>
+            <dd><a href="../profile_rootmethod.html">Specifying a Root Method</a></dd>
+            <dd><a href="profile_analyze_short.html">Analyzing Application Performance</a></dd>
+        </dl>
+        <hr>
+        <small><a href="../credits.html">Legal Notices</a></small>
+        <table border="0" cellpadding="50">
+        <tr><td>&nbsp;</td></tr>
+        </table>
+    </body>
+</html>
