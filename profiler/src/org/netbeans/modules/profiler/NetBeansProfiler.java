@@ -80,7 +80,6 @@ import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
 import org.netbeans.lib.profiler.wireprotocol.WireIO;
-import org.openide.DialogDescriptor;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -91,11 +90,10 @@ import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.BufferedInputStream;
@@ -115,6 +113,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -130,7 +129,7 @@ import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.openide.DialogDisplayer;
+import org.openide.awt.Mnemonics;
 
 
 /**
@@ -150,12 +149,11 @@ public abstract class NetBeansProfiler extends Profiler {
     
     public static final class ProgressPanel implements AppStatusHandler.AsyncDialog {
         
-        private static final int DEFAULT_WIDTH = 350;
-        private static final int DEFAULT_HEIGHT = 100;
+        private static final int MINIMUM_WIDTH = 350;
         
         private volatile boolean opened;
         private volatile boolean closed;
-        private Dialog dialog;
+        private JDialog dialog;
         
         private final String message;
         private final boolean showProgress;
@@ -173,7 +171,7 @@ public abstract class NetBeansProfiler extends Profiler {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if (!opened) closed = true;
-                    else dialog.setVisible(false);
+                    else closeImpl();
                 }
             });
         }
@@ -193,14 +191,12 @@ public abstract class NetBeansProfiler extends Profiler {
         }
         
         private void initUI() {
-            JPanel panel = new JPanel(new BorderLayout(10, 10));
-            panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+            Frame mainWindow = WindowManager.getDefault().getMainWindow();
+            dialog = new JDialog(mainWindow, PROGRESS_DIALOG_CAPTION, true);
+            
+            JPanel panel = new JPanel(new BorderLayout(5, 5));
+            panel.setBorder(new EmptyBorder(15, 15, 15, 10));
             panel.add(new JLabel(message), BorderLayout.NORTH);
-
-            Dimension ps = panel.getPreferredSize();
-            ps.setSize(Math.max(ps.getWidth(), DEFAULT_WIDTH),
-                       Math.max(ps.getHeight(), showProgress ? DEFAULT_HEIGHT : ps.getHeight()));
-            panel.setPreferredSize(ps);
 
             if (showProgress) {
                 JProgressBar progress = new JProgressBar();
@@ -208,18 +204,29 @@ public abstract class NetBeansProfiler extends Profiler {
                 panel.add(progress, BorderLayout.SOUTH);
             }
             
-            Object[] cancelOpts = cancelHandler != null ? new Object[]
-                    { DialogDescriptor.CANCEL_OPTION } : new Object[] {};
-            DialogDescriptor descriptor = new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true,
-                                                               cancelOpts, DialogDescriptor.CANCEL_OPTION,
-                                                               DialogDescriptor.RIGHT_ALIGN, null,
-                                                               new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    cancelHandler.run();
-                }
-            });
-            descriptor.setClosingOptions(cancelOpts);
-            dialog = DialogDisplayer.getDefault().createDialog(descriptor);
+            if (cancelHandler != null) {
+                JButton cancelButton = new JButton() {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        close();
+                        cancelHandler.run();
+                    }
+                };
+                Mnemonics.setLocalizedText(cancelButton, CANCEL_BTN);
+                JPanel buttonPanel = new JPanel(new BorderLayout(0, 0));
+                buttonPanel.setBorder(new EmptyBorder(5, 15, 10, 10));
+                buttonPanel.add(cancelButton, BorderLayout.EAST);
+                
+                dialog.add(panel, BorderLayout.NORTH);
+                dialog.add(buttonPanel, BorderLayout.SOUTH);
+            } else {
+                dialog.add(panel, BorderLayout.NORTH);
+            }
+            
+            Dimension ps = panel.getPreferredSize();
+            panel.setPreferredSize(new Dimension(Math.max(ps.width, MINIMUM_WIDTH), ps.height));
+            dialog.pack();
+            dialog.setLocationRelativeTo(mainWindow);
+            
             dialog.addHierarchyListener(new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {
                     if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && dialog.isShowing()) {
@@ -227,14 +234,18 @@ public abstract class NetBeansProfiler extends Profiler {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 opened = true;
-                                if (closed) dialog.setVisible(false);
+                                if (closed) closeImpl();
                             }
                         });
                     }
                 }
             });
-            if (dialog instanceof JDialog)
-                ((JDialog)dialog).setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        }
+        
+        private void closeImpl() {
+            dialog.setVisible(false);
+            dialog.dispose();
         }
         
     }
@@ -379,6 +390,8 @@ public abstract class NetBeansProfiler extends Profiler {
                                                                                              "NetBeansProfiler_TargetAppNotRespondingDialogTitle"); //NOI18N
     private static final String MODIFYING_INSTRUMENTATION_MSG = NbBundle.getMessage(NetBeansProfiler.class,
                                                                                     "NetBeansProfiler_ModifyingInstrumentationMsg"); //NOI18N
+    private static final String CANCEL_BTN = NbBundle.getMessage(NetBeansProfiler.class,
+                                                                                    "NetBeansProfiler_CancelBtn"); //NOI18N
                                                                                                                                      // -----
     private static final String GLOBAL_FILTERS_FILENAME = "filters"; //NOI18N
     private static final String DEFINED_FILTERSETS_FILENAME = "filtersets"; //NOI18N
