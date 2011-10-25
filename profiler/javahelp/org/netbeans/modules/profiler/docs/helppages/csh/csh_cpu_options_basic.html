@@ -18,19 +18,26 @@
         
         <p>When analyzing application performance, you specify one of the following options:</p>
         <ul>
-            <li><b>Entire Application.</b> 
+            
+            <li><b>Sample Application.</b> 
+            When selected, the IDE samples the application and takes a stack trace periodically.
+            This option is less precise than instrumenting methods, but the overhead is lower.
+            This option can help you locate methods that you might want to instrument.
+            </li>
+            <li><b>Profile Application.</b> 
             When selected, all of the methods of the profiled application are instrumented. 
             <p>When entering a method, threads generate a "method entry" event. 
             Threads generate a corresponding "method exit" event when exiting the method. 
             The timestamps for both of these events are recorded. 
-            This data is processed in real time.</p></li>
-            <li><b>Part of Application.</b> 
-            When selected, a limited part of the application's code is instrumented.
-            The part that is instrumented is determined by the defined root methods.
-            Profiling data is not collected until one of the application's threads enters the root method. 
+            This data is processed in real time.</p>
+            <p>You can choose to limit the part of the application's code that is instrumented
+            by defining root methods. 
             This option can greatly reduce the profiling overhead.
-            <p>To use this option, you need to specify a root method using the popup menu in the source code
-            or by clicking define to open the Specify Root Method dialog box.</p></li>
+            You can specify a root method using the popup menu in the source code
+            or by clicking <strong>customize</strong> to open the Edit Profiling Roots dialog box.
+            When you specify a root method,
+            profiling data is not collected until one of the application's threads enters the root method. 
+            </li>
         </ul>
         
         <p>Additionally, you can set the following options:</p>
