@@ -97,20 +97,7 @@ public class CodeRegionMethodInstrumentor extends ClassManager {
             return null;
         }
 
-        if (status.targetJDKVersionString.equals(JDK_15_STRING)) {
-            return createInstrumentedMethodPack15();
-        } else if (status.targetJDKVersionString.equals(JDK_16_STRING)) {
-            // for both 1.5 and 1.6 we use 15-style instrumentation
-            return createInstrumentedMethodPack15();
-        } else if (status.targetJDKVersionString.equals(JDK_17_STRING)) {
-            // for 1.7 we use 15-style instrumentation
-            return createInstrumentedMethodPack15();
-        } else if (status.targetJDKVersionString.equals(JDK_18_STRING)) {
-            // for 1.8 we use 15-style instrumentation
-            return createInstrumentedMethodPack15();
-        } else {
-            throw new InternalError("Unsupported JDK version"); // NOI18N
-        }
+        return createInstrumentedMethodPack15();
     }
 
     Object[] getInitialInstrumentCodeRegionResponse(String[] loadedClasses, int[] loadedClassLoaderIds) {
