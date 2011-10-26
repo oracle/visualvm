@@ -74,6 +74,7 @@ public class EventBufferManager implements CommonConstants {
     private RandomAccessFile raFile;
     private String bufFileName = "";
     private boolean bufFileOk;
+    private boolean bufFileSent;
     private boolean remoteProfiling;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -106,7 +107,8 @@ public class EventBufferManager implements CommonConstants {
 
             mapByteBuf.reset();
             mapByteBuf.put(eventBuffer, startPos, length);
-            bufFileOk = profilerServer.sendEventBufferDumpedCommand(length, null, -1);
+            bufFileOk = profilerServer.sendEventBufferDumpedCommand(length, bufFileSent ? "": getBufferFileName());
+            bufFileSent = true;
         } else {
             if (DEBUG) {
                 System.err.println("EventBufferManager.DEBUG: Dumping to compressed wire: startPos:" + startPos + ", length:" + length); // NOI18N
@@ -144,6 +146,7 @@ public class EventBufferManager implements CommonConstants {
         }
 
         try {
+            bufFileSent = false;
             bufFile = File.createTempFile("jfluidbuf", null); // NOI18N
             bufFileName = bufFile.getCanonicalPath();
 
