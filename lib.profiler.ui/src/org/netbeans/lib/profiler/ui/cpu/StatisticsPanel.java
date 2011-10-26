@@ -147,13 +147,14 @@ public class StatisticsPanel extends JPanel {
 
         private void initComponents() {
             filler.setOpaque(false);
-            nameLabel = new KeyboardAwareLabel(new Runnable() {
-                    public void run() {
-                        for (Listener l : listeners) {
-                            l.itemClicked(index);
-                        }
-                    }
-                });
+            nameLabel = new KeyboardAwareLabel(model.isSelectable(index), 
+                            new Runnable() {
+                                public void run() {
+                                    for (Listener l : listeners) {
+                                    l.itemClicked(index);
+                                }
+                            }
+                        });
 
             valueLabel.setOpaque(false);
             valueLabel.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -301,7 +302,7 @@ public class StatisticsPanel extends JPanel {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public KeyboardAwareLabel(final Runnable actionPerformer) {
+        public KeyboardAwareLabel(final boolean selectable, final Runnable actionPerformer) {
             super();
 
             setOpaque(false);
@@ -319,27 +320,35 @@ public class StatisticsPanel extends JPanel {
 
             addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
-                        requestFocusInWindow();
-                        actionPerformer.run();
+                        if (selectable) {
+                            requestFocusInWindow();
+                            actionPerformer.run();
+                        }
                     }
 
                     public void mouseEntered(MouseEvent e) {
-                        isMouseOver = true;
-                        updateText();
-                        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        if (selectable) {
+                            isMouseOver = true;
+                            updateText();
+                            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        }
                     }
 
                     public void mouseExited(MouseEvent e) {
-                        isMouseOver = false;
-                        updateText();
-                        setCursor(Cursor.getDefaultCursor());
+                        if (selectable) {
+                            isMouseOver = false;
+                            updateText();
+                            setCursor(Cursor.getDefaultCursor());
+                        }
                     }
                 });
 
             addKeyListener(new KeyAdapter() {
                     public void keyPressed(KeyEvent e) {
-                        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                            actionPerformer.run();
+                        if (selectable) {
+                            if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                                actionPerformer.run();
+                            }
                         }
                     }
                 });
