@@ -371,7 +371,9 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         TargetAppRunner targetApp = Profiler.getDefault().getTargetAppRunner();
         String jdkVersion = targetApp.getProfilerEngineSettings().getTargetJDKVersionString();
 
-        if (CommonConstants.JDK_16_STRING.equals(jdkVersion) || CommonConstants.JDK_17_STRING.equals(jdkVersion)) {
+        if (CommonConstants.JDK_16_STRING.equals(jdkVersion)
+           || CommonConstants.JDK_17_STRING.equals(jdkVersion)
+           || CommonConstants.JDK_18_STRING.equals(jdkVersion)) {
             return true;
         }
 
