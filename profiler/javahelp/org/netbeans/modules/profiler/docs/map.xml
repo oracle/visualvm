@@ -112,6 +112,13 @@ made subject to such option by the copyright holder.
         <!--CSH ID for select profiling task target dialog when profiling a freeform project -->
         <mapID target="FreeFormProjectTypeProfiler.AntTaskSelectPanel.HelpCtx" url="helppages/profile_freeform.html"/>
         
+        <!--CSH ID for root methods dialogs -->
+        <mapID target="RootMethodsPanel.HelpCtx" url="helppages/csh/csh_rootmethod_editing.html"/>
+        <mapID target="ManualMethodSelect.HelpCtx" url="helppages/csh/csh_rootmethod_definenew.html"/>
+        <!-- not sure if this one is still used -->
+        <mapID target="ProjectSelectRootMethodsPanel.HelpCtx" url="helppages/profile_rootmethod.html"/>
+
+        <!-- Ideally, the following should map to indiviudal CSH topics and not TOC topics -->
         <!--CSH ID for set profiling points dialog -->
         <mapID target="PPointsWizardPanel1UI.HelpCtx" url="helppages/profile_profilepoints.html"/>
         <mapID target="ResetResultsCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
@@ -120,11 +127,6 @@ made subject to such option by the copyright holder.
         <mapID target="TimedTakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
         <mapID target="TriggeredTakeSnapshotCustomizer.HelpCtx" url="helppages/snap_taking.html#pp"/>
         <mapID target="LoadGeneratorCustomizer.HelpCtx" url="helppages/profile_profilepoints.html"/>
-
-        <!--CSH ID for root methods dialogs -->
-        <mapID target="RootMethodsPanel.HelpCtx" url="helppages/profile_rootmethod.html"/>
-        <mapID target="ProjectSelectRootMethodsPanel.HelpCtx" url="helppages/profile_rootmethod.html"/>
-        <mapID target="ManualMethodSelect.HelpCtx" url="helppages/profile_rootmethod.html"/>
 
         <!--CSH ID for active profiling points dialog -->
         <mapID target="ProfilingPointsDisplayer.HelpCtx" url="helppages/profile_profilepoints.html"/>

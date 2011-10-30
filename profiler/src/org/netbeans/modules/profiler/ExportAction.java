@@ -112,7 +112,11 @@ public final class ExportAction extends AbstractAction {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         File getSelectedFile() {
-            return new File(folder + File.separator + fileName+ "." + fileExt);
+            String folderPath=folder.getAbsolutePath();
+            if (folderPath.endsWith(File.separator)) {
+                folderPath=folderPath.substring(0, folderPath.length()-1);
+            }
+            return new File(folderPath + File.separator + fileName+ "." + fileExt);
         }
     }
 
@@ -124,6 +128,7 @@ public final class ExportAction extends AbstractAction {
     private static final String EXPORT_ACTION_DESCRIPTION = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportActionDescr"); //NOI18N
     private static final String OVERWRITE_FILE_CAPTION = NbBundle.getMessage(ExportAction.class, "ExportAction_OverwriteFileCaption"); //NOI18N
     private static final String OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_OverwriteFileMsg"); //NOI18N
+    private static final String INVALID_LOCATION_FOR_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_InvalidLocationForFileMsg"); //NOI18N
     private static final String CANNOT_OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_CannotOverwriteFileMsg"); //NOI18N
     private static final String EXPORT_DIALOG_TITLE = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogTitle"); //NOI18N
     private static final String EXPORT_DIALOG_BUTTON = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogButton"); //NOI18N
@@ -233,6 +238,13 @@ public final class ExportAction extends AbstractAction {
                     return EXPORT_DIALOG_NPS_FILTER;
                 }
             });
+            // If there is snapshot, .nps must be selected as file filter
+            FileFilter[] currentFilters = fileChooser.getChoosableFileFilters();
+            for (int i = 0; i < currentFilters.length; i++) {
+                if (currentFilters[i].getDescription().equals(EXPORT_DIALOG_NPS_FILTER)) {
+                    fileChooser.setFileFilter(currentFilters[i]);
+                }
+            }
         }
     }
 
@@ -259,7 +271,7 @@ public final class ExportAction extends AbstractAction {
 
             if (!file.delete()) {
                 ProfilerDialogs.displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
-                return false;
+                return false; // Insufficient rights to overwrite file
             }
         }
 
@@ -268,7 +280,7 @@ public final class ExportAction extends AbstractAction {
 
     private SelectedFile selectExportTargetFile(final ExportProvider exportProvider) {
         File targetDir;
-        String targetName;
+        String targetName=null;
         String defaultName = exportProvider.getViewName();
 
         // 1. let the user choose file or directory
@@ -301,22 +313,23 @@ public final class ExportAction extends AbstractAction {
             exportedFileType=MODE_CSV;
         }
 
-        exportDir = chooser.getCurrentDirectory();
         if (file.isDirectory()) { // save to selected directory under default name
+            exportDir = file;
             targetDir = file;
             targetName = defaultName;
         } else { // save to selected file
-            targetDir = exportDir;
+            targetDir = fileChooser.getCurrentDirectory();
             String fName = file.getName();
 
             // divide the file name into name and extension
-            int idx = fName.lastIndexOf("."); // NOI18N
-
-            if (idx == -1) { // no extension
-                targetName = fName; // extension from source file
-            } else { // extension exists
-                targetName = fName.substring(0, idx);
-                targetExt = fName.substring(idx + 1);
+            if (fName.endsWith("."+targetExt)) {
+                int idx = fName.lastIndexOf("."); // NOI18N
+                if (idx == -1) { // no extension
+                    targetName = fName; // extension from source file
+                } else { // extension exists
+                    targetName = fName.substring(0, idx);
+                }
+                
             }
         }
 
@@ -355,7 +368,15 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
             try {
-                FileObject fo = FileUtil.toFileObject(FileUtil.normalizeFile(saveFile.folder)).createData(saveFile.fileName, saveFile.fileExt);
+                if (!(file.getAbsolutePath().toLowerCase().endsWith("."+FILE_EXTENSION_NPS))) {
+                    ProfilerDialogs.displayError(INVALID_LOCATION_FOR_FILE_MSG);
+                    return;
+                }
+                FileObject fo=FileUtil.createData(file);
+                if (fo==null) {
+                    ProfilerDialogs.displayError(INVALID_LOCATION_FOR_FILE_MSG);
+                    return;
+                }
                 saveFile=null;
                 ResultsManager.getDefault().saveSnapshot(snapshot, fo);
             } catch (IOException e1) {

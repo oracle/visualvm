@@ -64,25 +64,18 @@
         <p><b>To specify root methods when setting options for analyzing application performance:</b></p>
         <ol>
             <li>Open the Select Profiling Task dialog box and select the analyze CPU task.</li>
-            <li>Select Part of Application.</li>
-            <li>Click <strong>define</strong> (if no methods are defined) or <strong>edit</strong> (if some methods
-            are already defined) to open the Specify Root Methods dialog.</li>
-            <li>Click one of the following options.
-            <ul>
-                <li><b>Add From Project.</b> Choose Add From Project to select root methods displayed in a tree view.
-                In the Select Root Methods dialog box you can select the specific methods in the project that 
-                you want to add as root methods. You can choose the project view to see project methods or 
-                Default Package View to view the methods in the project sources and dependent libraries.</li>
-                <li><b>Add Manual.</b> Choose Add Manual to add a specific method by typing the class name,
-                method name and signature.</li>
-            </ul>
-            </li>
-            <li>Click OK.
-            </li>
+            <li>Select Profile Application.</li>
+            <li>Click <strong>customize</strong> (if no methods are defined) to open the Specify Root Methods dialog box.
+                <p>If some methods are already defined, click <strong>edit</strong>.</p></li>
+            <li>Expand the tree and select the nodes for the root methods to instrument.
+                <p>You can use the Select View dropdown list to modify the project tree view.</p></li>
+            <li>(Optional) Click Advanced to further edit the list of of root methods.</li>
+            <li>Click OK.</li>
         </ol>
-        <p>When you click OK the root method is added to the list of root methods displayed in the 
-        Specify Root Method dialog box.
-        You can select a method from the list and click Remove to delete the method from the list.</p>
+        <p>When you click OK the root method is added to the list of root methods that will be instrumented.
+            You can modify the list at any time by clicking <strong>customize</strong> or <strong>edit</strong>
+        in the Select Profiling Task dialog box.
+        </p>
         
         
         
