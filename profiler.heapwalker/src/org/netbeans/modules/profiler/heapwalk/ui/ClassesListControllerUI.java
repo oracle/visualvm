@@ -182,8 +182,29 @@ public class ClassesListControllerUI extends JTitledPanel {
         public void sortByColumn(int column, boolean order) {
             sortingColumn = column;
             sortingOrder = order;
-            initData();
-            repaint();
+            RequestProcessor.getDefault().post(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        initData();
+                        classListInitToken.acquire();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            
+                            @Override
+                            public void run() {
+                                try {
+                                    repaint();
+                                } finally {
+                                    classListInitToken.release();
+                                }
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            });            
         }
     }
 
@@ -330,8 +351,8 @@ public class ClassesListControllerUI extends JTitledPanel {
         hasProjectContext = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject() != null;
 
         initColumnsData();
-        initData();
         initComponents();
+        asyncInitData();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -367,15 +388,14 @@ public class ClassesListControllerUI extends JTitledPanel {
         if (sortResults) {
             sortingOrder = classesListTableModel.getInitialSorting(currentSortingColumn);
             sortingColumn = realSortingColumn;
-            initData();
+            asyncInitData();
+        } else {
+            sortingColumn = realSortingColumn;
+            classesListTableModel.setInitialSorting(currentSortingColumn, sortingOrder);
+            classesListTable.getTableHeader().repaint();
+            setColumnsData(true);
+            restoreSelection();
         }
-
-        sortingColumn = realSortingColumn;
-        classesListTableModel.setInitialSorting(currentSortingColumn, sortingOrder);
-        classesListTable.getTableHeader().repaint();
-        setColumnsData(true);
-        restoreSelection();
-
         // TODO [ui-persistence]
     }
 
@@ -439,7 +459,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
     public void updateData() {
         // TODO: should be performed lazily, not from AWT!
-        initData();
+        asyncInitData();
     }
 
     protected void initColumnSelectorItems() {
@@ -813,7 +833,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                 public void filterChanged() {
                     filterValue = filterComponent.getFilterString();
                     filterType = filterComponent.getFilterType();
-                    initData();
+                    asyncInitData();
                 }
             });
 
@@ -856,6 +876,15 @@ public class ClassesListControllerUI extends JTitledPanel {
             });
     }
 
+    private void asyncInitData() {
+        RequestProcessor.getDefault().post(new Runnable() {
+            @Override
+            public void run() {
+                initData();
+            }
+        });
+    }
+    
     /**
      * #192918
      * This semaphore guards access to the class list model.
