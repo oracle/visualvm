@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Analysing a Heap Dump Using OQL</title>
+    <title>Analyzing a Heap Dump Using OQL</title>
     <link rel="StyleSheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
 </head>
 <body>
@@ -26,42 +26,49 @@
 </object> captures profiling data at a specific point in time.</p>
 
 <p>
-OQL is a SQL-like query language to query Java heap. OQL allows to filter/select information
-wanted from Java heap. While pre-defined queries such as "show all instances of class X"
-are already supported by VisualVM, OQL adds more flexibility. OQL is based on JavaScript expression
+OQL is a SQL-like query language to query a Java heap that enables you to filter/select information
+wanted from the Java heap. While pre-defined queries such as "show all instances of class X"
+are already supported by the tool, OQL adds more flexibility. OQL is based on JavaScript expression
 language.
 </p>
 
+<p>When you load a Java heap in the Heap window, you can click the OQL Console tab of 
+the window to open the OQL editor.
+The OQL Console contains an OQL editor, a saved OQL queries window and a window
+that displays the query results. 
+You can use any of the sample OQL queries or create a query to filter and select heap data to
+locate the information that you want from the Java heap.
+After you choose or write a query, you can run the query against the Java heap and view the results.
+</p>
+
 <p>
-OQL query is of the following form:
+An OQL query is of the following form:
 </p>
 
 <pre>
-<code>
-         <span class="key">select</span> &lt;JavaScript expression to select&gt;
-         [ <span class="key">from</span> [<span class="key">instanceof</span>] &lt;class name&gt; &lt;identifier&gt;
-         [ <span class="key">where</span> &lt;JavaScript boolean expression to filter&gt; ] ]
-</code>
+         select &lt;JavaScript expression to select&gt;
+         [ from [instanceof] &lt;class name&gt; &lt;identifier&gt;
+         [ where &lt;JavaScript boolean expression to filter&gt; ] ]
 </pre>
-<p>where class name is fully qualified Java class name (example: java.net.URL) or array class name.
-char[] (or [C) is char array name, java.io.File (or [Ljava.io.File;) is name of java.io.File[] and so on.
+<p>where class name is fully qualified Java class name (example: <tt>java.net.URL</tt>) or array class name.
+    char[] (or [C) is char array name, <tt>java.io.File</tt> (or <tt>[Ljava.io.File;</tt>) is name of <tt>java.io.File[]</tt> and so on.
 Note that fully qualified class name does not always uniquely identify a 
 Java class at runtime. There may be more than one Java class with the same 
 name but loaded by different loaders. So, class name is permitted to be
 id string of the class object.
 
-If <span class="key">instanceof</span> keyword is used, subtype objects are selected. If this 
+If <tt>instanceof</tt> keyword is used, subtype objects are selected. If this 
 keyword is not specified, only the instances of exact class specified are selected. Both
-<span class="key">from</span> and <span class="key">where</span> clauses are optional.
+<tt>from</tt> and <tt>where</tt> clauses are optional.
 </p>
 
 
 <p>
-In <span class="key">select</span> and (optional) <span class="key">where</span> clauses, the expression 
+In <tt>select</tt> and (optional) <tt>where</tt> clauses, the expression 
 used in JavaScript expression. Java heap objects are wrapped as convenient script objects so that 
-fields may be accessed in natural syntax. For example, Java fields can be accessed with obj.field_name 
-syntax and array elements can be accessed with array[index] syntax. Each Java object selected is 
-bound to a JavaScript variable of the identifier name specified in <span class="key">from</span> clause.
+fields may be accessed in natural syntax. For example, Java fields can be accessed with <tt>obj.field_name</tt> 
+syntax and array elements can be accessed with <tt>array[index]</tt> syntax. 
+Each Java object selected is bound to a JavaScript variable of the identifier name specified in <tt>from</tt> clause.
 </p>
 
 <h3>OQL Examples</h3>
@@ -69,49 +76,37 @@ bound to a JavaScript variable of the identifier name specified in <span class="
 <ul>
 <li>select all Strings of length 100 or more
 <pre>
-<code>
     select s from java.lang.String s where s.count >= 100
-</code>
 </pre>
 </li>
-<li>select all int arrays of length 256 or more
+<li>select all <tt>int</tt> arrays of length 256 or more
 <pre>
-<code>
     select a from int[] a where a.length >= 256
-</code>
 </pre>
 </li>
 <li>show content of Strings that match a regular expression
 <pre>
-<code>
     select {instance: s, content: s.toString()} from java.lang.String s
     where /java/(s.toString())
-</code>
 </pre>
 </li>
 <li>show path value of all File objects
 <pre>
-<code>
     select file.path.toString() from java.io.File file
-</code>
 </pre>
 </li>
-<li>show names of all ClassLoader classes
+<li>show names of all <tt>ClassLoader</tt> classes
 <pre>
-<code>
     select <a href="#classof">classof</a>(cl).name 
     from instanceof java.lang.ClassLoader cl
-</code>
 </pre>
 </li>
 <li>show instances of the Class identified by given id string
 <pre>
-<code>
     select o from instanceof 0xd404b198 o
-</code>
 </pre>
-Note that 0xd404b198 is id of a Class (in a session). This is found by
-looking at the id shown in that class's page.
+    <p>Note that 0xd404b198 is id of a Class (in a session). This is found by
+looking at the id shown in that class's page.</p>
 </li>
 </ul>
 
@@ -124,32 +119,27 @@ looking at the id shown in that class's page.
 <ul> 
 <li><b>heap.forEachClass</b> -- calls a callback function for each Java Class
 <pre>
-<code>
     heap.forEachClass(callback);
-</code>
 </pre>
 </li>
 <li><b>heap.forEachObject</b> -- calls a callback function for each Java object
 <pre>
-<code>
     heap.forEachObject(callback, clazz, includeSubtypes);
-</code>
 </pre>
-<code>clazz</code> is the class whose instances are selected. If not specified, defaults to java.lang.Object. <code>includeSubtypes</code> is a boolean flag 
+    <p><tt>clazz</tt> is the class whose instances are selected. If not specified, defaults to <tt>java.lang.Object</tt>. 
+    <tt>includeSubtypes</tt> is a boolean flag 
 that specifies whether to include subtype instances or not. Default value of 
-this flag is true.</li>
+this flag is true.</p></li>
 
 <li><a name="findClass"></a><b>heap.findClass</b> -- finds Java Class of given name
 <pre>
-<code>
     heap.findClass(className);
-</code>
 </pre>
-where <code>className</code> is name of the class to find. The resulting Class 
-object has following properties:
+    <p>where <tt>className</tt> is name of the class to find. The resulting Class 
+object has following properties:</p>
 <ul>
 <li>name - name of the class.</li>
-<li>superclass - Class object for super class (or null if java.lang.Object).</li>
+<li>superclass - Class object for super class (or null if <tt>java.lang.Object</tt>).</li>
 <li>statics - name, value pairs for static fields of the Class.</li>
 <li>fields - array of field objects. field object has name, signature
 properties.</li>
@@ -161,34 +151,29 @@ properties.</li>
 </ul>
 <p>Class objects have the following methods:</p>
 <ul>
-<li>isSubclassOf - tests whether given class is direct or indirect 
-subclass of this class or not.</li>
-<li>isSuperclassOf - tests whether given Class is direct or indirect
-superclass of this class or not.</li>
-<li>subclasses - returns array of direct and indirect subclasses.</li>
-<li>superclasses - returns array of direct and indirect superclasses.</li>
+    <li><tt>isSubclassOf</tt> - tests whether given class is direct or indirect 
+    subclass of this class or not.</li>
+    <li><tt>isSuperclassOf</tt> - tests whether given Class is direct or indirect
+    superclass of this class or not.</li>
+    <li><tt>subclasses</tt> - returns array of direct and indirect subclasses.</li>
+    <li><tt>superclasses</tt> - returns array of direct and indirect superclasses.</li>
 </ul>
 
 </li>
 <li><a name="findObject"></a><b>heap.findObject</b> -- finds object from given object id
 <pre>
-<code>
     heap.findObject(stringIdOfObject);
-</code>
 </pre>
 </li>
-<li><a name="classes"></a><b>heap.classes</b> -- returns an enumeration of all Java classes
-</li>
+<li><a name="classes"></a><b>heap.classes</b> -- returns an enumeration of all Java classes</li>
 <li><a name="objects"></a><b>heap.objects</b> -- returns an enumeration of Java objects
 <pre>
-<code>
     heap.objects(clazz, [includeSubtypes], [filter])
-</code>
 </pre>
-<code>clazz</code> is the class whose instances are selected. If not specified, defaults to java.lang.Object. <code>includeSubtypes</code> is a boolean flag 
+    <p><tt>clazz</tt> is the class whose instances are selected. If not specified, defaults to <tt>java.lang.Object</tt>. <code>includeSubtypes</code> is a boolean flag 
 that specifies whether to include subtype instances or not. Default value of 
 this flag is true. This method accepts an optional filter expression to filter
-the result set of objects.
+the result set of objects.</p>
 </li>
 <li><a name="finalizables"></a><b>heap.finalizables</b> -- returns an enumeration of Java objects that are
 pending to be finalized.
@@ -198,16 +183,14 @@ is alive. This method accepts optional second parameter that is a boolean
 flag. This flag tells whether to include paths with weak reference(s) or not.
 By default, paths with weak reference(s) are not included.
 <pre>
-<code>
     select heap.livepaths(s) from java.lang.String s
-</code>
 </pre>
-Each element of this array itself is another array. The later array is 
-contains an objects that are in the 'reference chain' of the path.
+<p>Each element of this array itself is another array. The later array is 
+contains an objects that are in the 'reference chain' of the path.</p>
 </li>
 <li><b>heap.roots</b> -- returns an Enumeration of Roots of the heap. 
 <a name="rootobj"></a>
-Each Root object has the following properties:
+<p>Each Root object has the following properties:</p>
 <ul>
 <li>id - String id of the object that is referred by this root</li>
 <li>type - descriptive type of Root (JNI Global, JNI Local, Java Static etc)</li>
@@ -217,132 +200,123 @@ Each Root object has the following properties:
 </li>
 </ul>
 
-Examples:
+<p>Examples:</p>
 <ul>
-<li>access static field 'props' of class java.lang.System
+<li>access static field 'props' of class <tt>java.lang.System</tt>
 <pre>
-<code>
     select heap.findClass("java.lang.System").statics.props
     select heap.findClass("java.lang.System").props
-</code>
 </pre>
-<li>get number of fields of java.lang.String class 
+    </li>
+<li>get number of fields of <tt>java.lang.String</tt> class 
 <pre>
-<code>
     select heap.findClass("java.lang.String").fields.length
-</code>
 </pre>
+    </li>
 <li> find the object whose object id is given
 <pre>
-<code>
     select heap.findObject("0xf3800b58")
-</code>
 </pre>
-<li>select all classes that have name pattern java.net.*
+    </li>
+<li>select all classes that have name pattern <tt>java.net.*</tt>
 <pre>
-<code>
     select <a href="#filter">filter</a>(heap.classes(), "/java.net./(it.name)")
-</code>
 </pre>
+    </li>
 </ul>
 
 <h4>functions on individual objects</h4>
 
 <ul>
-<li><a href="#allocTrace">allocTrace(jobject)</a>
-<li><a href="#classof">classof(jobject)</a>
-<li><a href="#forEachReferrer">forEachReferrer(callback, jobject)</a>
-<li><a href="#identical">identical(o1, o2)</a>
-<li><a href="#objectid">objectid(jobject)</a>
-<li><a href="#reachables">reachables(jobject, excludedFields)</a>
-<li><a href="#referrers">referrers(jobject, weak)</a>
-<li><a href="#referees">referees(jobject, weak)</a>
-<li><a href="#refers">refers(jobject)</a>
-<li><a href="#root">root(jobject)</a>
-<li><a href="#sizeof">sizeof(jobject)</a>
-<li><a href="#rsizeof">rsizeof(jobject)</a>
-<li><a href="#toHtml">toHtml(obj)</a>
+    <li><a href="#allocTrace">allocTrace(jobject)</a></li>
+    <li><a href="#classof">classof(jobject)</a></li>
+    <li><a href="#forEachReferrer">forEachReferrer(callback, jobject)</a></li>
+    <li><a href="#identical">identical(o1, o2)</a></li>
+    <li><a href="#objectid">objectid(jobject)</a></li>
+    <li><a href="#reachables">reachables(jobject, excludedFields)</a></li>
+    <li><a href="#referrers">referrers(jobject, weak)</a></li>
+    <li><a href="#referees">referees(jobject, weak)</a></li>
+    <li><a href="#refers">refers(jobject)</a></li>
+    <li><a href="#root">root(jobject)</a></li>
+    <li><a href="#sizeof">sizeof(jobject)</a></li>
+    <li><a href="#rsizeof">rsizeof(jobject)</a></li>
+    <li><a href="#toHtml">toHtml(obj)</a></li>
 </ul>
 
 <a name="allocTrace"></a>
 <h5>allocTrace function</h5>
 
-This returns allocation site trace of a given Java object if available.
-allocTrace returns array of frame objects. Each frame object has the following
-properties:
+<p>This returns allocation site trace of a given Java object if available.
+<tt>allocTrace</tt> returns array of frame objects. Each frame object has the following
+properties:</p>
 <ul>
-<li>className - name of the Java class whose method is running in the frame.
-<li>methodName - name of the Java method running in the frame.
-<li>methodSignature - signature of the Java method running in the frame.
-<li>sourceFileName - name of source file of the Java class running in the frame.
-<li>lineNumber - source line number within the method.
+    <li>className - name of the Java class whose method is running in the frame.</li>
+    <li>methodName - name of the Java method running in the frame.</li>
+    <li>methodSignature - signature of the Java method running in the frame.</li>
+    <li>sourceFileName - name of source file of the Java class running in the frame.</li>
+    <li>lineNumber - source line number within the method.</li>
 </ul>
 
 <a name="classof"></a>
 <h5>classof function</h5>
 
-Returns Class object of a given Java Object. The result object supports the
-following properties:
+<p>Returns Class object of a given Java Object. The result object supports the
+following properties:</p>
 <ul>
-<li>name - name of the class.
-<li>superclass - Class object for super class (or null if java.lang.Object).
-<li>statics - name, value pairs for static fields of the Class.
-<li>fields - array of field objects. Field objects have name, signature
-properties.
-<li>loader - ClassLoader object that loaded this class.
+    <li>name - name of the class.</li>
+    <li>superclass - Class object for super class (or null if <tt>java.lang.Object</tt>).</li>
+    <li>statics - name, value pairs for static fields of the Class.</li>
+    <li>fields - array of field objects. Field objects have name, signature
+    properties.</li>
+    <li>loader - ClassLoader object that loaded this class.</li>
 <!--
 <li>signers - signers that signed this class.
 <li>protectionDomain - protection domain to which this class belongs.
 -->
 
 </ul>
-Class objects have the following methods:
+<p>Class objects have the following methods:</p>
 <ul>
-<li>isSubclassOf - tests whether given class is direct or indirect 
-subclass of this class or not.
-<li>isSuperclassOf - tests whether given Class is direct or indirect
-superclass of this class or not.
-<li>subclasses - returns array of direct and indirect subclasses.
-<li>superclasses - returns array of direct and indirect superclasses.
+    <li><tt>isSubclassOf</tt> - tests whether given class is direct or indirect 
+    subclass of this class or not.</li>
+    <li><tt>isSuperclassOf</tt> - tests whether given Class is direct or indirect
+    superclass of this class or not.</li>
+    <li><tt>subclasses</tt> - returns array of direct and indirect subclasses.</li>
+    <li><tt>superclasses</tt> - returns array of direct and indirect superclasses.</li>
 </ul>
 
-Examples:
+<p>Examples:</p>
 <ul>
 <li>show class name of each Reference type object
 <pre>
-<code>
     select classof(o).name from instanceof java.lang.ref.Reference o
-</code>
 </pre>
-<li>show all subclasses of java.io.InputStream
+    </li>
+<li>show all subclasses of <tt>java.io.InputStream</tt>
 <pre>
-<code>
     select heap.findClass("java.io.InputStream").subclasses()
-</code>
 </pre>
-<li>show all superclasses of java.io.BufferedInputStream
+    </li>
+<li>show all superclasses of <tt>java.io.BufferedInputStream</tt>
 <pre>
-<code>
     select heap.findClass("java.io.BufferedInputStream").superclasses()
-</code>
 </pre>
+    </li>
 </ul>
 
 <a name="forEachReferrer"></a>
 <h5>forEachReferrer function</h5>
 
-calls a callback function for each referrer of a given Java object.
+<p>calls a callback function for each referrer of a given Java object.</p>
 
 <a name="identical"></a>
 <h5>identical function</h5>
 <p>
 Returns whether two given Java objects are identical or not.
 </p>
-Example:
+<p>Example:</p>
 <pre>
-<code>
     select identical(heap.findClass("Foo").statics.bar, heap.findClass("AnotherClass").statics.bar)
-</code>
 </pre>
 
 <a name="objectid"></a>
@@ -353,11 +327,9 @@ Returns String id of a given Java object. This id can be passed to
 <a href="#findObject">heap.findObject</a> and may also be used to compare
 objects for identity.
 </p>
-Example:
+<p>Example:</p>
 <pre>
-<code>
     select objectid(o) from java.lang.Object o
-</code>
 </pre>
 
 <a name="reachables"></a>
@@ -368,21 +340,19 @@ given Java object. Optionally accepts a second parameter that is comma
 separated field names to be excluded from reachability computation.
 Fields are written in class_name.field_name pattern.
 </p>
-Examples: 
+<p>Example:</p>
 <ul>
 <li>print all reachable objects from each Properties instance.
 <pre>
-<code>
     select reachables(p) from java.util.Properties p
-</code>
 </pre>
-<li>print all reachables from each java.net.URL but omit the objects reachable
+    </li>
+<li>print all reachables from each <tt>java.net.URL</tt> but omit the objects reachable
 via the fields specified.
 <pre>
-<code>
     select reachables(u, 'java.net.URL.handler') from java.net.URL u
-</code>
 </pre>
+</li>
 </ul>
 
 <a name="referrers"></a>
@@ -393,26 +363,23 @@ object. This method accepts optional second parameter that is a boolean
 flag. This flag tells whether to include weak reference(s) or not.
 By default, weak reference(s) are not included.
 </p>
-Examples:
+<p>Example:</p>
 <ul>
-<li> print number of referrers for each java.lang.Object instance
+<li> print number of referrers for each <tt>java.lang.Object</tt> instance
 <pre>
-<code>
     select count(referrers(o)) from java.lang.Object o
-</code>
 </pre>
-<li>print referrers for each java.io.File object
+    </li>
+<li>print referrers for each <tt>java.io.File</tt> object
 <pre>
-<code>
     select referrers(f) from java.io.File f
-</code>
 </pre>
+    </li>
 <li>print URL objects only if referred by 2 or more 
 <pre>
-<code>
     select u from java.net.URL u where count(referrers(u)) > 2
-</code>
 </pre>
+    </li>
 </ul>
 
 <a name="referees"></a>
@@ -423,11 +390,9 @@ object directly refers to. This method accepts optional second parameter
 that is a boolean flag. This flag tells whether to include weak reference(s) or not.
 By default, weak reference(s) are not included.
 </p>
-Example: to print all static reference fields of java.io.File class
+<p>Example: to print all static reference fields of <tt>java.io.File</tt> class</p>
 <pre>
-<code>
     select referees(<a href="#findClass">heap.findClass</a>("java.io.File"))
-</code>
 </pre>
 
 <a name="refers"></a>
@@ -447,39 +412,33 @@ If given object is not a root, then this function returns null.
 <a name="sizeof"></a>
 <h5>sizeof function</h5>
 
-Returns size of the given Java object in bytes
-Example: 
+<p>Returns size of the given Java object in bytes</p>
+<p>Example: </p>
 <pre>
-<code>
     select sizeof(o) from int[] o
-</code>
 </pre>
 
 <a name="rsizeof"></a>
 <h5>retainedsize function</h5>
 
-Returns size of the retained set of the given Java object in bytes
+<p>Returns size of the retained set of the given Java object in bytes
 <b>Warning! Using this function for the first time on a heap dump may take
-significant amount of time</b>
-Example:
+significant amount of time</b></p>
+<p>Example:</p>
 <pre>
-<code>
     select rsizeof(o) from instanceof java.lang.HashMap o
-</code>
 </pre>
 
 <a name="toHtml"></a>
 <h5>toHtml function</h5>
-
+<p>
 Returns HTML string for the given Java object. Note that this is called
 automatically for objects selected by select expression. But, it may be useful
-to print more complex output.
+to print more complex output.</p>
 
-Example: print hyperlink in bold font weight
+<p>Example: print hyperlink in bold font weight</p>
 <pre>
-<code>
     select "&lt;b&gt;" + toHtml(o) + "&lt;/b&gt;" from java.lang.Object o
-</code>
 </pre>
 
 <h4>Selecting multiple values</h4>
@@ -487,12 +446,10 @@ Example: print hyperlink in bold font weight
 Multiple values can be selected using JavaScript object literals or arrays.
 </p>
 
-Example: show name and thread for each thread object
+<p>Example: show name and thread for each thread object</p>
 <pre>
-<code>
     select { name: t.name? t.name.toString() : "null", thread: t } 
     from instanceof java.lang.Thread t
-</code>
 </pre>
 
 <h4>array/iterator/enumeration manipulation functions</h4>
@@ -506,19 +463,19 @@ these functions may also be used with arbitrary JavaScript objects.
 </p>
 
 <ul>
-<li><a href="#concat">concat(array1/enumeration1, array2/enumeration2)</a>
-<li><a href="#contains">contains(array/enumeration, expression)</a>
-<li><a href="#count">count(array/enumeration, expression)</a>
-<li><a href="#filter">filter(array/enumeration, expression)</a>
-<li><a href="#length">length(array/enumeration)</a>
-<li><a href="#map">map(array/enumeration, expression)</a>
-<li><a href="#max">max(array/enumeration, [expression])</a>
-<li><a href="#min">min(array/enumeration, [expression])</a>
-<li><a href="#sort">sort(array/enumeration, [expression])</a>
-<li><a href="#top">top(array/enumeration, [expression], [top])</a>
-<li><a href="#sum">sum(array/enumeration, [expression])</a>
-<li><a href="#toArray">toArray(array/enumeration)</a>
-<li><a href="#unique">unique(array/enumeration, [expression])</a>
+    <li><a href="#concat">concat(array1/enumeration1, array2/enumeration2)</a></li>
+    <li><a href="#contains">contains(array/enumeration, expression)</a></li>
+    <li><a href="#count">count(array/enumeration, expression)</a></li>
+    <li><a href="#filter">filter(array/enumeration, expression)</a></li>
+    <li><a href="#length">length(array/enumeration)</a></li>
+    <li><a href="#map">map(array/enumeration, expression)</a></li>
+    <li><a href="#max">max(array/enumeration, [expression])</a></li>
+    <li><a href="#min">min(array/enumeration, [expression])</a></li>
+    <li><a href="#sort">sort(array/enumeration, [expression])</a></li>
+    <li><a href="#top">top(array/enumeration, [expression], [top])</a></li>
+    <li><a href="#sum">sum(array/enumeration, [expression])</a></li>
+    <li><a href="#toArray">toArray(array/enumeration)</a></li>
+    <li><a href="#unique">unique(array/enumeration, [expression])</a></li>
 </ul>
 
 <a name="concat"></a>
@@ -536,17 +493,15 @@ the given boolean expression specified in code. The code evaluated
 can refer to the following built-in variables.
 </p>
 <ul>
-<li>it -> currently visited element
-<li>index -> index of the current element
-<li>array -> array/enumeration that is being iterated
+    <li>it -&gt; currently visited element</li>
+    <li>index -&gt; index of the current element</li>
+    <li>array -&gt; array/enumeration that is being iterated</li>
 </ul>
-Example: select all Properties objects that are referred by 
-some static field some class.
+<p>Example: select all Properties objects that are referred by 
+some static field some class.</p>
 <pre>
-<code>
     select p from java.util.Properties p
     where contains(<a href="#referrers">referrers</a>(p), "<a href="#classof">classof</a>(it).name == 'java.lang.Class'")
-</code>
 </pre>
 
 <a name="count"></a>
@@ -557,15 +512,13 @@ that satisfy the given boolean expression. The boolean expression code can
 refer to the following built-in variables.
 </p>
 <ul>
-<li>it -> currently visited element
-<li>index -> index of the current element
-<li>array -> array/enumeration that is being iterated
+<li>it -&gt; currently visited element</li>
+<li>index -&gt; index of the current element</li>
+<li>array -&gt; array/enumeration that is being iterated</li>
 </ul>
-Example: print number of classes that have specific name pattern
+<p>Example: print number of classes that have specific name pattern</p>
 <pre>
-<code>
     select count(<a href="#classes">heap.classes()</a>, "/java.io./(it.name)")
-</code>
 </pre>
 
 <a name="filter"></a>
@@ -577,27 +530,25 @@ expression. The boolean expression code can refer to the following built-in
 variables.
 </p>
 <ul>
-<li>it -> currently visited element
-<li>index -> index of the current element
-<li>array -> array/enumeration that is being iterated
-<li>result -> result array/enumeration
+    <li>it -&gt; currently visited element</li>
+    <li>index -&gt; index of the current element</li>
+    <li>array -&gt; array/enumeration that is being iterated</li>
+    <li>result -&gt; result array/enumeration</li>
 </ul>
-Examples:
+<p>Examples:</p>
 <ul>
-<li>show all classes that have java.io.* name pattern
+    <li>show all classes that have <tt>java.io.*</tt> name pattern
 <pre>
-<code>
     select filter(<a href="#classes">heap.classes</a>(), "/java.io./(it.name)")
-</code>
 </pre>
-<li> show all referrers of URL object where the referrer is not from
+    </li>
+<li>show all referrers of URL object where the referrer is not from
 java.net package
 <pre>
-<code>
     select filter(<a href="#referrers">referrers</a>(u), "! /java.net./(<a href="#classof">classof</a>(it).name)")
     from java.net.URL u
-</code>
 </pre>
+</li>
 </ul>
 
 <a name="length"></a>
@@ -614,20 +565,18 @@ on each element. The code evaluated can refer to the following built-in
 variables.
 </p>
 <ul>
-<li>it -> currently visited element
-<li>index -> index of the current element
-<li>array -> array/enumeration that is being iterated
-<li>result -> result array/enumeration
+    <li>it -&gt; currently visited element</li>
+    <li>index -&gt; index of the current element</li>
+    <li>array -&gt; array/enumeration that is being iterated</li>
+    <li>result -&gt; result array/enumeration</li>
 </ul>
 <p>
 map function returns an array/enumeration of values created by repeatedly
 calling code on each element of input array/enumeration.
 </p>
-Example: show all static fields of java.io.File with name and value
+<p>Example: show all static fields of <tt>java.io.File</tt> with name and value</p>
 <pre>
-<code>
     select map(<a href="#findClass">heap.findClass</a>("java.io.File").statics, "index + '=' + <a href="#toHtml">toHtml</a>(it)")
-</code>
 </pre>
 
 <a name="max"></a>
@@ -639,23 +588,21 @@ By default numerical comparison is used. The comparison expression can
 use the following built-in variables:
 </p>
 <ul>
-<li>lhs -> left side element for comparison
-<li>rhs -> right side element for comparison
+<li>lhs -&gt; left side element for comparison</li>
+<li>rhs -&gt; right side element for comparison</li>
 </ul>
-Examples:
+<p>Examples:</p>
 <ul>
 <li>find the maximum length of any String instance
 <pre>
-<code>
     select max(map(heap.objects('java.lang.String', false), 'it.count'))
-</code>
 </pre>
+</li>
 <li>find string instance that has the maximum length
 <pre>
-<code>
     select max(heap.objects('java.lang.String'), 'lhs.count > rhs.count')
-</code>
 </pre>
+</li>
 </ul>
 
 <a name="min"></a>
@@ -667,23 +614,21 @@ comparison is used. The comparison expression can use the following built-in
 variables:
 </p>
 <ul>
-<li>lhs -> left side element for comparison
-<li>rhs -> right side element for comparison
+    <li>lhs -&gt; left side element for comparison</li>
+    <li>rhs -&gt; right side element for comparison</li>
 </ul>
-Examples:
+<p>Examples:</p>
 <ul>
 <li>find the minimum size of any Vector instance
 <pre>
-<code>
     select min(map(heap.objects('java.util.Vector', false), 'it.elementData.length'))
-</code>
 </pre>
+    </li>
 <li>find Vector instance that has the maximum length
 <pre>
-<code>
     select min(heap.objects('java.util.Vector'), 'lhs.elementData.length &lt; rhs.elementData.length')
-</code>
 </pre>
+    </li>
 </ul>
 
 <a name="sort"></a>
@@ -694,24 +639,22 @@ compare elements of the array. By default numerical comparison is used.
 The comparison expression can use the following built-in variables:
 </p>
 <ul>
-<li>lhs -> left side element for comparison
-<li>rhs -> right side element for comparison
+<li>lhs -&gt; left side element for comparison</li>
+<li>rhs -&gt; right side element for comparison</li>
 </ul>
-Examples:
+<p>Examples:</p>
 <ul>
-<li> print all char[] objects in the order of size.
+<li>print all <tt>char[]</tt> objects in the order of size.
 <pre>
-<code>
     select sort(<a href="#objects">heap.objects</a>('char[]'), '<a href="#sizeof">sizeof</a>(lhs) - sizeof(rhs)')
-</code>
 </pre>
-<li> print all char[] objects in the order of size but print
+</li>
+<li> print all <tt>char[]</tt> objects in the order of size but print
 size as well.
 <pre>
-<code>
     select <a href="#map">map</a>(sort(<a href="#objects">heap.objects</a>('char[]'), '<a href="#sizeof">sizeof</a>(lhs) - sizeof(rhs)'), '{ size: sizeof(it), obj: it }')
-</code>
 </pre>
+</li>
 </ul>
 
 <a name="top"></a>
@@ -719,28 +662,26 @@ size as well.
 <p>
 returns top N elements of the given array/enumeration. Optionally accepts code expression to
 compare elements of the array and the number of top elements. By default the first 10 elements
-in the order of appearence is returned.
+in the order of appearance is returned.
 The comparison expression can use the following built-in variables:
 </p>
 <ul>
-<li>lhs -> left side element for comparison
-<li>rhs -> right side element for comparison
+    <li>lhs -&gt; left side element for comparison</li>
+    <li>rhs -&gt; right side element for comparison</li>
 </ul>
-Examples:
+<p>Examples:</p>
 <ul>
 <li> print 5 longest strings
 <pre>
-<code>
     select top(<a href="#objects">heap.objects</a>('java.lang.String'), 'rhs.count - lhs.count', 5)
-</code>
 </pre>
+    </li>
 <li> print 5 longest strings but print
 size as well.
 <pre>
-<code>
     select <a href="#map">map</a>(top(<a href="#objects">heap.objects</a>('java.lang.String'), 'rhs.count - lhs.count', 5), '{ length: it.count, obj: it }')
-</code>
 </pre>
+</li>
 </ul>
 
 <a name="sum"></a>
@@ -750,16 +691,15 @@ This function returns the sum of all the elements of the given input array or
 enumeration. Optionally, accepts an expression as second param. This is used
 to map the input elements before summing those.
 </p>
-Example: return sum of sizes of the reachable objects from each Properties object
+<p>Example: return sum of sizes of the reachable objects from each Properties object</p>
 <pre>
-<code>
     select sum(<a href="#map">map</a>(<a href="#reachables">reachables</a>(p), '<a href="#sizeof">sizeof</a>(it)')) 
     from java.util.Properties p
 
     // or omit the map as in ...
     select sum(<a href="#reachables">reachables</a>(p), '<a href="#sizeof">sizeof</a>(it)') 
     from java.util.Properties p
-</code></pre>
+</pre>
 
 <a name="toArray"></a>
 <h5>toArray function</h5>
@@ -774,16 +714,14 @@ array/enumeration.
 This function returns an array/enumeration containing unique elements of the 
 given input array/enumeration
 </p>
-Example: select unique char[] instances referenced from Strings. Note that
-more than one String instance can share the same char[] for the content.
+<p>Example: select unique <tt>char[]</tt> instances referenced from Strings. Note that
+more than one String instance can share the same <tt>char[]</tt> for the content.</p>
 <pre>
-<code>
    // number of unique char[] instances referenced from any String
    select count(unique(map(heap.objects('java.lang.String'), 'it.value')))
 
    // total number of Strings
    select count(heap.objects('java.lang.String'))
-</code>
 </pre>
     
 <h4>More complex examples</h4>
@@ -791,11 +729,9 @@ more than one String instance can share the same char[] for the content.
 <h4>Print histogram of each class loader and number of classes loaded by it</h4>
 
 <pre>
-<code>
    select <a href="#map">map</a>(<a href="#sort">sort</a>(map(heap.objects('java.lang.ClassLoader'), 
    '{ loader: it, count: it.classes.elementCount }'), 'lhs.count &lt; rhs.count'),
    'toHtml(it) + "&lt;br&gt;"')
-</code>
 </pre>
 <p>
 The above query uses the fact that, <b>java.lang.ClassLoader</b> has a private 
@@ -809,7 +745,6 @@ loaded) using sort function with comparison expression.
 <h5>Show parent-child chain for each class loader instance</h5>
 
 <pre>
-<code>
    select <a href="#map">map</a>(heap.objects('java.lang.ClassLoader'),
       function (it) {
          var res = '';
@@ -820,7 +755,6 @@ loaded) using sort function with comparison expression.
          res += "null";
          return res + "&lt;br&gt;";
       })
-</code>
 </pre>
 <p>
 Note that we use <b>parent</b> field of <b>java.lang.ClassLoader</b> class
@@ -830,24 +764,22 @@ and walk until parent is null using the callback function to map call.
 <h5>Printing value of all System properties</h5>
 
 <pre>
-<code>
    select <a href="#map">map</a>(<a href="#filter">filter</a>(<a href="#findClass">heap.findClass</a>('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'),
             function (it) {
                 var res = it.key.toString() + ' = ' + it.value.toString();
                 return res;
             });
-</code>
 </pre>
 <p>
-The above query uses the following facts:
+The above query uses the following facts:</p>
 <ul>
-<li>java.lang.System has static field by name 'props' of type java.util.Properties.
-<li>java.util.Properties has field by 'table' of type java.util.Hashtable$Entry
-(this field is inherited from java.util.Hashtable). This is the hashtable
-buckets array.
-<li>java.util.Hashtable$Entry has 'key', 'value' and 'next' fields. Each
-entry points the next entry (or null) in the same hashtable bucket.
-<li>java.lang.String class has 'value' field of type char[].
+    <li><tt>java.lang.System</tt> has static field by name 'props' of type <tt>java.util.Properties</tt>.</li>
+    <li><tt>java.util.Properties</tt> has field by 'table' of type <tt>java.util.Hashtable$Entry</tt>
+    (this field is inherited from <tt>java.util.Hashtable</tt>). This is the hashtable
+    buckets array.</li>
+    <li><tt>java.util.Hashtable$Entry</tt> has 'key', 'value' and 'next' fields. Each
+    entry points the next entry (or null) in the same hashtable bucket.</li>
+    <li><tt>java.lang.String</tt> class has 'value' field of type <tt>char[]</tt>.</li>
 </ul>
 <p>
 <b>Note that this query (and many other queries) may not be stable - because

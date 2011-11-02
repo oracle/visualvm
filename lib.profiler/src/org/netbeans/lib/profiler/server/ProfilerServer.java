@@ -653,7 +653,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             }
 
             resultsNotified = true;
-            profilerServer.sendComplexCmdToClient(new ResultsAvailableCommand(ProfilerInterface.getBufferFileName()));
+            profilerServer.sendSimpleCmdToClient(Command.RESULTS_AVAILABLE);
         }
     }
 
@@ -714,13 +714,17 @@ public class ProfilerServer extends Thread implements CommonConstants {
     }
 
     // Several methods to send commands specific for modules that use wireprotocol just occasionally
+    public boolean sendEventBufferDumpedCommand(int length, String bufferName) {
+        EventBufferDumpedCommand cmd = new EventBufferDumpedCommand(length,bufferName);
+        sendComplexCmdToClient(cmd);
+        return getAndCheckLastResponse();
+    }
+
     public boolean sendEventBufferDumpedCommand(int length, byte[] buffer, int startPos) {
         EventBufferDumpedCommand cmd = new EventBufferDumpedCommand(length,buffer,startPos);
         sendComplexCmdToClient(cmd);
 
-        Response resp = getLastResponse();
-
-        return resp.isOK();
+        return getAndCheckLastResponse();
     }
 
     public synchronized void sendSimpleCmdToClient(int cmdType) {
