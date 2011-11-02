@@ -182,8 +182,8 @@ public class Platform implements CommonConstants {
 
         is64bitArch = architecture == ARCH_64;
 
-        if (jdkString.equals(JDK_17_STRING)) {
-            // for now, we use the same libs for 1.6 and 1.7 
+        if (jdkString.equals(JDK_17_STRING) || jdkString.equals(JDK_18_STRING)) {
+            // for now, we use the same libs for 1.6 and 1.7 and 1.8 
             jdkString = JDK_16_STRING;
         }
 
@@ -295,6 +295,8 @@ public class Platform implements CommonConstants {
             jdkVersion = JDK_16;
         } else if (javaVersion.startsWith("1.7")) { // NOI18N
             jdkVersion = JDK_17;
+        } else if (javaVersion.startsWith("1.8")) { // NOI18N
+            jdkVersion = JDK_18;
         } else if (javaVersion.equals("CVM")) { // NOI18N
             jdkVersion = JDK_CVM;
         } else {
@@ -316,8 +318,8 @@ public class Platform implements CommonConstants {
 
     /**
      * Returns the string for, essentially, JFluid directory corresponding to a particular JDK version the TA runs on.
-     * Currently it's "jdk15" for JDK 1.5 version and "jdk16" for JDK 1.6 version, "jdk17" for JDK 1.7 version
-     * and "cvm" for CVM
+     * Currently it's "jdk15" for JDK 1.5 version and "jdk16" for JDK 1.6 version, "jdk17" for JDK 1.7 version,
+     *  "jdk18" for JDK 1.8 version and "cvm" for CVM
      */
     public static String getJDKVersionString(String javaVersionString) {
         int jdkVersionNumber = getJDKVersionNumber(javaVersionString);
@@ -326,6 +328,7 @@ public class Platform implements CommonConstants {
             case JDK_15: return JDK_15_STRING;
             case JDK_16: return JDK_16_STRING;
             case JDK_17: return JDK_17_STRING;
+            case JDK_18: return JDK_18_STRING;
             case JDK_CVM: return JDK_CVM_STRING;
             case JDK_UNSUPPORTED: return JDK_UNSUPPORTED_STRING;
         }
@@ -335,8 +338,8 @@ public class Platform implements CommonConstants {
 
     /**
      * Returns the string for, essentially, JFluid directory corresponding to a particular JDK version the TA runs on.
-     * Currently it's "jdk15" for JDK 1.5 version, "jdk16" for JDK 1.6 version, "jdk17" for JDK 1.7 version
-     * and "cvm" for CVM
+     * Currently it's "jdk15" for JDK 1.5 version, "jdk16" for JDK 1.6 version, "jdk17" for JDK 1.7 version,
+     * "jdk18" for JDK 1.8 version and "cvm" for CVM
      */
     public static String getJDKVersionString() {
         if (jdkDenoteString == null) {
@@ -567,7 +570,9 @@ public class Platform implements CommonConstants {
      * Returns true if the given JVM version supports dynaimc attach
      */
     public static boolean supportsDynamicAttach(String jdkVersionString) {
-        return CommonConstants.JDK_16_STRING.equals(jdkVersionString) || CommonConstants.JDK_17_STRING.equals(jdkVersionString);
+        return CommonConstants.JDK_16_STRING.equals(jdkVersionString) 
+               || CommonConstants.JDK_17_STRING.equals(jdkVersionString)
+               || CommonConstants.JDK_18_STRING.equals(jdkVersionString);
     }
 
     /**
@@ -578,6 +583,7 @@ public class Platform implements CommonConstants {
                && (jdkVersionString.equals(JDK_15_STRING) ||
 		   jdkVersionString.equals(JDK_16_STRING) ||
 		   jdkVersionString.equals(JDK_17_STRING) ||
+		   jdkVersionString.equals(JDK_18_STRING) ||
 		   jdkVersionString.equals(JDK_CVM_STRING)));
     }
 
@@ -595,6 +601,7 @@ public class Platform implements CommonConstants {
         return ((jdkVersionNumber == JDK_15) ||
 		(jdkVersionNumber == JDK_16) ||
 		(jdkVersionNumber == JDK_17) ||
+		(jdkVersionNumber == JDK_18) ||
 		(jdkVersionNumber == JDK_CVM));
     }
 }
