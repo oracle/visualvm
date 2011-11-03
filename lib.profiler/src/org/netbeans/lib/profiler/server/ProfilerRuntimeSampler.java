@@ -237,9 +237,11 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
 
     public static void shutdown() {
         sampling.terminate();
+        sampling = null;
+        ProfilerRuntime.clearDataStructures();
     }
     
     static void resetProfilerCollectors() {
-        sampling.resetData = true;   
+        if (sampling != null) sampling.resetData = true;   
     }
 }
