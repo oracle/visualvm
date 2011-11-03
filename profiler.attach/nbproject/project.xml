@@ -91,6 +91,7 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.attach.impl</friend>
                 <friend>org.netbeans.modules.profiler.j2ee.generic</friend>

@@ -307,6 +307,9 @@ public class MiscUtils implements CommonConstants {
         } else if (outString.startsWith("1.7")) { // NOI18N
 
             return JDK_17_STRING;
+        } else if (outString.startsWith("1.8")) { // NOI18N
+
+            return JDK_18_STRING;
         } else {
             throw new IOException(VM_INCOMPATIBLE_MSG + printOutString);
         }
@@ -441,17 +444,17 @@ public class MiscUtils implements CommonConstants {
             return false;
         }
 
-        if (isSupported15or16or17orCvm(jdkVersionString)) {
+        if (isSupported15or16or17or18orCvm(jdkVersionString)) {
             return true;
         }
         // CVM is recognized via java.vm.name system property
-        return isSupported15or16or17orCvm(vmNameString);
+        return isSupported15or16or17or18orCvm(vmNameString);
     }
 
     // This method is used for checking running JVM if supported.
     // jvmVersionString should be enough to decide that
     public static boolean isSupportedRunningJVMVersion(String jdkVersionString) {
-        return isSupported15or16or17orCvm(jdkVersionString);
+        return isSupported15or16or17or18orCvm(jdkVersionString);
     }
 
     public static void setVerbosePrint() {
@@ -625,8 +628,10 @@ public class MiscUtils implements CommonConstants {
         return (new Date()).toString();
     }
 
-    private static boolean isSupported15or16or17orCvm(String jdkVersionString) {
-        if (jdkVersionString.startsWith("1.7")) { // NOI18N
+    private static boolean isSupported15or16or17or18orCvm(String jdkVersionString) {
+        if (jdkVersionString.startsWith("1.8")) { // NOI18N
+            return true;
+        } else if (jdkVersionString.startsWith("1.7")) { // NOI18N
             return true;
         } else if (jdkVersionString.startsWith("1.6")) { // NOI18N
             return true;
