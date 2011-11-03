@@ -25,14 +25,18 @@
                 <param name="textFontWeight" value="bold">
                 <param name="textColor" value="blue">
         </object> captures profiling data at a specific point in time.
-        
         You can load and browse any heap dump saved on your local system.
         You do not need to be running a profiling session to load and browse a heap dump.</p>
         <ol>
             <li>Choose Profile &gt; Load Heap Dump in the main menu.</li>
             <li>Locate the heap dump on your system and click Open.</li>
-        </ol>    
+        </ol>
         <p>When you load a heap dump, the heap dump opens in the HeapWalker in the Heap window.</p>
+        
+        <p class="note">The default location for heap dump files 
+            (the file name is appended with <tt>.hprof</tt>) that you save to your project
+            is in the <tt>&lt;PROJECT_ROOTDIR&gt;/nbproject/private/profiler</tt> folder.</p>
+        
 
         <p>The HeapWalker enables you to evaluate Java heap contents and search for memory leaks. 
         You can view the following:</p>
@@ -70,70 +74,26 @@
             After you choose or write a query, you can run the query against the Java heap and view the results.
             </li>
         </ul>
-        <!--
-
-
-        <h3>Using the Snapshot Toolbar</h3>
-        <p>When a snapshot is open you can use the toolbar at the top of the snapshot to help you work with the snapshot.
-        The tools in the toolbar enable you to save snapshots, refine the display and search for terms within the results.
-        The following table describes the items in the snapshot toolbar.</p>
-
-        <table border="1" cellpadding="0" cellspacing="0">
-            <tr align="left" valign="top">
-                <th scope="col">Button</th>
-                <th scope="col">Function</th>
-            </tr>
-            <tr valign="top">
-                <td><img src="img/save.png"></td>
-                <td><b>Save Snapshot to Project.</b>
-                Click this button to save the snapshot to your project. The snapshot is saved
-                to the <tt>profiler</tt> directory in <tt>nbproject</tt> &gt; <tt>private</tt> directory in your project.
-                Saved snapshot files are visible in the Saved Snapshots section of the Profiler window.</td>
-            </tr>
-            <tr valign="top">
-                <td><img src="img/saveAs.png"></td>
-                <td><b>Save Snapshot to Custom File.</b>
-                Click this button to open a save dialog box to save the snapshot file in a location other than
-                to your project.</td>
-            </tr>
-            <tr valign="top">
-                <td><img src="img/saveView.png"></td>
-                <td><b>Save Current View.</b>
-                Click this button to open a save dialog box to save the snapshot file as a .png image file.</td>
-            </tr>
-            <tr valign="top">
-                <td>&nbsp;</td>
-                <td><b>View dropdown list</b> (CPU snapshots)
-                Choose the granularity of the displayed results.</td>
-            </tr>
-            <tr valign="top">
-                <td><img src="img/export.png"></td>
-                <td><b>Find</b>
-                Click this button to find the occurence of a search term.</td>
-            </tr>
-            <tr valign="top">
-                <td><img src="img/find_next.png"></td>
-                <td><b>Find Next Occurence.</b>
-                Find the next occurence of a search term.</td>
-            </tr>
-            <tr valign="top">
-                <td><img src="img/find_previous.png"></td>
-                <td><b>Find Previous Occurence.</b>
-                Find the previous occurence of a search term.</td>
-            </tr>
-            <tr valign="top">
-                <td><img src="img/compareSnapshots.png"></td>
-                <td><b>Compare Memory Snapshots.</b> (Memory snapshots only)
-                Click this button to compare two saved Memory snapshots. Clicking the button opens a dialog box 
-                enabling you to choose the Memory snapshot files to compare.</td>
-            </tr>
-        </table>
-                
-               
-
-                
--->
-                
+        
+        
+        <h3>Comparing Heap Dumps</h3>
+        <p>You can compare two heap dumps to view the differences between the the heap at two different points in time.
+        You do not need to be running a profiling session to compare heap dumps.</p>
+        <ol>
+            <li>If no heap dump is open in the Heap window,
+                choose Profile &gt; Load Heap Dump to open a heap dump.</li>
+            <li>Click the Classes tab in the Heap window.</li>
+            <li>Click <b>Compare with another heap dump</b> at the top of the Classes tab.
+                <p>The IDE opens the Select Heap Dump to Compare dialog box.</p></li>
+            <li>Select a heap dump that is saved in your project or select From file and
+                click Browse to locate a heap dump that is saved outside of your project on your local system.</li>
+            <li>Click OK.</li>
+        </ol>    
+        <p>When you click OK, the IDE will update the Heap window to display the
+            differences between the two heap dumps.
+            You can click <b>reset view</b> to display the initial heap dump.
+            </p>
+        
                 
         <dl>
             <dt><a name="seealso">See Also</a></dt>
