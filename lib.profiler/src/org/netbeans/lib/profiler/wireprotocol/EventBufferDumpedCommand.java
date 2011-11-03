@@ -130,6 +130,7 @@ public class EventBufferDumpedCommand extends Command {
             } finally {
                 decompressor.end();
             }
+            eventBufferFileName = "";
         } else {
             eventBufferFileName = in.readUTF();
         }
