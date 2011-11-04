@@ -293,7 +293,18 @@ public class ProfilerClient implements CommonConstants {
 
                     break;
                 case Command.EVENT_BUFFER_DUMPED:
-                    readAndProcessProfilingResults((EventBufferDumpedCommand) cmd);
+                    EventBufferDumpedCommand ebdCmd = (EventBufferDumpedCommand) cmd;
+                    String bufferName = ebdCmd.getEventBufferFileName();
+                    if (bufferName.length() > 0) {
+                        if (!EventBufferProcessor.bufFileExists()) {
+                            if (!EventBufferProcessor.setEventBufferFile(bufferName)) {
+                                appStatusHandler.displayError(MessageFormat.format(CANNOT_OPEN_SERVER_TEMPFILE_MSG,
+                                                                                   new Object[] { ebdCmd.getEventBufferFileName() }));
+                            }
+                        }
+                        JMethodIdTable.reset();
+                    }
+                    readAndProcessProfilingResults(ebdCmd);
 
                     break;
                 case Command.CLASS_LOADER_UNLOADING:
@@ -301,17 +312,6 @@ public class ProfilerClient implements CommonConstants {
 
                     break;
                 case Command.RESULTS_AVAILABLE:
-                    ResultsAvailableCommand raCmd = (ResultsAvailableCommand) cmd;
-                    String bufferName = raCmd.getEventBufferFileName();
-                    if (bufferName.length() > 0) {
-                        if (!EventBufferProcessor.bufFileExists()) {
-                            if (!EventBufferProcessor.setEventBufferFile(bufferName)) {
-                                appStatusHandler.displayError(MessageFormat.format(CANNOT_OPEN_SERVER_TEMPFILE_MSG,
-                                                                                   new Object[] { raCmd.getEventBufferFileName() }));
-                            }
-                        }
-                        JMethodIdTable.reset();
-                    }
                     resultsStart = System.currentTimeMillis();
 
                     break;
@@ -1086,7 +1086,7 @@ public class ProfilerClient implements CommonConstants {
     public void removeAllInstrumentation(boolean cleanupClient)
                                   throws InstrumentationException {
         synchronized (instrumentationLock) {
-            if (getCurrentInstrType() == INSTR_NONE || getCurrentInstrType() == INSTR_NONE_SAMPLING) {
+            if (getCurrentInstrType() == INSTR_NONE) {
                 return;
             }
 
@@ -1695,7 +1695,7 @@ public class ProfilerClient implements CommonConstants {
                 return res;
             }
 
-            boolean terminateOnError = attachMode == 1; // in case of direct attach we don't want to have a JVM process hanging around waiting for the client to connect
+            boolean terminateOnError = attachMode != 2; // in case of direct attach we don't want to have a JVM process hanging around waiting for the client to connect
                                                         // Get VM properties
 
             synchronized (this) {

@@ -85,7 +85,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
             Stacks.getAllStackTraces(newThreads, newStates, newMethodIds);
             timestamp = Timers.getCurrentTimeInCounts();
             
-            if (newThreads[0] != null) { // ignore samples without data
+            if (newThreads[0] != null && eventBuffer != null) { // ignore samples without data 
                 synchronized (eventBuffer) {
                     writeThreadDumpStart(timestamp);
                     for (int i = 0; i < newThreads[0].length; i++) {
@@ -237,9 +237,11 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
 
     public static void shutdown() {
         sampling.terminate();
+        sampling = null;
+        ProfilerRuntime.clearDataStructures();
     }
     
     static void resetProfilerCollectors() {
-        sampling.resetData = true;   
+        if (sampling != null) sampling.resetData = true;   
     }
 }

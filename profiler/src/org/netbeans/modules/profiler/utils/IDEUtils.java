@@ -96,6 +96,10 @@ public final class IDEUtils {
         return getAntProfilerStartArgument(port, architecture, CommonConstants.JDK_17_STRING);
     }
 
+    public static String getAntProfilerStartArgument18(int port, int architecture) {
+        return getAntProfilerStartArgument(port, architecture, CommonConstants.JDK_18_STRING);
+    }
+
 //    // Searches for a localized help. The default directory is <profiler_cluster>/docs/profiler,
 //    // localized help is in <profiler_cluster>/docs/profiler_<locale_suffix> as obtained by NbBundle.getLocalizingSuffixes()
 //    // see Issue 65429 (http://www.netbeans.org/issues/show_bug.cgi?id=65429)

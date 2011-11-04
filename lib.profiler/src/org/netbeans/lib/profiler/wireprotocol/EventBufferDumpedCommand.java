@@ -63,6 +63,7 @@ public class EventBufferDumpedCommand extends Command {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     
     private int bufSize;
+    private String eventBufferFileName;
     private byte[] buffer;
     private int startPos;
     
@@ -73,6 +74,15 @@ public class EventBufferDumpedCommand extends Command {
         this.bufSize = bufSize;
         buffer = buf;
         startPos = start;
+        eventBufferFileName = "";
+    }
+
+    public EventBufferDumpedCommand(int bufSize, String bufferName) {
+        super(EVENT_BUFFER_DUMPED);
+        this.bufSize = bufSize;
+        buffer = null;
+        startPos = -1;
+        eventBufferFileName = bufferName;
     }
     
     // Custom serialization support
@@ -88,10 +98,15 @@ public class EventBufferDumpedCommand extends Command {
     
     public byte[] getBuffer() {
         return buffer;
-    }    
+    }
+
     // For debugging
     public String toString() {
-        return super.toString() + ", bufSize: " + bufSize; // NOI18N
+        return super.toString() + ", bufSize: " + bufSize + (eventBufferFileName.length()>0 ? ", eventBufferFileName:" + eventBufferFileName : ""); // NOI18N
+    }
+
+    public String getEventBufferFileName() {
+        return eventBufferFileName;
     }
     
     void readObject(ObjectInputStream in) throws IOException {
@@ -115,6 +130,9 @@ public class EventBufferDumpedCommand extends Command {
             } finally {
                 decompressor.end();
             }
+            eventBufferFileName = "";
+        } else {
+            eventBufferFileName = in.readUTF();
         }
     }
     
@@ -132,6 +150,8 @@ public class EventBufferDumpedCommand extends Command {
             compressedSize = compressor.deflate(compressedBytes);
             out.writeInt(compressedSize);
             out.write(compressedBytes,0,compressedSize);
+        } else {
+            out.writeUTF(eventBufferFileName);
         }
     }
 }

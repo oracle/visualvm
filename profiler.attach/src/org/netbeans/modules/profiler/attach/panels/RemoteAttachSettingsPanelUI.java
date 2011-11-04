@@ -66,16 +66,17 @@ public class RemoteAttachSettingsPanelUI extends javax.swing.JPanel implements D
     public HostOsComboBoxModel(Object[] objects) {
       super(objects);
       this.insertElementAt(HOSTOS_HEADER, 0);
-      this.insertElementAt(HOSTOS_HEADER, 0);
       this.fireIntervalAdded(this, 0, 0);
       this.setSelectedItem(this.getElementAt(0));
     }
     public void setSelectedItem(Object anObject) {
-      if (getElementAt(0).equals(HOSTOS_HEADER)) {
-        removeElementAt(0);
-        this.fireIntervalRemoved(this, 0, 0);
-      }
       super.setSelectedItem(anObject);
+      if (!anObject.equals(HOSTOS_HEADER)) {
+        if (getElementAt(0).equals(HOSTOS_HEADER)) {
+          removeElementAt(0);
+          this.fireIntervalRemoved(this, 0, 0);
+        }
+      }
     }
   }
   private RemoteAttachSettingsPanel.Model model;
