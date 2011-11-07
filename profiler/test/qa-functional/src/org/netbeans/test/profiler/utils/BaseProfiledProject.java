@@ -41,6 +41,8 @@
  */
 package org.netbeans.test.profiler.utils;
 
+import com.sun.management.HotSpotDiagnosticMXBean;
+import java.io.IOException;
 import org.netbeans.jellytools.NbDialogOperator;
 import org.netbeans.jellytools.nodes.ProjectRootNode;
 import org.netbeans.jemmy.DialogWaiter;
@@ -52,6 +54,7 @@ import org.netbeans.jemmy.EventTool;
 import org.netbeans.jemmy.Waitable;
 import org.netbeans.jemmy.Waiter;
 import org.openide.util.Exceptions;
+import sun.management.ManagementFactory;
 
 /**
  * Abstract base class representing a project to be used for profiler test. This class should
@@ -109,7 +112,7 @@ public class BaseProfiledProject {
 	 * Current profiling option.
 	 */
 	protected ProfilingOption m_profilingOption = ProfilingOption.NONE;
-
+        
 	/**
 	 * Get the name of the project
 	 * @return project name
@@ -132,7 +135,9 @@ public class BaseProfiledProject {
 	 * @return project node
 	 */
 	public ProjectRootNode getProjectNode() {
-		return new JavaProjectsTabOperator().getJavaProjectRootNode(m_name);
+            JavaProjectsTabOperator projectsTab = new JavaProjectsTabOperator();
+            projectsTab.requestFocus();
+		return projectsTab.getJavaProjectRootNode(m_name);
 	}
 
 	/**
@@ -167,7 +172,7 @@ public class BaseProfiledProject {
 	 */
 	public void profileCPU() {
 		print("profile CPU");
-		if (startProfilingCPU(true, true)) {
+		if (startProfilingCPU(true, true, false)) {
 			try {
 				stopProfiling();
 			} catch (Exception e) {
@@ -233,7 +238,7 @@ public class BaseProfiledProject {
 	 *	@param allClasses if true, all classes will be profiled, otherwise only project classes will be profiled
 	 *	@return true if profiling session is running, false otherwise
 	 */
-	public Boolean startProfilingCPU(Boolean entireApplication, Boolean allClasses) {
+	public Boolean startProfilingCPU(Boolean entireApplication, Boolean allClasses, Boolean sampled) {
 		if(m_profilingOption!=ProfilingOption.NONE){
 			print("WARNING: trying to start profiling session, but one is already running. Ignoring");
 			return false;
@@ -244,14 +249,10 @@ public class BaseProfiledProject {
 			NbProfilerDialogOperator profileDialog = prepareProfiling();
 			//monitor button
 			profileDialog.selectCpu();
-			//entire application switch
-			if (entireApplication) {
-				profileDialog.selectEntireApplication();
-				Thread.sleep(1000);
-			} else {
-				profileDialog.selectPartOfApp();
-				Thread.sleep(1000);
-			}
+                        if (!sampled) {
+                            profileDialog.selectInstrumented();
+                            Thread.sleep(1000);
+                        }
 
 			//all classes switch
 			if (allClasses) {
@@ -342,7 +343,7 @@ public class BaseProfiledProject {
 			print("WARNING: trying to write profiler information but no session is running. Ignoring");
 			return;
 		}
-		ProfilerControlPanelOperator pcpo = ProfilerControlPanelOperator.getDefault();
+                ProfilerControlPanelOperator pcpo = ProfilerControlPanelOperator.getDefault();
 		print("TELEMETRY: Instrumented methods: " + pcpo.getInstrumentedMethods());
 		print("TELEMETRY: Filter: " + pcpo.getFilter());
 		print("TELEMETRY: Threads: " + pcpo.getThreads());
@@ -425,19 +426,27 @@ public class BaseProfiledProject {
 	 * created.
 	 */
 	protected NbProfilerDialogOperator prepareProfiling() throws Exception {
+            print("prepare profiling");
 		//invoke popup action
-		getProjectNode().performPopupAction(PROFILE);
-		//enable profilier integration if run for the first time
-		print("profile popup menu action performed");
-		try {
-			new NbDialogOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.j2se.Bundle",
-					"J2SEProjectTypeProfiler_ModifyBuildScriptCaption")).ok(); //"Enable Profiling of {0}"
-		} catch (Exception e) {
-			print("profiler already integrated into the project");//this is not an error
-		}
+            ProjectRootNode prn = getProjectNode();
+            print("got project root node");
+            prn.collapse();
+            prn.select();
+            print("project node selected");
+            prn.performPopupAction(PROFILE);
+            print("executed profile action");
+            Thread.sleep(100);
+            //enable profiler integration if run for the first time
+            print("profile popup menu action performed");
+//		try {
+//			new NbDialogOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.j2se.Bundle",
+//					"J2SEProjectTypeProfiler_ModifyBuildScriptCaption")).ok(); //"Enable Profiling of {0}"
+//		} catch (Exception e) {
+//			print("profiler already integrated into the project");//this is not an error
+//		}
 
 		//profile dialog
-		return new NbProfilerDialogOperator();
+            return new NbProfilerDialogOperator();
 	}
 
 	/**
