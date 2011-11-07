@@ -247,8 +247,8 @@ public class ProfilerInterface implements CommonConstants {
                         rootClassNameWildcard[i] = true;
                         rootClassNamePackageWildcard[i] = true;
                     }
+//                    System.out.println("Root "+rootClassNames[i]+" wild "+rootClassNameWildcard[i]+" package "+rootClassNamePackageWildcard[i]);
                 }
-//                System.out.println("Root "+rootClassNames[i]+" wild "+rootClassNameWildcard[i]+" package "+rootClassNamePackageWildcard[i]);
             }
         }
     }
