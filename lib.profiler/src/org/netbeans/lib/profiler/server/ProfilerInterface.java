@@ -773,6 +773,11 @@ public class ProfilerInterface implements CommonConstants {
                     if (className.indexOf('.', rootName.length()) == -1) { // not a subpackage
                         return true;
                     }
+                } else if (rootClassNamePackageWildcard[i]){
+                    if (className.equals(rootName.substring(0,rootName.length()-1)))
+                    {
+                        return true;
+                    }
                 }
             } else if (rootName.equals(className)) {
                 return true;

@@ -63,6 +63,9 @@ public class Wildcards {
             packageWildcard = true;
         }
         if (!loadedClassName.startsWith(wildcard)) {
+            if (packageWildcard && loadedClassName.equals(wildcard.substring(0,wildcard.length()-1))) {
+                return true;
+            }
             return false;
         }
         return packageWildcard || (loadedClassName.indexOf('/', wildcard.length()) == -1); // NOI18N
