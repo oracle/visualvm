@@ -80,7 +80,7 @@ import org.netbeans.test.ide.WatchProjects;
  *
  * @author Alexandr Scherbatiy, Jiri Skrivanek
  */
-public class ProfilerValidation extends JellyTestCase {
+public class ProfilerValidationTest extends JellyTestCase {
 
     //private static final String SAMPLE_PROJECT_NAME = "AnagramGame";
 
@@ -91,7 +91,7 @@ public class ProfilerValidation extends JellyTestCase {
     /** Default constructor.
      * @param name test case name
      */
-    public ProfilerValidation(String name){
+    public ProfilerValidationTest(String name){
         super(name);
     }
 
@@ -100,7 +100,7 @@ public class ProfilerValidation extends JellyTestCase {
      */
     public static NbTestSuite suite() {
         NbModuleSuite.Configuration conf = NbModuleSuite.createConfiguration(
-            ProfilerValidation.class
+            ProfilerValidationTest.class
         ).clusters("profiler").enableModules(".*").honorAutoloadEager(true)
         .failOnException(Level.INFO)
         .failOnMessage(Level.SEVERE);
@@ -119,7 +119,7 @@ public class ProfilerValidation extends JellyTestCase {
 
 //    public static NbTestSuite suite() {
 //
-//        return (NbTestSuite) createModuleTest(ProfilerValidation.class,
+//        return (NbTestSuite) createModuleTest(ProfilerValidationTest.class,
 //        tests);
 //    }
     
@@ -128,7 +128,7 @@ public class ProfilerValidation extends JellyTestCase {
         // run whole suite
         TestRunner.run(suite());
         // run only selected test case
-        //TestRunner.run(new ProfilerValidation("testProfiler"));
+        //TestRunner.run(new ProfilerValidationTest("testProfiler"));
     }
 
     /** Setup before every test case. */
