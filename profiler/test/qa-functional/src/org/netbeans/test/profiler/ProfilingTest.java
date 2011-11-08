@@ -41,10 +41,11 @@
  */
 package org.netbeans.test.profiler;
 
+import java.util.logging.Level;
 import junit.textui.TestRunner;
 import org.netbeans.jellytools.JellyTestCase;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
-import org.netbeans.test.profiler.utils.BaseProfiledProject.ProfilingOption;
 import org.netbeans.test.profiler.utils.J2SEProfiledProject;
 import org.openide.util.Exceptions;
 
@@ -59,20 +60,36 @@ public class ProfilingTest extends JellyTestCase {
 	protected static final String PROFILER_UI_PANELS_BUNDLE = "org.netbeans.modules.profiler.ui.panels.Bundle";
 	protected static final String PROFILER_LIB_BUNDLE = "org.netbeans.lib.profiler.Bundle";
 	static String[] tests = new String[]{
-		"testJavaSEProject"
+		"testJavaSEProjectMonitoring",
+                "testJavaSEProjectCPU",
+                "testJavaSEProjectMemory"
 	};
+        static J2SEProfiledProject anagrams=null;
 
 	/** Default constructor.
 	 * @param name test case name
 	 */
 	public ProfilingTest(String name) {
-		super(name);
+            super(name);
 	}
 
 	public static NbTestSuite suite() {
+            NbModuleSuite.Configuration conf = NbModuleSuite.createConfiguration(
+            ProfilingTest.class);
+            
+            conf.clusters("profiler").enableModules(".*").honorAutoloadEager(true)
+            .failOnException(Level.INFO)
+            .failOnMessage(Level.SEVERE);
+        
+            conf.addTest("testJavaSEProjectMonitoring").addTest("testJavaSEProjectCPU").addTest("testJavaSEProjectMemory");
 
-		return (NbTestSuite) createModuleTest(ProfilingTest.class,
-				tests);
+            NbTestSuite suite = new NbTestSuite();
+            suite.addTest(NbModuleSuite.create(conf));
+        
+            return suite;
+
+//		return (NbTestSuite) createModuleTest(ProfilingTest.class,
+//				tests);
 	}
 
 	/** Use for execution inside IDE */
@@ -93,28 +110,40 @@ public class ProfilingTest extends JellyTestCase {
 	 * Tests basic javaSE project(anagram game). Tries all three profiling settings (monitoring,
 	 * cpu and memory).
 	 */
-	public void testJavaSEProject() {
-		J2SEProfiledProject anagrams = new J2SEProfiledProject();
-		anagrams.build();
-		anagrams.startProfilingMonitoring(true);
-		anagrams.showVMTelemetry();
-		anagrams.writeBasicTelemetryData();
-		anagrams.writeThreads();
-		anagrams.stopProfiling();
-
-		anagrams.startProfilingCPU(true, false);
-		anagrams.showLiveResults();
-		//now it is necesary to wait for showing the application window...
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException ex) {
-			Exceptions.printStackTrace(ex);
-		}
-		anagrams.writeLiveResults();
-		//anagrams.showLiveResults();
-		anagrams.stopProfiling();
-		anagrams.startProfilingMemory();
-		anagrams.writeLiveResults();
-		anagrams.stopProfiling();
+	public void testJavaSEProjectMonitoring() {
+            initiateAnagrams();
+            anagrams.build();
+            anagrams.startProfilingMonitoring(true);
+            anagrams.showVMTelemetry();
+            anagrams.writeBasicTelemetryData();
+            anagrams.writeThreads();
+            anagrams.stopProfiling();
+        }
+        
+        public void testJavaSEProjectCPU() {
+            initiateAnagrams();
+            anagrams.startProfilingCPU(true, false, false);
+            anagrams.showLiveResults();
+            //now it is necesary to wait for showing the application window...
+            try {
+                    Thread.sleep(10000);
+            } catch (InterruptedException ex) {
+                    Exceptions.printStackTrace(ex);
+            }
+            anagrams.writeLiveResults();
+            //anagrams.showLiveResults();
+            anagrams.stopProfiling();
+        }
+        public void testJavaSEProjectMemory() {
+            initiateAnagrams();
+            anagrams.startProfilingMemory();
+            anagrams.writeLiveResults();
+            anagrams.stopProfiling();
 	}
+        
+        public void initiateAnagrams() {
+            if (anagrams == null) {
+                anagrams = new J2SEProfiledProject();
+            }
+        }
 }
