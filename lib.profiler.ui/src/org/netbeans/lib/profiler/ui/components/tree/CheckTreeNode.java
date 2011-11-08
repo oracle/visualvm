@@ -86,7 +86,7 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
      */
     public CheckTreeNode(Object userObject, final Icon icon) {
         super(userObject);
-        setChecked(false);
+        checkState = STATE_UNCHECKED;
         this.icon = icon;
     }
 
