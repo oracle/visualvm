@@ -163,6 +163,18 @@ public class ExtendedTableModel extends SortableTableModel {
         realModel.sortByColumn(getRealColumn(column), order);
     }
 
+    @Override
+    public void setInitialSorting(int sortingColumn, boolean sortingOrder) {
+        realModel.setInitialSorting(sortingColumn, sortingOrder);
+        super.setInitialSorting(sortingColumn, sortingOrder);
+    }
+    
+    @Override
+    public void fireTableDataChanged() {
+        realModel.fireTableDataChanged();
+        super.fireTableDataChanged();
+    }    
+
     private void recomputeColumnsMapping() {
         virtualColumnsCount = 0;
 
