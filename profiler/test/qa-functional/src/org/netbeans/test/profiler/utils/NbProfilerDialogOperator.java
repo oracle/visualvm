@@ -61,18 +61,23 @@ import org.netbeans.modules.profiler.ProfilerControlPanel2;
  */
 public class NbProfilerDialogOperator extends NbDialogOperator {
 
-	protected static final String PROFILER_STP_BUNDLE = "org.netbeans.modules.profiler.ui.stp.Bundle";
-	protected static final String PROFILER_UTILS_BUNDLE = "org.netbeans.modules.profiler.utils.Bundle";
+	protected static final String PROFILER_STP_BUNDLE = "org.netbeans.modules.profiler.stp.Bundle";
+	protected static final String PROFILER_UTILS_BUNDLE = "org.netbeans.modules.profiler.projectsupport.utilities.Bundle";
 	protected static final String PROFILER_FILTERS_BUNDLE = "org.netbeans.lib.profiler.common.filters.Bundle";
 	/**
 	 * String constant for title of 'profiler' dialog.
 	 */
-	static String tprofileTitle = Bundle.getStringTrimmed("org.netbeans.modules.profiler.ui.stp.Bundle",
+	static String tprofileTitle = Bundle.getStringTrimmed(PROFILER_STP_BUNDLE,
 			"SelectProfilingTask_ProfileDialogCaption");
 	/**
-	 * String constant for enable thread monitoring.
+	 * String constant for instrumented profiling.
 	 */
-	static String tcpuPartOfApp = Bundle.getStringTrimmed(PROFILER_STP_BUNDLE, "CPUSettingsBasicPanel_PartAppRadioText");
+	static String tcpuInstrumented = Bundle.getStringTrimmed(PROFILER_STP_BUNDLE, "CPUSettingsBasicPanel_ProfileAppRadioText");
+        /**
+	 * String constant for sampled profiling.
+	 */
+        static String tcpuSampled = Bundle.getStringTrimmed(PROFILER_STP_BUNDLE, "CPUSettingsBasicPanel_SampleAppRadioText");
+        
 	/**
 	 * String constant for enable thread monitoring.
 	 */
@@ -100,11 +105,6 @@ public class NbProfilerDialogOperator extends NbDialogOperator {
 	 */
 	static String tcpu = Bundle.getStringTrimmed(PROFILER_STP_BUNDLE,
 			"SelectProfilingTask_CpuString");
-	/**
-	 * String const for Entire application (cpu).
-	 */
-	static String tcpuEntireApp = Bundle.getStringTrimmed(PROFILER_STP_BUNDLE,
-			"CPUSettingsBasicPanel_EntireAppRadioText");
 	/**
 	 * String constant for 'memory' button.
 	 */
@@ -175,33 +175,33 @@ public class NbProfilerDialogOperator extends NbDialogOperator {
 	//various profiler settings
 
 	/**
-	 * Select to profile entire application in the CPU task. Do not use with other
+	 * Select to use instrumenting profiler. Do not use with other
 	 * profiling task.
 	 */
-	public void selectEntireApplication() {
-		JRadioButtonOperator rbo = new JRadioButtonOperator(this, tcpuEntireApp);
+	public void selectInstrumented() {
+		JRadioButtonOperator rbo = new JRadioButtonOperator(this, tcpuInstrumented);
 		if (!rbo.isSelected()) {
 			rbo.clickMouse();
-			print("click on entire app");
+			print("click on \"Profile Application\"");
 		}
-		print("entire app button selected");
+		print("instrumenting profiler has been selected");
+	}
+        
+        /**
+	 * Select to use sampling profiler. Do not use with other
+	 * profiling task.
+	 */
+	public void selectSampled() {
+		JRadioButtonOperator rbo = new JRadioButtonOperator(this, tcpuSampled);
+		if (!rbo.isSelected()) {
+			rbo.clickMouse();
+			print("click on \"Sample Application\"");
+		}
+		print("sampling profiler has been selected");
 	}
 
 	/**
-	 * Select to profile only part of the application in the CPU task. Do not use with other
-	 * profiling task.
-	 */
-	public void selectPartOfApp() {
-		JRadioButtonOperator rbo = new JRadioButtonOperator(this, tcpuPartOfApp);
-		if (!rbo.isSelected()) {
-			rbo.clickMouse();
-			print("click on entire app");
-		}
-		print("entire app button selected");
-	}
-
-	/**
-	 * Enable or disable thred monitoring in the monitoring task. Do not use with another
+	 * Enable or disable thread monitoring in the monitoring task. Do not use with another
 	 * profiling task (cpu/memory).
 	 * @param enable
 	 */
@@ -274,6 +274,7 @@ public class NbProfilerDialogOperator extends NbDialogOperator {
 							try {
 								JLabelOperator lo = new JLabelOperator(new ContainerOperator(cmpm), label);
 							} catch (Exception e) {
+                                                            System.out.println(e.getMessage());
 								result = false;
 							}
 							return result;
