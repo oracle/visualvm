@@ -85,9 +85,9 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     }
 
     public void processDataFrame(byte[] buffer) {
-        synchronized(this) {
-            if (!processorLives) return;
-            synchronized (client) {
+        synchronized(client) {
+            synchronized (this) {
+                if (!processorLives) return;
                 try {
                     fireBatchStart();
                     doProcessDataFrame(buffer);
