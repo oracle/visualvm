@@ -93,13 +93,14 @@ public class StackTraceSnapshotBuilder {
         }
         
         MethodInfo(StackTraceElement element) {
+            String sig = "";
             className = element.getClassName();
             methodName = element.getMethodName() + (element.isNativeMethod() ? "[native]" : ""); // NOI18N
             if (element.getLineNumber() == -1) {
-                signature = element.getFileName();
-            } else {
-                signature = ""; // NOI18N
+                sig = element.getFileName();
+                if (sig == null) sig = ""; // NOI18N
             }
+            signature = sig;
         }
         
         @Override
