@@ -737,12 +737,13 @@ public abstract class NetBeansProfiler extends Profiler {
             
             setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
             
-            CommonUtils.runInEventDispatchThread(new Runnable() {
-
-                public void run() {
-                    openWindowsOnProfilingStart();
-                }
-            });
+            if (shouldOpenWindowsOnProfilingStart()) {
+                CommonUtils.runInEventDispatchThread(new Runnable() {
+                    public void run() {
+                        openWindowsOnProfilingStart();
+                    }
+                });
+            }
             
             if (attachSettings.isDirect()) { // Previously known as "attach on startup"
                 // The VM is already started with all necessary options and waiting for us to connect.
@@ -930,12 +931,13 @@ public abstract class NetBeansProfiler extends Profiler {
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
-        CommonUtils.runInEventDispatchThread(new Runnable() {
+        if (shouldOpenWindowsOnProfilingStart()) {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     openWindowsOnProfilingStart();
                 }
             });
-
+        }
         if (!CalibrationDataFileIO.validateCalibrationInput(sessionSettings.getJavaVersionString(),
                                                                 sessionSettings.getJavaExecutable())) {
             ProfilerDialogs.displayError(CALIBRATION_MISSING_SHORT_MESSAGE, null, CALIBRATION_MISSING_MESSAGE);
@@ -1153,7 +1155,9 @@ public abstract class NetBeansProfiler extends Profiler {
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
         //    System.err.println("------------------------------------------ 3: "+ (System.currentTimeMillis() - time));
-        openWindowsOnProfilingStart();
+        if (shouldOpenWindowsOnProfilingStart()) {
+            openWindowsOnProfilingStart();
+        }
 
         //    System.err.println("------------------------------------- 4: "+ (System.currentTimeMillis() - time));
         final Window mainWindow = WindowManager.getDefault().getMainWindow();
@@ -1214,6 +1218,10 @@ public abstract class NetBeansProfiler extends Profiler {
             });
 
         //    Syst---------------------------------------------------- Final: "+ (System.currentTimeMillis() - time));
+        return true;
+    }
+
+    protected boolean shouldOpenWindowsOnProfilingStart() {
         return true;
     }
 
