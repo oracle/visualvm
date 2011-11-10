@@ -227,11 +227,11 @@ public class ClientUtils implements CommonConstants {
             boolean wildcard = className.endsWith("*"); // NOI18N
             StringBuilder flattenedBuf = new StringBuilder(className.replace("$**", "").replace(".**", "").replace(".*", "")); // NOI18N
 
-            if (!wildcard && methodName != null && methodName.length() > 0) { //NOI18N
+            if (!wildcard && methodName != null && methodName.length() > 0 && !methodName.endsWith("*")) { //NOI18N
                 flattenedBuf.append('.').append(methodName);
             }
 
-            if (!wildcard && methodSignature != null && methodSignature.length() > 0) { //NOI18N
+            if (!wildcard && methodSignature != null && methodSignature.length() > 0 && !methodSignature.endsWith("*")) { //NOI18N
                 flattenedBuf.append(methodSignature);
             }
 
