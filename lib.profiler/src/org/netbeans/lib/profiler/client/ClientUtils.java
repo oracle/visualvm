@@ -178,7 +178,11 @@ public class ClientUtils implements CommonConstants {
             }
 
             // length of classNames needs to be the same
-            if (!this.className.equals(other.className)) {
+            // normalizing the class name; result of #203446
+            String cn1 = this.className.replace("$**", ""); // NOI18N
+            // normalizing the class name; result of #203446
+            String cn2 = other.className.replace("$**", ""); // NOI18N
+            if (!cn1.equals(cn2)) {
                 return false;
             }
 
@@ -217,20 +221,21 @@ public class ClientUtils implements CommonConstants {
 
         public String toFlattened() {
             if ((className == null) || (className.length() == 0)) {
-                return "";
+                return ""; // NOI18N
             }
 
-            StringBuffer flattenedBuf = new StringBuffer(className);
+            boolean wildcard = className.endsWith("*"); // NOI18N
+            StringBuilder flattenedBuf = new StringBuilder(className.replace("$**", "").replace(".**", "").replace(".*", "")); // NOI18N
 
-            if (flattenedBuf.charAt(flattenedBuf.length() - 1) != '*') { //NOI18N
+            if (!wildcard && methodName != null && methodName.length() > 0 && !methodName.endsWith("*")) { //NOI18N
                 flattenedBuf.append('.').append(methodName);
             }
 
-            if (flattenedBuf.charAt(flattenedBuf.length() - 1) != '*') { //NOI18N
+            if (!wildcard && methodSignature != null && methodSignature.length() > 0 && !methodSignature.endsWith("*")) { //NOI18N
                 flattenedBuf.append(methodSignature);
             }
 
-            return flattenedBuf.toString().replaceAll("\\.[\\*]+", ""); //NOI18N
+            return flattenedBuf.toString(); //NOI18N
         }
 
         public String toString() {
