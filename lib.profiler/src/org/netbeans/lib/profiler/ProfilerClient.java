@@ -259,10 +259,11 @@ public class ProfilerClient implements CommonConstants {
                                     // object count
                                     if (currentInstrTypeIsMemoryProfiling()) {
                                         savedAllocatedObjectsCountResults = getAllocatedObjectsCountResults();
-
-                                        //                  if (mcgb != null) {
-                                        //                    mcgb.getNamesForJMethodIds();
-                                        //                  }
+                                        // #204978: methodIds must be loaded from instead of 
+                                        // the MemoryCallGraphBuilder'shutdown' method where it is too late
+                                        if (memCctProvider instanceof MemoryCallGraphBuilder) {
+                                            ((MemoryCallGraphBuilder)memCctProvider).updateInternals();
+                                        }
                                     }
 
                                     status.savedInternalStats = getInternalStats();
@@ -609,7 +610,7 @@ public class ProfilerClient implements CommonConstants {
      * @throws ClientUtils.TargetAppOrVMTerminated
      *          In case the profiled application has already terminated
      */
-    public synchronized MemoryResultsSnapshot getMemoryProfilingResultsSnapshot()
+    public MemoryResultsSnapshot getMemoryProfilingResultsSnapshot()
         throws ClientUtils.TargetAppOrVMTerminated {
         return getMemoryProfilingResultsSnapshot(true);
     }
@@ -622,7 +623,7 @@ public class ProfilerClient implements CommonConstants {
      * @throws ClientUtils.TargetAppOrVMTerminated
      *          In case the profiled application has already terminated
      */
-    public synchronized MemoryResultsSnapshot getMemoryProfilingResultsSnapshot(boolean dump)
+    public MemoryResultsSnapshot getMemoryProfilingResultsSnapshot(boolean dump)
         throws ClientUtils.TargetAppOrVMTerminated {
         checkForTargetVMAlive();
 
