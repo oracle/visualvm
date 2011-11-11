@@ -259,10 +259,11 @@ public class ProfilerClient implements CommonConstants {
                                     // object count
                                     if (currentInstrTypeIsMemoryProfiling()) {
                                         savedAllocatedObjectsCountResults = getAllocatedObjectsCountResults();
-
-                                        //                  if (mcgb != null) {
-                                        //                    mcgb.getNamesForJMethodIds();
-                                        //                  }
+                                        // #204978: methodIds must be loaded from instead of 
+                                        // the MemoryCallGraphBuilder'shutdown' method where it is too late
+                                        if (memCctProvider instanceof MemoryCallGraphBuilder) {
+                                            ((MemoryCallGraphBuilder)memCctProvider).updateInternals();
+                                        }
                                     }
 
                                     status.savedInternalStats = getInternalStats();
