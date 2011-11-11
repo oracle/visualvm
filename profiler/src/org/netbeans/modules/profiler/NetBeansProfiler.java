@@ -1113,7 +1113,11 @@ public abstract class NetBeansProfiler extends Profiler {
     }
     
     public boolean processesProfilingPoints() {
-        return getProfilingPointsManager().getSupportedProfilingPoints().length > 0;
+        ProfilingPointsProcessor ppp = getProfilingPointsManager();
+        if (ppp != null) {
+            return ppp.getSupportedProfilingPoints().length > 0;
+        }
+        return false;
     }
 
     /**
@@ -1758,7 +1762,8 @@ public abstract class NetBeansProfiler extends Profiler {
                 }
             }
 
-            getProfilingPointsManager().init(getProfiledProject());
+            ProfilingPointsProcessor ppp = getProfilingPointsManager();
+            if (ppp != null) ppp.init(getProfiledProject());
 
             ProfilingResultsDispatcher.getDefault().startup(client);
         }
