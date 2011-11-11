@@ -610,7 +610,7 @@ public class ProfilerClient implements CommonConstants {
      * @throws ClientUtils.TargetAppOrVMTerminated
      *          In case the profiled application has already terminated
      */
-    public synchronized MemoryResultsSnapshot getMemoryProfilingResultsSnapshot()
+    public MemoryResultsSnapshot getMemoryProfilingResultsSnapshot()
         throws ClientUtils.TargetAppOrVMTerminated {
         return getMemoryProfilingResultsSnapshot(true);
     }
@@ -623,7 +623,7 @@ public class ProfilerClient implements CommonConstants {
      * @throws ClientUtils.TargetAppOrVMTerminated
      *          In case the profiled application has already terminated
      */
-    public synchronized MemoryResultsSnapshot getMemoryProfilingResultsSnapshot(boolean dump)
+    public MemoryResultsSnapshot getMemoryProfilingResultsSnapshot(boolean dump)
         throws ClientUtils.TargetAppOrVMTerminated {
         checkForTargetVMAlive();
 
