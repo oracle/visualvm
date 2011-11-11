@@ -47,6 +47,7 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,7 +72,7 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected volatile ProfilerClient client = null;
-    private final Set listeners = new HashSet();
+    private final Set listeners = new CopyOnWriteArraySet();
 
     // @GuardedBy this
     private boolean processorLives = false;
@@ -79,15 +80,13 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public boolean hasListeners() {
-        synchronized(listeners) {
-            return !listeners.isEmpty();
-        }
+        return !listeners.isEmpty();
     }
 
     public void processDataFrame(byte[] buffer) {
-        synchronized(this) {
-            if (!processorLives) return;
-            synchronized (client) {
+        synchronized(client) {
+            synchronized (this) {
+                if (!processorLives) return;
                 try {
                     fireBatchStart();
                     doProcessDataFrame(buffer);
@@ -101,15 +100,10 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     }
 
     public void removeAllListeners() {
-        Set tmpListeners ;
-        synchronized(listeners) {
-            tmpListeners = new HashSet(listeners);
-            listeners.clear();
-        }
-
-        for (Iterator iter = tmpListeners.iterator(); iter.hasNext();) {
+        for (Iterator iter = listeners.iterator(); iter.hasNext();) {
             ((ProfilingResultListener) iter.next()).shutdown();
         }
+        listeners.clear();
     }
 
     public void reset() {
@@ -132,9 +126,7 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     }
 
     protected void addListener(final ProfilingResultListener listener) {
-        synchronized(listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     protected abstract void doProcessDataFrame(byte[] buffer);
@@ -156,20 +148,14 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     }
 
     protected void foreachListener(ListenerFunctor functor) {
-        Set tmpListeners;
-        synchronized(listeners) {
-            tmpListeners = new HashSet(listeners);
-        }
-        for (Iterator iter = tmpListeners.iterator(); iter.hasNext();) {
+        for (Iterator iter = listeners.iterator(); iter.hasNext();) {
             functor.execute((ProfilingResultListener) iter.next());
         }
     }
 
     protected void removeListener(final ProfilingResultListener listener) {
-        synchronized(listeners) {
-            if (listeners.remove(listener)) {
-                listener.shutdown();
-            }
+        if (listeners.remove(listener)) {
+            listener.shutdown();
         }
     }
 

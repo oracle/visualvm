@@ -162,7 +162,7 @@ public class HeapWalker {
         HeapWalkerManager.getDefault().openHeapWalker(this);
     }
 
-    TopComponent getTopComponent() {
+    public TopComponent getTopComponent() {
         if (heapWalkerUI == null) {
             heapWalkerUI = new HeapWalkerUI(this);
         }

@@ -165,11 +165,34 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private ProfilerIDESettings() {
         try {
             if (contains55Settings()) convert55Settings();
+            else if (contains701Settings()) convert701Settings();
         } catch (BackingStoreException e) {
             // Silently skip exception in NB55 settings
         }
     }
     
+    //~ Conversion of 7.0 / 7.0.1 settings ---------------------------------------------------------------------------------------
+    
+    private boolean contains701Settings() throws BackingStoreException {
+        return get701Preferences().keys().length > 0;
+    }
+    
+    private void convert701Settings() throws BackingStoreException {
+        Preferences preferences = getPreferences();
+        Preferences pref701 = get701Preferences();
+        
+        for (String key : pref701.keys()) {
+            String oldValue = pref701.get(key, null);
+            
+            assert oldValue != null;
+            preferences.put(key, oldValue);
+        }
+        pref701.clear();
+    }
+    
+    private Preferences get701Preferences() {
+        return NbPreferences.root().node("org/netbeans/modules/profiler");  // NOI18N
+    }
     
     //~ Conversion of 5.5 / 5.5.1 settings ---------------------------------------------------------------------------------------
     
