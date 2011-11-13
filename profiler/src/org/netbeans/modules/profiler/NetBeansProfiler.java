@@ -1217,6 +1217,17 @@ public abstract class NetBeansProfiler extends Profiler {
         return true;
     }
 
+    // NOTE: used from com.sun.tools.visualvm.profiler.ProfilerSupport.calibrateJVM(),
+    //       requires targetAppRunner to be configured correctly. Most likely you want to use
+    //       runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) !!!
+    public boolean runConfiguredCalibration() {
+        calibrating = true;
+        boolean result = targetAppRunner.calibrateInstrumentationCode();
+        calibrating = false;
+
+        return result;
+    }
+
     public boolean runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) {
         calibrating = true;
 
