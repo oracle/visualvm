@@ -96,9 +96,9 @@ public class Wildcards {
         if (packageMask.endsWith(ALLWILDCARD)) {
             //      String newPk = packageMask.substring(0, packageMask.length() - 2);
             //      System.out.println(" -> " + newPk);
-            return packageMask.substring(0, packageMask.length() - 1);
+            return packageMask.substring(0, packageMask.length() - 1).intern();
         }
 
-        return packageMask;
+        return packageMask.intern();
     }
 }

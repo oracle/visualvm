@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.heapwalk;
 import javax.swing.BoundedRangeModel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.heapwalk.model.AbstractHeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
