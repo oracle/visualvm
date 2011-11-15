@@ -43,7 +43,6 @@
 
 package org.netbeans.lib.profiler.marker;
 
-import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
 import java.util.Arrays;
 import java.util.Collection;
