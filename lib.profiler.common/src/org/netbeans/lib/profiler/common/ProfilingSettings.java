@@ -574,6 +574,7 @@ public class ProfilingSettings {
         settings.setSortResultsByThreadCPUTime(getSortResultsByThreadCPUTime());
 
         settings.setSamplingInterval(getSamplingInterval());
+        settings.setSamplingFrequency(getSamplingFrequency());
 
         settings.setCodeRegionCPUResBufSize(getCodeRegionCPUResBufSize());
 
@@ -755,6 +756,8 @@ public class ProfilingSettings {
         sb.append("sortResultsByThreadCPUTime: " + getSortResultsByThreadCPUTime()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("samplingInterval: " + getSamplingInterval()); //NOI18N
+        sb.append('\n'); //NOI18N
+        sb.append("samplingFrequency: " + getSamplingFrequency()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("instrumentationRootMethods: " + instrumentationRootMethods); //NOI18N
         sb.append('\n'); //NOI18N
