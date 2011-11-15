@@ -111,6 +111,7 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
     private int nProfiledThreadsLimit = 32;
     private int portNo = 5140;
     private int samplingInterval = 10;
+    private int samplingFrequency = 10;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -328,6 +329,14 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
 
     public int getSamplingInterval() {
         return samplingInterval;
+    }
+
+    public void setSamplingFrequency(int num) {
+        samplingFrequency = num;
+    }
+
+    public int getSamplingFrequency() {
+        return samplingFrequency;
     }
 
     public void setSeparateConsole(boolean separateConsole) {
