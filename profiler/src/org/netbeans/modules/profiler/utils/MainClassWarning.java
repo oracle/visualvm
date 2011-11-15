@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.utils;
 
-import org.openide.filesystems.FileObject;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.openide.util.Lookup;
