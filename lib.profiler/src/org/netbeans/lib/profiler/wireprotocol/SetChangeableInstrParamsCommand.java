@@ -66,15 +66,17 @@ public class SetChangeableInstrParamsCommand extends Command {
     private int objAllocStackSamplingDepth;
     private int objAllocStackSamplingInterval;
     private int samplingInterval;
+    private int samplingFrequency;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SetChangeableInstrParamsCommand(int nProfiledThreadsLimit, int samplingInterval, int objAllocStackSamplingInterval,
+    public SetChangeableInstrParamsCommand(int nProfiledThreadsLimit, int samplingInterval, int samplingFrequency, int objAllocStackSamplingInterval,
                                            int objAllocStackSamplingDepth, boolean runGCOnGetResults,
                                            boolean waitTrackingEnabled, boolean sleepTrackingEnabled, boolean threadsSamplingEnabled) {
         super(SET_CHANGEABLE_INSTR_PARAMS);
         this.nProfiledThreadsLimit = nProfiledThreadsLimit;
         this.samplingInterval = samplingInterval;
+        this.samplingFrequency = samplingFrequency;
         this.objAllocStackSamplingInterval = objAllocStackSamplingInterval;
         this.objAllocStackSamplingDepth = objAllocStackSamplingDepth;
         this.runGCOnGetResultsInMemoryProfiling = runGCOnGetResults;
@@ -110,6 +112,10 @@ public class SetChangeableInstrParamsCommand extends Command {
         return samplingInterval;
     }
 
+    public int getSamplingFrequency() {
+        return samplingFrequency;
+    }
+
     public boolean isSleepTrackingEnabled() {
         return sleepTrackingEnabled;
     }
@@ -126,6 +132,7 @@ public class SetChangeableInstrParamsCommand extends Command {
     public String toString() {
         return super.toString() + ", nProfiledThreadsLimit: " + nProfiledThreadsLimit // NOI18N
                + ", samplingInterval: " + samplingInterval // NOI18N
+               + ", samplingFrequency: " + samplingFrequency // NOI18N
                + ", objAllocStackSamplingInterval: " + objAllocStackSamplingInterval // NOI18N
                + ", objAllocStackSamplingDepth: " + objAllocStackSamplingDepth // NOI18N
                + ", runGCOnGetResultsInMemoryProfiling: " + runGCOnGetResultsInMemoryProfiling // NOI18N
@@ -137,6 +144,7 @@ public class SetChangeableInstrParamsCommand extends Command {
     void readObject(ObjectInputStream in) throws IOException {
         nProfiledThreadsLimit = in.readInt();
         samplingInterval = in.readInt();
+        samplingFrequency = in.readInt();
         objAllocStackSamplingInterval = in.readInt();
         objAllocStackSamplingDepth = in.readInt();
         runGCOnGetResultsInMemoryProfiling = in.readBoolean();
@@ -148,6 +156,7 @@ public class SetChangeableInstrParamsCommand extends Command {
     void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(nProfiledThreadsLimit);
         out.writeInt(samplingInterval);
+        out.writeInt(samplingFrequency);
         out.writeInt(objAllocStackSamplingInterval);
         out.writeInt(objAllocStackSamplingDepth);
         out.writeBoolean(runGCOnGetResultsInMemoryProfiling);
