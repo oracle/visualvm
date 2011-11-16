@@ -43,9 +43,7 @@
 
 package org.netbeans.lib.profiler.ui.components.table;
 
-import org.netbeans.lib.profiler.ui.components.*;
 import java.awt.*;
-import javax.swing.*;
 
 
 /** Custom Table cell renderer that paints a bar based on numerical value within min/max bounds.

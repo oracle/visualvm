@@ -86,10 +86,10 @@ public class ObjectAllocationResultsResponse extends Response {
     }
 
     void readObject(ObjectInputStream in) throws IOException {
-        int len = in.readInt();
-        results = new int[len];
+        nEntries = in.readInt();
+        results = new int[nEntries];
 
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < nEntries; i++) {
             results[i] = in.readInt();
         }
     }

@@ -63,6 +63,9 @@ public class Wildcards {
             packageWildcard = true;
         }
         if (!loadedClassName.startsWith(wildcard)) {
+            if (packageWildcard && loadedClassName.equals(wildcard.substring(0,wildcard.length()-1))) {
+                return true;
+            }
             return false;
         }
         return packageWildcard || (loadedClassName.indexOf('/', wildcard.length()) == -1); // NOI18N
@@ -93,9 +96,9 @@ public class Wildcards {
         if (packageMask.endsWith(ALLWILDCARD)) {
             //      String newPk = packageMask.substring(0, packageMask.length() - 2);
             //      System.out.println(" -> " + newPk);
-            return packageMask.substring(0, packageMask.length() - 1);
+            return packageMask.substring(0, packageMask.length() - 1).intern();
         }
 
-        return packageMask;
+        return packageMask.intern();
     }
 }

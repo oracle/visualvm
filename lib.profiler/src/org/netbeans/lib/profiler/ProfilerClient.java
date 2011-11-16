@@ -259,10 +259,11 @@ public class ProfilerClient implements CommonConstants {
                                     // object count
                                     if (currentInstrTypeIsMemoryProfiling()) {
                                         savedAllocatedObjectsCountResults = getAllocatedObjectsCountResults();
-
-                                        //                  if (mcgb != null) {
-                                        //                    mcgb.getNamesForJMethodIds();
-                                        //                  }
+                                        // #204978: methodIds must be loaded from instead of 
+                                        // the MemoryCallGraphBuilder'shutdown' method where it is too late
+                                        if (memCctProvider instanceof MemoryCallGraphBuilder) {
+                                            ((MemoryCallGraphBuilder)memCctProvider).updateInternals();
+                                        }
                                     }
 
                                     status.savedInternalStats = getInternalStats();
@@ -609,7 +610,7 @@ public class ProfilerClient implements CommonConstants {
      * @throws ClientUtils.TargetAppOrVMTerminated
      *          In case the profiled application has already terminated
      */
-    public synchronized MemoryResultsSnapshot getMemoryProfilingResultsSnapshot()
+    public MemoryResultsSnapshot getMemoryProfilingResultsSnapshot()
         throws ClientUtils.TargetAppOrVMTerminated {
         return getMemoryProfilingResultsSnapshot(true);
     }
@@ -622,7 +623,7 @@ public class ProfilerClient implements CommonConstants {
      * @throws ClientUtils.TargetAppOrVMTerminated
      *          In case the profiled application has already terminated
      */
-    public synchronized MemoryResultsSnapshot getMemoryProfilingResultsSnapshot(boolean dump)
+    public MemoryResultsSnapshot getMemoryProfilingResultsSnapshot(boolean dump)
         throws ClientUtils.TargetAppOrVMTerminated {
         checkForTargetVMAlive();
 
@@ -1151,6 +1152,7 @@ public class ProfilerClient implements CommonConstants {
                                          throws ClientUtils.TargetAppOrVMTerminated {
         SetChangeableInstrParamsCommand cmd = new SetChangeableInstrParamsCommand(settings.getNProfiledThreadsLimit(),
                                                                                   settings.getSamplingInterval(),
+                                                                                  settings.getSamplingFrequency(),
                                                                                   settings.getAllocTrackEvery(),
                                                                                   settings.getAllocStackTraceLimit(),
                                                                                   settings.getRunGCOnGetResultsInMemoryProfiling(),
@@ -1901,12 +1903,9 @@ public class ProfilerClient implements CommonConstants {
 
         handlingEventBufferDump = true;
 
-        int instrType = getCurrentInstrType();
-
-        // Results of memory profiling can be processed concurrently to take advantage of a possible multiprocessor machine.
+        // Results of memory/CPU profiling can be processed concurrently to take advantage of a possible multiprocessor machine.
         // Similarly, during remote profiling any results can be processed concurrently, since processing on a different
-        // machine will not disturb execution timing on the TA machine. But for local CPU profiling we better not disturb
-        // execution further by introducing yet another concurrent CPU-bound thread. Note also that if this command is
+        // machine will not disturb execution timing on the TA machine. Note also that if this command is
         // received as a result of the forced dump (as opposed to the normal one due to buffer overflow), the data should
         // be processed synchronously to avoid e.g. a "no results" report when there are already some.
 
@@ -1914,7 +1913,7 @@ public class ProfilerClient implements CommonConstants {
         // since there would suddenly be 2 pieces of code that simultaneously read from the socket stream
         // leading to issue 59660: JFluid: error writing collected data to the socket
         // see http://www.netbeans.org/issues/show_bug.cgi?id=59660 for details
-        if (currentInstrTypeIsMemoryProfiling() && !status.remoteProfiling && !forceObtainedResultsDumpCalled) {
+        if (!status.remoteProfiling && !forceObtainedResultsDumpCalled) {
             // Note that the call below may block, waiting for separarateCmdExecThread to finish its current job.
             // That means that nothing in readResultsFromBuffer() that this command eventually calls, is allowed to
             // send a command to the server and await a response. If that happens, the communication thread will be
@@ -1925,10 +1924,8 @@ public class ProfilerClient implements CommonConstants {
             // Process profiling results synchronously in case of:
             //  - remote profiling
             //  - explicite Get results (forceObtainedResultsDumpCalled)
-            //  - CPU or Code Fragment profiling
-            //  - CPU sampling
             EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
-            EventBufferResultsProvider.getDefault().dataReady(bufSize, instrType);
+            EventBufferResultsProvider.getDefault().dataReady(bufSize, getCurrentInstrType());
             handlingEventBufferDump = false;
             sendSimpleRespToServer(true, null);
             forceObtainedResultsDumpCalled = false;
