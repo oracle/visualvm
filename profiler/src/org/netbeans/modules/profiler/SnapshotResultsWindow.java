@@ -49,6 +49,7 @@ import org.openide.actions.FindAction;
 import org.openide.cookies.SaveCookie;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.nodes.CookieSet;
 import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CallbackSystemAction;
@@ -126,6 +127,7 @@ public final class SnapshotResultsWindow extends TopComponent {
          */
         public SaveNode() {
             super(Children.LEAF);
+            setCookieSet(CookieSet.createGeneric(null));
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
