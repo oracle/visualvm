@@ -69,6 +69,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
         private Map threadIdMap = new HashMap();
         private int threadCount = 0;
         private volatile boolean resetData = false;
+        private boolean sendDataAvailable = true;
         
         Sampling(int samplingInterval) {
             super(samplingInterval);
@@ -86,6 +87,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
             if (resetData) {
                 resetProfilerCollectors();
                 resetData = false;
+                sendDataAvailable = true;
             }
             Stacks.getAllStackTraces(newThreads, newStates, newMethodIds);
             timestamp = Timers.getCurrentTimeInCounts();
@@ -141,8 +143,9 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                 return; 
             }
 
-            if (globalEvBufPos == 0) {
+            if (sendDataAvailable) {
                 ProfilerServer.notifyClientOnResultsAvailability();
+                sendDataAvailable = false;
             }
 
             int curPos = globalEvBufPos;
