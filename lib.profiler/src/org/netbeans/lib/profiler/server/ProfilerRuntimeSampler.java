@@ -169,10 +169,6 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                 return; 
             }
 
-            if (globalEvBufPos == 0) {
-                ProfilerServer.notifyClientOnResultsAvailability();
-            }
-
             int curPos = globalEvBufPos;
 
             if (curPos + 1 > globalEvBufPosThreshold) { // Dump the buffer
