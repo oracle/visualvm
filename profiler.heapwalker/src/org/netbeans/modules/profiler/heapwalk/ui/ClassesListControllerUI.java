@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
+import java.awt.*;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIConstants;
@@ -59,14 +60,6 @@ import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRender
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.modules.profiler.heapwalk.ClassesListController;
 import org.openide.util.NbBundle;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -349,22 +342,42 @@ public class ClassesListControllerUI extends JTitledPanel {
 
     // --- Listeners -------------------------------------------------------------
     private class ClassesListTableMouseListener extends MouseAdapter {
+        final private AtomicBoolean handled  = new AtomicBoolean();
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        private void updateSelection(int row) {
+        private void updateSelection(int row, boolean toggle) {
+            if (toggle) {
+                int oldRow = realClassesListTableModel.getSelectedRow();
+                if (oldRow == row) {
+                    realClassesListTableModel.setSelectedRow(-1);
+                    return;
+                }
+            }
             realClassesListTableModel.setSelectedRow(row);
         }
 
+        private boolean isToggle(MouseEvent e) {
+            return (e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) > 0;
+        }
+        
         public void mousePressed(final MouseEvent e) {
-            final int row = classesListTable.rowAtPoint(e.getPoint());
-            updateSelection(row);
-            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+//            final int row = classesListTable.rowAtPoint(e.getPoint());
+//            updateSelection(row, isToggle(e));
+            if (e.isPopupTrigger()) {
+                handled.set(true);
+                int row = classesListTable.rowAtPoint(e.getPoint());
+                updateSelection(row, isToggle(e));
+                tablePopup.show(e.getComponent(), e.getX(), e.getY());
+            }
         }
 
         public void mouseReleased(MouseEvent e) {
-            int row = classesListTable.rowAtPoint(e.getPoint());
-            updateSelection(row);
-            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+            if (handled.compareAndSet(false, true)) {
+                int row = classesListTable.rowAtPoint(e.getPoint());
+                updateSelection(row, isToggle(e));
+                if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+                handled.set(false);
+            }
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -492,8 +505,10 @@ public class ClassesListControllerUI extends JTitledPanel {
                 if (row != -1) {
                     classesListTable.setRowSelectionInterval(row, row);
                     classesListTable.ensureRowVisible(row);
+                    classesListController.classSelected(realClassesListTableModel.getSelectedClass());
                 } else {
                     classesListTable.clearSelection();
+                    classesListController.classSelected(null);
                 }
             }
         });
