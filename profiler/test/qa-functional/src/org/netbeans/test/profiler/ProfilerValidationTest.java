@@ -44,6 +44,7 @@
 package org.netbeans.test.profiler;
 
 import java.awt.Container;
+import java.util.logging.Level;
 import javax.swing.JCheckBox;
 import junit.textui.TestRunner;
 import org.netbeans.jellytools.Bundle;
@@ -58,10 +59,8 @@ import org.netbeans.jellytools.ProjectsTabOperator;
 import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jellytools.actions.Action;
 import org.netbeans.jellytools.actions.ActionNoBlock;
-import org.netbeans.jellytools.actions.OptionsViewAction;
 import org.netbeans.jellytools.nodes.JavaProjectRootNode;
 import org.netbeans.jellytools.nodes.Node;
-import org.netbeans.jellytools.nodes.ProjectRootNode;
 import org.netbeans.jemmy.EventTool;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TimeoutExpiredException;
@@ -81,53 +80,55 @@ import org.netbeans.test.ide.WatchProjects;
  *
  * @author Alexandr Scherbatiy, Jiri Skrivanek
  */
-public class ProfilerValidation extends JellyTestCase {
+public class ProfilerValidationTest extends JellyTestCase {
 
     //private static final String SAMPLE_PROJECT_NAME = "AnagramGame";
 
     protected static final String  PROFILER_ACTIONS_BUNDLE = "org.netbeans.modules.profiler.actions.Bundle";
-    protected static final String  PROFILER_UI_PANELS_BUNDLE = "org.netbeans.modules.profiler.ui.panels.Bundle";
+    protected static final String  PROFILER_UI_PANELS_BUNDLE = "org.netbeans.modules.profiler.options.ui.Bundle";
     protected static final String  PROFILER_LIB_BUNDLE = "org.netbeans.lib.profiler.Bundle";
 
-    static String[] tests = new String[]{
-            "testProfilerMenus",
-            //Commented out, because the for some unknown reason the
-            //test fails on being unable to open the Miscellaneous tab in Options
-            //"testProfilerProperties",
-            "testProfilerCalibration"//,
-          //  "testProfiler"
-    };
     /** Default constructor.
      * @param name test case name
      */
-    public ProfilerValidation(String name){
+    public ProfilerValidationTest(String name){
         super(name);
     }
 
     /** Defaine order of test cases.
      * @return NbTestSuite instance
      */
-//    public static NbTestSuite suite() {
-//        NbTestSuite suite = new NbTestSuite();
-//        suite.addTest(new ProfilerValidation("testProfilerMenus"));
-//        suite.addTest(new ProfilerValidation("testProfilerProperties"));
-//        //suite.addTest(new ProfilerValidation("testCreateProject"));
-//        //suite.addTest(new ProfilerValidation("testProfiler"));
-//        return suite;
-//    }
-
     public static NbTestSuite suite() {
-
-        return (NbTestSuite) createModuleTest(ProfilerValidation.class,
-        tests);
+        NbModuleSuite.Configuration conf = NbModuleSuite.createConfiguration(
+            ProfilerValidationTest.class
+        ).clusters("profiler").enableModules(".*").honorAutoloadEager(true)
+        .failOnException(Level.INFO)
+        .failOnMessage(Level.SEVERE);
+        
+        conf.addTest("testProfilerCalibration");
+        conf.addTest("testProfilerProperties");
+        conf.addTest("testProfilerMenus");
+        conf.addTest("testProfiler");
+        conf.addTest("issue144699Hack");
+        
+        NbTestSuite suite = new NbTestSuite();
+        suite.addTest(NbModuleSuite.create(conf));
+        
+        return suite;
     }
+
+//    public static NbTestSuite suite() {
+//
+//        return (NbTestSuite) createModuleTest(ProfilerValidationTest.class,
+//        tests);
+//    }
     
     /** Use for execution inside IDE */
     public static void main(java.lang.String[] args) {
         // run whole suite
         TestRunner.run(suite());
         // run only selected test case
-        //TestRunner.run(new ProfilerValidation("testProfiler"));
+        //TestRunner.run(new ProfilerValidationTest("testProfiler"));
     }
 
     /** Setup before every test case. */
@@ -249,7 +250,7 @@ public class ProfilerValidation extends JellyTestCase {
         String projectPropertiesTitle = Bundle.getStringTrimmed("org.netbeans.modules.java.j2seproject.ui.customizer.Bundle", "LBL_Customizer_Title");
         NbDialogOperator propertiesDialogOper = new NbDialogOperator(projectPropertiesTitle);
         // select "Compile" category
-        String buildCategoryTitle = Bundle.getStringTrimmed("org.netbeans.modules.java.j2seproject.ui.customizer.Bundle", "Projects/org-netbeans-modules-java-j2seproject/Customizer/BuildCategory");
+        String buildCategoryTitle = Bundle.getStringTrimmed("org.netbeans.modules.java.j2seproject.ui.customizer.Bundle", "LBL_Config_BuildCategory");
         String compileCategoryTitle = Bundle.getStringTrimmed("org.netbeans.modules.java.j2seproject.ui.customizer.Bundle", "LBL_Config_Build");
         new Node(new Node(new JTreeOperator(propertiesDialogOper), buildCategoryTitle), compileCategoryTitle).select();
         // actually disable the quick run:
@@ -270,13 +271,13 @@ public class ProfilerValidation extends JellyTestCase {
         // call Profile|Profile Main Project
         new ActionNoBlock(ProfileMenu + "|" + Bundle.getStringTrimmed("org.netbeans.modules.profiler.actions.Bundle", "LBL_ProfileMainProjectAction"), null).perform();
         // confirm changes in project when profiled for the first time
-        new NbDialogOperator( Bundle.getStringTrimmed("org.netbeans.modules.profiler.j2se.Bundle",
-                        "J2SEProjectTypeProfiler_ModifyBuildScriptCaption") ).ok(); //"Enable Profiling of {0}"
+        //new NbDialogOperator( Bundle.getStringTrimmed("org.netbeans.modules.profiler.j2se.Bundle",
+        //                "J2SEProjectTypeProfiler_ModifyBuildScriptCaption") ).ok(); //"Enable Profiling of {0}"
         //wait
         // click Run in Profile AnagramGame dialog
-        NbDialogOperator profileOper = new NbDialogOperator( Bundle.getStringTrimmed("org.netbeans.modules.profiler.ui.stp.Bundle",
+        NbDialogOperator profileOper = new NbDialogOperator( Bundle.getStringTrimmed("org.netbeans.modules.profiler.stp.Bundle",
                                         "SelectProfilingTask_ProfileDialogCaption") ); // "Profile "+anagramGamePrName
-        new JButtonOperator(profileOper, Bundle.getStringTrimmed("org.netbeans.modules.profiler.ui.stp.Bundle",
+        new JButtonOperator(profileOper, Bundle.getStringTrimmed("org.netbeans.modules.profiler.stp.Bundle",
                                         "SelectProfilingTask_RunButtonText") ).push(); //"Run"
         profileOper.waitClosed();
         waitProgressDialog( Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",

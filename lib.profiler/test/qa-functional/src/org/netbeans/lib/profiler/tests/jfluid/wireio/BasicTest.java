@@ -135,7 +135,7 @@ public class BasicTest extends CommonWireIOTestCase {
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
-            cmd = new SetChangeableInstrParamsCommand(32, 10, 5, 10, true, true, true, true);
+            cmd = new SetChangeableInstrParamsCommand(32, 10, 10, 5, 10, true, true, true, true);
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
