@@ -73,7 +73,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
     private boolean firstTime = true;
     private boolean updateResultsInProgress = false;
     private boolean updateResultsPending = false;
-
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LiveFlatProfileCollectorPanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler,
