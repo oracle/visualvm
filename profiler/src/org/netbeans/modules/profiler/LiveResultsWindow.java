@@ -211,7 +211,6 @@ public final class LiveResultsWindow extends TopComponent
             if (!empty) {
                 getDefault().resultsAvailable = true;
                 if (resultsDumpForced.getAndSet(false) && 
-                    getDefault().isAutoRefresh() && 
                     getDefault().autoRefreshRequested.getAndDecrement() > 0) {
                     CommonUtils.runInEventDispatchThread(new Runnable() {
                         public void run() {
