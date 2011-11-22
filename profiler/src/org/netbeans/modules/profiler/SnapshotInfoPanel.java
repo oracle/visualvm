@@ -183,7 +183,6 @@ public class SnapshotInfoPanel extends JPanel {
 
     public SnapshotInfoPanel(LoadedSnapshot snapshot) {
         setLayout(new BorderLayout());
-//        setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
         infoArea = new HTMLTextArea() {
             protected void showURL(URL url) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -199,6 +198,9 @@ public class SnapshotInfoPanel extends JPanel {
                         }
                     }
                 });
+            }
+            public void scrollRectToVisible(Rectangle aRect) {
+                if (isShowing()) super.scrollRectToVisible(aRect);
             }
         };
         infoArea.getAccessibleContext().setAccessibleName(INFO_AREA_ACCESS_NAME);
@@ -282,8 +284,6 @@ public class SnapshotInfoPanel extends JPanel {
     }
 
     public void updateInfo() {
-        int caret = infoArea.getCaretPosition();
-        
         ProfilingSettings ps = loadedSnapshot.getSettings();
 
         StringBuffer htmlText = new StringBuffer(1000);
@@ -425,12 +425,7 @@ public class SnapshotInfoPanel extends JPanel {
         htmlText.append("<br>"); // NOI18N
 
         infoArea.setText(htmlText.toString());
-        
-        try {
-            infoArea.setCaretPosition(caret);
-        } catch (IllegalArgumentException e) {
-            infoArea.setCaretPosition(0);
-        }
+        infoArea.setCaretPosition(0);
     }
 
     private static String getOnOff(boolean b) {
