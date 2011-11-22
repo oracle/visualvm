@@ -993,8 +993,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
                                 // Heap Dump
                                 c.setIcon(memoryIcon);
-
-                                String fileName = fo.getName();
                                 
                                 Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
                                 for (TopComponent tc : tcs) {
@@ -1005,81 +1003,28 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                     }
                                 }
 
-                                if (fileName.startsWith("heapdump-")) { // NOI18N
-
-                                    String time = fileName.substring("heapdump-".length(), fileName.length()); // NOI18N
-
-                                    try {
-                                        long timeStamp = Long.parseLong(time);
-                                        c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME,
-                                                                       new Object[] { StringUtils.formatUserDate(new Date(timeStamp)) }));
-                                    } catch (NumberFormatException e) {
-                                        // file name is probably customized
-                                        c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
-                                    }
-                                } else {
-                                    c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
-                                }
+                                c.setText(ResultsManager.getDefault().getHeapDumpDisplayName(fo.getName()));
                             } else {
                                 // Profiler snapshot
                                 LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
+                                int snapshotType = ls != null ? ls.getType() : ResultsManager.getDefault().getSnapshotType(fo);
+                                
+                                String fileName = fo.getName();
+                                c.setText(ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType));
+                                if (ls != null) c.setFont(c.getFont().deriveFont(Font.BOLD));
 
-                                if (ls != null) {
-                                    ResultsSnapshot rs = ls.getSnapshot();
-                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
-                                    c.setText(StringUtils.formatUserDate(new Date(rs.getTimeTaken())));
-
-                                    switch (ls.getType()) {
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                                            c.setIcon(cpuIcon);
-
-                                            break;
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                                            c.setIcon(fragmentIcon);
-
-                                            break;
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                                            c.setIcon(memoryIcon);
-
-                                            break;
-                                    }
-                                } else {
-                                    String fileName = fo.getName();
-
-                                    if (fileName.startsWith("snapshot-")) { // NOI18N
-
-                                        String time = fileName.substring("snapshot-".length(), fileName.length()); // NOI18N
-
-                                        try {
-                                            long timeStamp = Long.parseLong(time);
-                                            c.setText(StringUtils.formatUserDate(new Date(timeStamp)));
-                                        } catch (NumberFormatException e) {
-                                            // file name is probably customized
-                                            c.setText(fileName);
-                                        }
-                                    } else {
-                                        c.setText(fileName);
-                                    }
-
-                                    int type = ResultsManager.getDefault().getSnapshotType(fo);
-
-                                    switch (type) {
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                                            c.setIcon(cpuIcon);
-
-                                            break;
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                                            c.setIcon(fragmentIcon);
-
-                                            break;
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                                            c.setIcon(memoryIcon);
-
-                                            break;
-                                    }
-                                }
+                                switch (snapshotType) {
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                                        c.setIcon(cpuIcon);
+                                        break;
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
+                                        c.setIcon(fragmentIcon);
+                                        break;
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                                        c.setIcon(memoryIcon);
+                                        break;
+                                }                                
                             }
                         } else {
                             c.setText(value.toString());
@@ -1777,8 +1722,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                               "ProfilerControlPanel2_NoConfigurationString"); // NOI18N
     private static final String CONTROL_PANEL_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
                                                                                  "ProfilerControlPanel2_ControlPanelAcessDescr"); // NOI18N
-    private static final String HEAP_SNAPSHOT_DISPLAYNAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                "ProfilerControlPanel2_HeapSnapshotDisplayName"); // NOI18N
                                                                                                                                   // -----
     private static final String HELP_CTX_KEY = "ProfilerControlPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
