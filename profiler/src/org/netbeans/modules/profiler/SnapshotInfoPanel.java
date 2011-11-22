@@ -54,12 +54,20 @@ import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.RequestProcessor;
 
 
 public class SnapshotInfoPanel extends JPanel {
@@ -175,9 +183,26 @@ public class SnapshotInfoPanel extends JPanel {
 
     public SnapshotInfoPanel(LoadedSnapshot snapshot) {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        infoArea = new HTMLTextArea();
+//        setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        infoArea = new HTMLTextArea() {
+            protected void showURL(URL url) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        String userComments = loadedSnapshot.getUserComments();
+                        NotifyDescriptor.InputLine nd = createDescriptor(
+                                NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_UserCommentsLbl"), // NOI18N
+                                NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_UserCommentsCaption")); // NOI18N
+                        nd.setInputText(userComments);
+                        Object ret = DialogDisplayer.getDefault().notify(nd);
+                        if (ret == NotifyDescriptor.OK_OPTION) {
+                            setUserComments(nd.getInputText());
+                        }
+                    }
+                });
+            }
+        };
         infoArea.getAccessibleContext().setAccessibleName(INFO_AREA_ACCESS_NAME);
+        infoArea.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         infoAreaScrollPane = new JScrollPane(infoArea);
         add(infoAreaScrollPane, BorderLayout.CENTER);
         this.loadedSnapshot = snapshot;
@@ -197,12 +222,77 @@ public class SnapshotInfoPanel extends JPanel {
     public boolean fitsVisibleArea() {
         return !infoAreaScrollPane.getVerticalScrollBar().isVisible();
     }
+    
+    private NotifyDescriptor.InputLine createDescriptor(String label, String caption) {
+        return new NotifyDescriptor.InputLine(label, caption) {
+            private JTextArea textArea;
+            
+            public String getInputText() {
+                return textArea.getText();
+            }
+
+            public void setInputText(final String text) {
+                textArea.setText(text);
+                textArea.selectAll();
+            }
+            
+            protected Component createDesign(final String text) {
+                JPanel panel = new JPanel(new BorderLayout(5, 5));
+                panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
+                panel.setOpaque(false);
+
+                JLabel textLabel = new JLabel();
+                Mnemonics.setLocalizedText(textLabel, text);
+
+                textArea = new JTextArea();
+                textLabel.setLabelFor(textArea);
+
+                textArea.requestFocus();
+                
+                JScrollPane textAreaScroll = new JScrollPane(textArea);
+                textAreaScroll.setPreferredSize(new Dimension(350, 150));
+                panel.add(textAreaScroll, BorderLayout.CENTER);
+                panel.add(textLabel, BorderLayout.NORTH);
+                
+                panel.getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputPanel") // NOI18N
+                );
+                textArea.getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputField") // NOI18N
+                );
+
+                return panel;
+            }
+        };
+    }
+    
+    public void setUserComments(String userComments) {
+        loadedSnapshot.setUserComments(userComments);
+        if (!loadedSnapshot.isSaved()) {
+            updateInfo();
+            final File snapshotFile = loadedSnapshot.getFile();
+            if (snapshotFile != null)
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        ResultsManager.getDefault().saveSnapshot(loadedSnapshot,
+                                FileUtil.toFileObject(snapshotFile));
+                    }
+                });
+        }
+    }
 
     public void updateInfo() {
+        int caret = infoArea.getCaretPosition();
+        
         ProfilingSettings ps = loadedSnapshot.getSettings();
 
         StringBuffer htmlText = new StringBuffer(1000);
 
+        String infoRes = Icons.getResource(GeneralIcons.INFO);
+        String summaryStr = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_SummaryString"); // NOI18N
+        htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/" + infoRes + // NOI18N
+                        "'>&nbsp;&nbsp;" + summaryStr + "</b><br><hr>"); // NOI18N
+        htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
         htmlText.append(DATA_COLLECTED_FROM_STRING + " "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
@@ -234,22 +324,36 @@ public class SnapshotInfoPanel extends JPanel {
             format.setGroupingUsed(true);
             htmlText.append(format.format(f.length()) + " B"); // NOI18N
         }
+        htmlText.append("</div>"); // NOI18N
+        
+        String commentsRes = Icons.getResource(GeneralIcons.INFO);
+        String commentsStr = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_CommentsString"); // NOI18N
+        String commentsLink = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_EditCommentsLink"); // NOI18N
+        String noCommentsStr = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_NoCommentsString"); // NOI18N
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/" + commentsRes + // NOI18N
+                        "'>&nbsp;&nbsp;" + commentsStr + "&nbsp;&nbsp;" + // NOI18N
+                        "</b><a href='#'>" + commentsLink + "</a><br><hr>"); // NOI18N
+        htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
+        String comments = loadedSnapshot.getUserComments();
+        comments = comments.replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+        htmlText.append(comments.isEmpty() ? "&lt;" + noCommentsStr + "&gt;" : comments); // NOI18N
+        htmlText.append("</div>"); // NOI18N
 
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<br>"); // NOI18N
+        String settingsRes = Icons.getResource(GeneralIcons.INFO);
+        htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/" + settingsRes +
+                        "'>&nbsp;&nbsp;" + SETTINGS_STRING + "</b><br><hr>"); // NOI18N
+        htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(SETTINGS_STRING);
-        htmlText.append("</strong>"); // NOI18N
-        htmlText.append("<br>"); // NOI18N
-        htmlText.append("<br>"); // NOI18N
-        htmlText.append("<blockquote>"); // NOI18N
-        htmlText.append("<strong>"); // NOI18N
-        htmlText.append(" " + SETTINGS_NAME_STRING + " "); // NOI18N
+        htmlText.append(SETTINGS_NAME_STRING + " "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(ps.getSettingsName());
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(" " + PROFILING_TYPE_STRING + " "); // NOI18N
+        htmlText.append(PROFILING_TYPE_STRING + " "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
 
         switch (ps.getProfilingType()) {
@@ -317,10 +421,16 @@ public class SnapshotInfoPanel extends JPanel {
 
         appendOverridenGlobalProperties(htmlText, ps);
 
-        htmlText.append("</blockquote>"); // NOI18N
+        htmlText.append("</div>"); // NOI18N
         htmlText.append("<br>"); // NOI18N
 
         infoArea.setText(htmlText.toString());
+        
+        try {
+            infoArea.setCaretPosition(caret);
+        } catch (IllegalArgumentException e) {
+            infoArea.setCaretPosition(0);
+        }
     }
 
     private static String getOnOff(boolean b) {
@@ -481,7 +591,7 @@ public class SnapshotInfoPanel extends JPanel {
             htmlText.append(OVERRIDEN_GLOBAL_PROPERTIES_STRING + " "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append("<br>"); // NOI18N
-            htmlText.append("<blockquote>"); //NOI18N
+            htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
             htmlText.append(WORKING_DIRECTORY_STRING + " "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
@@ -503,8 +613,8 @@ public class SnapshotInfoPanel extends JPanel {
             htmlText.append(JVM_ARGUMENTS_STRING + " "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(ps.getJVMArgs());
+            htmlText.append("</div>"); // NOI18N
             htmlText.append("<br>"); // NOI18N
-            htmlText.append("</blockquote>"); // NOI18N
         }
     }
 
@@ -541,8 +651,6 @@ public class SnapshotInfoPanel extends JPanel {
             ret.append(MessageFormat.format(METHODS_COUNT_STRING, new Object[] { "" + methods.length })); // NOI18N
             ret.append("<br>"); // NOI18N
 
-            ret.append("<blockquote>"); // NOI18N
-
             java.util.List<String> rootNames = new ArrayList<String>();
 
             for (int i = 0; i < methods.length; i++) {
@@ -553,11 +661,11 @@ public class SnapshotInfoPanel extends JPanel {
             Collections.sort(rootNames);
 
             for (String rootName : rootNames) {
+                ret.append("&nbsp;&nbsp;&nbsp;&nbsp;"); // NOI18N
                 ret.append(rootName);
                 ret.append("<br>"); // NOI18N
             }
-
-            ret.append("</blockquote>"); // NOI18N
+            
 
             return ret.toString();
         }

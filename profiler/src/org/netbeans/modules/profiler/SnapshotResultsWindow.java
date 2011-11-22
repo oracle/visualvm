@@ -190,7 +190,7 @@ public final class SnapshotResultsWindow extends TopComponent {
      * This constructor cannot be called, instances of this window cannot be persisted.
      */
     public SnapshotResultsWindow() {
-        throw new InternalError("This constructor should never be called");
+        throw new InternalError("This constructor should never be called"); // NOI18N
     } // NOI18N
 
     /**
@@ -207,20 +207,9 @@ public final class SnapshotResultsWindow extends TopComponent {
         setFocusable(true);
         setRequestFocusEnabled(true);
         
-        String fileName = ls.getFile() == null ? null : ls.getFile().getName();
-        int snapshotType = ls.getType();
-        if (fileName != null) {
-            setToolTipText(ls.getFile().getAbsolutePath());
-            int dotIndex = fileName.lastIndexOf('.'); // NOI18N
-            if (dotIndex > 0 && dotIndex <= fileName.length() - 2)
-                fileName = fileName.substring(0, dotIndex);
-            setTabName(ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType));
-        } else {
-            ResultsSnapshot rs = ls.getSnapshot();
-            setTabName(StringUtils.formatUserDate(new Date(rs.getTimeTaken())));
-        }
+        refreshTabName();
 
-        switch (snapshotType) {
+        switch (snapshot.getType()) {
             case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
                 getAccessibleContext().setAccessibleDescription(CPU_SNAPSHOT_ACCESS_DESCR);
                 displayCPUResults(ls, sortingColumn, sortingOrder);
@@ -337,6 +326,23 @@ public final class SnapshotResultsWindow extends TopComponent {
             ((MemorySnapshotPanel) displayedPanel).displayStacksForClass(selectedClassId, sortingColumn, sortingOrder);
         }
     }
+    
+    public void refreshTabName() {
+        String fileName = snapshot.getFile() == null ? null : snapshot.getFile().getName();
+        int snapshotType = snapshot.getType();
+        if (fileName != null) {
+            setToolTipText(snapshot.getFile().getAbsolutePath());
+            int dotIndex = fileName.lastIndexOf('.'); // NOI18N
+            if (dotIndex > 0 && dotIndex <= fileName.length() - 2)
+                fileName = fileName.substring(0, dotIndex);
+            tabName = ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType);
+        } else {
+            ResultsSnapshot rs = snapshot.getSnapshot();
+            String snapshotTime = StringUtils.formatUserDate(new Date(rs.getTimeTaken()));
+            tabName = ResultsManager.getDefault().getSnapshotDisplayName(snapshotTime, snapshotType);
+        }
+        updateTitle();
+    }
 
     public void updateTitle() {
         if (snapshot.isSaved()) {
@@ -364,10 +370,6 @@ public final class SnapshotResultsWindow extends TopComponent {
     }
 
     // -- Private methods --------------------------------------------------------------------------------------------------
-    private void setTabName(String innerName) {
-        tabName = innerName;
-        updateTitle();
-    }
 
     private void displayCPUResults(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
         CPUSnapshotPanel cpuPanel = new CPUSnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
