@@ -1056,7 +1056,7 @@ public final class LiveResultsWindow extends TopComponent
                         return;
                     }
 
-                    if (!isProfiling() || !isOpened()) {
+                    if (!isProfiling() || !isShowing()) {
                         return;
                     }
 
@@ -1111,7 +1111,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private void updateResultsDisplay() {
-        if (!isOpened()) {
+        if (!isShowing()) {
             return; // do nothing if i'm closed
         }
 
