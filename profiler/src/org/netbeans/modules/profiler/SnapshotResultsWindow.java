@@ -59,8 +59,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import javax.swing.*;
+import org.netbeans.lib.profiler.results.ResultsSnapshot;
+import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -187,7 +190,7 @@ public final class SnapshotResultsWindow extends TopComponent {
      * This constructor cannot be called, instances of this window cannot be persisted.
      */
     public SnapshotResultsWindow() {
-        throw new InternalError("This constructor should never be called");
+        throw new InternalError("This constructor should never be called"); // NOI18N
     } // NOI18N
 
     /**
@@ -203,8 +206,10 @@ public final class SnapshotResultsWindow extends TopComponent {
         setLayout(new BorderLayout());
         setFocusable(true);
         setRequestFocusEnabled(true);
+        
+        refreshTabName();
 
-        switch (ls.getType()) {
+        switch (snapshot.getType()) {
             case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
                 getAccessibleContext().setAccessibleDescription(CPU_SNAPSHOT_ACCESS_DESCR);
                 displayCPUResults(ls, sortingColumn, sortingOrder);
@@ -321,6 +326,23 @@ public final class SnapshotResultsWindow extends TopComponent {
             ((MemorySnapshotPanel) displayedPanel).displayStacksForClass(selectedClassId, sortingColumn, sortingOrder);
         }
     }
+    
+    public void refreshTabName() {
+        String fileName = snapshot.getFile() == null ? null : snapshot.getFile().getName();
+        int snapshotType = snapshot.getType();
+        if (fileName != null) {
+            setToolTipText(snapshot.getFile().getAbsolutePath());
+            int dotIndex = fileName.lastIndexOf('.'); // NOI18N
+            if (dotIndex > 0 && dotIndex <= fileName.length() - 2)
+                fileName = fileName.substring(0, dotIndex);
+            tabName = ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType);
+        } else {
+            ResultsSnapshot rs = snapshot.getSnapshot();
+            String snapshotTime = StringUtils.formatUserDate(new Date(rs.getTimeTaken()));
+            tabName = ResultsManager.getDefault().getSnapshotDisplayName(snapshotTime, snapshotType);
+        }
+        updateTitle();
+    }
 
     public void updateTitle() {
         if (snapshot.isSaved()) {
@@ -329,6 +351,9 @@ public final class SnapshotResultsWindow extends TopComponent {
             // XXX consider using DataEditorSupport.annotateName
             setName(tabName + " *"); // NOI18N
         }
+        // Called when snapshot is saved, update also tooltip
+        if (snapshot.getFile() != null)
+            setToolTipText(snapshot.getFile().getAbsolutePath());
     }
 
     protected void componentClosed() {
@@ -345,17 +370,12 @@ public final class SnapshotResultsWindow extends TopComponent {
     }
 
     // -- Private methods --------------------------------------------------------------------------------------------------
-    private void setTabName(String innerName) {
-        tabName = innerName;
-        updateTitle();
-    }
 
     private void displayCPUResults(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
         CPUSnapshotPanel cpuPanel = new CPUSnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
         displayedPanel = cpuPanel;
         updateFind(true, cpuPanel);
         add(cpuPanel, BorderLayout.CENTER);
-        setTabName(cpuPanel.getTitle());
         setIcon(WINDOW_ICON_CPU);
     }
 
@@ -366,7 +386,6 @@ public final class SnapshotResultsWindow extends TopComponent {
         displayedPanel = codeRegionPanel;
         add(codeRegionPanel, BorderLayout.CENTER);
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        setTabName(codeRegionPanel.getTitle());
         setIcon(WINDOWS_ICON_FRAGMENT);
     }
 
@@ -375,7 +394,6 @@ public final class SnapshotResultsWindow extends TopComponent {
         displayedPanel = memoryPanel;
         updateFind(true, memoryPanel);
         add(memoryPanel, BorderLayout.CENTER);
-        setTabName(memoryPanel.getTitle());
         setIcon(WINDOWS_ICON_MEMORY);
     }
 

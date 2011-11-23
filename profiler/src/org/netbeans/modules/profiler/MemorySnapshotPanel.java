@@ -50,7 +50,6 @@ import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.memory.*;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.actions.FindNextAction;
 import org.netbeans.modules.profiler.actions.FindPreviousAction;
@@ -63,8 +62,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.text.MessageFormat;
-import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -122,7 +119,6 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     private static final String STACK_TRACES_TAB_DESCR = NbBundle.getMessage(MemorySnapshotPanel.class,
                                                                              "MemorySnapshotPanel_StackTracesTabDescr"); // NOI18N
     private static final String INFO_TAB_DESCR = NbBundle.getMessage(MemorySnapshotPanel.class, "MemorySnapshotPanel_InfoTabDescr"); // NOI18N
-    private static final String PANEL_TITLE = NbBundle.getMessage(MemorySnapshotPanel.class, "MemorySnapshotPanel_PanelTitle"); // NOI18N
     private static final String STRING_NOT_FOUND_MSG = NbBundle.getMessage(MemorySnapshotPanel.class,
                                                                            "MemorySnapshotPanel_StringNotFoundMsg"); // NOI18N
     private static final String FIND_ACTION_TOOLTIP = NbBundle.getMessage(MemorySnapshotPanel.class,
@@ -274,10 +270,6 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
     public ResultsSnapshot getSnapshot() {
         return snapshot;
-    }
-
-    public String getTitle() {
-        return MessageFormat.format(PANEL_TITLE, new Object[] { StringUtils.formatUserDate(new Date(snapshot.getTimeTaken())) });
     }
 
     public BufferedImage getViewImage(boolean onlyVisibleArea) {

@@ -54,12 +54,10 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.EqualFlowLayout;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.SnippetPanel;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.*;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -99,12 +97,16 @@ import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.modules.profiler.ProfilerControlPanel2.WhiteFilter;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.filesystems.FileLock;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -903,7 +905,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         private DefaultListModel listModel;
         private JButton deleteButton;
         private JButton exportButton;
-        private JButton loadButton;
+        private JButton renameButton;
         private JButton openButton;
         private JComboBox combo;
         private JList list;
@@ -994,8 +996,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                 // Heap Dump
                                 c.setIcon(memoryIcon);
 
-                                String fileName = fo.getName();
-                                
                                 Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
                                 for (TopComponent tc : tcs) {
                                     Object o = tc.getClientProperty("HeapDumpFileName"); // NOI18N
@@ -1005,80 +1005,27 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                     }
                                 }
 
-                                if (fileName.startsWith("heapdump-")) { // NOI18N
-
-                                    String time = fileName.substring("heapdump-".length(), fileName.length()); // NOI18N
-
-                                    try {
-                                        long timeStamp = Long.parseLong(time);
-                                        c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME,
-                                                                       new Object[] { StringUtils.formatUserDate(new Date(timeStamp)) }));
-                                    } catch (NumberFormatException e) {
-                                        // file name is probably customized
-                                        c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
-                                    }
-                                } else {
-                                    c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
-                                }
+                                c.setText(ResultsManager.getDefault().getHeapDumpDisplayName(fo.getName()));
                             } else {
                                 // Profiler snapshot
                                 LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
+                                int snapshotType = ls != null ? ls.getType() : ResultsManager.getDefault().getSnapshotType(fo);
 
-                                if (ls != null) {
-                                    ResultsSnapshot rs = ls.getSnapshot();
-                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
-                                    c.setText(StringUtils.formatUserDate(new Date(rs.getTimeTaken())));
-
-                                    switch (ls.getType()) {
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                                            c.setIcon(cpuIcon);
-
-                                            break;
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                                            c.setIcon(fragmentIcon);
-
-                                            break;
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                                            c.setIcon(memoryIcon);
-
-                                            break;
-                                    }
-                                } else {
                                     String fileName = fo.getName();
+                                c.setText(ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType));
+                                if (ls != null) c.setFont(c.getFont().deriveFont(Font.BOLD));
 
-                                    if (fileName.startsWith("snapshot-")) { // NOI18N
-
-                                        String time = fileName.substring("snapshot-".length(), fileName.length()); // NOI18N
-
-                                        try {
-                                            long timeStamp = Long.parseLong(time);
-                                            c.setText(StringUtils.formatUserDate(new Date(timeStamp)));
-                                        } catch (NumberFormatException e) {
-                                            // file name is probably customized
-                                            c.setText(fileName);
-                                        }
-                                    } else {
-                                        c.setText(fileName);
-                                    }
-
-                                    int type = ResultsManager.getDefault().getSnapshotType(fo);
-
-                                    switch (type) {
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                                            c.setIcon(cpuIcon);
-
-                                            break;
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                                            c.setIcon(fragmentIcon);
-
-                                            break;
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                                        case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                                            c.setIcon(memoryIcon);
-
-                                            break;
-                                    }
+                                switch (snapshotType) {
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                                        c.setIcon(cpuIcon);
+                                        break;
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
+                                        c.setIcon(fragmentIcon);
+                                        break;
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                                        c.setIcon(memoryIcon);
+                                        break;
                                 }
                             }
                         } else {
@@ -1134,6 +1081,15 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             openButton.setBorder(buttonsBorder);
             openButton.addActionListener(this);
             openButton.getAccessibleContext().setAccessibleDescription(OPEN_BUTTON_ACCESS_DESCR);
+            
+            renameButton = new JButton(RENAME_BUTTON_NAME);
+            UIUtils.fixButtonUI(renameButton);
+            renameButton.setContentAreaFilled(false);
+            renameButton.setMargin(new Insets(3, 3, 3, 3));
+            renameButton.setRolloverEnabled(true);
+            renameButton.setBorder(buttonsBorder);
+            renameButton.addActionListener(this);
+            renameButton.getAccessibleContext().setAccessibleDescription(RENAME_BUTTON_ACCESS_DESCR);
 
             deleteButton = new JButton(DELETE_BUTTON_NAME);
             UIUtils.fixButtonUI(deleteButton);
@@ -1143,15 +1099,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             deleteButton.setBorder(buttonsBorder);
             deleteButton.addActionListener(this);
             deleteButton.getAccessibleContext().setAccessibleDescription(DELETE_BUTTON_ACCESS_DESCR);
-
-            loadButton = new JButton(LOAD_BUTTON_NAME);
-            UIUtils.fixButtonUI(loadButton);
-            loadButton.setContentAreaFilled(false);
-            loadButton.setMargin(new Insets(3, 3, 3, 3));
-            loadButton.setRolloverEnabled(true);
-            loadButton.setBorder(buttonsBorder);
-            loadButton.addActionListener(this);
-            loadButton.getAccessibleContext().setAccessibleDescription(LOAD_BUTTON_ACCESS_DESCR);
 
             exportButton = new JButton(EXPORT_BUTTON_NAME);
             UIUtils.fixButtonUI(exportButton);
@@ -1172,9 +1119,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             gbc.insets = new Insets(0, 0, 4, 0);
             gbc.gridwidth = GridBagConstraints.REMAINDER;
             buttonsPanel.add(openButton, gbc);
+            buttonsPanel.add(renameButton, gbc);
             buttonsPanel.add(deleteButton, gbc);
             buttonsPanel.add(exportButton, gbc);
-            buttonsPanel.add(loadButton, gbc);
             gbc.weighty = 1.0;
             gbc.fill = GridBagConstraints.BOTH;
 
@@ -1210,6 +1157,8 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             if (e.getSource() == openButton) {
                 //ResultsManager.getDefault().openSnapshots(loadSelectedSnapshots());
                 openSelectedSnapshots();
+            } else if (e.getSource() == renameButton) {
+                renameSelectedSnapshot();
             } else if (e.getSource() == deleteButton) {
                 final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
 
@@ -1221,8 +1170,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             }
                         });
                 }
-            } else if (e.getSource() == loadButton) {
-                new LoadSnapshotAction().loadSnapshotOrHeapdump();
             } else if (e.getSource() == exportButton) {
                 ResultsManager.getDefault().exportSnapshots(getSelectedSnapshotFiles());
             } else if (e.getSource() == combo) {
@@ -1342,6 +1289,45 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 }
             }
         }
+        
+        private void renameSelectedSnapshot() {
+            FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
+            if (selectedSnapshotFiles.length == 1) {
+                final FileObject fileObject = selectedSnapshotFiles[0];
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        String origName = fileObject.getName();
+                        NotifyDescriptor.InputLine nd = new NotifyDescriptor.InputLine(
+                                NbBundle.getMessage(ProfilerControlPanel2.class, "ProfilerControlPanel2_NewFileNameLbl"), // NOI18N
+                                NbBundle.getMessage(ProfilerControlPanel2.class, "ProfilerControlPanel2_RenameSnapshotCaption")); // NOI18N
+                        nd.setInputText(origName);
+                        Object ret = DialogDisplayer.getDefault().notify(nd);
+                        if (ret == NotifyDescriptor.OK_OPTION) {
+                            String newName = nd.getInputText();
+                            if (!origName.equals(newName)) {
+                                FileLock lock = null;
+                                try {
+                                    lock = fileObject.lock();
+                                    final LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(
+                                            FileUtil.toFile(fileObject));
+                                    fileObject.rename(lock, newName, fileObject.getExt());
+                                    if (ls != null) ls.setFile(FileUtil.toFile(fileObject));
+                                    ProfilerControlPanel2.getDefault().refreshSnapshotsList();
+                                } catch (IOException e) {
+                                    ProfilerLogger.warning("Failed to rename snapshot " // NOI18N
+                                            + fileObject + " to " + newName + ": " + e.getMessage()); // NOI18N
+                                    ProfilerDialogs.displayError(NbBundle.getMessage(ProfilerControlPanel2.class,
+                                            "ProfilerControlPanel2_RenameSnapshotFailedMsg", newName)); // NOI18N
+                                    renameSelectedSnapshot();
+                                } finally {
+                                    if (lock != null) lock.releaseLock();
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
 
         private void refreshList() {
             final Object[] sel = list.getSelectedValues();
@@ -1388,9 +1374,11 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         }
 
         private void updateButtons() {
-            openButton.setEnabled(list.getSelectedIndices().length > 0);
-            deleteButton.setEnabled(list.getSelectedIndices().length > 0);
-            exportButton.setEnabled(list.getSelectedIndices().length > 0);
+            int[] selected = list.getSelectedIndices();
+            openButton.setEnabled(selected.length > 0);
+            renameButton.setEnabled(selected.length == 1);
+            deleteButton.setEnabled(selected.length > 0);
+            exportButton.setEnabled(selected.length > 0);
         }
 
         private void updateCombo() {
@@ -1719,8 +1707,8 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                        "ProfilerControlPanel2_OpenButtonName"); // NOI18N
     private static final String DELETE_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
                                                                          "ProfilerControlPanel2_DeleteButtonName"); // NOI18N
-    private static final String LOAD_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                       "ProfilerControlPanel2_LoadButtonName"); // NOI18N
+    private static final String RENAME_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
+                                                                       "ProfilerControlPanel2_RenameButtonName"); // NOI18N
     private static final String EXPORT_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
                                                                          "ProfilerControlPanel2_ExportButtonName"); // NOI18N
     private static final String TAKE_SNAPSHOT_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
@@ -1771,14 +1759,12 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                                  "ProfilerControlPanel2_DeleteButtonAccessDescr"); // NOI18N
     private static final String EXPORT_BUTTON_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
                                                                                  "ProfilerControlPanel2_ExportButtonAccessDescr"); // NOI18N
-    private static final String LOAD_BUTTON_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                               "ProfilerControlPanel2_LoadButtonAccessDescr"); // NOI18N
+    private static final String RENAME_BUTTON_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
+                                                                               "ProfilerControlPanel2_RenameButtonAccessDescr"); // NOI18N
     private static final String NO_CONFIGURATION_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
                                                                               "ProfilerControlPanel2_NoConfigurationString"); // NOI18N
     private static final String CONTROL_PANEL_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
                                                                                  "ProfilerControlPanel2_ControlPanelAcessDescr"); // NOI18N
-    private static final String HEAP_SNAPSHOT_DISPLAYNAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                "ProfilerControlPanel2_HeapSnapshotDisplayName"); // NOI18N
                                                                                                                                   // -----
     private static final String HELP_CTX_KEY = "ProfilerControlPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
