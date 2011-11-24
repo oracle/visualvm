@@ -65,6 +65,7 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import javax.management.openmbean.CompositeData;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -114,7 +115,7 @@ public class LoadedSnapshot {
     public static final int SNAPSHOT_TYPE_MEMORY = SNAPSHOT_TYPE_MEMORY_ALLOCATIONS | SNAPSHOT_TYPE_MEMORY_LIVENESS;
     public static final String PROFILER_FILE_MAGIC_STRING = "nBpRoFiLeR"; // NOI18N
     private static final byte SNAPSHOT_FILE_VERSION_MAJOR = 1;
-    private static final byte SNAPSHOT_FILE_VERSION_MINOR = 1;
+    private static final byte SNAPSHOT_FILE_VERSION_MINOR = 2;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -122,6 +123,7 @@ public class LoadedSnapshot {
     private ProfilingSettings settings;
     private Lookup.Provider project = null;
     private ResultsSnapshot snapshot;
+    private String userComments = ""; // NOI18N
     private boolean saved = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -157,6 +159,12 @@ public class LoadedSnapshot {
     public void setFile(File file) {
         this.file = file;
         saved = true;
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (SnapshotResultsWindow.hasSnapshotWindow(LoadedSnapshot.this))
+                        SnapshotResultsWindow.get(LoadedSnapshot.this).refreshTabName();
+                }
+            });
     }
 
     /**
@@ -176,6 +184,17 @@ public class LoadedSnapshot {
 
     public boolean isSaved() {
         return saved;
+    }
+    
+    public void setUserComments(String userComments) {
+        if (!this.userComments.equals(userComments)) {
+            this.userComments = userComments;
+            setSaved(false);
+        }
+    }
+    
+    public String getUserComments() {
+        return userComments;
     }
 
     /**
@@ -307,6 +326,7 @@ public class LoadedSnapshot {
             // 4. snapshot data bytes
             // 5. int length of settings data size
             // 6. settings data bytes (.properties plain text file format)
+            // 7. String (UTF) custom comments
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("save version:" + SNAPSHOT_FILE_VERSION_MAJOR //NOI18N
                               + "." + SNAPSHOT_FILE_VERSION_MINOR); // NOI18N
@@ -325,6 +345,7 @@ public class LoadedSnapshot {
             dos.write(compressedBytes, 0, compressedLen); // 6. compressed snapshot data bytes
             dos.writeInt(baos2.size()); // 7. int length of settings data size
             dos.write(baos2.toByteArray()); // 8. settings data bytes (.properties plain text file format)
+            dos.writeUTF(userComments);
         } catch (OutOfMemoryError e) {
             baos = null;
             bufBaos = null;
@@ -380,6 +401,7 @@ public class LoadedSnapshot {
             // 4. snapshot data bytes
             // 5. int length of settings data size
             // 6. settings data bytes (.properties plain text file format)
+            // 7. String (UTF) custom comments
 
             // 1. magic number: "nbprofiler"
             byte[] magicArray = new byte[PROFILER_FILE_MAGIC_STRING.length()];
@@ -429,6 +451,10 @@ public class LoadedSnapshot {
             if (settingsLen != readLen2) {
                 throw new IOException(MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON,
                                                            new Object[] { CANNOT_READ_SETTINGS_DATA_MSG }));
+            }
+            
+            if (minorVersion >= SNAPSHOT_FILE_VERSION_MINOR) {
+                userComments = dis.readUTF();
             }
 
             // Process read data:

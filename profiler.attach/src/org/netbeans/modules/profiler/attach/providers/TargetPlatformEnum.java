@@ -58,12 +58,14 @@ public class TargetPlatformEnum {
 
     private static final String[] jvmNames = new String[] {
                                                  IntegrationUtils.PLATFORM_JAVA_50, IntegrationUtils.PLATFORM_JAVA_60,
-                                                 IntegrationUtils.PLATFORM_JAVA_70, IntegrationUtils.PLATFORM_JAVA_CVM
+                                                 IntegrationUtils.PLATFORM_JAVA_70, IntegrationUtils.PLATFORM_JAVA_80, 
+                                                 IntegrationUtils.PLATFORM_JAVA_CVM
                                              };
     public static final TargetPlatformEnum JDK5 = new TargetPlatformEnum(0);
     public static final TargetPlatformEnum JDK6 = new TargetPlatformEnum(1);
     public static final TargetPlatformEnum JDK7 = new TargetPlatformEnum(2);
-    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(3);
+    public static final TargetPlatformEnum JDK8 = new TargetPlatformEnum(3);
+    public static final TargetPlatformEnum JDK_CVM = new TargetPlatformEnum(4);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -86,10 +88,11 @@ public class TargetPlatformEnum {
     }
 
     public static Iterator iterator() {
-        List jvmList = new ArrayList(4);
+        List jvmList = new ArrayList(5);
         jvmList.add(JDK5);
         jvmList.add(JDK6);
         jvmList.add(JDK7);
+        jvmList.add(JDK8);
         jvmList.add(JDK_CVM);
 
         return jvmList.listIterator();
