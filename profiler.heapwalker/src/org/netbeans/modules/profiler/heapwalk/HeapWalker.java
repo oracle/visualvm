@@ -49,7 +49,6 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.HeapWalkerUI;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -58,9 +57,8 @@ import org.openide.windows.TopComponent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.Date;
 import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.openide.util.Lookup;
 
@@ -76,8 +74,6 @@ public class HeapWalker {
     // I18N String constants
     private static final String HEAPWALKER_DEFAULT_NAME = NbBundle.getMessage(ClassesListController.class,
                                                                               "ClassesListController_HeapWalkerDefaultName"); // NOI18N
-    private static final String HEAPWALKER_CUSTOM_NAME = NbBundle.getMessage(ClassesListController.class,
-                                                                             "ClassesListController_HeapWalkerCustomName"); // NOI18N
     private static final String LOADING_DUMP_MSG = NbBundle.getMessage(ClassesListController.class,
                                                                        "ClassesListController_LoadingDumpMsg"); // NOI18N
                                                                                                                 // -----
@@ -105,30 +101,10 @@ public class HeapWalker {
         heapDumpProject = computeHeapDumpProject(heapDumpFile);
 
         String fileName = heapDumpFile.getName();
-        String fileNamePart;
-        int extensionIndex = fileName.lastIndexOf("."); // NOI18N
-
-        if (extensionIndex == -1) {
-            fileNamePart = fileName;
-        } else {
-            fileNamePart = fileName.substring(0, extensionIndex);
-
-            if (fileNamePart.startsWith("heapdump-")) { // NOI18N
-
-                String time = fileNamePart.substring("heapdump-".length(), fileNamePart.length()); // NOI18N
-
-                try {
-                    long timeStamp = Long.parseLong(time);
-                    fileNamePart = StringUtils.formatUserDate(new Date(timeStamp));
-                } catch (NumberFormatException e) {
-                    fileNamePart = fileName;
-                }
-            } else {
-                fileNamePart = fileName;
-            }
-        }
-
-        heapWalkerName = MessageFormat.format(HEAPWALKER_CUSTOM_NAME, new Object[] { fileNamePart });
+        int dotIndex = fileName.lastIndexOf('.'); // NOI18N
+        if (dotIndex > 0 && dotIndex <= fileName.length() - 2)
+            fileName = fileName.substring(0, dotIndex);
+        heapWalkerName = ResultsManager.getDefault().getHeapDumpDisplayName(fileName);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

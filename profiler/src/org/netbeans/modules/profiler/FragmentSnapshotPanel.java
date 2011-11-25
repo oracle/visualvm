@@ -48,12 +48,9 @@ import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.coderegion.CodeRegionResultsSnapshot;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.cpu.CodeRegionSnapshotPanel;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.text.MessageFormat;
-import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -78,7 +75,6 @@ public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListen
                                                                       "FragmentSnapshotPanel_CallsTabDescr"); //NOI18N
     private static final String INFO_TAB_DESCR = NbBundle.getMessage(FragmentSnapshotPanel.class,
                                                                      "FragmentSnapshotPanel_InfoTabDescr"); //NOI18N
-    private static final String PANEL_TITLE = NbBundle.getMessage(FragmentSnapshotPanel.class, "FragmentSnapshotPanel_PanelTitle"); // NOI18N
                                                                                                                                     // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -147,10 +143,6 @@ public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListen
         return snapshot;
     }
 
-    public String getTitle() {
-        return MessageFormat.format(PANEL_TITLE, new Object[] { StringUtils.formatUserDate(new Date(snapshot.getTimeTaken())) });
-    }
-
     public void stateChanged(ChangeEvent e) {
         updateToolbar();
     }
@@ -173,7 +165,7 @@ public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListen
     }
 
     public String getViewName() {
-        return PANEL_TITLE;
+        return "snapshot-" + snapshot.getTimeTaken() + "-fragment"; // NOI18N
     }
 
     public boolean hasLoadedSnapshot() {
