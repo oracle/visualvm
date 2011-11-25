@@ -1794,6 +1794,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     private final StatusPanel statusSnippet;
     private Component lastFocusOwner;
     private boolean initialized = false;
+    private Listener listener;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -1854,7 +1855,8 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         setFocusable(true);
         setRequestFocusEnabled(true);
         
-        Lookup.getDefault().lookup(Listener.class).setDelegate(this);
+        listener = Lookup.getDefault().lookup(Listener.class);
+        listener.setDelegate(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
