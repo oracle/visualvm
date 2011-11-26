@@ -70,6 +70,8 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
                                                 };
     private static final String NAME_STRING = NbBundle.getMessage(TakeSnapshotAction.class, "LBL_TakeSnapshotAction"); // NOI18N
     private static final String SHORT_DESCRIPTION_STRING = NbBundle.getMessage(TakeSnapshotAction.class, "HINT_TakeSnapshotAction"); // NOI18N
+    
+    private Listener listener;
 
     /*
      * The following code is an externalization of various listeners registered
@@ -95,7 +97,8 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     public TakeSnapshotAction() {
-        Lookup.getDefault().lookup(Listener.class).setDelegate(this);
+        listener = Lookup.getDefault().lookup(Listener.class);
+        listener.setDelegate(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
