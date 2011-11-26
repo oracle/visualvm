@@ -74,6 +74,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.openide.cookies.OpenCookie;
@@ -181,6 +182,12 @@ public final class ResultsManager {
                                                                                  "ResultsManager_DirectoryDoesntExistMsg"); // NOI18N
     private static final String CANNOT_OPEN_SNAPSHOT_MSG = NbBundle.getMessage(LoadedSnapshot.class,
                                                                                  "ResultsManager_CannotOpenSnapshotMsg"); // NOI18N
+    private static final String CPU_SNAPSHOT_DISPLAYNAME = NbBundle.getMessage(ResultsManager.class,
+                                                                                "ResultsManager_CpuSnapshotDisplayName"); // NOI18N
+    private static final String MEMORY_SNAPSHOT_DISPLAYNAME = NbBundle.getMessage(ResultsManager.class,
+                                                                                "ResultsManager_MemorySnapshotDisplayName"); // NOI18N
+    private static final String HEAP_SNAPSHOT_DISPLAYNAME = NbBundle.getMessage(ResultsManager.class,
+                                                                                "ResultsManager_HeapSnapshotDisplayName"); // NOI18N
                                                                                                                             // -----
     public static final String SNAPSHOT_EXTENSION = "nps"; // NOI18N
     public static final String HEAPDUMP_EXTENSION = "hprof"; // NOI18N
@@ -218,6 +225,48 @@ public final class ResultsManager {
 
     public String getDefaultSnapshotFileName(LoadedSnapshot ls) {
         return "snapshot-" + ls.getSnapshot().getTimeTaken(); // NOI18N
+    }
+        
+    public String getSnapshotDisplayName(String fileName, int snapshotType) {
+        String displayName;
+        if (fileName.startsWith("snapshot-")) { // NOI18N
+            String time = fileName.substring("snapshot-".length(), fileName.length()); // NOI18N
+            try {
+                long timeStamp = Long.parseLong(time);
+                displayName = StringUtils.formatUserDate(new Date(timeStamp));
+            } catch (NumberFormatException e) {
+                // file name is probably customized
+                displayName = fileName;
+            }
+        } else {
+            displayName = fileName;
+        }
+        switch (snapshotType) {
+            case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                return MessageFormat.format(CPU_SNAPSHOT_DISPLAYNAME, new Object[] { displayName });
+            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                return MessageFormat.format(MEMORY_SNAPSHOT_DISPLAYNAME, new Object[] { displayName });
+            default:
+                return displayName;
+        }
+    }
+    
+    public String getHeapDumpDisplayName(String fileName) {
+        String displayName;
+        if (fileName.startsWith("heapdump-")) { // NOI18N
+            String time = fileName.substring("heapdump-".length(), fileName.length()); // NOI18N
+            try {
+                long timeStamp = Long.parseLong(time);
+                displayName = StringUtils.formatUserDate(new Date(timeStamp));
+            } catch (NumberFormatException e) {
+                // file name is probably customized
+                displayName = fileName;
+            }
+        } else {
+            displayName = fileName;
+        }
+        return MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { displayName });
     }
 
     public LoadedSnapshot[] getLoadedSnapshots() {

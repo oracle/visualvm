@@ -302,11 +302,11 @@ public class ProfilerValidationTest extends JellyTestCase {
         TopComponentOperator collectedResults;
 	try {
             collectedResults = new TopComponentOperator( Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",
-                                                        "CPUSnapshotPanel_PanelTitle") ); //"CPU"
+                                                        "ResultsManager_CpuSnapshotDisplayName") ); //"CPU"
 	} catch (Exception e) {
 	    issue144699Hack();
 	    collectedResults = new TopComponentOperator( Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",
-                                                        "CPUSnapshotPanel_PanelTitle") ); //"CPU"
+                                                        "ResultsManager_CpuSnapshotDisplayName") ); //"CPU"
 	}
         collectedResults.save();
         // call "Profile|Stop Profiling Session"

@@ -479,7 +479,7 @@ public final class LiveResultsWindow extends TopComponent
     private volatile boolean profilerRunning = false;
     private volatile boolean resultsAvailable = false;
     private volatile boolean resultsAvailableinTA = false;
-    
+    private Listener listener;
     final private AtomicLong autoRefreshRequested = new AtomicLong(0);
     
     private static class Singleton {
@@ -492,7 +492,8 @@ public final class LiveResultsWindow extends TopComponent
         CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
                 initUI();
-                Lookup.getDefault().lookup(Listener.class).setDelegate(LiveResultsWindow.this);
+                listener = Lookup.getDefault().lookup(Listener.class);
+                listener.setDelegate(LiveResultsWindow.this);
             }
         });
     }
@@ -1056,7 +1057,7 @@ public final class LiveResultsWindow extends TopComponent
                         return;
                     }
 
-                    if (!isProfiling() || !isOpened()) {
+                    if (!isProfiling() || !isShowing()) {
                         return;
                     }
 
@@ -1111,7 +1112,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private void updateResultsDisplay() {
-        if (!isOpened()) {
+        if (!isShowing()) {
             return; // do nothing if i'm closed
         }
 
