@@ -570,11 +570,13 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             ti.topMethodEntryTime1 += timeDiff1;
         }
 
-        afterBatchCommands.add(new Runnable() {
+        if (ppp != null) {
+            afterBatchCommands.add(new Runnable() {
                 public void run() {
                     ppp.timeAdjust(threadId, timeDiff0, timeDiff1);
                 }
             });
+        }
         batchNotEmpty = true;
     }
 

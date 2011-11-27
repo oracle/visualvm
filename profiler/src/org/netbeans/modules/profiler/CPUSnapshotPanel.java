@@ -52,7 +52,6 @@ import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FilterComponent;
 import org.netbeans.lib.profiler.ui.cpu.*;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.modules.profiler.actions.FindNextAction;
 import org.netbeans.modules.profiler.actions.FindPreviousAction;
@@ -74,7 +73,6 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -298,7 +296,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private static final String TOGGLE_DOWN_TOOLTIP = NbBundle.getMessage(CPUSnapshotPanel.class,
                                                                           "CPUSnapshotPanel_ToggleDownToolTip"); // NOI18N
     private static final String TOGGLE_UP_TOOLTIP = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_ToggleUpToolTip"); // NOI18N
-    private static final String PANEL_TITLE = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_PanelTitle"); // NOI18N
     private static final String FIND_IN_STATEMENT = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_FindInStatement"); // NOI18N
     private static final String AGGREGATION_COMBO_ACCESS_NAME = NbBundle.getMessage(CPUSnapshotPanel.class,
                                                                                     "CPUSnapshotPanel_AggregationComboAccessName"); // NOI18N
@@ -639,10 +636,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
     public ResultsSnapshot getSnapshot() {
         return snapshot;
-    }
-
-    public String getTitle() {
-        return MessageFormat.format(PANEL_TITLE, new Object[] { StringUtils.formatUserDate(new Date(snapshot.getTimeTaken())) });
     }
 
     public BufferedImage getViewImage(boolean onlyVisibleArea) {
@@ -1132,15 +1125,15 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         if (tabs.getSelectedComponent() instanceof CCTDisplay) { // Call tree
-            cctPanel.exportData(exportedFileType,eDD,false, getTitle());
+            cctPanel.exportData(exportedFileType,eDD,false, CALLTREE_STRING);
         } else if (tabs.getSelectedComponent() instanceof SnapshotFlatProfilePanel) { // Hot Spots
-            flatPanel.exportData(exportedFileType,eDD,false, getTitle());
+            flatPanel.exportData(exportedFileType,eDD,false, HOTSPOTS_STRING);
         } else if (tabs.getSelectedComponent() instanceof SubtreeCallGraphPanel) { //Subtree
-            subtreeView.exportData(exportedFileType,eDD, getTitle());
+            subtreeView.exportData(exportedFileType,eDD, subtreeView.getShortTitle());
         } else if (tabs.getSelectedComponent() instanceof ReverseCallGraphPanel) { //Back Trace
-            backtraceView.exportData(exportedFileType,eDD, getTitle());
+            backtraceView.exportData(exportedFileType,eDD, backtraceView.getShortTitle());
         } else if (tabs.getSelectedComponent()==combined) { // Combined
-            combined.exportData(exportedFileType,eDD, getTitle());
+            combined.exportData(exportedFileType,eDD, COMBINED_STRING);
         }
     }
 
