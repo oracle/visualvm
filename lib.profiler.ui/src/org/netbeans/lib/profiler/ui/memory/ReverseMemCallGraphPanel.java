@@ -59,6 +59,7 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
+import org.netbeans.lib.profiler.ui.components.FilterComponent;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -107,6 +108,8 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
     protected JPopupMenu popupMenu;
     protected JTreeTable treeTable;
     protected JTreeTablePanel treeTablePanel;
+    protected FilterComponent filterComponent;
+    protected JMenuItem popupShowSource;
     protected MemoryResUserActionsHandler actionsHandler;
     protected TreePath treePath;
     protected String[] columnNames;
@@ -251,7 +254,7 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
         Font boldfont = popup.getFont().deriveFont(Font.BOLD);
 
         if (GoToSource.isAvailable()) {
-            JMenuItem popupShowSource = new JMenuItem();
+            popupShowSource = new JMenuItem();
             popupShowSource.setFont(boldfont);
             popupShowSource.setText(GO_SOURCE_POPUP_ITEM);
             popupShowSource.addActionListener(new java.awt.event.ActionListener() {
@@ -269,6 +272,7 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
 
     void performDefaultAction(TreePath path) {
         PresoObjAllocCCTNode node = (PresoObjAllocCCTNode) path.getLastPathComponent();
+        if (node.isFilteredNode()) return;
         String[] classMethodAndSig = node.getMethodClassNameAndSig();
         if (node.getParent() == null) showSourceForClass(classMethodAndSig[0]);
         else actionsHandler.showSourceForMethod(classMethodAndSig[0], classMethodAndSig[1], classMethodAndSig[2]);
