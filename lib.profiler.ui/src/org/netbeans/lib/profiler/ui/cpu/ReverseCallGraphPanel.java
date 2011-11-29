@@ -73,7 +73,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.results.FilterSortSupport;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNodeFree;
+import org.netbeans.lib.profiler.ui.components.FilterComponent;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -118,6 +120,7 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     protected JButton cornerButton;
     protected JTreeTable treeTable;
     protected JTreeTablePanel treeTablePanel;
+    protected FilterComponent filterComponent;
     protected boolean sortOrder;
     protected int selectedMethodId;
     protected int sortingColumn;
@@ -226,8 +229,6 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     public void setDataToDisplay(CPUResultsSnapshot snapshot, int threadId, int view) {
         super.setDataToDisplay(snapshot, view);
         this.threadId = threadId;
-        if (popupShowSource != null) popupShowSource.setEnabled(isShowSourceAvailable());
-        popupAddToRoots.setEnabled(isAddToRootsAvailable());
     }
 
     // NOTE: this method only sets sortingColumn and sortOrder, it doesn't refresh UI!
@@ -517,6 +518,9 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
                         if (selectedRow != -1) {
                             popupPath = treeTable.getTree().getPathForRow(selectedRow);
+                            
+                            PrestimeCPUCCTNode node = (PrestimeCPUCCTNode) popupPath.getLastPathComponent();
+                            enableDisablePopup(node);
 
                             Rectangle cellRect = treeTable.getCellRect(selectedRow, 0, false);
                             callGraphPopupMenu.show(e.getComponent(), ((cellRect.x + treeTable.getSize().width) > 50) ? 50 : 5,
@@ -547,6 +551,8 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
                     } else {
                         treeTable.getTree().setSelectionPath(popupPath);
                         if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
+                            PrestimeCPUCCTNode node = (PrestimeCPUCCTNode) popupPath.getLastPathComponent();
+                            enableDisablePopup(node);
                             callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                         } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
                             if (treeTableModel.isLeaf(popupPath.getPath()[popupPath.getPath().length - 1])) {
@@ -572,6 +578,45 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
         treeTablePanel = new JTreeTablePanel(treeTable);
         treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, cornerButton);
         add(treeTablePanel, BorderLayout.CENTER);
+        initFilterPanel();
+    }
+    
+    private void initFilterPanel() {
+        filterComponent = new FilterComponent();
+
+        //filterComponent.setEmptyFilterText("[Method Name Filter]");
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
+//                "Starts with", CommonConstants.FILTER_STARTS_WITH);
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS
+//        ), "Contains", CommonConstants.FILTER_CONTAINS);
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
+//                "Ends with", CommonConstants.FILTER_ENDS_WITH);
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP), // NOI18N
+//                                      "Regular expression", CommonConstants.FILTER_REGEXP);
+        //filterComponent.addSeparatorItem();
+        
+        FilterSortSupport.Configuration config = snapshot.getFilterSortInfo(
+                (PrestimeCPUCCTNode)treeTableModel.getRoot());
+        filterComponent.setFilterValues(config.getFilterString(), config.getFilterType());
+
+        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
+                public void filterChanged() {
+                    String filterString = filterComponent.getFilterString();
+                    int filterType = filterComponent.getFilterType();
+                    snapshot.filterReverse(filterString, filterType,
+                            (PrestimeCPUCCTNodeFree)abstractTreeTableModel.getRoot(), currentView);
+                    
+                    treeTable.updateTreeTable();
+                }
+            });
+
+        add(filterComponent, BorderLayout.SOUTH);
+    }
+    
+    private void enableDisablePopup(PrestimeCPUCCTNode node) {
+        boolean regularNode = node.getMethodId() > 0 && !node.isFilteredNode();
+        if (popupShowSource != null) popupShowSource.setEnabled(regularNode && isShowSourceAvailable());
+        popupAddToRoots.setEnabled(regularNode && isAddToRootsAvailable());
     }
 
     public void requestFocus() {
