@@ -71,6 +71,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.ui.components.FilterComponent;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
@@ -295,7 +296,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
                             switch (column) {
                                 case 0:
-                                    return pNode.getNodeName();
+                                    return pNode;
                                 case 1:
                                     return new Long(pNode.totalObjSize);
                                 case 2:
@@ -322,7 +323,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
                             switch (column) {
                                 case 0:
-                                    return pNode.getNodeName();
+                                    return pNode;
                                 case 1:
                                     return new Long(pNode.totalObjSize);
                                 case 2:
@@ -490,6 +491,9 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
                             if (selectedRow != -1) {
                                 treePath = treeTable.getTree().getPathForRow(selectedRow);
+                                
+                                PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treePath.getLastPathComponent();
+                                enableDisablePopup(node);
 
                                 Rectangle cellRect = treeTable.getCellRect(selectedRow, 0, false);
                                 popupMenu.show(e.getComponent(), ((cellRect.x + treeTable.getSize().width) > 50) ? 50 : 5,
@@ -520,6 +524,8 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                         } else {
                             treeTable.getTree().setSelectionPath(treePath);
                             if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
+                                PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treePath.getLastPathComponent();
+                                enableDisablePopup(node);
                                 popupMenu.show(e.getComponent(), e.getX(), e.getY());
                             } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
                                 if (treeTableModel.isLeaf(treePath.getPath()[treePath.getPath().length - 1])) {
@@ -534,6 +540,40 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
             treeTablePanel = new JTreeTablePanel(treeTable);
             treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, cornerButton);
             add(treeTablePanel, BorderLayout.CENTER);
+            initFilterPanel();
         }
+    }
+    
+    private void initFilterPanel() {
+        filterComponent = new FilterComponent();
+
+        //filterComponent.setEmptyFilterText("[Method Name Filter]");
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
+//                "Starts with", CommonConstants.FILTER_STARTS_WITH);
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS
+//        ), "Contains", CommonConstants.FILTER_CONTAINS);
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
+//                "Ends with", CommonConstants.FILTER_ENDS_WITH);
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP), // NOI18N
+//                                      "Regular expression", CommonConstants.FILTER_REGEXP);
+        //filterComponent.addSeparatorItem();
+////        filterComponent.setFilterValues(snapshot.getFilter(), filterComponent.getDefaultFilterType());
+
+        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
+                public void filterChanged() {
+                    String filterString = filterComponent.getFilterString();
+                    int filterType = filterComponent.getFilterType();
+                    snapshot.filterReverse(filterString, filterType, treeTable.getSortingColumn(), treeTable.getSortingOrder(),
+                            (PresoObjAllocCCTNode)abstractTreeTableModel.getRoot(), classId, true);
+                    
+                    treeTable.updateTreeTable();
+                }
+            });
+
+        add(filterComponent, BorderLayout.SOUTH);
+    }
+    
+    private void enableDisablePopup(PresoObjAllocCCTNode node) {
+        if (popupShowSource != null) popupShowSource.setEnabled(!node.isFilteredNode());
     }
 }
