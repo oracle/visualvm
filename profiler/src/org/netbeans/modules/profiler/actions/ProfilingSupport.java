@@ -155,6 +155,10 @@ public final class ProfilingSupport {
 
         return false;
     }
+    
+    public int selectApplicationPid() {
+        return PIDSelectPanel.selectPID();
+    }
 
     public AttachSTPData selectTaskForAttach(final Lookup.Provider project, final SessionSettings sessionSettings) {
         TaskConfigurator.Configuration configuration = TaskConfigurator.getDefault().configureAttachProfilerTask(project);
@@ -290,7 +294,7 @@ public final class ProfilingSupport {
 
                         if (!as.isRemote() && as.isDynamic16()) {
                             // we need to prompt the user for PID
-                            int pid = PIDSelectPanel.selectPID();
+                            int pid = selectApplicationPid();
 
                             if (pid == -1) {
                                 return; // cancelled by the user
