@@ -50,6 +50,7 @@ import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import java.util.ResourceBundle;
+import org.netbeans.lib.profiler.results.FilterSortSupport;
 
 
 /**
@@ -72,6 +73,8 @@ public class PresoObjAllocCCTNode implements CCTNode {
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_ALLOC_OBJ_SIZE = 2;
     public static final int SORT_BY_ALLOC_OBJ_NUMBER = 3;
+    
+    protected static final char MASK_FILTERED_NODE = 0x8;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -84,6 +87,8 @@ public class PresoObjAllocCCTNode implements CCTNode {
     String nodeName;
     PresoObjAllocCCTNode[] children;
     int methodId;
+    
+    protected char flags;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -167,7 +172,9 @@ public class PresoObjAllocCCTNode implements CCTNode {
     }
 
     public String getNodeName() {
-        if (methodId != 0) {
+        if (isFilteredNode()) {
+            return FilterSortSupport.FILTERED_OUT_LBL;
+        } else if (methodId != 0) {
             return nodeName;
         } else {
             return className;
@@ -209,6 +216,44 @@ public class PresoObjAllocCCTNode implements CCTNode {
 
     public String toString() {
         return getNodeName();
+    }
+    
+    public void setFilteredNode() {
+        flags |= MASK_FILTERED_NODE;
+    }
+    
+    public void resetFilteredNode() {
+        flags &= ~MASK_FILTERED_NODE;
+    }
+
+    public boolean isFilteredNode() {
+        return (flags & MASK_FILTERED_NODE) != 0;
+    }
+    
+    void merge(PresoObjAllocCCTNode node) {
+        nCalls += node.nCalls;
+        totalObjSize += totalObjSize;
+        
+        if (node.children != null) {
+            for (PresoObjAllocCCTNode ch : node.children)
+                ch.parent = this;
+            
+            int chl = children == null ? 0 : children.length;
+            int newchl = node.children.length;
+            PresoObjAllocCCTNode[] newch = new PresoObjAllocCCTNode[chl + newchl];
+            if (children != null) System.arraycopy(children, 0, newch, 0, chl);
+            System.arraycopy(node.children, 0, newch, chl, newchl);
+            children = newch;
+        }
+    }
+    
+    public boolean equals(Object o) {
+        if (!(o instanceof PresoObjAllocCCTNode)) return false;
+        return getNodeName().equals(((PresoObjAllocCCTNode)o).getNodeName());
+    }
+    
+    public int hashCode() {
+        return getNodeName().hashCode();
     }
 
     protected static void assignNamesToNodesFromSnapshot(MemoryResultsSnapshot snapshot, PresoObjAllocCCTNode rootNode,
