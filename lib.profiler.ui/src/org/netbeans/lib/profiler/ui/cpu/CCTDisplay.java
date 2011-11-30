@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.ui.cpu;
 
+import java.awt.BorderLayout;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
@@ -79,7 +80,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.results.FilterSortSupport;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNodeBacked;
+import org.netbeans.lib.profiler.ui.components.FilterComponent;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
@@ -119,6 +122,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
 
     protected JTreeTable treeTable;
     protected JTreeTablePanel treeTablePanel;
+    protected FilterComponent filterComponent;
     protected boolean sortOrder;
     protected int sortingColumn;
     private AbstractTreeTableModel abstractTreeTableModel;
@@ -592,7 +596,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
                             callGraphPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                         } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
                             if (treeTableModel.isLeaf(popupPath.getPath()[popupPath.getPath().length - 1])) {
-                                showSourceForMethod(popupPath);
+                                    showSourceForMethod(popupPath);
                             }
                         }
                     }
@@ -620,6 +624,38 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         treeTablePanel = new JTreeTablePanel(treeTable);
         treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, cornerButton);
         add(treeTablePanel, java.awt.BorderLayout.CENTER);
+        initFilterPanel();
+    }
+    
+    private void initFilterPanel() {
+        filterComponent = new FilterComponent();
+
+        //filterComponent.setEmptyFilterText("[Method Name Filter]");
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
+//                "Starts with", CommonConstants.FILTER_STARTS_WITH);
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS
+//        ), "Contains", CommonConstants.FILTER_CONTAINS);
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
+//                "Ends with", CommonConstants.FILTER_ENDS_WITH);
+//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP), // NOI18N
+//                                      "Regular expression", CommonConstants.FILTER_REGEXP);
+        //filterComponent.addSeparatorItem();
+        
+        FilterSortSupport.Configuration config = snapshot.getFilterSortInfo(
+                (PrestimeCPUCCTNode)treeTableModel.getRoot());
+        filterComponent.setFilterValues(config.getFilterString(), config.getFilterType());
+
+        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
+                public void filterChanged() {
+                    String filterString = filterComponent.getFilterString();
+                    int filterType = filterComponent.getFilterType();
+                    snapshot.filterForward(filterString, filterType, (PrestimeCPUCCTNodeBacked)treeTableModel.getRoot());
+                    
+                    treeTable.updateTreeTable();
+                }
+            });
+
+        add(filterComponent, BorderLayout.SOUTH);
     }
 
     public void removeResultsViewFocusListener(FocusListener listener) {
@@ -640,6 +676,8 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         if (treeTablePanel != null) {
             remove(treeTablePanel);
             treeTablePanel = null;
+            remove(filterComponent);
+            filterComponent = null;
         }
 
         treeTable = null;
@@ -761,11 +799,12 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     }
 
     private void enableDisablePopup(PrestimeCPUCCTNode node) {
-        if (popupShowSource != null) popupShowSource.setEnabled(isShowSourceAvailable() && ((node.getThreadId() != -1) && (node.getMethodId() > 0)));
-        popupShowSubtree.setEnabled((node.getThreadId() != -1) && (node.getMethodId() > 0));
-        popupShowReverse.setEnabled((node.getThreadId() != -1) && (node.getMethodId() > 0));
-        popupAddToRoots.setEnabled(isAddToRootsAvailable() && ((node.getThreadId() != -1) && (node.getMethodId() > 0)));
-        popupFind.setEnabled((node.getThreadId() != -1) && (node.getMethodId() > 0));
+        boolean regularNode = node.getThreadId() != -1 && node.getMethodId() > 0 && !node.isFilteredNode();
+        if (popupShowSource != null) popupShowSource.setEnabled(regularNode && isShowSourceAvailable());
+        popupShowSubtree.setEnabled(regularNode);
+        popupShowReverse.setEnabled(regularNode);
+        popupAddToRoots.setEnabled(regularNode && isAddToRootsAvailable());
+        popupFind.setEnabled(regularNode);
         // Allow the selection handler to change state of popupFind
         if (selectionHandler != null) selectionHandler.methodSelected(node.getThreadId(), node.getMethodId(), currentView);
     }

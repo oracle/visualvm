@@ -643,7 +643,8 @@ public final class ResultsManager {
                     ret[i] = loadSnapshotImpl(selectedFiles[i]);
                 }
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }), e);
+                ProfilerDialogs.displayError(NbBundle.getMessage(ResultsManager.class,
+                    "ResultsManager_SnapshotLoadFailedMsg", selectedFiles[i].getNameExt())); // NOI18N
             }
         }
 
