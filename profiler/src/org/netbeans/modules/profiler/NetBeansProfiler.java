@@ -1271,20 +1271,25 @@ public abstract class NetBeansProfiler extends Profiler {
                 ProfilerDialogs.displayInfo(INITIAL_CALIBRATION_MSG);
                 result = getTargetAppRunner().calibrateInstrumentationCode();
             }
-
-            boolean shouldCalibrate = false;
-            getTargetAppRunner().getProfilingSessionStatus().beginTrans(false);
-            try {
-                // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
-                // ---> recalibrate <---
-                shouldCalibrate = Platform.isLinux() &&
-                                  Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
-                                  getTargetAppRunner().getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
-            } finally {
-                getTargetAppRunner().getProfilingSessionStatus().endTrans();
-            }
-            if (shouldCalibrate) {
-                result = getTargetAppRunner().calibrateInstrumentationCode();
+            
+            // NOTE: use -Dprofiler.disableFTSRecalibration=true to skip fast
+            //       timestamp recalibration for each profiling session on old
+            //       linux kernels not supporting Time Stamp Counter.
+            if (!Boolean.getBoolean("profiler.disableFTSRecalibration")) { // NOI18N
+                boolean shouldCalibrate = false;
+                getTargetAppRunner().getProfilingSessionStatus().beginTrans(false);
+                try {
+                    // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
+                    // ---> recalibrate <---
+                    shouldCalibrate = Platform.isLinux() &&
+                                      Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
+                                      getTargetAppRunner().getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
+                } finally {
+                    getTargetAppRunner().getProfilingSessionStatus().endTrans();
+                }
+                if (shouldCalibrate) {
+                    result = getTargetAppRunner().calibrateInstrumentationCode();
+                }
             }
         } else {
             result = getTargetAppRunner().calibrateInstrumentationCode();
