@@ -1401,7 +1401,6 @@ public class ProfilerClient implements CommonConstants {
                 // and target JVM is dead
                 if (!targetVMAlive) {
                     status.targetAppRunning = false;
-                    targetVMAlive = false;
                     throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
                 } else if (lastResponse == null && wireIO.wasAlive()<start) { // timed out
                     if (!appStatusHandler.confirmWaitForConnectionReply()) {
