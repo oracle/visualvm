@@ -361,7 +361,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         }
         result.append((nodeName==null)?(className):(nodeName)).append(quote).append(separator);
         result.append(quote).append(totalObjSize).append(quote).append(separator);
-        StringBuffer append = result.append(quote).append(nLiveObjects).append(quote).append(separator);
+        result.append(quote).append(nLiveObjects).append(quote).append(separator);
         result.append(quote).append(nCalls).append(quote).append(separator);
         result.append(quote).append(decimalFormat.format(avgObjectAge)).append(quote).append(separator);
         result.append(quote).append(survGen).append(quote).append(separator);

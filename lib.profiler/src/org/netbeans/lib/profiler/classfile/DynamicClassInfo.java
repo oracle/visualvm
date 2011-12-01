@@ -475,7 +475,6 @@ public class DynamicClassInfo extends ClassInfo {
      * benefit from providing the name rather than a DynamicClassInfo.
      */
     public boolean implementsInterface(String intfName) {
-        int loaderId = getLoaderId();
         String[] intfs = getInterfaceNames();
 
         if (intfs != null) {
@@ -534,7 +533,6 @@ public class DynamicClassInfo extends ClassInfo {
             boolean constructor = "<init>".equals(getMethodName(methodIdx));    // NOI18N
             int[] localsCPIdx = new int[0];
             int[] stacksCPIdx;
-            StackMapTables tables = getStackMapTables();
             
 //            LOG.finer("Adding global catch for " + getName() + " method " + getMethodName(methodIdx));   // NOI18N
             if (stackMapTableCPindex == 0) {

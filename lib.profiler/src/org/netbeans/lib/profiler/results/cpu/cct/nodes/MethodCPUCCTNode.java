@@ -55,10 +55,6 @@ public class MethodCPUCCTNode extends TimedCPUCCTNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static class Locator {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private MethodCPUCCTNode cctNodeCandidate = null;
-        private int locatedMethodId;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
