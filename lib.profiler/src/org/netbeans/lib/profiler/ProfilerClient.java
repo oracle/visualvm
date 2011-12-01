@@ -1113,7 +1113,7 @@ public class ProfilerClient implements CommonConstants {
     }
 
     /**
-     * If the target VM is terminated, cleans up all localy cached data so that they can be
+     * If the target VM is terminated, cleans up all locally cached data so that they can be
      * GCd from the memory. If the TA is running, this method does nothing.
      */
     public void resetClientData() {
