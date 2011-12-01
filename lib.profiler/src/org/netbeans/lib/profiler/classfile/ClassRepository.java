@@ -444,7 +444,7 @@ public abstract class ClassRepository implements CommonConstants {
         list.addAll(extClassPathElementList);
         list.addAll(userClassPathElementList);
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         for (Iterator e = list.iterator(); e.hasNext();) {
             buf.append((String) e.next());

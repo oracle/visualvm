@@ -208,7 +208,7 @@ public class ProfilerValidationTest extends JellyTestCase {
         String lbl = Bundle.getStringTrimmed(PROFILER_LIB_BUNDLE,
                         "TargetAppRunner_CalibrationSummaryShortMsg");
         /* The calibration was successful.\nClick Show Details to see calibration results.\n\nWarning\: If your computer uses dynamic CPU frequency switching,\nplease disable it and rerun calibration as changing the CPU frequency\nduring profiling would produce inaccurate results. */
-        new JLabelOperator(infoDlg, lbl.substring(0, lbl.indexOf("\n") ) ); // The calibration was successful.
+        new JLabelOperator(infoDlg, lbl.substring(0, lbl.indexOf('\n') ) ); // The calibration was successful.
         infoDlg.ok();
     }
 

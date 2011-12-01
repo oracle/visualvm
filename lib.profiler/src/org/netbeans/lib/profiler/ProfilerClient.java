@@ -1602,7 +1602,7 @@ public class ProfilerClient implements CommonConstants {
 
         String taHost = (attachMode == 1) ? settings.getRemoteHost() : ""; // NOI18N
 
-        if (taHost.equals("")) { // NOI18N
+        if (taHost.isEmpty()) { // NOI18N
             status.remoteProfiling = false;
             taHost = "127.0.0.1"; // NOI18N
         } else {

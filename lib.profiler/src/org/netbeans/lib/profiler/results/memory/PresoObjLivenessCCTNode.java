@@ -297,13 +297,13 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     public void exportXMLData(ExportDataDumper eDD,String indent) {
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result = new StringBuffer(indent+"<Node>"+newline); //NOI18N
-        result.append(indent+" <Name>"+replaceHTMLCharacters(getNodeName())+"<Name>"+newline); //NOI18N
-        result.append(indent+" <Parent>"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"<Parent>"+newline); //NOI18N
-        result.append(indent+" <Live_Bytes>"+totalObjSize+"</Live_Bytes>"+newline); //NOI18N
-        result.append(indent+" <Live_Objects>"+nLiveObjects+"</Live_Objects>"+newline); //NOI18N
-        result.append(indent+" <Allocated_Objects>"+nCalls+"</Allocated_Objects>"+newline); //NOI18N
-        result.append(indent+" <Avg_Age>"+avgObjectAge+"</Avg_Age>"+newline); //NOI18N
-        result.append(indent+" <Generations>"+survGen+"</Generations>"+newline); //NOI18N
+        result.append(indent).append(" <Name>").append(replaceHTMLCharacters(getNodeName())).append("<Name>").append(newline); //NOI18N
+        result.append(indent).append(" <Parent>").append(replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))).append("<Parent>").append(newline); //NOI18N
+        result.append(indent).append(" <Live_Bytes>").append(totalObjSize).append("</Live_Bytes>").append(newline); //NOI18N
+        result.append(indent).append(" <Live_Objects>").append(nLiveObjects).append("</Live_Objects>").append(newline); //NOI18N
+        result.append(indent).append(" <Allocated_Objects>").append(nCalls).append("</Allocated_Objects>").append(newline); //NOI18N
+        result.append(indent).append(" <Avg_Age>").append(avgObjectAge).append("</Avg_Age>").append(newline); //NOI18N
+        result.append(indent).append(" <Generations>").append(survGen).append("</Generations>").append(newline); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
@@ -321,7 +321,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         for (int i=0; i<depth; i++) {
             result.append("."); //NOI18N
         }
-        result.append(replaceHTMLCharacters(getNodeName())+"</pre></td><td class=\"right\">"+totalObjSize+"</td><td class=\"right\">"+nLiveObjects+"</td><td class=\"right\">"+nCalls+"</td><td class=\"right\">"+avgObjectAge+"</td><td class=\"right\">"+survGen+"</td><td class=\"parent\"><pre class=\"parent\">"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"</pre></td></tr>"); //NOI18N
+        result.append(replaceHTMLCharacters(getNodeName())).append("</pre></td><td class=\"right\">").append(totalObjSize).append("</td><td class=\"right\">").append(nLiveObjects).append("</td><td class=\"right\">").append(nCalls).append("</td><td class=\"right\">").append(avgObjectAge).append("</td><td class=\"right\">").append(survGen).append("</td><td class=\"parent\"><pre class=\"parent\">").append(replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))).append("</pre></td></tr>"); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
@@ -332,7 +332,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     }
 
     private String replaceHTMLCharacters(String s) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int len = s.length();
         for (int i = 0; i < len; i++) {
           char c = s.charAt(i);
