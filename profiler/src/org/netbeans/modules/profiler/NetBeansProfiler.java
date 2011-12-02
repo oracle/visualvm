@@ -1662,7 +1662,8 @@ public abstract class NetBeansProfiler extends Profiler {
 
         // 3. Live Results
         if ((ideSettings.getDisplayLiveResultsCPU()
-                && ((type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)))
+                && ((type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)
+                    || (type == ProfilingSettings.PROFILE_CPU_SAMPLING)))
                 || (ideSettings.getDisplayLiveResultsFragment() && (type == ProfilingSettings.PROFILE_CPU_STOPWATCH))
                 || (ideSettings.getDisplayLiveResultsMemory()
                        && ((type == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS)

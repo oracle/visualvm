@@ -159,7 +159,7 @@ public class FilterComponent extends JPanel {
 
             String string = (String) filterStringCombo.getSelectedItem();
 
-            if ((string == null) || (string.equals(""))) {
+            if ((string == null) || (string.isEmpty())) {
                 return; // NOI18N
                         //if (string == filterStringCombo.comboPopupSeparatorString) return;
             }

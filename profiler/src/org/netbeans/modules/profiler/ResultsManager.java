@@ -1042,7 +1042,7 @@ public final class ResultsManager {
             String fName = file.getName();
 
             // divide the file name into name and extension
-            int idx = fName.lastIndexOf("."); // NOI18N
+            int idx = fName.lastIndexOf('.'); // NOI18N
 
             if (idx == -1) { // no extension
                 targetName = fName;

@@ -349,7 +349,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
          // Header
         StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><TABLE border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < ( columnCount); i++) {
-            result.append("<th>"+columnNames[i]+"</th>"); //NOI18N
+            result.append("<th>").append(columnNames[i]).append("</th>"); //NOI18N
         }
         result.append("</tr>"); //NOI18N
 
@@ -357,9 +357,9 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         eDD.dumpData(result);
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</td>"); //NOI18N
-            result.append("<td align=\"right\">"+percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)+((flatProfileContainer.getTimeInMcs0AtRow(i)%10==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%100==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%1000==0)?("    "):("  ")):(" ")):(""))+"</td>"); //NOI18N
-            result.append("<td align=right>"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>"); //NOI18N
-            result.append("<td align=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>"); //NOI18N
+            result.append("<td align=\"right\">").append(percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)).append((flatProfileContainer.getTimeInMcs0AtRow(i)%10==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%100==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%1000==0)?("    "):("  ")):(" ")):("")).append("</td>"); //NOI18N
+            result.append("<td align=right>").append((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms</td>"); //NOI18N
+            result.append("<td align=\"right\">").append(flatProfileContainer.getNInvocationsAtRow(i)).append("</td></tr>"); //NOI18N
             eDD.dumpData(result);
         }
         eDD.dumpDataAndClose(new StringBuffer(" </TABLE></BODY></HTML>")); //NOI18N
@@ -370,16 +370,16 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\"table\">"+newline+" <TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
         for (int i = 0; i < ( columnCount); i++) {
-            result.append("   <TableColumn><![CDATA["+columnNames[i]+"]]></TableColumn>"+newline); //NOI18N
+            result.append("   <TableColumn><![CDATA[").append(columnNames[i]).append("]]></TableColumn>").append(newline); //NOI18N
         }
-        result.append("  </TableHeader>"+newline+"  <TableBody>"+newline); //NOI18N
+        result.append("  </TableHeader>").append(newline).append("  <TableBody>").append(newline); //NOI18N
         eDD.dumpData(result);
 
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline); //NOI18N
-            result.append("    <TableColumn><![CDATA["+percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)+"]]></TableColumn>"+newline); //NOI18N
-            result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline); //NOI18N
-            result.append("    <TableColumn><![CDATA["+flatProfileContainer.getNInvocationsAtRow(i)+"]]></TableColumn>"+newline+"  </TableRow>"+newline); //NOI18N
+            result.append("    <TableColumn><![CDATA[").append(percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)).append("]]></TableColumn>").append(newline); //NOI18N
+            result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline); //NOI18N
+            result.append("    <TableColumn><![CDATA[").append(flatProfileContainer.getNInvocationsAtRow(i)).append("]]></TableColumn>").append(newline).append("  </TableRow>").append(newline); //NOI18N
             eDD.dumpData(result);
         }
         eDD.dumpDataAndClose(new StringBuffer("  </TableBody>"+" </TableData>"+newline+"</ExportedView>")); //NOI18N
@@ -392,7 +392,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         String quote = "\""; // NOI18N
 
         for (int i = 0; i < (columnCount); i++) {
-            result.append(quote+columnNames[i]+quote+separator);
+            result.append(quote).append(columnNames[i]).append(quote).append(separator);
         }
         result.deleteCharAt(result.length()-1);
         result.append(newLine);
@@ -401,17 +401,17 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         // Data
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer();
-            result.append(quote+flatProfileContainer.getMethodNameAtRow(i)+quote+separator);
-            result.append(quote+flatProfileContainer.getPercentAtRow(i)+quote+separator);
-            result.append(quote+((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms"+quote+separator);
-            result.append(quote+flatProfileContainer.getNInvocationsAtRow(i)+quote+newLine);
+            result.append(quote).append(flatProfileContainer.getMethodNameAtRow(i)).append(quote).append(separator);
+            result.append(quote).append(flatProfileContainer.getPercentAtRow(i)).append(quote).append(separator);
+            result.append(quote).append((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            result.append(quote).append(flatProfileContainer.getNInvocationsAtRow(i)).append(quote).append(newLine);
             eDD.dumpData(result);
         }
         eDD.close();
     }
 
     private String replaceHTMLCharacters(String s) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int len = s.length();
         for (int i = 0; i < len; i++) {
           char c = s.charAt(i);

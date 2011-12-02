@@ -68,7 +68,6 @@ public class CodeRegionMethodInstrumentor extends ClassManager {
     private ClientUtils.SourceCodeSelection sourceCodeSelection;
     private ArrayList instrClasses;
     private String className;
-    private int methodIdx;
     private int nInstrClasses;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------

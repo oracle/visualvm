@@ -428,7 +428,7 @@ public class CrossBorderLayout implements LayoutManager2 {
     }
 
     private static String toString(Integer[] constraints) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
 
         for (int constraint : constraints)

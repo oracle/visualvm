@@ -1113,7 +1113,7 @@ public class ProfilerClient implements CommonConstants {
     }
 
     /**
-     * If the target VM is terminated, cleans up all localy cached data so that they can be
+     * If the target VM is terminated, cleans up all locally cached data so that they can be
      * GCd from the memory. If the TA is running, this method does nothing.
      */
     public void resetClientData() {
@@ -1401,7 +1401,6 @@ public class ProfilerClient implements CommonConstants {
                 // and target JVM is dead
                 if (!targetVMAlive) {
                     status.targetAppRunning = false;
-                    targetVMAlive = false;
                     throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
                 } else if (lastResponse == null && wireIO.wasAlive()<start) { // timed out
                     if (!appStatusHandler.confirmWaitForConnectionReply()) {
@@ -1602,7 +1601,7 @@ public class ProfilerClient implements CommonConstants {
 
         String taHost = (attachMode == 1) ? settings.getRemoteHost() : ""; // NOI18N
 
-        if (taHost.equals("")) { // NOI18N
+        if (taHost.isEmpty()) { // NOI18N
             status.remoteProfiling = false;
             taHost = "127.0.0.1"; // NOI18N
         } else {
