@@ -163,9 +163,9 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
         String quote = "\""; // NOI18N
         StringBuffer result = new StringBuffer(quote+columnNames[0]+quote+separator);
         for (int i = 2; i < (columnNames.length); i++) {
-            result.append(quote+columnNames[i]+quote+separator);
+            result.append(quote).append(columnNames[i]).append(quote).append(separator);
         }        
-        result.append(messages.getString("SnapshotReverseMemCallGraphPanel_ExportAddedColumnName")+newLine);// NOI18N
+        result.append(messages.getString("SnapshotReverseMemCallGraphPanel_ExportAddedColumnName")).append(newLine);// NOI18N
         return result;
     }
 
@@ -216,9 +216,9 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
     private StringBuffer getHTMLHeader(String viewName) {
         StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE><style type=\"text/css\">pre.method{overflow:auto;width:600;height:30;vertical-align:baseline}pre.parent{overflow:auto;width:400;height:30;vertical-align:baseline}td.method{text-align:left;width:600}td.parent{text-align:left;width:400}td.right{text-align:right;white-space:nowrap}</style></HEAD><BODY><table border=\"1\"><tr><th>"+columnNames[0]+"</th>"); // NOI18N
         for (int i = 2; i < (columnNames.length); i++) {
-            result.append("<th>"+columnNames[i]+"</th>");
+            result.append("<th>").append(columnNames[i]).append("</th>");
         }
-        result.append("<th>"+messages.getString("SnapshotReverseMemCallGraphPanel_ExportAddedColumnName")+"</th></tr>"); //NOI18N
+        result.append("<th>").append(messages.getString("SnapshotReverseMemCallGraphPanel_ExportAddedColumnName")).append("</th></tr>"); //NOI18N
         return result;
     }
 

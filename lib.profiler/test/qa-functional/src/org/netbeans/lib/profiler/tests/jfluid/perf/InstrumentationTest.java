@@ -216,7 +216,7 @@ public class InstrumentationTest extends CommonProfilerTestCase implements NbPer
 
             if (entry.getName().endsWith(".class")) {
                 String nm = entry.getName();
-                nm = nm.substring(0, nm.lastIndexOf("."));
+                nm = nm.substring(0, nm.lastIndexOf('.'));
                 names.add(nm);
 
                 BufferedInputStream bis = new BufferedInputStream(file.getInputStream(entry));

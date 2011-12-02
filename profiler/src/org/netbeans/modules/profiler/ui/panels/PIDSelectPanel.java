@@ -271,7 +271,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
             vmFlags = vm.getVMFlags();
         }
         
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         
         buffer.append("<table cellspacing=\"3\" cellpadding=\"0\">"); //NOI18N
         

@@ -330,8 +330,8 @@ public class OQLController extends AbstractTopLevelController
         if (urls.startsWith("file://instance/")) { // NOI18N
             urls = urls.substring("file://instance/".length()); // NOI18N
 
-            int indexPos = urls.indexOf("#"); // NOI18N
-            int pointerPos = urls.indexOf("@"); // NOI18N
+            int indexPos = urls.indexOf('#'); // NOI18N
+            int pointerPos = urls.indexOf('@'); // NOI18N
             String clzName = null;
 
             if (indexPos > -1 || pointerPos > -1) {
