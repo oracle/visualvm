@@ -737,12 +737,13 @@ public abstract class NetBeansProfiler extends Profiler {
             
             setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
             
-            CommonUtils.runInEventDispatchThread(new Runnable() {
-
-                public void run() {
-                    openWindowsOnProfilingStart();
-                }
-            });
+            if (shouldOpenWindowsOnProfilingStart()) {
+                CommonUtils.runInEventDispatchThread(new Runnable() {
+                    public void run() {
+                        openWindowsOnProfilingStart();
+                    }
+                });
+            }
             
             if (attachSettings.isDirect()) { // Previously known as "attach on startup"
                 // The VM is already started with all necessary options and waiting for us to connect.
@@ -930,12 +931,13 @@ public abstract class NetBeansProfiler extends Profiler {
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
-        CommonUtils.runInEventDispatchThread(new Runnable() {
+        if (shouldOpenWindowsOnProfilingStart()) {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     openWindowsOnProfilingStart();
                 }
             });
-
+        }
         if (!CalibrationDataFileIO.validateCalibrationInput(sessionSettings.getJavaVersionString(),
                                                                 sessionSettings.getJavaExecutable())) {
             ProfilerDialogs.displayError(CALIBRATION_MISSING_SHORT_MESSAGE, null, CALIBRATION_MISSING_MESSAGE);
@@ -1111,7 +1113,11 @@ public abstract class NetBeansProfiler extends Profiler {
     }
     
     public boolean processesProfilingPoints() {
-        return getProfilingPointsManager().getSupportedProfilingPoints().length > 0;
+        ProfilingPointsProcessor ppp = getProfilingPointsManager();
+        if (ppp != null) {
+            return ppp.getSupportedProfilingPoints().length > 0;
+        }
+        return false;
     }
 
     /**
@@ -1153,7 +1159,9 @@ public abstract class NetBeansProfiler extends Profiler {
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
         //    System.err.println("------------------------------------------ 3: "+ (System.currentTimeMillis() - time));
-        openWindowsOnProfilingStart();
+        if (shouldOpenWindowsOnProfilingStart()) {
+            openWindowsOnProfilingStart();
+        }
 
         //    System.err.println("------------------------------------- 4: "+ (System.currentTimeMillis() - time));
         final Window mainWindow = WindowManager.getDefault().getMainWindow();
@@ -1217,6 +1225,21 @@ public abstract class NetBeansProfiler extends Profiler {
         return true;
     }
 
+    protected boolean shouldOpenWindowsOnProfilingStart() {
+        return true;
+    }
+
+    // NOTE: used from com.sun.tools.visualvm.profiler.ProfilerSupport.calibrateJVM(),
+    //       requires targetAppRunner to be configured correctly. Most likely you want to use
+    //       runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) !!!
+    public boolean runConfiguredCalibration() {
+        calibrating = true;
+        boolean result = targetAppRunner.calibrateInstrumentationCode();
+        calibrating = false;
+
+        return result;
+    }
+
     public boolean runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) {
         calibrating = true;
 
@@ -1248,20 +1271,25 @@ public abstract class NetBeansProfiler extends Profiler {
                 ProfilerDialogs.displayInfo(INITIAL_CALIBRATION_MSG);
                 result = getTargetAppRunner().calibrateInstrumentationCode();
             }
-
-            boolean shouldCalibrate = false;
-            getTargetAppRunner().getProfilingSessionStatus().beginTrans(false);
-            try {
-                // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
-                // ---> recalibrate <---
-                shouldCalibrate = Platform.isLinux() &&
-                                  Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
-                                  getTargetAppRunner().getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
-            } finally {
-                getTargetAppRunner().getProfilingSessionStatus().endTrans();
-            }
-            if (shouldCalibrate) {
-                result = getTargetAppRunner().calibrateInstrumentationCode();
+            
+            // NOTE: use -Dprofiler.disableFTSRecalibration=true to skip fast
+            //       timestamp recalibration for each profiling session on old
+            //       linux kernels not supporting Time Stamp Counter.
+            if (!Boolean.getBoolean("profiler.disableFTSRecalibration")) { // NOI18N
+                boolean shouldCalibrate = false;
+                getTargetAppRunner().getProfilingSessionStatus().beginTrans(false);
+                try {
+                    // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
+                    // ---> recalibrate <---
+                    shouldCalibrate = Platform.isLinux() &&
+                                      Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
+                                      getTargetAppRunner().getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
+                } finally {
+                    getTargetAppRunner().getProfilingSessionStatus().endTrans();
+                }
+                if (shouldCalibrate) {
+                    result = getTargetAppRunner().calibrateInstrumentationCode();
+                }
             }
         } else {
             result = getTargetAppRunner().calibrateInstrumentationCode();
@@ -1739,7 +1767,8 @@ public abstract class NetBeansProfiler extends Profiler {
                 }
             }
 
-            getProfilingPointsManager().init(getProfiledProject());
+            ProfilingPointsProcessor ppp = getProfilingPointsManager();
+            if (ppp != null) ppp.init(getProfiledProject());
 
             ProfilingResultsDispatcher.getDefault().startup(client);
         }

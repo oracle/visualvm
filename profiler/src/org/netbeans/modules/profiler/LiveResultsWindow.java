@@ -88,6 +88,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Action;
@@ -209,11 +210,16 @@ public final class LiveResultsWindow extends TopComponent
         public void cctEstablished(RuntimeCCTNode runtimeCCTNode, boolean empty) {
             if (!empty) {
                 getDefault().resultsAvailable = true;
-                CommonUtils.runInEventDispatchThread(new Runnable() {
+                if (resultsDumpForced.getAndSet(false) && 
+                    getDefault().autoRefreshRequested.getAndDecrement() > 0) {
+                    CommonUtils.runInEventDispatchThread(new Runnable() {
                         public void run() {
                             getDefault().updateResultsDisplay();
                         }
                     });
+                } else {
+                    getDefault().autoRefreshRequested.compareAndSet(-1, 0);
+                }
             } else {
                 resultsDumpForced.set(false); // fix for issue #114638
             }
@@ -473,6 +479,8 @@ public final class LiveResultsWindow extends TopComponent
     private volatile boolean profilerRunning = false;
     private volatile boolean resultsAvailable = false;
     private volatile boolean resultsAvailableinTA = false;
+    private Listener listener;
+    final private AtomicLong autoRefreshRequested = new AtomicLong(0);
     
     private static class Singleton {
         final private static LiveResultsWindow INSTANCE = new LiveResultsWindow();
@@ -484,7 +492,8 @@ public final class LiveResultsWindow extends TopComponent
         CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
                 initUI();
-                Lookup.getDefault().lookup(Listener.class).setDelegate(LiveResultsWindow.this);
+                listener = Lookup.getDefault().lookup(Listener.class);
+                listener.setDelegate(LiveResultsWindow.this);
             }
         });
     }
@@ -1048,13 +1057,14 @@ public final class LiveResultsWindow extends TopComponent
                         return;
                     }
 
-                    if (!isProfiling() || !isOpened()) {
+                    if (!isProfiling() || !isShowing()) {
                         return;
                     }
 
                     ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                             public void run() {
                                 // send a command to server to generate the newest live data
+                                autoRefreshRequested.incrementAndGet();
                                 callForceObtainedResultsDump(runner.getProfilerClient());
                             }
                         });
@@ -1083,7 +1093,7 @@ public final class LiveResultsWindow extends TopComponent
 
     private void refresh() {        
         if (LOGGER.isLoggable(Level.FINE) && (currentDisplayComponent != null)) {
-            LOGGER.fine("refreshing contributors for drilldown: " + currentDisplayComponent.getClass().getName()); // NOI18N
+            LOGGER.log(Level.FINE, "refreshing contributors for drilldown: {0}", currentDisplayComponent.getClass().getName()); // NOI18N
         }
         
         refreshContributors();
@@ -1102,12 +1112,8 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private void updateResultsDisplay() {
-        if (!isOpened()) {
+        if (!isShowing()) {
             return; // do nothing if i'm closed
-        }
-
-        if (!resultsDumpForced.getAndSet(false) && !isAutoRefresh()) {
-            return; // process only forced results if autorefresh is off
         }
 
         if (!resultsAvailable) {

@@ -118,6 +118,16 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
 
         return rootNode;
     }
+    
+    void merge(PresoObjAllocCCTNode node) {
+        PresoObjLivenessCCTNode nodel = (PresoObjLivenessCCTNode)node;
+        nLiveObjects += nodel.nLiveObjects;
+        // TODO: use a more precise aggregation algorithm!!!
+        avgObjectAge = Math.max(avgObjectAge, nodel.avgObjectAge);
+        survGen = Math.max(survGen, nodel.survGen);
+        
+        super.merge(node);
+    }
 
     public void sortChildren(int sortBy, boolean sortOrder) {
         int nChildren = getNChildren();

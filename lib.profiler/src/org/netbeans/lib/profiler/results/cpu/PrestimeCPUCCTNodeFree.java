@@ -136,6 +136,26 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
     public long getWaitTime0() {
         return 0; // TODO [wait]
     }
+    
+    void merge(PrestimeCPUCCTNodeFree node) {
+        addNCalls(node.getNCalls());
+        addSleepTime0(node.getSleepTime0());
+        addTotalTime0(node.getTotalTime0());
+        addTotalTime1(node.getTotalTime1());
+        addWaitTime0(node.getWaitTime0());
+        
+        if (node.children != null) {
+            for (PrestimeCPUCCTNode ch : node.children)
+                ch.parent = this;
+            
+            int chl = children == null ? 0 : children.length;
+            int newchl = node.children.length;
+            PrestimeCPUCCTNodeFree[] newch = new PrestimeCPUCCTNodeFree[chl + newchl];
+            if (children != null) System.arraycopy(children, 0, newch, 0, chl);
+            System.arraycopy(node.children, 0, newch, chl, newchl);
+            children = newch;
+        }
+    }
 
     public void addChild(PrestimeCPUCCTNodeFree node) {
         if (children == null) {
@@ -191,7 +211,7 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
             doSortChildren(sortBy, sortOrder);
         }
     }
-
+    
     public void exportXMLData(ExportDataDumper eDD,String indent) {
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result = new StringBuffer(indent+"<node>"+newline); //NOI18N
