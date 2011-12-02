@@ -548,7 +548,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     }
 
     private void storeDNSAMap() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (Iterator it = getDNSAMap().entrySet().iterator(); it.hasNext();) {
             Map.Entry e = (Map.Entry) it.next();

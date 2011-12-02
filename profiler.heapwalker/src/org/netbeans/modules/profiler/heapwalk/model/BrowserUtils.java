@@ -100,7 +100,7 @@ public class BrowserUtils {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static String getArrayItemType(String arrayTypeName) {
-        int arrayBracketsIdx = arrayTypeName.lastIndexOf("["); // NOI18N
+        int arrayBracketsIdx = arrayTypeName.lastIndexOf('['); // NOI18N
 
         return ((arrayBracketsIdx == -1) ? arrayTypeName : arrayTypeName.substring(0, arrayBracketsIdx));
     }
@@ -149,7 +149,7 @@ public class BrowserUtils {
     }
 
     public static String getSimpleType(String fullType) {
-        int simpleTypeIdx = fullType.lastIndexOf("."); // NOI18N
+        int simpleTypeIdx = fullType.lastIndexOf('.'); // NOI18N
 
         if (simpleTypeIdx == -1) {
             return fullType;
@@ -269,7 +269,7 @@ public class BrowserUtils {
 
         if (name.endsWith(")")) { // NOI18N
             // filters out additional information in name, i.e. GC root type
-            name = name.substring(0, name.indexOf("(")).trim(); // NOI18N
+            name = name.substring(0, name.indexOf('(')).trim(); // NOI18N
         }
 
         return name;

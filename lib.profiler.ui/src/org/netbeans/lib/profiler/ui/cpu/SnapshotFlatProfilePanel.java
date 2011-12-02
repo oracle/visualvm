@@ -97,16 +97,16 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
 
          // NOI18N
         for (int i = 0; i < (columnCount); i++) {
-            result.append("<th>"+columnNames[i]+"</th>");
+            result.append("<th>").append(columnNames[i]).append("</th>");
         }
         result.append("</tr>");
         eDD.dumpData(result);
 
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("<tr><td class=\"method\"><pre class=\"method\">"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</pre></td>");
-            result.append("<td class=\"right\">"+percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)+"</td>");
-            result.append("<td class=\"right\">"+((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms</td>");
-            result.append("<td class=\"right\">"+flatProfileContainer.getNInvocationsAtRow(i)+"</td></tr>");
+            result.append("<td class=\"right\">").append(percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)).append("</td>");
+            result.append("<td class=\"right\">").append((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms</td>");
+            result.append("<td class=\"right\">").append(flatProfileContainer.getNInvocationsAtRow(i)).append("</td></tr>");
             eDD.dumpData(result);
         }
         eDD.dumpDataAndClose(new StringBuffer(" </TABLE></BODY></HTML>"));
@@ -122,16 +122,16 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result = new StringBuffer(newline+"<TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
         }
         for (int i = 0; i < ( columnCount); i++) {
-            result.append("   <TableColumn><![CDATA["+columnNames[i]+"]]></TableColumn>"+newline);
+            result.append("   <TableColumn><![CDATA[").append(columnNames[i]).append("]]></TableColumn>").append(newline);
         }
-        result.append("  </TableHeader>"+newline+"  <TableBody>"+newline);
+        result.append("  </TableHeader>").append(newline).append("  <TableBody>").append(newline);
         eDD.dumpData(result);
 
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline);
-            result.append("    <TableColumn><![CDATA["+percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)+"]]></TableColumn>"+newline);
-            result.append("    <TableColumn><![CDATA["+(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000)+" ms]]></TableColumn>"+newline);
-            result.append("    <TableColumn><![CDATA["+flatProfileContainer.getNInvocationsAtRow(i)+"]]></TableColumn>"+newline+"  </TableRow>"+newline);
+            result.append("    <TableColumn><![CDATA[").append(percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)).append("]]></TableColumn>").append(newline);
+            result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline);
+            result.append("    <TableColumn><![CDATA[").append(flatProfileContainer.getNInvocationsAtRow(i)).append("]]></TableColumn>").append(newline).append("  </TableRow>").append(newline);
             eDD.dumpData(result);
         }
         eDD.dumpDataAndClose(new StringBuffer("  </TableBody>"+" </TableData>"+newline+"</ExportedView>"));
@@ -144,10 +144,10 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         String quote = "\""; // NOI18N
 
         if (combine) {
-            result.append(quote+quote+separator+quote+quote+separator+quote+quote+separator+quote+quote+newLine);
+            result.append(quote).append(quote).append(separator).append(quote).append(quote).append(separator).append(quote).append(quote).append(separator).append(quote).append(quote).append(newLine);
         }
         for (int i = 0; i < (columnCount); i++) {
-            result.append(quote+columnNames[i]+quote+separator);
+            result.append(quote).append(columnNames[i]).append(quote).append(separator);
         }
         result.deleteCharAt(result.length()-1);
         result.append(newLine);
@@ -156,17 +156,17 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         // Data
         for (int i=0; i < flatProfileContainer.getNRows(); i++) {
             result = new StringBuffer();
-            result.append(quote+flatProfileContainer.getMethodNameAtRow(i)+quote+separator);
-            result.append(quote+flatProfileContainer.getPercentAtRow(i)+quote+separator);
-            result.append(quote+((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000)+" ms"+quote+separator);
-            result.append(quote+flatProfileContainer.getNInvocationsAtRow(i)+quote+newLine);
+            result.append(quote).append(flatProfileContainer.getMethodNameAtRow(i)).append(quote).append(separator);
+            result.append(quote).append(flatProfileContainer.getPercentAtRow(i)).append(quote).append(separator);
+            result.append(quote).append((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            result.append(quote).append(flatProfileContainer.getNInvocationsAtRow(i)).append(quote).append(newLine);
             eDD.dumpData(result);
         }
         eDD.close();
     }
 
     private String replaceHTMLCharacters(String s) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int len = s.length();
         for (int i = 0; i < len; i++) {
           char c = s.charAt(i);

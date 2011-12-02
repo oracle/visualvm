@@ -155,7 +155,7 @@ public class OQLEngineImpl {
             selectExpr += " " + tok; // NOI18N
         }
 
-        if (selectExpr.equals("")) { // NOI18N
+        if (selectExpr.isEmpty()) { // NOI18N
             throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EMPTY_SELECT"));
         }
 
@@ -195,7 +195,7 @@ public class OQLEngineImpl {
                     while (st.hasMoreTokens()) {
                         whereExpr += " " + st.nextToken(); // NOI18N
                     }
-                    if (whereExpr.equals("")) { // NOI18N
+                    if (whereExpr.isEmpty()) { // NOI18N
                         throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EMPTY_WHERE"));
                     }
                 }
