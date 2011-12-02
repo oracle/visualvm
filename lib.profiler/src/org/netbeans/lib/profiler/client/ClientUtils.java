@@ -245,7 +245,7 @@ public class ClientUtils implements CommonConstants {
                        + startLine + ", end line: " // NOI18N
                        + endLine + "]"; // NOI18N
             } else {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append("Source Code defined via method: "); // NOI18N
                 sb.append("\n"); // NOI18N
                 sb.append("  class: "); // NOI18N

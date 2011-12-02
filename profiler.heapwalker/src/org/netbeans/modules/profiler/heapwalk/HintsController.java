@@ -169,7 +169,7 @@ public class HintsController extends AbstractController {
         
         output.append("<table border='0' width='100%'>");  // NOI18N
         output.append("<tr style='background-color:");  // NOI18N
-        output.append(oddRowBackgroundString + ";'>");  // NOI18N
+        output.append(oddRowBackgroundString).append(";'>");  // NOI18N
         addHeading(output, CLASS_NAME_MSG);
         addHeading(output, RETAINED_SIZE_MSG);
         output.append("</tr>"); // NOI18N
@@ -206,9 +206,9 @@ public class HintsController extends AbstractController {
     }
 
     private void addTag(StringBuffer output,String text,String tag, boolean ralign) {
-        output.append("<" + tag + (ralign ? " style='text-align: right;'>" : ">"));   // NOI18N
+        output.append("<").append(tag).append(ralign ? " style='text-align: right;'>" : ">");   // NOI18N
         output.append(text);
-        output.append("</" + tag + ">");   // NOI18N
+        output.append("</").append(tag).append(">");   // NOI18N
     }
     
     private String printInstance(Instance in) {

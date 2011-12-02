@@ -98,7 +98,7 @@ public class MethodNameFormatter {
         int idx2;
         char nextChar;
 
-        StringBuffer arrayIndicator = new StringBuffer();
+        StringBuilder arrayIndicator = new StringBuilder();
 
         if (cname != null) {
             this.className = cname.replace('/', '.'); // NOI18N
@@ -179,7 +179,7 @@ public class MethodNameFormatter {
 
                 if (idx2 > 0) {
                     String paramsString = sig.substring(idx1, idx2);
-                    StringBuffer paramsBuf = new StringBuffer();
+                    StringBuilder paramsBuf = new StringBuilder();
                     arrayIndicator.setLength(0);
                     curPos = 0;
 

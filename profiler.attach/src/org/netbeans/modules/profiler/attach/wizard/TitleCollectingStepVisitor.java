@@ -80,7 +80,7 @@ public class TitleCollectingStepVisitor implements WizardStepVisitor {
 
     public void visit(final WizardStep wizardStep, final WizardContext context, int level) {
         if ((level > 0) && (wizardStep.getTitle() != null) && (wizardStep.getTitle().length() != 0)) {
-            StringBuffer title = new StringBuffer();
+            StringBuilder title = new StringBuilder();
             title.append(wizardStep.getTitle());
             titles.add(title.toString());
 
