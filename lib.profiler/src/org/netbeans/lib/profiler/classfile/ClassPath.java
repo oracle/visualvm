@@ -276,7 +276,7 @@ public class ClassPath {
 
     //------------------------------------------ Debugging -----------------------------------------
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         for (int i = 0; i < paths.length; i++) {
             buf.append((paths[i] instanceof Dir) ? ((Dir) paths[i]).dir.getAbsolutePath() : ((Zip) paths[i]).zipFilePath);

@@ -234,7 +234,7 @@ public final class TelemetryWindow extends TopComponent {
             }
             //header
             StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
-            result.append("<th>"+col1Name+"</th><th>"+col2Name+"</th><th>"+col3Name+"</th></tr>"); //NOI18N
+            result.append("<th>").append(col1Name).append("</th><th>").append(col2Name).append("</th><th>").append(col3Name).append("</th></tr>"); //NOI18N
             eDD.dumpData(result);
             Date d = new Date();
             // Data
@@ -280,17 +280,17 @@ public final class TelemetryWindow extends TopComponent {
             //header
             String newline = System.getProperty("line.separator"); // NOI18N
             StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\">"+newline); // NOI18N
-            result.append("<TableData NumRows=\""+nItems+"\" NumColumns=\"3\">"+newline+" <TableHeader>");  // NOI18N
-            result.append(" <TableColumn>"+col1Name+" </TableColumn>"+newline+" <TableColumn>"+col2Name+" </TableColumn>"+newline+" <TableColumn>"+col3Name+" </TableColumn>"+newline);  // NOI18N
-            result.append(" </TableHeader>"+newline+" <TableBody>"+newline); //NOI18N
+            result.append("<TableData NumRows=\"").append(nItems).append("\" NumColumns=\"3\">").append(newline).append(" <TableHeader>");  // NOI18N
+            result.append(" <TableColumn>").append(col1Name).append(" </TableColumn>").append(newline).append(" <TableColumn>").append(col2Name).append(" </TableColumn>").append(newline).append(" <TableColumn>").append(col3Name).append(" </TableColumn>").append(newline);  // NOI18N
+            result.append(" </TableHeader>").append(newline).append(" <TableBody>").append(newline); //NOI18N
             eDD.dumpData(result);
             Date d = new Date();
             // Data
             for (int i=0; i < (nItems); i++) {
                 d.setTime(col1[i]);
                 result = new StringBuffer("  <TableRow>"+newline+"   <TableCell>"+DateFormat.getDateTimeInstance().format(d)+"</TableCell>"+newline);  // NOI18N
-                result.append("   <TableCell>"+col2[i]+"</TableCell>"+newline);  // NOI18N
-                result.append("   <TableCell>"+col3[i]+"</TableCell>"+newline+"  </TableRow>"+newline);  // NOI18N
+                result.append("   <TableCell>").append(col2[i]).append("</TableCell>").append(newline);  // NOI18N
+                result.append("   <TableCell>").append(col3[i]).append("</TableCell>").append(newline).append("  </TableRow>").append(newline);  // NOI18N
                 eDD.dumpData(result);
             }
             eDD.dumpDataAndClose(new StringBuffer(" </TableBody>"+newline+"</TableData>"+newline+"</ExportedView>"));  // NOI18N

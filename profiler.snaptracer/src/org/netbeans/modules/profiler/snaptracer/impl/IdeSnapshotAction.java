@@ -175,7 +175,7 @@ public final class IdeSnapshotAction implements ActionListener {
         }
 
         private static String getFileExt(String fileName) {
-            int extIndex = fileName.lastIndexOf("."); // NOI18N
+            int extIndex = fileName.lastIndexOf('.'); // NOI18N
             if (extIndex == -1) return ""; // NOI18N
             return fileName.substring(extIndex);
         }

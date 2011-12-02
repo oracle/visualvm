@@ -171,7 +171,7 @@ public final class Histogram<T extends Histogram.Entry> {
     }
 
     public String toString(int treshold) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         int totalSize = 0;
         int totalCount = 0;
         SortedMap<String, T> bySize = getResults(sortBySize());
