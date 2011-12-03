@@ -177,8 +177,8 @@ final class PackagesView {
 
         for (int i = 0; i < packagesCount; i++) {
             TracerPackage p = packages.get(i);
-            categories[i] = new String(p.getName());
-            tooltips[i] = new String(p.getDescription());
+            categories[i] = p.getName();
+            tooltips[i] = p.getDescription();
             initialStates[i] = expanded == null || expanded;
             if (expanded == null) expanded = false;
 

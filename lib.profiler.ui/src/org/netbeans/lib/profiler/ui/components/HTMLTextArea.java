@@ -171,12 +171,12 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public static String decode(String str) {
-            StringBuffer ostr = new StringBuffer();
+            StringBuilder ostr = new StringBuilder();
             int i1 = 0;
             int i2 = 0;
 
             while (i2 < str.length()) {
-                i1 = str.indexOf("&", i2); //NOI18N
+                i1 = str.indexOf('&', i2); //NOI18N
 
                 if (i1 == -1) {
                     ostr.append(str.substring(i2, str.length()));
@@ -185,7 +185,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
                 }
 
                 ostr.append(str.substring(i2, i1));
-                i2 = str.indexOf(";", i1); //NOI18N
+                i2 = str.indexOf(';', i1); //NOI18N
 
                 if (i2 == -1) {
                     ostr.append(str.substring(i1, str.length()));

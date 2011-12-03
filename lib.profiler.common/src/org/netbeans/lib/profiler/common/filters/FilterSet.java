@@ -190,13 +190,13 @@ public final class FilterSet {
     public String debug() {
         final StringBuffer sb = new StringBuffer();
 
-        sb.append("FilterSet name: " + filterSetName); //NOI18N
+        sb.append("FilterSet name: ").append(filterSetName); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("  Type: " + ((filterSetType == FILTER_SET_EXCLUSIVE) ? "Exclusive" : "Inclusive")); //NOI18N
+        sb.append("  Type: ").append((filterSetType == FILTER_SET_EXCLUSIVE) ? "Exclusive" : "Inclusive"); //NOI18N
         sb.append("\n"); //NOI18N
 
         for (int i = 0; i < activeGlobalFilters.length; i++) {
-            sb.append("  GlobalFilter " + i + ": " + activeGlobalFilters[i]); //NOI18N
+            sb.append("  GlobalFilter ").append(i).append(": ").append(activeGlobalFilters[i]); //NOI18N
             sb.append("\n"); //NOI18N
         }
 

@@ -161,7 +161,7 @@ public class AttachSettingsPanel extends AttachWizardPanel {
 
         // <editor-fold defaultstate="collapsed" desc="hints">
         public String getHints() {
-            StringBuffer hintBuffer = new StringBuffer();
+            StringBuilder hintBuffer = new StringBuilder();
 
             if (!targetGroup.isNull()) {
                 if (isLocal()) {
@@ -249,7 +249,7 @@ public class AttachSettingsPanel extends AttachWizardPanel {
         }
 
         private String getDirectHint() {
-            StringBuffer hint = new StringBuffer();
+            StringBuilder hint = new StringBuilder();
 
             if (model.isLocal()) { // don't display hints for disabled features
 
@@ -278,7 +278,7 @@ public class AttachSettingsPanel extends AttachWizardPanel {
         }
 
         private String getLocalHint() {
-            StringBuffer hint = new StringBuffer();
+            StringBuilder hint = new StringBuilder();
 
             if (getContext().getIntegrationProvider().supportsLocal()) {
                 hint.append(MessageFormat.format(LOCAL_HELP_STRING, new Object[] { getTargetGroup().getName() }));

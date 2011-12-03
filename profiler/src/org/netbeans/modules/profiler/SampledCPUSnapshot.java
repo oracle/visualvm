@@ -206,9 +206,8 @@ public final class SampledCPUSnapshot {
     private void print16Thread(final StringBuilder sb, final ThreadInfo thread, boolean goToSourceAvailable) {
         MonitorInfo[] monitors = thread.getLockedMonitors();
         sb.append("&nbsp;<b>");   // NOI18N
-        sb.append("\"" + thread.getThreadName() + // NOI18N
-                "\" - Thread t@" + thread.getThreadId() + "<br>");    // NOI18N
-        sb.append("    java.lang.Thread.State: " + thread.getThreadState()); // NOI18N
+        sb.append("\"").append(thread.getThreadName()).append("\" - Thread t@").append(thread.getThreadId()).append("<br>");    // NOI18N
+        sb.append("    java.lang.Thread.State: ").append(thread.getThreadState()); // NOI18N
         sb.append("</b><br>");   // NOI18N
         int index = 0;
         for (StackTraceElement st : thread.getStackTrace()) {
@@ -225,7 +224,7 @@ public final class SampledCPUSnapshot {
                 stackEl = "<a href=\""+stackUrl+"\">"+stackElementText+"</a>";    // NOI18N
             }
 
-            sb.append("\tat " + stackEl + "<br>");    // NOI18N
+            sb.append("\tat ").append(stackEl).append("<br>");    // NOI18N
             if (index == 0) {
                 if ("java.lang.Object".equals(st.getClassName()) &&     // NOI18N
                         "wait".equals(st.getMethodName())) {                // NOI18N
@@ -242,7 +241,7 @@ public final class SampledCPUSnapshot {
                     } else {
                         sb.append("\t- waiting to lock ");      // NOI18N
                         printLock(sb,lock);
-                        sb.append(" owned by \""+lockOwner+"\" t@"+thread.getLockOwnerId()+"<br>");   // NOI18N
+                        sb.append(" owned by \"").append(lockOwner).append("\" t@").append(thread.getLockOwnerId()).append("<br>");   // NOI18N
                     }
                 }
             }
@@ -287,7 +286,7 @@ public final class SampledCPUSnapshot {
         String id = Integer.toHexString(lock.getIdentityHashCode());
         String className = lock.getClassName();
 
-        sb.append("&lt;"+id+"&gt; (a "+className+")");       // NOI18N
+        sb.append("&lt;").append(id).append("&gt; (a ").append(className).append(")");       // NOI18N
     }
     
     private static String htmlize(String value) {
