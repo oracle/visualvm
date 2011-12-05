@@ -7,4 +7,4 @@ Server start to listen on port 5140
  received object org.netbeans.lib.profiler.wireprotocol.DefiningLoaderResponse DefiningLoaderResponse, loaderId: 1, DEFINING_LOADER Ok, yes
  received object org.netbeans.lib.profiler.wireprotocol.CalibrationDataResponse CalibrationDataResponse, CALIBRATION_DATA Ok, yes
  received object org.netbeans.lib.profiler.wireprotocol.InternalStatsResponse InternalStatsResponse, INTERNAL_STATS Ok, yes
- received object org.netbeans.lib.profiler.wireprotocol.ObjectAllocationResultsResponse ObjectAllocationResultsResponse, entries: 0, OBJECT_ALLOCATION_RESULTS Ok, yes
+ received object org.netbeans.lib.profiler.wireprotocol.ObjectAllocationResultsResponse ObjectAllocationResultsResponse, entries: 1, OBJECT_ALLOCATION_RESULTS Ok, yes

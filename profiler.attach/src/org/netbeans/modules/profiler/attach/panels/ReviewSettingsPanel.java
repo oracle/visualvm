@@ -169,7 +169,7 @@ public class ReviewSettingsPanel extends AttachWizardPanel {
     }
 
     private String buildSummary(AttachSettings attachSettings) {
-        StringBuffer attachSettingsSummaryBuffer = new StringBuffer();
+        StringBuilder attachSettingsSummaryBuffer = new StringBuilder();
         attachSettingsSummaryBuffer.append("<b>"); // NOI18N
         attachSettingsSummaryBuffer.append(NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_TargetTypeString")); // NOI18N
         attachSettingsSummaryBuffer.append("</b> "); // NOI18N

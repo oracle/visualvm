@@ -136,7 +136,7 @@ public abstract class FlatProfileContainer {
 
     public void filterOriginalData(String[] filters, int type, double valueFilter) {
         //    percent = null;
-        if (((type == CommonConstants.FILTER_NONE) || (filters == null) || filters[0].equals("")) && (valueFilter == 0.0d)) { // NOI18N
+        if (((type == CommonConstants.FILTER_NONE) || (filters == null) || filters[0].isEmpty()) && (valueFilter == 0.0d)) { // NOI18N
             nRows = totalMethods; // Effectively removes all filtering
 
             return;

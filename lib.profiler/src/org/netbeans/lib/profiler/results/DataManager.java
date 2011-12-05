@@ -93,8 +93,6 @@ public abstract class DataManager {
             toNotify = new HashSet(listeners);
         }
 
-        final Set listenerSet = toNotify;
-
         Iterator iterator = toNotify.iterator();
 
         while (iterator.hasNext()) {
@@ -116,8 +114,6 @@ public abstract class DataManager {
         synchronized (listeners) {
             toNotify = new HashSet(listeners);
         }
-
-        final Set listenerSet = toNotify;
 
         Iterator iterator = toNotify.iterator();
 

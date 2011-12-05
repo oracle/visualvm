@@ -66,7 +66,6 @@ class StackTraceSegment extends TagBounds {
     StackTraceSegment(HprofHeap heap, long start, long end) {
         super(HprofHeap.STACK_TRACE, start, end);
 
-        int idSize = heap.dumpBuffer.getIDSize();
         hprofHeap = heap;
         timeOffset = 1;
         lengthOffset = timeOffset + 4;

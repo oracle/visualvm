@@ -79,7 +79,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
         }
 
         public void setText(String text) {
-            int classNameIndex = text.lastIndexOf("."); // NOI18N
+            int classNameIndex = text.lastIndexOf('.'); // NOI18N
 
             if (classNameIndex == -1) {
                 super.setText(text);
