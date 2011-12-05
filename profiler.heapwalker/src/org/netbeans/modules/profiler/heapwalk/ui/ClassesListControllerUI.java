@@ -514,22 +514,8 @@ public class ClassesListControllerUI extends JTitledPanel {
         });
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (isDiff != classesListController.isDiff()) {
-                    isDiff = !isDiff;
-                    CustomBarCellRenderer customBarCellRenderer = isDiff ?
-                            new DiffBarCellRenderer(classesListController.minDiff, classesListController.maxDiff) :
-                            new CustomBarCellRenderer(0, 100);
-                    columnRenderers[1] = customBarCellRenderer;
 
-                    TableCellRenderer dataCellRenderer = isDiff ?
-                            new LabelTableCellRenderer(JLabel.TRAILING) :
-                            new LabelBracketTableCellRenderer(JLabel.TRAILING);
-                    columnRenderers[2] = dataCellRenderer;
-                    columnRenderers[3] = dataCellRenderer;
-                    setColumnsData(false);
-                }
-
-                classesListTableModel.fireTableDataChanged();
+                adjustRenderers();
                 restoreSelection();
                 if (contents != null) contents.show(contentsPanel, DATA);
             }
@@ -597,6 +583,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     public void updateData() {
+        updateTableRenderers();
         realClassesListTableModel.resetDisplayCache();
     }
     
@@ -1141,5 +1128,33 @@ public class ClassesListControllerUI extends JTitledPanel {
     private void showSubclassesForClass(JavaClass jClass) {
         saveSelection();
         filterComponent.setFilterValues(jClass.getName(),ClassesListController.FILTER_SUBCLASS);
+    }
+    
+    private void adjustRenderers() {
+        if (isDiff != classesListController.isDiff()) {
+            isDiff = !isDiff;
+            CustomBarCellRenderer customBarCellRenderer = isDiff ?
+                    new DiffBarCellRenderer(classesListController.minDiff, classesListController.maxDiff) :
+                    new CustomBarCellRenderer(0, 100);
+            columnRenderers[1] = customBarCellRenderer;
+
+            TableCellRenderer dataCellRenderer = isDiff ?
+                    new LabelTableCellRenderer(JLabel.TRAILING) :
+                    new LabelBracketTableCellRenderer(JLabel.TRAILING);
+            columnRenderers[2] = dataCellRenderer;
+            columnRenderers[3] = dataCellRenderer;
+            setColumnsData(false);
+        }
+
+        classesListTableModel.fireTableDataChanged();
+    }
+    
+    private void updateTableRenderers() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                adjustRenderers();
+            }
+        });
     }
 }
