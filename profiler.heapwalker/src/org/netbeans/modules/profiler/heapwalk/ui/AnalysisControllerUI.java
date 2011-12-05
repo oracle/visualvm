@@ -313,7 +313,7 @@ public class AnalysisControllerUI extends JPanel {
                                                                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
             public Dimension getPreferredSize() {
                 Dimension pref = super.getPreferredSize();
-                int height = Math.min(pref.height, 160);
+                int height = Math.min(pref.height, 200);
 
                 return new Dimension(pref.width, height);
             }
