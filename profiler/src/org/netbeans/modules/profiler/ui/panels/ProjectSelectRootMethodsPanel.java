@@ -77,10 +77,10 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.CommonUtils;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
@@ -133,7 +133,18 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
     public static synchronized ProjectSelectRootMethodsPanel getDefault() {
         if (instance == null) {
-            instance = new ProjectSelectRootMethodsPanel();
+            Runnable initializer = new Runnable() {
+                public void run() { instance = new ProjectSelectRootMethodsPanel(); }
+            };
+            if (SwingUtilities.isEventDispatchThread()) {
+                initializer.run();
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(initializer);
+                } catch (Exception e) {
+                    initializer.run();
+                }
+            }
         }
 
         return instance;
