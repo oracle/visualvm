@@ -68,6 +68,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -93,6 +94,8 @@ import org.openide.util.lookup.Lookups;
  * @author Jaroslav Bachorik
  */
 final public class ProjectSelectRootMethodsPanel extends JPanel {
+    final private static Logger LOG = Logger.getLogger(ProjectSelectRootMethodsPanel.class.getName());
+    
     private static ProjectSelectRootMethodsPanel instance = null;
 
     // -----
@@ -105,8 +108,8 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 //            "SelectRootMethodsPanel_RemoveAllItemText"); // NOI18N
 //    private static final String SELECT_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
 //            "SelectRootMethodsPanel_SelectAllItemText"); // NOI18N
-    private static final String NO_SELECTION_PROVIDES = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_NoSelectionProviders"); // NOI18N
+    private static final String NO_SELECTION_PROVIDERS = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
+            "SelectRootMethodsPanel_NoSelectionProviders_MSG"); // NOI18N
     // -----
     protected static final Dimension PREFERRED_TOPTREE_DIMENSION = new Dimension(500, 250);
 
@@ -185,8 +188,8 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             });
 
             if (advancedLogicalPackageTree.getBuilderTypes().isEmpty()) {
-                ProfilerDialogs.displayWarning(NO_SELECTION_PROVIDES);
-                return null;
+                LOG.fine(NO_SELECTION_PROVIDERS);
+                return RootMethodsPanel.getSelectedRootMethods(currentSelection, project);
             }
 
             final DialogDescriptor dd = new DialogDescriptor(this,

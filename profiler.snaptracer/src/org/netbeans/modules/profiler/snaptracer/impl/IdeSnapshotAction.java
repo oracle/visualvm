@@ -50,6 +50,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
@@ -99,10 +100,14 @@ public final class IdeSnapshotAction implements ActionListener {
         if (file == null) return null;
         try {
             FileObject primary = FileUtil.toFileObject(file);
-            FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log");
+            FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
             
             return new IdeSnapshot(primary, uigestureFO);
-        } catch (Throwable t) { Exceptions.printStackTrace(t); return null; }
+        } catch (Throwable t) {
+            ProfilerDialogs.displayError(NbBundle.getMessage(IdeSnapshotAction.class,
+                    "MSG_SnapshotLoadFailedMsg", file.getName())); // NOI18N
+            return null;
+        }
     }
 
     private File snapshotFile() {
@@ -170,7 +175,7 @@ public final class IdeSnapshotAction implements ActionListener {
         }
 
         private static String getFileExt(String fileName) {
-            int extIndex = fileName.lastIndexOf("."); // NOI18N
+            int extIndex = fileName.lastIndexOf('.'); // NOI18N
             if (extIndex == -1) return ""; // NOI18N
             return fileName.substring(extIndex);
         }

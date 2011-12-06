@@ -421,7 +421,7 @@ public class OverviewController extends AbstractController {
     }
     
     private String formatSystemProperties(Properties properties) {
-        StringBuffer text = new StringBuffer(200);
+        StringBuilder text = new StringBuilder(200);
         List keys = new ArrayList();
         Enumeration en = properties.propertyNames();
         Iterator keyIt;
@@ -480,15 +480,15 @@ public class OverviewController extends AbstractController {
                         }                        
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
                         // sw.append("&nbsp;&nbsp;<span style=\"color: #0033CC\">"); // NOI18N
-                        sb.append("&nbsp;&nbsp;<a name="+threadInstance.getInstanceId()+"></a><b "+style+">");   // NOI18N
+                        sb.append("&nbsp;&nbsp;<a name=").append(threadInstance.getInstanceId()).append("></a><b ").append(style).append(">");   // NOI18N
                         // -------------------------------------------------------------------
-                        sb.append("\""+htmlize(threadName)+"\""+(daemon.booleanValue() ? " daemon" : "")+" prio="+priority);   // NOI18N
+                        sb.append("\"").append(htmlize(threadName)).append("\"").append(daemon.booleanValue() ? " daemon" : "").append(" prio=").append(priority);   // NOI18N
                         if (threadId != null) {
-                            sb.append(" tid="+threadId);    // NOI18N
+                            sb.append(" tid=").append(threadId);    // NOI18N
                         }
                         if (threadStatus != null) {
                             State tState = sun.misc.VM.toThreadState(threadStatus.intValue());
-                            sb.append(" "+tState);          // NOI18N
+                            sb.append(" ").append(tState);          // NOI18N
                         }
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
                         // sw.append("</span><br>"); // NOI18N
@@ -513,7 +513,7 @@ public class OverviewController extends AbstractController {
                                 } else {
                                     stackElHref = stackElementText;
                                 }
-                                sb.append("\tat "+stackElHref+"<br>");  // NOI18N
+                                sb.append("\tat ").append(stackElHref).append("<br>");  // NOI18N
                                 if (localsMap != null) {
                                     List<JavaFrameGCRoot> locals = localsMap.get(Integer.valueOf(i));
                                     
@@ -522,7 +522,7 @@ public class OverviewController extends AbstractController {
                                             Instance localInstance = localVar.getInstance();
                                             
                                             if (localInstance != null) {
-                                                sb.append("\t   Local Variable: "+printInstance(localInstance)+"<br>"); // NOI18N
+                                                sb.append("\t   Local Variable: ").append(printInstance(localInstance)).append("<br>"); // NOI18N
                                             } else {
                                                 sb.append("\t   Unknown Local Variable<br>"); // NOI18N                                                
                                             }

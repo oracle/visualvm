@@ -574,6 +574,7 @@ public class ProfilingSettings {
         settings.setSortResultsByThreadCPUTime(getSortResultsByThreadCPUTime());
 
         settings.setSamplingInterval(getSamplingInterval());
+        settings.setSamplingFrequency(getSamplingFrequency());
 
         settings.setCodeRegionCPUResBufSize(getCodeRegionCPUResBufSize());
 
@@ -714,63 +715,65 @@ public class ProfilingSettings {
 
     public String debug() {
         final StringBuffer sb = new StringBuffer();
-        sb.append("isPreset: " + isPreset()); //NOI18N
+        sb.append("isPreset: ").append(isPreset()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("name: " + getSettingsName()); //NOI18N
+        sb.append("name: ").append(getSettingsName()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("profilingType: " + getProfilingType()); //NOI18N
+        sb.append("profilingType: ").append(getProfilingType()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("overrideGlobalSettings: " + getOverrideGlobalSettings()); //NOI18N
+        sb.append("overrideGlobalSettings: ").append(getOverrideGlobalSettings()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("workingDir: " + getWorkingDir()); //NOI18N
+        sb.append("workingDir: ").append(getWorkingDir()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("jvmArgs: " + getJVMArgs()); //NOI18N
+        sb.append("jvmArgs: ").append(getJVMArgs()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("javaPlatform: " + ((getJavaPlatformName() == null) ? "<project>" : getJavaPlatformName())); //NOI18N
+        sb.append("javaPlatform: ").append((getJavaPlatformName() == null) ? "<project>" : getJavaPlatformName()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("threadsMonitoringEnabled: " + getThreadsMonitoringEnabled()); //NOI18N
+        sb.append("threadsMonitoringEnabled: ").append(getThreadsMonitoringEnabled()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("threadsSamplingEnabled: " + getThreadsSamplingEnabled()); //NOI18N
+        sb.append("threadsSamplingEnabled: ").append(getThreadsSamplingEnabled()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("useProfilingPoints: " + useProfilingPoints()); // NOI18N
+        sb.append("useProfilingPoints: ").append(useProfilingPoints()); // NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("excludeWaitTime: " + getExcludeWaitTime()); //NOI18N
+        sb.append("excludeWaitTime: ").append(getExcludeWaitTime()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("cpuProfilingType: " + getCPUProfilingType()); //NOI18N
+        sb.append("cpuProfilingType: ").append(getCPUProfilingType()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("instrScheme: " + getInstrScheme()); //NOI18N
+        sb.append("instrScheme: ").append(getInstrScheme()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("threadCPUTimerOn: " + getThreadCPUTimerOn()); //NOI18N
+        sb.append("threadCPUTimerOn: ").append(getThreadCPUTimerOn()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("instrumentGetterSetterMethods: " + getInstrumentGetterSetterMethods()); //NOI18N
+        sb.append("instrumentGetterSetterMethods: ").append(getInstrumentGetterSetterMethods()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("instrumentEmptyMethods: " + getInstrumentEmptyMethods()); //NOI18N
+        sb.append("instrumentEmptyMethods: ").append(getInstrumentEmptyMethods()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("instrumentMethodInvoke: " + getInstrumentMethodInvoke()); //NOI18N
+        sb.append("instrumentMethodInvoke: ").append(getInstrumentMethodInvoke()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("instrumentSpawnedThreads: " + getInstrumentSpawnedThreads()); //NOI18N
+        sb.append("instrumentSpawnedThreads: ").append(getInstrumentSpawnedThreads()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("nProfiledThreadsLimit: " + getNProfiledThreadsLimit()); //NOI18N
+        sb.append("nProfiledThreadsLimit: ").append(getNProfiledThreadsLimit()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("sortResultsByThreadCPUTime: " + getSortResultsByThreadCPUTime()); //NOI18N
+        sb.append("sortResultsByThreadCPUTime: ").append(getSortResultsByThreadCPUTime()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("samplingInterval: " + getSamplingInterval()); //NOI18N
+        sb.append("samplingInterval: ").append(getSamplingInterval()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("instrumentationRootMethods: " + instrumentationRootMethods); //NOI18N
+        sb.append("samplingFrequency: ").append(getSamplingFrequency()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("codeFragmentSelection: " + getCodeFragmentSelection()); //NOI18N
+        sb.append("instrumentationRootMethods: ").append(instrumentationRootMethods); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("codeRegionCPUResBufSize: " + getCodeRegionCPUResBufSize()); //NOI18N
+        sb.append("codeFragmentSelection: ").append(getCodeFragmentSelection()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("runGCOnGetResultsInMemoryProfiling: " + getRunGCOnGetResultsInMemoryProfiling()); //NOI18N
+        sb.append("codeRegionCPUResBufSize: ").append(getCodeRegionCPUResBufSize()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("allocTrackEvery: " + getAllocTrackEvery()); //NOI18N
+        sb.append("runGCOnGetResultsInMemoryProfiling: ").append(getRunGCOnGetResultsInMemoryProfiling()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("allocStackTraceLimit: " + getAllocStackTraceLimit()); //NOI18N
+        sb.append("allocTrackEvery: ").append(getAllocTrackEvery()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("selectedInstrFilter: " + getSelectedInstrumentationFilter()); //NOI18N
+        sb.append("allocStackTraceLimit: ").append(getAllocStackTraceLimit()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("profileUnderlyingFramework: " + getProfileUnderlyingFramework()); //NOI18N
+        sb.append("selectedInstrFilter: ").append(getSelectedInstrumentationFilter()); //NOI18N
+        sb.append('\n'); //NOI18N
+        sb.append("profileUnderlyingFramework: ").append(getProfileUnderlyingFramework()); //NOI18N
         sb.append('\n'); //NOI18N
 
         return sb.toString();

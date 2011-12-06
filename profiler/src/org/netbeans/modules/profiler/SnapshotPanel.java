@@ -58,7 +58,5 @@ public abstract class SnapshotPanel extends JPanel {
 
     public abstract ResultsSnapshot getSnapshot();
 
-    public abstract String getTitle();
-
     public abstract void updateSavedState();
 }

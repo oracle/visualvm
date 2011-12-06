@@ -354,7 +354,7 @@ public class ClassesListController extends AbstractController {
         
         List filteredClasses;
 
-        if ((filterType == FILTER_SUBCLASS) && !((filterStrings == null) || filterStrings[0].equals(""))) { // NOI18N
+        if ((filterType == FILTER_SUBCLASS) && !((filterStrings == null) || filterStrings[0].isEmpty())) { // NOI18N
             filteredClasses = getFilteredClasses(getSubclasses(heap, diffClasses, filterStrings, fragmentWalker.getHeapDumpProject()), null,
                                                  CommonConstants.FILTER_NONE, showZeroInstances, showZeroSize);
         } else {
@@ -391,7 +391,7 @@ public class ClassesListController extends AbstractController {
             return false;
         }
 
-        if ((filterType == CommonConstants.FILTER_NONE) || (filterStrings == null) || filterStrings[0].equals("")) {
+        if ((filterType == CommonConstants.FILTER_NONE) || (filterStrings == null) || filterStrings[0].isEmpty()) {
             return true; // NOI18N
         }
 

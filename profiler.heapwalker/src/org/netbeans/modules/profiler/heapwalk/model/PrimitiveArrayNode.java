@@ -201,7 +201,7 @@ public class PrimitiveArrayNode extends ArrayNode {
         if (getInstance().getJavaClass().getName().equals("char[]")) { // NOI18N
 
             List fields = getInstance().getValues();
-            StringBuffer logicalValue = new StringBuffer();
+            StringBuilder logicalValue = new StringBuilder();
             int fieldsSize = fields.size();
             boolean truncated = false;
 
