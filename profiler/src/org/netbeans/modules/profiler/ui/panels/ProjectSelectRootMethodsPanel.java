@@ -86,6 +86,7 @@ import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
 import org.openide.DialogDisplayer;
+import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
 import org.openide.util.lookup.Lookups;
 
@@ -323,7 +324,8 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         gridBagConstraints.insets = new Insets(10, 10, 0, 10);
         container.add(advancedLogicalPackageTreeScrollPane, gridBagConstraints);
 
-        advancedShowAllProjectsCheckBox.setText(NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_ShowAllProjectsLabel")); // NOI18N
+        Mnemonics.setLocalizedText(advancedShowAllProjectsCheckBox,
+                NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_ShowAllProjectsLabel")); // NOI18N
         advancedShowAllProjectsCheckBox.addActionListener(new ActionListener() {
 
             @Override
@@ -340,7 +342,11 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         });
 
         JPanel comboPanel = new JPanel(new FlowLayout());
-        comboPanel.add(new JLabel(NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_SelectViewLabel"))); // NOI18N
+        JLabel label = new JLabel();
+        Mnemonics.setLocalizedText(label, NbBundle.getMessage(this.getClass(),
+                "SelectRootMethodsPanel_SelectViewLabel")); // NOI18N
+        label.setLabelFor(treeBuilderList);
+        comboPanel.add(label);
         comboPanel.add(treeBuilderList);
 
         gridBagConstraints = new GridBagConstraints();
@@ -381,7 +387,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private Object[] getAdditionalOptions() {
-        return new Object[] { new JButton(NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_AdvancedButtonText")) { //NOI18N
+        JButton button = new JButton() {
             @Override
             protected void fireActionPerformed(ActionEvent e) {
                 RequestProcessor.getDefault().post(new Runnable() {
@@ -400,7 +406,10 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
                     }
                 });
             }
-        }};
+        };
+        Mnemonics.setLocalizedText(button,
+                NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_AdvancedButtonText")); //NOI18N
+        return new Object[] { button };
     }
 
     private void setGlobalMode(boolean value) {
