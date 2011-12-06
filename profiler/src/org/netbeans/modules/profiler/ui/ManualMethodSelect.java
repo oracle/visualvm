@@ -250,6 +250,10 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
             mms.setClassName(method.getClassName());
             mms.setMethodName(method.getMethodName());
             mms.setMethodSignature(method.getMethodSignature());
+        } else {
+            mms.setClassName(""); // NOI18N
+            mms.setMethodName(""); // NOI18N
+            mms.setMethodSignature(""); // NOI18N
         }
 
         final DialogDescriptor dd = new DialogDescriptor(mms, method == null ? SELECT_METHODS_DIALOG_CAPTION :
