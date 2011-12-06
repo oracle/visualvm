@@ -434,7 +434,7 @@ public class CompareSnapshotsHelper {
                     // filename not empty string
                     File s = new File(sf);
 
-                    if (s.exists() && s.isFile()) {
+                    if (s.exists() && ResultsManager.checkHprofFile(s)) {
                         // file exists
                         if (s.equals(heapWalker.getHeapDumpFile())) {
                             // comparing snapshot with itself
@@ -446,7 +446,7 @@ public class CompareSnapshotsHelper {
                             okButton.setEnabled(true);
                         }
                     } else {
-                        // file doesn't exist
+                        // file doesn't exist or not a .hprof file
                         externalFileHintLabel.setText(INVALID_FILE_MSG);
                         okButton.setEnabled(false);
                     }
