@@ -65,29 +65,23 @@ import org.openide.windows.WindowManager;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LoadSnapshotAction_ActionName=&Load Snapshot...",
+    "LoadSnapshotAction_ActionDescr=Load profiling results snapshot from disk",
+    "LoadSnapshotAction_OpenSnapshotDialogCaption=Open Snapshot File",
+    "LoadSnapshotAction_ProfilerSnapshotFileFilter=Profiler Snapshot Files (*.{0})",
+    "LoadSnapshotAction_OpenSnapshotHeapdumpDialogCaption=Open Snapshot or Heap Dump",
+    "LoadSnapshotAction_ProfilerSnapshotHeapdumpFileFilter=Profiler Snapshot or Heap Dump Files (*.{0} | *.{1})",
+    "LoadSnapshotAction_No_Snapshot_Selected=Not a .nps snapshot file"
+})
 public final class LoadSnapshotAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String ACTION_DESCR = NbBundle.getMessage(LoadSnapshotAction.class, "LoadSnapshotAction_ActionDescr"); // NOI18N
-    private static final String OPEN_SNAPSHOT_DIALOG_CAPTION = NbBundle.getMessage(LoadSnapshotAction.class,
-                                                                                   "LoadSnapshotAction_OpenSnapshotDialogCaption"); // NOI18N
-    private static final String PROFILER_SNAPSHOT_FILE_FILTER = NbBundle.getMessage(LoadSnapshotAction.class,
-                                                                                    "LoadSnapshotAction_ProfilerSnapshotFileFilter"); // NOI18N
-    private static final String OPEN_SNAPSHOT_HEAPDUMP_DIALOG_CAPTION = NbBundle.getMessage(LoadSnapshotAction.class,
-                                                                                            "LoadSnapshotAction_OpenSnapshotHeapdumpDialogCaption"); // NOI18N
-    private static final String PROFILER_SNAPSHOT_HEAPDUMP_FILE_FILTER = NbBundle.getMessage(LoadSnapshotAction.class,
-                                                                                             "LoadSnapshotAction_ProfilerSnapshotHeapdumpFileFilter"); // NOI18N
-                                                                                                                                                       // -----
-    private static final String CANNOT_OPEN_SNAPSHOT_MSG = NbBundle.getMessage(LoadSnapshotAction.class,
-                                                                                    "LoadSnapshotAction_No_Snapshot_Selected"); // NOI18N
+    //~ Static fields/initializers ----------------------------------------------------------------------------------------------- 
     private static File importDir;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LoadSnapshotAction() {
-        putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
+        putValue(Action.SHORT_DESCRIPTION, Bundle.LoadSnapshotAction_ActionDescr());
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -123,7 +117,9 @@ public final class LoadSnapshotAction extends AbstractAction {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(true);
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        chooser.setDialogTitle(handleHeapdumps ? OPEN_SNAPSHOT_HEAPDUMP_DIALOG_CAPTION : OPEN_SNAPSHOT_DIALOG_CAPTION);
+        chooser.setDialogTitle(handleHeapdumps ? 
+            Bundle.LoadSnapshotAction_OpenSnapshotHeapdumpDialogCaption() : 
+            Bundle.LoadSnapshotAction_OpenSnapshotDialogCaption());
         chooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
                     if (f.isDirectory()) return true;
@@ -136,12 +132,11 @@ public final class LoadSnapshotAction extends AbstractAction {
 
                 public String getDescription() {
                     return handleHeapdumps
-                           ? MessageFormat.format(PROFILER_SNAPSHOT_HEAPDUMP_FILE_FILTER,
-                                                  new Object[] {
-                                                      ResultsManager.SNAPSHOT_EXTENSION, ResultsManager.HEAPDUMP_EXTENSION
-                                                  })
-                           : MessageFormat.format(PROFILER_SNAPSHOT_FILE_FILTER,
-                                                  new Object[] { ResultsManager.SNAPSHOT_EXTENSION });
+                           ? Bundle.LoadSnapshotAction_ProfilerSnapshotHeapdumpFileFilter(
+                                ResultsManager.SNAPSHOT_EXTENSION, 
+                                ResultsManager.HEAPDUMP_EXTENSION)
+                           : Bundle.LoadSnapshotAction_ProfilerSnapshotFileFilter(
+                                ResultsManager.SNAPSHOT_EXTENSION);
                 }
             });
 
@@ -166,8 +161,7 @@ public final class LoadSnapshotAction extends AbstractAction {
                                                           .loadSnapshots(snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
                 ResultsManager.getDefault().openSnapshots(imported);
             } else if (!handleHeapdumps) {
-                ProfilerDialogs.displayError(MessageFormat
-                        .format(CANNOT_OPEN_SNAPSHOT_MSG, null));
+                ProfilerDialogs.displayError(Bundle.LoadSnapshotAction_No_Snapshot_Selected());
 
             }
 

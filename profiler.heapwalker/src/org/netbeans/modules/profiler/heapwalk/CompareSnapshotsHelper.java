@@ -75,7 +75,24 @@ import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
-
+@NbBundle.Messages({
+    "CompareSnapshotsHelper_HeapSnapshotDisplayName=[heap] {0}",
+    "CompareSnapshotsHelper_SelectDialogCaption=Select Heap Dump to Compare",
+    "CompareSnapshotsHelper_OpenChooserCaption=Open Heap Dump",
+    "CompareSnapshotsHelper_OpenChooserFilter=Heap Dump Files",
+    "CompareSnapshotsHelper_NoComparableSnapshotsFoundMsg=<No comparable heap dumps found>",
+    "CompareSnapshotsHelper_ComparingSameSnapshotsMsg=The heap dump cannot be compared to itself.",
+    "CompareSnapshotsHelper_InvalidFileMsg=Invalid heap dump file",
+    "CompareSnapshotsHelper_EnterFileMsg=Enter heap dump file",
+    "CompareSnapshotsHelper_OkButtonText=OK",
+    "CompareSnapshotsHelper_SelectSnapshotString=<html><b><nobr>Select heap dump to compare\\:</nobr></b></html>",
+    "CompareSnapshotsHelper_FromProjectRadioText=From &project\\:",
+    "CompareSnapshotsHelper_FromCurrentLocationRadioText=From &current location\\:",
+    "CompareSnapshotsHelper_FromFileRadioText=From &file\\:",
+    "CompareSnapshotsHelper_BrowseButtonText=&Browse",
+    "CompareSnapshotsHelper_BrowseButtonAccessDescr=Select heap dump file",
+    "CompareSnapshotsHelper_SnapshotsListAccessDescr=List of comparable heap dumps in current project"
+})
 public class CompareSnapshotsHelper {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -151,7 +168,7 @@ public class CompareSnapshotsHelper {
             }
 
             if (listModel.getSize() == 0) {
-                listModel.addElement(NO_COMPARABLE_SNAPSHOTS_FOUND_MSG);
+                listModel.addElement(Bundle.CompareSnapshotsHelper_NoComparableSnapshotsFoundMsg());
                 fromFileRadio.setSelected(true);
                 externalFileField.addHierarchyListener(new HierarchyListener() {
                     public void hierarchyChanged(HierarchyEvent e) {
@@ -184,10 +201,10 @@ public class CompareSnapshotsHelper {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if (project != null) {
-                        org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, FROM_PROJECT_RADIO_TEXT);
+                        org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, Bundle.CompareSnapshotsHelper_FromProjectRadioText());
                         fromProjectRadio.setToolTipText(null);
                     } else {
-                        org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, FROM_CURRENT_LOCATION_RADIO_TEXT);
+                        org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, Bundle.CompareSnapshotsHelper_FromCurrentLocationRadioText());
                         fromProjectRadio.setToolTipText(heapdumpDir != null ?
                                 heapdumpDir.getAbsolutePath() : null);
                     }
@@ -196,14 +213,14 @@ public class CompareSnapshotsHelper {
         }
 
         private void initComponents() {
-            okButton = new JButton(OK_BUTTON_TEXT);
+            okButton = new JButton(Bundle.CompareSnapshotsHelper_OkButtonText());
 
             setLayout(new GridBagLayout());
 
             GridBagConstraints c;
             ButtonGroup group = new ButtonGroup();
 
-            selectSnapshotLabel = new JLabel(SELECT_SNAPSHOT_STRING);
+            selectSnapshotLabel = new JLabel(Bundle.CompareSnapshotsHelper_SelectSnapshotString());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 0;
@@ -214,9 +231,9 @@ public class CompareSnapshotsHelper {
             add(selectSnapshotLabel, c);
 
             fromProjectRadio = new JRadioButton();
-            org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, FROM_PROJECT_RADIO_TEXT);
+            org.openide.awt.Mnemonics.setLocalizedText(fromProjectRadio, Bundle.CompareSnapshotsHelper_FromProjectRadioText());
             group.add(fromProjectRadio);
-            fromProjectRadio.getAccessibleContext().setAccessibleDescription(SELECT_SNAPSHOT_STRING + FROM_PROJECT_RADIO_TEXT);
+            fromProjectRadio.getAccessibleContext().setAccessibleDescription(Bundle.CompareSnapshotsHelper_SelectSnapshotString() + Bundle.CompareSnapshotsHelper_FromProjectRadioText());
             fromProjectRadio.setSelected(true);
             c = new GridBagConstraints();
             c.gridx = 0;
@@ -228,7 +245,7 @@ public class CompareSnapshotsHelper {
             add(fromProjectRadio, c);
 
             projectSnapshotsList = new JList(new DefaultListModel());
-            projectSnapshotsList.getAccessibleContext().setAccessibleName(SNAPSHOTS_LIST_ACCESS_DESCR);
+            projectSnapshotsList.getAccessibleContext().setAccessibleName(Bundle.CompareSnapshotsHelper_SnapshotsListAccessDescr());
             projectSnapshotsList.setVisibleRowCount(5);
             projectSnapshotsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -257,10 +274,10 @@ public class CompareSnapshotsHelper {
             c.insets = new Insets(0, 15 + new JRadioButton("").getPreferredSize().width, 5, 10); // NOI18N
             add(projectSnapshotsHintLabel, c);
 
-            fromFileRadio = new JRadioButton(FROM_FILE_RADIO_TEXT);
-            org.openide.awt.Mnemonics.setLocalizedText(fromFileRadio, FROM_FILE_RADIO_TEXT);
+            fromFileRadio = new JRadioButton(Bundle.CompareSnapshotsHelper_FromFileRadioText());
+            org.openide.awt.Mnemonics.setLocalizedText(fromFileRadio, Bundle.CompareSnapshotsHelper_FromFileRadioText());
             group.add(fromFileRadio);
-            fromProjectRadio.getAccessibleContext().setAccessibleDescription(SELECT_SNAPSHOT_STRING + FROM_FILE_RADIO_TEXT);
+            fromProjectRadio.getAccessibleContext().setAccessibleDescription(Bundle.CompareSnapshotsHelper_SelectSnapshotString() + Bundle.CompareSnapshotsHelper_FromFileRadioText());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 4;
@@ -284,8 +301,8 @@ public class CompareSnapshotsHelper {
             add(externalFileField, c);
 
             externalFileButton = new JButton();
-            org.openide.awt.Mnemonics.setLocalizedText(externalFileButton, BROWSE_BUTTON_TEXT);
-            externalFileButton.getAccessibleContext().setAccessibleDescription(BROWSE_BUTTON_ACCESS_DESCR);
+            org.openide.awt.Mnemonics.setLocalizedText(externalFileButton, Bundle.CompareSnapshotsHelper_BrowseButtonText());
+            externalFileButton.getAccessibleContext().setAccessibleDescription(Bundle.CompareSnapshotsHelper_BrowseButtonAccessDescr());
             externalFileButton.setEnabled(false);
             c = new GridBagConstraints();
             c.gridx = 2;
@@ -332,14 +349,14 @@ public class CompareSnapshotsHelper {
 
                                 try {
                                     long timeStamp = Long.parseLong(time);
-                                    c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME,
-                                                                   new Object[] { StringUtils.formatUserDate(new Date(timeStamp)) }));
+                                    c.setText(Bundle.CompareSnapshotsHelper_HeapSnapshotDisplayName(
+                                                StringUtils.formatUserDate(new Date(timeStamp))));
                                 } catch (NumberFormatException e) {
                                     // file name is probably customized
-                                    c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
+                                    c.setText(Bundle.CompareSnapshotsHelper_HeapSnapshotDisplayName(fileName));
                                 }
                             } else {
-                                c.setText(MessageFormat.format(HEAP_SNAPSHOT_DISPLAYNAME, new Object[] { fileName }));
+                                c.setText(Bundle.CompareSnapshotsHelper_HeapSnapshotDisplayName(fileName));
                             }
                         }
 
@@ -438,7 +455,7 @@ public class CompareSnapshotsHelper {
                         // file exists
                         if (s.equals(heapWalker.getHeapDumpFile())) {
                             // comparing snapshot with itself
-                            externalFileHintLabel.setText(COMPARING_SAME_SNAPSHOTS_MSG);
+                            externalFileHintLabel.setText(Bundle.CompareSnapshotsHelper_ComparingSameSnapshotsMsg());
                             okButton.setEnabled(false);
                         } else {
                             // comparing different snapshots
@@ -447,12 +464,12 @@ public class CompareSnapshotsHelper {
                         }
                     } else {
                         // file doesn't exist or not a .hprof file
-                        externalFileHintLabel.setText(INVALID_FILE_MSG);
+                        externalFileHintLabel.setText(Bundle.CompareSnapshotsHelper_InvalidFileMsg());
                         okButton.setEnabled(false);
                     }
                 } else {
                     // filename is empty string
-                    externalFileHintLabel.setText(ENTER_FILE_MSG);
+                    externalFileHintLabel.setText(Bundle.CompareSnapshotsHelper_EnterFileMsg());
                     okButton.setEnabled(false);
                 }
             } else {
@@ -463,41 +480,6 @@ public class CompareSnapshotsHelper {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String SELECT_DIALOG_CAPTION = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                            "CompareSnapshotsHelper_SelectDialogCaption"); // NOI18N
-    private static final String OPEN_CHOOSER_CAPTION = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                           "CompareSnapshotsHelper_OpenChooserCaption"); // NOI18N
-    private static final String OPEN_CHOOSER_FILTER = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                          "CompareSnapshotsHelper_OpenChooserFilter"); // NOI18N
-    private static final String NO_COMPARABLE_SNAPSHOTS_FOUND_MSG = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                                        "CompareSnapshotsHelper_NoComparableSnapshotsFoundMsg"); // NOI18N
-    private static final String COMPARING_SAME_SNAPSHOTS_MSG = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                                   "CompareSnapshotsHelper_ComparingSameSnapshotsMsg"); // NOI18N
-    private static final String INVALID_FILE_MSG = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                       "CompareSnapshotsHelper_InvalidFileMsg"); // NOI18N
-    private static final String ENTER_FILE_MSG = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                     "CompareSnapshotsHelper_EnterFileMsg"); // NOI18N
-    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                     "CompareSnapshotsHelper_OkButtonText"); // NOI18N
-    private static final String SELECT_SNAPSHOT_STRING = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                             "CompareSnapshotsHelper_SelectSnapshotString"); // NOI18N
-    private static final String FROM_PROJECT_RADIO_TEXT = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                              "CompareSnapshotsHelper_FromProjectRadioText"); // NOI18N
-    private static final String FROM_CURRENT_LOCATION_RADIO_TEXT = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                              "CompareSnapshotsHelper_FromCurrentLocationRadioText"); // NOI18N
-    private static final String FROM_FILE_RADIO_TEXT = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                           "CompareSnapshotsHelper_FromFileRadioText"); // NOI18N
-    private static final String BROWSE_BUTTON_TEXT = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                         "CompareSnapshotsHelper_BrowseButtonText"); // NOI18N
-    private static final String BROWSE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                          "CompareSnapshotsHelper_BrowseButtonAccessDescr"); // NOI18N
-    private static final String SNAPSHOTS_LIST_ACCESS_DESCR = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                                  "CompareSnapshotsHelper_SnapshotsListAccessDescr"); // NOI18N
-    private static final String HEAP_SNAPSHOT_DISPLAYNAME = NbBundle.getMessage(CompareSnapshotsHelper.class,
-                                                                                "CompareSnapshotsHelper_HeapSnapshotDisplayName"); // NOI18N
-                                                                                                                                      // -----
     private static final Icon memoryIcon = Icons.getIcon(ProfilerIcons.MEMORY);
     private static JFileChooser snapshotFileChooser;
 
@@ -519,7 +501,7 @@ public class CompareSnapshotsHelper {
         SelectSecondSnapshotPanel panel = helper.getSecondSnapshotSelector();
         panel.populateSnapshotsList();
 
-        DialogDescriptor desc = new DialogDescriptor(panel, SELECT_DIALOG_CAPTION, true,
+        DialogDescriptor desc = new DialogDescriptor(panel, Bundle.CompareSnapshotsHelper_SelectDialogCaption(), true,
                                                      new Object[] {
                                                          panel.getOKButton(), DialogDescriptor.CANCEL_OPTION
                                                      }, DialogDescriptor.OK_OPTION, 0, null, null);
@@ -539,14 +521,14 @@ public class CompareSnapshotsHelper {
             snapshotFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             snapshotFileChooser.setMultiSelectionEnabled(false);
             snapshotFileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-            snapshotFileChooser.setDialogTitle(OPEN_CHOOSER_CAPTION);
+            snapshotFileChooser.setDialogTitle(Bundle.CompareSnapshotsHelper_OpenChooserCaption());
             snapshotFileChooser.setFileFilter(new FileFilter() {
                     public boolean accept(File f) {
                         return f.isDirectory() || ResultsManager.checkHprofFile(f);
                     }
 
                     public String getDescription() {
-                        return OPEN_CHOOSER_FILTER; // NOI18N
+                        return Bundle.CompareSnapshotsHelper_OpenChooserFilter();
                     }
                 });
         }

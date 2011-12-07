@@ -70,6 +70,14 @@ import org.openide.util.Lookup;
  * @author Tomas Hurka
  * @author Jiri Rechtacek
  */
+@NbBundle.Messages({
+    "CTL_SelectAvaialableMainClasses=&Select the main class for profiling\\:",
+    "CTL_AvaialableMainClasses=&Main classes\\:",
+    "AD_jMainClassList=N/A",
+    "AD_MainClassChooser=N/A",
+    "LBL_ChooseMainClass_NO_CLASSES_NODE=<No main classes found>",
+    "LBL_ChooseMainClass_WARMUP_MESSAGE=Initializing view, please wait ..."
+})
 public class MainClassChooser extends JPanel {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -141,7 +149,7 @@ public class MainClassChooser extends JPanel {
     }
 
     private Object[] getWarmupList() {
-        return new Object[] { NbBundle.getMessage(MainClassChooser.class, "LBL_ChooseMainClass_WARMUP_MESSAGE") }; // NOI18N
+        return new Object[] { Bundle.LBL_ChooseMainClass_WARMUP_MESSAGE() };
     }
 
     private void initClassesView(final Lookup.Provider project) {
@@ -156,9 +164,8 @@ public class MainClassChooser extends JPanel {
 
                     if (possibleMainClasses.isEmpty()) {
                         jMainClassList.setListData(new String[] {
-                                                       NbBundle.getMessage(MainClassChooser.class,
-                                                                           "LBL_ChooseMainClass_NO_CLASSES_NODE")
-                                                   }); // NOI18N
+                                                       Bundle.LBL_ChooseMainClass_NO_CLASSES_NODE()
+                                                   });
                     } else {
                         Object[] arr = possibleMainClasses.toArray();
                         // #46861, sort name of classes
@@ -216,9 +223,9 @@ public class MainClassChooser extends JPanel {
 
         setPreferredSize(new java.awt.Dimension(380, 300));
         getAccessibleContext()
-            .setAccessibleDescription(NbBundle.getBundle(MainClassChooser.class).getString("AD_MainClassChooser")); // NOI18N
+            .setAccessibleDescription(Bundle.AD_MainClassChooser());
         jLabel1.setLabelFor(jMainClassList);
-        Mnemonics.setLocalizedText(jLabel1, NbBundle.getBundle(MainClassChooser.class).getString("CTL_AvaialableMainClasses")); // NOI18N
+        Mnemonics.setLocalizedText(jLabel1, Bundle.CTL_AvaialableMainClasses());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -232,7 +239,7 @@ public class MainClassChooser extends JPanel {
         jScrollPane1.setMinimumSize(new java.awt.Dimension(100, 200));
         jScrollPane1.setViewportView(jMainClassList);
         jMainClassList.getAccessibleContext()
-                      .setAccessibleDescription(NbBundle.getBundle(MainClassChooser.class).getString("AD_jMainClassList")); // NOI18N
+                      .setAccessibleDescription(Bundle.AD_jMainClassList());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

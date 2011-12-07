@@ -64,24 +64,16 @@ import org.openide.DialogDisplayer;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "IDEUtils_CreateNewConfigurationHint=<Create new configuration>",
+    "IDEUtils_SelectSettingsConfigurationLabelText=Select the settings configuration to use\\:",
+    "IDEUtils_SelectSettingsConfigurationDialogCaption=Select Settings Configuration",
+    "IDEUtils_InvalidTargetJVMExeFileError=Invalid target JVM executable file specified\\: {0}\n{1}",
+    "IDEUtils_ErrorConvertingProfilingSettingsMessage=Error occurred during automatic conversion of old Profiler configuration file\n   {0}\nto a new version\n   {1}.\n\nOperating system message:\n{2}",
+    "IDEUtils_ListAccessName=List of available settings configurations.",
+    "IDEUtils_OkButtonText=OK"
+})
 public final class IDEUtils {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String CREATE_NEW_CONFIGURATION_HINT = NbBundle.getMessage(IDEUtils.class,
-                                                                                    "IDEUtils_CreateNewConfigurationHint"); // NOI18N
-    private static final String SELECT_SETTINGS_CONFIGURATION_LABEL_TEXT = NbBundle.getMessage(IDEUtils.class,
-                                                                                               "IDEUtils_SelectSettingsConfigurationLabelText"); // NOI18N
-    private static final String SELECT_SETTINGS_CONFIGURATION_DIALOG_CAPTION = NbBundle.getMessage(IDEUtils.class,
-                                                                                                   "IDEUtils_SelectSettingsConfigurationDialogCaption"); // NOI18N
-    private static final String INVALID_TARGET_JVM_EXEFILE_ERROR = NbBundle.getMessage(IDEUtils.class,
-                                                                                       "IDEUtils_InvalidTargetJVMExeFileError"); // NOI18N // TODO: move to this package's bundle
-    private static final String ERROR_CONVERTING_PROFILING_SETTINGS_MESSAGE = NbBundle.getMessage(IDEUtils.class,
-                                                                                                  "IDEUtils_ErrorConvertingProfilingSettingsMessage"); //NOI18N
-    private static final String LIST_ACCESS_NAME = NbBundle.getMessage(IDEUtils.class, "IDEUtils_ListAccessName"); //NOI18N
-    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(IDEUtils.class, "IDEUtils_OkButtonText"); //NOI18N
-                                                                                                               // -----
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static String getAntProfilerStartArgument15(int port, int architecture) {
@@ -130,11 +122,11 @@ public final class IDEUtils {
             settings[i] = availableSettings[i];
         }
 
-        settings[availableSettings.length] = CREATE_NEW_CONFIGURATION_HINT;
+        settings[availableSettings.length] = Bundle.IDEUtils_CreateNewConfigurationHint();
 
         // constuct the UI
-        final JLabel label = new JLabel(SELECT_SETTINGS_CONFIGURATION_LABEL_TEXT);
-        final JButton okButton = new JButton(OK_BUTTON_TEXT);
+        final JLabel label = new JLabel(Bundle.IDEUtils_SelectSettingsConfigurationLabelText());
+        final JButton okButton = new JButton(Bundle.IDEUtils_OkButtonText());
         final JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(450, 250));
         panel.setBorder(new EmptyBorder(12, 12, 12, 12));
@@ -143,7 +135,7 @@ public final class IDEUtils {
 
         final JList list = new JList(settings);
         label.setLabelFor(list);
-        list.getAccessibleContext().setAccessibleName(LIST_ACCESS_NAME);
+        list.getAccessibleContext().setAccessibleName(Bundle.IDEUtils_ListAccessName());
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
@@ -159,7 +151,7 @@ public final class IDEUtils {
 
         panel.add(new JScrollPane(list), BorderLayout.CENTER);
 
-        final DialogDescriptor dd = new DialogDescriptor(panel, SELECT_SETTINGS_CONFIGURATION_DIALOG_CAPTION, true,
+        final DialogDescriptor dd = new DialogDescriptor(panel, Bundle.IDEUtils_SelectSettingsConfigurationDialogCaption(), true,
                                                          new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton, 0,
                                                          null, null);
         final Dialog d = DialogDisplayer.getDefault().createDialog(dd);

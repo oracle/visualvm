@@ -41,57 +41,65 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.netbeans.modules.profiler.api;
 
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.openide.util.NbBundle;
-import java.awt.event.ActionEvent;
-import javax.swing.*;
-
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.Cancellable;
 
 /**
- * Action to start profiler attach
  *
- * @author Ian Formanek
+ * @author Jaroslav Bachorik
  */
-@NbBundle.Messages({
-    "LBL_AttachMainProjectAction=&Attach Profiler...",
-    "HINT_AttachMainProjectAction=Attach Profiler...",
-})
-public final class AttachAction extends AbstractAction {
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
+public interface ProgressDisplayer {
+    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
-    private AttachAction() {
-        putValue(Action.NAME, Bundle.LBL_AttachMainProjectAction());
-        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_AddRootMethodAction());
-    }
-
-    private static final AttachAction DEF = new AttachAction();
-    public static AttachAction getDefault() {
-        return DEF;
+    public static interface ProgressController extends Cancellable {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    @Override
-    public boolean isEnabled() {
-        if (!NetBeansProfiler.isInitialized()) {
-            return false;
+    public boolean isOpened();
+
+    public void close();
+
+    public ProgressDisplayer showProgress(String message);
+
+    public ProgressDisplayer showProgress(String message, ProgressController controller);
+
+    public ProgressDisplayer showProgress(String caption, String message, ProgressController controller);
+    
+    public static final ProgressDisplayer DEFAULT = new ProgressDisplayer() {
+        ProgressHandle ph = null;
+
+        public synchronized ProgressDisplayer showProgress(String message) {
+            ph = ProgressHandleFactory.createHandle(message);
+            ph.start();
+            return DEFAULT;
         }
 
-        return super.isEnabled();
-    }
-
-    /**
-     * Invoked when an action occurs.
-     */
-    public void actionPerformed(final ActionEvent e) {
-        // 1. if there is profiling in progress, ask the user and possibly cancel
-        if (ProfilingSupport.checkProfilingInProgress()) {
-            return;
+        public synchronized ProgressDisplayer showProgress(String message, ProgressController controller) {
+            ph = ProgressHandleFactory.createHandle(message, controller);
+            ph.start();
+            return DEFAULT;
         }
 
-        //2. start attaching
-        ProfilingSupport.getDefault().doAttach();
-    }
+        public synchronized ProgressDisplayer showProgress(String caption, String message, ProgressController controller) {
+            ph = ProgressHandleFactory.createHandle(message, controller);
+            ph.start();
+            return DEFAULT;
+        }
+
+        public synchronized boolean isOpened() {
+            return ph != null;
+        }
+
+        public synchronized void close() {
+            if (ph != null) {
+                ph.finish();
+                ph = null;
+            }
+        }
+    };
+
 }
