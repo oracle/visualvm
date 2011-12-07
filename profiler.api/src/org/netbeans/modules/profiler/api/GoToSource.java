@@ -121,6 +121,10 @@ final public class GoToSource {
         });
     }
     
+    @NbBundle.Messages({
+        "OpeningSourceMsg=Opening source for class {0}",
+        "NoSourceFoundMessage=No source found for class {0}"
+    })
     private static void openSourceImpl(final Lookup.Provider project, final String className, final String methodName, final String signature, final int line) {
         // *** logging stuff ***
         ProfilerLogger.debug("Open Source: Project: " + project); // NOI18N
@@ -130,8 +134,7 @@ final public class GoToSource {
         
         Collection<? extends GoToSourceProvider> implementations = Lookup.getDefault().lookupAll(GoToSourceProvider.class);
         
-        String st = MessageFormat.format(NbBundle.getMessage(GoToSource.class, "OpeningSourceMsg"),  // NOI18N
-                                                             new Object[] { className });
+        String st = Bundle.OpeningSourceMsg(className);
         final String finalStatusText = st + " ..."; // NOI18N
         StatusDisplayer.getDefault().setStatusText(finalStatusText);
         
@@ -143,11 +146,13 @@ final public class GoToSource {
             }
         }
         
-        ProfilerDialogs.displayError(MessageFormat.format(NbBundle.getMessage(GoToSource.class,
-                                                                                "NoSourceFoundMessage"), // NOI18N
-                                                                                new Object[] { className }));
+        ProfilerDialogs.displayError(Bundle.NoSourceFoundMessage(className));
     }
     
+    @NbBundle.Messages({
+        "OpeningFileMsg=Opening source file {0}",
+        "OpenFileFailsMessage=File \"{0}\" does not exist or the offset \"{1}\" is out of range"
+    })
     private static void openFileImpl(FileObject srcFile, int offset) {
         // *** logging stuff ***
         ProfilerLogger.debug("Open Source: FileObject: " + srcFile); // NOI18N
@@ -155,8 +160,7 @@ final public class GoToSource {
         
         Collection<? extends GoToSourceProvider> implementations = Lookup.getDefault().lookupAll(GoToSourceProvider.class);
         
-        String st = MessageFormat.format(NbBundle.getMessage(GoToSource.class, "OpeningFileMsg"),  // NOI18N
-                                                             new Object[] { srcFile.getName() });
+        String st = Bundle.OpeningFileMsg(srcFile.getName());
         final String finalStatusText = st + " ..."; // NOI18N
         StatusDisplayer.getDefault().setStatusText(finalStatusText);
         
@@ -168,8 +172,6 @@ final public class GoToSource {
             }
         }
         
-        ProfilerDialogs.displayError(MessageFormat.format(NbBundle.getMessage(GoToSource.class,
-                                                                                "OpenFileFailsMessage"), // NOI18N
-                                                                                new Object[] { srcFile.getName(), offset }));
+        ProfilerDialogs.displayError(Bundle.OpenFileFailsMessage(srcFile.getName(), offset));
     }
 }

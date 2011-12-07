@@ -93,6 +93,25 @@ import org.openide.windows.WindowManager;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "HeapDumpAction_ActionName=Take &Heap Dump...",
+    "HeapDumpAction_RequiredJdkMsg=The profiled application must be run on JDK 1.6, 1.7 or 1.5.0_12 to take a heap dump",
+    "HeapDumpAction_RemoteUnsupportedMsg=Taking heap dump on a remote machine not supported.",
+    "HeapDumpAction_WrongDestinationMsg=Dumping heap failed, cannot resolve destination file.",
+    "HeapDumpAction_DumpingHeapText=Dumping heap...",
+    "HeapDumpAction_SavedDialogCaption=Heap Dump Saved",
+    "HeapDumpAction_SavedDialogText=<html><b>The heap has been successfuly saved to a file.</b><br>Do you want to open it in HeapWalker?</html>",
+    "HeapDumpAction_DumpingFailedMsg=Taking heap dump failed. See NetBeans logfile for details.",
+    "HeapDumpAction_DestinationDialogCaption=Choose Heap Dump Destination",
+    "HeapDumpAction_LocationProjectString=Profiled project",
+    "HeapDumpAction_LocationGlobalString=Default storage for Global Attach",
+    "HeapDumpAction_DirectoryDialogCaption=Choose Directory",
+    "HeapDumpAction_OkButtonText=OK",
+    "HeapDumpAction_DestinationLabelText=<html><b><nobr>Choose heap dump destination:</nobr></b></html>",
+    "HeapDumpAction_DefaultLocationRadioText=Default location",
+    "HeapDumpAction_CustomLocationRadioText=Custom directory\\:",
+    "HeapDumpAction_BrowseButtonText=Browse"
+})
 public final class HeapDumpAction extends ProfilingAwareAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -140,14 +159,14 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         }
 
         private void initComponents() {
-            okButton = new JButton(OK_BUTTON_TEXT);
+            okButton = new JButton(Bundle.HeapDumpAction_OkButtonText());
 
             setLayout(new GridBagLayout());
 
             GridBagConstraints c;
             ButtonGroup group = new ButtonGroup();
 
-            chooseDestinationLabel = new JLabel(DESTINATION_LABEL_TEXT);
+            chooseDestinationLabel = new JLabel(Bundle.HeapDumpAction_DestinationLabelText());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 0;
@@ -157,7 +176,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
             c.insets = new Insets(15, 10, 8, 5);
             add(chooseDestinationLabel, c);
 
-            defaultLocationRadio = new JRadioButton(DEFAULT_LOCATION_RADIO_TEXT);
+            defaultLocationRadio = new JRadioButton(Bundle.HeapDumpAction_DefaultLocationRadioText());
             group.add(defaultLocationRadio);
             defaultLocationRadio.setSelected(true);
             c = new GridBagConstraints();
@@ -169,7 +188,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
             c.insets = new Insets(0, 15, 0, 5);
             add(defaultLocationRadio, c);
 
-            customLocationRadio = new JRadioButton(CUSTOM_LOCATION_RADIO_TEXT);
+            customLocationRadio = new JRadioButton(Bundle.HeapDumpAction_CustomLocationRadioText());
             group.add(customLocationRadio);
             c = new GridBagConstraints();
             c.gridx = 0;
@@ -200,7 +219,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
             c.insets = new Insets(0, 15 + new JRadioButton("").getPreferredSize().width, 5, 5); // NOI18N
             add(customLocationField, c);
 
-            customLocationButton = new JButton(BROWSE_BUTTON_TEXT);
+            customLocationButton = new JButton(Bundle.HeapDumpAction_BrowseButtonText());
             customLocationButton.setEnabled(false);
             c = new GridBagConstraints();
             c.gridx = 2;
@@ -282,35 +301,6 @@ public final class HeapDumpAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
-    // I18N String constants
-    private static final String ACTION_NAME = NbBundle.getMessage(HeapDumpAction.class, "HeapDumpAction_ActionName"); // NOI18N
-    private static final String REQUIRED_JDK_MSG = NbBundle.getMessage(HeapDumpAction.class, "HeapDumpAction_RequiredJdkMsg"); // NOI18N
-    private static final String REMOTE_UNSUPPORTED_MSG = NbBundle.getMessage(HeapDumpAction.class,
-                                                                             "HeapDumpAction_RemoteUnsupportedMsg"); // NOI18N
-    private static final String WRONG_DESTINATION_MSG = NbBundle.getMessage(HeapDumpAction.class,
-                                                                            "HeapDumpAction_WrongDestinationMsg"); // NOI18N
-    private static final String DUMPING_HEAP_TEXT = NbBundle.getMessage(HeapDumpAction.class, "HeapDumpAction_DumpingHeapText"); // NOI18N
-    private static final String SAVED_DIALOG_CAPTION = NbBundle.getMessage(HeapDumpAction.class,
-                                                                           "HeapDumpAction_SavedDialogCaption"); // NOI18N
-    private static final String SAVED_DIALOG_TEXT = NbBundle.getMessage(HeapDumpAction.class, "HeapDumpAction_SavedDialogText"); // NOI18N
-    private static final String DUMPING_FAILED_MSG = NbBundle.getMessage(HeapDumpAction.class, "HeapDumpAction_DumpingFailedMsg"); // NOI18N
-    private static final String DESTINATION_DIALOG_CAPTION = NbBundle.getMessage(HeapDumpAction.class,
-                                                                                 "HeapDumpAction_DestinationDialogCaption"); // NOI18N
-    private static final String LOCATION_PROJECT_STRING = NbBundle.getMessage(HeapDumpAction.class,
-                                                                              "HeapDumpAction_LocationProjectString"); // NOI18N
-    private static final String LOCATION_GLOBAL_STRING = NbBundle.getMessage(HeapDumpAction.class,
-                                                                             "HeapDumpAction_LocationGlobalString"); // NOI18N
-    private static final String DIRECTORY_DIALOG_CAPTION = NbBundle.getMessage(HeapDumpAction.class,
-                                                                               "HeapDumpAction_DirectoryDialogCaption"); // NOI18N
-    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(HeapDumpAction.class, "HeapDumpAction_OkButtonText"); // NOI18N
-    private static final String DESTINATION_LABEL_TEXT = NbBundle.getMessage(HeapDumpAction.class,
-                                                                             "HeapDumpAction_DestinationLabelText"); // NOI18N
-    private static final String DEFAULT_LOCATION_RADIO_TEXT = NbBundle.getMessage(HeapDumpAction.class,
-                                                                                  "HeapDumpAction_DefaultLocationRadioText"); // NOI18N
-    private static final String CUSTOM_LOCATION_RADIO_TEXT = NbBundle.getMessage(HeapDumpAction.class,
-                                                                                 "HeapDumpAction_CustomLocationRadioText"); // NOI18N
-    private static final String BROWSE_BUTTON_TEXT = NbBundle.getMessage(HeapDumpAction.class, "HeapDumpAction_BrowseButtonText"); // NOI18N
-                                                                                                                                   // -----
     public static final String TAKEN_HEAPDUMP_PREFIX = "heapdump-"; // NOI18N // should differ from generated OOME heapdumps not to be detected as OOME
     private static final String SELECTING_TARGET_CANCELLED = "&*$?CANCELLED?$*&"; // NOI18N
     private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING };
@@ -330,7 +320,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
     }
 
     public String getName() {
-        return ACTION_NAME;
+        return Bundle.HeapDumpAction_ActionName();
     }
 
     // dumps to project and opens in HeapWalker if automatic snapshot opening is set
@@ -394,7 +384,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
             snapshotDirectoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             snapshotDirectoryChooser.setMultiSelectionEnabled(false);
             snapshotDirectoryChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-            snapshotDirectoryChooser.setDialogTitle(DIRECTORY_DIALOG_CAPTION);
+            snapshotDirectoryChooser.setDialogTitle(Bundle.HeapDumpAction_DirectoryDialogCaption());
         }
 
         return snapshotDirectoryChooser;
@@ -412,9 +402,10 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         // Choose heapdump destination
         ChooseHeapdumpTargetPanel targetSelector = getHeapdumpTargetSelector();
         targetSelector.updateDefaultLocation((NetBeansProfiler.getDefaultNB().getProfiledProject() != null)
-                                             ? LOCATION_PROJECT_STRING : LOCATION_GLOBAL_STRING);
+                                             ? Bundle.HeapDumpAction_LocationProjectString() : 
+                                               Bundle.HeapDumpAction_LocationGlobalString());
 
-        DialogDescriptor desc = new DialogDescriptor(targetSelector, DESTINATION_DIALOG_CAPTION, true,
+        DialogDescriptor desc = new DialogDescriptor(targetSelector, Bundle.HeapDumpAction_DestinationDialogCaption(), true,
                                                      new Object[] { targetSelector.getOKButton(), DialogDescriptor.CANCEL_OPTION },
                                                      DialogDescriptor.OK_OPTION, 0, null, null);
         Object res = DialogDisplayer.getDefault().notify(desc);
@@ -443,14 +434,14 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
                     // not supported for JDK other than 1.6 & 1.7 & 1.5.0_12 and up
                     if (!targetApp.hasSupportedJDKForHeapDump()) {
-                        ProfilerDialogs.displayWarning(REQUIRED_JDK_MSG);
+                        ProfilerDialogs.displayWarning(Bundle.HeapDumpAction_RequiredJdkMsg());
 
                         return;
                     }
 
                     // not supported for remote attach
                     if (targetApp.getProfilingSessionStatus().remoteProfiling) {
-                        ProfilerDialogs.displayWarning(REMOTE_UNSUPPORTED_MSG);
+                        ProfilerDialogs.displayWarning(Bundle.HeapDumpAction_RemoteUnsupportedMsg());
 
                         return;
                     }
@@ -466,7 +457,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
                         // Cannot resolve destination file
                         if (dumpFileName == null) {
-                            ProfilerDialogs.displayError(WRONG_DESTINATION_MSG);
+                            ProfilerDialogs.displayError(Bundle.HeapDumpAction_WrongDestinationMsg());
 
                             return;
                         }
@@ -476,7 +467,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
                         ProgressHandle pHandle = null;
 
                         try {
-                            pHandle = ProgressHandleFactory.createHandle(DUMPING_HEAP_TEXT);
+                            pHandle = ProgressHandleFactory.createHandle(Bundle.HeapDumpAction_DumpingHeapText());
                             pHandle.setInitialDelay(0);
                             pHandle.start();
                             heapdumpTaken = targetApp.getProfilerClient().takeHeapDump(dumpFileName);
@@ -492,8 +483,8 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
                             if (askForDestination) {
                                 // Heapdump saved, open in HeapWalker?
-                                if (ProfilerDialogs.displayConfirmationDNSA(SAVED_DIALOG_TEXT,
-                                        SAVED_DIALOG_CAPTION, null, "HeapDumpAction.heapdumpSaved", false)) { //NOI18N
+                                if (ProfilerDialogs.displayConfirmationDNSA(Bundle.HeapDumpAction_SavedDialogText(),
+                                        Bundle.HeapDumpAction_SavedDialogCaption(), null, "HeapDumpAction.heapdumpSaved", false)) { //NOI18N
                                     ResultsManager.getDefault().openSnapshot(new File(dumpFileName));
                                 }
                             } else {
@@ -503,7 +494,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
                             }
                         } else {
                             // Saving heapdump failed
-                            ProfilerDialogs.displayError(DUMPING_FAILED_MSG);
+                            ProfilerDialogs.displayError(Bundle.HeapDumpAction_DumpingFailedMsg());
                         }
                     } catch (Exception e) {
                         ProfilerDialogs.displayError(e.getMessage());

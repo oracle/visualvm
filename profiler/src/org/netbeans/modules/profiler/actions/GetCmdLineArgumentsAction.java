@@ -67,27 +67,21 @@ import org.openide.DialogDisplayer;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "GetCmdLineArgumentsAction_TargetJvmInactiveMsg=Target JVM is inactive",
+    "GetCmdLineArgumentsAction_JvmArgumentsString=JVM arguments\\:",
+    "GetCmdLineArgumentsAction_MainClassAndArgsString=Main class (JAR) and its arguments\\:",
+    "LBL_GetCmdLineArgumentsAction=&View Command-line Arguments",
+    "HINT_GetCmdLineArgumentsAction=View Command-line Arguments",
+    "CAPTION_JVMandMainClassCommandLineArguments=JVM and Main Class Command-line Arguments",
+    "MSG_NotAvailableNow=Not available at this time: {0}"
+})
 public final class GetCmdLineArgumentsAction extends AbstractAction implements ProfilingStateListener {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String TARGET_JVM_INACTIVE_MSG = NbBundle.getMessage(GetCmdLineArgumentsAction.class,
-                                                                              "GetCmdLineArgumentsAction_TargetJvmInactiveMsg"); // NOI18N
-    private static final String JVM_ARGUMENTS_STRING = NbBundle.getMessage(GetCmdLineArgumentsAction.class,
-                                                                           "GetCmdLineArgumentsAction_JvmArgumentsString"); // NOI18N
-    private static final String MAIN_CLASS_AND_ARGS_STRING = NbBundle.getMessage(GetCmdLineArgumentsAction.class,
-                                                                                 "GetCmdLineArgumentsAction_MainClassAndArgsString"); // NOI18N
-                                                                                                                                      // -----
-
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public GetCmdLineArgumentsAction() {
-        putValue(Action.NAME, NbBundle.getMessage(GetCmdLineArgumentsAction.class, "LBL_GetCmdLineArgumentsAction") // NOI18N
-        );
-        putValue(Action.SHORT_DESCRIPTION,
-                 NbBundle.getMessage(GetCmdLineArgumentsAction.class, "HINT_GetCmdLineArgumentsAction") // NOI18N
-        );
+        putValue(Action.NAME, Bundle.LBL_GetCmdLineArgumentsAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_GetCmdLineArgumentsAction());
         putValue("noIconInMenu", Boolean.TRUE); //NOI18N
         
         updateEnabledState();
@@ -107,7 +101,7 @@ public final class GetCmdLineArgumentsAction extends AbstractAction implements P
             final ProfilerEngineSettings settings = runner.getProfilerEngineSettings();
 
             if (!profilerClient.targetJVMIsAlive()) {
-                throw new ClientUtils.TargetAppOrVMTerminated(1, TARGET_JVM_INACTIVE_MSG);
+                throw new ClientUtils.TargetAppOrVMTerminated(1, Bundle.GetCmdLineArgumentsAction_TargetJvmInactiveMsg());
             }
 
             final String jvmArgs;
@@ -123,19 +117,18 @@ public final class GetCmdLineArgumentsAction extends AbstractAction implements P
 
             final StringBuffer s = new StringBuffer();
             s.append("<b>"); // NOI18N
-            s.append(JVM_ARGUMENTS_STRING);
+            s.append(Bundle.GetCmdLineArgumentsAction_JvmArgumentsString());
             s.append("</b><br>"); // NOI18N
             s.append(jvmArgs);
             s.append("<br><br>"); // NOI18N
             s.append("<b>"); // NOI18N
-            s.append(MAIN_CLASS_AND_ARGS_STRING);
+            s.append(Bundle.GetCmdLineArgumentsAction_MainClassAndArgsString());
             s.append("</b><br>"); // NOI18N
             s.append(javaCommand);
 
             final HTMLTextArea textArea = new HTMLTextArea(s.toString());
             textArea.getAccessibleContext()
-                    .setAccessibleName(NbBundle.getMessage(GetCmdLineArgumentsAction.class,
-                                                           "CAPTION_JVMandMainClassCommandLineArguments")); // NOI18N
+                    .setAccessibleName(Bundle.CAPTION_JVMandMainClassCommandLineArguments());
 
             final JPanel p = new JPanel();
             p.setLayout(new BorderLayout());
@@ -144,15 +137,12 @@ public final class GetCmdLineArgumentsAction extends AbstractAction implements P
             p.setPreferredSize(new Dimension(600, 200));
 
             DialogDisplayer.getDefault().createDialog(new DialogDescriptor(p,
-                                                              NbBundle.getMessage(GetCmdLineArgumentsAction.class,
-                                                                                  "CAPTION_JVMandMainClassCommandLineArguments"), // NOI18N
+                                                              Bundle.CAPTION_JVMandMainClassCommandLineArguments(),
                                                               true, new Object[] { DialogDescriptor.CLOSED_OPTION },
                                                               DialogDescriptor.CLOSED_OPTION, DialogDescriptor.BOTTOM_ALIGN,
                                                               null, null)).setVisible(true);
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
-            ProfilerDialogs.displayWarning(MessageFormat.format(NbBundle.getMessage(GetCmdLineArgumentsAction.class,
-                                                                             "MSG_NotAvailableNow"),
-                                                         new Object[] { e.getMessage() })); // NOI18N
+            ProfilerDialogs.displayWarning(Bundle.MSG_NotAvailableNow(e.getMessage()));
         }
     }
     

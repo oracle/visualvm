@@ -54,7 +54,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.*;
@@ -67,6 +66,21 @@ import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.windows.WindowManager;
 
 
+@NbBundle.Messages({
+    "SaveViewAction_SaveViewActionName=Save Current View",
+    "SaveViewAction_SaveViewActionDescr=Save Current View to Image",
+    "SaveViewAction_NoViewMsg=No view to save.",
+    "SaveViewAction_SavingViewMsg=Saving Current View...",
+    "SaveViewAction_OverwriteFileCaption=Overwrite Existing File",
+    "SaveViewAction_OverwriteFileMsg=<html><b>File {0} already exists.</b><br><br>Do you want to replace it?</html>",
+    "SaveViewAction_CannotOverwriteFileMsg=File {0} cannot be replaced. Check permissions.",
+    "SaveViewAction_SaveDialogTitle=Select File or Directory",
+    "SaveViewAction_SaveDialogButton=Save",
+    "SaveViewAction_SaveDialogFilter=PNG Image (*.png)",
+    "SaveViewAction_SaveDialogPreview=Saved view preview\\:",
+    "SaveViewAction_SaveDialogVisible=Save only visible area",
+    "SaveViewAction_OomeSavingMsg=<html><b>Not enough memory to save the image.</b><br><br>To avoid this error, either save smaller image or increase the -Xmx<br>value in the etc/netbeans.conf file in NetBeans IDE installation.</html>"
+})
 class SaveViewAction extends AbstractAction {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
@@ -112,32 +126,6 @@ class SaveViewAction extends AbstractAction {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String SAVE_VIEW_ACTION_NAME = NbBundle.getMessage(SaveViewAction.class,
-                                                                            "SaveViewAction_SaveViewActionName"); //NOI18N
-    private static final String SAVE_VIEW_ACTION_DESCR = NbBundle.getMessage(SaveViewAction.class,
-                                                                             "SaveViewAction_SaveViewActionDescr"); //NOI18N
-    private static final String NO_VIEW_MSG = NbBundle.getMessage(SaveViewAction.class, "SaveViewAction_NoViewMsg"); //NOI18N
-    private static final String SAVING_VIEW_MSG = NbBundle.getMessage(SaveViewAction.class, "SaveViewAction_SavingViewMsg"); //NOI18N
-    private static final String OVERWRITE_FILE_CAPTION = NbBundle.getMessage(SaveViewAction.class,
-                                                                             "SaveViewAction_OverwriteFileCaption"); //NOI18N
-    private static final String OVERWRITE_FILE_MSG = NbBundle.getMessage(SaveViewAction.class,
-                                                                         "SaveViewAction_OverwriteFileMsg"); //NOI18N
-    private static final String CANNOT_OVERWRITE_FILE_MSG = NbBundle.getMessage(SaveViewAction.class,
-                                                                                "SaveViewAction_CannotOverwriteFileMsg"); //NOI18N
-    private static final String SAVE_DIALOG_TITLE = NbBundle.getMessage(SaveViewAction.class,
-                                                                        "SaveViewAction_SaveDialogTitle"); //NOI18N
-    private static final String SAVE_DIALOG_BUTTON = NbBundle.getMessage(SaveViewAction.class,
-                                                                         "SaveViewAction_SaveDialogButton"); //NOI18N
-    private static final String SAVE_DIALOG_FILTER = NbBundle.getMessage(SaveViewAction.class,
-                                                                         "SaveViewAction_SaveDialogFilter"); //NOI18N
-    private static final String SAVE_DIALOG_PREVIEW = NbBundle.getMessage(SaveViewAction.class,
-                                                                          "SaveViewAction_SaveDialogPreview"); //NOI18N
-    private static final String SAVE_DIALOG_VISIBLE = NbBundle.getMessage(SaveViewAction.class,
-                                                                          "SaveViewAction_SaveDialogVisible"); //NOI18N
-    private static final String OOME_SAVING_MSG = NbBundle.getMessage(SaveViewAction.class, "SaveViewAction_OomeSavingMsg"); //NOI18N
-                                                                                                                                   // -----
     private static final Icon ICON = Icons.getIcon(GeneralIcons.SAVE_VIEW);
     private static File exportDir;
 
@@ -153,8 +141,8 @@ class SaveViewAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public SaveViewAction(ViewProvider viewProvider) {
-        putValue(Action.NAME, SAVE_VIEW_ACTION_NAME);
-        putValue(Action.SHORT_DESCRIPTION, SAVE_VIEW_ACTION_DESCR);
+        putValue(Action.NAME, Bundle.SaveViewAction_SaveViewActionName());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.SaveViewAction_SaveViewActionDescr());
         putValue(Action.SMALL_ICON, ICON);
         putValue("iconBase", Icons.getResource(GeneralIcons.SAVE_VIEW));
         this.viewProvider = viewProvider;
@@ -164,7 +152,7 @@ class SaveViewAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent evt) {
         if (!viewProvider.hasView()) { // nothing to save in current view
-            ProfilerDialogs.displayError(NO_VIEW_MSG);
+            ProfilerDialogs.displayError(Bundle.SaveViewAction_NoViewMsg());
 
             return;
         }
@@ -208,7 +196,7 @@ class SaveViewAction extends AbstractAction {
                     ProgressHandle pHandle = null;
 
                     try {
-                        pHandle = ProgressHandleFactory.createHandle(SAVING_VIEW_MSG);
+                        pHandle = ProgressHandleFactory.createHandle(Bundle.SaveViewAction_SavingViewMsg());
                         pHandle.setInitialDelay(0);
                         pHandle.start();
                         
@@ -219,11 +207,10 @@ class SaveViewAction extends AbstractAction {
                             stream.close();
                         }
                     } catch (OutOfMemoryError e) {
-                        ProfilerDialogs.displayError(OOME_SAVING_MSG);
+                        ProfilerDialogs.displayError(Bundle.SaveViewAction_OomeSavingMsg());
                     } catch (IOException ex) {
                         ProfilerDialogs.displayError(
-                                NbBundle.getMessage(SaveViewAction.class,
-                                "ExportAction_FileWriteErrorMsg", //NOI18N
+                                Bundle.ExportAction_FileWriteErrorMsg(
                                 file.getAbsolutePath()));
                     }
                     finally {
@@ -249,20 +236,20 @@ class SaveViewAction extends AbstractAction {
             fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             fileChooser.setMultiSelectionEnabled(false);
-            fileChooser.setDialogTitle(SAVE_DIALOG_TITLE);
-            fileChooser.setApproveButtonText(SAVE_DIALOG_BUTTON);
+            fileChooser.setDialogTitle(Bundle.SaveViewAction_SaveDialogTitle());
+            fileChooser.setApproveButtonText(Bundle.SaveViewAction_SaveDialogButton());
             fileChooser.setFileFilter(new FileFilter() {
                     public boolean accept(File f) {
                         return f.isDirectory() || f.getName().endsWith(".png") || f.getName().endsWith(".PNG");
                     } //NOI18N
 
                     public String getDescription() {
-                        return SAVE_DIALOG_FILTER;
+                        return Bundle.SaveViewAction_SaveDialogFilter();
                     }
                 });
 
             // Preview label
-            JLabel previewLabel = new JLabel(SAVE_DIALOG_PREVIEW);
+            JLabel previewLabel = new JLabel(Bundle.SaveViewAction_SaveDialogPreview());
             previewLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 5, 0));
 
             // Preview area
@@ -271,7 +258,7 @@ class SaveViewAction extends AbstractAction {
             imagePreview.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
 
             // Mode checkbox
-            visibleAreaCheckBox = new JCheckBox(SAVE_DIALOG_VISIBLE);
+            visibleAreaCheckBox = new JCheckBox(Bundle.SaveViewAction_SaveDialogVisible());
             visibleAreaCheckBox.setBorder(BorderFactory.createEmptyBorder(8, 8, 0, 0));
 
             visibleAreaCheckBox.addActionListener(new ActionListener() {
@@ -305,13 +292,14 @@ class SaveViewAction extends AbstractAction {
 
     private boolean checkFileExists(File file) {
         if (file.exists()) {
-            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(OVERWRITE_FILE_CAPTION,
-                                                  new Object[] { file.getName() }), OVERWRITE_FILE_CAPTION)) {
+            if (!ProfilerDialogs.displayConfirmation(
+                    Bundle.SaveViewAction_OverwriteFileMsg(file.getName()), 
+                    Bundle.SaveViewAction_OverwriteFileCaption())) {
                 return false; // cancelled by the user
             }
 
             if (!file.delete()) {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
+                ProfilerDialogs.displayError(Bundle.SaveViewAction_CannotOverwriteFileMsg(file.getName()));
 
                 return false;
             }

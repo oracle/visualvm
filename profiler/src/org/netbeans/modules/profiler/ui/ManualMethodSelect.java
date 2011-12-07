@@ -63,6 +63,18 @@ import org.openide.util.HelpCtx;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "ManualMethodSelect_SelectMethodsDialogCaption=Define New Profiling Root",
+    "ManualMethodSelect_EditMethodDialogCaption=Edit Profiling Root",
+    "ManualMethodSelect_OKButtonText=OK",
+    "ManualMethodSelect_ClassNameLabelText=&Class Name\\:",
+    "ManualMethodSelect_MethodNameLabelText=&Method Name\\:",
+    "ManualMethodSelect_MethodSignatureLabelText=Method &VM Signature\\:",
+    "ManualMethodSelect_HintMsg=The <b>Method Signature</b> must be in VM format, this means that for method \"String toString()\" the signature looks like \"()Ljava/lang/String;\".",
+    "ManualMethodSelect_ClassNameAccessName=Enter class name here.",
+    "ManualMethodSelect_MethodNameAccessName=Enter method name here.",
+    "ManualMethodSelect_MethodSignatureAccessName=Enter method signature in VM format here."
+})
 public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -83,36 +95,12 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String SELECT_METHODS_DIALOG_CAPTION = NbBundle.getMessage(ManualMethodSelect.class,
-                                                                                    "ManualMethodSelect_SelectMethodsDialogCaption" //NOI18N
-    );
-    private static final String EDIT_METHOD_DIALOG_CAPTION = NbBundle.getMessage(ManualMethodSelect.class,
-                                                                                    "ManualMethodSelect_EditMethodDialogCaption" //NOI18N
-    );
-    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(ManualMethodSelect.class, "ManualMethodSelect_OKButtonText"); //NOI18N
-    private static final String CLASS_NAME_LABEL_TEXT = NbBundle.getMessage(ManualMethodSelect.class,
-                                                                            "ManualMethodSelect_ClassNameLabelText"); //NOI18N
-    private static final String METHOD_NAME_LABEL_TEXT = NbBundle.getMessage(ManualMethodSelect.class,
-                                                                             "ManualMethodSelect_MethodNameLabelText"); //NOI18N
-    private static final String METHOD_SIGNATURE_LABEL_TEXT = NbBundle.getMessage(ManualMethodSelect.class,
-                                                                                  "ManualMethodSelect_MethodSignatureLabelText"); //NOI18N
-    private static final String HINT_MSG = NbBundle.getMessage(ManualMethodSelect.class, "ManualMethodSelect_HintMsg"); //NOI18N
-    private static final String CLASS_NAME_ACCESS_NAME = NbBundle.getMessage(ManualMethodSelect.class,
-                                                                             "ManualMethodSelect_ClassNameAccessName"); //NOI18N
-    private static final String METHOD_NAME_ACCESS_NAME = NbBundle.getMessage(ManualMethodSelect.class,
-                                                                              "ManualMethodSelect_MethodNameAccessName"); //NOI18N
-    private static final String METHOD_SIGNATURE_ACCESS_NAME = NbBundle.getMessage(ManualMethodSelect.class,
-                                                                                   "ManualMethodSelect_MethodSignatureAccessName"); //NOI18N
-                                                                                                                                    // -----
     
     private static final String HELP_CTX_KEY = "ManualMethodSelect.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     
     private static ManualMethodSelect mms;
-    private static JButton okButton = new JButton(OK_BUTTON_TEXT);
+    private static JButton okButton = new JButton(Bundle.ManualMethodSelect_OKButtonText());
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -160,35 +148,35 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
         fieldConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         classNameLabel.setLabelFor(className);
-        org.openide.awt.Mnemonics.setLocalizedText(classNameLabel, CLASS_NAME_LABEL_TEXT);
+        org.openide.awt.Mnemonics.setLocalizedText(classNameLabel, Bundle.ManualMethodSelect_ClassNameLabelText());
         labelConstraints.gridx = 0;
         labelConstraints.gridy = 0;
         add(classNameLabel, labelConstraints);
 
-        className.getAccessibleContext().setAccessibleName(CLASS_NAME_ACCESS_NAME);
+        className.getAccessibleContext().setAccessibleName(Bundle.ManualMethodSelect_ClassNameAccessName());
         className.setPreferredSize(new Dimension(290, className.getPreferredSize().height));
         fieldConstraints.gridx = 1;
         fieldConstraints.gridy = 0;
         add(className, fieldConstraints);
 
         methodNameLabel.setLabelFor(methodName);
-        org.openide.awt.Mnemonics.setLocalizedText(methodNameLabel, METHOD_NAME_LABEL_TEXT);
+        org.openide.awt.Mnemonics.setLocalizedText(methodNameLabel, Bundle.ManualMethodSelect_MethodNameLabelText());
         labelConstraints.gridx = 0;
         labelConstraints.gridy = 1;
         add(methodNameLabel, labelConstraints);
 
-        methodName.getAccessibleContext().setAccessibleName(METHOD_NAME_ACCESS_NAME);
+        methodName.getAccessibleContext().setAccessibleName(Bundle.ManualMethodSelect_MethodNameAccessName());
         fieldConstraints.gridx = 1;
         fieldConstraints.gridy = 1;
         add(methodName, fieldConstraints);
 
         methodSignatureLabel.setLabelFor(methodSignature);
-        org.openide.awt.Mnemonics.setLocalizedText(methodSignatureLabel, METHOD_SIGNATURE_LABEL_TEXT);
+        org.openide.awt.Mnemonics.setLocalizedText(methodSignatureLabel, Bundle.ManualMethodSelect_MethodSignatureLabelText());
         labelConstraints.gridx = 0;
         labelConstraints.gridy = 2;
         add(methodSignatureLabel, labelConstraints);
 
-        methodSignature.getAccessibleContext().setAccessibleName(METHOD_SIGNATURE_ACCESS_NAME);
+        methodSignature.getAccessibleContext().setAccessibleName(Bundle.ManualMethodSelect_MethodSignatureAccessName());
         fieldConstraints.gridx = 1;
         fieldConstraints.gridy = 2;
         add(methodSignature, fieldConstraints);
@@ -208,7 +196,7 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
         add(new JPanel(), constraints);
 
         // hintArea
-        hintArea.setText(HINT_MSG); // NOI18N
+        hintArea.setText(Bundle.ManualMethodSelect_HintMsg());
         hintArea.setEnabled(false);
         hintArea.setDisabledTextColor(Color.darkGray);
         hintArea.setBackground(hintBackground);
@@ -252,8 +240,10 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
             mms.setMethodSignature(method.getMethodSignature());
         }
 
-        final DialogDescriptor dd = new DialogDescriptor(mms, method == null ? SELECT_METHODS_DIALOG_CAPTION :
-                                                         EDIT_METHOD_DIALOG_CAPTION, true,
+        final DialogDescriptor dd = new DialogDescriptor(mms, method == null ? 
+                                                         Bundle.ManualMethodSelect_SelectMethodsDialogCaption() :
+                                                            Bundle.ManualMethodSelect_EditMethodDialogCaption(), 
+                                                         true,
                                                          new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                          DialogDescriptor.BOTTOM_ALIGN, null, null);
 

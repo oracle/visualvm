@@ -54,7 +54,10 @@ import javax.swing.*;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.ui.NBHTMLLabel;
 
-
+@NbBundle.Messages({
+    "ProfilerDialogs_DontShowAgainMsg=Do not show this message again",
+    "ProfilerDialogs_ShowDetailsButtonText=Show Details"
+})
 final class ProfilerDialogs {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -62,7 +65,7 @@ final class ProfilerDialogs {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final String dnsaKey;
-        private String dnsaMessage = DONT_SHOW_AGAIN_MSG;
+        private String dnsaMessage = Bundle.ProfilerDialogs_DontShowAgainMsg();
         private boolean dnsaDefault = true;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -171,7 +174,7 @@ final class ProfilerDialogs {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final String dnsaKey;
-        private String dnsaMessage = DONT_SHOW_AGAIN_MSG;
+        private String dnsaMessage = Bundle.ProfilerDialogs_DontShowAgainMsg();
         private boolean dnsaDefault = false;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -279,7 +282,7 @@ final class ProfilerDialogs {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final String dnsaKey;
-        private String dnsaMessage = DONT_SHOW_AGAIN_MSG;
+        private String dnsaMessage = Bundle.ProfilerDialogs_DontShowAgainMsg();
         private boolean dnsaDefault = true;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -333,7 +336,7 @@ final class ProfilerDialogs {
     public static final class MessageWithDetails extends DialogDescriptor {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private JButton showDetailsButton = new JButton(SHOW_DETAILS_BUTTON_TEXT);
+        private JButton showDetailsButton = new JButton(Bundle.ProfilerDialogs_DontShowAgainMsg());
         private Object detailsMsg;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -426,13 +429,6 @@ final class ProfilerDialogs {
 
     private static final Logger LOGGER = Logger.getLogger(ProfilerDialogs.class.getName());
 
-    // -----
-    // I18N String constants
-    private static final String DONT_SHOW_AGAIN_MSG = NbBundle.getMessage(ProfilerDialogs.class,
-                                                                          "ProfilerDialogs_DontShowAgainMsg"); //NOI18N
-    private static final String SHOW_DETAILS_BUTTON_TEXT = NbBundle.getMessage(ProfilerDialogs.class,
-                                                                               "ProfilerDialogs_ShowDetailsButtonText"); //NOI18N
-                                                                                                                         // -----
     private static boolean DEBUG = System.getProperty("org.netbeans.modules.profiler.ui.ProfilerDialogs") != null; //NOI18N
     private static final DialogDisplayer standard = DialogDisplayer.getDefault();
     private static boolean silent = false;

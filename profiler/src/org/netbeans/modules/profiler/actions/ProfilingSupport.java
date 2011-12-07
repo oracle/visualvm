@@ -69,6 +69,12 @@ import org.openide.util.Lookup;
  * @author Ian Formanek
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "CAPTION_Question=Question",
+    "ProfilingSupport_StopStartProfileSessionMessage=Profiling session is currently in progress.\nDo you want to stop the current session and start a new one?",
+    "ProfilingSupport_StopStartAttachSessionMessage=Profiling session is currently in progress\nDo you want to detach from the target application and start a new profiling session?",
+    "ProfilingSupport_FailedLoadSettingsMsg=Failed to load attach settings\\: {0}"
+})
 public final class ProfilingSupport {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -97,16 +103,6 @@ public final class ProfilingSupport {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String QUESTION_DIALOG_CAPTION = NbBundle.getMessage(ProfilingSupport.class, "CAPTION_Question"); // NOI18N
-    private static final String STOP_START_PROFILE_SESSION_MESSAGE = NbBundle.getMessage(ProfilingSupport.class,
-                                                                                         "ProfilingSupport_StopStartProfileSessionMessage"); // NOI18N
-    private static final String STOP_START_ATTACH_SESSION_MESSAGE = NbBundle.getMessage(ProfilingSupport.class,
-                                                                                        "ProfilingSupport_StopStartAttachSessionMessage"); // NOI18N
-    private static final String FAILED_LOAD_SETTINGS_MSG = NbBundle.getMessage(ProfilingSupport.class,
-                                                                               "ProfilingSupport_FailedLoadSettingsMsg"); // NOI18N
 
     // -----
     private static ProfilingSupport defaultInstance;
@@ -139,13 +135,17 @@ public final class ProfilingSupport {
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
-                if (!ProfilerDialogs.displayConfirmation(STOP_START_PROFILE_SESSION_MESSAGE, QUESTION_DIALOG_CAPTION)) {
+                if (!ProfilerDialogs.displayConfirmation(
+                    Bundle.ProfilingSupport_StopStartProfileSessionMessage(), 
+                    Bundle.CAPTION_Question())) {
                     return true;
                 }
 
                 Profiler.getDefault().stopApp();
             } else {
-                if (!ProfilerDialogs.displayConfirmation(STOP_START_ATTACH_SESSION_MESSAGE, QUESTION_DIALOG_CAPTION)) {
+                if (!ProfilerDialogs.displayConfirmation(
+                    Bundle.ProfilingSupport_StopStartAttachSessionMessage(), 
+                    Bundle.CAPTION_Question())) {
                     return true;
                 }
 
@@ -266,7 +266,7 @@ public final class ProfilingSupport {
                         try {
                             as = ProjectStorage.loadAttachSettings(project);
                         } catch (IOException e) {
-                            ProfilerDialogs.displayWarning(MessageFormat.format(FAILED_LOAD_SETTINGS_MSG, new Object[] { e.getMessage() }));
+                            ProfilerDialogs.displayWarning(Bundle.ProfilingSupport_FailedLoadSettingsMsg(e.getMessage()));
                             ProfilerLogger.log(e);
                         }
 

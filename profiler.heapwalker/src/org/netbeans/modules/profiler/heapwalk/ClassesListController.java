@@ -113,11 +113,6 @@ public class ClassesListController extends AbstractController {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String ANALYZING_CLASSES_MSG = NbBundle.getMessage(ClassesListController.class,
-                                                                            "ClassesListController_AnalyzingClassesMsg"); // NOI18N
-                                                                                                                          // -----
     public static final int FILTER_SUBCLASS = 1001;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -141,9 +136,7 @@ public class ClassesListController extends AbstractController {
     public void setColumnVisibility(int column, boolean isColumnVisible) {
         ((ClassesListControllerUI) getPanel()).setColumnVisibility(column, isColumnVisible);
     }
-    
-    private static final String RESULT_NOT_AVAILABLE_STRING = NbBundle.getMessage(ClassesListController.class,
-                                                                                  "ClassesListController_ResultNotAvailableString"); // NOI18N
+
     private static final NumberFormat percentFormat = NumberFormat.getPercentInstance();
     private static final NumberFormat numberFormat = NumberFormat.getInstance();
     static {
@@ -155,6 +148,7 @@ public class ClassesListController extends AbstractController {
     public long maxDiff;
 
     // --- Internal interface ----------------------------------------------------
+    @NbBundle.Messages("ClassesListController_ResultNotAvailableString=N/A")
     public Object[][] getData(String[] filterStrings, int filterType, boolean showZeroInstances, boolean showZeroSize,
                                          int sortingColumn, boolean sortingOrder, int columnCount) {
         boolean diff = isDiff();
@@ -190,7 +184,7 @@ public class ClassesListController extends AbstractController {
                 data[i][2] = numberFormat.format(instancesCount) + " (" // NOI18N
                                      + percentFormat.format((double) instancesCount /
                                      (double) totalLiveInstances) + ")"; // NOI18N
-                data[i][3] = (allInstancesSize < 0) ? RESULT_NOT_AVAILABLE_STRING
+                data[i][3] = (allInstancesSize < 0) ? Bundle.ClassesListController_ResultNotAvailableString()
                                       : (numberFormat.format(allInstancesSize) + " (" // NOI18N
                                       + percentFormat.format((double) allInstancesSize /
                                       (double) totalLiveBytes) + ")"); // NOI18N
@@ -491,11 +485,12 @@ public class ClassesListController extends AbstractController {
         return new ClassesListControllerUI(this);
     }
 
+    @NbBundle.Messages("ClassesListController_AnalyzingClassesMsg=Analyzing classes...")
     private static Collection getContextSubclasses(Heap heap, String className, Lookup.Provider project) {
         ProgressHandle pHandle = null;
 
         try {
-            pHandle = ProgressHandleFactory.createHandle(ANALYZING_CLASSES_MSG);
+            pHandle = ProgressHandleFactory.createHandle(Bundle.ClassesListController_AnalyzingClassesMsg());
             pHandle.setInitialDelay(0);
             pHandle.start();
 

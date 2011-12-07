@@ -117,6 +117,77 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "ProfilerControlPanel2_ControlsSnippetName=Controls",
+    "ProfilerControlPanel2_StatusSnippetName=Status",
+    "ProfilerControlPanel2_ResultsSnippetName=Profiling Results",
+    "ProfilerControlPanel2_SnapshotsSnippetName=Saved Snapshots",
+    "ProfilerControlPanel2_ViewSnippetName=View",
+    "ProfilerControlPanel2_TelemetrySnippetName=Basic Telemetry",
+    "ProfilerControlPanel2_ModeLabelString=Mode\\:",
+    "ProfilerControlPanel2_TypeLabelString=Type\\:",
+    "ProfilerControlPanel2_ConfigLabelString=Configuration\\:",
+    "ProfilerControlPanel2_OnLabelString=On\\:",
+    "ProfilerControlPanel2_StatusLabelString=Status\\:",
+    "ProfilerControlPanel2_ProfileLabelString=Profile",
+    "ProfilerControlPanel2_CpuLabelString=CPU",
+    "ProfilerControlPanel2_EntireAppLabelString=Entire Application",
+    "ProfilerControlPanel2_ThisCompLabelString=This Computer",
+    "ProfilerControlPanel2_RunningLabelString=Running",
+    "ProfilerControlPanel2_AttachLabelString=Attach",
+    "ProfilerControlPanel2_CodeFragmentLabelString=Code Fragment",
+    "ProfilerControlPanel2_MemoryLabelString=Memory",
+    "ProfilerControlPanel2_MonitorLabelString=Monitor",
+    "ProfilerControlPanel2_InactiveLabelString=Inactive",
+    "ProfilerControlPanel2_StartedLabelString=Started",
+    "ProfilerControlPanel2_PausedLabelString=Paused",
+    "ProfilerControlPanel2_StoppedLabelString=Stopped",
+    "ProfilerControlPanel2_StartingLabelString=Starting",
+    "ProfilerControlPanel2_TelemetryButtonName=VM Telemetry",
+    "ProfilerControlPanel2_TelemetryButtonToolTip=Show VM Telemetry graphs",
+    "ProfilerControlPanel2_ThreadsButtonName=Threads",
+    "ProfilerControlPanel2_ThreadsButtonToolTip=Show application threads timeline",
+    "ProfilerControlPanel2_GlobalComboItemString=<Global>",
+    "ProfilerControlPanel2_ConfirmDeleteSnapshotCaption=Confirm File Delete",
+    "ProfilerControlPanel2_ConfirmDeleteSnapshotMsg=Do you really want to delete the selected snapshot(s) from the disk?\nYou cannot undo this operation.",
+    "ProfilerControlPanel2_OpenButtonName=Open",
+    "ProfilerControlPanel2_DeleteButtonName=Delete",
+    "ProfilerControlPanel2_RenameButtonName=Rename...",
+    "ProfilerControlPanel2_ExportButtonName=Save As...",
+    "ProfilerControlPanel2_TakeSnapshotButtonName=Take Snapshot",
+    "ProfilerControlPanel2_DumpHeapButtonName=Dump Heap",
+    "ProfilerControlPanel2_TakeSnapshotButtonToolTip=Obtains a snapshot of profiling results at the current moment",
+    "ProfilerControlPanel2_LiveResultsButtonName=Live Results",
+    "ProfilerControlPanel2_LiveResultsButtonToolTip=Show live profiling results",
+    "ProfilerControlPanel2_ResetResultsButtonName=Reset Collected Results",
+    "ProfilerControlPanel2_ResetResultsButtonToolTip=Reset the profiler data obtained so far (if any)",
+    "ProfilerControlPanel2_InstrumentedLabelString=Instrumented\\:",
+    "ProfilerControlPanel2_FilterLabelString=Filter\\:",
+    "ProfilerControlPanel2_ThreadsLabelString=Threads\\:",
+    "ProfilerControlPanel2_TotalMemoryLabelString=Total Memory\\:",
+    "ProfilerControlPanel2_UsedMemoryLabelString=Used Memory\\:", 
+    "ProfilerControlPanel2_GcTimeLabelString=Time Spent in GC\\:",
+    "ProfilerControlPanel2_NoLinesCodeRegionMsg={0} Lines in Code Region",
+    "ProfilerControlPanel2_NoMethodsMsg={0} Methods",
+    "ProfilerControlPanel2_NoClassesMsg={0} Classes",
+    "ProfilerControlPanel2_NothingInstrumentedMsg=None",
+    "ProfilerControlPanel2_ControlPanelToolTip=Profiler Control Panel",
+    "ProfilerControlPanel2_ComboAccessName=List of open projects.",
+    "ProfilerControlPanel2_ComboAccessDescr=Select project to view saved snapshots for project.",
+    "ProfilerControlPanel2_ListAccessName=List of saved snapshots for selected project.",
+    "ProfilerControlPanel2_OpenButtonAccessDescr=Opens selected snapshots.",
+    "ProfilerControlPanel2_DeleteButtonAccessDescr=Delete selected snapshots.",
+    "ProfilerControlPanel2_ExportButtonAccessDescr=Save selected snapshots as standalone files.",
+    "ProfilerControlPanel2_RenameButtonAccessDescr=Renames currently selected snapshot file.",
+    "ProfilerControlPanel2_NoConfigurationString=None",
+    "ProfilerControlPanel2_ControlPanelAcessDescr=Profiler control panel",
+    "ProfilerControlPanel2_SnapshotsNotDeletedMsg=<html><b>Problem deleting snapshot(s).</b><br><br>The snapshot(s) might not have been deleted<br>or have already been deleted outside of the IDE.</html>",
+    "ProfilerControlPanel2_RenameSnapshotCaption=Rename Snapshot",
+    "ProfilerControlPanel2_NewFileNameLbl=&New file name\\:",
+    "ProfilerControlPanel2_RenameSnapshotFailedMsg=Failed to rename snapshot to {0}",
+    "MSG_Loading_Progress=Loading...",
+    "LAB_ControlPanelName=Profiler"
+})
 public final class ProfilerControlPanel2 extends TopComponent implements ProfilingStateListener {
     final private static Logger LOGGER = Logger.getLogger(ProfilerControlPanel2.class.getName());
     
@@ -326,25 +397,25 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             setBorder(BorderFactory.createEmptyBorder(8, 3, 9, 3));
             setLayout(new GridBagLayout());
 
-            final JLabel instrLabel = new JLabel(INSTRUMENTED_LABEL_STRING);
+            final JLabel instrLabel = new JLabel(Bundle.ProfilerControlPanel2_InstrumentedLabelString());
             instrLabel.setFont(instrLabel.getFont().deriveFont(Font.BOLD));
 
-            final JLabel instrFilterLabel = new JLabel(FILTER_LABEL_STRING);
+            final JLabel instrFilterLabel = new JLabel(Bundle.ProfilerControlPanel2_FilterLabelString());
             instrFilterLabel.setFont(instrFilterLabel.getFont().deriveFont(Font.BOLD));
 
-            final JLabel threadsLabel = new JLabel(THREADS_LABEL_STRING);
+            final JLabel threadsLabel = new JLabel(Bundle.ProfilerControlPanel2_ThreadsLabelString());
             threadsLabel.setFont(threadsLabel.getFont().deriveFont(Font.BOLD));
 
-            final JLabel typeLabel = new JLabel(TYPE_LABEL_STRING);
+            final JLabel typeLabel = new JLabel(Bundle.ProfilerControlPanel2_TypeLabelString());
             typeLabel.setFont(typeLabel.getFont().deriveFont(Font.BOLD));
 
-            final JLabel totalMemLabel = new JLabel(TOTAL_MEMORY_LABEL_STRING);
+            final JLabel totalMemLabel = new JLabel(Bundle.ProfilerControlPanel2_TotalMemoryLabelString());
             totalMemLabel.setFont(totalMemLabel.getFont().deriveFont(Font.BOLD));
 
-            final JLabel usedMemLabel = new JLabel(USED_MEMORY_LABEL_STRING);
+            final JLabel usedMemLabel = new JLabel(Bundle.ProfilerControlPanel2_UsedMemoryLabelString());
             usedMemLabel.setFont(usedMemLabel.getFont().deriveFont(Font.BOLD));
 
-            final JLabel relTimeLabel = new JLabel(GC_TIME_LABEL_STRING);
+            final JLabel relTimeLabel = new JLabel(Bundle.ProfilerControlPanel2_GcTimeLabelString());
             relTimeLabel.setFont(relTimeLabel.getFont().deriveFont(Font.BOLD));
 
             instrValueLabel = new JLabel(savedInstrText);
@@ -394,11 +465,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
                 switch (currentInstrType) {
                     case CommonConstants.INSTR_CODE_REGION:
-                        instrStatusText = MessageFormat.format(NO_LINES_CODE_REGION_MSG,
-                                                               new Object[] {
-                                                                   Integer.valueOf(targetAppRunner.getProfilingSessionStatus().instrEndLine
-                                                                               - targetAppRunner.getProfilingSessionStatus().instrStartLine)
-                                                               });
+                        instrStatusText = Bundle.ProfilerControlPanel2_NoLinesCodeRegionMsg(
+                                            Integer.valueOf(targetAppRunner.getProfilingSessionStatus().instrEndLine
+                                                - targetAppRunner.getProfilingSessionStatus().instrStartLine));
 
                         break;
                     case CommonConstants.INSTR_RECURSIVE_FULL:
@@ -410,20 +479,20 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             nMethods--; // Because nInstrMethods is actually the array size where element 0 is always empty
                         }
 
-                        instrStatusText = MessageFormat.format(NO_METHODS_MSG, new Object[] { Integer.valueOf(nMethods) });
+                        instrStatusText = Bundle.ProfilerControlPanel2_NoMethodsMsg(Integer.valueOf(nMethods));
 
                         break;
                     case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
                     case CommonConstants.INSTR_OBJECT_LIVENESS:
 
                         final int nClasses = targetAppRunner.getProfilingSessionStatus().getNInstrClasses();
-                        instrStatusText = MessageFormat.format(NO_CLASSES_MSG, new Object[] { Integer.valueOf(nClasses) });
+                        instrStatusText = Bundle.ProfilerControlPanel2_NoClassesMsg(Integer.valueOf(nClasses));
                         ;
 
                         break;
                     case CommonConstants.INSTR_NONE_SAMPLING:
                     case CommonConstants.INSTR_NONE:
-                        instrStatusText = NOTHING_INSTRUMENTED_MSG;
+                        instrStatusText = Bundle.ProfilerControlPanel2_NothingInstrumentedMsg();
 
                         break;
                 }
@@ -663,7 +732,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                new FlatToolBar.FlatMarginBorder());
 
             // Take CPU snapshot
-            takeCPUSnapshotButton = new JButton(TAKE_SNAPSHOT_BUTTON_NAME, TAKE_SNAPSHOT_CPU_ICON);
+            takeCPUSnapshotButton = new JButton(Bundle.ProfilerControlPanel2_TakeSnapshotButtonName(), TAKE_SNAPSHOT_CPU_ICON);
             UIUtils.fixButtonUI(takeCPUSnapshotButton);
             takeCPUSnapshotButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) takeCPUSnapshotButton
                                                                                                                     .getIcon())
@@ -675,12 +744,12 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             takeCPUSnapshotButton.setHorizontalTextPosition(SwingConstants.CENTER);
             takeCPUSnapshotButton.setRolloverEnabled(true);
             takeCPUSnapshotButton.setBorder(myRolloverBorder);
-            takeCPUSnapshotButton.setToolTipText(TAKE_SNAPSHOT_BUTTON_TOOLTIP);
+            takeCPUSnapshotButton.setToolTipText(Bundle.ProfilerControlPanel2_TakeSnapshotButtonToolTip());
 
             // Take Memory snapshot
             takeMemorySnapshotButton = new org.netbeans.lib.profiler.ui.components.PopupButton(new String[] {
-                                                                                                   TAKE_SNAPSHOT_BUTTON_NAME,
-                                                                                                   DUMP_HEAP_BUTTON_NAME
+                                                                                                   Bundle.ProfilerControlPanel2_TakeSnapshotButtonName(),
+                                                                                                   Bundle.ProfilerControlPanel2_DumpHeapButtonName()
                                                                                                },
                                                                                                new ImageIcon[] {
                                                                                                    (ImageIcon)TAKE_SNAPSHOT_MEMORY_ICON
@@ -696,10 +765,10 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             takeMemorySnapshotButton.setHorizontalTextPosition(SwingConstants.CENTER);
             takeMemorySnapshotButton.setRolloverEnabled(true);
             takeMemorySnapshotButton.setBorder(myRolloverBorder);
-            takeMemorySnapshotButton.setToolTipText(TAKE_SNAPSHOT_BUTTON_TOOLTIP);
+            takeMemorySnapshotButton.setToolTipText(Bundle.ProfilerControlPanel2_TakeSnapshotButtonToolTip());
 
             // Take Fragment snapshot
-            takeFragmentSnapshotButton = new JButton(TAKE_SNAPSHOT_BUTTON_NAME, TAKE_SNAPSHOT_FRAGMENT_ICON);
+            takeFragmentSnapshotButton = new JButton(Bundle.ProfilerControlPanel2_TakeSnapshotButtonName(), TAKE_SNAPSHOT_FRAGMENT_ICON);
             UIUtils.fixButtonUI(takeFragmentSnapshotButton);
             takeFragmentSnapshotButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) takeFragmentSnapshotButton
                                                                                                                          .getIcon())
@@ -711,9 +780,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             takeFragmentSnapshotButton.setHorizontalTextPosition(SwingConstants.CENTER);
             takeFragmentSnapshotButton.setRolloverEnabled(true);
             takeFragmentSnapshotButton.setBorder(myRolloverBorder);
-            takeFragmentSnapshotButton.setToolTipText(TAKE_SNAPSHOT_BUTTON_TOOLTIP);
+            takeFragmentSnapshotButton.setToolTipText(Bundle.ProfilerControlPanel2_TakeSnapshotButtonToolTip());
 
-            liveResultsButton = new JButton(LIVE_RESULTS_BUTTON_NAME, LIVE_RESULTS_CPU_ICON);
+            liveResultsButton = new JButton(Bundle.ProfilerControlPanel2_LiveResultsButtonName(), LIVE_RESULTS_CPU_ICON);
             UIUtils.fixButtonUI(liveResultsButton);
             liveResultsButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) liveResultsButton
                                                                                                                 .getIcon())
@@ -725,7 +794,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             liveResultsButton.setHorizontalTextPosition(SwingConstants.CENTER);
             liveResultsButton.setRolloverEnabled(true);
             liveResultsButton.setBorder(myRolloverBorder);
-            liveResultsButton.setToolTipText(LIVE_RESULTS_BUTTON_TOOLTIP);
+            liveResultsButton.setToolTipText(Bundle.ProfilerControlPanel2_LiveResultsButtonToolTip());
 
             displayedIcon = CPU;
 
@@ -736,7 +805,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 }
             };
             UIUtils.fixButtonUI(resetResultsButton);
-            resetResultsButton.setText(RESET_RESULTS_BUTTON_NAME);
+            resetResultsButton.setText(Bundle.ProfilerControlPanel2_ResetResultsButtonName());
             resetResultsButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) resetResultsButton
                                                                                                           .getIcon()).getImage()))));
             
@@ -746,7 +815,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             resetResultsButton.setHorizontalTextPosition(SwingConstants.RIGHT);
             resetResultsButton.setRolloverEnabled(true);
             resetResultsButton.setBorder(myRolloverBorder);
-            resetResultsButton.setToolTipText(RESET_RESULTS_BUTTON_TOOLTIP);
+            resetResultsButton.setToolTipText(Bundle.ProfilerControlPanel2_ResetResultsButtonToolTip());
 
             final JPanel southPanel = new JPanel();
             centerPanel = new JPanel();
@@ -774,7 +843,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         }
                     });
             } else if (e.getSource() == takeMemorySnapshotButton) {
-                if (TAKE_SNAPSHOT_BUTTON_NAME.equals(e.getActionCommand())) {
+                if (Bundle.ProfilerControlPanel2_TakeSnapshotButtonName().equals(e.getActionCommand())) {
                     ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                             public void run() {
                                 ResultsManager.getDefault().takeSnapshot();
@@ -933,8 +1002,8 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
             combo = new JComboBox(new DefaultComboBoxModel());
             combo.setRenderer(new ProjectNameRenderer());
-            combo.getAccessibleContext().setAccessibleName(COMBO_ACCESS_NAME);
-            combo.getAccessibleContext().setAccessibleDescription(COMBO_ACCESS_DESCR);
+            combo.getAccessibleContext().setAccessibleName(Bundle.ProfilerControlPanel2_ComboAccessName());
+            combo.getAccessibleContext().setAccessibleDescription(Bundle.ProfilerControlPanel2_ComboAccessDescr());
 
             ComboBoxUI ui = combo.getUI();
 
@@ -967,7 +1036,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             ProjectUtilities.addOpenProjectsListener(this);
 
             list = new JList(listModel = new DefaultListModel());
-            list.getAccessibleContext().setAccessibleName(LIST_ACCESS_NAME);
+            list.getAccessibleContext().setAccessibleName(Bundle.ProfilerControlPanel2_ListAccessName());
             list.setVisibleRowCount(8);
             list.setCellRenderer(new DefaultListCellRenderer() {
                     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
@@ -1044,7 +1113,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                             final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
 
-                            if (ProfilerDialogs.displayConfirmation(CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION)) {
+                            if (ProfilerDialogs.displayConfirmation(
+                                    Bundle.ProfilerControlPanel2_ConfirmDeleteSnapshotMsg(), 
+                                    Bundle.ProfilerControlPanel2_ConfirmDeleteSnapshotCaption())) {
                                 RequestProcessor.getDefault().post(new Runnable() {
                                         public void run() {
                                             deleteSnapshots(selectedSnapshotFiles);
@@ -1072,42 +1143,42 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             listScroll.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
             listScroll.setPreferredSize(new Dimension(1, listScroll.getPreferredSize().height));
             add(listScroll, BorderLayout.CENTER);
-
-            openButton = new JButton(OPEN_BUTTON_NAME);
+            
+            openButton = new JButton(Bundle.ProfilerControlPanel2_OpenButtonName());
             UIUtils.fixButtonUI(openButton);
             openButton.setContentAreaFilled(false);
             openButton.setMargin(new Insets(3, 3, 3, 3));
             openButton.setRolloverEnabled(true);
             openButton.setBorder(buttonsBorder);
             openButton.addActionListener(this);
-            openButton.getAccessibleContext().setAccessibleDescription(OPEN_BUTTON_ACCESS_DESCR);
+            openButton.getAccessibleContext().setAccessibleDescription(Bundle.ProfilerControlPanel2_OpenButtonAccessDescr());
             
-            renameButton = new JButton(RENAME_BUTTON_NAME);
+            renameButton = new JButton(Bundle.ProfilerControlPanel2_RenameButtonName());
             UIUtils.fixButtonUI(renameButton);
             renameButton.setContentAreaFilled(false);
             renameButton.setMargin(new Insets(3, 3, 3, 3));
             renameButton.setRolloverEnabled(true);
             renameButton.setBorder(buttonsBorder);
             renameButton.addActionListener(this);
-            renameButton.getAccessibleContext().setAccessibleDescription(RENAME_BUTTON_ACCESS_DESCR);
+            renameButton.getAccessibleContext().setAccessibleDescription(Bundle.ProfilerControlPanel2_RenameButtonAccessDescr());
 
-            deleteButton = new JButton(DELETE_BUTTON_NAME);
+            deleteButton = new JButton(Bundle.ProfilerControlPanel2_DeleteButtonName());
             UIUtils.fixButtonUI(deleteButton);
             deleteButton.setContentAreaFilled(false);
             deleteButton.setMargin(new Insets(3, 3, 3, 3));
             deleteButton.setRolloverEnabled(true);
             deleteButton.setBorder(buttonsBorder);
             deleteButton.addActionListener(this);
-            deleteButton.getAccessibleContext().setAccessibleDescription(DELETE_BUTTON_ACCESS_DESCR);
+            deleteButton.getAccessibleContext().setAccessibleDescription(Bundle.ProfilerControlPanel2_DeleteButtonAccessDescr());
 
-            exportButton = new JButton(EXPORT_BUTTON_NAME);
+            exportButton = new JButton(Bundle.ProfilerControlPanel2_ExportButtonName());
             UIUtils.fixButtonUI(exportButton);
             exportButton.setContentAreaFilled(false);
             exportButton.setMargin(new Insets(3, 3, 3, 3));
             exportButton.setRolloverEnabled(true);
             exportButton.setBorder(buttonsBorder);
             exportButton.addActionListener(this);
-            exportButton.getAccessibleContext().setAccessibleDescription(EXPORT_BUTTON_ACCESS_DESCR);
+            exportButton.getAccessibleContext().setAccessibleDescription(Bundle.ProfilerControlPanel2_ExportButtonAccessDescr());
 
             JPanel buttonsPanel = new JPanel();
             buttonsPanel.setOpaque(false);
@@ -1145,7 +1216,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             internalChange = true;
 
             if (project == null) {
-                combo.setSelectedItem(GLOBAL_COMBO_ITEM_STRING);
+                combo.setSelectedItem(Bundle.ProfilerControlPanel2_GlobalComboItemString());
             } else {
                 combo.setSelectedItem(project);
             }
@@ -1162,7 +1233,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             } else if (e.getSource() == deleteButton) {
                 final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
 
-                if (ProfilerDialogs.displayConfirmation(CONFIRM_DELETE_SNAPSHOT_MSG, CONFIRM_DELETE_SNAPSHOT_CAPTION)) {
+                if (ProfilerDialogs.displayConfirmation(
+                        Bundle.ProfilerControlPanel2_ConfirmDeleteSnapshotMsg(), 
+                        Bundle.ProfilerControlPanel2_ConfirmDeleteSnapshotCaption())) {
                     RequestProcessor.getDefault().post(new Runnable() {
                             public void run() {
                                 deleteSnapshots(selectedSnapshotFiles);
@@ -1246,8 +1319,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 }
             }
             if (!success) {
-                ProfilerDialogs.displayError(NbBundle.getMessage(ProfilerControlPanel2.class,
-                        "ProfilerControlPanel2_SnapshotsNotDeletedMsg")); // NOI18N
+                ProfilerDialogs.displayError(Bundle.ProfilerControlPanel2_SnapshotsNotDeletedMsg());
             }
         }
 
@@ -1298,8 +1370,8 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                     public void run() {
                         String origName = fileObject.getName();
                         NotifyDescriptor.InputLine nd = new NotifyDescriptor.InputLine(
-                                NbBundle.getMessage(ProfilerControlPanel2.class, "ProfilerControlPanel2_NewFileNameLbl"), // NOI18N
-                                NbBundle.getMessage(ProfilerControlPanel2.class, "ProfilerControlPanel2_RenameSnapshotCaption")); // NOI18N
+                                Bundle.ProfilerControlPanel2_NewFileNameLbl(),
+                                Bundle.ProfilerControlPanel2_RenameSnapshotCaption()); // NOI18N
                         nd.setInputText(origName);
                         Object ret = DialogDisplayer.getDefault().notify(nd);
                         if (ret == NotifyDescriptor.OK_OPTION) {
@@ -1316,8 +1388,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                 } catch (IOException e) {
                                     ProfilerLogger.warning("Failed to rename snapshot " // NOI18N
                                             + fileObject + " to " + newName + ": " + e.getMessage()); // NOI18N
-                                    ProfilerDialogs.displayError(NbBundle.getMessage(ProfilerControlPanel2.class,
-                                            "ProfilerControlPanel2_RenameSnapshotFailedMsg", newName)); // NOI18N
+                                    ProfilerDialogs.displayError(Bundle.ProfilerControlPanel2_RenameSnapshotFailedMsg(newName));
                                     renameSelectedSnapshot();
                                 } finally {
                                     if (lock != null) lock.releaseLock();
@@ -1365,7 +1436,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         @Override
                         public void run() {
                             list.setEnabled(false);
-                            listModel.addElement(NbBundle.getMessage(ProfilerControlPanel2.class, "MSG_Loading_Progress")); // NOI18N
+                            listModel.addElement(Bundle.MSG_Loading_Progress());
                         }
                     });
                 }
@@ -1386,7 +1457,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             java.util.List items = new ArrayList(projects.length + 1);
             items.addAll(Arrays.asList(projects));
 
-            items.add(0, GLOBAL_COMBO_ITEM_STRING);
+            items.add(0, Bundle.ProfilerControlPanel2_GlobalComboItemString());
 
             DefaultComboBoxModel comboModel = (DefaultComboBoxModel) combo.getModel();
             comboModel.removeAllElements();
@@ -1427,26 +1498,26 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             setBorder(BorderFactory.createEmptyBorder(8, 3, 9, 3));
             setLayout(new GridBagLayout());
 
-            final JLabel modeLabel = new JLabel(MODE_LABEL_STRING);
+            final JLabel modeLabel = new JLabel(Bundle.ProfilerControlPanel2_ModeLabelString());
             modeLabel.setFont(modeLabel.getFont().deriveFont(Font.BOLD));
 
-            final JLabel typeLabel = new JLabel(TYPE_LABEL_STRING);
+            final JLabel typeLabel = new JLabel(Bundle.ProfilerControlPanel2_TypeLabelString());
             typeLabel.setFont(typeLabel.getFont().deriveFont(Font.BOLD));
 
-            final JLabel profileLabel = new JLabel(CONFIG_LABEL_STRING);
+            final JLabel profileLabel = new JLabel(Bundle.ProfilerControlPanel2_ConfigLabelString());
             profileLabel.setFont(profileLabel.getFont().deriveFont(Font.BOLD));
 
-            onLabel = new JLabel(ON_LABEL_STRING);
+            onLabel = new JLabel(Bundle.ProfilerControlPanel2_OnLabelString());
             onLabel.setFont(onLabel.getFont().deriveFont(Font.BOLD));
 
-            final JLabel statusLabel = new JLabel(STATUS_LABEL_STRING);
+            final JLabel statusLabel = new JLabel(Bundle.ProfilerControlPanel2_StatusLabelString());
             statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
 
-            modeValueLabel = new JLabel(NO_CONFIGURATION_STRING);
-            typeValueLabel = new JLabel(NO_CONFIGURATION_STRING);
-            profileValueLabel = new JLabel(NO_CONFIGURATION_STRING);
-            onValueLabel = new JLabel(NO_CONFIGURATION_STRING);
-            statusValueLabel = new JLabel(INACTIVE_LABEL_STRING);
+            modeValueLabel = new JLabel(Bundle.ProfilerControlPanel2_NoConfigurationString());
+            typeValueLabel = new JLabel(Bundle.ProfilerControlPanel2_NoConfigurationString());
+            profileValueLabel = new JLabel(Bundle.ProfilerControlPanel2_NoConfigurationString());
+            onValueLabel = new JLabel(Bundle.ProfilerControlPanel2_NoConfigurationString());
+            statusValueLabel = new JLabel(Bundle.ProfilerControlPanel2_InactiveLabelString());
 
             final GridBagConstraints labelGbc = new GridBagConstraints();
             labelGbc.anchor = GridBagConstraints.WEST;
@@ -1479,9 +1550,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 mode = Profiler.getDefault().getProfilingMode();
 
                 if (mode == Profiler.MODE_ATTACH) {
-                    modeValueLabel.setText(ATTACH_LABEL_STRING);
+                    modeValueLabel.setText(Bundle.ProfilerControlPanel2_AttachLabelString());
                 } else {
-                    modeValueLabel.setText(PROFILE_LABEL_STRING);
+                    modeValueLabel.setText(Bundle.ProfilerControlPanel2_ProfileLabelString());
                 }
             }
 
@@ -1490,21 +1561,21 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             if ((ps != null) && ((configuration == null) || !configuration.equals(ps.getSettingsName()))) {
                 switch (ps.getProfilingType()) {
                     case ProfilingSettings.PROFILE_CPU_STOPWATCH:
-                        typeValueLabel.setText(CODE_FRAGMENT_LABEL_STRING);
+                        typeValueLabel.setText(Bundle.ProfilerControlPanel2_CodeFragmentLabelString());
 
                         break;
                     case ProfilingSettings.PROFILE_CPU_ENTIRE:
                     case ProfilingSettings.PROFILE_CPU_PART:
-                        typeValueLabel.setText(CPU_LABEL_STRING);
+                        typeValueLabel.setText(Bundle.ProfilerControlPanel2_CpuLabelString());
 
                         break;
                     case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
                     case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
-                        typeValueLabel.setText(MEMORY_LABEL_STRING);
+                        typeValueLabel.setText(Bundle.ProfilerControlPanel2_MemoryLabelString());
 
                         break;
                     case ProfilingSettings.PROFILE_MONITOR:
-                        typeValueLabel.setText(MONITOR_LABEL_STRING);
+                        typeValueLabel.setText(Bundle.ProfilerControlPanel2_MonitorLabelString());
 
                         break;
                 }
@@ -1540,31 +1611,31 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
                 switch (state) {
                     case Profiler.PROFILING_INACTIVE:
-                        statusValueLabel.setText(INACTIVE_LABEL_STRING);
+                        statusValueLabel.setText(Bundle.ProfilerControlPanel2_InactiveLabelString());
 
                         break;
                     case Profiler.PROFILING_STARTED:
-                        statusValueLabel.setText(STARTED_LABEL_STRING);
+                        statusValueLabel.setText(Bundle.ProfilerControlPanel2_StartedLabelString());
                         count = 1;
 
                         break;
                     case Profiler.PROFILING_PAUSED:
-                        statusValueLabel.setText(PAUSED_LABEL_STRING);
+                        statusValueLabel.setText(Bundle.ProfilerControlPanel2_PausedLabelString());
 
                         break;
                     case Profiler.PROFILING_RUNNING:
-                        statusValueLabel.setText(RUNNING_LABEL_STRING);
+                        statusValueLabel.setText(Bundle.ProfilerControlPanel2_RunningLabelString());
 
                         break;
                     case Profiler.PROFILING_STOPPED:
-                        statusValueLabel.setText(STOPPED_LABEL_STRING);
+                        statusValueLabel.setText(Bundle.ProfilerControlPanel2_StoppedLabelString());
 
                         break;
                 }
             } else {
                 // state stays the same: started -> show progress by adding dots
                 if (state == Profiler.PROFILING_STARTED) {
-                    StringBuilder text = new StringBuilder(STARTING_LABEL_STRING);
+                    StringBuilder text = new StringBuilder(Bundle.ProfilerControlPanel2_StartingLabelString());
 
                     for (int i = 0; i < count; i++) {
                         text.append('.'); // NOI18N
@@ -1597,7 +1668,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                                                         Color.LIGHT_GRAY),
                                                                new FlatToolBar.FlatMarginBorder());
 
-            vmTelemetryButton = new JButton(TELEMETRY_BUTTON_NAME, Icons.getIcon(ProfilerIcons.VIEW_TELEMETRY_32));
+            vmTelemetryButton = new JButton(Bundle.ProfilerControlPanel2_TelemetryButtonName(), Icons.getIcon(ProfilerIcons.VIEW_TELEMETRY_32));
             UIUtils.fixButtonUI(vmTelemetryButton);
             vmTelemetryButton.addActionListener(this);
             vmTelemetryButton.setContentAreaFilled(false);
@@ -1606,9 +1677,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             vmTelemetryButton.setHorizontalTextPosition(SwingConstants.CENTER);
             vmTelemetryButton.setRolloverEnabled(true);
             vmTelemetryButton.setBorder(myRolloverBorder);
-            vmTelemetryButton.setToolTipText(TELEMETRY_BUTTON_TOOLTIP);
+            vmTelemetryButton.setToolTipText(Bundle.ProfilerControlPanel2_TelemetryButtonToolTip());
 
-            threadsButton = new JButton(THREADS_BUTTON_NAME, Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
+            threadsButton = new JButton(Bundle.ProfilerControlPanel2_ThreadsButtonName(), Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
             UIUtils.fixButtonUI(threadsButton);
             threadsButton.addActionListener(this);
             threadsButton.setContentAreaFilled(false);
@@ -1617,7 +1688,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             threadsButton.setHorizontalTextPosition(SwingConstants.CENTER);
             threadsButton.setRolloverEnabled(true);
             threadsButton.setBorder(myRolloverBorder);
-            threadsButton.setToolTipText(THREADS_BUTTON_TOOLTIP);
+            threadsButton.setToolTipText(Bundle.ProfilerControlPanel2_ThreadsButtonToolTip());
 
             add(vmTelemetryButton);
             add(threadsButton);
@@ -1635,137 +1706,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String CONTROL_PANEL_NAME = NbBundle.getMessage(ProfilerControlPanel2.class, "LAB_ControlPanelName");
-    private static final String CONTROLS_SNIPPET_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                            "ProfilerControlPanel2_ControlsSnippetName"); // NOI18N
-    private static final String STATUS_SNIPPET_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                          "ProfilerControlPanel2_StatusSnippetName"); // NOI18N
-    private static final String RESULTS_SNIPPET_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                           "ProfilerControlPanel2_ResultsSnippetName"); // NOI18N
-    private static final String SNAPSHOTS_SNIPPET_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                             "ProfilerControlPanel2_SnapshotsSnippetName"); // NOI18N
-    private static final String VIEW_SNIPPET_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                        "ProfilerControlPanel2_ViewSnippetName"); // NOI18N
-    private static final String TELEMETRY_SNIPPET_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                             "ProfilerControlPanel2_TelemetrySnippetName"); // NOI18N
-    private static final String MODE_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                        "ProfilerControlPanel2_ModeLabelString"); // NOI18N
-    private static final String TYPE_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                        "ProfilerControlPanel2_TypeLabelString"); // NOI18N
-    private static final String CONFIG_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                          "ProfilerControlPanel2_ConfigLabelString"); // NOI18N
-    private static final String ON_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                      "ProfilerControlPanel2_OnLabelString"); // NOI18N
-    private static final String STATUS_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                          "ProfilerControlPanel2_StatusLabelString"); // NOI18N
-    private static final String PROFILE_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                           "ProfilerControlPanel2_ProfileLabelString"); // NOI18N
-    private static final String CPU_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                       "ProfilerControlPanel2_CpuLabelString"); // NOI18N
-    private static final String ENTIRE_APP_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                              "ProfilerControlPanel2_EntireAppLabelString"); // NOI18N
-    private static final String THIS_COMP_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                             "ProfilerControlPanel2_ThisCompLabelString"); // NOI18N
-    private static final String RUNNING_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                           "ProfilerControlPanel2_RunningLabelString"); // NOI18N
-    private static final String ATTACH_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                          "ProfilerControlPanel2_AttachLabelString"); // NOI18N
-    private static final String CODE_FRAGMENT_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                 "ProfilerControlPanel2_CodeFragmentLabelString"); // NOI18N
-    private static final String MEMORY_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                          "ProfilerControlPanel2_MemoryLabelString"); // NOI18N
-    private static final String MONITOR_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                           "ProfilerControlPanel2_MonitorLabelString"); // NOI18N
-    private static final String INACTIVE_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                            "ProfilerControlPanel2_InactiveLabelString"); // NOI18N
-    private static final String STARTED_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                           "ProfilerControlPanel2_StartedLabelString"); // NOI18N
-    private static final String PAUSED_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                          "ProfilerControlPanel2_PausedLabelString"); // NOI18N
-    private static final String STOPPED_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                           "ProfilerControlPanel2_StoppedLabelString"); // NOI18N
-    private static final String STARTING_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                            "ProfilerControlPanel2_StartingLabelString"); // NOI18N
-    private static final String TELEMETRY_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                            "ProfilerControlPanel2_TelemetryButtonName"); // NOI18N
-    private static final String TELEMETRY_BUTTON_TOOLTIP = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                               "ProfilerControlPanel2_TelemetryButtonToolTip"); // NOI18N
-    private static final String THREADS_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                          "ProfilerControlPanel2_ThreadsButtonName"); // NOI18N
-    private static final String THREADS_BUTTON_TOOLTIP = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                             "ProfilerControlPanel2_ThreadsButtonToolTip"); // NOI18N
-    private static final String GLOBAL_COMBO_ITEM_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                               "ProfilerControlPanel2_GlobalComboItemString"); // NOI18N
-    private static final String CONFIRM_DELETE_SNAPSHOT_CAPTION = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                      "ProfilerControlPanel2_ConfirmDeleteSnapshotCaption"); // NOI18N
-    private static final String CONFIRM_DELETE_SNAPSHOT_MSG = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                  "ProfilerControlPanel2_ConfirmDeleteSnapshotMsg"); // NOI18N
-    private static final String OPEN_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                       "ProfilerControlPanel2_OpenButtonName"); // NOI18N
-    private static final String DELETE_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                         "ProfilerControlPanel2_DeleteButtonName"); // NOI18N
-    private static final String RENAME_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                       "ProfilerControlPanel2_RenameButtonName"); // NOI18N
-    private static final String EXPORT_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                         "ProfilerControlPanel2_ExportButtonName"); // NOI18N
-    private static final String TAKE_SNAPSHOT_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                "ProfilerControlPanel2_TakeSnapshotButtonName"); // NOI18N
-    private static final String DUMP_HEAP_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                            "ProfilerControlPanel2_DumpHeapButtonName"); // NOI18N
-    private static final String TAKE_SNAPSHOT_BUTTON_TOOLTIP = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                   "ProfilerControlPanel2_TakeSnapshotButtonToolTip"); // NOI18N
-    private static final String LIVE_RESULTS_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                               "ProfilerControlPanel2_LiveResultsButtonName"); // NOI18N
-    private static final String LIVE_RESULTS_BUTTON_TOOLTIP = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                  "ProfilerControlPanel2_LiveResultsButtonToolTip"); // NOI18N
-    private static final String RESET_RESULTS_BUTTON_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                "ProfilerControlPanel2_ResetResultsButtonName"); // NOI18N
-    private static final String RESET_RESULTS_BUTTON_TOOLTIP = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                   "ProfilerControlPanel2_ResetResultsButtonToolTip"); // NOI18N
-    private static final String INSTRUMENTED_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                "ProfilerControlPanel2_InstrumentedLabelString"); // NOI18N
-    private static final String FILTER_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                          "ProfilerControlPanel2_FilterLabelString"); // NOI18N
-    private static final String THREADS_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                           "ProfilerControlPanel2_ThreadsLabelString"); // NOI18N
-    private static final String TOTAL_MEMORY_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                "ProfilerControlPanel2_TotalMemoryLabelString"); // NOI18N
-    private static final String USED_MEMORY_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                               "ProfilerControlPanel2_UsedMemoryLabelString"); // NOI18N
-    private static final String GC_TIME_LABEL_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                           "ProfilerControlPanel2_GcTimeLabelString"); // NOI18N
-    private static final String NO_LINES_CODE_REGION_MSG = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                               "ProfilerControlPanel2_NoLinesCodeRegionMsg"); // NOI18N
-    private static final String NO_METHODS_MSG = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                     "ProfilerControlPanel2_NoMethodsMsg"); // NOI18N
-    private static final String NO_CLASSES_MSG = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                     "ProfilerControlPanel2_NoClassesMsg"); // NOI18N
-    private static final String NOTHING_INSTRUMENTED_MSG = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                               "ProfilerControlPanel2_NothingInstrumentedMsg"); // NOI18N
-    private static final String CONTROL_PANEL_TOOLTIP = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                            "ProfilerControlPanel2_ControlPanelToolTip"); // NOI18N
-    private static final String COMBO_ACCESS_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                        "ProfilerControlPanel2_ComboAccessName"); // NOI18N
-    private static final String COMBO_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                         "ProfilerControlPanel2_ComboAccessDescr"); // NOI18N
-    private static final String LIST_ACCESS_NAME = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                       "ProfilerControlPanel2_ListAccessName"); // NOI18N
-    private static final String OPEN_BUTTON_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                               "ProfilerControlPanel2_OpenButtonAccessDescr"); // NOI18N
-    private static final String DELETE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                 "ProfilerControlPanel2_DeleteButtonAccessDescr"); // NOI18N
-    private static final String EXPORT_BUTTON_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                 "ProfilerControlPanel2_ExportButtonAccessDescr"); // NOI18N
-    private static final String RENAME_BUTTON_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                               "ProfilerControlPanel2_RenameButtonAccessDescr"); // NOI18N
-    private static final String NO_CONFIGURATION_STRING = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                              "ProfilerControlPanel2_NoConfigurationString"); // NOI18N
-    private static final String CONTROL_PANEL_ACCESS_DESCR = NbBundle.getMessage(ProfilerControlPanel2.class,
-                                                                                 "ProfilerControlPanel2_ControlPanelAcessDescr"); // NOI18N
-                                                                                                                                  // -----
     private static final String HELP_CTX_KEY = "ProfilerControlPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static ProfilerControlPanel2 defaultInstance;
@@ -1799,9 +1739,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ProfilerControlPanel2() {
-        setName(CONTROL_PANEL_NAME); // NOI18N
+        setName(Bundle.LAB_ControlPanelName());
         setIcon(windowIcon);
-        getAccessibleContext().setAccessibleDescription(CONTROL_PANEL_ACCESS_DESCR);
+        getAccessibleContext().setAccessibleDescription(Bundle.ProfilerControlPanel2_ControlPanelAcessDescr());
         setLayout(new BorderLayout());
 
         ControlsPanel controlsSnippet = new ControlsPanel();
@@ -1823,12 +1763,12 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1;
 
-        scrollPanel.add(spControls = new SnippetPanel(CONTROLS_SNIPPET_NAME, controlsSnippet), gbc);
-        scrollPanel.add(spStatus = new SnippetPanel(STATUS_SNIPPET_NAME, statusSnippet), gbc);
-        scrollPanel.add(spResults = new SnippetPanel(RESULTS_SNIPPET_NAME, resultsSnippet), gbc);
-        scrollPanel.add(spSnapshots = new SnippetPanel(SNAPSHOTS_SNIPPET_NAME, snapshotsSnippet), gbc);
-        scrollPanel.add(spView = new SnippetPanel(VIEW_SNIPPET_NAME, viewSnippet), gbc);
-        scrollPanel.add(spBasicTelemetry = new SnippetPanel(TELEMETRY_SNIPPET_NAME, basicTelemetrySnippet), gbc);
+        scrollPanel.add(spControls = new SnippetPanel(Bundle.ProfilerControlPanel2_ControlsSnippetName(), controlsSnippet), gbc);
+        scrollPanel.add(spStatus = new SnippetPanel(Bundle.ProfilerControlPanel2_StatusSnippetName(), statusSnippet), gbc);
+        scrollPanel.add(spResults = new SnippetPanel(Bundle.ProfilerControlPanel2_ResultsSnippetName(), resultsSnippet), gbc);
+        scrollPanel.add(spSnapshots = new SnippetPanel(Bundle.ProfilerControlPanel2_SnapshotsSnippetName(), snapshotsSnippet), gbc);
+        scrollPanel.add(spView = new SnippetPanel(Bundle.ProfilerControlPanel2_ViewSnippetName(), viewSnippet), gbc);
+        scrollPanel.add(spBasicTelemetry = new SnippetPanel(Bundle.ProfilerControlPanel2_TelemetrySnippetName(), basicTelemetrySnippet), gbc);
         gbc.weighty = 1;
         scrollPanel.add(padding, gbc);
 
@@ -1897,7 +1837,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     }
 
     public String getToolTipText() {
-        return CONTROL_PANEL_TOOLTIP;
+        return Bundle.ProfilerControlPanel2_ControlPanelToolTip();
     }
 
     public static synchronized void closeIfOpened() {

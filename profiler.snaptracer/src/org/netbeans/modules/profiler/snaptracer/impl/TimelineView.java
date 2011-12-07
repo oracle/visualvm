@@ -150,6 +150,10 @@ final class TimelineView {
 
     // --- UI implementation ---------------------------------------------------
 
+    @NbBundle.Messages({
+        "TOOLTIP_SelectAll=Select all",
+        "TOOLTIP_ClearMarks=Clear marks"
+    })
     JComponent getView() {
         final TimelineSupport support = model.getTimelineSupport();
         panel = new TimelinePanel(support);
@@ -185,8 +189,7 @@ final class TimelineView {
                 });
             }
         };
-        selectAllButton.setToolTipText(NbBundle.getMessage(TimelineView.class,
-                "TOOLTIP_SelectAll")); //NOI18N
+        selectAllButton.setToolTipText(Bundle.TOOLTIP_SelectAll());
         toolbar.add(selectAllButton);
         
         clearTimestampSelectionButton = new JButton(Icons.getIcon(TracerIcons.MARK_CLEAR)) {
@@ -196,8 +199,7 @@ final class TimelineView {
                 });
             }
         };
-        clearTimestampSelectionButton.setToolTipText(NbBundle.getMessage(
-                TimelineView.class, "TOOLTIP_ClearMarks")); // NOI18N
+        clearTimestampSelectionButton.setToolTipText(Bundle.TOOLTIP_ClearMarks());
         toolbar.add(clearTimestampSelectionButton);
 
         toolbar.addSeparator();
@@ -229,6 +231,14 @@ final class TimelineView {
 
     private static final Format df = new SimpleDateFormat(TimeAxisUtils.TIME_MSEC);
 
+    @NbBundle.Messages({
+        "LBL_Selection=Selection\\:",
+        "LBL_None=<none>",
+        "LBL_SingleSample=sample #{0}",
+        "LBL_TwoSamples=samples #{0} to #{1}",
+        "LBL_TwoTimes={0} to {1}",
+        "LBL_EntireSnapshot=entire snapshot"
+    })
     private void updateSelectionToolbar() {
         TimelineSupport support = model.getTimelineSupport();
         selectAllButton.setEnabled(!support.isSelectAll());
@@ -236,25 +246,22 @@ final class TimelineView {
         
         int startIndex = support.getStartIndex();
         int endIndex = support.getEndIndex();
-        String selection = " " + NbBundle.getMessage(TimelineView.class, // NOI18N
-                "LBL_Selection") + " "; // NOI18N
+        String selection = " " + Bundle.LBL_Selection() + " ";
         if (startIndex == -1) {
-            selection += NbBundle.getMessage(TimelineView.class, "LBL_None"); // NOI18N
+            selection += Bundle.LBL_None();
         }  else if (startIndex == endIndex) {
             selection += df.format(support.getTimestamp(startIndex)) + ", " + // NOI18N
-                    NbBundle.getMessage(TimelineView.class, "LBL_SingleSample", startIndex); // NOI18N
+                    Bundle.LBL_SingleSample(startIndex);
         }  else {
             long startTime = support.getTimestamp(startIndex);
             long endTime = support.getTimestamp(endIndex);
-            selection += NbBundle.getMessage(TimelineView.class, "LBL_TwoTimes", // NOI18N
-                    df.format(startTime), df.format(endTime));
+            selection += Bundle.LBL_TwoTimes(df.format(startTime), df.format(endTime));
             selection += " (" + (endTime - startTime) + " ms)";
-            selection += ", " + NbBundle.getMessage(TimelineView.class, "LBL_TwoSamples", // NOI18N
-                    startIndex, endIndex);
+            selection += ", " + Bundle.LBL_TwoSamples(startIndex, endIndex);
         }
 
         if (support.isSelectAll())
-            selection += ", " + NbBundle.getMessage(TimelineView.class, "LBL_EntireSnapshot"); // NOI18N
+            selection += ", " + Bundle.LBL_EntireSnapshot();
         selectionLabel.setText(selection);
     }
 

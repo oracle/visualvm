@@ -67,6 +67,12 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassPresenterPanel_InstancesCountString=Instances\\: {0}",
+    "ClassPresenterPanel_InstanceSizeString=Instance size\\: {0}",
+    "ClassPresenterPanel_TotalSizeString=Total size\\: {0}",
+    "ClassPresenterPanel_RetainedSizesString=Compute Retained Sizes"
+})
 public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.StateListener {
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -97,17 +103,6 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String INSTANCES_COUNT_STRING = NbBundle.getMessage(ClassPresenterPanel.class,
-                                                                             "ClassPresenterPanel_InstancesCountString"); // NOI18N
-    private static final String INSTANCE_SIZE_STRING = NbBundle.getMessage(ClassPresenterPanel.class,
-                                                                           "ClassPresenterPanel_InstanceSizeString"); // NOI18N
-    private static final String TOTAL_SIZE_STRING = NbBundle.getMessage(ClassPresenterPanel.class,
-                                                                        "ClassPresenterPanel_TotalSizeString"); // NOI18N
-    private static final String RETAINED_SIZES_STRING = NbBundle.getMessage(ClassPresenterPanel.class,
-                                                                        "ClassPresenterPanel_RetainedSizesString"); // NOI18N
-                                                                                                                // -----
     private static Icon ICON_CLASS = Icons.getIcon(LanguageIcons.CLASS);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -129,13 +124,13 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
     public void setJavaClass(JavaClass javaClass) {
         if (javaClass != null) {
             String className = javaClass.getName();
-            String instancesCount = MessageFormat.format(INSTANCES_COUNT_STRING, new Object[] { javaClass.getInstancesCount() });
+            String instancesCount = Bundle.ClassPresenterPanel_InstancesCountString(javaClass.getInstancesCount());
             String instanceSize = (javaClass.getInstanceSize() != -1)
                                   ? ("  |  " // NOI18N
-                                  + MessageFormat.format(INSTANCE_SIZE_STRING, new Object[] { javaClass.getInstanceSize() })) : ""; // NOI18N
+                                  + Bundle.ClassPresenterPanel_InstanceSizeString(javaClass.getInstanceSize())) : ""; // NOI18N
             String allInstancesSize = (javaClass.getAllInstancesSize() != -1)
                                       ? ("  |  " // NOI18N
-                                      + MessageFormat.format(TOTAL_SIZE_STRING, new Object[] { javaClass.getAllInstancesSize() }))
+                                      + Bundle.ClassPresenterPanel_TotalSizeString(javaClass.getAllInstancesSize()))
                                       : ""; // NOI18N
             String classDetails = javaClass.isArray() ? (instancesCount + allInstancesSize)
                                                       : (instancesCount + instanceSize + allInstancesSize);
@@ -216,7 +211,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
         actionsRenderer.setBorder(BorderFactory.createEmptyBorder());
         actionsRenderer.setForeground(UIManager.getColor("ToolTip.foreground")); // NOI18N
         actionsRenderer.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
-        actionsRenderer.setText("&nbsp;&nbsp;|&nbsp;&nbsp;<a href='#'>" + RETAINED_SIZES_STRING + "</a>"); // NOI18N
+        actionsRenderer.setText("&nbsp;&nbsp;|&nbsp;&nbsp;<a href='#'>" + Bundle.ClassPresenterPanel_RetainedSizesString() + "</a>"); // NOI18N
         actionsRenderer.setOpaque(false);
         actionsRenderer.setVisible(false);
 

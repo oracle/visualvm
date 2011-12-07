@@ -112,6 +112,38 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassesListControllerUI_ViewTitle=Classes",
+    "ClassesListControllerUI_NoInstancesMsg=Class {0} has no instances.",
+    "ClassesListControllerUI_NoClassInBaseMsg=Class is not present in base heap dump.",
+    "ClassesListControllerUI_FilterStartsWith=Starts with",
+    "ClassesListControllerUI_FilterContains=Contains",
+    "ClassesListControllerUI_FilterEndsWith=Ends with",
+    "ClassesListControllerUI_FilterRegexp=Regular expression",
+    "ClassesListControllerUI_FilterImplementation=Subclass/implementation",
+    "ClassesListControllerUI_FilterSubclass=Subclass of",
+    "ClassesListControllerUI_DefaultFilterText=[Class Name Filter]",
+    "ClassesListControllerUI_ShowInInstancesString=Show in Instances View",
+    "ClassesListControllerUI_ShowImplementationsString=Show Only Subclasses or Implementations",
+    "ClassesListControllerUI_ShowSubclassesString=Show Only Subclasses",
+    "ClassesListControllerUI_GoToSourceString=Go To Source",
+    "ClassesListControllerUI_ShowHideColumnsString=Show or hide columns",
+    "ClassesListControllerUI_FilterCheckboxText=Filter",
+    "ClassesListControllerUI_ClassNameColumnText=Class Name",
+    "ClassesListControllerUI_ClassNameColumnDescr=Class name",
+    "ClassesListControllerUI_InstancesRelColumnText=Instances [%]",
+    "ClassesListControllerUI_InstancesRelColumnDescr=Relative number of instances",
+    "ClassesListControllerUI_InstancesColumnText=Instances",
+    "ClassesListControllerUI_InstancesColumnDescr=Number of instances",
+    "ClassesListControllerUI_SizeColumnText=Size",
+    "ClassesListControllerUI_SizeColumnDescr=Size of all instances",
+    "ClassesListControllerUI_FilteringProgressText=Processing classes, wait please...",
+    "ClassesListControllerUI_ClassesTableAccessName=Classes",
+    "ClassesListControllerUI_ClassesTableAccessDescr=List of classes allocated on the heap",
+    "ClassesListControllerUI_CompareWithAnotherText=Compare with another heap dump",
+    "ClassesListControllerUI_ComparingMsg=Comparing heap dumps...",
+    "ClassesListControllerUI_ShowingDiffText=Showing heap dumps difference, {0}reset view{1}"
+})
 public class ClassesListControllerUI extends JTitledPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -160,17 +192,17 @@ public class ClassesListControllerUI extends JTitledPanel {
             columnNames = new String[columnCount];
             columnToolTips = new String[columnCount];
             
-            columnNames[0] = CLASSNAME_COLUMN_TEXT;
-            columnToolTips[0] = CLASSNAME_COLUMN_DESCR;
+            columnNames[0] = Bundle.ClassesListControllerUI_ClassNameColumnText();
+            columnToolTips[0] = Bundle.ClassesListControllerUI_ClassNameColumnDescr();
 
-            columnNames[1] = INSTANCES_REL_COLUMN_TEXT;
-            columnToolTips[1] = INSTANCES_REL_COLUMN_DESCR;
+            columnNames[1] = Bundle.ClassesListControllerUI_InstancesRelColumnText();
+            columnToolTips[1] = Bundle.ClassesListControllerUI_InstancesRelColumnDescr();
 
-            columnNames[2] = INSTANCES_COLUMN_TEXT;
-            columnToolTips[2] = INSTANCES_COLUMN_DESCR;
+            columnNames[2] = Bundle.ClassesListControllerUI_InstancesColumnText();
+            columnToolTips[2] = Bundle.ClassesListControllerUI_InstancesColumnDescr();
 
-            columnNames[3] = SIZE_COLUMN_TEXT;
-            columnToolTips[3] = SIZE_COLUMN_DESCR;
+            columnNames[3] = Bundle.ClassesListControllerUI_SizeColumnText();
+            columnToolTips[3] = Bundle.ClassesListControllerUI_SizeColumnDescr();
         }
         
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -389,67 +421,6 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String VIEW_TITLE = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                 "ClassesListControllerUI_ViewTitle"); // NOI18N
-    private static final String NO_INSTANCES_MSG = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                       "ClassesListControllerUI_NoInstancesMsg"); // NOI18N
-    private static final String NO_CLASS_IN_BASE_MSG = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                       "ClassesListControllerUI_NoClassInBaseMsg"); // NOI18N
-    private static final String FILTER_STARTS_WITH = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                         "ClassesListControllerUI_FilterStartsWith"); // NOI18N
-    private static final String FILTER_CONTAINS = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                      "ClassesListControllerUI_FilterContains"); // NOI18N
-    private static final String FILTER_ENDS_WITH = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                       "ClassesListControllerUI_FilterEndsWith"); // NOI18N
-    private static final String FILTER_REGEXP = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                    "ClassesListControllerUI_FilterRegexp"); // NOI18N
-    private static final String FILTER_IMPLEMENTATION = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                            "ClassesListControllerUI_FilterImplementation"); // NOI18N
-    private static final String FILTER_SUBCLASS = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                      "ClassesListControllerUI_FilterSubclass"); // NOI18N
-    private static final String DEFAULT_FILTER_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                          "ClassesListControllerUI_DefaultFilterText"); // NOI18N
-    private static final String SHOW_IN_INSTANCES_STRING = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                               "ClassesListControllerUI_ShowInInstancesString"); // NOI18N
-    private static final String SHOW_IMPLEMENTATIONS_STRING = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                                  "ClassesListControllerUI_ShowImplementationsString"); // NOI18N
-    private static final String SHOW_SUBCLASSES_STRING = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                             "ClassesListControllerUI_ShowSubclassesString"); // NOI18N
-    private static final String GO_TO_SOURCE_STRING = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                          "ClassesListControllerUI_GoToSourceString"); // NOI18N
-    private static final String SHOW_HIDE_COLUMNS_STRING = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                               "ClassesListControllerUI_ShowHideColumnsString"); // NOI18N
-    private static final String FILTER_CHECKBOX_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                           "ClassesListControllerUI_FilterCheckboxText"); // NOI18N
-    private static final String CLASSNAME_COLUMN_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                            "ClassesListControllerUI_ClassNameColumnText"); // NOI18N
-    private static final String CLASSNAME_COLUMN_DESCR = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                             "ClassesListControllerUI_ClassNameColumnDescr"); // NOI18N
-    private static final String INSTANCES_REL_COLUMN_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                                "ClassesListControllerUI_InstancesRelColumnText"); // NOI18N
-    private static final String INSTANCES_REL_COLUMN_DESCR = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                                 "ClassesListControllerUI_InstancesRelColumnDescr"); // NOI18N
-    private static final String INSTANCES_COLUMN_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                            "ClassesListControllerUI_InstancesColumnText"); // NOI18N
-    private static final String INSTANCES_COLUMN_DESCR = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                             "ClassesListControllerUI_InstancesColumnDescr"); // NOI18N
-    private static final String SIZE_COLUMN_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                       "ClassesListControllerUI_SizeColumnText"); // NOI18N
-    private static final String SIZE_COLUMN_DESCR = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                        "ClassesListControllerUI_SizeColumnDescr"); // NOI18N
-    private static final String FITERING_PROGRESS_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                             "ClassesListControllerUI_FilteringProgressText"); // NOI18N
-    private static final String CLASSES_TABLE_ACCESS_NAME = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                             "ClassesListControllerUI_ClassesTableAccessName"); // NOI18N
-    private static final String CLASSES_TABLE_ACCESS_DESCR = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                                  "ClassesListControllerUI_ClassesTableAccessDescr"); // NOI18N
-    private static final String COMPARE_WITH_ANOTHER_TEXT = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                                  "ClassesListControllerUI_CompareWithAnotherText"); // NOI18N
-    private static final String COMPARING_MSG = NbBundle.getMessage(ClassesListControllerUI.class,
-                                                                                  "ClassesListControllerUI_ComparingMsg"); // NOI18N
                                                                                                                                        // -----
     private static Icon ICON_CLASSES = Icons.getIcon(HeapWalkerIcons.CLASSES);
     private static String filterValue = ""; // NOI18N
@@ -488,7 +459,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
     // --- Constructors ----------------------------------------------------------
     public ClassesListControllerUI(final ClassesListController classesListController) {
-        super(VIEW_TITLE, ICON_CLASSES, true);
+        super(Bundle.ClassesListControllerUI_ViewTitle(), ICON_CLASSES, true);
 
         this.classesListController = classesListController;
         hasProjectContext = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject() != null;
@@ -612,7 +583,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         cornerPopup.addSeparator();
 
-        JCheckBoxMenuItem filterMenuItem = new JCheckBoxMenuItem(FILTER_CHECKBOX_TEXT);
+        JCheckBoxMenuItem filterMenuItem = new JCheckBoxMenuItem(Bundle.ClassesListControllerUI_FilterCheckboxText());
         filterMenuItem.setActionCommand("Filter"); // NOI18N
         addMenuItemListener(filterMenuItem);
 
@@ -670,7 +641,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
         final JButton cornerButton = new JButton(Icons.getIcon(GeneralIcons.HIDE_COLUMN));
-        cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
+        cornerButton.setToolTipText(Bundle.ClassesListControllerUI_ShowHideColumnsString());
         cornerButton.setDefaultCapable(false);
 
         if (UIUtils.isWindowsClassicLookAndFeel()) {
@@ -716,7 +687,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     private JPopupMenu createTablePopup() {
         JPopupMenu popup = new JPopupMenu();
 
-        JMenuItem showInstancesItem = new JMenuItem(SHOW_IN_INSTANCES_STRING);
+        JMenuItem showInstancesItem = new JMenuItem(Bundle.ClassesListControllerUI_ShowInInstancesString());
         showInstancesItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     performDefaultAction();
@@ -724,7 +695,9 @@ public class ClassesListControllerUI extends JTitledPanel {
             });
         showInstancesItem.setFont(popup.getFont().deriveFont(Font.BOLD));
 
-        JMenuItem showInstancesOfItem = new JMenuItem(hasProjectContext ? SHOW_IMPLEMENTATIONS_STRING : SHOW_SUBCLASSES_STRING);
+        JMenuItem showInstancesOfItem = new JMenuItem(hasProjectContext ? 
+                                            Bundle.ClassesListControllerUI_ShowImplementationsString() : 
+                                            Bundle.ClassesListControllerUI_ShowSubclassesString());
         showInstancesOfItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     int row = classesListTable.getSelectedRow();
@@ -737,7 +710,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         JMenuItem showSourceItem = null;
         if (GoToSource.isAvailable()) {
-            showSourceItem = new JMenuItem(GO_TO_SOURCE_STRING);
+            showSourceItem = new JMenuItem(Bundle.ClassesListControllerUI_GoToSourceString());
             showSourceItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         int row = classesListTable.getSelectedRow();
@@ -806,11 +779,11 @@ public class ClassesListControllerUI extends JTitledPanel {
             };
             l.setBorder(BorderFactory.createEmptyBorder());
             l.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
-            l.setText("<nobr><a href='#'>" + COMPARE_WITH_ANOTHER_TEXT + "</a></nobr>"); // NOI18N
+            l.setText("<nobr><a href='#'>" + Bundle.ClassesListControllerUI_CompareWithAnotherText() + "</a></nobr>"); // NOI18N
         }
         
         if (w == null) {
-            w = new JLabel(COMPARING_MSG);
+            w = new JLabel(Bundle.ClassesListControllerUI_ComparingMsg());
             w.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
             w.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
         }
@@ -861,7 +834,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                     l.setText("<nobr>" + NbBundle.getMessage(ClassesListControllerUI.class, // NOI18N
                               "ClassesListControllerUI_ShowingDiffText", "<a href='#'>", "</a>") + "</nobr>"); // NOI18N
                 } else {
-                    l.setText("<nobr><a href='#'>" + COMPARE_WITH_ANOTHER_TEXT + "</a></nobr>"); // NOI18N
+                    l.setText("<nobr><a href='#'>" + Bundle.ClassesListControllerUI_CompareWithAnotherText() + "</a></nobr>"); // NOI18N
                 }
                 l.setVisible(true);
             }
@@ -904,8 +877,8 @@ public class ClassesListControllerUI extends JTitledPanel {
         classesListTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
         classesListTableModel.setTable(classesListTable);
         classesListTable.getColumnModel().getColumn(0).setMinWidth(150);
-        classesListTable.getAccessibleContext().setAccessibleName(CLASSES_TABLE_ACCESS_NAME);
-        classesListTable.getAccessibleContext().setAccessibleDescription(CLASSES_TABLE_ACCESS_DESCR);
+        classesListTable.getAccessibleContext().setAccessibleName(Bundle.ClassesListControllerUI_ClassesTableAccessName());
+        classesListTable.getAccessibleContext().setAccessibleDescription(Bundle.ClassesListControllerUI_ClassesTableAccessDescr());
         classesListTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                         .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
         classesListTable.getActionMap().put("DEFAULT_ACTION", // NOI18N
@@ -928,17 +901,19 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         filterComponent = new FilterComponent();
         filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
-                FILTER_STARTS_WITH, CommonConstants.FILTER_STARTS_WITH);
+                Bundle.ClassesListControllerUI_FilterStartsWith(), CommonConstants.FILTER_STARTS_WITH);
         filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS),
-                FILTER_CONTAINS, CommonConstants.FILTER_CONTAINS);
+                Bundle.ClassesListControllerUI_FilterContains(), CommonConstants.FILTER_CONTAINS);
         filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
-                FILTER_ENDS_WITH, CommonConstants.FILTER_ENDS_WITH);
+                Bundle.ClassesListControllerUI_FilterEndsWith(), CommonConstants.FILTER_ENDS_WITH);
         filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP),
-                FILTER_REGEXP, CommonConstants.FILTER_REGEXP);
+                Bundle.ClassesListControllerUI_FilterRegexp(), CommonConstants.FILTER_REGEXP);
         filterComponent.addFilterItem(Icons.getImageIcon(LanguageIcons.CLASS),
-                hasProjectContext ? FILTER_IMPLEMENTATION : FILTER_SUBCLASS,
+                hasProjectContext ? 
+                    Bundle.ClassesListControllerUI_FilterImplementation() : 
+                    Bundle.ClassesListControllerUI_FilterSubclass(),
                 ClassesListController.FILTER_SUBCLASS);
-        filterComponent.setEmptyFilterText(DEFAULT_FILTER_TEXT);
+        filterComponent.setEmptyFilterText(Bundle.ClassesListControllerUI_DefaultFilterText());
         filterComponent.setFilterValues(filterValue, filterType);
         filterComponent.addFilterListener(new FilterComponent.FilterListener() {
                 public void filterChanged() {
@@ -968,7 +943,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         String progressRes = Icons.getResource(HeapWalkerIcons.PROGRESS);
         String hintText = "<img border='0' align='bottom' src='nbresloc:/" + progressRes + "'>&nbsp;&nbsp;" // NOI18N
-                          + FITERING_PROGRESS_TEXT;
+                          + Bundle.ClassesListControllerUI_FilteringProgressText();
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);
 
@@ -1117,9 +1092,9 @@ public class ClassesListControllerUI extends JTitledPanel {
 
     private void showInstancesForClass(JavaClass jClass) {
         if (classesListController.isDiff() && jClass == null) {
-            ProfilerDialogs.displayInfo(NO_CLASS_IN_BASE_MSG);
+            ProfilerDialogs.displayInfo(Bundle.ClassesListControllerUI_NoClassInBaseMsg());
         } else if (jClass.getInstancesCount() == 0) {
-            ProfilerDialogs.displayInfo(MessageFormat.format(NO_INSTANCES_MSG, new Object[] { jClass.getName() }));
+            ProfilerDialogs.displayInfo(Bundle.ClassesListControllerUI_NoInstancesMsg(jClass.getName()));
         } else {
             classesListController.getClassesController().getHeapFragmentWalker().showInstancesForClass(jClass);
         }
