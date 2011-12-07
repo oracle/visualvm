@@ -56,7 +56,7 @@ import javax.swing.*;
  */
 @NbBundle.Messages({
     "LBL_AttachMainProjectAction=&Attach Profiler...",
-    "HINT_AttachMainProjectAction=Attach Profiler...",
+    "HINT_AttachMainProjectAction=Attach Profiler..."
 })
 public final class AttachAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------

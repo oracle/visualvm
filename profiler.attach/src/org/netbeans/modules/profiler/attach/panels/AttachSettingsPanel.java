@@ -75,7 +75,7 @@ import org.netbeans.modules.profiler.attach.wizard.AttachWizardContext;
     "TargetSettingsWizardPanelUI_DirectHelpString=Choose <strong>Direct</strong> attach to start JVM of the {0} and block its execution until the profiler connects.",
     "TargetSettingsWizardPanelUI_DynamicHelpString=Choose <strong>Dynamic</strong> attach to start the {0} normally and then attach the profiler at any time.",
     "TargetSettingsWizardPanelUI_DynamicNosuppHelpString=<b>Dynamic</b> attach is not supported by {0}.",
-    "TargetSettingsWizardPanelUI_DynamicJvmHelpString=<i>Note that using the {0} is required for dynamic attach.</i>",
+    "TargetSettingsWizardPanelUI_DynamicJvmHelpString=<i>Note that using the {0} is required for dynamic attach.</i>"
     
 })
 public class AttachSettingsPanel extends AttachWizardPanel {
