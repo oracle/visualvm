@@ -70,6 +70,13 @@ import org.openide.util.Lookup;
  * @author Misha Dmitriev
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "LBL_AddRootMethodAction=Add As Profiling Root Method...",
+    "HINT_AddRootMethodAction=Add As Profiling Root Method...",
+    "MSG_NoMethodFoundAtPosition=No method found at current position.",
+    "MSG_CannotAddAbstractNativeProfilingRoot=Cannot add abstract or native method as profiling roots.",
+    "MSG_ProblemAddingRootMethod=Cannot add selected method as a root method. This can happen for items placed in directory other than project sources directory (typically /src and /web). If so, please select appropriate item in project sources directory."
+})
 public final class AddRootMethodAction extends NodeAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -90,7 +97,7 @@ public final class AddRootMethodAction extends NodeAction {
      * @return The name of the action
      */
     public String getName() {
-        return NbBundle.getMessage(AddRootMethodAction.class, "LBL_AddRootMethodAction"); // NOI18N
+        return Bundle.LBL_AddRootMethodAction();
     }
 
     /**
@@ -136,8 +143,7 @@ public final class AddRootMethodAction extends NodeAction {
                         SourceMethodInfo resolvedMethod = src.resolveMethodAtPosition(currentOffsetInEditor);
 
                         if (resolvedMethod == null) {
-                            ProfilerDialogs.displayWarning(NbBundle.getMessage(AddRootMethodAction.class,
-                                                                                "MSG_NoMethodFoundAtPosition")); // NOI18N
+                            ProfilerDialogs.displayWarning(Bundle.MSG_NoMethodFoundAtPosition());
 
                             return;
                         }
@@ -148,8 +154,7 @@ public final class AddRootMethodAction extends NodeAction {
 
                         // Check if method is executable
                         if (!resolvedMethod.isExecutable()) {
-                            ProfilerDialogs.displayInfo(NbBundle.getMessage(AddRootMethodAction.class,
-                                                        "MSG_CannotAddAbstractNativeProfilingRoot")); // NOI18N
+                            ProfilerDialogs.displayInfo(Bundle.MSG_CannotAddAbstractNativeProfilingRoot());
 
                             return;
                         }
@@ -189,8 +194,7 @@ public final class AddRootMethodAction extends NodeAction {
                             ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settings, project);
                         }
                     } catch (Exception ex) {
-                        ProfilerDialogs.displayWarning(NbBundle.getMessage(AddRootMethodAction.class,
-                                                        "MSG_ProblemAddingRootMethod")); // NOI18N
+                        ProfilerDialogs.displayWarning(Bundle.MSG_ProblemAddingRootMethod());
                     }
                 }
             }.execute();

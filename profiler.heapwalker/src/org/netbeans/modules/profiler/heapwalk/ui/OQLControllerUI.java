@@ -104,6 +104,28 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  * @author Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "OQLControllerUI_ControllerName=OQL Console",
+    "OQLControllerUI_ControllerDescr=Write and run OQL scripts on the dump",
+    "OQLControllerUI_QueryResultsCaption=Query Results",
+    "OQLControllerUI_QueryEditorCaption=Query Editor",
+    "OQLControllerUI_SavedQueriesCaption=Saved Queries",
+    "OQLControllerUI_ExecutingQueryMsg=Executing query\\:",
+    "OQLControllerUI_ExecuteButtonText=E&xecute",
+    "OQLControllerUI_ExecuteButtonAccessDescr=Execute the current OQL query",
+    "OQLControllerUI_CancelButtonText=Cancel",
+    "OQLControllerUI_CancelButtonAccessDescr=Cancel the query currently being executed",
+    "OQLControllerUI_SaveButtonText=Save",
+    "OQLControllerUI_SaveButtonAccessDescr=Save the current query",
+    "OQLControllerUI_PropertiesButtonText=Properties",
+    "OQLControllerUI_PropertiesButtonAccessDescr=Change selected query name, description and position",
+    "OQLControllerUI_DeleteButtonText=Delete",
+    "OQLControllerUI_DeleteButtonAccessDescr=Delete selected query",
+    "OQLControllerUI_OpenButtonText=Open",
+    "OQLControllerUI_OpenButtonAccessDescr=Open selected query in Query Editor",
+    "OQLControllerUI_LoadingQueriesMsg=Loading saved queries...",
+    "OQLControllerUI_NoSavedQueriesMsg=<No Saved Queries>"
+})
 public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
     
     private static Icon OQL_ICON = Icons.getIcon(OQLIcons.OQL);
@@ -120,8 +142,8 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
         public Presenter(final QueryUI queryUI) {
             super();
-            setText(CONTROLLER_NAME);
-            setToolTipText(CONTROLLER_DESCR);
+            setText(Bundle.OQLControllerUI_ControllerName());
+            setToolTipText(Bundle.OQLControllerUI_ControllerDescr());
             setIcon(OQL_ICON);
             setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
 
@@ -143,50 +165,6 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String CONTROLLER_NAME = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_ControllerName"); // NOI18N
-    private static final String CONTROLLER_DESCR = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_ControllerDescr"); // NOI18N
-    private static final String QUERY_RESULTS_CAPTION = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_QueryResultsCaption"); // NOI18N
-    private static final String QUERY_EDITOR_CAPTION = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_QueryEditorCaption"); // NOI18N
-    private static final String SAVED_QUERIES_CAPTION = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_SavedQueriesCaption"); // NOI18N
-    private static final String EXECUTING_QUERY_MSG = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_ExecutingQueryMsg"); // NOI18N
-    private static final String EXECUTE_BUTTON_TEXT = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_ExecuteButtonText"); // NOI18N
-    private static final String EXECUTE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_ExecuteButtonAccessDescr"); // NOI18N
-    private static final String CANCEL_BUTTON_TEXT = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_CancelButtonText"); // NOI18N
-    private static final String CANCEL_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_CancelButtonAccessDescr"); // NOI18N
-    private static final String SAVE_BUTTON_TEXT = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_SaveButtonText"); // NOI18N
-    private static final String SAVE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_SaveButtonAccessDescr"); // NOI18N
-    private static final String PROPERTIES_BUTTON_TEXT = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_PropertiesButtonText"); // NOI18N
-    private static final String PROPERTIES_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_PropertiesButtonAccessDescr"); // NOI18N
-    private static final String DELETE_BUTTON_TEXT = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_DeleteButtonText"); // NOI18N
-    private static final String DELETE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_DeleteButtonAccessDescr"); // NOI18N
-    private static final String OPEN_BUTTON_TEXT = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_OpenButtonText"); // NOI18N
-    private static final String OPEN_BUTTON_ACCESS_DESCR = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_OpenButtonAccessDescr"); // NOI18N
-    private static final String LOADING_QUERIES_MSG = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_LoadingQueriesMsg"); // NOI18N
-    private static final String NO_SAVED_QUERIES_MSG = NbBundle.getMessage(
-            OQLControllerUI.class, "OQLControllerUI_NoSavedQueriesMsg"); // NOI18N
-    // -----
 
     private static final String HELP_CTX_KEY = "OQLControllerUI.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
@@ -256,7 +234,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private static Icon ICON = Icons.getIcon(HeapWalkerIcons.PROPERTIES);
 
         public ResultsUI(OQLController.ResultsController resultsController) {
-            super(QUERY_RESULTS_CAPTION, ICON, true);
+            super(Bundle.OQLControllerUI_QueryResultsCaption(), ICON, true);
             this.resultsController = resultsController;
             initComponents();
         }
@@ -317,7 +295,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private static Icon ICON = Icons.getIcon(HeapWalkerIcons.RULES);
 
         public QueryUI(OQLController.QueryController queryController, OQLEngine engine) {
-            super(QUERY_EDITOR_CAPTION, ICON, true);
+            super(Bundle.OQLControllerUI_QueryEditorCaption(), ICON, true);
 
             this.queryController = queryController;
 
@@ -336,7 +314,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     updateUIState();
-                    progressLabel.setText(EXECUTING_QUERY_MSG); // NOI18N
+                    progressLabel.setText(Bundle.OQLControllerUI_ExecutingQueryMsg());
                     progressBar.setModel(model);
                     progressBar.setMaximumSize(new Dimension(progressBar.getMaximumSize().width,
                                                              progressBar.getPreferredSize().height));
@@ -437,13 +415,13 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             runButton = new JButton() {
                 protected void fireActionPerformed(ActionEvent e) { executeQuery(); }
             };
-            Mnemonics.setLocalizedText(runButton, EXECUTE_BUTTON_TEXT);
-            runButton.getAccessibleContext().setAccessibleDescription(EXECUTE_BUTTON_ACCESS_DESCR);
+            Mnemonics.setLocalizedText(runButton, Bundle.OQLControllerUI_ExecuteButtonText());
+            runButton.getAccessibleContext().setAccessibleDescription(Bundle.OQLControllerUI_ExecuteButtonAccessDescr());
             saveButton = new JButton() {
                  protected void fireActionPerformed(ActionEvent e) { saveQuery(); }
             };
-            Mnemonics.setLocalizedText(saveButton, SAVE_BUTTON_TEXT);
-            saveButton.getAccessibleContext().setAccessibleDescription(SAVE_BUTTON_ACCESS_DESCR);
+            Mnemonics.setLocalizedText(saveButton, Bundle.OQLControllerUI_SaveButtonText());
+            saveButton.getAccessibleContext().setAccessibleDescription(Bundle.OQLControllerUI_SaveButtonAccessDescr());
 
             controlPanel = new JPanel(new BorderLayout(5, 5));
             controlPanel.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5,
@@ -458,8 +436,8 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             cancelButton = new JButton() {
                  protected void fireActionPerformed(ActionEvent e) { cancelQuery(); }
             };
-            Mnemonics.setLocalizedText(cancelButton, CANCEL_BUTTON_TEXT);
-            cancelButton.getAccessibleContext().setAccessibleDescription(CANCEL_BUTTON_ACCESS_DESCR);
+            Mnemonics.setLocalizedText(cancelButton, Bundle.OQLControllerUI_CancelButtonText());
+            cancelButton.getAccessibleContext().setAccessibleDescription(Bundle.OQLControllerUI_CancelButtonAccessDescr());
 
             progressPanel = new JPanel(new GridBagLayout());
             progressPanel.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5,
@@ -530,7 +508,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
         private static Icon ICON = Icons.getIcon(HeapWalkerIcons.SAVED_OQL_QUERIES);
 
         public SavedUI(OQLController.SavedController savedController) {
-            super(SAVED_QUERIES_CAPTION, ICON, true);
+            super(Bundle.OQLControllerUI_SavedQueriesCaption(), ICON, true);
 
             this.savedController = savedController;
 
@@ -732,34 +710,34 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
 
             loadingMsgPanel = new JPanel(new BorderLayout());
             loadingMsgPanel.setOpaque(false);
-            JLabel loadingMsgLabel = new JLabel(LOADING_QUERIES_MSG, JLabel.CENTER);
+            JLabel loadingMsgLabel = new JLabel(Bundle.OQLControllerUI_LoadingQueriesMsg(), JLabel.CENTER);
             loadingMsgLabel.setEnabled(false);
             loadingMsgPanel.add(loadingMsgLabel, BorderLayout.CENTER);
 
             noQueriesMsgPanel = new JPanel(new BorderLayout());
             noQueriesMsgPanel.setOpaque(false);
-            JLabel noQueriesMsgLabel = new JLabel(NO_SAVED_QUERIES_MSG, JLabel.CENTER);
+            JLabel noQueriesMsgLabel = new JLabel(Bundle.OQLControllerUI_NoSavedQueriesMsg(), JLabel.CENTER);
             noQueriesMsgLabel.setEnabled(false);
             noQueriesMsgPanel.add(noQueriesMsgLabel, BorderLayout.CENTER);
 
             openButton = new JButton() {
                  protected void fireActionPerformed(ActionEvent e) { openQuery(); }
             };
-            Mnemonics.setLocalizedText(openButton, OPEN_BUTTON_TEXT);
+            Mnemonics.setLocalizedText(openButton, Bundle.OQLControllerUI_OpenButtonText());
             openButton.getAccessibleContext().
-                            setAccessibleDescription(OPEN_BUTTON_ACCESS_DESCR);
+                            setAccessibleDescription(Bundle.OQLControllerUI_OpenButtonAccessDescr());
             editButton = new JButton() {
                  protected void fireActionPerformed(ActionEvent e) { editQuery(); }
             };
-            Mnemonics.setLocalizedText(editButton, PROPERTIES_BUTTON_TEXT);
+            Mnemonics.setLocalizedText(editButton, Bundle.OQLControllerUI_PropertiesButtonText());
             editButton.getAccessibleContext().
-                            setAccessibleDescription(PROPERTIES_BUTTON_ACCESS_DESCR);
+                            setAccessibleDescription(Bundle.OQLControllerUI_PropertiesButtonAccessDescr());
             deleteButton = new JButton() {
                  protected void fireActionPerformed(ActionEvent e) { deleteQueries(); }
             };
-            Mnemonics.setLocalizedText(deleteButton, DELETE_BUTTON_TEXT);
+            Mnemonics.setLocalizedText(deleteButton, Bundle.OQLControllerUI_DeleteButtonText());
             deleteButton.getAccessibleContext().
-                            setAccessibleDescription(DELETE_BUTTON_ACCESS_DESCR);
+                            setAccessibleDescription(Bundle.OQLControllerUI_DeleteButtonAccessDescr());
 
             JPanel editContainer = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
             editContainer.setOpaque(false);

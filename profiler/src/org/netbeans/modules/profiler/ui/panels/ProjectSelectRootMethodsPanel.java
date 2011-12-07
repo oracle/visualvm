@@ -46,7 +46,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
+import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
 import org.openide.DialogDescriptor;
 import org.openide.util.Lookup;
@@ -85,6 +85,7 @@ import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
+import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
@@ -94,23 +95,16 @@ import org.openide.util.lookup.Lookups;
  *
  * @author Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "SelectRootMethodsPanel_NoSelectionProviders_MSG=No selection view providers available. Falling back to manual selector.",
+    "SelectRootMethodsPanel_ShowAllProjectsLabel=Show All Projects",
+    "SelectRootMethodsPanel_SelectViewLabel=Select View: ",
+    "SelectRootMethodsPanel_AdvancedButtonText=Advanced..."
+})
 final public class ProjectSelectRootMethodsPanel extends JPanel {
     final private static Logger LOG = Logger.getLogger(ProjectSelectRootMethodsPanel.class.getName());
     
     private static ProjectSelectRootMethodsPanel instance = null;
-
-    // -----
-    // I18N String constants
-    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_OkButtonText"); // NOI18N
-//    private static final String REMOVE_SELECTED_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-//            "SelectRootMethodsPanel_RemoveSelectedItemText"); // NOI18N
-//    private static final String REMOVE_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-//            "SelectRootMethodsPanel_RemoveAllItemText"); // NOI18N
-//    private static final String SELECT_ALL_ITEM_TEXT = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-//            "SelectRootMethodsPanel_SelectAllItemText"); // NOI18N
-    private static final String NO_SELECTION_PROVIDERS = NbBundle.getMessage(ProjectSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_NoSelectionProviders_MSG"); // NOI18N
     // -----
     protected static final Dimension PREFERRED_TOPTREE_DIMENSION = new Dimension(500, 250);
 
@@ -200,12 +194,12 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             });
 
             if (advancedLogicalPackageTree.getBuilderTypes().isEmpty()) {
-                LOG.fine(NO_SELECTION_PROVIDERS);
+                LOG.fine(Bundle.SelectRootMethodsPanel_NoSelectionProviders_MSG());
                 return RootMethodsPanel.getSelectedRootMethods(currentSelection, project);
             }
 
             final DialogDescriptor dd = new DialogDescriptor(this,
-                    NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_Title"), // NOI18N
+                    Bundle.SelectRootMethodsPanel_Title(),
                     true, new Object[]{okButton, DialogDescriptor.CANCEL_OPTION},
                     okButton, DialogDescriptor.BOTTOM_ALIGN, null, null);
 
@@ -235,41 +229,10 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     protected void initComponents(final Container container) {
         GridBagConstraints gridBagConstraints;
 
-        okButton = new JButton(OK_BUTTON_TEXT);
+        okButton = new JButton(Bundle.SelectRootMethodsPanel_OkButtonText());
 
-        ProgressDisplayer pd = new ProgressDisplayer() {
-
-            ProfilerProgressDisplayer pd = null;
-
-            @Override
-            public synchronized void showProgress(String message) {
-                pd = ProfilerProgressDisplayer.showProgress(message);
-            }
-
-            @Override
-            public synchronized void showProgress(String message, ProgressController controller) {
-                pd = ProfilerProgressDisplayer.showProgress(message, controller);
-            }
-
-            @Override
-            public synchronized void showProgress(String caption, String message, ProgressController controller) {
-                pd = ProfilerProgressDisplayer.showProgress(caption, message, controller);
-            }
-
-            @Override
-            public synchronized boolean isOpened() {
-                return pd != null;
-            }
-
-            @Override
-            public synchronized void close() {
-                if (pd != null) {
-                    pd.close();
-                    pd = null;
-                }
-            }
-        };
-
+        ProgressDisplayer pd = ProfilerProgressDisplayer.getDefault();
+        
         advancedLogicalPackageTree = new RootSelectorTree(pd, RootSelectorTree.DEFAULT_FILTER);
 //        advancedLogicalPackageTree.setNodeFilter(getNodeFilter());
 
@@ -325,7 +288,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         container.add(advancedLogicalPackageTreeScrollPane, gridBagConstraints);
 
         Mnemonics.setLocalizedText(advancedShowAllProjectsCheckBox,
-                NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_ShowAllProjectsLabel")); // NOI18N
+                Bundle.SelectRootMethodsPanel_ShowAllProjectsLabel());
         advancedShowAllProjectsCheckBox.addActionListener(new ActionListener() {
 
             @Override
@@ -343,8 +306,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
         JPanel comboPanel = new JPanel(new FlowLayout());
         JLabel label = new JLabel();
-        Mnemonics.setLocalizedText(label, NbBundle.getMessage(this.getClass(),
-                "SelectRootMethodsPanel_SelectViewLabel")); // NOI18N
+        Mnemonics.setLocalizedText(label, Bundle.SelectRootMethodsPanel_SelectViewLabel());
         label.setLabelFor(treeBuilderList);
         comboPanel.add(label);
         comboPanel.add(treeBuilderList);
@@ -408,7 +370,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             }
         };
         Mnemonics.setLocalizedText(button,
-                NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_AdvancedButtonText")); //NOI18N
+                Bundle.SelectRootMethodsPanel_AdvancedButtonText());
         return new Object[] { button };
     }
 
@@ -442,8 +404,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private void updateSelector(Runnable updater) {
-        final ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
-                "SelectRootMethodsPanel_ParsingProjectStructureMessage")); // NOI18N
+        final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.SelectRootMethodsPanel_ParsingProjectStructureMessage());
         CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
             @Override
             public void run() {

@@ -66,27 +66,19 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "HeapWalkerNodeFactory_NoneString=<none>",
+    "HeapWalkerNodeFactory_NoFieldsString=<no fields>",
+    "HeapWalkerNodeFactory_NoReferencesString=<no references>",
+    "HeapWalkerNodeFactory_NoItemsString=<no items>",
+    "HeapWalkerNodeFactory_SearchingString=<Searching...>",
+    "HeapWalkerNodeFactory_OutOfMemoryString=<out of memory>",
+    "HeapWalkerNodeFactory_ArrayContainerNameString=<items {0}-{1}>",
+    "HeapWalkerNodeFactory_ArrayContainerValueString=({0} items)"
+})
 public class HeapWalkerNodeFactory {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String NONE_STRING = NbBundle.getMessage(HeapWalkerNodeFactory.class, "HeapWalkerNodeFactory_NoneString"); // NOI18N
-    private static final String NO_FIELDS_STRING = NbBundle.getMessage(HeapWalkerNodeFactory.class,
-                                                                       "HeapWalkerNodeFactory_NoFieldsString"); // NOI18N
-    private static final String NO_REFERENCES_STRING = NbBundle.getMessage(HeapWalkerNodeFactory.class,
-                                                                           "HeapWalkerNodeFactory_NoReferencesString"); // NOI18N
-    private static final String NO_ITEMS_STRING = NbBundle.getMessage(HeapWalkerNodeFactory.class,
-                                                                      "HeapWalkerNodeFactory_NoItemsString"); // NOI18N
-    private static final String SEARCHING_STRING = NbBundle.getMessage(HeapWalkerNodeFactory.class,
-                                                                       "HeapWalkerNodeFactory_SearchingString"); // NOI18N
-    private static final String OUT_OF_MEMORY_STRING = NbBundle.getMessage(HeapWalkerNodeFactory.class,
-                                                                           "HeapWalkerNodeFactory_OutOfMemoryString"); // NOI18N
-    private static final String ARRAY_CONTAINER_NAME_STRING = NbBundle.getMessage(HeapWalkerNodeFactory.class,
-                                                                                  "HeapWalkerNodeFactory_ArrayContainerNameString"); // NOI18N
-    private static final String ARRAY_CONTAINER_VALUE_STRING = NbBundle.getMessage(HeapWalkerNodeFactory.class,
-                                                                                   "HeapWalkerNodeFactory_ArrayContainerValueString"); // NOI18N
-                                                                                                                                       // -----
     public static final int ITEMS_COLLAPSE_UNIT_SIZE = 500;
     public static final int ITEMS_COLLAPSE_THRESHOLD = 2000;
     public static final int ITEMS_COLLAPSE_UNIT_THRESHOLD = 5000;
@@ -96,7 +88,7 @@ public class HeapWalkerNodeFactory {
     public static HeapWalkerNode createArrayItemContainerNode(final ArrayNode array, final int startIndex, final int endIndex) {
         return new AbstractHeapWalkerNode(array) {
             protected String computeName() {
-                return MessageFormat.format(ARRAY_CONTAINER_NAME_STRING, new Object[] { startIndex, endIndex });
+                return Bundle.HeapWalkerNodeFactory_ArrayContainerNameString(startIndex, endIndex);
             }
 
             protected String computeType() {
@@ -104,7 +96,7 @@ public class HeapWalkerNodeFactory {
             }
 
             protected String computeValue() {
-                return MessageFormat.format(ARRAY_CONTAINER_VALUE_STRING, new Object[] { (endIndex - startIndex + 1) });
+                return Bundle.HeapWalkerNodeFactory_ArrayContainerValueString((endIndex - startIndex + 1));
             }
 
             protected String computeSize() {
@@ -189,15 +181,15 @@ public class HeapWalkerNodeFactory {
     public static HeapWalkerNode createNoFieldsNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
             protected String computeName() {
-                return NO_FIELDS_STRING;
+                return Bundle.HeapWalkerNodeFactory_NoFieldsString();
             }
 
             protected String computeType() {
-                return NONE_STRING;
+                return Bundle.HeapWalkerNodeFactory_NoneString();
             }
 
             protected String computeValue() {
-                return NONE_STRING;
+                return Bundle.HeapWalkerNodeFactory_NoneString();
             }
 
             protected String computeSize() {
@@ -215,21 +207,21 @@ public class HeapWalkerNodeFactory {
     }
     
     public static boolean isNoFieldsNode(HeapWalkerNode node) {
-        return NO_FIELDS_STRING.equals(node.getName());
+        return Bundle.HeapWalkerNodeFactory_NoFieldsString().equals(node.getName());
     }
 
     public static HeapWalkerNode createNoItemsNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
             protected String computeName() {
-                return NO_ITEMS_STRING;
+                return Bundle.HeapWalkerNodeFactory_NoItemsString();
             }
 
             protected String computeType() {
-                return NONE_STRING;
+                return Bundle.HeapWalkerNodeFactory_NoneString();
             }
 
             protected String computeValue() {
-                return NONE_STRING;
+                return Bundle.HeapWalkerNodeFactory_NoneString();
             }
 
             protected String computeSize() {
@@ -247,21 +239,21 @@ public class HeapWalkerNodeFactory {
     }
     
     public static boolean isNoItemsNode(HeapWalkerNode node) {
-        return NO_ITEMS_STRING.equals(node.getName());
+        return Bundle.HeapWalkerNodeFactory_NoItemsString().equals(node.getName());
     }
 
     public static HeapWalkerNode createNoReferencesNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
             protected String computeName() {
-                return NO_REFERENCES_STRING;
+                return Bundle.HeapWalkerNodeFactory_NoReferencesString();
             }
 
             protected String computeType() {
-                return NONE_STRING;
+                return Bundle.HeapWalkerNodeFactory_NoneString();
             }
 
             protected String computeValue() {
-                return NONE_STRING;
+                return Bundle.HeapWalkerNodeFactory_NoneString();
             }
 
             protected String computeSize() {
@@ -279,13 +271,13 @@ public class HeapWalkerNodeFactory {
     }
     
     public static boolean isNoReferencesNode(HeapWalkerNode node) {
-        return NO_REFERENCES_STRING.equals(node.getName());
+        return Bundle.HeapWalkerNodeFactory_NoReferencesString().equals(node.getName());
     }
 
     public static HeapWalkerNode createOOMNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
             protected String computeName() {
-                return OUT_OF_MEMORY_STRING;
+                return Bundle.HeapWalkerNodeFactory_OutOfMemoryString();
             }
 
             protected String computeType() {
@@ -311,7 +303,7 @@ public class HeapWalkerNodeFactory {
     }
     
     public static boolean isOOMNode(HeapWalkerNode node) {
-        return OUT_OF_MEMORY_STRING.equals(node.getName());
+        return Bundle.HeapWalkerNodeFactory_OutOfMemoryString().equals(node.getName());
     }
 
     public static HeapWalkerNode createObjectArrayItemNode(ObjectArrayNode array, int itemIndex, Instance instance) {
@@ -331,7 +323,7 @@ public class HeapWalkerNodeFactory {
     public static HeapWalkerNode createProgressNode(HeapWalkerNode parent) {
         return new AbstractHeapWalkerNode(parent) {
             protected String computeName() {
-                return SEARCHING_STRING;
+                return Bundle.HeapWalkerNodeFactory_SearchingString();
             }
 
             protected String computeType() {
@@ -357,7 +349,7 @@ public class HeapWalkerNodeFactory {
     }
     
     public static boolean isProgressNode(HeapWalkerNode node) {
-        return SEARCHING_STRING.equals(node.getName());
+        return Bundle.HeapWalkerNodeFactory_SearchingString().equals(node.getName());
     }
 
     public static HeapWalkerNode[] createReferences(InstanceNode parent) {
