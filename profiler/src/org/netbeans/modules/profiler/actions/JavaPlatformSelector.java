@@ -64,9 +64,9 @@ import org.openide.DialogDisplayer;
     "JavaPlatformSelector_OkButtonName=OK",
     "JavaPlatformSelector_UseSelPlatformChckBoxName=Always use the selected platform for profiling",
     "JavaPlatformSelector_NoSupportedPlatformMsg=None of the installed Java Platforms can be used for profiling.\nNetBeans Profiler requires JDK 5.0 Update 4 and newer.\n\nPlease install a suitable Java Platform and run calibration again.",
-    "JavaPlatformSelector_SelectPlatformCalibrateMsg=Select Java Platform to calibrate\\:",
+    "JavaPlatformSelector_SelectPlatformCalibrateMsg=Select Java Platform to calibrate:",
     "JavaPlatformSelector_SelectPlatformCalibrateDialogCaption=Select Java Platform to calibrate",
-    "JavaPlatformSelector_SelectPlatformProfileMsg=Please select Java Platform to use\\:",
+    "JavaPlatformSelector_SelectPlatformProfileMsg=Please select Java Platform to use:",
     "JavaPlatformSelector_SelectPlatformProfileDialogCaption=Select Java Platform for Profiling",
     "JavaPlatformSelector_CannotUsePlatform=The Java Platform this project runs on cannot be used for profiling.",
     "JavaPlatformSelector_ListAccessName=List of Java Platforms available for profiling"

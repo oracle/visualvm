@@ -64,12 +64,12 @@ import org.openide.DialogDisplayer;
  */
 @NbBundle.Messages({
     "PIDSelectPanel_RefreshButtonName=&Refresh",
-    "PIDSelectPanel_PidLabelText=PID\\:",
-    "PIDSelectPanel_MainClassLabelText=Main Class\\:",
-    "PIDSelectPanel_ArgumentsLabelText=Arguments\\:",
-    "PIDSelectPanel_VmArgumentsLabelText=VM Arguments\\:",
-    "PIDSelectPanel_VmFlagsLabelText=VM Flags\\:",
-    "PIDSelectPanel_VmComboItemText={0} (pid\\: {1})",
+    "PIDSelectPanel_PidLabelText=PID:",
+    "PIDSelectPanel_MainClassLabelText=Main Class:",
+    "PIDSelectPanel_ArgumentsLabelText=Arguments:",
+    "PIDSelectPanel_VmArgumentsLabelText=VM Arguments:",
+    "PIDSelectPanel_VmFlagsLabelText=VM Flags:",
+    "PIDSelectPanel_VmComboItemText={0} (pid: {1})",
     "PIDSelectPanel_ProcessesListItemText=Getting list of running processes...",
     "PIDSelectPanel_ErrorGettingProcessesItemText=<Error Getting Running Processes>",
     "PIDSelectPanel_NoProcessesItemText=<No Processes Running>",

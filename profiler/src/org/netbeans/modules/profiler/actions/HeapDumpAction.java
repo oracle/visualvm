@@ -109,7 +109,7 @@ import org.openide.windows.WindowManager;
     "HeapDumpAction_OkButtonText=OK",
     "HeapDumpAction_DestinationLabelText=<html><b><nobr>Choose heap dump destination:</nobr></b></html>",
     "HeapDumpAction_DefaultLocationRadioText=Default location",
-    "HeapDumpAction_CustomLocationRadioText=Custom directory\\:",
+    "HeapDumpAction_CustomLocationRadioText=Custom directory:",
     "HeapDumpAction_BrowseButtonText=Browse"
 })
 public final class HeapDumpAction extends ProfilingAwareAction {

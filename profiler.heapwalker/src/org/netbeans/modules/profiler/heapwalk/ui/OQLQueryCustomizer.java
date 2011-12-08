@@ -101,10 +101,10 @@ import org.openide.util.NbBundle;
     "OQLQueryCustomizer_DownButtonAccessName=Down",
     "OQLQueryCustomizer_NewQueryRadioText=&Create New Query",
     "OQLQueryCustomizer_ExistingQueryRadioText=&Use Existing Query",
-    "OQLQueryCustomizer_NameLabelText=&Name\\:",
+    "OQLQueryCustomizer_NameLabelText=&Name:",
     "OQLQueryCustomizer_DefaultQueryName=New OQL Query",
-    "OQLQueryCustomizer_DescriptionLabelText=&Description (optional)\\:",
-    "OQLQueryCustomizer_UpdateQueryLabelText=&Query to update\\:"
+    "OQLQueryCustomizer_DescriptionLabelText=&Description (optional):",
+    "OQLQueryCustomizer_UpdateQueryLabelText=&Query to update:"
 })
 public class OQLQueryCustomizer {
     private static Icon ICON_UP = Icons.getIcon(GeneralIcons.UP);

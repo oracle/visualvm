@@ -90,11 +90,11 @@ import org.openide.DialogDisplayer;
  */
 @NbBundle.Messages({
     "AnalysisControllerUI_InfoString=info",
-    "AnalysisControllerUI_RulesToApplyString=Rules to apply\\:",
+    "AnalysisControllerUI_RulesToApplyString=Rules to apply:",
     "AnalysisControllerUI_ProcessingRulesMsg=Processing rules...",
     "AnalysisControllerUI_CancelButtonText=Cancel",
     "AnalysisControllerUI_PerformButtonText=Perform Analysis",
-    "AnalysisControllerUI_AnalysisResultsText=Analysis results\\:",
+    "AnalysisControllerUI_AnalysisResultsText=Analysis results:",
     "AnalysisControllerUI_ControllerName=Analysis",
     "AnalysisControllerUI_ControllerDescr=Automated dump analysis using the MemoryLint tool"
 })

@@ -51,7 +51,7 @@ import org.openide.util.NbBundle;
  * @author  Jaroslav Bachorik
  */
 @NbBundle.Messages({
-    "PerformIntegrationWizardPanelUI_PerformedStepsString=These steps will be performed by the Integration Wizard\\:",
+    "PerformIntegrationWizardPanelUI_PerformedStepsString=These steps will be performed by the Integration Wizard:",
     "PerformIntegrationWizardPanelUI_PerformIntegrationHintMsg=After you click <strong>Perform</strong>, the steps described above will be performed. Note that you cannot undo this action."
 })
 public class PerformIntegrationPanelUI extends javax.swing.JPanel {

@@ -107,7 +107,7 @@ import org.openide.util.Lookup;
     "CPUSnapshotPanel_CombinedTabDescr=Combined View - Call Tree and Hot Spots",
     "CPUSnapshotPanel_InfoTabDescr=Snapshot Information",
     "CPUSnapshotPanel_AllThreadsItem=<All Threads>",
-    "CPUSnapshotPanel_ViewLabelString=View\\:",
+    "CPUSnapshotPanel_ViewLabelString=View:",
     "CPUSnapshotPanel_ToggleDownToolTip=When selecting item in Call Tree, automatically select corresponding row in Hot Spots.",
     "CPUSnapshotPanel_ToggleUpToolTip=When selecting item in Hot Spots, automatically select first occurence in Call Tree. Use Find Previous/Next to see other occurences.",
     "CPUSnapshotPanel_AggregationComboAccessName=Results aggregation level.",

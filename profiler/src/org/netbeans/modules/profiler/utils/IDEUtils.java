@@ -66,9 +66,9 @@ import org.openide.DialogDisplayer;
  */
 @NbBundle.Messages({
     "IDEUtils_CreateNewConfigurationHint=<Create new configuration>",
-    "IDEUtils_SelectSettingsConfigurationLabelText=Select the settings configuration to use\\:",
+    "IDEUtils_SelectSettingsConfigurationLabelText=Select the settings configuration to use:",
     "IDEUtils_SelectSettingsConfigurationDialogCaption=Select Settings Configuration",
-    "IDEUtils_InvalidTargetJVMExeFileError=Invalid target JVM executable file specified\\: {0}\n{1}",
+    "IDEUtils_InvalidTargetJVMExeFileError=Invalid target JVM executable file specified: {0}\n{1}",
     "IDEUtils_ErrorConvertingProfilingSettingsMessage=Error occurred during automatic conversion of old Profiler configuration file\n   {0}\nto a new version\n   {1}.\n\nOperating system message:\n{2}",
     "IDEUtils_ListAccessName=List of available settings configurations.",
     "IDEUtils_OkButtonText=OK"

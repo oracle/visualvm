@@ -78,7 +78,7 @@ import org.netbeans.modules.profiler.api.icons.Icons;
     "HintsControllerUI_FindButton=Find",
     "HintsControllerUI_FindButtonTooltip=Find objects with biggest retained size",
     "HintsControllerUI_Label1String=Find",
-    "HintsControllerUI_Label2String=biggest objects by retained size\\:"
+    "HintsControllerUI_Label2String=biggest objects by retained size:"
 })
 public class HintsControllerUI extends JTitledPanel {
     private static final Number OBJECTS_DEFAULT = 20;

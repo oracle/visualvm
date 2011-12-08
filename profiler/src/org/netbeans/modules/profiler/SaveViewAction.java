@@ -77,7 +77,7 @@ import org.openide.windows.WindowManager;
     "SaveViewAction_SaveDialogTitle=Select File or Directory",
     "SaveViewAction_SaveDialogButton=Save",
     "SaveViewAction_SaveDialogFilter=PNG Image (*.png)",
-    "SaveViewAction_SaveDialogPreview=Saved view preview\\:",
+    "SaveViewAction_SaveDialogPreview=Saved view preview:",
     "SaveViewAction_SaveDialogVisible=Save only visible area",
     "SaveViewAction_OomeSavingMsg=<html><b>Not enough memory to save the image.</b><br><br>To avoid this error, either save smaller image or increase the -Xmx<br>value in the etc/netbeans.conf file in NetBeans IDE installation.</html>"
 })

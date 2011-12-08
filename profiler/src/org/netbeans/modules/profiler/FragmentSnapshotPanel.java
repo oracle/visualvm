@@ -67,7 +67,7 @@ import javax.swing.event.ChangeListener;
     "FragmentSnapshotPanel_InfoTabName=Info",
     "FragmentSnapshotPanel_CallsTabDescr=Code Fragment Calls - Execution data for code region",
     "FragmentSnapshotPanel_InfoTabDescr=Snapshot Information",
-    "FragmentSnapshotPanel_PanelTitle=Code Fragment\\: {0}"
+    "FragmentSnapshotPanel_PanelTitle=Code Fragment: {0}"
 })
 public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListener, ExportAction.ExportProvider {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

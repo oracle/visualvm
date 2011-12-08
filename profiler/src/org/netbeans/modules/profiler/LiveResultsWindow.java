@@ -136,7 +136,7 @@ import org.openide.util.lookup.ServiceProvider;
     "LiveResultsWindow_RunGCTooltip=Run Garbage Collection in Profiled Application and Update Results",
     "LiveResultsWindow_ErrorDisplayingStackTracesMsg=Allocation stack traces cannot be displayed for live results",
     "LiveResultsWindow_ErrorDisplayingCallGraphMsg=Reverse call graphs can not be displayed for live results",
-    "LiveResultsWindow_ErrorInstrumentingRootMethodMsg=Error occured when instrumenting the new root method\\: {0}",
+    "LiveResultsWindow_ErrorInstrumentingRootMethodMsg=Error occured when instrumenting the new root method: {0}",
     "LiveResultsWindow_LiveResultsAccessDescr=Live profiling results",
     "LiveResultsWindow_LiveResultsTabName=Live Results",
     "LiveResultsWindow_HistoryTabName=Class History",

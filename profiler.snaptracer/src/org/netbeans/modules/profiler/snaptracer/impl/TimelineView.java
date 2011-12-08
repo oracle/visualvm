@@ -232,7 +232,7 @@ final class TimelineView {
     private static final Format df = new SimpleDateFormat(TimeAxisUtils.TIME_MSEC);
 
     @NbBundle.Messages({
-        "LBL_Selection=Selection\\:",
+        "LBL_Selection=Selection:",
         "LBL_None=<none>",
         "LBL_SingleSample=sample #{0}",
         "LBL_TwoSamples=samples #{0} to #{1}",

@@ -84,7 +84,7 @@ import org.openide.util.NbBundle;
     "AttachWizard_TargetNamePidString=Target {0} PID",
     "AttachWizard_WorkingDirectoryString=Working directory",
     "AttachWizard_AutomaticIntegrationSuccMsg=Automatic integration performed successfuly.",
-    "AttachWizard_ReviewAdditionalStepsMsg=Please review additional steps\\:",
+    "AttachWizard_ReviewAdditionalStepsMsg=Please review additional steps:",
     "AttachWizard_NoStepsRequiredMsg=No additional steps are required.",
     "AttachWizard_AutomaticIntegrationFailedMsg=Automatic integration failed.",
     "AttachWizard_TheTargetNameString=the {0}"

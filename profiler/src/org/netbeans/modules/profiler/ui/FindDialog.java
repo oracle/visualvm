@@ -64,7 +64,7 @@ import org.openide.DialogDisplayer;
  */
 @NbBundle.Messages({
     "FindDialog_FindInResultsDialogCaption=Find in Results",
-    "FindDialog_FindWhatLabelString=Find What\\:",
+    "FindDialog_FindWhatLabelString=Find What:",
     "FindDialog_FindButtonName=Find",
     "FindDialog_FindWhatFieldAccessDescr=First item starting with this string will be found in results."
 })

@@ -95,7 +95,7 @@ public final class IdeSnapshotAction implements ActionListener {
         return tc;
     }
 
-    @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot\\: {0}")
+    @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot: {0}")
     private IdeSnapshot snapshot() {
         File file = snapshotFile();
         if (file == null) return null;

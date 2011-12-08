@@ -69,8 +69,8 @@ import org.openide.DialogDisplayer;
  */
 @NbBundle.Messages({
     "GetCmdLineArgumentsAction_TargetJvmInactiveMsg=Target JVM is inactive",
-    "GetCmdLineArgumentsAction_JvmArgumentsString=JVM arguments\\:",
-    "GetCmdLineArgumentsAction_MainClassAndArgsString=Main class (JAR) and its arguments\\:",
+    "GetCmdLineArgumentsAction_JvmArgumentsString=JVM arguments:",
+    "GetCmdLineArgumentsAction_MainClassAndArgsString=Main class (JAR) and its arguments:",
     "LBL_GetCmdLineArgumentsAction=&View Command-line Arguments",
     "HINT_GetCmdLineArgumentsAction=View Command-line Arguments",
     "CAPTION_JVMandMainClassCommandLineArguments=JVM and Main Class Command-line Arguments",

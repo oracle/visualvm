@@ -68,9 +68,9 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "ClassPresenterPanel_InstancesCountString=Instances\\: {0}",
-    "ClassPresenterPanel_InstanceSizeString=Instance size\\: {0}",
-    "ClassPresenterPanel_TotalSizeString=Total size\\: {0}",
+    "ClassPresenterPanel_InstancesCountString=Instances: {0}",
+    "ClassPresenterPanel_InstanceSizeString=Instance size: {0}",
+    "ClassPresenterPanel_TotalSizeString=Total size: {0}",
     "ClassPresenterPanel_RetainedSizesString=Compute Retained Sizes"
 })
 public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.StateListener {

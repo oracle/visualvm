@@ -72,11 +72,11 @@ import org.openide.util.Lookup;
  * @author Misha Dmitriev
  */
 @NbBundle.Messages({
-    "RootMethodsPanel_RootMethodsLabelText=&Selected Root Methods\\:",
+    "RootMethodsPanel_RootMethodsLabelText=&Selected Root Methods:",
     "RootMethodsPanel_AddManualButtonText=&Add...",
     "RootMethodsPanel_EditButtonText=&Edit...",
     "RootMethodsPanel_RemoveButtonText=&Remove",
-    "RootMethodsPanel_MessageAreaText=<b>Note\\:</b> You can also specify a root method in the source editor by right-clicking the method and choosing \"Profiling > Add As Profiling Root Method...\".",
+    "RootMethodsPanel_MessageAreaText=<b>Note:</b> You can also specify a root method in the source editor by right-clicking the method and choosing \"Profiling > Add As Profiling Root Method...\".",
     "RootMethodsPanel_SpecifyRootMethodsDialogCaption=Edit Profiling Roots (Advanced)",
     "RootMethodsPanel_RootsListAccessName=List of selected profiling roots.",
     "RootMethodsPanel_AddManuallyButtonAccessDescr=Add new profiling root.",

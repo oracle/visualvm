@@ -73,7 +73,7 @@ import org.openide.util.Lookup;
     "CAPTION_Question=Question",
     "ProfilingSupport_StopStartProfileSessionMessage=Profiling session is currently in progress.\nDo you want to stop the current session and start a new one?",
     "ProfilingSupport_StopStartAttachSessionMessage=Profiling session is currently in progress\nDo you want to detach from the target application and start a new profiling session?",
-    "ProfilingSupport_FailedLoadSettingsMsg=Failed to load attach settings\\: {0}"
+    "ProfilingSupport_FailedLoadSettingsMsg=Failed to load attach settings: {0}"
 })
 public final class ProfilingSupport {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------

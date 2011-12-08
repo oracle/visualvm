@@ -110,7 +110,7 @@ import org.openide.util.RequestProcessor;
     "OQLControllerUI_QueryResultsCaption=Query Results",
     "OQLControllerUI_QueryEditorCaption=Query Editor",
     "OQLControllerUI_SavedQueriesCaption=Saved Queries",
-    "OQLControllerUI_ExecutingQueryMsg=Executing query\\:",
+    "OQLControllerUI_ExecutingQueryMsg=Executing query:",
     "OQLControllerUI_ExecuteButtonText=E&xecute",
     "OQLControllerUI_ExecuteButtonAccessDescr=Execute the current OQL query",
     "OQLControllerUI_CancelButtonText=Cancel",

@@ -71,8 +71,8 @@ import org.openide.util.Lookup;
  * @author Jiri Rechtacek
  */
 @NbBundle.Messages({
-    "CTL_SelectAvaialableMainClasses=&Select the main class for profiling\\:",
-    "CTL_AvaialableMainClasses=&Main classes\\:",
+    "CTL_SelectAvaialableMainClasses=&Select the main class for profiling:",
+    "CTL_AvaialableMainClasses=&Main classes:",
     "AD_jMainClassList=N/A",
     "AD_MainClassChooser=N/A",
     "LBL_ChooseMainClass_NO_CLASSES_NODE=<No main classes found>",
