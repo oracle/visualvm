@@ -121,7 +121,7 @@ public final class ProfilingSupport {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static ProfilingSupport getDefault() {
+    public synchronized static ProfilingSupport getDefault() {
         if (defaultInstance == null) {
             defaultInstance = new ProfilingSupport();
         }
@@ -129,9 +129,10 @@ public final class ProfilingSupport {
         return defaultInstance;
     }
 
-    public static boolean checkProfilingInProgress() {
-        final int state = Profiler.getDefault().getProfilingState();
-        final int mode = Profiler.getDefault().getProfilingMode();
+    public boolean checkProfilingInProgress() {
+        final Profiler profiler = Profiler.getDefault();
+        final int state = profiler.getProfilingState();
+        final int mode = profiler.getProfilingMode();
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
@@ -141,7 +142,7 @@ public final class ProfilingSupport {
                     return true;
                 }
 
-                Profiler.getDefault().stopApp();
+                profiler.stopApp();
             } else {
                 if (!ProfilerDialogs.displayConfirmation(
                     Bundle.ProfilingSupport_StopStartAttachSessionMessage(), 
@@ -149,7 +150,7 @@ public final class ProfilingSupport {
                     return true;
                 }
 
-                Profiler.getDefault().detachFromApp();
+                profiler.detachFromApp();
             }
         }
 
@@ -206,7 +207,7 @@ public final class ProfilingSupport {
                 public void run() {
                     try {
                         // 1. if there is profiling in progress, ask the user and possibly cancel
-                        if (ProfilingSupport.checkProfilingInProgress()) {
+                        if (checkProfilingInProgress()) {
                             return;
                         }
 
@@ -214,9 +215,10 @@ public final class ProfilingSupport {
                         //       Project should be passed here from hypotetic Attach To Project action (not implemented yet)
                         //Project project = ProjectUtilities.getMainProject();
                         Lookup.Provider project = null;
+                        Profiler profiler = Profiler.getDefault();
 
                         //2. load or ask the user for attach settings
-                        final GlobalProfilingSettings gps = Profiler.getDefault().getGlobalProfilingSettings();
+                        final GlobalProfilingSettings gps = profiler.getGlobalProfilingSettings();
 
                         SessionSettings ss = new SessionSettings();
                         ss.setPortNo(gps.getPortNo());
@@ -258,7 +260,7 @@ public final class ProfilingSupport {
                         }
 
                         // 5. start the actual attach process with selected settings
-                        ((NetBeansProfiler) Profiler.getDefault()).setProfiledProject(project, null);
+                        ((NetBeansProfiler) profiler).setProfiledProject(project, null);
 
                         // 6. the user may have altered the attach settings from the Select task panel, let's reread them
                         AttachSettings as = null;
@@ -304,7 +306,7 @@ public final class ProfilingSupport {
                         }
 
                         // 7. start the actual attach
-                        Profiler.getDefault().attachToApp(ps, as);
+                        profiler.attachToApp(ps, as);
                     } finally {
                         setProfilingActionInvoked(false);
                     }
@@ -321,26 +323,24 @@ public final class ProfilingSupport {
 
         RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
+                    NetBeansProfiler profiler = NetBeansProfiler.getDefaultNB();
+                    TargetAppRunner targetAppRunner = profiler.getTargetAppRunner();
+                    
                     try {
-                        Profiler.getDefault().getTargetAppRunner().getAppStatusHandler().pauseLiveUpdates();
+                        ProfilingSettings settings;
+                        boolean attach = profiler.getProfilingMode() == Profiler.MODE_ATTACH;
+                        
+                        targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
+                        settings = selectTaskForProfiling(profiler.getProfiledProject(),null,profiler.getProfiledSingleFile(),attach);
 
-                        final boolean attach = (Profiler.getDefault().getProfilingMode() == Profiler.MODE_ATTACH);
-
-                        TaskConfigurator.Configuration configuration = TaskConfigurator.getDefault().configureModifyProfilingTask(NetBeansProfiler.getDefaultNB()
-                                                                                                                                        .getProfiledProject(),
-                                                                                                                        NetBeansProfiler.getDefaultNB()
-                                                                                                                                        .getProfiledSingleFile(),
-                                                                                                                        Profiler.getDefault()
-                                                                                                                                .getProfilingMode() == Profiler.MODE_ATTACH);
-
-                        if (configuration == null) {
+                        if (settings == null) {
                             return; // Cancelled by the user
                         } else {
-                            Profiler.getDefault().modifyCurrentProfiling(configuration.getProfilingSettings());
+                            profiler.modifyCurrentProfiling(settings);
                         }
                     } finally {
                         setProfilingActionInvoked(false);
-                        Profiler.getDefault().getTargetAppRunner().getAppStatusHandler().resumeLiveUpdates();
+                        targetAppRunner.getAppStatusHandler().resumeLiveUpdates();
                     }
                 }
             });

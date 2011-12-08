@@ -87,7 +87,7 @@ public final class AttachAction extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent e) {
         // 1. if there is profiling in progress, ask the user and possibly cancel
-        if (ProfilingSupport.checkProfilingInProgress()) {
+        if (ProfilingSupport.getDefault().checkProfilingInProgress()) {
             return;
         }
 
