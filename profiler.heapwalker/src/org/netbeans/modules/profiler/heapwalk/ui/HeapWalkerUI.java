@@ -117,6 +117,8 @@ public class HeapWalkerUI extends TopComponent {
     private void initDefaults() {
         setName(heapWalker.getName());
         setIcon(Icons.getImage(ProfilerIcons.MEMORY));
+        if (heapWalker.getHeapDumpFile() != null)
+            setToolTipText(heapWalker.getHeapDumpFile().getAbsolutePath());
         getAccessibleContext().setAccessibleDescription(COMPONENT_DESCR);
         
         putClientProperty("HeapDumpFileName", heapWalker.getHeapDumpFile().toURI().getPath()); // NOI18N

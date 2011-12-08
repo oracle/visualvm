@@ -61,14 +61,14 @@ class HprofFileBuffer extends HprofByteBuffer {
     private static final int MIN_bufferSize = 1 << MIN_bufferSizeBits;
     private static final int MIN_bufferSizeMask = MIN_bufferSize - 1;
     private static final int BUFFER_EXT = 8;
-    private static int bufferSizeBits;
-    private static int bufferSize;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     RandomAccessFile fis;
     private byte[] dumpBuffer;
     private long bufferStartOffset;
+    private int bufferSizeBits;
+    private int bufferSize;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

@@ -323,7 +323,7 @@ public final class ExportAction extends AbstractAction {
 
             // divide the file name into name and extension
             if (fName.endsWith("."+targetExt)) {
-                int idx = fName.lastIndexOf("."); // NOI18N
+                int idx = fName.lastIndexOf('.'); // NOI18N
                 if (idx == -1) { // no extension
                     targetName = fName; // extension from source file
                 } else { // extension exists

@@ -68,6 +68,9 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Ian Formanek
  */
 public final class ResetResultsAction extends AbstractAction implements ProfilingStateListener {
+    
+    Listener resultListener;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     
     /* 
@@ -102,7 +105,8 @@ public final class ResetResultsAction extends AbstractAction implements Profilin
         
         updateEnabledState();
         
-        Lookup.getDefault().lookup(Listener.class).setDelegate(this);
+        resultListener = Lookup.getDefault().lookup(Listener.class);
+        resultListener.setDelegate(this);        
         Profiler.getDefault().addProfilingStateListener(this);
     }
     
