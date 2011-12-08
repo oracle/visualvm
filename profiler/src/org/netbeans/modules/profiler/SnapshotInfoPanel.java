@@ -54,12 +54,20 @@ import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.RequestProcessor;
 
 
 public class SnapshotInfoPanel extends JPanel {
@@ -175,9 +183,28 @@ public class SnapshotInfoPanel extends JPanel {
 
     public SnapshotInfoPanel(LoadedSnapshot snapshot) {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        infoArea = new HTMLTextArea();
+        infoArea = new HTMLTextArea() {
+            protected void showURL(URL url) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        String userComments = loadedSnapshot.getUserComments();
+                        NotifyDescriptor.InputLine nd = createDescriptor(
+                                NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_UserCommentsLbl"), // NOI18N
+                                NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_UserCommentsCaption")); // NOI18N
+                        nd.setInputText(userComments);
+                        Object ret = DialogDisplayer.getDefault().notify(nd);
+                        if (ret == NotifyDescriptor.OK_OPTION) {
+                            setUserComments(nd.getInputText());
+                        }
+                    }
+                });
+            }
+            public void scrollRectToVisible(Rectangle aRect) {
+                if (isShowing()) super.scrollRectToVisible(aRect);
+            }
+        };
         infoArea.getAccessibleContext().setAccessibleName(INFO_AREA_ACCESS_NAME);
+        infoArea.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         infoAreaScrollPane = new JScrollPane(infoArea);
         add(infoAreaScrollPane, BorderLayout.CENTER);
         this.loadedSnapshot = snapshot;
@@ -197,26 +224,88 @@ public class SnapshotInfoPanel extends JPanel {
     public boolean fitsVisibleArea() {
         return !infoAreaScrollPane.getVerticalScrollBar().isVisible();
     }
+    
+    private NotifyDescriptor.InputLine createDescriptor(String label, String caption) {
+        return new NotifyDescriptor.InputLine(label, caption) {
+            private JTextArea textArea;
+            
+            public String getInputText() {
+                return textArea.getText();
+            }
+
+            public void setInputText(final String text) {
+                textArea.setText(text);
+                textArea.selectAll();
+            }
+            
+            protected Component createDesign(final String text) {
+                JPanel panel = new JPanel(new BorderLayout(5, 5));
+                panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
+                panel.setOpaque(false);
+
+                JLabel textLabel = new JLabel();
+                Mnemonics.setLocalizedText(textLabel, text);
+
+                textArea = new JTextArea();
+                textLabel.setLabelFor(textArea);
+
+                textArea.requestFocus();
+                
+                JScrollPane textAreaScroll = new JScrollPane(textArea);
+                textAreaScroll.setPreferredSize(new Dimension(350, 150));
+                panel.add(textAreaScroll, BorderLayout.CENTER);
+                panel.add(textLabel, BorderLayout.NORTH);
+                
+                panel.getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputPanel") // NOI18N
+                );
+                textArea.getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputField") // NOI18N
+                );
+
+                return panel;
+            }
+        };
+    }
+    
+    public void setUserComments(String userComments) {
+        loadedSnapshot.setUserComments(userComments);
+        if (!loadedSnapshot.isSaved()) {
+            updateInfo();
+            final File snapshotFile = loadedSnapshot.getFile();
+            if (snapshotFile != null)
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        ResultsManager.getDefault().saveSnapshot(loadedSnapshot,
+                                FileUtil.toFileObject(snapshotFile));
+                    }
+                });
+        }
+    }
 
     public void updateInfo() {
         ProfilingSettings ps = loadedSnapshot.getSettings();
 
         StringBuffer htmlText = new StringBuffer(1000);
 
+        String infoRes = Icons.getResource(GeneralIcons.INFO);
+        String summaryStr = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_SummaryString"); // NOI18N
+        htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/").append(infoRes).append("'>&nbsp;&nbsp;").append(summaryStr).append("</b><br><hr>"); // NOI18N
+        htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(DATA_COLLECTED_FROM_STRING + " "); // NOI18N
+        htmlText.append(DATA_COLLECTED_FROM_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(StringUtils.formatFullDate(new Date(loadedSnapshot.getSnapshot().getBeginTime())));
         htmlText.append("<br>"); // NOI18N
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(SNAPSHOT_TAKEN_AT_STRING + " "); // NOI18N
+        htmlText.append(SNAPSHOT_TAKEN_AT_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(StringUtils.formatFullDate(new Date(loadedSnapshot.getSnapshot().getTimeTaken())));
         htmlText.append("<br>"); // NOI18N
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(FILE_STRING + " "); // NOI18N
+        htmlText.append(FILE_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
 
         File f = loadedSnapshot.getFile();
@@ -227,29 +316,40 @@ public class SnapshotInfoPanel extends JPanel {
             htmlText.append(f.getAbsolutePath());
             htmlText.append("<br>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(FILE_SIZE_STRING + " "); // NOI18N
+            htmlText.append(FILE_SIZE_STRING).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
 
             NumberFormat format = NumberFormat.getIntegerInstance();
             format.setGroupingUsed(true);
-            htmlText.append(format.format(f.length()) + " B"); // NOI18N
+            htmlText.append(format.format(f.length())).append(" B"); // NOI18N
         }
+        htmlText.append("</div>"); // NOI18N
+        
+        String commentsRes = Icons.getResource(GeneralIcons.INFO);
+        String commentsStr = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_CommentsString"); // NOI18N
+        String commentsLink = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_EditCommentsLink"); // NOI18N
+        String noCommentsStr = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_NoCommentsString"); // NOI18N
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/").append(commentsRes).append("'>&nbsp;&nbsp;").append(commentsStr).append("&nbsp;&nbsp;" + "</b><a href='#'>").append(commentsLink).append("</a><br><hr>"); // NOI18N
+        htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
+        String comments = loadedSnapshot.getUserComments();
+        comments = comments.replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+        htmlText.append(comments.isEmpty() ? "&lt;" + noCommentsStr + "&gt;" : comments); // NOI18N
+        htmlText.append("</div>"); // NOI18N
 
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<br>"); // NOI18N
+        String settingsRes = Icons.getResource(GeneralIcons.INFO);
+        htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/").append(settingsRes).append("'>&nbsp;&nbsp;").append(SETTINGS_STRING).append("</b><br><hr>"); // NOI18N
+        htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(SETTINGS_STRING);
-        htmlText.append("</strong>"); // NOI18N
-        htmlText.append("<br>"); // NOI18N
-        htmlText.append("<br>"); // NOI18N
-        htmlText.append("<blockquote>"); // NOI18N
-        htmlText.append("<strong>"); // NOI18N
-        htmlText.append(" " + SETTINGS_NAME_STRING + " "); // NOI18N
+        htmlText.append(SETTINGS_NAME_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(ps.getSettingsName());
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(" " + PROFILING_TYPE_STRING + " "); // NOI18N
+        htmlText.append(PROFILING_TYPE_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
 
         switch (ps.getProfilingType()) {
@@ -258,28 +358,28 @@ public class SnapshotInfoPanel extends JPanel {
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<strong>"); // NOI18N
-                htmlText.append(PROFILED_CODE_REGION_STRING + " "); // NOI18N
+                htmlText.append(PROFILED_CODE_REGION_STRING).append(" "); // NOI18N
                 htmlText.append("</strong>"); // NOI18N
                 htmlText.append(formatRootMethod(ps.getCodeFragmentSelection()));
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<strong>"); // NOI18N
-                htmlText.append(EXCLUDE_SLEEP_WAIT_STRING + " "); // NOI18N
+                htmlText.append(EXCLUDE_SLEEP_WAIT_STRING).append(" "); // NOI18N
                 htmlText.append("</strong>"); // NOI18N
                 htmlText.append(getYesNo(ps.getExcludeWaitTime()));
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<strong>"); // NOI18N
-                htmlText.append(BUFFER_SIZE_STRING + " "); // NOI18N
+                htmlText.append(BUFFER_SIZE_STRING).append(" "); // NOI18N
                 htmlText.append("</strong>"); // NOI18N
                 htmlText.append(ps.getCodeRegionCPUResBufSize());
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<strong>"); // NOI18N
-                htmlText.append(LIMIT_PROFILED_THREADS_STRING + " "); // NOI18N
+                htmlText.append(LIMIT_PROFILED_THREADS_STRING).append(" "); // NOI18N
                 htmlText.append("</strong>"); // NOI18N
 
                 if (ps.getNProfiledThreadsLimit() < 0) {
                     htmlText.append(UNLIMITED_STRING);
                 } else {
-                    htmlText.append("" + ps.getNProfiledThreadsLimit()); // NOI18N
+                    htmlText.append("").append(ps.getNProfiledThreadsLimit()); // NOI18N
                 }
 
                 htmlText.append("<br>"); // NOI18N
@@ -317,10 +417,11 @@ public class SnapshotInfoPanel extends JPanel {
 
         appendOverridenGlobalProperties(htmlText, ps);
 
-        htmlText.append("</blockquote>"); // NOI18N
+        htmlText.append("</div>"); // NOI18N
         htmlText.append("<br>"); // NOI18N
 
         infoArea.setText(htmlText.toString());
+        infoArea.setCaretPosition(0);
     }
 
     private static String getOnOff(boolean b) {
@@ -360,72 +461,72 @@ public class SnapshotInfoPanel extends JPanel {
     private void appendCPUText(StringBuffer htmlText, ProfilingSettings ps) {
         // Done
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(ROOT_METHODS_STRING + " "); // NOI18N
+        htmlText.append(ROOT_METHODS_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(formatRootMethods(ps.getInstrumentationRootMethods()));
         htmlText.append("<br>"); // NOI18N // TODO: formatting
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(CPU_PROFILING_TYPE_STRING + " "); // NOI18N
+        htmlText.append(CPU_PROFILING_TYPE_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getCPUProfilingType(ps.getCPUProfilingType()));
         htmlText.append("<br>"); // NOI18N
 
         if (ps.getCPUProfilingType() == CommonConstants.CPU_INSTR_SAMPLED) {
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(SAMPLING_PERIOD_STRING + " "); // NOI18N
+            htmlText.append(SAMPLING_PERIOD_STRING).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(ps.getSamplingInterval());
             htmlText.append(" ms<br>"); // NOI18N
         }
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(CPU_TIMER_STRING + " "); // NOI18N
+        htmlText.append(CPU_TIMER_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getOnOff(ps.getThreadCPUTimerOn()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(EXCLUDE_SLEEP_WAIT_STRING + " "); // NOI18N
+        htmlText.append(EXCLUDE_SLEEP_WAIT_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getExcludeWaitTime()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(LIMIT_PROFILED_THREADS_STRING + " "); // NOI18N
+        htmlText.append(LIMIT_PROFILED_THREADS_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
 
         if (ps.getNProfiledThreadsLimit() < 0) {
             htmlText.append(UNLIMITED_STRING);
         } else {
-            htmlText.append("" + ps.getNProfiledThreadsLimit()); // NOI18N
+            htmlText.append("").append(ps.getNProfiledThreadsLimit()); // NOI18N
         }
 
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENTATION_FILTER_STRING + " "); // NOI18N
+        htmlText.append(INSTRUMENTATION_FILTER_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(ps.getSelectedInstrumentationFilter().toString());
         htmlText.append("<br>"); // NOI18N // TODO: text
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENTATION_SCHEME_STRING + " "); // NOI18N
+        htmlText.append(INSTRUMENTATION_SCHEME_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getCPUProfilingScheme(ps.getInstrScheme()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENT_METHOD_INVOKE_STRING + " "); // NOI18N
+        htmlText.append(INSTRUMENT_METHOD_INVOKE_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getInstrumentMethodInvoke()));
         htmlText.append("<br>"); //NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENT_NEW_THREADS_STRING + " "); // NOI18N
+        htmlText.append(INSTRUMENT_NEW_THREADS_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getInstrumentSpawnedThreads()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENT_GETTERS_SETTERS_STRING + " "); // NOI18N
+        htmlText.append(INSTRUMENT_GETTERS_SETTERS_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getInstrumentGetterSetterMethods()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENT_EMPTY_METHODS_STRING + " "); // NOI18N
+        htmlText.append(INSTRUMENT_EMPTY_METHODS_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getInstrumentEmptyMethods()));
         htmlText.append("<br>"); // NOI18N
@@ -435,11 +536,11 @@ public class SnapshotInfoPanel extends JPanel {
         // Done
         if (ps.getAllocTrackEvery() == 1) {
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(TRACKING_ALL_INSTANCES_STRING + " "); // NOI18N
+            htmlText.append(TRACKING_ALL_INSTANCES_STRING).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
         } else {
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(TRACK_EVERY_STRING + " "); // NOI18N
+            htmlText.append(TRACK_EVERY_STRING).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(MessageFormat.format(INSTANCES_COUNT_STRING, new Object[] { "" + ps.getAllocTrackEvery() })); // NOI18N
         }
@@ -447,14 +548,14 @@ public class SnapshotInfoPanel extends JPanel {
         htmlText.append("<br>"); // NOI18N
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(RECORD_STACK_TRACES_STRING + " "); // NOI18N
+        htmlText.append(RECORD_STACK_TRACES_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getAllocStackTraceLimit() != 0));
         htmlText.append("<br>"); // NOI18N
 
         if (ps.getAllocStackTraceLimit() != 0) {
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(LIMIT_STACK_DEPTH_STRING + " "); // NOI18N
+            htmlText.append(LIMIT_STACK_DEPTH_STRING).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
 
             if (ps.getAllocStackTraceLimit() < 0) {
@@ -467,7 +568,7 @@ public class SnapshotInfoPanel extends JPanel {
         }
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(RUN_GC_STRING + " "); // NOI18N
+        htmlText.append(RUN_GC_STRING).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getRunGCOnGetResultsInMemoryProfiling()));
         htmlText.append("<br>"); // NOI18N
@@ -478,12 +579,12 @@ public class SnapshotInfoPanel extends JPanel {
         if (ps.getOverrideGlobalSettings()) {
             htmlText.append("<br>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(OVERRIDEN_GLOBAL_PROPERTIES_STRING + " "); // NOI18N
+            htmlText.append(OVERRIDEN_GLOBAL_PROPERTIES_STRING).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append("<br>"); // NOI18N
-            htmlText.append("<blockquote>"); //NOI18N
+            htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(WORKING_DIRECTORY_STRING + " "); // NOI18N
+            htmlText.append(WORKING_DIRECTORY_STRING).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(ps.getWorkingDir());
             htmlText.append("<br>"); // NOI18N
@@ -495,16 +596,16 @@ public class SnapshotInfoPanel extends JPanel {
             }
 
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(JAVA_PLATFORM_STRING + " "); // NOI18N
+            htmlText.append(JAVA_PLATFORM_STRING).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(platformName);
             htmlText.append("<br>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(JVM_ARGUMENTS_STRING + " "); // NOI18N
+            htmlText.append(JVM_ARGUMENTS_STRING).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(ps.getJVMArgs());
+            htmlText.append("</div>"); // NOI18N
             htmlText.append("<br>"); // NOI18N
-            htmlText.append("</blockquote>"); // NOI18N
         }
     }
 
@@ -536,12 +637,10 @@ public class SnapshotInfoPanel extends JPanel {
         } else if (methods.length == 1) {
             return formatRootMethod(methods[0]);
         } else {
-            StringBuffer ret = new StringBuffer();
+            StringBuilder ret = new StringBuilder();
 
             ret.append(MessageFormat.format(METHODS_COUNT_STRING, new Object[] { "" + methods.length })); // NOI18N
             ret.append("<br>"); // NOI18N
-
-            ret.append("<blockquote>"); // NOI18N
 
             java.util.List<String> rootNames = new ArrayList<String>();
 
@@ -553,11 +652,11 @@ public class SnapshotInfoPanel extends JPanel {
             Collections.sort(rootNames);
 
             for (String rootName : rootNames) {
+                ret.append("&nbsp;&nbsp;&nbsp;&nbsp;"); // NOI18N
                 ret.append(rootName);
                 ret.append("<br>"); // NOI18N
             }
-
-            ret.append("</blockquote>"); // NOI18N
+            
 
             return ret.toString();
         }

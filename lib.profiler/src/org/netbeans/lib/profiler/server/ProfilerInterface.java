@@ -247,8 +247,8 @@ public class ProfilerInterface implements CommonConstants {
                         rootClassNameWildcard[i] = true;
                         rootClassNamePackageWildcard[i] = true;
                     }
+//                    System.out.println("Root "+rootClassNames[i]+" wild "+rootClassNameWildcard[i]+" package "+rootClassNamePackageWildcard[i]);
                 }
-//                System.out.println("Root "+rootClassNames[i]+" wild "+rootClassNameWildcard[i]+" package "+rootClassNamePackageWildcard[i]);
             }
         }
     }
@@ -771,6 +771,11 @@ public class ProfilerInterface implements CommonConstants {
                         return true;
                     }
                     if (className.indexOf('.', rootName.length()) == -1) { // not a subpackage
+                        return true;
+                    }
+                } else if (rootClassNamePackageWildcard[i]){
+                    if (className.equals(rootName.substring(0,rootName.length()-1)))
+                    {
                         return true;
                     }
                 }
