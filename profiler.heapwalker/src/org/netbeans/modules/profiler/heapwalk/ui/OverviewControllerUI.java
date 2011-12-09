@@ -71,14 +71,16 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
+@NbBundle.Messages({
+    "OverviewControllerUI_ViewTitle=Overview",
+    "OverviewControllerUI_ViewDescr=Overview",
+    "OverviewControllerUI_InProgressMsg=In progress..."
+})
 public class OverviewControllerUI extends JTitledPanel {
     
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     
     private static Icon ICON_INFO = Icons.getIcon(GeneralIcons.INFO);
-    private static final String VIEW_TITLE = NbBundle.getMessage(OverviewControllerUI.class, "OverviewControllerUI_ViewTitle"); // NOI18N
-    private static final String VIEW_DESCR = NbBundle.getMessage(OverviewControllerUI.class, "OverviewControllerUI_ViewDescr"); // NOI18N
-    private static final String IN_PROGRESS_MSG = NbBundle.getMessage(OverviewControllerUI.class, "OverviewControllerUI_InProgressMsg"); // NOI18N
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     
@@ -97,7 +99,7 @@ public class OverviewControllerUI extends JTitledPanel {
     
     // --- Constructors ----------------------------------------------------------
     public OverviewControllerUI(OverviewController controller) {
-        super(VIEW_TITLE,ICON_INFO,true);
+        super(Bundle.OverviewControllerUI_ViewTitle(),ICON_INFO,true);
         overviewController = controller;
         initComponents();
         refreshSummary();
@@ -132,7 +134,7 @@ public class OverviewControllerUI extends JTitledPanel {
 
     private void refreshSummary() {
         if (!showSysprops && !showThreads) {
-            dataArea.setText(IN_PROGRESS_MSG);
+            dataArea.setText(Bundle.OverviewControllerUI_InProgressMsg());
         }
         
         RequestProcessor.getDefault().post(new Runnable() {

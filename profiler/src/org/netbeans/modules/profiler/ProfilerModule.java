@@ -57,18 +57,15 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "ProfilerModule_CalibrationFailedMessage=Calibration failed.\nPlease check your setup and run the calibration again.",
+    "ProfilerModule_ExitingFromProfileMessage=Profiling session is currently in progress\nDo you want to stop the current session and exit the IDE?",
+    "ProfilerModule_QuestionDialogCaption=Question",
+    "ProfilerModule_ExitingFromAttachMessage=Profiling session is currently in progress\nDo you want to detach from the target application and exit the IDE?"
+})
 public final class ProfilerModule extends ModuleInstall {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String QUESTION_DIALOG_CAPTION = NbBundle.getMessage(ProfilerModule.class,
-                                                                              "ProfilerModule_QuestionDialogCaption"); // NOI18N
-    private static final String EXITING_FROM_PROFILE_MESSAGE = NbBundle.getMessage(ProfilerModule.class,
-                                                                                   "ProfilerModule_ExitingFromProfileMessage"); // NOI18N
-    private static final String EXITING_FROM_ATTACH_MESSAGE = NbBundle.getMessage(ProfilerModule.class,
-                                                                                  "ProfilerModule_ExitingFromAttachMessage"); // NOI18N
-                                                                                                                              // -----
     public static final String LIBS_DIR = "lib"; //NOI18N
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -86,13 +83,17 @@ public final class ProfilerModule extends ModuleInstall {
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
-                if (!ProfilerDialogs.displayConfirmation(EXITING_FROM_PROFILE_MESSAGE, QUESTION_DIALOG_CAPTION)) {
+                if (!ProfilerDialogs.displayConfirmation(
+                        Bundle.ProfilerModule_ExitingFromProfileMessage(), 
+                        Bundle.ProfilerModule_QuestionDialogCaption())) {
                     return false;
                 }
 
                 Profiler.getDefault().stopApp();
             } else {
-                if (!ProfilerDialogs.displayConfirmation(EXITING_FROM_ATTACH_MESSAGE, QUESTION_DIALOG_CAPTION)) {
+                if (!ProfilerDialogs.displayConfirmation(
+                        Bundle.ProfilerModule_ExitingFromAttachMessage(), 
+                        Bundle.ProfilerModule_QuestionDialogCaption())) {
                     return false;
                 }
 

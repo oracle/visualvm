@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.ui.panels;
+package org.netbeans.modules.profiler.ui;
 
 import org.openide.DialogDescriptor;
 import org.openide.util.Cancellable;
@@ -62,6 +62,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.openide.DialogDisplayer;
 
 
@@ -69,25 +70,22 @@ import org.openide.DialogDisplayer;
  *
  * @author Jiri Sedlacek
  */
-public class ModalProgressDisplayer extends JPanel {
-    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
-
-    // --- ProgressController interface ------------------------------------------
-    public static interface ProgressController extends Cancellable {
-    }
-
+@NbBundle.Messages({
+    "ProgressDisplayer_ProgressString=Progress...",
+    "ProgressDisplayer_CancelButtonText=Cancel"
+})
+public class ProfilerProgressDisplayer extends JPanel implements ProgressDisplayer {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
     // I18N String constants
-    private static final String PROGRESS_STRING = NbBundle.getMessage(ModalProgressDisplayer.class, "ProgressDisplayer_ProgressString"); // NOI18N
-    private static final String CANCEL_BUTTON_TEXT = NbBundle.getMessage(ModalProgressDisplayer.class,
-                                                                         "ProgressDisplayer_CancelButtonText"); // NOI18N
-                                                                                                                // -----
+    protected static final String PROGRESS_STRING = Bundle.ProgressDisplayer_ProgressString();
+    protected static final String CANCEL_BUTTON_TEXT = Bundle.ProgressDisplayer_CancelButtonText();
+    // -----
     private static final Object displayerLock = new Object();
 
     // --- Private implementation ------------------------------------------------
-    private static ModalProgressDisplayer defaultInstance;
+    private static ProfilerProgressDisplayer defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -104,39 +102,42 @@ public class ModalProgressDisplayer extends JPanel {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    private ModalProgressDisplayer() {
+    private ProfilerProgressDisplayer() {
         initComponents();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     // --- Public interface ------------------------------------------------------
-    public static ModalProgressDisplayer showProgress(String message) {
+    
+    @Override
+    public ProgressDisplayer showProgress(String message) {
         return showProgress(message, null);
     }
 
-    public static ModalProgressDisplayer showProgress(String message, ProgressController controller) {
+    @Override
+    public ProgressDisplayer showProgress(String message, ProgressController controller) {
         return showProgress(PROGRESS_STRING, message, controller);
     }
-
-    public static ModalProgressDisplayer showProgress(String caption, String message, ProgressController controller) {
+    
+    
+    @Override
+    public ProgressDisplayer showProgress(String caption, String message, ProgressController controller) {
         synchronized (displayerLock) {
-            final ModalProgressDisplayer pd = ModalProgressDisplayer.getDefault();
-
-            final DialogDescriptor dd = pd.createDialogDescriptor(caption, message, controller);
+            final DialogDescriptor dd = createDialogDescriptor(caption, message, controller);
             final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
             d.pack();
 
-            pd.setOwner(d);
+            setOwner(d);
 
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        pd.setOpened(true);
+                        setOpened(true);
                         d.setVisible(true);
                     }
                 });
 
-            return pd;
+            return this;
         }
     }
 
@@ -157,9 +158,9 @@ public class ModalProgressDisplayer extends JPanel {
         }
     }
 
-    private static ModalProgressDisplayer getDefault() {
+    public static ProfilerProgressDisplayer getDefault() {
         if (defaultInstance == null) {
-            defaultInstance = new ModalProgressDisplayer();
+            defaultInstance = new ProfilerProgressDisplayer();
         }
 
         return defaultInstance;

@@ -43,11 +43,8 @@
 
 package org.netbeans.modules.profiler.attach.panels;
 
-import java.awt.Font;
-import java.util.Vector;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.openide.util.NbBundle;
@@ -56,23 +53,24 @@ import org.openide.util.NbBundle;
  *
  * @author  Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "TargetSettingsWizardPanelUI_SelectHostOsString=<Select Host OS & JVM>"
+})
 public class RemoteAttachSettingsPanelUI extends javax.swing.JPanel implements DocumentListener {
-  private final String HOSTOS_HEADER = NbBundle.getMessage(this.getClass(), "TargetSettingsWizardPanelUI_SelectHostOsString"); // NOI18N
-
   private class HostOsComboBoxModel extends DefaultComboBoxModel {
     public HostOsComboBoxModel() {
       super();
     }
     public HostOsComboBoxModel(Object[] objects) {
       super(objects);
-      this.insertElementAt(HOSTOS_HEADER, 0);
+      this.insertElementAt(Bundle.TargetSettingsWizardPanelUI_SelectHostOsString(), 0);
       this.fireIntervalAdded(this, 0, 0);
       this.setSelectedItem(this.getElementAt(0));
     }
     public void setSelectedItem(Object anObject) {
       super.setSelectedItem(anObject);
-      if (!anObject.equals(HOSTOS_HEADER)) {
-        if (getElementAt(0).equals(HOSTOS_HEADER)) {
+      if (!anObject.equals(Bundle.TargetSettingsWizardPanelUI_SelectHostOsString())) {
+        if (getElementAt(0).equals(Bundle.TargetSettingsWizardPanelUI_SelectHostOsString())) {
           removeElementAt(0);
           this.fireIntervalRemoved(this, 0, 0);
         }
