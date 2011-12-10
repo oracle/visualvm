@@ -62,6 +62,10 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
+@NbBundle.Messages({
+    "SummaryControllerUI_ViewTitle=Summary",
+    "SummaryControllerUI_ViewDescr=Summary information about the loaded heap dump"
+})
 public class SummaryControllerUI extends JPanel {
     private SummaryController summaryController;
     private Presenter presenter;
@@ -76,15 +80,12 @@ public class SummaryControllerUI extends JPanel {
 
         public Presenter() {
             super();
-            setText(VIEW_TITLE);
-            setToolTipText(VIEW_DESCR);
+            setText(Bundle.SummaryControllerUI_ViewTitle());
+            setToolTipText(Bundle.SummaryControllerUI_ViewDescr());
             setIcon(ICON_INFO);
             setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
         }
     }
-
-    private static final String VIEW_TITLE = NbBundle.getMessage(SummaryControllerUI.class, "SummaryControllerUI_ViewTitle"); // NOI18N
-    private static final String VIEW_DESCR = NbBundle.getMessage(SummaryControllerUI.class, "SummaryControllerUI_ViewDescr"); // NOI18N
 
     // --- Constructors ----------------------------------------------------------
     public SummaryControllerUI(SummaryController summaryController) {

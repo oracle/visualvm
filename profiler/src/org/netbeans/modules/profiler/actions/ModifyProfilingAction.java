@@ -56,6 +56,10 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_ModifyProfilingAction=&Modify Profiling Session...",
+    "HINT_ModifyProfilingAction=Modify Profiling Session..."
+})
 public final class ModifyProfilingAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -65,7 +69,7 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
 
     protected ModifyProfilingAction() {
         super();
-        putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ModifyProfilingAction.class, "HINT_ModifyProfilingAction")); //NOI18N
+        putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_ModifyProfilingAction());
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -93,7 +97,7 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
     }
 
     public String getName() {
-        return NbBundle.getMessage(ModifyProfilingAction.class, "LBL_ModifyProfilingAction"); //NOI18N
+        return Bundle.LBL_ModifyProfilingAction();
     }
 
     public void performAction() {

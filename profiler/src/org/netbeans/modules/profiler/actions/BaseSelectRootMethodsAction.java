@@ -67,14 +67,13 @@ import org.openide.util.Lookup;
  * @author Ian Formanek
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "SelectRootMethodsAction_NoClassFoundMsg=Unable to select root method. No class found at current location.",
+    "LBL_SelectRootMethodsAction=Select Profiling Root Methods...",
+    "HINT_SelectRootMethodsAction=Select Profiling Root Methods..."
+})
 abstract public class BaseSelectRootMethodsAction extends NodeAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String NO_CLASS_FOUND_MSG = NbBundle.getMessage(BaseSelectRootMethodsAction.class,
-            "SelectRootMethodsAction_NoClassFoundMsg"); // NOI18N
-    // -----
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     public BaseSelectRootMethodsAction() {
@@ -87,7 +86,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
     }
 
     public String getName() {
-        return NbBundle.getMessage(BaseSelectRootMethodsAction.class, "LBL_SelectRootMethodsAction"); //NOI18N
+        return Bundle.LBL_SelectRootMethodsAction();
     }
 
     protected boolean asynchronous() {
@@ -159,7 +158,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
                         ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settings, project);
                     }
                 } else {
-                    ProfilerDialogs.displayError(NO_CLASS_FOUND_MSG);
+                    ProfilerDialogs.displayError(Bundle.SelectRootMethodsAction_NoClassFoundMsg());
                 }
             }
         }.execute();

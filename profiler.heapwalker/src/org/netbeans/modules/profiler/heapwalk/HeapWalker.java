@@ -67,17 +67,11 @@ import org.openide.util.Lookup;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassesListController_HeapWalkerDefaultName=HeapWalker",
+    "ClassesListController_LoadingDumpMsg=Loading Heap Dump..."
+})
 public class HeapWalker {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String HEAPWALKER_DEFAULT_NAME = NbBundle.getMessage(ClassesListController.class,
-                                                                              "ClassesListController_HeapWalkerDefaultName"); // NOI18N
-    private static final String LOADING_DUMP_MSG = NbBundle.getMessage(ClassesListController.class,
-                                                                       "ClassesListController_LoadingDumpMsg"); // NOI18N
-                                                                                                                // -----
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private File heapDumpFile;
@@ -90,7 +84,7 @@ public class HeapWalker {
 
     // --- Constructors ----------------------------------------------------------
     public HeapWalker(Heap heap) {
-        heapWalkerName = HEAPWALKER_DEFAULT_NAME;
+        heapWalkerName = Bundle.ClassesListController_HeapWalkerDefaultName();
         createMainFragment(heap);
     }
 
@@ -191,7 +185,7 @@ public class HeapWalker {
         ProgressHandle pHandle = null;
 
         try {
-            pHandle = ProgressHandleFactory.createHandle(LOADING_DUMP_MSG);
+            pHandle = ProgressHandleFactory.createHandle(Bundle.ClassesListController_LoadingDumpMsg());
             pHandle.setInitialDelay(0);
             pHandle.start(HeapProgress.PROGRESS_MAX*2);
             
