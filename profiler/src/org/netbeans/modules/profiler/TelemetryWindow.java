@@ -80,21 +80,28 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Ian Formanek
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TelemetryWindow_ThreadsStatisticsTabName=Threads / Loaded Classes",
+    "TelemetryWindow_MemoryHeapTabName=Memory (Heap)",
+    "TelemetryWindow_MemoryGCTabName=Memory (GC)",
+    "TelemetryWindow_ThreadsStatisticsTabDescr=Graph displaying number of application threads",
+    "TelemetryWindow_MemoryHeapTabDescr=Graph displaying heap size and usage",
+    "TelemetryWindow_MemoryGCTabDescr=Graph displaying surviving generations and time spent in GC",
+    "TelemetryWindow_TelemetryAccessDescr=Profiler telemetry graphs",
+    "LAB_TelemetryWindowName=VM Telemetry",
+    "Timestamp=Timestamp",
+    "Heap_Size_in_Bytes=Heap Size (Bytes)",
+    "Used_Heap_in_Bytes=Used Heap (Bytes)",
+    "Surviving_Generations=Surviving Generations",
+    "Relative_Time_Spent_in_GC=Relative Time Spent in GC (%)",
+    "Number_of_Threads=Threads",
+    "Loaded_Classes_Count=Loaded Classes"
+})
 public final class TelemetryWindow extends TopComponent {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static final class GraphTab extends JPanel implements /*ActionListener, ChartActionListener,*/
                                                                   SaveViewAction.ViewProvider, ExportAction.ExportProvider {
-        //~ Static fields/initializers -------------------------------------------------------------------------------------------
-
-        private static final String timestamp = "Timestamp";
-        private static final String heapSize = "Heap_Size_in_Bytes";
-        private static final String usedHeap = "Used_Heap_in_Bytes";
-        private static final String survivingGenerations = "Surviving_Generations";
-        private static final String timeInGC = "Relative_Time_Spent_in_GC";
-        private static final String  threadsCount = "Number_of_Threads";
-        private static final String loadedClasses = "Loaded_Classes_Count";
-
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final GraphPanel panel;
@@ -169,25 +176,25 @@ public final class TelemetryWindow extends TopComponent {
             long[] col2 = new long[nItems];
             long[] col3 = new long[nItems];
             // TODO Issue #160475
-            String col1Name = timestamp;
+            String col1Name = Bundle.Timestamp();
             String col2Name = ""; // NOI18N
             String col3Name = ""; // NOI18N
             System.arraycopy(data.timeStamps, 0, col1, 0, nItems);
             if (panel instanceof MemoryGraphPanel) {
                 System.arraycopy(data.totalMemory, 0, col2, 0, nItems);
                 System.arraycopy(data.usedMemory, 0, col3, 0, nItems);
-                col2Name=heapSize;
-                col3Name=usedHeap;
+                col2Name=Bundle.Heap_Size_in_Bytes();
+                col3Name=Bundle.Used_Heap_in_Bytes();
             } else if (panel instanceof SurvivingGenerationsGraphPanel) {
                 System.arraycopy(data.nSurvivingGenerations, 0, col2, 0, nItems);
                 System.arraycopy(data.relativeGCTimeInPerMil, 0, col3, 0, nItems);
-                col2Name=survivingGenerations;
-                col3Name=timeInGC;
+                col2Name=Bundle.Surviving_Generations();
+                col3Name=Bundle.Relative_Time_Spent_in_GC();
             } else if (panel instanceof ThreadsGraphPanel) {
                 System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
                 System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
-                col2Name=threadsCount;
-                col3Name=loadedClasses;
+                col2Name=Bundle.Number_of_Threads();
+                col3Name=Bundle.Loaded_Classes_Count();
             }
             //header
             eDD.dumpData(new StringBuffer(quote+col1Name+quote+separator+quote+col2Name+quote+separator+quote+col3Name+quote+newLine));
@@ -208,7 +215,7 @@ public final class TelemetryWindow extends TopComponent {
             long[] col2 = new long[nItems];
             long[] col3 = new long[nItems];
             
-            String col1Name = NbBundle.getMessage(TelemetryWindow.class,timestamp);
+            String col1Name = Bundle.Timestamp();
             String col2Name = new String();
             String col3Name = new String();
             String viewName = new String();
@@ -216,21 +223,21 @@ public final class TelemetryWindow extends TopComponent {
             if (panel instanceof MemoryGraphPanel) {
                 System.arraycopy(data.totalMemory, 0, col2, 0, nItems);
                 System.arraycopy(data.usedMemory, 0, col3, 0, nItems);
-                viewName=MEMORY_HEAP_TAB_NAME;
-                col2Name=NbBundle.getMessage(TelemetryWindow.class,heapSize);
-                col3Name=NbBundle.getMessage(TelemetryWindow.class,usedHeap);
+                viewName=Bundle.TelemetryWindow_MemoryHeapTabName();
+                col2Name=Bundle.Heap_Size_in_Bytes();
+                col3Name=Bundle.Used_Heap_in_Bytes();
             } else if (panel instanceof SurvivingGenerationsGraphPanel) {
                 System.arraycopy(data.nSurvivingGenerations, 0, col2, 0, nItems);
                 System.arraycopy(data.relativeGCTimeInPerMil, 0, col3, 0, nItems);
-                viewName=MEMORY_GC_TAB_NAME;
-                col2Name=NbBundle.getMessage(TelemetryWindow.class,survivingGenerations);
-                col3Name=NbBundle.getMessage(TelemetryWindow.class,timeInGC);
+                viewName=Bundle.TelemetryWindow_MemoryGCTabName();
+                col2Name=Bundle.Surviving_Generations();
+                col3Name=Bundle.Relative_Time_Spent_in_GC();
             } else if (panel instanceof ThreadsGraphPanel) {
                 System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
                 System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
-                viewName=THREADS_STATISTICS_TAB_NAME;
-                col2Name=NbBundle.getMessage(TelemetryWindow.class,threadsCount);
-                col3Name=NbBundle.getMessage(TelemetryWindow.class,loadedClasses);
+                viewName=Bundle.TelemetryWindow_ThreadsStatisticsTabName();
+                col2Name=Bundle.Number_of_Threads();
+                col3Name=Bundle.Loaded_Classes_Count();
             }
             //header
             StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
@@ -253,7 +260,7 @@ public final class TelemetryWindow extends TopComponent {
             long[] col2 = new long[nItems];
             long[] col3 = new long[nItems];
 
-            String col1Name = NbBundle.getMessage(TelemetryWindow.class,timestamp);
+            String col1Name = Bundle.Timestamp();
             String col2Name = new String();
             String col3Name = new String();
             String viewName = new String();
@@ -261,21 +268,21 @@ public final class TelemetryWindow extends TopComponent {
             if (panel instanceof MemoryGraphPanel) {
                 System.arraycopy(data.totalMemory, 0, col2, 0, nItems);
                 System.arraycopy(data.usedMemory, 0, col3, 0, nItems);
-                viewName=MEMORY_HEAP_TAB_NAME;
-                col2Name=heapSize;
-                col3Name=usedHeap;
+                viewName=Bundle.TelemetryWindow_MemoryHeapTabName();
+                col2Name=Bundle.Heap_Size_in_Bytes();
+                col3Name=Bundle.Used_Heap_in_Bytes();
             } else if (panel instanceof SurvivingGenerationsGraphPanel) {
                 System.arraycopy(data.nSurvivingGenerations, 0, col2, 0, nItems);
                 System.arraycopy(data.relativeGCTimeInPerMil, 0, col3, 0, nItems);
-                viewName=MEMORY_GC_TAB_NAME;
-                col2Name=survivingGenerations;
-                col3Name=timeInGC;
+                viewName=Bundle.TelemetryWindow_MemoryGCTabName();
+                col2Name=Bundle.Surviving_Generations();
+                col3Name=Bundle.Relative_Time_Spent_in_GC();
             } else if (panel instanceof ThreadsGraphPanel) {
                 System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
                 System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
-                viewName=THREADS_STATISTICS_TAB_NAME;
-                col2Name=threadsCount;
-                col3Name=loadedClasses;
+                viewName=Bundle.TelemetryWindow_ThreadsStatisticsTabName();
+                col2Name=Bundle.Number_of_Threads();
+                col3Name=Bundle.Loaded_Classes_Count();
             }
             //header
             String newline = System.getProperty("line.separator"); // NOI18N
@@ -322,22 +329,6 @@ public final class TelemetryWindow extends TopComponent {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String THREADS_STATISTICS_TAB_NAME = NbBundle.getMessage(TelemetryWindow.class,
-                                                                                  "TelemetryWindow_ThreadsStatisticsTabName"); // NOI18N
-    private static final String MEMORY_HEAP_TAB_NAME = NbBundle.getMessage(TelemetryWindow.class,
-                                                                           "TelemetryWindow_MemoryHeapTabName"); // NOI18N
-    private static final String MEMORY_GC_TAB_NAME = NbBundle.getMessage(TelemetryWindow.class, "TelemetryWindow_MemoryGCTabName"); // NOI18N
-    private static final String THREADS_STATISTICS_TAB_DESCR = NbBundle.getMessage(TelemetryWindow.class,
-                                                                                   "TelemetryWindow_ThreadsStatisticsTabDescr"); // NOI18N
-    private static final String MEMORY_HEAP_TAB_DESCR = NbBundle.getMessage(TelemetryWindow.class,
-                                                                            "TelemetryWindow_MemoryHeapTabDescr"); // NOI18N
-    private static final String MEMORY_GC_TAB_DESCR = NbBundle.getMessage(TelemetryWindow.class,
-                                                                          "TelemetryWindow_MemoryGCTabDescr"); // NOI18N
-    private static final String TELEMETRY_ACCESS_DESCR = NbBundle.getMessage(TelemetryWindow.class,
-                                                                             "TelemetryWindow_TelemetryAccessDescr"); // NOI18N
-                                                                                                                      // -----
     private static final String HELP_CTX_KEY = "TelemetryWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static TelemetryWindow defaultInstance;
@@ -358,9 +349,9 @@ public final class TelemetryWindow extends TopComponent {
 
     /** Initializes the window */
     public TelemetryWindow() {
-        setName(NbBundle.getMessage(TelemetryWindow.class, "LAB_TelemetryWindowName")); // NOI18N
+        setName(Bundle.LAB_TelemetryWindowName()); 
         setIcon(windowIcon);
-        getAccessibleContext().setAccessibleDescription(TELEMETRY_ACCESS_DESCR);
+        getAccessibleContext().setAccessibleDescription(Bundle.TelemetryWindow_TelemetryAccessDescr());
         setLayout(new BorderLayout());
         tabs = new JTabbedPane();
 
@@ -379,9 +370,9 @@ public final class TelemetryWindow extends TopComponent {
         generationsPanel = new GraphTab(generationsGraph);
         threadsStatsPanel = new GraphTab(threadsStatsGraph);
 
-        tabs.addTab(MEMORY_HEAP_TAB_NAME, null, heapPanel, MEMORY_HEAP_TAB_DESCR);
-        tabs.addTab(MEMORY_GC_TAB_NAME, null, generationsPanel, MEMORY_GC_TAB_DESCR);
-        tabs.addTab(THREADS_STATISTICS_TAB_NAME, null, threadsStatsPanel, THREADS_STATISTICS_TAB_DESCR);
+        tabs.addTab(Bundle.TelemetryWindow_MemoryHeapTabName(), null, heapPanel, Bundle.TelemetryWindow_MemoryHeapTabDescr());
+        tabs.addTab(Bundle.TelemetryWindow_MemoryGCTabName(), null, generationsPanel, Bundle.TelemetryWindow_MemoryGCTabDescr());
+        tabs.addTab(Bundle.TelemetryWindow_ThreadsStatisticsTabName(), null, threadsStatsPanel, Bundle.TelemetryWindow_ThreadsStatisticsTabDescr());
 
         // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
         tabs.getActionMap().getParent().remove("navigatePageUp"); // NOI18N

@@ -105,6 +105,21 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "InstancesListControllerUI_ViewCaption=Instances",
+    "InstancesListControllerUI_ShowHideColumnsString=Show or hide columns",
+    "InstancesListControllerUI_InstanceColumnName=Instance",
+    "InstancesListControllerUI_InstanceColumnDescr=Instance number",
+    "InstancesListControllerUI_ObjidColumnName=ID",
+    "InstancesListControllerUI_ObjidColumnDescr=Object ID",
+    "InstancesListControllerUI_SizeColumnName=Size",
+    "InstancesListControllerUI_SizeColumnDescr=Instance size",
+    "InstancesListControllerUI_RetainedSizeColumnName=Retained",
+    "InstancesListControllerUI_RetainedSizeColumnDescr=Retained size of the instance",
+    "InstancesListControllerUI_ReachableSizeColumnName=Reachable",
+    "InstancesListControllerUI_ReachableSizeColumnDescr=Reachable size of the instance",
+    "InstancesListControllerUI_CopyIdString=Copy ID"
+})
 public class InstancesListControllerUI extends JTitledPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -258,35 +273,6 @@ public class InstancesListControllerUI extends JTitledPanel {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String VIEW_CAPTION = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                   "InstancesListControllerUI_ViewCaption"); // NOI18N
-    private static final String SHOW_HIDE_COLUMNS_STRING = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                               "InstancesListControllerUI_ShowHideColumnsString"); // NOI18N
-    private static final String INSTANCE_COLUMN_NAME = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                           "InstancesListControllerUI_InstanceColumnName"); // NOI18N
-    private static final String INSTANCE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                            "InstancesListControllerUI_InstanceColumnDescr"); // NOI18N
-    private static final String OBJID_COLUMN_NAME = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                           "InstancesListControllerUI_ObjidColumnName"); // NOI18N
-    private static final String OBJID_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                            "InstancesListControllerUI_ObjidColumnDescr"); // NOI18N
-    private static final String SIZE_COLUMN_NAME = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                       "InstancesListControllerUI_SizeColumnName"); // NOI18N
-    private static final String SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                        "InstancesListControllerUI_SizeColumnDescr"); // NOI18N
-    private static final String RETAINED_SIZE_COLUMN_NAME = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                                "InstancesListControllerUI_RetainedSizeColumnName"); // NOI18N
-    private static final String RETAINED_SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                                 "InstancesListControllerUI_RetainedSizeColumnDescr"); // NOI18N
-    private static final String REACHABLE_SIZE_COLUMN_NAME = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                                 "InstancesListControllerUI_ReachableSizeColumnName"); // NOI18N
-    private static final String REACHABLE_SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                                  "InstancesListControllerUI_ReachableSizeColumnDescr"); // NOI18N
-    private static final String COPY_ID_STRING = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                               "InstancesListControllerUI_CopyIdString"); // NOI18N
-// -----
     private static KeyStroke COPY_ID_KEYSTROKE = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK + InputEvent.CTRL_DOWN_MASK);
     private static Icon ICON_INSTANCES = Icons.getIcon(HeapWalkerIcons.INSTANCES);
     private int columnCount;
@@ -325,7 +311,7 @@ public class InstancesListControllerUI extends JTitledPanel {
 
     // --- Constructors ----------------------------------------------------------
     public InstancesListControllerUI(InstancesListController instancesListController) {
-        super(VIEW_CAPTION, ICON_INSTANCES, true);
+        super(Bundle.InstancesListControllerUI_ViewCaption(), ICON_INSTANCES, true);
 
         this.instancesListController = instancesListController;
 
@@ -520,7 +506,7 @@ public class InstancesListControllerUI extends JTitledPanel {
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
         final JButton cornerButton = new JButton(Icons.getIcon(GeneralIcons.HIDE_COLUMN));
-        cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
+        cornerButton.setToolTipText(Bundle.InstancesListControllerUI_ShowHideColumnsString());
         cornerButton.setDefaultCapable(false);
 
         if (UIUtils.isWindowsClassicLookAndFeel()) {
@@ -566,7 +552,7 @@ public class InstancesListControllerUI extends JTitledPanel {
     private JPopupMenu createTablePopup() {
         JPopupMenu popup = new JPopupMenu();
         
-        JMenuItem copyIdItem = new JMenuItem(COPY_ID_STRING);
+        JMenuItem copyIdItem = new JMenuItem(Bundle.InstancesListControllerUI_CopyIdString());
         copyIdItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 copyIdToClipboard();
@@ -620,18 +606,18 @@ public class InstancesListControllerUI extends JTitledPanel {
         columnToolTips = new String[columnCount];
         columnRenderers = new TableCellRenderer[columnCount];
 
-        columnNames[0] = INSTANCE_COLUMN_NAME;
-        columnToolTips[0] = INSTANCE_COLUMN_DESCR;
+        columnNames[0] = Bundle.InstancesListControllerUI_InstanceColumnName();
+        columnToolTips[0] = Bundle.InstancesListControllerUI_InstanceColumnDescr();
 
-        columnNames[1] = OBJID_COLUMN_NAME;
-        columnToolTips[1] = OBJID_COLUMN_DESCR;
+        columnNames[1] = Bundle.InstancesListControllerUI_ObjidColumnName();
+        columnToolTips[1] = Bundle.InstancesListControllerUI_ObjidColumnDescr();
         
-        columnNames[2] = SIZE_COLUMN_NAME;
-        columnToolTips[2] = SIZE_COLUMN_DESCR;
+        columnNames[2] = Bundle.InstancesListControllerUI_SizeColumnName();
+        columnToolTips[2] = Bundle.InstancesListControllerUI_SizeColumnDescr();
 
         if (retainedSizeSupported) {
-            columnNames[3] = RETAINED_SIZE_COLUMN_NAME;
-            columnToolTips[3] = RETAINED_SIZE_COLUMN_DESCR;
+            columnNames[3] = Bundle.InstancesListControllerUI_RetainedSizeColumnName();
+            columnToolTips[3] = Bundle.InstancesListControllerUI_RetainedSizeColumnDescr();
         }
 
         // TODO: uncomment once reachable size implemented

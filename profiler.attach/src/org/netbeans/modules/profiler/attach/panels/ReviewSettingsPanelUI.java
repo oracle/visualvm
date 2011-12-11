@@ -50,9 +50,11 @@ import org.openide.util.NbBundle;
  *
  * @author  Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "AttachSettingsSummaryWizardPanelUI_FinishContinueMsg=If these settings are correct, click <strong>Finish</strong> to close the Attach Wizard and start profiling. If you have not integrated the {0} for profiling yet, click <strong>Next</strong> to continue with {0} integration."
+})
 public class ReviewSettingsPanelUI extends javax.swing.JPanel {
   private ReviewSettingsPanel.Model model;
-  private final String REVIEW_HINT = NbBundle.getMessage(this.getClass(), "AttachSettingsSummaryWizardPanelUI_FinishContinueMsg"); // NOI18N
 
   /** Creates new form ReviewSettingsPanelUI */
   public ReviewSettingsPanelUI(ReviewSettingsPanel.Model model) {
@@ -154,6 +156,6 @@ public class ReviewSettingsPanelUI extends javax.swing.JPanel {
   
   public void refresh() {
     textReview.setText(this.model.getSummary());
-    hintPanel.setHint(MessageFormat.format(REVIEW_HINT, new Object[]{model.getProviderName()}));
+    hintPanel.setHint(Bundle.AttachSettingsSummaryWizardPanelUI_FinishContinueMsg(model.getProviderName()));
   }
 }

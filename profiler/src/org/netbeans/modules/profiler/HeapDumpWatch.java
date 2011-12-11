@@ -61,6 +61,10 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
  *
  * @author Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "HeapDumpWatch_OOME_PROTECTION_OPEN_HEAPDUMP=Profiled application crashed and generated heap dump.\nDo you wish to open it in heapwalker?",
+    "HeapDumpWatch_OOME_PROTECTION_REMOVE_HEAPDUMP=You chose not to open the generated heap dump.\nThe heap dump can take a significant amount of disk space.\nShould it be deleted?"
+})
 public class HeapDumpWatch {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -139,11 +143,9 @@ public class HeapDumpWatch {
         ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // refresh list of snapshots
 
         try {
-            if (ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
-                    HeapDumpWatch.class, "HeapDumpWatch_OOME_PROTECTION_OPEN_HEAPDUMP"))) { // NOI18N
+            if (ProfilerDialogs.displayConfirmation(Bundle.HeapDumpWatch_OOME_PROTECTION_OPEN_HEAPDUMP())) {
                 ResultsManager.getDefault().openSnapshot(heapDump);
-            } else if (ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
-                    HeapDumpWatch.class, "HeapDumpWatch_OOME_PROTECTION_REMOVE_HEAPDUMP"))) { // NOI18N
+            } else if (ProfilerDialogs.displayConfirmation(Bundle.HeapDumpWatch_OOME_PROTECTION_REMOVE_HEAPDUMP())) {
                 heapDump.delete();
                 ProfilerControlPanel2.getDefault().refreshSnapshotsList();
             }

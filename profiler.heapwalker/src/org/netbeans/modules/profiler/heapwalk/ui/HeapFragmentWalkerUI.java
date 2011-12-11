@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -59,7 +58,6 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -71,21 +69,13 @@ import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "HeapFragmentWalkerUI_NavigateBackName=Navigate back",
+    "HeapFragmentWalkerUI_NavigateBackDescr=Navigate back",
+    "HeapFragmentWalkerUI_NavigateForwardName=Navigate forward",
+    "HeapFragmentWalkerUI_NavigateForwardDescr=Navigate forward"
+})
 public class HeapFragmentWalkerUI extends JPanel {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String NAVIGATE_BACK_NAME = NbBundle.getMessage(HeapFragmentWalkerUI.class,
-                                                                         "HeapFragmentWalkerUI_NavigateBackName"); // NOI18N
-    private static final String NAVIGATE_BACK_DESCR = NbBundle.getMessage(HeapFragmentWalkerUI.class,
-                                                                          "HeapFragmentWalkerUI_NavigateBackDescr"); // NOI18N
-    private static final String NAVIGATE_FORWARD_NAME = NbBundle.getMessage(HeapFragmentWalkerUI.class,
-                                                                            "HeapFragmentWalkerUI_NavigateForwardName"); // NOI18N
-    private static final String NAVIGATE_FORWARD_DESCR = NbBundle.getMessage(HeapFragmentWalkerUI.class,
-                                                                             "HeapFragmentWalkerUI_NavigateForwardDescr"); // NOI18N
-                                                                                                                           // -----
-
     // --- UI definition ---------------------------------------------------------
     private static Icon ICON_BACK = Icons.getIcon(GeneralIcons.BACK);
     private static Icon ICON_FORWARD = Icons.getIcon(GeneralIcons.FORWARD);
@@ -243,19 +233,19 @@ public class HeapFragmentWalkerUI extends JPanel {
             analysisControllerPresenter = heapFragmentWalker.getAnalysisController().getPresenter();
         }
 
-        backAction = new AbstractAction(NAVIGATE_BACK_NAME, ICON_BACK) {
+        backAction = new AbstractAction(Bundle.HeapFragmentWalkerUI_NavigateBackName(), ICON_BACK) {
                 public void actionPerformed(ActionEvent e) {
                     heapFragmentWalker.navigateBack();
                 }
             };
-        backAction.putValue(Action.SHORT_DESCRIPTION, NAVIGATE_BACK_DESCR);
+        backAction.putValue(Action.SHORT_DESCRIPTION, Bundle.HeapFragmentWalkerUI_NavigateBackDescr());
 
-        forwardAction = new AbstractAction(NAVIGATE_FORWARD_NAME, ICON_FORWARD) {
+        forwardAction = new AbstractAction(Bundle.HeapFragmentWalkerUI_NavigateForwardName(), ICON_FORWARD) {
                 public void actionPerformed(ActionEvent e) {
                     heapFragmentWalker.navigateForward();
                 }
             };
-        forwardAction.putValue(Action.SHORT_DESCRIPTION, NAVIGATE_FORWARD_DESCR);
+        forwardAction.putValue(Action.SHORT_DESCRIPTION, Bundle.HeapFragmentWalkerUI_NavigateForwardDescr());
 
         setLayout(new BorderLayout());
 
