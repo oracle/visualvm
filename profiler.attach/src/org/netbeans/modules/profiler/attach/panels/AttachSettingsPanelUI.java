@@ -105,9 +105,6 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
     }
   }
   
-  private final String SELECT_GROUP_TITLE = NbBundle.getMessage(this.getClass(), "AttachWizard_SelectTargetTypeForceString"); // NOI18N
-  private final String SELECT_TARGET_TITLE = NbBundle.getMessage(this.getClass(), "AttachWizard_SelectTargetForceString"); // NOI18N
-  
   /** Creates new form AttachSettingsPanelUI */
   public AttachSettingsPanelUI(AttachSettingsPanel.PanelModel model) {
     this.model = model;
@@ -513,20 +510,20 @@ public class AttachSettingsPanelUI extends javax.swing.JPanel {
   }
   
   public ComboBoxModel getGroupsModel() {
-    return new ForceSelectionComboBoxModel(SELECT_GROUP_TITLE, model.getTargetGroups());
+    return new ForceSelectionComboBoxModel(Bundle.AttachWizard_SelectTargetTypeForceString(), model.getTargetGroups());
   }
   
   public ComboBoxModel getTargetsModel(final boolean forcedModel) {
     if (forcedModel)
-      return new ForceSelectionComboBoxModel(SELECT_TARGET_TITLE, model.getTargetGroup() != null ? model.getTargetGroup().getTargets() : new Object[]{});
+      return new ForceSelectionComboBoxModel(Bundle.AttachWizard_SelectTargetForceString(), model.getTargetGroup() != null ? model.getTargetGroup().getTargets() : new Object[]{});
     else
       return new ForceSelectionComboBoxModel(model.getTargetGroup().getTargets());
   }
 
     private boolean isDynamicAttachSupported() {
         try {
-            Class.forName("sun.jvmstat.monitor.MonitoredHost");
-            Class.forName("com.sun.tools.attach.VirtualMachine");
+            Class.forName("sun.jvmstat.monitor.MonitoredHost"); // NOI18N
+            Class.forName("com.sun.tools.attach.VirtualMachine"); // NOI18N
         } catch (ClassNotFoundException ex) {
             return false;
         }

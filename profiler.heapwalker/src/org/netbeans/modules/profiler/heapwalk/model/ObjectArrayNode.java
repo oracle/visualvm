@@ -54,6 +54,10 @@ import java.util.List;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ObjectArrayNode_ItemsNumberString=({0} items)",
+    "ObjectArrayNode_LoopToString=(loop to {0})"
+})
 public class ObjectArrayNode extends ArrayNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -85,7 +89,7 @@ public class ObjectArrayNode extends ArrayNode {
 
             if (isLoop()) {
                 return name + " "
-                       + MessageFormat.format(LOOP_TO_STRING, new Object[] { BrowserUtils.getFullNodeName(getLoopTo()) }); // NOI18N
+                       + Bundle.ObjectArrayNode_LoopToString(BrowserUtils.getFullNodeName(getLoopTo()));
             }
 
             return name;
@@ -115,15 +119,6 @@ public class ObjectArrayNode extends ArrayNode {
 
         public abstract void refreshView();
     }
-
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String ITEMS_NUMBER_STRING = NbBundle.getMessage(ObjectArrayNode.class,
-                                                                          "ObjectArrayNode_ItemsNumberString"); // NOI18N
-    private static final String LOOP_TO_STRING = NbBundle.getMessage(ObjectArrayNode.class, "ObjectArrayNode_LoopToString"); // NOI18N
-                                                                                                                             // -----
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -195,6 +190,6 @@ public class ObjectArrayNode extends ArrayNode {
             return super.computeValue();
         }
 
-        return super.computeValue() + " " + MessageFormat.format(ITEMS_NUMBER_STRING, new Object[] { getInstance().getLength() }); // NOI18N
+        return super.computeValue() + " " + Bundle.ObjectArrayNode_ItemsNumberString(getInstance().getLength());
     }
 }

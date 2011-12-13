@@ -171,14 +171,14 @@ public class ReviewSettingsPanel extends AttachWizardPanel {
     private String buildSummary(AttachSettings attachSettings) {
         StringBuilder attachSettingsSummaryBuffer = new StringBuilder();
         attachSettingsSummaryBuffer.append("<b>"); // NOI18N
-        attachSettingsSummaryBuffer.append(NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_TargetTypeString")); // NOI18N
+        attachSettingsSummaryBuffer.append(Bundle.AttachWizard_TargetTypeString());
         attachSettingsSummaryBuffer.append("</b> "); // NOI18N
         attachSettingsSummaryBuffer.append(attachSettings.getTargetType());
         attachSettingsSummaryBuffer.append("<br>"); // NOI18N
 
         if (!getContext().isProviderSingular()) {
             attachSettingsSummaryBuffer.append("<b>"); // NOI18N
-            attachSettingsSummaryBuffer.append(NbBundle.getMessage(this.getClass(), "AttachWizard_TargetNameTypeString")); // NOI18N
+            attachSettingsSummaryBuffer.append(Bundle.AttachWizard_TargetNameTypeString());
             attachSettingsSummaryBuffer.append("</b> "); // NOI18N
             attachSettingsSummaryBuffer.append(attachSettings.getServerType());
             attachSettingsSummaryBuffer.append("<br>"); // NOI18N
@@ -186,33 +186,31 @@ public class ReviewSettingsPanel extends AttachWizardPanel {
 
         attachSettingsSummaryBuffer.append("<br>"); // NOI18N
         attachSettingsSummaryBuffer.append("<b>"); // NOI18N
-        attachSettingsSummaryBuffer.append(MessageFormat.format(NbBundle.getMessage(this.getClass(),
-                                                                                    "AttachWizard_TargetNameLocationString"),
-                                                                new Object[] { attachSettings.getServerType() })); // NOI18N
+        attachSettingsSummaryBuffer.append(Bundle.AttachWizard_TargetNameLocationString());
         attachSettingsSummaryBuffer.append("</b> "); // NOI18N
 
         if (attachSettings.isRemote()) {
-            attachSettingsSummaryBuffer.append(NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_RemoteSystemString")); // NOI18N
+            attachSettingsSummaryBuffer.append(Bundle.AttachWizard_RemoteSystemString());
             attachSettingsSummaryBuffer.append("<br>"); // NOI18N
             attachSettingsSummaryBuffer.append("<b>"); // NOI18N
-            attachSettingsSummaryBuffer.append(NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_RemoteSystemHostNameString")); // NOI18N
+            attachSettingsSummaryBuffer.append(Bundle.AttachWizard_RemoteSystemHostNameString());
             attachSettingsSummaryBuffer.append("</b> "); // NOI18N
             attachSettingsSummaryBuffer.append(attachSettings.getHost());
             attachSettingsSummaryBuffer.append("<br>"); // NOI18N
             attachSettingsSummaryBuffer.append("<b>"); // NOI18N
-            attachSettingsSummaryBuffer.append(NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_RemoteSystemOsString")); // NOI18N
+            attachSettingsSummaryBuffer.append(Bundle.AttachWizard_RemoteSystemOsString());
             attachSettingsSummaryBuffer.append("</b> "); // NOI18N
             attachSettingsSummaryBuffer.append(attachSettings.getHostOS());
             attachSettingsSummaryBuffer.append("<br>"); // NOI18N
         } else {
-            attachSettingsSummaryBuffer.append(NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_LocalMachineString")); // NOI18N
+            attachSettingsSummaryBuffer.append(Bundle.AttachWizard_LocalMachineString());
             attachSettingsSummaryBuffer.append("<br>"); // NOI18N
             attachSettingsSummaryBuffer.append("<b>"); // NOI18N
-            attachSettingsSummaryBuffer.append(NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_AttachMethodString")); // NOI18N
+            attachSettingsSummaryBuffer.append(Bundle.AttachWizard_AttachMethodString());
             attachSettingsSummaryBuffer.append("</b> "); // NOI18N
             attachSettingsSummaryBuffer.append(attachSettings.isDirect()
-                                               ? NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_DirectAttachString") // NOI18N
-                                               : NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_DynamicAttachString")); // NOI18N
+                                               ? Bundle.AttachWizard_DirectAttachString()
+                                               : Bundle.AttachWizard_DynamicAttachString());
             attachSettingsSummaryBuffer.append("<br>"); // NOI18N
         }
 

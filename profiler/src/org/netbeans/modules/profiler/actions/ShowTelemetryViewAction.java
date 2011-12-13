@@ -44,9 +44,7 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.modules.profiler.TelemetryWindow;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -58,18 +56,16 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_ShowTelemetryViewAction=&VM Telemetry",
+    "HINT_ShowTelemetryViewAction=Show VM Telemetry View"
+})
 public final class ShowTelemetryViewAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final String NAME_STRING = NbBundle.getMessage(ShowTelemetryViewAction.class, "LBL_ShowTelemetryViewAction"); // NOI18N
-    private static final String SHORT_DESCRIPTION_STRING = NbBundle.getMessage(ShowTelemetryViewAction.class,
-                                                                               "HINT_ShowTelemetryViewAction"); // NOI18N
-
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ShowTelemetryViewAction() {
-        putValue(Action.NAME, NAME_STRING);
-        putValue(Action.SHORT_DESCRIPTION, SHORT_DESCRIPTION_STRING);
+        putValue(Action.NAME, Bundle.LBL_ShowTelemetryViewAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_ShowTelemetryViewAction());
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.WINDOW_TELEMETRY));
         putValue("iconBase", Icons.getResource(ProfilerIcons.WINDOW_TELEMETRY)); // NOI18N
     }

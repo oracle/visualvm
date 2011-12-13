@@ -58,7 +58,6 @@ import org.netbeans.modules.profiler.api.GlobalStorage;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryCategory;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryDefinition;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryRepository;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -67,24 +66,15 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "OQLSupport_CategoryCaption=Category",
+    "OQLSupport_CustomCategoryName=Custom",
+    "OQLSupport_CustomCategoryDescr=Custom OQL queries created by the Save button in Query Editor.",
+    "OQLSupport_QueryCaption=Query",
+    "OQLSupport_NoCustomQueryName=<No Custom Queries Defined>",
+    "OQLSupport_NoCustomQueryDescr=Use Save button in Query Editor to create custom OQL query."
+})
 public final class OQLSupport {
-
-    // -----
-    // I18N String constants
-    private static final String CATEGORY_CAPTION = NbBundle.getMessage(
-            OQLSupport.class, "OQLSupport_CategoryCaption"); // NOI18N
-    private static final String CUSTOM_CATEGORY_NAME = NbBundle.getMessage(
-            OQLSupport.class, "OQLSupport_CustomCategoryName"); // NOI18N
-    private static final String CUSTOM_CATEGORY_DESCR = NbBundle.getMessage(
-            OQLSupport.class, "OQLSupport_CustomCategoryDescr"); // NOI18N
-    private static final String QUERY_CAPTION = NbBundle.getMessage(
-            OQLSupport.class, "OQLSupport_QueryCaption"); // NOI18N
-    private static final String NO_CUSTOM_QUERY_NAME = NbBundle.getMessage(
-            OQLSupport.class, "OQLSupport_NoCustomQueryName"); // NOI18N
-    private static final String NO_CUSTOM_QUERY_DESCR = NbBundle.getMessage(
-            OQLSupport.class, "OQLSupport_NoCustomQueryDescr"); // NOI18N
-    // -----
-
     private static final String SAVED_OQL_QUERIES_FILENAME = "oqlqueries"; // NOI18N
     private static final String SNAPSHOT_VERSION = "oqlqueries_version_1"; // NOI18N
     private static final String PROP_QUERY_NAME_KEY = "query-name"; // NOI18N
@@ -270,7 +260,7 @@ public final class OQLSupport {
 
         public String toString() { return getUserObject().getName(); }
 
-        public String getCaption() { return CATEGORY_CAPTION; }
+        public String getCaption() { return Bundle.OQLSupport_CategoryCaption(); }
 
         public String getDescription() { return getUserObject().getDescription(); }
 
@@ -294,9 +284,9 @@ public final class OQLSupport {
 
         private CustomCategoryNode() { super(null); }
 
-        public String toString() { return CUSTOM_CATEGORY_NAME; }
+        public String toString() { return Bundle.OQLSupport_CustomCategoryName(); }
 
-        public String getDescription() { return CUSTOM_CATEGORY_DESCR; }
+        public String getDescription() { return Bundle.OQLSupport_CustomCategoryDescr(); }
 
         public boolean isLeaf() { return false; }
 
@@ -314,7 +304,7 @@ public final class OQLSupport {
 
         public String toString() { return getUserObject().getName(); }
 
-        public String getCaption() { return QUERY_CAPTION; }
+        public String getCaption() { return Bundle.OQLSupport_QueryCaption(); }
 
         public String getDescription() { return getUserObject().getDescription(); }
 
@@ -334,9 +324,9 @@ public final class OQLSupport {
 
     private static class NoCustomQueriesNode extends SpecialNode {
 
-        public String toString() { return NO_CUSTOM_QUERY_NAME; }
+        public String toString() { return Bundle.OQLSupport_NoCustomQueryName(); }
 
-        public String getDescription() { return NO_CUSTOM_QUERY_DESCR; }
+        public String getDescription() { return Bundle.OQLSupport_NoCustomQueryDescr(); }
 
         public boolean isLeaf() { return true; }
 

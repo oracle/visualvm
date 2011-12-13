@@ -57,15 +57,13 @@ import javax.swing.*;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "DoNotShowDialogDescriptor_DoNotShowAgainString=Do not show this dialog again"
+})
 public final class DoNotShowDialogDescriptor extends DialogDescriptor {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String DO_NOT_SHOW_AGAIN_STRING = NbBundle.getMessage(DoNotShowDialogDescriptor.class,
-                                                                               "DoNotShowDialogDescriptor_DoNotShowAgainString"); //NOI18N
-                                                                                                                                  // -----
-    private static final JCheckBox doNotShowAgain = new JCheckBox(DO_NOT_SHOW_AGAIN_STRING);
+    private static final JCheckBox doNotShowAgain = new JCheckBox(Bundle.DoNotShowDialogDescriptor_DoNotShowAgainString());
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

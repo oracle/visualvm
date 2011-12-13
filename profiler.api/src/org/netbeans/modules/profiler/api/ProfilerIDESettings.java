@@ -59,13 +59,6 @@ import java.util.prefs.Preferences;
 public final class ProfilerIDESettings implements GlobalProfilingSettings {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String PROFILER_IDE_SETTINGS_NAME = NbBundle.getMessage(ProfilerIDESettings.class,
-                                                                                 "ProfilerIDESettings_Name" // NOI18N
-    );
-
-    // -----
     public static final String DO_NOT_SHOW_ATTACH_SETTINGS = "dns-attach-settings"; // NOI18N
     public static final String DO_NOT_SHOW_JDK_DIALOG = "dns-jdk-dialog"; // NOI18N
     public static final String DO_NOT_SHOW_PID_WINDOWS = "dns-pid-windows4"; // NOI18N
@@ -516,8 +509,11 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     }
 
     // -------------------------
+    @NbBundle.Messages({
+        "ProfilerIDESettings_Name=Profiler Settings"
+    })
     public String displayName() {
-        return PROFILER_IDE_SETTINGS_NAME;
+        return Bundle.ProfilerIDESettings_Name();
     }
 
     private Map<String, String> getDNSAMap() {

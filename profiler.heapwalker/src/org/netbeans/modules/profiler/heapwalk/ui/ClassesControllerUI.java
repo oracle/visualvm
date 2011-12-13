@@ -67,6 +67,10 @@ import org.netbeans.modules.profiler.api.icons.LanguageIcons;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassesControllerUI_ControllerName=Classes",
+    "ClassesControllerUI_ControllerDescr=List of classes present on the heap"
+})
 public class ClassesControllerUI extends JPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -80,22 +84,14 @@ public class ClassesControllerUI extends JPanel {
 
         public Presenter() {
             super();
-            setText(CONTROLLER_NAME);
-            setToolTipText(CONTROLLER_DESCR);
+            setText(Bundle.ClassesControllerUI_ControllerName());
+            setToolTipText(Bundle.ClassesControllerUI_ControllerDescr());
             setIcon(ICON_CLASS);
             setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
         }
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String CONTROLLER_NAME = NbBundle.getMessage(ClassesControllerUI.class,
-                                                                      "ClassesControllerUI_ControllerName"); // NOI18N
-    private static final String CONTROLLER_DESCR = NbBundle.getMessage(ClassesControllerUI.class,
-                                                                       "ClassesControllerUI_ControllerDescr"); // NOI18N
-                                                                                                               // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
