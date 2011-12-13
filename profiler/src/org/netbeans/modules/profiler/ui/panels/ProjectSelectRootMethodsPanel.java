@@ -97,9 +97,9 @@ import org.openide.util.lookup.Lookups;
  */
 @NbBundle.Messages({
     "SelectRootMethodsPanel_NoSelectionProviders_MSG=No selection view providers available. Falling back to manual selector.",
-    "SelectRootMethodsPanel_ShowAllProjectsLabel=Show All Projects",
-    "SelectRootMethodsPanel_SelectViewLabel=Select View: ",
-    "SelectRootMethodsPanel_AdvancedButtonText=Advanced..."
+    "SelectRootMethodsPanel_ShowAllProjectsLabel=&Show All Projects",
+    "SelectRootMethodsPanel_SelectViewLabel=Select &View: ",
+    "SelectRootMethodsPanel_AdvancedButtonText=&Advanced..."
 })
 final public class ProjectSelectRootMethodsPanel extends JPanel {
     final private static Logger LOG = Logger.getLogger(ProjectSelectRootMethodsPanel.class.getName());
