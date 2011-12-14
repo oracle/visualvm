@@ -536,10 +536,18 @@ final class SamplerImpl {
                         });
                     }
                 };
+                tcpu = new ThreadsCPU(ti.getThreadMXBean(), JmxModelFactory.getJmxModelFor(application).getMBeanServerConnection());
+                try {
+                    tcpu.getThreadsCPUInfo();
+                } catch (Exception ex) {
+                    tcpu = null;
+                }
 
                 final ThreadDumpSupport tds = ThreadDumpSupport.getInstance();
                 final String noThreadDump = tds.supportsThreadDump(application) ? null : NbBundle.getMessage(
                                             SamplerImpl.class, "MSG_Thread_dump_unsupported"); // NOI18N
+                final String noThreadCPU =  tcpu != null ? null : NbBundle.getMessage(
+                                            SamplerImpl.class, "MSG_ThreadCPU_unsupported"); // NOI18N
 
                 CPUSamplerSupport.ThreadDumper threadDumper = noThreadDump != null ? null :
                     new CPUSamplerSupport.ThreadDumper() {
@@ -548,21 +556,30 @@ final class SamplerImpl {
                         }
                     };
                     
-                tcpu = new ThreadsCPU(ti.getThreadMXBean(), JmxModelFactory.getJmxModelFor(application).getMBeanServerConnection());
-                try {
-                    tcpu.getThreadsCPUInfo();
-                } catch (Exception ex) {
-                    tcpu = null;
-                    throw new RuntimeException(ex);
-                }
                 cpuSampler = new CPUSamplerSupport(ti, tcpu, snapshotDumper, threadDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        String avail = noThreadDump == null ? NbBundle.getMessage(
-                                SamplerImpl.class, "MSG_Available") : NbBundle.getMessage( // NOI18N
-                                SamplerImpl.class, "MSG_Available_details", noThreadDump); // NOI18N
+                        String avail = NbBundle.getMessage(SamplerImpl.class,
+                                                           "MSG_Available"); // NOI18N
+                        if (noThreadDump != null || noThreadCPU != null) {
+                            String[] msgs = new String[2];
+                            int i = 0;
+                            if (noThreadDump != null) {
+                                msgs[i++] = noThreadDump;
+                            }
+                            if (noThreadCPU != null) {
+                                msgs[i++] = noThreadCPU;
+                            }
+                            if (i == 1) {
+                                avail = NbBundle.getMessage(SamplerImpl.class,
+                                        "MSG_Available_details", msgs[0]); // NOI18N
+                            } else if (i == 2) {
+                                avail = NbBundle.getMessage(SamplerImpl.class,
+                                        "MSG_Available_details2", msgs[0], msgs[1]); // NOI18N
+                            }
+                        }
                         cpuStatus = avail + " " + NbBundle.getMessage(SamplerImpl.class, "MSG_Press_cpu"); // NOI18N
                         cpuProfilingSupported = true;
                         refreshSummary();
