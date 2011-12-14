@@ -85,6 +85,11 @@ import org.openide.util.Lookup;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "MemoryDiffPanel_PanelTitle=Memory Diff",
+    "MemoryDiffPanel_SnapshotsComparisonString=Comparison of {0} to {1}",
+    "MemoryDiffPanel_SnapshotNotAvailableMsg=Compared snapshot no longer available."
+})
 public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.FindPerformer, SaveViewAction.ViewProvider, ExportAction.ExportProvider {
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -107,20 +112,6 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         }
     }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String PANEL_TITLE = NbBundle.getMessage(MemoryDiffPanel.class, "MemoryDiffPanel_PanelTitle"); // NOI18N
-    private static final String SNAPSHOTS_COMPARISON_STRING = NbBundle.getMessage(MemoryDiffPanel.class,
-                                                                                  "MemoryDiffPanel_SnapshotsComparisonString"); // NOI18N
-    private static final String SNAPSHOT_NOT_AVAILABLE_MSG = NbBundle.getMessage(MemoryDiffPanel.class,
-                                                                                 "MemoryDiffPanel_SnapshotNotAvailableMsg"); // NOI18N
-    private static final String STRING_NOT_FOUND_MSG = NbBundle.getMessage(MemoryDiffPanel.class,
-                                                                           "MemorySnapshotPanel_StringNotFoundMsg"); // NOI18N
-    private static final String FIND_ACTION_TOOLTIP = NbBundle.getMessage(MemoryDiffPanel.class,
-                                                                           "MemorySnapshotPanel_FindActionTooltip"); // NOI18N
-                                                                                                                     // -----
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private JButton findActionPresenter;
@@ -184,7 +175,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
             AbstractButton ab = (AbstractButton)findActionPresenter;
             ab.setIcon(Icons.getIcon(GeneralIcons.FIND));
             ab.setText(""); // NOI18N
-            ab.setToolTipText(FIND_ACTION_TOOLTIP);
+            ab.setToolTipText(Bundle.MemorySnapshotPanel_FindActionTooltip());
         }
 
         findActionPresenter.setEnabled(true);
@@ -218,8 +209,9 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         final String SNAPSHOT_2_LINK = "<a href='" + SNAPSHOT_2_MASK + "'>" //NOI18N
                                        + StringUtils.formatUserDate(new Date(snapshot2.getSnapshot().getTimeTaken())) + "</a>"; //NOI18N
 
-        HTMLLabel descriptionLabel = new HTMLLabel(MessageFormat.format(SNAPSHOTS_COMPARISON_STRING,
-                                                                        new Object[] { SNAPSHOT_1_LINK, SNAPSHOT_2_LINK })) {
+        HTMLLabel descriptionLabel = new HTMLLabel(Bundle.MemoryDiffPanel_SnapshotsComparisonString(
+                                                    SNAPSHOT_1_LINK, 
+                                                    SNAPSHOT_2_LINK)) {
             public Dimension getMinimumSize() {
                 return getPreferredSize();
             }
@@ -252,7 +244,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
                     srw.open();
                     srw.requestActive();
                 } else {
-                    ProfilerDialogs.displayWarning(SNAPSHOT_NOT_AVAILABLE_MSG);
+                    ProfilerDialogs.displayWarning(Bundle.MemoryDiffPanel_SnapshotNotAvailableMsg());
                 }
             }
         };
@@ -285,7 +277,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public String getTitle() {
-        return PANEL_TITLE;
+        return Bundle.MemoryDiffPanel_PanelTitle();
     }
 
     public BufferedImage getViewImage(boolean onlyVisibleArea) {
@@ -314,7 +306,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         memoryPanel.setFindString(findString);
 
         if (!memoryPanel.findFirst()) {
-            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
         }
     }
 
@@ -330,7 +322,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         }
 
         if (!memoryPanel.findNext()) {
-            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
         }
     }
 
@@ -346,7 +338,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         }
 
         if (!memoryPanel.findPrevious()) {
-            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
         }
     }
 
@@ -356,9 +348,9 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
 
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         if (memoryPanel instanceof DiffAllocResultsPanel) {
-            ((DiffAllocResultsPanel) memoryPanel).exportData(exportedFileType, eDD, PANEL_TITLE);
+            ((DiffAllocResultsPanel) memoryPanel).exportData(exportedFileType, eDD, Bundle.MemoryDiffPanel_PanelTitle());
         } else {
-            ((DiffLivenessResultsPanel) memoryPanel).exportData(exportedFileType, eDD, PANEL_TITLE);
+            ((DiffLivenessResultsPanel) memoryPanel).exportData(exportedFileType, eDD, Bundle.MemoryDiffPanel_PanelTitle());
         }
     }
 

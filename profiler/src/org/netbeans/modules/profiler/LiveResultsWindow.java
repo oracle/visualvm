@@ -129,6 +129,26 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LiveResultsWindow_NoProfilingResultsLabelText=No profiling results available yet",
+    "LiveResultsWindow_UpdateResultsAutomaticallyTooltip=Update Results Automatically",
+    "LiveResultsWindow_UpdateResultsNowTooltip=Update Results Now",
+    "LiveResultsWindow_RunGCTooltip=Run Garbage Collection in Profiled Application and Update Results",
+    "LiveResultsWindow_ErrorDisplayingStackTracesMsg=Allocation stack traces cannot be displayed for live results",
+    "LiveResultsWindow_ErrorDisplayingCallGraphMsg=Reverse call graphs can not be displayed for live results",
+    "LiveResultsWindow_ErrorInstrumentingRootMethodMsg=Error occured when instrumenting the new root method: {0}",
+    "LiveResultsWindow_LiveResultsAccessDescr=Live profiling results",
+    "LiveResultsWindow_LiveResultsTabName=Live Results",
+    "LiveResultsWindow_HistoryTabName=Class History",
+    "LiveResultsWindow_ClassHistoryTabName=History of {0}",
+    "History_LiveObjects=Live Objects",
+    "History_AllocatedObjects=Allocated Objects",
+    "History_AllocatedSize=Allocated Size",
+    "History_LoggingConfirmationCaption=Log Class History",
+    "History_LoggingResetMsg=This will reset history logging for {0}.\nDo you want to continue?",
+    "History_LoggingStopMsg=This will stop history logging for {0}.\nDo you want to continue?",
+    "LAB_ResultsWindowName=Live Profiling Results"
+})
 public final class LiveResultsWindow extends TopComponent
                                      implements ProfilingStateListener,
                                                 SaveViewAction.ViewProvider,
@@ -299,7 +319,7 @@ public final class LiveResultsWindow extends TopComponent
 
         public void showReverseCallGraph(final CPUResultsSnapshot snapshot, final int threadId, final int methodId, int view,
                                          int sortingColumn, boolean sortingOrder) {
-            throw new IllegalStateException(ERROR_DISPLAYING_CALL_GRAPH_MSG);
+            throw new IllegalStateException(Bundle.LiveResultsWindow_ErrorDisplayingCallGraphMsg());
         }
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
@@ -355,15 +375,15 @@ public final class LiveResultsWindow extends TopComponent
             String currentlyTrackedClassName = classHistoryManager.getTrackedClassName();
             if (currentlyTrackedClass != -1) {
                 if (classID == currentlyTrackedClass) {
-                    if (!ProfilerDialogs.displayConfirmationDNSA(MessageFormat.format(
-                            LOGGING_RESET_MSG, new Object[] { currentlyTrackedClassName }),
-                            LOGGING_CONFIRMATION_CAPTION, null, "History.historylogging.reset", true)) { //NOI18N
+                    if (!ProfilerDialogs.displayConfirmationDNSA(
+                            Bundle.History_LoggingResetMsg(currentlyTrackedClassName),
+                            Bundle.History_LoggingConfirmationCaption(), null, "History.historylogging.reset", true)) { //NOI18N
                         return;
                     }
                 } else {
-                    if (!ProfilerDialogs.displayConfirmationDNSA(MessageFormat.format(
-                            LOGGING_STOP_MSG, new Object[] { currentlyTrackedClassName }),
-                            LOGGING_CONFIRMATION_CAPTION, null, "History.historylogging.stop", true)) { //NOI18N
+                    if (!ProfilerDialogs.displayConfirmationDNSA(
+                            Bundle.History_LoggingStopMsg(currentlyTrackedClassName),
+                            Bundle.History_LoggingConfirmationCaption(), null, "History.historylogging.stop", true)) { //NOI18N
                         return;
                     }
                 }
@@ -403,9 +423,7 @@ public final class LiveResultsWindow extends TopComponent
                     Collections.reverse(chartActions);
 
                     tabs.setEnabledAt(1, true);
-                    tabs.setTitleAt(1, NbBundle.getMessage(LiveResultsWindow.class,
-                                                           "LiveResultsWindow_ClassHistoryTabName", //NOI18N
-                                                            new Object[] { className }));
+                    tabs.setTitleAt(1, Bundle.LiveResultsWindow_ClassHistoryTabName(className));
                     tabs.setSelectedIndex(1);
                 }
             });
@@ -415,32 +433,7 @@ public final class LiveResultsWindow extends TopComponent
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Logger LOGGER = Logger.getLogger("org.netbeans.modules.profiler.LiveResultsWindow"); // NOI18N
-                                                                                                              // -----
-                                                                                                              // I18N String constants
-    private static final String UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP = NbBundle.getMessage(LiveResultsWindow.class,
-                                                                                           "LiveResultsWindow_UpdateResultsAutomaticallyTooltip"); // NOI18N
-    private static final String UPDATE_RESULTS_NOW_TOOLTIP = NbBundle.getMessage(LiveResultsWindow.class,
-                                                                                 "LiveResultsWindow_UpdateResultsNowTooltip"); // NOI18N
-    private static final String RUN_GC_TOOLTIP = NbBundle.getMessage(LiveResultsWindow.class, "LiveResultsWindow_RunGCTooltip"); // NOI18N
-    private static final String NO_PROFILING_RESULTS_LABEL_TEXT = NbBundle.getMessage(LiveResultsWindow.class,
-                                                                                      "LiveResultsWindow_NoProfilingResultsLabelText"); // NOI18N
-    private static final String ERROR_DISPLAYING_STACK_TRACES_MSG = NbBundle.getMessage(LiveResultsWindow.class,
-                                                                                        "LiveResultsWindow_ErrorDisplayingStackTracesMsg"); // NOI18N
-    private static final String ERROR_DISPLAYING_CALL_GRAPH_MSG = NbBundle.getMessage(LiveResultsWindow.class,
-                                                                                      "LiveResultsWindow_ErrorDisplayingCallGraphMsg"); // NOI18N
-    private static final String ERROR_INSTRUMENTING_ROOT_METHOD_MSG = NbBundle.getMessage(LiveResultsWindow.class,
-                                                                                          "LiveResultsWindow_ErrorInstrumentingRootMethodMsg"); // NOI18N
-    private static final String LIVE_RESULTS_TAB_NAME = NbBundle.getMessage(LiveResultsWindow.class,
-                                                                            "LiveResultsWindow_LiveResultsTabName"); // NOI18N
-    private static final String HISTORY_TAB_NAME = NbBundle.getMessage(LiveResultsWindow.class, "LiveResultsWindow_HistoryTabName"); // NOI18N
-    private static final String LIVE_RESULTS_ACCESS_DESCR = NbBundle.getMessage(LiveResultsWindow.class,
-                                                                                "LiveResultsWindow_LiveResultsAccessDescr"); // NOI18N
-    private static final String LOGGING_CONFIRMATION_CAPTION = NbBundle.getMessage(LiveResultsWindow.class,
-                                                                                   "History_LoggingConfirmationCaption"); //NOI18N
-    private static final String LOGGING_RESET_MSG = NbBundle.getMessage(LiveResultsWindow.class, "History_LoggingResetMsg"); //NOI18N
-    private static final String LOGGING_STOP_MSG = NbBundle.getMessage(LiveResultsWindow.class, "History_LoggingStopMsg"); //NOI18N
 
-    // -----
     private static final String HELP_CTX_KEY = "LiveResultsWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static LiveResultsWindow defaultLiveInstance;
@@ -499,9 +492,9 @@ public final class LiveResultsWindow extends TopComponent
     }
     
     private void initUI() {
-        setName(NbBundle.getMessage(LiveResultsWindow.class, "LAB_ResultsWindowName")); // NOI18N
+        setName(Bundle.LAB_ResultsWindowName());
         setIcon(liveWindowIcon);
-        getAccessibleContext().setAccessibleDescription(LIVE_RESULTS_ACCESS_DESCR);
+        getAccessibleContext().setAccessibleDescription(Bundle.LiveResultsWindow_LiveResultsAccessDescr());
         //        setBorder(new EmptyBorder(5, 5, 5, 5));
         setLayout(new BorderLayout());
 
@@ -520,7 +513,7 @@ public final class LiveResultsWindow extends TopComponent
         noResultsPanel.setLayout(new BorderLayout());
         noResultsPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        final JLabel noResultsLabel = new JLabel(NO_PROFILING_RESULTS_LABEL_TEXT);
+        final JLabel noResultsLabel = new JLabel(Bundle.LiveResultsWindow_NoProfilingResultsLabelText());
 
         noResultsLabel.setFont(noResultsLabel.getFont().deriveFont(14));
         noResultsLabel.setIcon(Icons.getIcon(ProfilerIcons.MONITORING_32));
@@ -779,12 +772,12 @@ public final class LiveResultsWindow extends TopComponent
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         if (currentDisplayComponent == memoryTabPanel) {
             if (tabs.getSelectedComponent() instanceof LiveAllocResultsPanel) {
-                ((LiveAllocResultsPanel) currentDisplay).exportData(exportedFileType, eDD, NbBundle.getMessage(LiveResultsWindow.class, "LAB_ResultsWindowName"));
+                ((LiveAllocResultsPanel) currentDisplay).exportData(exportedFileType, eDD, Bundle.LAB_ResultsWindowName());
             } else if (tabs.getSelectedComponent() instanceof LiveLivenessResultsPanel) {
-                ((LiveLivenessResultsPanel) currentDisplay).exportData(exportedFileType, eDD, NbBundle.getMessage(LiveResultsWindow.class, "LAB_ResultsWindowName"));
+                ((LiveLivenessResultsPanel) currentDisplay).exportData(exportedFileType, eDD, Bundle.LAB_ResultsWindowName());
             }
         } else if (currentDisplayComponent instanceof LiveFlatProfilePanel) {
-            ((LiveFlatProfilePanel) currentDisplay).exportData(exportedFileType, eDD, NbBundle.getMessage(LiveResultsWindow.class, "LAB_ResultsWindowName"));
+            ((LiveFlatProfilePanel) currentDisplay).exportData(exportedFileType, eDD, Bundle.LAB_ResultsWindowName());
         }
     }
 
@@ -932,8 +925,8 @@ public final class LiveResultsWindow extends TopComponent
                     autoRefresh = autoToggle.isSelected();
                 }
             });
-        autoToggle.setToolTipText(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
-        autoToggle.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_AUTOMATICALLY_TOOLTIP);
+        autoToggle.setToolTipText(Bundle.LiveResultsWindow_UpdateResultsAutomaticallyTooltip());
+        autoToggle.getAccessibleContext().setAccessibleName(Bundle.LiveResultsWindow_UpdateResultsAutomaticallyTooltip());
 
         updateNowButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW));
         updateNowButton.addActionListener(new ActionListener() {
@@ -941,8 +934,8 @@ public final class LiveResultsWindow extends TopComponent
                     requestProfilingDataUpdate(true);
                 }
             });
-        updateNowButton.setToolTipText(UPDATE_RESULTS_NOW_TOOLTIP);
-        updateNowButton.getAccessibleContext().setAccessibleName(UPDATE_RESULTS_NOW_TOOLTIP);
+        updateNowButton.setToolTipText(Bundle.LiveResultsWindow_UpdateResultsNowTooltip());
+        updateNowButton.getAccessibleContext().setAccessibleName(Bundle.LiveResultsWindow_UpdateResultsNowTooltip());
 
         runGCButton = new JButton(Icons.getIcon(ProfilerIcons.RUN_GC));
         runGCButton.addActionListener(new ActionListener() {
@@ -957,8 +950,8 @@ public final class LiveResultsWindow extends TopComponent
                     requestProfilingDataUpdate(true);
                 }
             });
-        runGCButton.setToolTipText(RUN_GC_TOOLTIP);
-        runGCButton.getAccessibleContext().setAccessibleName(RUN_GC_TOOLTIP);
+        runGCButton.setToolTipText(Bundle.LiveResultsWindow_RunGCTooltip());
+        runGCButton.getAccessibleContext().setAccessibleName(Bundle.LiveResultsWindow_RunGCTooltip());
 
         // todo: add profiler listener to enable/disable buttons
         toolBar.add(autoToggle);
@@ -990,8 +983,8 @@ public final class LiveResultsWindow extends TopComponent
                     tabs.removeAll();
                 }
 
-                tabs.addTab(LIVE_RESULTS_TAB_NAME, allocPanel);
-                tabs.addTab(HISTORY_TAB_NAME, historyPanel);
+                tabs.addTab(Bundle.LiveResultsWindow_LiveResultsTabName(), allocPanel);
+                tabs.addTab(Bundle.LiveResultsWindow_HistoryTabName(), historyPanel);
                 tabs.setEnabledAt(1, false);
                 aPanel = allocPanel;
 
@@ -1009,8 +1002,8 @@ public final class LiveResultsWindow extends TopComponent
                     tabs.removeAll();
                 }
 
-                tabs.addTab(LIVE_RESULTS_TAB_NAME, livenessPanel);
-                tabs.addTab(HISTORY_TAB_NAME, historyPanel);
+                tabs.addTab(Bundle.LiveResultsWindow_LiveResultsTabName(), livenessPanel);
+                tabs.addTab(Bundle.LiveResultsWindow_HistoryTabName(), historyPanel);
                 tabs.setEnabledAt(1, false);
                 aPanel = livenessPanel;
 

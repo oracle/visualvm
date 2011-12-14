@@ -167,11 +167,13 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     
     public boolean equals(Object o) {
         if (!(o instanceof PrestimeCPUCCTNode)) return false;
+        if (isThreadNode()) return super.equals(o); // #205942
         if (parent == null) return super.equals(o); // Required for filtering & sorting
         return getNodeName().equals(((PrestimeCPUCCTNode)o).getNodeName());
     }
     
     public int hashCode() {
+        if (isThreadNode()) return super.hashCode(); // #205942
         if (parent == null) return super.hashCode(); // Required for filtering & sorting
         return getNodeName().hashCode();
     }

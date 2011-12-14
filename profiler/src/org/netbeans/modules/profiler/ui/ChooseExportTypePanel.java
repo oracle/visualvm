@@ -59,18 +59,15 @@ import org.openide.DialogDisplayer;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "ChooseExportTypePanel_ChooseExportTypeDialogCaption=Select Data to Export",
+    "ChooseExportTypePanel_CallChainsRadioText=Call Chains",
+    "ChooseExportTypePanel_NamesInvocationsTimingsRadioText=Names, Invocations and Timings",
+    "ChooseExportTypePanel_NamesInvocationsRadioText=Names and Invocations",
+    "ChooseExportTypePanel_NamesOnlyRadioText=Names Only",
+    "ChooseExportTypePanel_FlatProfileRadioText=Flat Profile"
+})
 public final class ChooseExportTypePanel extends javax.swing.JPanel implements ActionListener {
-
-  // -----
-  // I18N String constants
-  private static final String CHOOSE_EXPORT_TYPE_DIALOG_CAPTION = NbBundle.getMessage(ChooseExportTypePanel.class, "ChooseExportTypePanel_ChooseExportTypeDialogCaption");
-  private static final String CALL_CHAINS_RADIO_TEXT = NbBundle.getMessage(ChooseExportTypePanel.class, "ChooseExportTypePanel_CallChainsRadioText");
-  private static final String NAMES_INVOCATIONS_TIMINGS_RADIO_TEXT = NbBundle.getMessage(ChooseExportTypePanel.class, "ChooseExportTypePanel_NamesInvocationsTimingsRadioText");
-  private static final String NAMES_INVOCATIONS_RADIO_TEXT = NbBundle.getMessage(ChooseExportTypePanel.class, "ChooseExportTypePanel_NamesInvocationsRadioText");
-  private static final String NAMES_ONLY_RADIO_TEXT = NbBundle.getMessage(ChooseExportTypePanel.class, "ChooseExportTypePanel_NamesOnlyRadioText");
-  private static final String FLAT_PROFILE_RADIO_TEXT = NbBundle.getMessage(ChooseExportTypePanel.class, "ChooseExportTypePanel_FlatProfileRadioText");
-  // -----
-  
   public final static int CANCELLED = -1;
   public final static int FLAT = 0;
   public final static int CCT_1 = 1;
@@ -83,7 +80,7 @@ public final class ChooseExportTypePanel extends javax.swing.JPanel implements A
   public static int chooseExportType () {
     final ChooseExportTypePanel cetp = getDefault ();
 
-    final DialogDescriptor dd = new DialogDescriptor(cetp, CHOOSE_EXPORT_TYPE_DIALOG_CAPTION);
+    final DialogDescriptor dd = new DialogDescriptor(cetp, Bundle.ChooseExportTypePanel_ChooseExportTypeDialogCaption());
     final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
     d.setVisible(true);
 
@@ -138,7 +135,7 @@ public final class ChooseExportTypePanel extends javax.swing.JPanel implements A
         setLayout(new java.awt.GridBagLayout());
 
         whichRadioGroup.add(callChainsRadio);
-        callChainsRadio.setText(CALL_CHAINS_RADIO_TEXT);
+        callChainsRadio.setText(Bundle.ChooseExportTypePanel_CallChainsRadioText());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -146,7 +143,7 @@ public final class ChooseExportTypePanel extends javax.swing.JPanel implements A
         add(callChainsRadio, gridBagConstraints);
 
         ccTypeRadioGroup.add(ccType1Radio);
-        ccType1Radio.setText(NAMES_INVOCATIONS_TIMINGS_RADIO_TEXT);
+        ccType1Radio.setText(Bundle.ChooseExportTypePanel_NamesInvocationsTimingsRadioText());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -155,7 +152,7 @@ public final class ChooseExportTypePanel extends javax.swing.JPanel implements A
         add(ccType1Radio, gridBagConstraints);
 
         ccTypeRadioGroup.add(ccType2Radio);
-        ccType2Radio.setText(NAMES_INVOCATIONS_RADIO_TEXT);
+        ccType2Radio.setText(Bundle.ChooseExportTypePanel_NamesInvocationsRadioText());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -164,7 +161,7 @@ public final class ChooseExportTypePanel extends javax.swing.JPanel implements A
         add(ccType2Radio, gridBagConstraints);
 
         ccTypeRadioGroup.add(ccType3Radio);
-        ccType3Radio.setText(NAMES_ONLY_RADIO_TEXT);
+        ccType3Radio.setText(Bundle.ChooseExportTypePanel_NamesOnlyRadioText());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -173,7 +170,7 @@ public final class ChooseExportTypePanel extends javax.swing.JPanel implements A
         add(ccType3Radio, gridBagConstraints);
 
         whichRadioGroup.add(flatRadio);
-        flatRadio.setText(FLAT_PROFILE_RADIO_TEXT);
+        flatRadio.setText(Bundle.ChooseExportTypePanel_FlatProfileRadioText());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;

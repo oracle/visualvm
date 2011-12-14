@@ -51,9 +51,11 @@ import org.openide.util.NbBundle;
  *
  * @author  Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "IntegrationTypeWizardPanelUI_IntegrationHintMsg=<strong>Automatic</strong> integration configures the {0} for profiling automatically by generating or modifying appropriate config files. <strong>Manual</strong> integration suggests modifications which you need to perform manually to integrate the Profiler with profiled {0}."
+})
 public class SelectIntegrationTypePanelUI extends javax.swing.JPanel {
   private SelectIntegrationTypePanel.Model model = null;
-  private final String INTEGRATION_TYPE_HELP=NbBundle.getMessage(this.getClass(), "IntegrationTypeWizardPanelUI_IntegrationHintMsg"); // NOI18N
   /**
    * Creates new form SelectIntegrationTypePanelUI
    */
@@ -203,7 +205,7 @@ public class SelectIntegrationTypePanelUI extends javax.swing.JPanel {
     }
     
     final String providerName = model.getProviderName();
-    hintPanel.setHint(MessageFormat.format(INTEGRATION_TYPE_HELP, new Object[]{providerName != null ? providerName : ""})); // NOI18N
+    hintPanel.setHint(Bundle.IntegrationTypeWizardPanelUI_IntegrationHintMsg(providerName != null ? providerName : "")); // NOI18N
   }
 }
 
