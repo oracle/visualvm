@@ -66,16 +66,11 @@ import org.openide.ErrorManager;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "AnalysisController_CannotResolveClassMsg=Cannot resolve class {0}",
+    "AnalysisController_CannotResolveInstanceMsg=Cannot resolve instance #{0} of class {1}"
+})
 public class AnalysisController extends AbstractTopLevelController implements NavigationHistoryManager.NavigationHistoryCapable {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String CANNOT_RESOLVE_CLASS_MSG = NbBundle.getMessage(AnalysisController.class,
-                                                                               "AnalysisController_CannotResolveClassMsg"); // NOI18N
-    private static final String CANNOT_RESOLVE_INSTANCE_MSG = NbBundle.getMessage(AnalysisController.class,
-                                                                                  "AnalysisController_CannotResolveInstanceMsg"); // NOI18N
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HeapFragmentWalker heapFragmentWalker;
@@ -182,11 +177,10 @@ public class AnalysisController extends AbstractTopLevelController implements Na
                 if (i != null) {
                     heapFragmentWalker.getClassesController().showInstance(i);
                 } else {
-                    ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
-                                                                       new Object[] { id[1], c.getName() }));
+                    ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveInstanceMsg(id[1], c.getName()));
                 }
             } else {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(id[0]));
             }
         } else if (urls.startsWith("file://class/")) { // NOI18N
             urls = urls.substring("file://class/".length()); // NOI18N
@@ -196,7 +190,7 @@ public class AnalysisController extends AbstractTopLevelController implements Na
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { urls }));
+                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(urls));
             }
         }
     }

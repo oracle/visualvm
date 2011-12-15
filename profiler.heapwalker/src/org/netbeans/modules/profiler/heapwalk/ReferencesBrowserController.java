@@ -74,6 +74,14 @@ import org.openide.DialogDisplayer;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ReferencesBrowserController_NoInstanceSelectedString=<No Instance Selected>",
+    "ReferencesBrowserController_NoneString=<none>",
+    "ReferencesBrowserController_ProgressDialogCaption=Progress...",
+    "ReferencesBrowserController_ProgressMsg=Computing nearest GC root...",
+    "ReferencesBrowserController_SelfGcRootMsg=The instance is a GC root.",
+    "ReferencesBrowserController_NoGcRootMsg=No GC root found."
+})
 public class ReferencesBrowserController extends AbstractController {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
@@ -121,36 +129,19 @@ public class ReferencesBrowserController extends AbstractController {
 //        }
 //    }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String NO_INSTANCE_SELECTED_STRING = NbBundle.getMessage(ReferencesBrowserController.class,
-                                                                                  "ReferencesBrowserController_NoInstanceSelectedString"); // NOI18N
-    private static final String NONE_STRING = NbBundle.getMessage(ReferencesBrowserController.class,
-                                                                  "ReferencesBrowserController_NoneString"); // NOI18N
-    private static final String PROGRESS_DIALOG_CAPTION = NbBundle.getMessage(ReferencesBrowserController.class,
-                                                                              "ReferencesBrowserController_ProgressDialogCaption"); // NOI18N
-    private static final String PROGRESS_MSG = NbBundle.getMessage(ReferencesBrowserController.class,
-                                                                   "ReferencesBrowserController_ProgressMsg"); // NOI18N
-    private static final String SELF_GCROOT_MSG = NbBundle.getMessage(ReferencesBrowserController.class,
-                                                                      "ReferencesBrowserController_SelfGcRootMsg"); // NOI18N
-    private static final String NO_GCROOT_MSG = NbBundle.getMessage(ReferencesBrowserController.class,
-                                                                    "ReferencesBrowserController_NoGcRootMsg"); // NOI18N
-                                                                                                                // -----
 
     // --- Public interface ------------------------------------------------------
     public static final AbstractHeapWalkerNode EMPTY_INSTANCE_NODE = new AbstractHeapWalkerNode(null) {
         protected String computeName() {
-            return NO_INSTANCE_SELECTED_STRING;
+            return Bundle.ReferencesBrowserController_NoInstanceSelectedString();
         }
 
         protected String computeType() {
-            return NONE_STRING;
+            return Bundle.ReferencesBrowserController_NoneString();
         }
 
         protected String computeValue() {
-            return NONE_STRING;
+            return Bundle.ReferencesBrowserController_NoneString();
         }
         
         protected String computeSize() {
@@ -234,7 +225,7 @@ public class ReferencesBrowserController extends AbstractController {
                 SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             if (!done) {
-                                progress = createProgressPanel(PROGRESS_MSG,progressModel);
+                                progress = createProgressPanel(Bundle.ReferencesBrowserController_ProgressMsg(),progressModel);
                                 progress.setVisible(true);
                             }
                         }
@@ -251,13 +242,13 @@ public class ReferencesBrowserController extends AbstractController {
 
                 if (gcRootNode != null) {
                     if (instanceNode == gcRootNode) {
-                        ProfilerDialogs.displayInfo(SELF_GCROOT_MSG);
+                        ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_SelfGcRootMsg());
                     } else {
                         ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
                         controlerUI.selectNode(gcRootNode);
                     }
                 } else {
-                    ProfilerDialogs.displayInfo(NO_GCROOT_MSG);
+                    ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_NoGcRootMsg());
                 }
             }
         }.execute();
@@ -308,7 +299,7 @@ public class ReferencesBrowserController extends AbstractController {
             progress.setModel(model);
         }
         panel.add(progress, BorderLayout.SOUTH);
-        dialog = DialogDisplayer.getDefault().createDialog(new DialogDescriptor(panel, PROGRESS_DIALOG_CAPTION, true, new Object[] {  },
+        dialog = DialogDisplayer.getDefault().createDialog(new DialogDescriptor(panel, Bundle.ReferencesBrowserController_ProgressDialogCaption(), true, new Object[] {  },
                                                            DialogDescriptor.CANCEL_OPTION, DialogDescriptor.RIGHT_ALIGN,
                                                            null, null));
 

@@ -95,6 +95,7 @@ public final class IdeSnapshotAction implements ActionListener {
         return tc;
     }
 
+    @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot: {0}")
     private IdeSnapshot snapshot() {
         File file = snapshotFile();
         if (file == null) return null;
@@ -104,8 +105,7 @@ public final class IdeSnapshotAction implements ActionListener {
             
             return new IdeSnapshot(primary, uigestureFO);
         } catch (Throwable t) {
-            ProfilerDialogs.displayError(NbBundle.getMessage(IdeSnapshotAction.class,
-                    "MSG_SnapshotLoadFailedMsg", file.getName())); // NOI18N
+            ProfilerDialogs.displayError(Bundle.MSG_SnapshotLoadFailedMsg(file.getName()));
             return null;
         }
     }
@@ -129,18 +129,20 @@ public final class IdeSnapshotAction implements ActionListener {
         }
     }
 
+    @NbBundle.Messages({
+        "ACTION_IdeSnapshot_dialog=Load IDE Snapshot",
+        "ACTION_IdeSnapshot_filter=IDE Snapshots"
+    })
     private static JFileChooser createFileChooser() {
         JFileChooser chooser = new JFileChooser();
 
-        chooser.setDialogTitle(NbBundle.getMessage(IdeSnapshotAction.class,
-                "ACTION_IdeSnapshot_dialog")); // NOI18N
+        chooser.setDialogTitle(Bundle.ACTION_IdeSnapshot_dialog());
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         chooser.setAcceptAllFileFilterUsed(false);
 
-        chooser.addChoosableFileFilter(Filter.create(NbBundle.getMessage(
-                IdeSnapshotAction.class, "ACTION_IdeSnapshot_filter"), ".npss")); // NOI18N
+        chooser.addChoosableFileFilter(Filter.create(Bundle.ACTION_IdeSnapshot_filter(), ".npss")); // NOI18N
 
         return chooser;
     }
