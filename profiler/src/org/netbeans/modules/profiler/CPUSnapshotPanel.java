@@ -93,6 +93,30 @@ import org.openide.util.Lookup;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "CPUSnapshotPanel_MethodsString=Methods",
+    "CPUSnapshotPanel_ClassesString=Classes",
+    "CPUSnapshotPanel_PackagesString=Packages",
+    "CPUSnapshotPanel_CallTreeString=Call Tree",
+    "CPUSnapshotPanel_HotSpotsString=Hot Spots",
+    "CPUSnapshotPanel_FindInStatement=Find in {0}",
+    "CPUSnapshotPanel_CombinedString=Combined",
+    "CPUSnapshotPanel_InfoString=Info",
+    "CPUSnapshotPanel_CallTreeTabDescr=Call Tree View - Execution call tree for application threads",
+    "CPUSnapshotPanel_HotSpotTabDescr=Hot Spots View - List of methods which the application spent most time executing",
+    "CPUSnapshotPanel_CombinedTabDescr=Combined View - Call Tree and Hot Spots",
+    "CPUSnapshotPanel_InfoTabDescr=Snapshot Information",
+    "CPUSnapshotPanel_AllThreadsItem=<All Threads>",
+    "CPUSnapshotPanel_ViewLabelString=View:",
+    "CPUSnapshotPanel_ToggleDownToolTip=When selecting item in Call Tree, automatically select corresponding row in Hot Spots.",
+    "CPUSnapshotPanel_ToggleUpToolTip=When selecting item in Hot Spots, automatically select first occurence in Call Tree. Use Find Previous/Next to see other occurences.",
+    "CPUSnapshotPanel_AggregationComboAccessName=Results aggregation level.",
+    "CPUSnapshotPanel_AggregationComboAccessDescr=Select which aggregation level will be used for showing collected results.",
+    "CPUSnapshotPanel_ThreadsComboAccessName=List of application threads.",
+    "CPUSnapshotPanel_ThreadsComboAccessDescr=Choose application thread to display collected results for the thread.",
+    "CPUSnapshotPanel_StringNotFoundMsg=String not found in results",
+    "CPUSnapshotPanel_FindActionTooltip=Find in Results... (Ctrl+F)"
+})
 public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListener, ChangeListener,
                                                                      SnapshotResultsWindow.FindPerformer,
                                                                      SaveViewAction.ViewProvider, ExportAction.ExportProvider {
@@ -276,43 +300,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String METHODS_STRING = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_MethodsString"); // NOI18N
-    private static final String CLASSES_STRING = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_ClassesString"); // NOI18N
-    private static final String PACKAGES_STRING = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_PackagesString"); // NOI18N
-    private static final String CALLTREE_STRING = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_CallTreeString"); // NOI18N
-    private static final String HOTSPOTS_STRING = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_HotSpotsString"); // NOI18N
-    private static final String COMBINED_STRING = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_CombinedString"); // NOI18N
-    private static final String INFO_STRING = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_InfoString"); // NOI18N
-    private static final String CALLTREE_TAB_DESCR = NbBundle.getMessage(CPUSnapshotPanel.class,
-                                                                         "CPUSnapshotPanel_CallTreeTabDescr"); // NOI18N
-    private static final String HOTSPOT_TAB_DESCR = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_HotSpotTabDescr"); // NOI18N
-    private static final String COMBINED_TAB_DESCR = NbBundle.getMessage(CPUSnapshotPanel.class,
-                                                                         "CPUSnapshotPanel_CombinedTabDescr"); // NOI18N
-    private static final String INFO_TAB_DESCR = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_InfoTabDescr"); // NOI18N
-    private static final String ALL_THREADS_ITEM = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_AllThreadsItem"); // NOI18N
-    private static final String VIEW_LABEL_STRING = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_ViewLabelString"); // NOI18N
-    private static final String TOGGLE_DOWN_TOOLTIP = NbBundle.getMessage(CPUSnapshotPanel.class,
-                                                                          "CPUSnapshotPanel_ToggleDownToolTip"); // NOI18N
-    private static final String TOGGLE_UP_TOOLTIP = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_ToggleUpToolTip"); // NOI18N
-    private static final String FIND_IN_STATEMENT = NbBundle.getMessage(CPUSnapshotPanel.class, "CPUSnapshotPanel_FindInStatement"); // NOI18N
-    private static final String AGGREGATION_COMBO_ACCESS_NAME = NbBundle.getMessage(CPUSnapshotPanel.class,
-                                                                                    "CPUSnapshotPanel_AggregationComboAccessName"); // NOI18N
-    private static final String AGGREGATION_COMBO_ACCESS_DESCR = NbBundle.getMessage(CPUSnapshotPanel.class,
-                                                                                     "CPUSnapshotPanel_AggregationComboAccessDescr"); // NOI18N
-    private static final String THREADS_COMBO_ACCESS_NAME = NbBundle.getMessage(CPUSnapshotPanel.class,
-                                                                                "CPUSnapshotPanel_ThreadsComboAccessName"); // NOI18N
-    private static final String THREADS_COMBO_ACCESS_DESCR = NbBundle.getMessage(CPUSnapshotPanel.class,
-                                                                                 "CPUSnapshotPanel_ThreadsComboAccessDescr"); // NOI18N
-    private static final String STRING_NOT_FOUND_MSG = NbBundle.getMessage(CPUSnapshotPanel.class,
-                                                                           "CPUSnapshotPanel_StringNotFoundMsg"); // NOI18N
-    private static final String FIND_ACTION_TOOLTIP = NbBundle.getMessage(CPUSnapshotPanel.class,
-                                                                           "CPUSnapshotPanel_FindActionTooltip"); // NOI18N
-    private static final String FIND_IN_HOTSPOTS_STRING = MessageFormat.format(FIND_IN_STATEMENT, new Object[] { HOTSPOTS_STRING });
-    private static final String FIND_IN_CALLTREE_STRING = MessageFormat.format(FIND_IN_STATEMENT, new Object[] { CALLTREE_STRING });
-
-    // -----
     private static final Icon CLASSES_ICON = Icons.getIcon(LanguageIcons.CLASS);
     private static final Icon METHODS_ICON = Icons.getIcon(LanguageIcons.METHODS);
     private static final Icon PACKAGES_ICON = Icons.getIcon(LanguageIcons.PACKAGE);
@@ -381,22 +368,22 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         combinedCCT.setSorting(sortingColumn, sortingOrder);
 
         if (cctPanel.getPopupFindItem() != null) {
-            cctPanel.getPopupFindItem().setText(FIND_IN_HOTSPOTS_STRING);
+            cctPanel.getPopupFindItem().setText(Bundle.CPUSnapshotPanel_FindInStatement(Bundle.CPUSnapshotPanel_HotSpotsString()));
             cctPanel.getPopupFindItem().setVisible(true);
         }
 
         if (flatPanel.getPopupFindItem() != null) {
-            flatPanel.getPopupFindItem().setText(FIND_IN_CALLTREE_STRING);
+            flatPanel.getPopupFindItem().setText(Bundle.CPUSnapshotPanel_FindInStatement(Bundle.CPUSnapshotPanel_CallTreeString()));
             flatPanel.getPopupFindItem().setVisible(true);
         }
 
         if (combinedFlat.getPopupFindItem() != null) {
-            combinedFlat.getPopupFindItem().setText(FIND_IN_CALLTREE_STRING);
+            combinedFlat.getPopupFindItem().setText(Bundle.CPUSnapshotPanel_FindInStatement(Bundle.CPUSnapshotPanel_CallTreeString()));
             combinedFlat.getPopupFindItem().setVisible(true);
         }
 
         if (combinedCCT.getPopupFindItem() != null) {
-            combinedCCT.getPopupFindItem().setText(FIND_IN_HOTSPOTS_STRING);
+            combinedCCT.getPopupFindItem().setText(Bundle.CPUSnapshotPanel_FindInStatement(Bundle.CPUSnapshotPanel_HotSpotsString()));
             combinedCCT.getPopupFindItem().setVisible(true);
         }
 
@@ -448,10 +435,10 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                 }
             });
 
-        tabs.addTab(CALLTREE_STRING, CALL_TREE_TAB_ICON, cctPanel, CALLTREE_TAB_DESCR);
-        tabs.addTab(HOTSPOTS_STRING, HOTSPOTS_TAB_ICON, flatPanel, HOTSPOT_TAB_DESCR);
-        tabs.addTab(COMBINED_STRING, COMBINED_TAB_ICON, combined, COMBINED_TAB_DESCR);
-        tabs.addTab(INFO_STRING, INFO_TAB_ICON, infoPanel, INFO_TAB_DESCR);
+        tabs.addTab(Bundle.CPUSnapshotPanel_CallTreeString(), CALL_TREE_TAB_ICON, cctPanel, Bundle.CPUSnapshotPanel_CallTreeTabDescr());
+        tabs.addTab(Bundle.CPUSnapshotPanel_HotSpotsString(), HOTSPOTS_TAB_ICON, flatPanel, Bundle.CPUSnapshotPanel_HotSpotTabDescr());
+        tabs.addTab(Bundle.CPUSnapshotPanel_CombinedString(), COMBINED_TAB_ICON, combined, Bundle.CPUSnapshotPanel_CombinedTabDescr());
+        tabs.addTab(Bundle.CPUSnapshotPanel_InfoString(), INFO_TAB_ICON, infoPanel, Bundle.CPUSnapshotPanel_InfoTabDescr());
         add(tabs, BorderLayout.CENTER);
 
         tabs.addChangeListener(this);
@@ -476,14 +463,17 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         toolBar.addSeparator();
 
-        aggregationCombo = new JComboBox(new Object[] { METHODS_STRING, CLASSES_STRING, PACKAGES_STRING }) {
+        aggregationCombo = new JComboBox(new Object[] { 
+            Bundle.CPUSnapshotPanel_MethodsString(), 
+            Bundle.CPUSnapshotPanel_ClassesString(), 
+            Bundle.CPUSnapshotPanel_PackagesString()}) {
                 public Dimension getMaximumSize() {
                     return new Dimension(getPreferredSize().width + 20, getPreferredSize().height);
                 }
                 ;
             };
-        aggregationCombo.getAccessibleContext().setAccessibleName(AGGREGATION_COMBO_ACCESS_NAME);
-        aggregationCombo.getAccessibleContext().setAccessibleDescription(AGGREGATION_COMBO_ACCESS_DESCR);
+        aggregationCombo.getAccessibleContext().setAccessibleName(Bundle.CPUSnapshotPanel_AggregationComboAccessName());
+        aggregationCombo.getAccessibleContext().setAccessibleDescription(Bundle.CPUSnapshotPanel_AggregationComboAccessDescr());
 
         currentAggregationMode = CPUResultsSnapshot.METHOD_LEVEL_VIEW;
 
@@ -491,7 +481,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         Object[] threadNames = new Object[tn.length + 1];
         threadNames[0] = new Object() {
                 public String toString() {
-                    return ALL_THREADS_ITEM;
+                    return Bundle.CPUSnapshotPanel_AllThreadsItem();
                 }
             };
 
@@ -518,8 +508,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                     return d;
                 }
             };
-        threadsCombo.getAccessibleContext().setAccessibleName(THREADS_COMBO_ACCESS_NAME);
-        threadsCombo.getAccessibleContext().setAccessibleDescription(THREADS_COMBO_ACCESS_DESCR);
+        threadsCombo.getAccessibleContext().setAccessibleName(Bundle.CPUSnapshotPanel_ThreadsComboAccessName());
+        threadsCombo.getAccessibleContext().setAccessibleDescription(Bundle.CPUSnapshotPanel_ThreadsComboAccessDescr());
 
         aggregationCombo.setRenderer(new DefaultListCellRenderer() {
                 public Component getListCellRendererComponent(final JList list, final Object value, final int index,
@@ -529,11 +519,11 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                                                                                                                 isSelected,
                                                                                                                 cellHasFocus);
 
-                    if (value == METHODS_STRING) {
+                    if (Bundle.CPUSnapshotPanel_MethodsString().equals(value)) {
                         dlcr.setIcon(METHODS_ICON);
-                    } else if (value == CLASSES_STRING) {
+                    } else if (Bundle.CPUSnapshotPanel_ClassesString().equals(value)) {
                         dlcr.setIcon(CLASSES_ICON);
-                    } else if (value == PACKAGES_STRING) {
+                    } else if (Bundle.CPUSnapshotPanel_PackagesString().equals(value)) {
                         dlcr.setIcon(PACKAGES_ICON);
                     }
 
@@ -541,7 +531,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                 }
             });
 
-        JLabel lab = new JLabel(VIEW_LABEL_STRING);
+        JLabel lab = new JLabel(Bundle.CPUSnapshotPanel_ViewLabelString());
         lab.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
         lab.setLabelFor(aggregationCombo);
 
@@ -558,15 +548,15 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         slaveToggleButtonDown = new JToggleButton(SLAVE_DOWN_ICON);
         slaveToggleButtonDown.setSelected(slaveModeDown);
         slaveToggleButtonDown.addActionListener(this);
-        slaveToggleButtonDown.setToolTipText(TOGGLE_DOWN_TOOLTIP);
-        slaveToggleButtonDown.getAccessibleContext().setAccessibleName(TOGGLE_DOWN_TOOLTIP);
+        slaveToggleButtonDown.setToolTipText(Bundle.CPUSnapshotPanel_ToggleDownToolTip());
+        slaveToggleButtonDown.getAccessibleContext().setAccessibleName(Bundle.CPUSnapshotPanel_ToggleDownToolTip());
         toolBar.add(slaveToggleButtonDown);
 
         slaveToggleButtonUp = new JToggleButton(SLAVE_UP_ICON);
         slaveToggleButtonUp.setSelected(slaveModeUp);
         slaveToggleButtonUp.addActionListener(this);
-        slaveToggleButtonUp.setToolTipText(TOGGLE_UP_TOOLTIP);
-        slaveToggleButtonUp.getAccessibleContext().setAccessibleName(TOGGLE_UP_TOOLTIP);
+        slaveToggleButtonUp.setToolTipText(Bundle.CPUSnapshotPanel_ToggleUpToolTip());
+        slaveToggleButtonUp.getAccessibleContext().setAccessibleName(Bundle.CPUSnapshotPanel_ToggleUpToolTip());
         toolBar.add(slaveToggleButtonUp);
 
         toolBar.add(threadsCombo);
@@ -583,7 +573,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             AbstractButton ab = (AbstractButton)findActionPresenter;
             ab.setIcon(Icons.getIcon(GeneralIcons.FIND));
             ab.setText(""); // NOI18N
-            ab.setToolTipText(FIND_ACTION_TOOLTIP);
+            ab.setToolTipText(Bundle.CPUSnapshotPanel_FindActionTooltip());
         }
 
         findActionPresenter.setEnabled(false);
@@ -666,11 +656,11 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         if (src == aggregationCombo) {
             Object sel = ((JComboBox) aggregationCombo).getSelectedItem();
 
-            if (sel == METHODS_STRING) {
+            if (Bundle.CPUSnapshotPanel_MethodsString().equals(sel)) {
                 changeView(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-            } else if (sel == CLASSES_STRING) {
+            } else if (Bundle.CPUSnapshotPanel_ClassesString().equals(sel)) {
                 changeView(CPUResultsSnapshot.CLASS_LEVEL_VIEW);
-            } else if (sel == PACKAGES_STRING) {
+            } else if (Bundle.CPUSnapshotPanel_PackagesString().equals(sel)) {
                 changeView(CPUResultsSnapshot.PACKAGE_LEVEL_VIEW);
             }
         } else if (src == threadsCombo) {
@@ -837,7 +827,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(Bundle.CPUSnapshotPanel_StringNotFoundMsg());
         }
     }
 
@@ -929,7 +919,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(Bundle.CPUSnapshotPanel_StringNotFoundMsg());
         }
     }
 
@@ -1021,7 +1011,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
 
         if (!found) {
-            ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+            ProfilerDialogs.displayInfo(Bundle.CPUSnapshotPanel_StringNotFoundMsg());
         }
     }
 
@@ -1100,15 +1090,15 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         switch (viewType) {
             case CPUResultsSnapshot.PACKAGE_LEVEL_VIEW:
-                aggregationCombo.setSelectedItem(PACKAGES_STRING);
+                aggregationCombo.setSelectedItem(Bundle.CPUSnapshotPanel_PackagesString());
 
                 break;
             case CPUResultsSnapshot.CLASS_LEVEL_VIEW:
-                aggregationCombo.setSelectedItem(CLASSES_STRING);
+                aggregationCombo.setSelectedItem(Bundle.CPUSnapshotPanel_ClassesString());
 
                 break;
             case CPUResultsSnapshot.METHOD_LEVEL_VIEW:default:
-                aggregationCombo.setSelectedItem(METHODS_STRING);
+                aggregationCombo.setSelectedItem(Bundle.CPUSnapshotPanel_MethodsString());
 
                 break;
         }
@@ -1125,15 +1115,15 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         if (tabs.getSelectedComponent() instanceof CCTDisplay) { // Call tree
-            cctPanel.exportData(exportedFileType,eDD,false, CALLTREE_STRING);
+            cctPanel.exportData(exportedFileType,eDD,false, Bundle.CPUSnapshotPanel_CallTreeString());
         } else if (tabs.getSelectedComponent() instanceof SnapshotFlatProfilePanel) { // Hot Spots
-            flatPanel.exportData(exportedFileType,eDD,false, HOTSPOTS_STRING);
+            flatPanel.exportData(exportedFileType,eDD,false, Bundle.CPUSnapshotPanel_HotSpotsString());
         } else if (tabs.getSelectedComponent() instanceof SubtreeCallGraphPanel) { //Subtree
             subtreeView.exportData(exportedFileType,eDD, subtreeView.getShortTitle());
         } else if (tabs.getSelectedComponent() instanceof ReverseCallGraphPanel) { //Back Trace
             backtraceView.exportData(exportedFileType,eDD, backtraceView.getShortTitle());
         } else if (tabs.getSelectedComponent()==combined) { // Combined
-            combined.exportData(exportedFileType,eDD, COMBINED_STRING);
+            combined.exportData(exportedFileType,eDD, Bundle.CPUSnapshotPanel_CombinedString());
         }
     }
 

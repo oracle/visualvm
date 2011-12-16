@@ -71,33 +71,21 @@ import org.openide.util.Lookup;
  * @author Ian Formanek
  * @author Misha Dmitriev
  */
+@NbBundle.Messages({
+    "RootMethodsPanel_RootMethodsLabelText=&Selected Root Methods:",
+    "RootMethodsPanel_AddManualButtonText=&Add...",
+    "RootMethodsPanel_EditButtonText=&Edit...",
+    "RootMethodsPanel_RemoveButtonText=&Remove",
+    "RootMethodsPanel_MessageAreaText=<b>Note:</b> You can also specify a root method in the source editor by right-clicking the method and choosing \"Profiling > Add As Profiling Root Method...\".",
+    "RootMethodsPanel_SpecifyRootMethodsDialogCaption=Edit Profiling Roots (Advanced)",
+    "RootMethodsPanel_RootsListAccessName=List of selected profiling roots.",
+    "RootMethodsPanel_AddManuallyButtonAccessDescr=Add new profiling root.",
+    "RootMethodsPanel_EditButtonAccessDescr=Edit defined profiling root.",
+    "RootMethodsPanel_RemoveButtonAccessDescr=Remove selected profiling roots.",
+    "RootMethodsPanel_IncorrectManualRootMsg=<html><b>No method could be resolved based on the provided data.</b><br><br>Please make sure you have entered the method definition correctly.<br>Use <code>javap -s &lt;classname&gt;</code> for exact methods definitions in VM format."
+})
 public final class RootMethodsPanel extends JPanel implements ActionListener, ListSelectionListener, HelpCtx.Provider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String ROOT_METHODS_LABEL_TEXT = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                              "RootMethodsPanel_RootMethodsLabelText"); //NOI18N
-    private static final String ADD_MANUAL_BUTTON_TEXT = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                             "RootMethodsPanel_AddManualButtonText"); //NOI18N
-    private static final String EDIT_BUTTON_TEXT = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                             "RootMethodsPanel_EditButtonText"); //NOI18N
-    private static final String REMOVE_BUTTON_TEXT = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                         "RootMethodsPanel_RemoveButtonText"); //NOI18N
-    private static final String MESSAGE_AREA_TEXT = NbBundle.getMessage(RootMethodsPanel.class, "RootMethodsPanel_MessageAreaText"); //NOI18N
-    private static final String SPECIFY_ROOT_METHODS_DIALOG_CAPTION = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                                          "RootMethodsPanel_SpecifyRootMethodsDialogCaption"); //NOI18N
-    private static final String ROOTS_LIST_ACCESS_NAME = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                             "RootMethodsPanel_RootsListAccessName"); //NOI18N
-    private static final String ADD_MANUALLY_BUTTON_ACCESS_DESCR = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                                       "RootMethodsPanel_AddManuallyButtonAccessDescr"); //NOI18N
-    private static final String EDIT_BUTTON_ACCESS_DESCR = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                                       "RootMethodsPanel_EditButtonAccessDescr"); //NOI18N
-    private static final String REMOVE_BUTTON_ACCESS_DESCR = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                                 "RootMethodsPanel_RemoveButtonAccessDescr"); //NOI18N
-    private static final String INCORRECT_MANUAL_ROOT_MSG = NbBundle.getMessage(RootMethodsPanel.class,
-                                                                                 "RootMethodsPanel_IncorrectManualRootMsg"); //NOI18N
-                                                                                                                              // -----
     
     private static final String HELP_CTX_KEY = "RootMethodsPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
@@ -178,7 +166,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                         rootsList.setSelectedValue(newItem, true);
                     }
                 } catch (Exception ex) {
-                    ProfilerDialogs.displayError(INCORRECT_MANUAL_ROOT_MSG);
+                    ProfilerDialogs.displayError(Bundle.RootMethodsPanel_IncorrectManualRootMsg());
                 }
             }
         } else if (e.getSource() == editButton) {
@@ -198,7 +186,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                         rootsList.setSelectedValue(newItem, true);
                     }
                 } catch (Exception ex) {
-                    ProfilerDialogs.displayError(INCORRECT_MANUAL_ROOT_MSG);
+                    ProfilerDialogs.displayError(Bundle.RootMethodsPanel_IncorrectManualRootMsg());
                 }
             }
         } else if (e.getSource() == removeButton) {
@@ -247,7 +235,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
 
     // ---------------------------------------------------------------------------
     private static ClientUtils.SourceCodeSelection[] performDisplay(final RootMethodsPanel rm) {
-        final DialogDescriptor dd = new DialogDescriptor(rm, SPECIFY_ROOT_METHODS_DIALOG_CAPTION);
+        final DialogDescriptor dd = new DialogDescriptor(rm, Bundle.RootMethodsPanel_SpecifyRootMethodsDialogCaption());
         final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
 
 //        if (rm.addFromProjectButton.isEnabled()) {
@@ -311,7 +299,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                 }
             };
 
-        org.openide.awt.Mnemonics.setLocalizedText(label, ROOT_METHODS_LABEL_TEXT);
+        org.openide.awt.Mnemonics.setLocalizedText(label, Bundle.RootMethodsPanel_RootMethodsLabelText());
         label.setLabelFor(rootsList);
         label.setIconTextGap(10);
         gridBagConstraints = new GridBagConstraints();
@@ -323,7 +311,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
         gridBagConstraints.insets = new Insets(12, 12, 5, 12);
         add(label, gridBagConstraints);
 
-        rootsList.getAccessibleContext().setAccessibleName(ROOTS_LIST_ACCESS_NAME);
+        rootsList.getAccessibleContext().setAccessibleName(Bundle.RootMethodsPanel_RootsListAccessName());
 
         rootsScrollPane.setViewportView(rootsList);
         rootsScrollPane.setPreferredSize(new Dimension(330, rootsScrollPane.getPreferredSize().height));
@@ -346,16 +334,16 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
 //        addFromProjectButton.getAccessibleContext().setAccessibleDescription(ADD_FROM_PROJECT_BUTTON_ACCESS_DESCR);
 //        buttonPanel.add(addFromProjectButton);
 
-        org.openide.awt.Mnemonics.setLocalizedText(addButton, ADD_MANUAL_BUTTON_TEXT);
-        addButton.getAccessibleContext().setAccessibleDescription(ADD_MANUALLY_BUTTON_ACCESS_DESCR);
+        org.openide.awt.Mnemonics.setLocalizedText(addButton, Bundle.RootMethodsPanel_AddManualButtonText());
+        addButton.getAccessibleContext().setAccessibleDescription(Bundle.RootMethodsPanel_AddManuallyButtonAccessDescr());
         buttonPanel.add(addButton);
         
-        org.openide.awt.Mnemonics.setLocalizedText(editButton, EDIT_BUTTON_TEXT);
-        editButton.getAccessibleContext().setAccessibleDescription(EDIT_BUTTON_ACCESS_DESCR);
+        org.openide.awt.Mnemonics.setLocalizedText(editButton, Bundle.RootMethodsPanel_EditButtonText());
+        editButton.getAccessibleContext().setAccessibleDescription(Bundle.RootMethodsPanel_EditButtonAccessDescr());
         buttonPanel.add(editButton);
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeButton, REMOVE_BUTTON_TEXT);
-        removeButton.getAccessibleContext().setAccessibleDescription(REMOVE_BUTTON_ACCESS_DESCR);
+        org.openide.awt.Mnemonics.setLocalizedText(removeButton, Bundle.RootMethodsPanel_RemoveButtonText());
+        removeButton.getAccessibleContext().setAccessibleDescription(Bundle.RootMethodsPanel_RemoveButtonAccessDescr());
         buttonPanel.add(removeButton);
 
         gridBagConstraints = new GridBagConstraints();
@@ -370,7 +358,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                                                     panelBackground.getBlue() - 10);
 
         // hintArea
-        hintArea.setText(MESSAGE_AREA_TEXT); // NOI18N
+        hintArea.setText(Bundle.RootMethodsPanel_MessageAreaText());
         hintArea.setEnabled(false);
         hintArea.setDisabledTextColor(Color.darkGray);
         hintArea.setBackground(hintBackground);
