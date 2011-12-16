@@ -48,12 +48,10 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import org.netbeans.api.editor.mimelookup.MimeLookup;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -62,8 +60,9 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
+import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
-import org.netbeans.modules.profiler.selector.ui.ProgressDisplayer;
+import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
@@ -75,6 +74,11 @@ import org.openide.util.lookup.Lookups;
  *
  * @author Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "SelectRootMethodsPanel_OkButtonText=OK",
+    "SelectRootMethodsPanel_ParsingProjectStructureMessage=Parsing project structure...",
+    "SelectRootMethodsPanel_Title=Edit Profiling Roots"
+})
 final public class ClassSelectRootMethodsPanel extends JPanel {
 
     final private static class Singleton {
@@ -85,8 +89,6 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
     final public static ClassSelectRootMethodsPanel getDefault() {
         return Singleton.INSTANCE;
     }
-    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(ClassSelectRootMethodsPanel.class,
-            "SelectRootMethodsPanel_OkButtonText"); // NOI18N
     private static final String HELP_CTX_KEY = "ClassSelectRootMethodsPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static final Dimension PREFERRED_TOPTREE_DIMENSION = new Dimension(500, 250);
@@ -100,35 +102,9 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
     private void init(final Container container) {
         GridBagConstraints gridBagConstraints;
 
-        okButton = new JButton(OK_BUTTON_TEXT);
+        okButton = new JButton(Bundle.SelectRootMethodsPanel_OkButtonText());
 
-        ProgressDisplayer pd = new ProgressDisplayer() {
-
-            ProfilerProgressDisplayer pd = null;
-
-            public synchronized void showProgress(String message) {
-                pd = ProfilerProgressDisplayer.showProgress(message);
-            }
-
-            public synchronized void showProgress(String message, ProgressController controller) {
-                pd = ProfilerProgressDisplayer.showProgress(message, controller);
-            }
-
-            public synchronized void showProgress(String caption, String message, ProgressController controller) {
-                pd = ProfilerProgressDisplayer.showProgress(caption, message, controller);
-            }
-
-            public synchronized boolean isOpened() {
-                return pd != null;
-            }
-
-            public synchronized void close() {
-                if (pd != null) {
-                    pd.close();
-                    pd = null;
-                }
-            }
-        };
+        ProgressDisplayer pd = ProfilerProgressDisplayer.getDefault();
 
         advancedLogicalPackageTree = new RootSelectorTree(pd, RootSelectorTree.DEFAULT_FILTER);
 
@@ -170,7 +146,7 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
         });
 
         final DialogDescriptor dd = new DialogDescriptor(this,
-                NbBundle.getMessage(this.getClass(), "SelectRootMethodsPanel_Title"), // NOI18N
+                Bundle.SelectRootMethodsPanel_Title(),
                 true, new Object[]{okButton, DialogDescriptor.CANCEL_OPTION},
                 okButton, DialogDescriptor.BOTTOM_ALIGN, null, null);
 
@@ -192,8 +168,7 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
     }
 
     private void updateSelector(Runnable updater) {
-        final ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(),
-                "SelectRootMethodsPanel_ParsingProjectStructureMessage")); // NOI18N
+        final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.SelectRootMethodsPanel_ParsingProjectStructureMessage());
         CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
             public void run() {
                 ph.setInitialDelay(500);

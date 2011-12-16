@@ -90,40 +90,23 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "OQLQueryCustomizer_OkButtonText=OK",
+    "OQLQueryCustomizer_CloseButtonText=Close",
+    "OQLQueryCustomizer_SaveQueryCaption=Save Query",
+    "OQLQueryCustomizer_QueryPropertiesCaption={0} Properties",
+    "OQLQueryCustomizer_UpButtonToolTip=Move selected query up in the list",
+    "OQLQueryCustomizer_DownButtonToolTip=Move selected query down in the list",
+    "OQLQueryCustomizer_UpButtonAccessName=Up",
+    "OQLQueryCustomizer_DownButtonAccessName=Down",
+    "OQLQueryCustomizer_NewQueryRadioText=&Create New Query",
+    "OQLQueryCustomizer_ExistingQueryRadioText=&Use Existing Query",
+    "OQLQueryCustomizer_NameLabelText=&Name:",
+    "OQLQueryCustomizer_DefaultQueryName=New OQL Query",
+    "OQLQueryCustomizer_DescriptionLabelText=&Description (optional):",
+    "OQLQueryCustomizer_UpdateQueryLabelText=&Query to update:"
+})
 public class OQLQueryCustomizer {
-
-    // -----
-    // I18N String constants
-    private static final String OK_BUTTON_TEXT = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_OkButtonText"); // NOI18N
-    private static final String CLOSE_BUTTON_TEXT = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_CloseButtonText"); // NOI18N
-    private static final String SAVE_QUERY_CAPTION = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_SaveQueryCaption"); // NOI18N
-    private static final String QUERY_PROPERTIES_CAPTION = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_QueryPropertiesCaption"); // NOI18N
-    private static final String UP_BUTTON_TOOLTIP = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_UpButtonToolTip"); // NOI18N
-    private static final String DOWN_BUTTON_TOOLTIP = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_DownButtonToolTip"); // NOI18N
-    private static final String UP_BUTTON_ACCESS_NAME = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_UpButtonAccessName"); // NOI18N
-    private static final String DOWN_BUTTON_ACCESS_NAME = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_DownButtonAccessName"); // NOI18N
-    private static final String NEW_QUERY_RADIO_TEXT = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_NewQueryRadioText"); // NOI18N
-    private static final String EXISTING_QUERY_RADIO_TEXT = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_ExistingQueryRadioText"); // NOI18N
-    private static final String NAME_LABEL_TEXT = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_NameLabelText"); // NOI18N
-    private static final String DEFAULT_QUERY_NAME = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_DefaultQueryName"); // NOI18N
-    private static final String DESCRIPTION_LABEL_TEXT = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_DescriptionLabelText"); // NOI18N
-    private static final String UPDATE_QUERY_LABEL_TEXT = NbBundle.getMessage(
-            OQLQueryCustomizer.class, "OQLQueryCustomizer_UpdateQueryLabelText"); // NOI18N
-    // -----
-
     private static Icon ICON_UP = Icons.getIcon(GeneralIcons.UP);
     private static Icon ICON_DOWN = Icons.getIcon(GeneralIcons.DOWN);
 
@@ -132,11 +115,11 @@ public class OQLQueryCustomizer {
                                     final OQLSupport.OQLTreeModel treeModel,
                                     final JTree tree) {
         JButton okButton = new JButton();
-        Mnemonics.setLocalizedText(okButton, OK_BUTTON_TEXT);
+        Mnemonics.setLocalizedText(okButton, Bundle.OQLQueryCustomizer_OkButtonText());
 
         CustomizerPanel customizer = new CustomizerPanel(okButton,  treeModel);
         final DialogDescriptor dd = new DialogDescriptor(customizer,
-                                            SAVE_QUERY_CAPTION, true,
+                                            Bundle.OQLQueryCustomizer_SaveQueryCaption(), true,
                                             new Object[] { okButton,
                                             DialogDescriptor.CANCEL_OPTION },
                                             okButton, 0, null, null);
@@ -174,7 +157,7 @@ public class OQLQueryCustomizer {
         int originalIndex = parent.getIndex(node);
 
         JButton okButton = new JButton();
-        Mnemonics.setLocalizedText(okButton, OK_BUTTON_TEXT);
+        Mnemonics.setLocalizedText(okButton, Bundle.OQLQueryCustomizer_OkButtonText());
 
         final JButton[] upDownButtons = new JButton[2];
         upDownButtons[0] = new JButton(ICON_UP) {
@@ -186,9 +169,9 @@ public class OQLQueryCustomizer {
                 updateButtons(upDownButtons, node);
             }
         };
-        upDownButtons[0].setToolTipText(UP_BUTTON_TOOLTIP);
+        upDownButtons[0].setToolTipText(Bundle.OQLQueryCustomizer_UpButtonToolTip());
         upDownButtons[0].getAccessibleContext().
-                                        setAccessibleName(UP_BUTTON_ACCESS_NAME);
+                                        setAccessibleName(Bundle.OQLQueryCustomizer_UpButtonAccessName());
         upDownButtons[1] = new JButton(ICON_DOWN) {
             protected void fireActionPerformed(ActionEvent e) {
                 int index = parent.getIndex(node) + 1;
@@ -198,9 +181,9 @@ public class OQLQueryCustomizer {
                 updateButtons(upDownButtons, node);
             }
         };
-        upDownButtons[1].setToolTipText(DOWN_BUTTON_TOOLTIP);
+        upDownButtons[1].setToolTipText(Bundle.OQLQueryCustomizer_DownButtonToolTip());
         upDownButtons[1].getAccessibleContext().
-                                      setAccessibleName(DOWN_BUTTON_ACCESS_NAME);
+                                      setAccessibleName(Bundle.OQLQueryCustomizer_DownButtonAccessName());
 
         final CustomizerPanel customizer = new CustomizerPanel(okButton,
                                                 node.toString(),
@@ -223,15 +206,14 @@ public class OQLQueryCustomizer {
         });
 
         JButton closeButton = readOnly ? new JButton() : null;
-        if (closeButton != null) Mnemonics.setLocalizedText(closeButton, CLOSE_BUTTON_TEXT);
+        if (closeButton != null) Mnemonics.setLocalizedText(closeButton, Bundle.OQLQueryCustomizer_CloseButtonText());
         Object[] options = readOnly ? new Object[] { closeButton } :
                                       new Object[] { okButton,
                                             DialogDescriptor.CANCEL_OPTION };
         JButton defaultButton = readOnly ? closeButton : okButton;
 
         final DialogDescriptor dd = new DialogDescriptor(customizer,
-                                            MessageFormat.format(QUERY_PROPERTIES_CAPTION,
-                                            new Object[] { node.getCaption() }),
+                                            Bundle.OQLQueryCustomizer_QueryPropertiesCaption(node.getCaption()),
                                             true, options, defaultButton, 0, null, null);
         dd.setAdditionalOptions(new Object[] { upDownButtons[0],
                                                upDownButtons[1] });
@@ -359,7 +341,7 @@ public class OQLQueryCustomizer {
                 newRadio = new JRadioButton() {
                     protected void fireActionPerformed(ActionEvent e) { updateComponents(); }
                 };
-                Mnemonics.setLocalizedText(newRadio, NEW_QUERY_RADIO_TEXT);
+                Mnemonics.setLocalizedText(newRadio, Bundle.OQLQueryCustomizer_NewQueryRadioText());
                 newRadio.setSelected(true);
                 c = new GridBagConstraints();
                 c.gridx = 0;
@@ -396,7 +378,7 @@ public class OQLQueryCustomizer {
             }
 
             nameLabel = new JLabel();
-            Mnemonics.setLocalizedText(nameLabel, NAME_LABEL_TEXT);
+            Mnemonics.setLocalizedText(nameLabel, Bundle.OQLQueryCustomizer_NameLabelText());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 1;
@@ -407,7 +389,7 @@ public class OQLQueryCustomizer {
 
             nameField = new JTextField();
             nameLabel.setLabelFor(nameField);
-            nameField.setText(DEFAULT_QUERY_NAME);
+            nameField.setText(Bundle.OQLQueryCustomizer_DefaultQueryName());
             nameField.getDocument().addDocumentListener(new DocumentListener() {
                 public void insertUpdate(DocumentEvent e) {  updateComponents(); }
                 public void removeUpdate(DocumentEvent e) {  updateComponents(); }
@@ -425,7 +407,7 @@ public class OQLQueryCustomizer {
             add(nameField, c);
 
             descriptionLabel = new JLabel();
-            Mnemonics.setLocalizedText(descriptionLabel, DESCRIPTION_LABEL_TEXT);
+            Mnemonics.setLocalizedText(descriptionLabel, Bundle.OQLQueryCustomizer_DescriptionLabelText());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 2;
@@ -469,7 +451,7 @@ public class OQLQueryCustomizer {
                 existingRadio = new JRadioButton() {
                     protected void fireActionPerformed(ActionEvent e) { updateComponents(); }
                 };
-                Mnemonics.setLocalizedText(existingRadio, EXISTING_QUERY_RADIO_TEXT);
+                Mnemonics.setLocalizedText(existingRadio, Bundle.OQLQueryCustomizer_ExistingQueryRadioText());
                 c = new GridBagConstraints();
                 c.gridx = 0;
                 c.gridy = 4;
@@ -504,7 +486,7 @@ public class OQLQueryCustomizer {
                 add(headerContainer2, c);
 
                 existingLabel = new JLabel();
-                Mnemonics.setLocalizedText(existingLabel, UPDATE_QUERY_LABEL_TEXT);
+                Mnemonics.setLocalizedText(existingLabel, Bundle.OQLQueryCustomizer_UpdateQueryLabelText());
                 c = new GridBagConstraints();
                 c.gridx = 0;
                 c.gridy = 5;
