@@ -59,13 +59,6 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Jiri Sedlacek
  */
 public class HeapWalkerUI extends TopComponent {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String COMPONENT_DESCR = NbBundle.getMessage(HeapWalkerUI.class, "HeapWalkerUI_ComponentDescr"); // NOI18N
-                                                                                                                          // -----
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HeapWalker heapWalker;
@@ -114,12 +107,13 @@ public class HeapWalkerUI extends TopComponent {
         add(heapWalker.getMainHeapWalker().getPanel(), BorderLayout.CENTER);
     }
 
+    @NbBundle.Messages("HeapWalkerUI_ComponentDescr=Profiler HeapWalker")
     private void initDefaults() {
         setName(heapWalker.getName());
         setIcon(Icons.getImage(ProfilerIcons.MEMORY));
         if (heapWalker.getHeapDumpFile() != null)
             setToolTipText(heapWalker.getHeapDumpFile().getAbsolutePath());
-        getAccessibleContext().setAccessibleDescription(COMPONENT_DESCR);
+        getAccessibleContext().setAccessibleDescription(Bundle.HeapWalkerUI_ComponentDescr());
         
         putClientProperty("HeapDumpFileName", heapWalker.getHeapDumpFile().toURI().getPath()); // NOI18N
     }

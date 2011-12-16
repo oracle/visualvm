@@ -50,9 +50,11 @@ import org.openide.util.NbBundle;
  *
  * @author  Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "PerformIntegrationWizardPanelUI_PerformedStepsString=These steps will be performed by the Integration Wizard:",
+    "PerformIntegrationWizardPanelUI_PerformIntegrationHintMsg=After you click <strong>Perform</strong>, the steps described above will be performed. Note that you cannot undo this action."
+})
 public class PerformIntegrationPanelUI extends javax.swing.JPanel {
-  private final String PERFORM_INTEGRATION_MSG = NbBundle.getMessage(this.getClass(), "PerformIntegrationWizardPanelUI_PerformIntegrationHintMsg"); // NOI18N
-  private final String PERFORMED_INTEGRATION_MSG = NbBundle.getMessage(this.getClass(), "PerformIntegrationWizardPanelUI_IntegrationPerformedMsg"); // NOI18N
 
   private PerformIntegrationPanel.Model model;
 
@@ -132,7 +134,10 @@ public class PerformIntegrationPanelUI extends javax.swing.JPanel {
   }
   
   private void refreshCanPerform() {
-    this.integrationSteps.setHintText(MessageFormat.format(this.model.canPerform() ? PERFORM_INTEGRATION_MSG : PERFORMED_INTEGRATION_MSG, new Object[]{this.model.getApplicationName()}));
+    this.integrationSteps.setHintText(
+        this.model.canPerform() ? 
+            Bundle.PerformIntegrationWizardPanelUI_PerformIntegrationHintMsg() : 
+            Bundle.PerformIntegrationWizardPanelUI_PerformedStepsString());
     buttonPerform.setEnabled(this.model.canPerform());
   }
 }

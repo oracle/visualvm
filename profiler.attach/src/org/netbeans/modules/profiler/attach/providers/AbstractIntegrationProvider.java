@@ -45,29 +45,31 @@ package org.netbeans.modules.profiler.attach.providers;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
 import org.openide.util.NbBundle;
-import java.text.MessageFormat;
 import org.netbeans.modules.profiler.attach.wizard.steps.WizardStep;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "ExportSetenvMessage=Depending on the version shell used, you may need to use \"<code>setenv</code>\" command instead of \"<code>export</code>\".",
+    "ReduceOverheadMessage=When profiling CPU, you should set a meaningful instrumentation filter and/or select Part of Application option to reduce profiling overhead.",
+    "RemoteAbsolutePathHint=<code>{0}</code> must be an absolute path",
+    "SpacesInPathWarningMsg=On some systems/configurations, problems may occur when starting the profiler agent using parameters with spaces in the path. To fix these problems, please remove the quotes from agent parameters and modify these parameters to use 8.3 (DOS) path format.",
+    "RemoteString=remote",
+    "WorkDirMessage=Working directory is the directory from which the application will be started.",
+    "ManualRemoteStep1Message=If you have not done it before click \"Generate Remote Pack ...\" button to generate an appropriate Remote pack. Once it is generated install it on the remote machine. The Remote pack root directory will be referred to as \"<code>{0}</code>\".",
+    "ManualRemoteStep2Message=If you have not run profiling on this remote machine, run the <code>{0}</code> script first."
+})
 public abstract class AbstractIntegrationProvider implements WizardIntegrationProvider {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-    protected final String EXPORT_SETENV_MSG = NbBundle.getMessage(AbstractIntegrationProvider.class, "ExportSetenvMessage"); // NOI18N
-    protected final String REDUCE_OVERHEAD_MSG = NbBundle.getMessage(AbstractIntegrationProvider.class, "ReduceOverheadMessage"); // NOI18N
-    protected final String REMOTE_ABSOLUTE_PATH_HINT = MessageFormat.format(NbBundle.getMessage(AbstractIntegrationProvider.class,
-            "RemoteAbsolutePathHint"), // NOI18N
-            new Object[]{
-                "&lt;" + NbBundle.getMessage(AbstractIntegrationProvider.class,
-                "RemoteString") + "&gt;"
-            } // NOI18N
-            );
-    protected final String SPACES_IN_PATH_WARNING_MSG = NbBundle.getMessage(AbstractIntegrationProvider.class,
-            "SpacesInPathWarningMsg"); // NOI18N
+    protected final String EXPORT_SETENV_MSG = Bundle.ExportSetenvMessage();
+    protected final String REDUCE_OVERHEAD_MSG = Bundle.ReduceOverheadMessage();
+    protected final String REMOTE_ABSOLUTE_PATH_HINT = Bundle.RemoteAbsolutePathHint("&lt;" + Bundle.RemoteString() + "&gt;"); // NOI18N
+    protected final String SPACES_IN_PATH_WARNING_MSG = Bundle.SpacesInPathWarningMsg();
     protected WizardStep attachedWizard;
-    private final String HTML_REMOTE_STRING = "&lt;" + NbBundle.getMessage(AbstractIntegrationProvider.class, "RemoteString") + "&gt;"; // NOI18N
-    private final String WORK_DIR_MESSAGE = NbBundle.getMessage(AbstractIntegrationProvider.class, "WorkDirMessage"); // NOI18N
+    private final String HTML_REMOTE_STRING = "&lt;" + Bundle.RemoteString() + "&gt;"; // NOI18N
+    private final String WORK_DIR_MESSAGE = Bundle.WorkDirMessage();
     private String targetJava = ""; // NOI18N
     private String targetJavaHomePath = ""; // NOI18N
 
@@ -156,12 +158,10 @@ public abstract class AbstractIntegrationProvider implements WizardIntegrationPr
     protected abstract int getAttachWizardPriority();
 
     protected final String getManualRemoteStep1(final String targetOS) {
-        return MessageFormat.format(NbBundle.getMessage(AbstractIntegrationProvider.class, "ManualRemoteStep1Message"),
-                new Object[]{"JDK 5.0/6.0", targetOS, HTML_REMOTE_STRING}); //NOI18N
+        return Bundle.ManualRemoteStep1Message(HTML_REMOTE_STRING);
     }
 
     protected final String getManualRemoteStep2(final String targetOS) {
-        return MessageFormat.format(NbBundle.getMessage(AbstractIntegrationProvider.class, "ManualRemoteStep2Message"),
-                new Object[]{IntegrationUtils.getRemoteCalibrateCommandString(targetOS, getTargetJava())}); // NOI18N
+        return Bundle.ManualRemoteStep2Message(IntegrationUtils.getRemoteCalibrateCommandString(targetOS, getTargetJava()));
     }
 }

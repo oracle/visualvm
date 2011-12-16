@@ -67,6 +67,10 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_ResetResultsAction=R&eset Collected Results",
+    "HINT_ResetResultsAction=Reset Collected Results Buffer"
+})
 public final class ResetResultsAction extends AbstractAction implements ProfilingStateListener {
     
     Listener resultListener;
@@ -96,10 +100,8 @@ public final class ResetResultsAction extends AbstractAction implements Profilin
     private static ResetResultsAction instance;
     
     private ResetResultsAction() {
-        putValue(Action.NAME, NbBundle.getMessage(ResetResultsAction.class, "LBL_ResetResultsAction" // NOI18N
-        ));
-        putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ResetResultsAction.class, "HINT_ResetResultsAction" // NOI18N
-        ));
+        putValue(Action.NAME, Bundle.LBL_ResetResultsAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_ResetResultsAction());
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.RESET_RESULTS));
         putValue("iconBase", Icons.getResource(ProfilerIcons.RESET_RESULTS)); // NOI18N
         

@@ -56,15 +56,11 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "FindPreviousAction_ActionName=Find Previous",
+    "FindPreviousAction_ActionDescr=Find Previous Occurence (Shift+F3)"
+})
 public final class FindPreviousAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String ACTION_NAME = NbBundle.getMessage(FindPreviousAction.class, "FindPreviousAction_ActionName"); // NOI18N
-    private static final String ACTION_DESCR = NbBundle.getMessage(FindPreviousAction.class, "FindPreviousAction_ActionDescr"); // NOI18N
-                                                                                                                                // -----
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private SnapshotResultsWindow.FindPerformer findPerformer;
@@ -73,8 +69,8 @@ public final class FindPreviousAction extends AbstractAction {
 
     public FindPreviousAction(SnapshotResultsWindow.FindPerformer findPerformer) {
         this.findPerformer = findPerformer;
-        putValue(Action.NAME, ACTION_NAME);
-        putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
+        putValue(Action.NAME, Bundle.FindPreviousAction_ActionName());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.FindPreviousAction_ActionDescr());
         putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.FIND_PREVIOUS));
     }
 

@@ -59,6 +59,11 @@ import javax.swing.JPanel;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "FieldsBrowserController_NoInstanceSelectedString=<No Instance Selected>",
+    "FieldsBrowserController_NoClassSelectedString=<No Class Selected>",
+    "FieldsBrowserController_NoneString=<none>"
+})
 public class FieldsBrowserController extends AbstractController {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
@@ -108,30 +113,21 @@ public class FieldsBrowserController extends AbstractController {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String NONE_STRING = NbBundle.getMessage(FieldsBrowserController.class,
-                                                                  "FieldsBrowserController_NoneString"); // NOI18N
-    private static final String NO_INSTANCE_SELECTED_STRING = NbBundle.getMessage(FieldsBrowserController.class,
-                                                                                  "FieldsBrowserController_NoInstanceSelectedString"); // NOI18N
-    private static final String NO_CLASS_SELECTED_STRING = NbBundle.getMessage(FieldsBrowserController.class,
-                                                                               "FieldsBrowserController_NoClassSelectedString"); // NOI18N
-                                                                                                                                 // -----
     public static final int ROOT_INSTANCE = 0;
     public static final int ROOT_CLASS = 1;
 
     // --- Public interface ------------------------------------------------------
     public static final AbstractHeapWalkerNode EMPTY_INSTANCE_NODE = new AbstractHeapWalkerNode(null) {
         protected String computeName() {
-            return NO_INSTANCE_SELECTED_STRING;
+            return Bundle.FieldsBrowserController_NoInstanceSelectedString();
         }
 
         protected String computeType() {
-            return NONE_STRING;
+            return Bundle.FieldsBrowserController_NoneString();
         }
 
         protected String computeValue() {
-            return NONE_STRING;
+            return Bundle.FieldsBrowserController_NoneString();
         }
 
         protected String computeSize() {
@@ -153,15 +149,15 @@ public class FieldsBrowserController extends AbstractController {
 
     public static final AbstractHeapWalkerNode EMPTY_CLASS_NODE = new AbstractHeapWalkerNode(null) {
         protected String computeName() {
-            return NO_CLASS_SELECTED_STRING;
+            return Bundle.FieldsBrowserController_NoClassSelectedString();
         }
 
         protected String computeType() {
-            return NONE_STRING;
+            return Bundle.FieldsBrowserController_NoneString();
         }
 
         protected String computeValue() {
-            return NONE_STRING;
+            return Bundle.FieldsBrowserController_NoneString();
         }
         
         protected String computeSize() {
