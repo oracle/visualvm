@@ -84,6 +84,12 @@ final class ProbesPanel extends JPanel {
     private final HeaderButton decreaseB;
     private final HeaderButton resetB;
 
+    @NbBundle.Messages({
+        "TOOLTIP_IncreaseRowsHeight=Increase rows height",
+        "TOOLTIP_DecreaseRowsHeight=Decrease rows height",
+        "TOOLTIP_ResetRowsHeight=Reset rows height",
+        "LBL_Probes=Probes"
+    })
     ProbesPanel(final TimelineSupport support) {
         final TimelineChart chart = support.getChart();
 
@@ -135,8 +141,7 @@ final class ProbesPanel extends JPanel {
                                          getMenuShortcutKeyMask()) == 0);
             }
         };
-        increaseB.setToolTipText(NbBundle.getMessage(ProbesPanel.class,
-                "TOOLTIP_IncreaseRowsHeight")); // NOI18N
+        increaseB.setToolTipText(Bundle.TOOLTIP_IncreaseRowsHeight());
         bottomPanel.add(increaseB);
 
         decreaseB = new HeaderButton(null, Icons.getIcon(TracerIcons.DECREMENT)) {
@@ -145,8 +150,7 @@ final class ProbesPanel extends JPanel {
                                          getMenuShortcutKeyMask()) == 0);
             }
         };
-        decreaseB.setToolTipText(NbBundle.getMessage(ProbesPanel.class,
-                "TOOLTIP_DecreaseRowsHeight")); // NOI18N
+        decreaseB.setToolTipText(Bundle.TOOLTIP_DecreaseRowsHeight());
         bottomPanel.add(decreaseB);
 
         resetB = new HeaderButton(null, Icons.getIcon(TracerIcons.RESET)) {
@@ -154,14 +158,12 @@ final class ProbesPanel extends JPanel {
                 chart.resetRowHeights();
             }
         };
-        resetB.setToolTipText(NbBundle.getMessage(ProbesPanel.class,
-                "TOOLTIP_ResetRowsHeight")); // NOI18N
+        resetB.setToolTipText(Bundle.TOOLTIP_ResetRowsHeight());
         bottomPanel.add(resetB);
         
         setOpaque(false);
         setLayout(new BorderLayout());
-        add(new HeaderLabel(NbBundle.getMessage(ProbesPanel.class,
-                "LBL_Probes")), BorderLayout.NORTH); // NOI18N
+        add(new HeaderLabel(Bundle.LBL_Probes()), BorderLayout.NORTH);
         add(viewport, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 

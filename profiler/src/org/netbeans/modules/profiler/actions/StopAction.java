@@ -60,15 +60,14 @@ import org.netbeans.modules.profiler.utilities.ProfilerUtils;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "StopAction_DoYouWantToTerminateMsg=Do you want to terminate the profiled application upon detach?",
+    "LBL_StopAction=&Stop Profiling Session",
+    "HINT_StopAction=Stop (Terminate) the Profiled Application",
+    "LBL_DetachAction=Detach...",
+    "HINT_DetachAction=Detach from the Profiled Application"
+})
 public final class StopAction extends AbstractAction implements ProfilingStateListener {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String MSG_DO_YOU_WANT_TO_TERMINATE_MSG = NbBundle.getMessage(StopAction.class,
-                                                                                       "StopAction_DoYouWantToTerminateMsg"); // NOI18N
-                                                                                                                              // -----
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private boolean taskPosted = false;
@@ -105,7 +104,8 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
         Runnable task = null;
 
         if (mode == Profiler.MODE_ATTACH) {
-            Boolean ret = ProfilerDialogs.displayCancellableConfirmationDNSA(MSG_DO_YOU_WANT_TO_TERMINATE_MSG, null, null, StopAction.class.getName(), false);
+            Boolean ret = ProfilerDialogs.displayCancellableConfirmationDNSA(
+                Bundle.StopAction_DoYouWantToTerminateMsg(), null, null, StopAction.class.getName(), false);
 
             if (Boolean.TRUE.equals(ret)) {
                 task = new Runnable() {
@@ -156,17 +156,13 @@ public final class StopAction extends AbstractAction implements ProfilingStateLi
         mode = Profiler.getDefault().getProfilingMode();
 
         if (mode == Profiler.MODE_PROFILE) {
-            putValue(Action.NAME, NbBundle.getMessage(StopAction.class, "LBL_StopAction" // NOI18N
-            ));
-            putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(StopAction.class, "HINT_StopAction" // NOI18N
-            ));
+            putValue(Action.NAME, Bundle.LBL_StopAction());
+            putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_StopAction());
             putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.STOP));
             putValue("iconBase", Icons.getResource(GeneralIcons.STOP)); // NOI18N
         } else {
-            putValue(Action.NAME, NbBundle.getMessage(StopAction.class, "LBL_DetachAction" // NOI18N
-            ));
-            putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(StopAction.class, "HINT_DetachAction" // NOI18N
-            ));
+            putValue(Action.NAME, Bundle.LBL_DetachAction());
+            putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_DetachAction());
             putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.DETACH));
             putValue("iconBase", Icons.getResource(GeneralIcons.DETACH)); // NOI18N
         }

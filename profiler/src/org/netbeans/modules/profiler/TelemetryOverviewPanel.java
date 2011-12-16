@@ -63,14 +63,13 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "TelemetryOverviewPanel_TelemetryOverviewAccessDescr=Profiler telemetry overview",
+    "LAB_TelemetryOverviewPanelName=VM Telemetry Overview"
+})
 public final class TelemetryOverviewPanel extends TopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String TELEMETRY_OVERVIEW_ACCESS_DESCR = NbBundle.getMessage(TelemetryOverviewPanel.class,
-                                                                                      "TelemetryOverviewPanel_TelemetryOverviewAccessDescr"); // NOI18N
-                                                                                                                                              // -----
     private static final String HELP_CTX_KEY = "TelemetryOverviewPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static TelemetryOverviewPanel defaultInstance;
@@ -89,9 +88,8 @@ public final class TelemetryOverviewPanel extends TopComponent {
      * Initializes the Form
      */
     public TelemetryOverviewPanel() {
-        setName(NbBundle.getMessage(TelemetryOverviewPanel.class, "LAB_TelemetryOverviewPanelName")); // NOI18N
-        setIcon(windowIcon);
-        getAccessibleContext().setAccessibleDescription(TELEMETRY_OVERVIEW_ACCESS_DESCR);
+        setName(Bundle.LAB_TelemetryOverviewPanelName());
+        getAccessibleContext().setAccessibleDescription(Bundle.TelemetryOverviewPanel_TelemetryOverviewAccessDescr());
 
         graphsPanel = new MonitoringGraphsPanel();
         JScrollPane graphsPanelScroll = new JScrollPane(graphsPanel,

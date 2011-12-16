@@ -63,17 +63,11 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "HeapWalkerManager_CannotOpenHeapWalkerMsg=<html><b>Failed to open the heap dump.</b><br><br>{0}</html>",
+    "HeapWalkerManager_CannotDeleteHeapDumpMsg=<html><b>Deleting heap dump failed</b><br><br>Please try to delete the file once more. If it fails<br>again, restart the IDE and repeat the action.</html>"
+})
 public class HeapWalkerManager {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String CANNOT_OPEN_HEAPWALKER_MSG = NbBundle.getMessage(HeapWalkerManager.class,
-                                                                                 "HeapWalkerManager_CannotOpenHeapWalkerMsg"); // NOI18N
-    private static final String CANNOT_DELETE_HEAPDUMP_MSG = NbBundle.getMessage(HeapWalkerManager.class,
-                                                                                 "HeapWalkerManager_CannotDeleteHeapDumpMsg"); // NOI18N
-                                                                                                                               // -----
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private java.util.Set dumpsBeingDeleted = new java.util.HashSet();
@@ -168,8 +162,7 @@ public class HeapWalkerManager {
             try {
                 hw = new HeapWalker(heapDump);
             } catch (Exception e) {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_OPEN_HEAPWALKER_MSG,
-                                                                   new Object[] { e.getLocalizedMessage() }));
+                ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotOpenHeapWalkerMsg(e.getLocalizedMessage()));
             }
         }
 
@@ -243,7 +236,7 @@ public class HeapWalkerManager {
 
                             deleteHeapDumpImpl(file, retries - 1);
                         } else {
-                            ProfilerDialogs.displayError(CANNOT_DELETE_HEAPDUMP_MSG);
+                            ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotDeleteHeapDumpMsg());
                         }
                     } else {
                         ProfilerControlPanel2.getDefault().refreshSnapshotsList();

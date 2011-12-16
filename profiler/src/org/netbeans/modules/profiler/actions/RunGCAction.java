@@ -59,6 +59,10 @@ import org.openide.util.NbBundle;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_RunGCAction=Run &GC",
+    "HINT_RunGCAction=Run Garbage Collection in Profiled Application"
+})
 public final class RunGCAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -68,7 +72,7 @@ public final class RunGCAction extends ProfilingAwareAction {
 
     protected RunGCAction() {
         super();
-        putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ModifyProfilingAction.class, "HINT_RunGCAction")); //NOI18N
+        putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_RunGCAction());
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -81,7 +85,7 @@ public final class RunGCAction extends ProfilingAwareAction {
     }
 
     public String getName() {
-        return NbBundle.getMessage(RunGCAction.class, "LBL_RunGCAction"); //NOI18N
+        return Bundle.LBL_RunGCAction();
     }
 
     public void performAction() {
