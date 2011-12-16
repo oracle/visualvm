@@ -68,14 +68,23 @@ public class StackTraceSnapshotBuilder {
     private static final boolean COLLECT_TWO_TIMESTAMPS = true;
     private static final List<MethodInfo> knownBLockingMethods = Arrays.asList(new MethodInfo[] {
         new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native]"), // NOI18N
+        new MethodInfo("java.net.PlainSocketImpl", "socketAccept(java.net.SocketImpl) : void"), // NOI18N
         new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]"), // NOI18N
+        new MethodInfo("sun.awt.windows.WToolkit", "eventLoop() : void"), // NOI18N
         new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit[native]"), // NOI18N
+        new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit(int) : int"), // NOI18N
         new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents[native]"), // NOI18N
+        new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents(long) : void"), // NOI18N
         new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native]"), // NOI18N
+        new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop(long, boolean, boolean) : void"), // NOI18N
         new MethodInfo("java.lang.Object", "wait[native]"), // NOI18N
+        new MethodInfo("java.lang.Object", "wait(long) : void"), // NOI18N
         new MethodInfo("java.lang.Thread", "sleep[native]"), // NOI18N
+        new MethodInfo("java.lang.Thread", "sleep(long) : void"), // NOI18N
         new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0[native]"), // NOI18N
+        new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0() : int"), // NOI18N
         new MethodInfo("java.lang.ProcessImpl","waitFor[native]"), // NOI18N
+        new MethodInfo("java.lang.ProcessImpl","waitFor() : int"), // NOI18N
     });
 
     private InstrumentationFilter filter;

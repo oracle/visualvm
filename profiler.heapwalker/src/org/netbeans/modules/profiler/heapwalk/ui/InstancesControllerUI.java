@@ -70,6 +70,11 @@ import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "InstancesControllerUI_NoClassDefinedMsg=<b>No class defined.</b><br><br>To view instances, double-click a class or choose Show in Instances View from pop-up menu in {0}&nbsp;<a href='#'>Classes</a> view first.",
+    "InstancesControllerUI_ViewCaption=Instances",
+    "InstancesControllerUI_ViewDescr=List of instances of the selected class"
+})
 public class InstancesControllerUI extends JPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -79,8 +84,8 @@ public class InstancesControllerUI extends JPanel {
 
         public Presenter() {
             super();
-            setText(VIEW_CAPTION);
-            setToolTipText(VIEW_DESCR);
+            setText(Bundle.InstancesControllerUI_ViewCaption());
+            setToolTipText(Bundle.InstancesControllerUI_ViewDescr());
             setIcon(BrowserUtils.ICON_INSTANCE);
             setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
         }
@@ -102,15 +107,6 @@ public class InstancesControllerUI extends JPanel {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String NO_CLASS_DEFINED_MSG = NbBundle.getMessage(InstancesControllerUI.class,
-                                                                           "InstancesControllerUI_NoClassDefinedMsg"); // NOI18N
-    private static final String VIEW_CAPTION = NbBundle.getMessage(InstancesControllerUI.class,
-                                                                   "InstancesControllerUI_ViewCaption"); // NOI18N
-    private static final String VIEW_DESCR = NbBundle.getMessage(InstancesControllerUI.class, "InstancesControllerUI_ViewDescr"); // NOI18N
-                                                                                                                                  // -----
 
     // --- UI definition ---------------------------------------------------------
     private static final String DATA = "Data"; // NOI18N
@@ -196,10 +192,8 @@ public class InstancesControllerUI extends JPanel {
         hintArea.setBorder(BorderFactory.createEmptyBorder(10, 8, 8, 8));
 
         String classesRes = Icons.getResource(LanguageIcons.CLASS);
-        String hintText = MessageFormat.format(NO_CLASS_DEFINED_MSG,
-                                               new Object[] {
-                                                   "<a href='#'><img border='0' align='bottom' src='nbresloc:/" + classesRes + "'></a>"
-                                               }); // NOI18N
+        String hintText = Bundle.InstancesControllerUI_NoClassDefinedMsg(
+                            "<a href='#'><img border='0' align='bottom' src='nbresloc:/" + classesRes + "'></a>"); // NOI18N
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);
 

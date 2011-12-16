@@ -41,39 +41,65 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.actions;
+package org.netbeans.modules.profiler.api;
 
-import org.netbeans.modules.profiler.ProfilerControlPanel2;
-import org.openide.util.NbBundle;
-import java.awt.event.ActionEvent;
-import javax.swing.*;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.Cancellable;
 
 /**
- * Action to display the Control Panel window.
  *
- * @author Ian Formanek
+ * @author Jaroslav Bachorik
  */
-@NbBundle.Messages({
-    "LBL_ControlPanelAction=Profiler &Control Panel",
-    "HINT_ControlPanelAction=Show Profiler Control Panel"
-})
-public final class ControlPanelAction extends AbstractAction {
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
+public interface ProgressDisplayer {
+    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
-    public ControlPanelAction() {
-        putValue(Action.NAME, Bundle.LBL_ControlPanelAction());
-        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_ControlPanelAction());
-        putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.CONTROL_PANEL));
+    public static interface ProgressController extends Cancellable {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public void actionPerformed(final ActionEvent e) {
-        final ProfilerControlPanel2 pcp = ProfilerControlPanel2.getDefault();
-        pcp.open();
-        pcp.requestActive();
-    }
+    public boolean isOpened();
+
+    public void close();
+
+    public ProgressDisplayer showProgress(String message);
+
+    public ProgressDisplayer showProgress(String message, ProgressController controller);
+
+    public ProgressDisplayer showProgress(String caption, String message, ProgressController controller);
+    
+    public static final ProgressDisplayer DEFAULT = new ProgressDisplayer() {
+        ProgressHandle ph = null;
+
+        public synchronized ProgressDisplayer showProgress(String message) {
+            ph = ProgressHandleFactory.createHandle(message);
+            ph.start();
+            return DEFAULT;
+        }
+
+        public synchronized ProgressDisplayer showProgress(String message, ProgressController controller) {
+            ph = ProgressHandleFactory.createHandle(message, controller);
+            ph.start();
+            return DEFAULT;
+        }
+
+        public synchronized ProgressDisplayer showProgress(String caption, String message, ProgressController controller) {
+            ph = ProgressHandleFactory.createHandle(message, controller);
+            ph.start();
+            return DEFAULT;
+        }
+
+        public synchronized boolean isOpened() {
+            return ph != null;
+        }
+
+        public synchronized void close() {
+            if (ph != null) {
+                ph.finish();
+                ph = null;
+            }
+        }
+    };
+
 }

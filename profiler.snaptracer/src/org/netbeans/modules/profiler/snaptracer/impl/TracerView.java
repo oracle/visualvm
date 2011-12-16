@@ -156,11 +156,11 @@ final class TracerView {
         support.dataLoadingStarted(end - start);
     }
 
+    @NbBundle.Messages("MSG_LoadingSnapshot=Loading snapshot...")
     private void initData(final JPanel component, final JPanel container) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JLabel progress = new JLabel(NbBundle.getMessage(TracerView.class,
-                        "MSG_LoadingSnapshot"), JLabel.CENTER); // NOI18N
+                JLabel progress = new JLabel(Bundle.MSG_LoadingSnapshot(), JLabel.CENTER);
                 progress.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 addContents(component, progress);
 
@@ -192,6 +192,7 @@ final class TracerView {
         });
     }
 
+    @NbBundle.Messages("MSG_ProcessingSelection=Processing selection...")
     private void initListeners(final JPanel component) {
         final TimelineSupport support = model.getTimelineSupport();
         support.addSelectionListener(
@@ -199,8 +200,7 @@ final class TracerView {
             public void indexSelectionChanged() {
                 final int startIndex = Math.min(support.getStartIndex(), support.getEndIndex());
                 final int endIndex = Math.max(support.getStartIndex(), support.getEndIndex());
-                JLabel progress = new JLabel(NbBundle.getMessage(TracerView.class,
-                        "MSG_ProcessingSelection"), JLabel.CENTER); // NOI18N
+                JLabel progress = new JLabel(Bundle.MSG_ProcessingSelection(), JLabel.CENTER); // NOI18N
                 addContents(component, progress);
 
                 controller.performAfterSession(new Runnable() {

@@ -117,6 +117,29 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ReferencesBrowserControllerUI_ViewTitleReferences=References",
+    "ReferencesBrowserControllerUI_NoInstanceSelectedMsg=<b>No instance selected.</b><br><br>To view references to instance, select an instance in {0}&nbsp;Instances list.",
+    "ReferencesBrowserControllerUI_ShowLoopItemText=Show Loop Origin",
+    "ReferencesBrowserControllerUI_ShowInstanceItemText=Show Instance",
+    "ReferencesBrowserControllerUI_ShowInClassesItemText=Show in Classes View",
+    "ReferencesBrowserControllerUI_ShowGcRootItemText=Show Nearest GC Root",
+    "ReferencesBrowserControllerUI_GoToSourceItemText=Go To Source",
+    "ReferencesBrowserControllerUI_ShowInThreadsItemText=Show In Threads",
+    "ReferencesBrowserControllerUI_ShowHideColumnsString=Show or hide columns",
+    "ReferencesBrowserControllerUI_FieldColumnName=Field",
+    "ReferencesBrowserControllerUI_FieldColumnDescr=Name of field referencing the instance",
+    "ReferencesBrowserControllerUI_TypeColumnName=Type",
+    "ReferencesBrowserControllerUI_TypeColumnDescr=Type of owning instance",
+    "ReferencesBrowserControllerUI_FullTypeColumnName=Full Type",
+    "ReferencesBrowserControllerUI_FullTypeColumnDescr=Fully qualified type of owning instance",
+    "ReferencesBrowserControllerUI_ValueColumnName=Value",
+    "ReferencesBrowserControllerUI_ValueColumnDescr=Number of owning instance",
+    "ReferencesBrowserControllerUI_SizeColumnName=Size",
+    "ReferencesBrowserControllerUI_SizeColumnDescr=Size of owning instance",
+    "ReferencesBrowserControllerUI_RetainedSizeColumnName=Retained",
+    "ReferencesBrowserControllerUI_RetainedSizeColumnDescr=Retained size of owning instance"
+})
 public class ReferencesBrowserControllerUI extends JTitledPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -231,53 +254,6 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         }
     }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String VIEW_TITLE_REFERENCES = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                            "ReferencesBrowserControllerUI_ViewTitleReferences"); // NOI18N
-    private static final String NO_INSTANCE_SELECTED_MSG = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                               "ReferencesBrowserControllerUI_NoInstanceSelectedMsg"); // NOI18N
-    private static final String SHOW_LOOP_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                          "ReferencesBrowserControllerUI_ShowLoopItemText"); // NOI18N
-    private static final String SHOW_INSTANCE_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                              "ReferencesBrowserControllerUI_ShowInstanceItemText"); // NOI18N
-    private static final String SHOW_IN_CLASSES_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                                "ReferencesBrowserControllerUI_ShowInClassesItemText"); // NOI18N
-    private static final String SHOW_GCROOT_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                            "ReferencesBrowserControllerUI_ShowGcRootItemText"); // NOI18N
-    private static final String GO_TO_SOURCE_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                             "ReferencesBrowserControllerUI_GoToSourceItemText"); // NOI18N
-    private static final String SHOW_IN_THREADS_ITEM_TEXT = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                             "ReferencesBrowserControllerUI_ShowInThreadsItemText"); // NOI18N
-    private static final String SHOW_HIDE_COLUMNS_STRING = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                               "ReferencesBrowserControllerUI_ShowHideColumnsString"); // NOI18N
-    private static final String FIELD_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                        "ReferencesBrowserControllerUI_FieldColumnName"); // NOI18N
-    private static final String FIELD_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                         "ReferencesBrowserControllerUI_FieldColumnDescr"); // NOI18N
-    private static final String TYPE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                       "ReferencesBrowserControllerUI_TypeColumnName"); // NOI18N
-    private static final String TYPE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                        "ReferencesBrowserControllerUI_TypeColumnDescr"); // NOI18N
-    private static final String FULL_TYPE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                            "ReferencesBrowserControllerUI_FullTypeColumnName"); // NOI18N
-    private static final String FULL_TYPE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                             "ReferencesBrowserControllerUI_FullTypeColumnDescr"); // NOI18N
-    private static final String VALUE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                        "ReferencesBrowserControllerUI_ValueColumnName"); // NOI18N
-    private static final String VALUE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                         "ReferencesBrowserControllerUI_ValueColumnDescr"); // NOI18N
-    private static final String SIZE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                       "ReferencesBrowserControllerUI_SizeColumnName"); // NOI18N
-    private static final String SIZE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                        "ReferencesBrowserControllerUI_SizeColumnDescr"); // NOI18N
-    private static final String RETAINED_SIZE_COLUMN_NAME = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                                "ReferencesBrowserControllerUI_RetainedSizeColumnName"); // NOI18N
-    private static final String RETAINED_SIZE_COLUMN_DESCR = NbBundle.getMessage(ReferencesBrowserControllerUI.class,
-                                                                                 "ReferencesBrowserControllerUI_RetainedSizeColumnDescr"); // NOI18N
-    // -----
     private static Icon ICON_FIELDS = Icons.getIcon(HeapWalkerIcons.INCOMING_REFERENCES);
 
     // --- UI definition ---------------------------------------------------------
@@ -320,7 +296,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
     // --- Constructors ----------------------------------------------------------
     public ReferencesBrowserControllerUI(ReferencesBrowserController referencesBrowserController) {
-        super(VIEW_TITLE_REFERENCES, ICON_FIELDS, true);
+        super(Bundle.ReferencesBrowserControllerUI_ViewTitleReferences(), ICON_FIELDS, true);
 
         this.referencesBrowserController = referencesBrowserController;
 
@@ -510,7 +486,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
         final JButton cornerButton = new JButton(Icons.getIcon(GeneralIcons.HIDE_COLUMN));
-        cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
+        cornerButton.setToolTipText(Bundle.ReferencesBrowserControllerUI_ShowHideColumnsString());
         cornerButton.setDefaultCapable(false);
 
         if (UIUtils.isWindowsClassicLookAndFeel()) {
@@ -556,7 +532,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private JPopupMenu createTablePopup() {
         JPopupMenu popup = new JPopupMenu();
 
-        showInstanceItem = new JMenuItem(SHOW_INSTANCE_ITEM_TEXT);
+        showInstanceItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_ShowInstanceItemText());
         showInstanceItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     performDefaultAction();
@@ -586,7 +562,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 //                }
 //            });
 
-        showGcRootItem = new JMenuItem(SHOW_GCROOT_ITEM_TEXT);
+        showGcRootItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_ShowGcRootItemText());
         showGcRootItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     int row = fieldsListTable.getSelectedRow();
@@ -605,7 +581,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                 }
             });
 
-        showLoopOriginItem = new JMenuItem(SHOW_LOOP_ITEM_TEXT);
+        showLoopOriginItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_ShowLoopItemText());
         showLoopOriginItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     int row = fieldsListTable.getSelectedRow();
@@ -621,7 +597,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
             });
 
         if (GoToSource.isAvailable()) {
-            showSourceItem = new JMenuItem(GO_TO_SOURCE_ITEM_TEXT);
+            showSourceItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_GoToSourceItemText());
             showSourceItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         int row = fieldsListTable.getSelectedRow();
@@ -640,7 +616,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                 });
         }
             
-        showInThreadsItem = new JMenuItem(SHOW_IN_THREADS_ITEM_TEXT);
+        showInThreadsItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_ShowInThreadsItemText());
         showInThreadsItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     int row = fieldsListTable.getSelectedRow();
@@ -672,24 +648,24 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         columnToolTips = new String[columnCount];
         columnRenderers = new TableCellRenderer[columnCount];
 
-        columnNames[0] = FIELD_COLUMN_NAME;
-        columnToolTips[0] = FIELD_COLUMN_DESCR;
+        columnNames[0] = Bundle.ReferencesBrowserControllerUI_FieldColumnName();
+        columnToolTips[0] = Bundle.ReferencesBrowserControllerUI_FieldColumnDescr();
 
-        columnNames[1] = TYPE_COLUMN_NAME;
-        columnToolTips[1] = TYPE_COLUMN_DESCR;
+        columnNames[1] = Bundle.ReferencesBrowserControllerUI_TypeColumnName();
+        columnToolTips[1] = Bundle.ReferencesBrowserControllerUI_TypeColumnDescr();
 
-        columnNames[2] = FULL_TYPE_COLUMN_NAME;
-        columnToolTips[2] = FULL_TYPE_COLUMN_DESCR;
+        columnNames[2] = Bundle.ReferencesBrowserControllerUI_FullTypeColumnName();
+        columnToolTips[2] = Bundle.ReferencesBrowserControllerUI_FullTypeColumnDescr();
 
-        columnNames[3] = VALUE_COLUMN_NAME;
-        columnToolTips[3] = VALUE_COLUMN_DESCR;
+        columnNames[3] = Bundle.ReferencesBrowserControllerUI_ValueColumnName();
+        columnToolTips[3] = Bundle.ReferencesBrowserControllerUI_ValueColumnDescr();
 
-        columnNames[4] = SIZE_COLUMN_NAME;
-        columnToolTips[4] = SIZE_COLUMN_DESCR;
+        columnNames[4] = Bundle.ReferencesBrowserControllerUI_SizeColumnName();
+        columnToolTips[4] = Bundle.ReferencesBrowserControllerUI_SizeColumnDescr();
 
         if (retainedSizeSupported) {
-            columnNames[5] = RETAINED_SIZE_COLUMN_NAME;
-            columnToolTips[5] = RETAINED_SIZE_COLUMN_DESCR;
+            columnNames[5] = Bundle.ReferencesBrowserControllerUI_RetainedSizeColumnName();
+            columnToolTips[5] = Bundle.ReferencesBrowserControllerUI_RetainedSizeColumnDescr();
         }
 
         int unitWidth = getFontMetrics(getFont()).charWidth('W'); // NOI18N // initial width of data columns
@@ -806,10 +782,9 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         hintArea.setBorder(BorderFactory.createEmptyBorder(10, 8, 8, 8));
 
         String instancesRes = Icons.getResource(HeapWalkerIcons.INSTANCES);
-        String hintText = MessageFormat.format(NO_INSTANCE_SELECTED_MSG,
-                                               new Object[] {
-                                                   "<img border='0' align='bottom' src='nbresloc:/" + instancesRes + "'>" // NOI18N
-                                               });
+        String hintText = Bundle.ReferencesBrowserControllerUI_NoInstanceSelectedMsg(
+                                "<img border='0' align='bottom' src='nbresloc:/" + instancesRes + "'>"); // NOI18N
+
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);
 
