@@ -64,6 +64,8 @@ public class NbProfilerDialogOperator extends NbDialogOperator {
 	protected static final String PROFILER_STP_BUNDLE = "org.netbeans.modules.profiler.stp.Bundle";
 	protected static final String PROFILER_UTILS_BUNDLE = "org.netbeans.modules.profiler.projectsupport.utilities.Bundle";
 	protected static final String PROFILER_FILTERS_BUNDLE = "org.netbeans.lib.profiler.common.filters.Bundle";
+        protected static final String PROFILER_NBIMPL_BUNDLE = "org.netbeans.modules.profiler.nbimpl.Bundle";
+        
 	/**
 	 * String constant for title of 'profiler' dialog.
 	 */
@@ -89,7 +91,7 @@ public class NbProfilerDialogOperator extends NbDialogOperator {
 	/**
 	 * String constant for enable thread monitoring.
 	 */
-	static String tcpuProfileOnlyProject = Bundle.getStringTrimmed(PROFILER_UTILS_BUNDLE, "ProjectUtilities_ProfileProjectClassesString");
+	static String tcpuProfileOnlyProject = Bundle.getStringTrimmed(PROFILER_NBIMPL_BUNDLE, "ProjectUtilities_ProfileProjectClassesString");
 	/**
 	 * String constant for run button.
 	 */
