@@ -70,20 +70,13 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "HeapFragmentWalker_ComputeRetainedMsg=<html><b>Retained sizes will be computed.</b><br><br>For large heap dumps this operation can take a significant<br>amount of time. Do you want to continue?</html>",
+    "HeapFragmentWalker_ComputeRetainedCaption=Compute Retained Sizes",
+    "HeapFragmentWalker_ComputingRetainedMsg=Computing retained sizes...",
+    "HeapFragmentWalker_ComputingRetainedCaption=Computing Retained Sizes"
+})
 public class HeapFragmentWalker {
-
-    // -----
-    // I18N String constants
-    private static final String COMPUTE_RETAINED_MSG = NbBundle.getMessage(HeapFragmentWalker.class,
-                                                                         "HeapFragmentWalker_ComputeRetainedMsg"); // NOI18N
-    private static final String COMPUTE_RETAINED_CAPTION = NbBundle.getMessage(HeapFragmentWalker.class,
-                                                                          "HeapFragmentWalker_ComputeRetainedCaption"); // NOI18N
-    private static final String COMPUTING_RETAINED_MSG = NbBundle.getMessage(HeapFragmentWalker.class,
-                                                                         "HeapFragmentWalker_ComputingRetainedMsg"); // NOI18N
-    private static final String COMPUTING_RETAINED_CAPTION = NbBundle.getMessage(HeapFragmentWalker.class,
-                                                                          "HeapFragmentWalker_ComputingRetainedCaption"); // NOI18N
-    // -----
-
     public static final int RETAINED_SIZES_UNSUPPORTED = -1;
     public static final int RETAINED_SIZES_UNKNOWN = 0;
     public static final int RETAINED_SIZES_CANCELLED = 1;
@@ -135,8 +128,10 @@ public class HeapFragmentWalker {
         if (retainedSizesStatus != RETAINED_SIZES_UNSUPPORTED &&
             retainedSizesStatus != RETAINED_SIZES_COMPUTED) {
 
-            if (!ProfilerDialogs.displayConfirmationDNSA(COMPUTE_RETAINED_MSG, COMPUTE_RETAINED_CAPTION,
-                            null, "HeapFragmentWalker.computeRetainedSizes", false)) { //NOI18N
+            if (!ProfilerDialogs.displayConfirmationDNSA(
+                    Bundle.HeapFragmentWalker_ComputeRetainedMsg(), 
+                    Bundle.HeapFragmentWalker_ComputeRetainedCaption(),
+                    null, "HeapFragmentWalker.computeRetainedSizes", false)) { //NOI18N
                 changeState(RETAINED_SIZES_CANCELLED, masterAction);
             } else {
                 changeState(RETAINED_SIZES_COMPUTING, masterAction);
@@ -144,8 +139,9 @@ public class HeapFragmentWalker {
                 for (JavaClass jclass : classes) {
                     List<Instance> instances = jclass.getInstances();
                     if (instances.size() > 0) {
-                        Dialog progress = showProgress(COMPUTING_RETAINED_CAPTION,
-                                                   COMPUTING_RETAINED_MSG);
+                        Dialog progress = showProgress(
+                            Bundle.HeapFragmentWalker_ComputingRetainedCaption(),
+                            Bundle.HeapFragmentWalker_ComputingRetainedMsg());
                         instances.get(0).getRetainedSize();
                         if (progress != null) {
                             progress.setVisible(false);

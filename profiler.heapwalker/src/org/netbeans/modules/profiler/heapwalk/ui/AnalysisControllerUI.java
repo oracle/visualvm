@@ -88,6 +88,16 @@ import org.openide.DialogDisplayer;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "AnalysisControllerUI_InfoString=info",
+    "AnalysisControllerUI_RulesToApplyString=Rules to apply:",
+    "AnalysisControllerUI_ProcessingRulesMsg=Processing rules...",
+    "AnalysisControllerUI_CancelButtonText=Cancel",
+    "AnalysisControllerUI_PerformButtonText=Perform Analysis",
+    "AnalysisControllerUI_AnalysisResultsText=Analysis results:",
+    "AnalysisControllerUI_ControllerName=Analysis",
+    "AnalysisControllerUI_ControllerDescr=Automated dump analysis using the MemoryLint tool"
+})
 public class AnalysisControllerUI extends JPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -141,34 +151,13 @@ public class AnalysisControllerUI extends JPanel {
 
         public Presenter() {
             super();
-            setText(CONTROLLER_NAME);
-            setToolTipText(CONTROLLER_DESCR);
+            setText(Bundle.AnalysisControllerUI_ControllerName());
+            setToolTipText(Bundle.AnalysisControllerUI_ControllerDescr());
             setIcon(ICON_INFO);
             setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
         }
     }
-
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String INFO_STRING = NbBundle.getMessage(AnalysisControllerUI.class, "AnalysisControllerUI_InfoString"); // NOI18N
-    private static final String RULES_TO_APPLY_STRING = NbBundle.getMessage(AnalysisControllerUI.class,
-                                                                            "AnalysisControllerUI_RulesToApplyString"); // NOI18N
-    private static final String PROCESSING_RULES_MSG = NbBundle.getMessage(AnalysisControllerUI.class,
-                                                                           "AnalysisControllerUI_ProcessingRulesMsg"); // NOI18N
-    private static final String CANCEL_BUTTON_TEXT = NbBundle.getMessage(AnalysisControllerUI.class,
-                                                                         "AnalysisControllerUI_CancelButtonText"); // NOI18N
-    private static final String PERFORM_BUTTON_TEXT = NbBundle.getMessage(AnalysisControllerUI.class,
-                                                                          "AnalysisControllerUI_PerformButtonText"); // NOI18N
-    private static final String ANALYSIS_RESULTS_TEXT = NbBundle.getMessage(AnalysisControllerUI.class,
-                                                                            "AnalysisControllerUI_AnalysisResultsText"); // NOI18N
-    private static final String CONTROLLER_NAME = NbBundle.getMessage(AnalysisControllerUI.class,
-                                                                      "AnalysisControllerUI_ControllerName"); // NOI18N
-    private static final String CONTROLLER_DESCR = NbBundle.getMessage(AnalysisControllerUI.class,
-                                                                       "AnalysisControllerUI_ControllerDescr"); // NOI18N
-                                                                                                                // -----
-
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private AbstractButton presenter;
@@ -286,7 +275,7 @@ public class AnalysisControllerUI extends JPanel {
         settingsArea = new HTMLTextArea();
         String rulesRes = Icons.getResource(HeapWalkerIcons.RULES);
         settingsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/" + rulesRes + "'>&nbsp;&nbsp;"
-                             + RULES_TO_APPLY_STRING + "</b><br><hr>&nbsp;&nbsp;&nbsp;&nbsp;Searching for rules..."); // NOI18N
+                             + Bundle.AnalysisControllerUI_RulesToApplyString() + "</b><br><hr>&nbsp;&nbsp;&nbsp;&nbsp;Searching for rules..."); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;
@@ -297,7 +286,7 @@ public class AnalysisControllerUI extends JPanel {
         add(settingsArea, constraints);
 
         // performButton
-        performButton = new JButton(PERFORM_BUTTON_TEXT);
+        performButton = new JButton(Bundle.AnalysisControllerUI_PerformButtonText());
         performButton.setEnabled(false);
         performButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -340,7 +329,7 @@ public class AnalysisControllerUI extends JPanel {
         resultsArea = new HTMLTextArea();
         String propertiesRes = Icons.getResource(HeapWalkerIcons.PROPERTIES);
         resultsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/" + propertiesRes + "'>&nbsp;&nbsp;"
-                            + ANALYSIS_RESULTS_TEXT + "</b><br><hr>"); // NOI18N
+                            + Bundle.AnalysisControllerUI_AnalysisResultsText() + "</b><br><hr>"); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 4;
@@ -429,7 +418,7 @@ public class AnalysisControllerUI extends JPanel {
                                             });
 
                                         if (htmlDescription != null) {
-                                            HTMLLabel description = new HTMLLabel("<a href='#info'>" + INFO_STRING + "</a>") { // NOI18N
+                                            HTMLLabel description = new HTMLLabel("<a href='#info'>" + Bundle.AnalysisControllerUI_InfoString() + "</a>") { // NOI18N
                                                 protected void showURL(URL url) {
                                                     DescriptionDisplayer.showDescription(rule, htmlDescription);
                                                 }
@@ -482,7 +471,7 @@ public class AnalysisControllerUI extends JPanel {
 
                                     String rulesRes = Icons.getResource(HeapWalkerIcons.RULES);
                                     settingsArea.setText("<b><img border='0' align='bottom' src='nbresloc:/" + rulesRes + "'>&nbsp;&nbsp;"
-                                                         + RULES_TO_APPLY_STRING + "</b><br><hr>"); // NOI18N
+                                                         + Bundle.AnalysisControllerUI_RulesToApplyString() + "</b><br><hr>"); // NOI18N
                                     updatePerformButton();
                                 }
                             }
@@ -508,7 +497,7 @@ public class AnalysisControllerUI extends JPanel {
         constraints.fill = GridBagConstraints.NONE;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.insets = new Insets(0, 0, 0, 5);
-        progressContainer.add(new JLabel(PROCESSING_RULES_MSG + "  "), constraints);
+        progressContainer.add(new JLabel(Bundle.AnalysisControllerUI_ProcessingRulesMsg() + "  "), constraints);
 
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
@@ -520,7 +509,7 @@ public class AnalysisControllerUI extends JPanel {
         constraints.insets = new Insets(0, 0, 0, 8);
         progressContainer.add(new JProgressBar(progressModel), constraints);
 
-        JButton cancelAnalysis = new JButton(CANCEL_BUTTON_TEXT);
+        JButton cancelAnalysis = new JButton(Bundle.AnalysisControllerUI_CancelButtonText());
         cancelAnalysis.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     cancelAnalysis();

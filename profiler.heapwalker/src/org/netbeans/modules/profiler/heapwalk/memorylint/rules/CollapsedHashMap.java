@@ -53,7 +53,17 @@ import java.util.List;
 import java.util.Set;
 import org.openide.util.NbBundle;
 
-
+@NbBundle.Messages({
+    "LBL_CHM_Name=Collapsed (Weak)HashMaps",
+    "LBL_CHM_Desc=HashMaps populated by entries with poorly distributed hashcode",
+    "LBL_CHM_LongDesc=<html><body>This rule checks for (<code>Weak</code>)<code>" +
+    "HashMap</code>s that have bad distribution of entries among allocated buckets," +
+    "like in the illustration: <br><img src='res/wrongmap.png'><br> This can be " +
+    "caused by bad implementation of <code>hashcode()</code> or " +
+    "<code>equals()</code> methods of the objects used as map keys</body></html>",
+    "FMT_CHM_Record={0}: {1} {2,number} entries are allocated to " +
+    "{3,choice,1#'<b>one bucket</b>'|2#{3,number,integer} buckets}"
+})
 @org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
 public class CollapsedHashMap extends IteratingRule {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -78,13 +88,12 @@ public class CollapsedHashMap extends IteratingRule {
         @Override
         public String toString() {
             boolean reallyBad = slots == 1;
-            return NbBundle.getMessage(CollapsedHashMap.class, "FMT_CHM_Record",
-                    new Object[] {
+            return Bundle.FMT_CHM_Record(
                         Utils.printClass(getContext(), getContext().getRootIncommingString(hm)),
                         Utils.printInstance(hm),
                         size,
                         slots
-                    });
+                    );
         }
     }
 
@@ -104,8 +113,8 @@ public class CollapsedHashMap extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public CollapsedHashMap() {
-        super(NbBundle.getMessage(CollapsedHashMap.class, "LBL_CHM_Name"),
-                NbBundle.getMessage(CollapsedHashMap.class, "LBL_CHM_Desc"),
+        super(Bundle.LBL_CHM_Name(),
+                Bundle.LBL_CHM_Desc(),
                 "java.util.HashMap|java.util.WeakHashMap"); // NOI18N
     }
 
@@ -113,7 +122,7 @@ public class CollapsedHashMap extends IteratingRule {
 
     @Override
     public String getHTMLDescription() {
-        return NbBundle.getMessage(CollapsedHashMap.class, "LBL_CHM_LongDesc");
+        return Bundle.LBL_CHM_LongDesc();
     }
 
     public void setRatio(float ratio) {
