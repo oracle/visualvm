@@ -66,22 +66,16 @@ import org.openide.util.NbBundle;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "HintsController_NoData=&lt;No Data&gt;",
+    "HintsController_ClassName=Class Name",
+    "HintsController_RetainedSize=Retained Size"
+})
 public class HintsController extends AbstractController {
     
     private static final String CLASS_URL_PREFIX = "file://class/"; // NOI18N
     private static final String INSTANCE_URL_PREFIX = "file://instance/";   // NOI18N
-    // I18N String constants
-    private static final String CANNOT_RESOLVE_CLASS_MSG = NbBundle.getMessage(AnalysisController.class,
-            "AnalysisController_CannotResolveClassMsg"); // NOI18N
-    private static final String CANNOT_RESOLVE_INSTANCE_MSG = NbBundle.getMessage(AnalysisController.class,
-            "AnalysisController_CannotResolveInstanceMsg"); // NOI18N
-    private static final String NO_DATA_MSG = NbBundle.getMessage(HintsController.class,
-            "HintsController_NoData"); // NOI18N
-    private static final String CLASS_NAME_MSG = NbBundle.getMessage(HintsController.class,
-            "HintsController_ClassName"); // NOI18N
-    private static final String RETAINED_SIZE_MSG = NbBundle.getMessage(HintsController.class,
-            "HintsController_RetainedSize"); // NOI18N
-    
+        
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     
     private SummaryController summaryController;
@@ -116,8 +110,7 @@ public class HintsController extends AbstractController {
             if (i != null) {
                 heapFragmentWalker.getClassesController().showInstance(i);
             } else {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
-                        new Object[] { id[1], id[0] }));
+                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveInstanceMsg(id[1], id[0]));
             }
         } else if (urls.startsWith(CLASS_URL_PREFIX)) {
             urls = urls.substring(CLASS_URL_PREFIX.length());
@@ -129,7 +122,7 @@ public class HintsController extends AbstractController {
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(id[0]));
             }
         }
     }
@@ -142,7 +135,7 @@ public class HintsController extends AbstractController {
 
                 final String result = retainedSizesState == HeapFragmentWalker.
                                       RETAINED_SIZES_COMPUTED ?
-                                      findBiggestObjects(number) : NO_DATA_MSG;
+                                      findBiggestObjects(number) : Bundle.HintsController_NoData();
 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -170,8 +163,8 @@ public class HintsController extends AbstractController {
         output.append("<table border='0' width='100%'>");  // NOI18N
         output.append("<tr style='background-color:");  // NOI18N
         output.append(oddRowBackgroundString).append(";'>");  // NOI18N
-        addHeading(output, CLASS_NAME_MSG);
-        addHeading(output, RETAINED_SIZE_MSG);
+        addHeading(output, Bundle.HintsController_ClassName());
+        addHeading(output, Bundle.HintsController_RetainedSize());
         output.append("</tr>"); // NOI18N
         for(Instance in : bigObjects) {
             output.append(oddRow ? "<tr style='background-color: " + // NOI18N

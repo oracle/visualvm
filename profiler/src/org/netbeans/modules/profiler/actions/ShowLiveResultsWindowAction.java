@@ -56,19 +56,16 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_ShowLiveResultsWindowAction=&Live Results",
+    "HINT_ShowLiveResultsWindowAction=Show Live Results Window"
+})
 public final class ShowLiveResultsWindowAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final String NAME_STRING = NbBundle.getMessage(ShowLiveResultsWindowAction.class,
-                                                                  "LBL_ShowLiveResultsWindowAction"); // NOI18N
-    private static final String SHORT_DESCRIPTION_STRING = NbBundle.getMessage(ShowLiveResultsWindowAction.class,
-                                                                               "HINT_ShowLiveResultsWindowAction"); // NOI18N
-
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ShowLiveResultsWindowAction() {
-        putValue(Action.NAME, NAME_STRING);
-        putValue(Action.SHORT_DESCRIPTION, SHORT_DESCRIPTION_STRING);
+        putValue(Action.NAME, Bundle.LBL_ShowLiveResultsWindowAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_ShowLiveResultsWindowAction());
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.LIVE_RESULTS));
         putValue("iconBase", Icons.getResource(ProfilerIcons.LIVE_RESULTS)); // NOI18N
     }

@@ -57,24 +57,15 @@ import javax.swing.SwingConstants;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassesListController_GcRootString=GC Root",
+    "ClassesListController_ArrayTypeString=Array type",
+    "ClassesListController_ObjectTypeString=Object type",
+    "ClassesListController_PrimitiveTypeString=Primitive type",
+    "ClassesListController_StaticFieldString=Static field",
+    "ClassesListController_LoopString=Loop"
+})
 public class LegendPanel extends JPanel {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String GC_ROOT_STRING = NbBundle.getMessage(ClassesListController.class,
-                                                                     "ClassesListController_GcRootString"); // NOI18N
-    private static final String ARRAY_TYPE_STRING = NbBundle.getMessage(ClassesListController.class,
-                                                                        "ClassesListController_ArrayTypeString"); // NOI18N
-    private static final String OBJECT_TYPE_STRING = NbBundle.getMessage(ClassesListController.class,
-                                                                         "ClassesListController_ObjectTypeString"); // NOI18N
-    private static final String PRIMITIVE_TYPE_STRING = NbBundle.getMessage(ClassesListController.class,
-                                                                            "ClassesListController_PrimitiveTypeString"); // NOI18N
-    private static final String STATIC_FIELD_STRING = NbBundle.getMessage(ClassesListController.class,
-                                                                          "ClassesListController_StaticFieldString"); // NOI18N
-    private static final String LOOP_STRING = NbBundle.getMessage(ClassesListController.class, "ClassesListController_LoopString"); // NOI18N
-                                                                                                                                    // -----
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private JLabel gcRootLegend;
@@ -100,20 +91,20 @@ public class LegendPanel extends JPanel {
 
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
 
-        gcRootLegend = new JLabel(GC_ROOT_STRING, BrowserUtils.ICON_GCROOT, SwingConstants.LEFT);
+        gcRootLegend = new JLabel(Bundle.ClassesListController_GcRootString(), BrowserUtils.ICON_GCROOT, SwingConstants.LEFT);
         gcRootLegendDivider = new JLabel("|"); // NOI18N
 
-        legendPanel.add(new JLabel(ARRAY_TYPE_STRING, BrowserUtils.ICON_ARRAY, SwingConstants.LEFT));
+        legendPanel.add(new JLabel(Bundle.ClassesListController_ArrayTypeString(), BrowserUtils.ICON_ARRAY, SwingConstants.LEFT));
         legendPanel.add(new JLabel("|")); // NOI18N
-        legendPanel.add(new JLabel(OBJECT_TYPE_STRING, BrowserUtils.ICON_INSTANCE, SwingConstants.LEFT));
+        legendPanel.add(new JLabel(Bundle.ClassesListController_ObjectTypeString(), BrowserUtils.ICON_INSTANCE, SwingConstants.LEFT));
         legendPanel.add(new JLabel("|")); // NOI18N
-        legendPanel.add(new JLabel(PRIMITIVE_TYPE_STRING, BrowserUtils.ICON_PRIMITIVE, SwingConstants.LEFT));
+        legendPanel.add(new JLabel(Bundle.ClassesListController_PrimitiveTypeString(), BrowserUtils.ICON_PRIMITIVE, SwingConstants.LEFT));
         legendPanel.add(new JLabel("|")); // NOI18N
-        legendPanel.add(new JLabel(STATIC_FIELD_STRING, BrowserUtils.ICON_STATIC, SwingConstants.LEFT));
+        legendPanel.add(new JLabel(Bundle.ClassesListController_StaticFieldString(), BrowserUtils.ICON_STATIC, SwingConstants.LEFT));
         legendPanel.add(new JLabel("|")); // NOI18N
         legendPanel.add(gcRootLegend);
         legendPanel.add(gcRootLegendDivider);
-        legendPanel.add(new JLabel(LOOP_STRING, BrowserUtils.ICON_LOOP, SwingConstants.LEFT));
+        legendPanel.add(new JLabel(Bundle.ClassesListController_LoopString(), BrowserUtils.ICON_LOOP, SwingConstants.LEFT));
 
         //add(new JLabel("Legend:"), BorderLayout.WEST);
         add(legendPanel, BorderLayout.EAST);
