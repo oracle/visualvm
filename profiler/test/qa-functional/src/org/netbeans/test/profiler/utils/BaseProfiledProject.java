@@ -411,7 +411,7 @@ public class BaseProfiledProject {
 		}
 		ProfilerControlPanelOperator pcpo = ProfilerControlPanelOperator.getDefault();
 		if(pcpo == null){
-			print("ERROR: profiler control panle not found");
+			print("ERROR: profiler control panel not found");
 			return null;
 		}
 		pcpo.showLiveResults();

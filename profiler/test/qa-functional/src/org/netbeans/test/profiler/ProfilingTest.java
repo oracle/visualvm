@@ -78,7 +78,7 @@ public class ProfilingTest extends JellyTestCase {
             ProfilingTest.class);
             
             conf.clusters("profiler").enableModules(".*").honorAutoloadEager(true)
-            .failOnException(Level.INFO)
+            .failOnException(Level.SEVERE)
             .failOnMessage(Level.SEVERE);
         
             conf.addTest("testJavaSEProjectMonitoring").addTest("testJavaSEProjectCPU").addTest("testJavaSEProjectMemory");
