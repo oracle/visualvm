@@ -50,7 +50,10 @@ import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
+import org.netbeans.lib.profiler.results.FilterSortSupport;
 
 
 /**
@@ -181,6 +184,67 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
     public boolean containsStacks() {
         return stacksForClasses != null;
     }
+    
+    
+    public void filterReverse(String filter, int filterType, int sortBy, boolean sortOrder, PresoObjAllocCCTNode root, int classId, boolean dontShowZeroLiveObjAllocPaths) {
+        PresoObjAllocCCTNode rev =
+                (PresoObjAllocCCTNode)createPresentationCCT(classId, dontShowZeroLiveObjAllocPaths);
+        filter(filter, filterType, rev);
+        root.children = rev.children;
+        if (root.children != null) {
+            for (PresoObjAllocCCTNode ch : root.children)
+                ch.parent = root;
+            root.sortChildren(sortBy, sortOrder);
+        }
+        if (!FilterSortSupport.passesFilter(filter, filterType, root.getNodeName())) {
+            root.setFilteredNode();
+//            root.methodId = -1;
+        } else {
+            root.resetFilteredNode();
+        }
+    }
+    
+    private void filter(String filter, int filterType, PresoObjAllocCCTNode node) {
+        if (node.children != null) {
+            PresoObjAllocCCTNode filtered = null;
+            List<PresoObjAllocCCTNode> ch = new ArrayList();
+            for (PresoObjAllocCCTNode n : node.children) {
+                PresoObjAllocCCTNode nn = (PresoObjAllocCCTNode)n;
+                if (FilterSortSupport.passesFilter(filter, filterType, nn.getNodeName())) {
+                    int i = ch.indexOf(nn);
+                    if (i == -1) ch.add(nn);
+                    else ch.get(i).merge(nn);
+                } else {
+                    if (filtered == null) {
+                        nn.setFilteredNode();
+//                        nn.methodId = -1;
+                        filtered = nn;
+                        ch.add(nn);
+                    } else {
+                        filtered.merge(nn);
+                    }
+                }
+            }
+            
+            if (ch.isEmpty()) {
+                node.children = null;
+            } else {
+                if (node.isFilteredNode() && filtered != null && ch.size() == 1) {
+                    // "naive" approach, collapse simple chain of filtered out nodes
+                    PresoObjAllocCCTNode n = ch.get(0);
+                    filter(filter, filterType, n);
+                    node.children = n.children;
+                } else {
+                    node.children = ch.toArray(new PresoObjAllocCCTNode[ch.size()]);
+                }
+            }
+            
+            if (node.children != null)
+                for (PresoObjAllocCCTNode n : node.children)
+                    filter(filter, filterType, (PresoObjAllocCCTNode)n);
+        }
+    }
+    
 
     /**
      * Creates a presentation-time allocation stack traces CCT for given classId.

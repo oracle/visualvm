@@ -60,6 +60,9 @@ import org.netbeans.lib.profiler.heap.Instance;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ObjectNode_LoopToString=(loop to {0})"
+})
 public class ObjectNode extends InstanceNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -92,7 +95,7 @@ public class ObjectNode extends InstanceNode {
             String name = "[" + itemIndex + "]"; // NOI18N
 
             if (isLoop()) {
-                name += (" " + MessageFormat.format(LOOP_TO_STRING, new Object[] { BrowserUtils.getFullNodeName(getLoopTo()) }));
+                name += (" " + Bundle.ObjectNode_LoopToString(BrowserUtils.getFullNodeName(getLoopTo())));
             }
 
             if ((getMode() == HeapWalkerNode.MODE_REFERENCES) && getInstance().isGCRoot()) {
@@ -134,13 +137,6 @@ public class ObjectNode extends InstanceNode {
 
         public abstract void refreshView();
     }
-
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String LOOP_TO_STRING = NbBundle.getMessage(ObjectNode.class, "ObjectNode_LoopToString"); // NOI18N
-                                                                                                                   // -----
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

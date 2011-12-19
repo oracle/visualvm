@@ -186,7 +186,7 @@ abstract class HprofByteBuffer {
     }
 
     private String readStringNull(long[] offset, int len) {
-        StringBuffer s = new StringBuffer(20);
+        StringBuilder s = new StringBuilder(20);
         byte b = get(offset[0]++);
 
         for (; (b > 0) && (s.length() < len); b = get(offset[0]++)) {

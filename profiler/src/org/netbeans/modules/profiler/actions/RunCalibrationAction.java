@@ -58,14 +58,19 @@ import org.netbeans.modules.profiler.utilities.ProfilerUtils;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_RunCalibrationAction=&Run Profiler Calibration",
+    "HINT_RunCalibrationAction=Run Profiler Calibration",
+    "MSG_CalibrationOnProfile=Profiling session is currently in progress.\nDo you want to stop the current session and perform the calibration?",
+    "MSG_CalibrationOnAttach=Profiling session is currently in progress\nDo you want to detach from the target application and perform the calibration?",
+    "MSG_CalibrationFailed=Calibration failed.\nPlease check your setup and run the calibration again."
+})
 public final class RunCalibrationAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public RunCalibrationAction() {
-        putValue(Action.NAME, NbBundle.getMessage(RunCalibrationAction.class, "LBL_RunCalibrationAction" // NOI18N
-        ));
-        putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(RunCalibrationAction.class, "HINT_RunCalibrationAction" // NOI18N
-        ));
+        putValue(Action.NAME, Bundle.LBL_RunCalibrationAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_RunCalibrationAction());
         putValue("noIconInMenu", Boolean.TRUE); //NOI18N
     }
 
@@ -90,15 +95,17 @@ public final class RunCalibrationAction extends AbstractAction {
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
-                if (!ProfilerDialogs.displayConfirmation(NbBundle.getMessage(RunCalibrationAction.class,
-                        "MSG_CalibrationOnProfile"), NbBundle.getMessage(RunCalibrationAction.class, "CAPTION_Question"))) { //NOI18N
+                if (!ProfilerDialogs.displayConfirmation(
+                    Bundle.MSG_CalibrationOnProfile(), 
+                    Bundle.CAPTION_Question())) {
                     return;
                 }
 
                 terminate = true;
             } else {
-                if (!ProfilerDialogs.displayConfirmation(NbBundle.getMessage(RunCalibrationAction.class,
-                        "MSG_CalibrationOnAttach"), NbBundle.getMessage(RunCalibrationAction.class, "CAPTION_Question"))) { //NOI18N
+                if (!ProfilerDialogs.displayConfirmation(
+                    Bundle.MSG_CalibrationOnAttach(), 
+                    Bundle.CAPTION_Question())) { 
                     return;
                 }
 
@@ -128,7 +135,7 @@ public final class RunCalibrationAction extends AbstractAction {
                                      .runCalibration(false, calibratePlatform.getPlatformJavaFile(),
                                                          calibratePlatform.getPlatformJDKVersion(),
                                                          calibratePlatform.getPlatformArchitecture())) {
-                        ProfilerDialogs.displayError(NbBundle.getMessage(RunCalibrationAction.class, "MSG_CalibrationFailed")); //NOI18N
+                        ProfilerDialogs.displayError(Bundle.MSG_CalibrationFailed());
                     }
                 }
             }, 0, Thread.MAX_PRIORITY);

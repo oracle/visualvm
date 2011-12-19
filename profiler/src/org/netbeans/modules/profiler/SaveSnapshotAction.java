@@ -49,15 +49,11 @@ import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
-
+@NbBundle.Messages({
+    "SaveSnapshotAction_ActionName=Save Snapshot",
+    "SaveSnapshotAction_ActionDescr=Save Snapshot to Project"
+})
 class SaveSnapshotAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String ACTION_NAME = NbBundle.getMessage(SaveSnapshotAction.class, "SaveSnapshotAction_ActionName"); // NOI18N
-    private static final String ACTION_DESCR = NbBundle.getMessage(SaveSnapshotAction.class, "SaveSnapshotAction_ActionDescr"); // NOI18N
-                                                                                                                                // -----
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private LoadedSnapshot snapshot;
@@ -65,8 +61,8 @@ class SaveSnapshotAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public SaveSnapshotAction(LoadedSnapshot snapshot) {
-        putValue(Action.NAME, ACTION_NAME);
-        putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
+        putValue(Action.NAME, Bundle.SaveSnapshotAction_ActionName());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.SaveSnapshotAction_ActionDescr());
         putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE));
         putValue("iconBase", Icons.getResource(GeneralIcons.SAVE)); // NOI18N
         this.snapshot = snapshot;

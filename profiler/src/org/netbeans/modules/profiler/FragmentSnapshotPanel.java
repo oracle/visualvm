@@ -48,12 +48,9 @@ import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.coderegion.CodeRegionResultsSnapshot;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.cpu.CodeRegionSnapshotPanel;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.text.MessageFormat;
-import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -65,22 +62,14 @@ import javax.swing.event.ChangeListener;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "FragmentSnapshotPanel_CallsTabName=Calls",
+    "FragmentSnapshotPanel_InfoTabName=Info",
+    "FragmentSnapshotPanel_CallsTabDescr=Code Fragment Calls - Execution data for code region",
+    "FragmentSnapshotPanel_InfoTabDescr=Snapshot Information",
+    "FragmentSnapshotPanel_PanelTitle=Code Fragment: {0}"
+})
 public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListener, ExportAction.ExportProvider {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String CALLS_TAB_NAME = NbBundle.getMessage(FragmentSnapshotPanel.class,
-                                                                     "FragmentSnapshotPanel_CallsTabName"); //NOI18N
-    private static final String INFO_TAB_NAME = NbBundle.getMessage(FragmentSnapshotPanel.class,
-                                                                    "FragmentSnapshotPanel_InfoTabName"); //NOI18N
-    private static final String CALLS_TAB_DESCR = NbBundle.getMessage(FragmentSnapshotPanel.class,
-                                                                      "FragmentSnapshotPanel_CallsTabDescr"); //NOI18N
-    private static final String INFO_TAB_DESCR = NbBundle.getMessage(FragmentSnapshotPanel.class,
-                                                                     "FragmentSnapshotPanel_InfoTabDescr"); //NOI18N
-    private static final String PANEL_TITLE = NbBundle.getMessage(FragmentSnapshotPanel.class, "FragmentSnapshotPanel_PanelTitle"); // NOI18N
-                                                                                                                                    // -----
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private CodeRegionResultsSnapshot snapshot;
@@ -101,8 +90,8 @@ public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListen
 
         infoPanel.updateInfo();
 
-        tabs.addTab(CALLS_TAB_NAME, null, crsPanel, CALLS_TAB_DESCR);
-        tabs.addTab(INFO_TAB_NAME, null, infoPanel, INFO_TAB_DESCR);
+        tabs.addTab(Bundle.FragmentSnapshotPanel_CallsTabName(), null, crsPanel, Bundle.FragmentSnapshotPanel_CallsTabDescr());
+        tabs.addTab(Bundle.FragmentSnapshotPanel_InfoTabName(), null, infoPanel, Bundle.FragmentSnapshotPanel_InfoTabDescr());
         add(tabs, BorderLayout.CENTER);
 
         tabs.addChangeListener(this);
@@ -147,10 +136,6 @@ public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListen
         return snapshot;
     }
 
-    public String getTitle() {
-        return MessageFormat.format(PANEL_TITLE, new Object[] { StringUtils.formatUserDate(new Date(snapshot.getTimeTaken())) });
-    }
-
     public void stateChanged(ChangeEvent e) {
         updateToolbar();
     }
@@ -173,7 +158,7 @@ public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListen
     }
 
     public String getViewName() {
-        return PANEL_TITLE;
+        return "snapshot-" + snapshot.getTimeTaken() + "-fragment"; // NOI18N
     }
 
     public boolean hasLoadedSnapshot() {

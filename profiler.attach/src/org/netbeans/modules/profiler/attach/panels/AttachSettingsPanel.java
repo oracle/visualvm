@@ -67,6 +67,17 @@ import org.netbeans.modules.profiler.attach.wizard.AttachWizardContext;
  *
  * @author Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "TargetSettingsWizardPanelUI_LocalHelpString=Choose <strong>Local</strong> to profile local {0}.",
+    "TargetSettingsWizardPanelUI_RemoteHelpString=Choose <strong>Remote</strong> to profile remote {0}.",
+    "TargetSettingsWizardPanelUI_RemoteNosuppHelpString=<b>Remote</b> profiling not supported by {0}.",
+    "TargetSettingsWizardPanelUI_RemotePacksHelpString=<i>Note that the appropriate Profiler Remote pack is required for profiling remote target.</i>",
+    "TargetSettingsWizardPanelUI_DirectHelpString=Choose <strong>Direct</strong> attach to start JVM of the {0} and block its execution until the profiler connects.",
+    "TargetSettingsWizardPanelUI_DynamicHelpString=Choose <strong>Dynamic</strong> attach to start the {0} normally and then attach the profiler at any time.",
+    "TargetSettingsWizardPanelUI_DynamicNosuppHelpString=<b>Dynamic</b> attach is not supported by {0}.",
+    "TargetSettingsWizardPanelUI_DynamicJvmHelpString=<i>Note that using the {0} is required for dynamic attach.</i>"
+    
+})
 public class AttachSettingsPanel extends AttachWizardPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -89,9 +100,9 @@ public class AttachSettingsPanel extends AttachWizardPanel {
         public PanelModel() {
             Collection<? extends IntegrationProvider> instances = Lookup.getDefault().lookupAll(IntegrationProvider.class);
 
-            final TargetGroup application = new TargetGroup(APPLICATION_STRING, true);
-            final TargetGroup applet = new TargetGroup(APPLET_STRING, true);
-            final TargetGroup server = new TargetGroup(J2EE_STRING, false);
+            final TargetGroup application = new TargetGroup(Bundle.AttachWizard_GroupApplication(), true);
+            final TargetGroup applet = new TargetGroup(Bundle.AttachWizard_GroupApplet(), true);
+            final TargetGroup server = new TargetGroup(Bundle.AttachWizard_GroupJ2EE(), false);
 
             IntegrationCategorizer myCategorizer = new IntegrationCategorizer() {
                 public void addApplet(IntegrationProvider provider, int priority) {
@@ -161,7 +172,7 @@ public class AttachSettingsPanel extends AttachWizardPanel {
 
         // <editor-fold defaultstate="collapsed" desc="hints">
         public String getHints() {
-            StringBuffer hintBuffer = new StringBuffer();
+            StringBuilder hintBuffer = new StringBuilder();
 
             if (!targetGroup.isNull()) {
                 if (isLocal()) {
@@ -249,12 +260,12 @@ public class AttachSettingsPanel extends AttachWizardPanel {
         }
 
         private String getDirectHint() {
-            StringBuffer hint = new StringBuffer();
+            StringBuilder hint = new StringBuilder();
 
             if (model.isLocal()) { // don't display hints for disabled features
 
                 if (getContext().getIntegrationProvider().supportsDirect()) {
-                    hint.append(MessageFormat.format(DIRECT_HELP_STRING, new Object[] { getTargetGroup().getName() }));
+                    hint.append(Bundle.TargetSettingsWizardPanelUI_DirectHelpString(getTargetGroup().getName()));
                 }
 
                 if (hint.length() > 0) {
@@ -262,9 +273,9 @@ public class AttachSettingsPanel extends AttachWizardPanel {
                 }
 
                 if (getContext().getIntegrationProvider().supportsDynamic()) {
-                    hint.append(MessageFormat.format(DYNAMIC_HELP_STRING, new Object[] { getTargetGroup().getName() }));
+                    hint.append(Bundle.TargetSettingsWizardPanelUI_DynamicHelpString(getTargetGroup().getName()));
                 } else {
-                    hint.append(MessageFormat.format(DYNAMIC_NOSUPP_HELP_STRING, new Object[] { getTarget().getName() }));
+                    hint.append(Bundle.TargetSettingsWizardPanelUI_DynamicNosuppHelpString(getTarget().getName()));
                 }
             }
 
@@ -273,15 +284,14 @@ public class AttachSettingsPanel extends AttachWizardPanel {
 
         private String getDynamicHint() {
             return new StringBuffer(getDirectHint()).append(' ')
-                                                    .append(MessageFormat.format(DYNAMIC_JVM_HELP_STRING,
-                                                                                 new Object[] { "JDK 6.0/7.0" })).toString(); // NOI18N
+                        .append(Bundle.TargetSettingsWizardPanelUI_DynamicJvmHelpString("JDK 6.0/7.0")).toString(); // NOI18N
         }
 
         private String getLocalHint() {
-            StringBuffer hint = new StringBuffer();
+            StringBuilder hint = new StringBuilder();
 
             if (getContext().getIntegrationProvider().supportsLocal()) {
-                hint.append(MessageFormat.format(LOCAL_HELP_STRING, new Object[] { getTargetGroup().getName() }));
+                hint.append(Bundle.TargetSettingsWizardPanelUI_LocalHelpString(getTargetGroup().getName()));
             }
 
             if (hint.length() > 0) {
@@ -289,16 +299,17 @@ public class AttachSettingsPanel extends AttachWizardPanel {
             }
 
             if (getContext().getIntegrationProvider().supportsRemote()) {
-                hint.append(MessageFormat.format(REMOTE_HELP_STRING, new Object[] { getTargetGroup().getName() }));
+                hint.append(Bundle.TargetSettingsWizardPanelUI_RemoteHelpString(getTargetGroup().getName()));
             } else {
-                hint.append(MessageFormat.format(REMOTE_NOSUPP_HELP_STRING, new Object[] { getTarget().getName() }));
+                hint.append(Bundle.TargetSettingsWizardPanelUI_RemoteNosuppHelpString(getTarget().getName()));
             }
 
             return hint.toString();
         }
 
         private String getRemoteHint() {
-            return new StringBuffer(getLocalHint()).append(' ').append(REMOTE_PACKS_HELP_STRING).toString(); // NOI18N
+            return new StringBuffer(getLocalHint()).append(' ').append( // NOI18N
+                    Bundle.TargetSettingsWizardPanelUI_RemotePacksHelpString()).toString(); 
         }
 
         // </editor-fold>
@@ -446,29 +457,6 @@ public class AttachSettingsPanel extends AttachWizardPanel {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // <editor-fold defaultstate="collapsed" desc="I18N constants">
-    private static final String LOCAL_HELP_STRING = NbBundle.getMessage(AttachSettingsPanel.class,
-                                                                        "TargetSettingsWizardPanelUI_LocalHelpString"); // NOI18N
-    private static final String REMOTE_HELP_STRING = NbBundle.getMessage(AttachSettingsPanel.class,
-                                                                         "TargetSettingsWizardPanelUI_RemoteHelpString"); // NOI18N
-    private static final String REMOTE_NOSUPP_HELP_STRING = NbBundle.getMessage(AttachSettingsPanel.class,
-                                                                                "TargetSettingsWizardPanelUI_RemoteNosuppHelpString"); // NOI18N
-    private static final String REMOTE_PACKS_HELP_STRING = NbBundle.getMessage(AttachSettingsPanel.class,
-                                                                               "TargetSettingsWizardPanelUI_RemotePacksHelpString"); // NOI18N
-    private static final String DIRECT_HELP_STRING = NbBundle.getMessage(AttachSettingsPanel.class,
-                                                                         "TargetSettingsWizardPanelUI_DirectHelpString"); // NOI18N
-    private static final String DYNAMIC_HELP_STRING = NbBundle.getMessage(AttachSettingsPanel.class,
-                                                                          "TargetSettingsWizardPanelUI_DynamicHelpString"); // NOI18N
-    private static final String DYNAMIC_NOSUPP_HELP_STRING = NbBundle.getMessage(AttachSettingsPanel.class,
-                                                                                 "TargetSettingsWizardPanelUI_DynamicNosuppHelpString"); // NOI18N
-    private static final String DYNAMIC_JVM_HELP_STRING = NbBundle.getMessage(AttachSettingsPanel.class,
-                                                                              "TargetSettingsWizardPanelUI_DynamicJvmHelpString"); // NOI18N
-    private static final String APPLICATION_STRING = NbBundle.getMessage(AttachSettingsPanel.class,
-                                                                         "AttachWizard_GroupApplication"); // NOI18N
-    private static final String APPLET_STRING = NbBundle.getMessage(AttachSettingsPanel.class, "AttachWizard_GroupApplet"); // NOI18N
-    private static final String J2EE_STRING = NbBundle.getMessage(AttachSettingsPanel.class, "AttachWizard_GroupJ2EE"); // NOI18N
-
-    // </editor-fold>
     private static final String HELP_CTX_KEY = "AttachSettingsPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
 

@@ -41,22 +41,65 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.netbeans.modules.profiler.api;
 
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
-import javax.swing.*;
-
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.Cancellable;
 
 /**
- * A common superclass for all snapshot panels.
  *
- * @author Tomas Hurka
- * @author Ian Formanek
+ * @author Jaroslav Bachorik
  */
-public abstract class SnapshotPanel extends JPanel {
+public interface ProgressDisplayer {
+    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
+
+    public static interface ProgressController extends Cancellable {
+    }
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public abstract ResultsSnapshot getSnapshot();
+    public boolean isOpened();
 
-    public abstract void updateSavedState();
+    public void close();
+
+    public ProgressDisplayer showProgress(String message);
+
+    public ProgressDisplayer showProgress(String message, ProgressController controller);
+
+    public ProgressDisplayer showProgress(String caption, String message, ProgressController controller);
+    
+    public static final ProgressDisplayer DEFAULT = new ProgressDisplayer() {
+        ProgressHandle ph = null;
+
+        public synchronized ProgressDisplayer showProgress(String message) {
+            ph = ProgressHandleFactory.createHandle(message);
+            ph.start();
+            return DEFAULT;
+        }
+
+        public synchronized ProgressDisplayer showProgress(String message, ProgressController controller) {
+            ph = ProgressHandleFactory.createHandle(message, controller);
+            ph.start();
+            return DEFAULT;
+        }
+
+        public synchronized ProgressDisplayer showProgress(String caption, String message, ProgressController controller) {
+            ph = ProgressHandleFactory.createHandle(message, controller);
+            ph.start();
+            return DEFAULT;
+        }
+
+        public synchronized boolean isOpened() {
+            return ph != null;
+        }
+
+        public synchronized void close() {
+            if (ph != null) {
+                ph.finish();
+                ph = null;
+            }
+        }
+    };
+
 }

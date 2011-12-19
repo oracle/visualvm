@@ -72,6 +72,10 @@ import org.netbeans.lib.profiler.heap.JavaClass;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "InstancesListController_NoInstanceString=<No Instance>",
+    "InstancesListController_InstancesNumberString=<{0} instances>"
+})
 public class InstancesListController extends AbstractController {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
@@ -393,7 +397,7 @@ public class InstancesListController extends AbstractController {
         }
 
         protected String computeName() {
-            return MessageFormat.format(INSTANCES_NUMBER_STRING, new Object[] { (endIndex - startIndex + 1) });
+            return Bundle.InstancesListController_InstancesNumberString((endIndex - startIndex + 1));
         }
 
         protected String computeType() {
@@ -588,20 +592,10 @@ public class InstancesListController extends AbstractController {
         }
     }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String NO_INSTANCE_STRING = NbBundle.getMessage(InstancesListController.class,
-                                                                         "InstancesListController_NoInstanceString"); // NOI18N
-    private static final String INSTANCES_NUMBER_STRING = NbBundle.getMessage(InstancesListController.class,
-                                                                              "InstancesListController_InstancesNumberString"); // NOI18N
-                                                                                                                                // -----
-
     // --- Public interface ------------------------------------------------------
     public static final AbstractHeapWalkerNode EMPTY_INSTANCE_NODE = new AbstractHeapWalkerNode(null) {
         protected String computeName() {
-            return NO_INSTANCE_STRING;
+            return Bundle.InstancesListController_NoInstanceString();
         }
 
         protected String computeType() {

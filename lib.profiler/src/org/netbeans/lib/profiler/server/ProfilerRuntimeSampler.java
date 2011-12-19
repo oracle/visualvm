@@ -56,6 +56,11 @@ import org.netbeans.lib.profiler.server.system.Timers;
 class ProfilerRuntimeSampler extends ProfilerRuntime {
 
     private static Sampling sampling;
+    private static int samplingFrequency = 10;
+
+    static void setSamplngFrequency(int v) {
+        samplingFrequency = v;
+    }
     
     static class Sampling extends SamplingThread {
         private int[] states = new int[0];
@@ -64,6 +69,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
         private Map threadIdMap = new HashMap();
         private int threadCount = 0;
         private volatile boolean resetData = false;
+        private boolean sendDataAvailable = true;
         
         Sampling(int samplingInterval) {
             super(samplingInterval);
@@ -81,6 +87,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
             if (resetData) {
                 resetProfilerCollectors();
                 resetData = false;
+                sendDataAvailable = true;
             }
             Stacks.getAllStackTraces(newThreads, newStates, newMethodIds);
             timestamp = Timers.getCurrentTimeInCounts();
@@ -136,8 +143,9 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                 return; 
             }
 
-            if (globalEvBufPos == 0) {
+            if (sendDataAvailable) {
                 ProfilerServer.notifyClientOnResultsAvailability();
+                sendDataAvailable = false;
             }
 
             int curPos = globalEvBufPos;
@@ -162,10 +170,6 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
         private void writeThreadDumpEnd() {
             if (eventBuffer == null) {
                 return; 
-            }
-
-            if (globalEvBufPos == 0) {
-                ProfilerServer.notifyClientOnResultsAvailability();
             }
 
             int curPos = globalEvBufPos;
@@ -231,7 +235,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
     }
 
     static void initialize() {
-        sampling = new Sampling(10);
+        sampling = new Sampling(samplingFrequency);
         sampling.start();
     }
 
@@ -245,3 +249,4 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
         if (sampling != null) sampling.resetData = true;   
     }
 }
+

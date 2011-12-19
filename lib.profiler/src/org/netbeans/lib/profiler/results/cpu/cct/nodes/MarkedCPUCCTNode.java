@@ -56,10 +56,6 @@ public class MarkedCPUCCTNode extends TimedCPUCCTNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static class Locator {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private MarkedCPUCCTNode candidate = null;
-        private Mark searchMark;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 

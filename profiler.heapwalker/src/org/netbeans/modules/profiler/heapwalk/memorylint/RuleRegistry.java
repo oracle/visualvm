@@ -48,10 +48,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 
 /**
  *
@@ -78,19 +75,6 @@ final class RuleRegistry {
     }
 
     private static List<Rule> instantiateRules() {
-        Lookup.Template<Rule> template = new Lookup.Template<Rule>(Rule.class);
-        Lookup.Result<Rule> result = Lookup.getDefault().lookup(template);
-        Collection<Class<?extends Rule>> classes = result.allClasses();
-
-        List<Rule> list = new ArrayList<Rule>(classes.size());
-
-        for (Class<?extends Rule> cls : classes) {
-            try {
-                list.add(cls.newInstance());
-            } catch (Exception any) {
-            } // not a class/wrong class, ignore
-        }
-
-        return list;
+        return new ArrayList<Rule>(Lookup.getDefault().lookupAll(Rule.class));
     }
 }
