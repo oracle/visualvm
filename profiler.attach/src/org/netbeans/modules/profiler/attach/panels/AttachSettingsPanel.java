@@ -284,7 +284,7 @@ public class AttachSettingsPanel extends AttachWizardPanel {
 
         private String getDynamicHint() {
             return new StringBuffer(getDirectHint()).append(' ')
-                        .append(Bundle.TargetSettingsWizardPanelUI_DynamicJvmHelpString("JDK 6.0/7.0")).toString(); // NOI18N
+                        .append(Bundle.TargetSettingsWizardPanelUI_DynamicJvmHelpString("JDK 6.0/7.0/8.0")).toString(); // NOI18N
         }
 
         private String getLocalHint() {
