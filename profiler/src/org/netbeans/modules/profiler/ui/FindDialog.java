@@ -62,18 +62,15 @@ import org.openide.DialogDisplayer;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "FindDialog_FindInResultsDialogCaption=Find in Results",
+    "FindDialog_FindWhatLabelString=Find What:",
+    "FindDialog_FindButtonName=Find",
+    "FindDialog_FindWhatFieldAccessDescr=First item starting with this string will be found in results."
+})
 public class FindDialog extends JPanel {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String FIND_IN_RESULTS_DIALOG_CAPTION = NbBundle.getMessage(FindDialog.class,
-                                                                                     "FindDialog_FindInResultsDialogCaption"); //NOI18N
-    private static final String FIND_WHAT_LABEL_STRING = NbBundle.getMessage(FindDialog.class, "FindDialog_FindWhatLabelString"); //NOI18N
-    private static final String FIND_BUTTON_NAME = NbBundle.getMessage(FindDialog.class, "FindDialog_FindButtonName"); //NOI18N
-    private static final String FIND_WHAT_FIELD_ACCESS_DESCR = NbBundle.getMessage(FindDialog.class,
-                                                                                   "FindDialog_FindWhatFieldAccessDescr"); //NOI18N
-                                                                                                                           // -----
     private static FindDialog defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -95,7 +92,7 @@ public class FindDialog extends JPanel {
         final FindDialog findDialog = getDefault();
         findDialog.findWhatField.selectAll();
 
-        final DialogDescriptor dd = new DialogDescriptor(findDialog, FIND_IN_RESULTS_DIALOG_CAPTION, true,
+        final DialogDescriptor dd = new DialogDescriptor(findDialog, Bundle.FindDialog_FindInResultsDialogCaption(), true,
                                                          new Object[] { findDialog.findButton, DialogDescriptor.CANCEL_OPTION },
                                                          findDialog.findButton, DialogDescriptor.BOTTOM_ALIGN, null, null);
         final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
@@ -126,7 +123,7 @@ public class FindDialog extends JPanel {
         setLayout(new GridBagLayout());
 
         // findWhatLabel
-        findWhatLabel.setText(FIND_WHAT_LABEL_STRING);
+        findWhatLabel.setText(Bundle.FindDialog_FindWhatLabelString());
         findWhatLabel.setLabelFor(findWhatField);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -137,7 +134,7 @@ public class FindDialog extends JPanel {
         add(findWhatLabel, gridBagConstraints);
 
         // findWhatField
-        findWhatField.getAccessibleContext().setAccessibleDescription(FIND_WHAT_FIELD_ACCESS_DESCR);
+        findWhatField.getAccessibleContext().setAccessibleDescription(Bundle.FindDialog_FindWhatFieldAccessDescr());
         findWhatField.setSelectionColor(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
         findWhatField.setSelectedTextColor(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
         findWhatField.setPreferredSize(new Dimension(260, findWhatField.getPreferredSize().height));
@@ -151,7 +148,7 @@ public class FindDialog extends JPanel {
         add(findWhatField, gridBagConstraints);
 
         // findButton
-        findButton.setText(FIND_BUTTON_NAME);
+        findButton.setText(Bundle.FindDialog_FindButtonName());
 
         // panel filling bottom space
         gridBagConstraints = new java.awt.GridBagConstraints();

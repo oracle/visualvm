@@ -77,6 +77,12 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "SnapshotResultsWindow_SaveSnapshotDialogMsg=The results snapshot is not saved. Do you want to save it?",
+    "SnapshotResultsWindow_CpuSnapshotAccessDescr=Profiler snapshot with CPU results",
+    "SnapshotResultsWindow_FragmentSnapshotAccessDescr=Profiler snapshot with code fragment results",
+    "SnapshotResultsWindow_MemorySnapshotAccessDescr=Profiler snapshot with memory results"
+})
 public final class SnapshotResultsWindow extends TopComponent {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
     
@@ -157,18 +163,6 @@ public final class SnapshotResultsWindow extends TopComponent {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String SAVE_SNAPSHOT_DIALOG_MSG = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                               "SnapshotResultsWindow_SaveSnapshotDialogMsg"); // NOI18N
-    private static final String CPU_SNAPSHOT_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                                "SnapshotResultsWindow_CpuSnapshotAccessDescr"); // NOI18N
-    private static final String FRAGMENT_SNAPSHOT_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                                     "SnapshotResultsWindow_FragmentSnapshotAccessDescr"); // NOI18N
-    private static final String MEMORY_SNAPSHOT_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                                   "SnapshotResultsWindow_MemorySnapshotAccessDescr"); // NOI18N
-                                                                                                                                       // -----
     private static final Image WINDOW_ICON_CPU = Icons.getImage(ProfilerIcons.CPU);
     private static final Image WINDOWS_ICON_FRAGMENT = Icons.getImage(ProfilerIcons.FRAGMENT);
     private static final Image WINDOWS_ICON_MEMORY = Icons.getImage(ProfilerIcons.MEMORY);
@@ -212,18 +206,18 @@ public final class SnapshotResultsWindow extends TopComponent {
 
         switch (snapshot.getType()) {
             case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                getAccessibleContext().setAccessibleDescription(CPU_SNAPSHOT_ACCESS_DESCR);
+                getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_CpuSnapshotAccessDescr());
                 displayCPUResults(ls, sortingColumn, sortingOrder);
 
                 break;
             case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                getAccessibleContext().setAccessibleDescription(FRAGMENT_SNAPSHOT_ACCESS_DESCR);
+                getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_FragmentSnapshotAccessDescr());
                 displayCodeRegionResults(ls);
 
                 break;
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                getAccessibleContext().setAccessibleDescription(MEMORY_SNAPSHOT_ACCESS_DESCR);
+                getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_MemorySnapshotAccessDescr());
                 displayMemoryResults(ls, sortingColumn, sortingOrder);
 
                 break;
@@ -292,7 +286,7 @@ public final class SnapshotResultsWindow extends TopComponent {
             return true; // already saved
         }
 
-        Boolean ret = ProfilerDialogs.displayCancellableConfirmationDNSA(SAVE_SNAPSHOT_DIALOG_MSG,
+        Boolean ret = ProfilerDialogs.displayCancellableConfirmationDNSA(Bundle.SnapshotResultsWindow_SaveSnapshotDialogMsg(),
                 null, null, "org.netbeans.modules.profiler.SnapshotResultsWindow.canClose", false); // NOI18N
 
         if (Boolean.TRUE.equals(ret)) {

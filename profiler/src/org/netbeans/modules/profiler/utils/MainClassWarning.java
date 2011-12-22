@@ -46,6 +46,7 @@ package org.netbeans.modules.profiler.utils;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -54,6 +55,9 @@ import org.openide.util.Lookup;
  * @author Tomas Hurka
  * @author Jiri Rechtacek
  */
+@NbBundle.Messages({
+    "AD_MainClassWarning=N/A"
+})
 public class MainClassWarning extends JPanel {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -98,14 +102,12 @@ public class MainClassWarning extends JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = new MainClassChooser(project,
-                                       org.openide.util.NbBundle.getBundle(MainClassWarning.class)
-                                                                .getString("CTL_SelectAvaialableMainClasses")); // NOI18N
+        jPanel1 = new MainClassChooser(project, Bundle.CTL_SelectAvaialableMainClasses());
 
         setLayout(new java.awt.GridBagLayout());
 
         getAccessibleContext()
-            .setAccessibleDescription(org.openide.util.NbBundle.getBundle(MainClassWarning.class).getString("AD_MainClassWarning")); // NOI18N
+            .setAccessibleDescription(Bundle.AD_MainClassWarning());
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, this.message);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
