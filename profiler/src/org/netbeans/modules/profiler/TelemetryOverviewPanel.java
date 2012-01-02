@@ -89,6 +89,7 @@ public final class TelemetryOverviewPanel extends TopComponent {
      */
     public TelemetryOverviewPanel() {
         setName(Bundle.LAB_TelemetryOverviewPanelName());
+        setIcon(windowIcon);
         getAccessibleContext().setAccessibleDescription(Bundle.TelemetryOverviewPanel_TelemetryOverviewAccessDescr());
 
         graphsPanel = new MonitoringGraphsPanel();
