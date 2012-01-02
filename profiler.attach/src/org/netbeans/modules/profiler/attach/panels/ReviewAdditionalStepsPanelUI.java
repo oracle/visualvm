@@ -44,16 +44,19 @@
 package org.netbeans.modules.profiler.attach.panels;
 
 import java.text.MessageFormat;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author  Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "AdditionalStepsWizardPanelUI_StartAutomaticallyString=&Automatically start the server"
+})
 public class ReviewAdditionalStepsPanelUI extends javax.swing.JPanel {
-  private final String checkAutomationText = java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/wizard/Bundle").getString("AdditionalStepsWizardPanelUI_StartAutomaticallyString"); // NOI18N
-
   private ReviewAdditionalStepsPanel.Model model = null;
-
+  final private String automaticStartMsg = Bundle.AdditionalStepsWizardPanelUI_StartAutomaticallyString();
+  
   /**
    * Creates new form ReviewAdditionalStepsPanelUI
    */
@@ -77,10 +80,8 @@ public class ReviewAdditionalStepsPanelUI extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(400, 300));
         setPreferredSize(new java.awt.Dimension(500, 300));
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/Bundle"); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(checkAutomation, bundle.getString("AdditionalStepsWizardPanelUI_StartAutomaticallyString")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(checkAutomation, automaticStartMsg);
         checkAutomation.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        checkAutomation.setMargin(new java.awt.Insets(0, 0, 0, 0));
         checkAutomation.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkAutomationActionPerformed(evt);
@@ -90,6 +91,7 @@ public class ReviewAdditionalStepsPanelUI extends javax.swing.JPanel {
         additionalSteps.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         additionalSteps.setHintText(org.openide.util.NbBundle.getMessage(ReviewAdditionalStepsPanelUI.class, "ReviewAdditionalStepsPanelUI.additionalSteps.hintText")); // NOI18N
         additionalSteps.setPreferredSize(new java.awt.Dimension(10, 10));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/Bundle"); // NOI18N
         additionalSteps.setTitle(bundle.getString("AttachWizard_ReviewAdditionalStepsMsg")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -99,7 +101,7 @@ public class ReviewAdditionalStepsPanelUI extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(additionalSteps, javax.swing.GroupLayout.DEFAULT_SIZE, 460, Short.MAX_VALUE)
+                    .addComponent(additionalSteps, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
                     .addComponent(checkAutomation, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -107,13 +109,13 @@ public class ReviewAdditionalStepsPanelUI extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(additionalSteps, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
+                .addComponent(additionalSteps, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(checkAutomation)
                 .addContainerGap())
         );
 
-        checkAutomation.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(ReviewAdditionalStepsPanelUI.class, "ReviewAdditionalStepsPanelUI.checkAutomation.AccessibleContext.accessibleDescription")); // NOI18N
+        checkAutomation.getAccessibleContext().setAccessibleDescription(automaticStartMsg);
     }// </editor-fold>//GEN-END:initComponents
     
     private void checkAutomationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkAutomationActionPerformed
@@ -128,7 +130,7 @@ public class ReviewAdditionalStepsPanelUI extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
     
     public void refresh() {
-      checkAutomation.setText(MessageFormat.format(checkAutomationText, new Object[]{model.getProviderName()}));
+      checkAutomation.setText(automaticStartMsg);
       this.additionalSteps.setSteps(this.model.getAdditionalSteps());
       this.checkAutomation.setSelected(this.model.getAutomaticStart());
     }

@@ -44,9 +44,7 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.modules.profiler.ThreadsWindow;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -58,21 +56,16 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "ShowThreadsViewAction_ActionName=&Threads",
+    "ShowThreadsViewAction_ActionDescr=Show Threads View"
+})
 public final class ShowThreadsViewAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String ACTION_NAME = NbBundle.getMessage(ShowThreadsViewAction.class, "ShowThreadsViewAction_ActionName"); // NOI18N
-    private static final String ACTION_DESCR = NbBundle.getMessage(ShowThreadsViewAction.class,
-                                                                   "ShowThreadsViewAction_ActionDescr"); // NOI18N
-                                                                                                         // -----
-
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ShowThreadsViewAction() {
-        putValue(Action.NAME, ACTION_NAME);
-        putValue(Action.SHORT_DESCRIPTION, ACTION_DESCR);
+        putValue(Action.NAME, Bundle.ShowThreadsViewAction_ActionName());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.ShowThreadsViewAction_ActionDescr());
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
         putValue("iconBase", Icons.getResource(ProfilerIcons.WINDOW_THREADS)); // NOI18N
     }

@@ -44,7 +44,8 @@
 package org.netbeans.lib.profiler.ui.components.tree;
 
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -85,7 +86,7 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
      */
     public CheckTreeNode(Object userObject, final Icon icon) {
         super(userObject);
-        setChecked(false);
+        checkState = STATE_UNCHECKED;
         this.icon = icon;
     }
 
@@ -134,7 +135,7 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
     }
 
     protected Collection setPartiallyChecked() {
-        LinkedList changedNodes = new LinkedList();
+        Set changedNodes = new HashSet();
         changedNodes.add(this);
 
         // Check if change is needed
@@ -160,7 +161,7 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
 
     // --- Private implementation ------------------------------------------------
     private Collection setFullyChecked() {
-        LinkedList changedNodes = new LinkedList();
+        Set changedNodes = new HashSet();
         changedNodes.add(this);
 
         // Check if change is needed
@@ -198,7 +199,7 @@ public class CheckTreeNode extends DefaultMutableTreeNode {
     }
 
     private Collection setUnchecked() {
-        LinkedList changedNodes = new LinkedList();
+        Set changedNodes = new HashSet();
         changedNodes.add(this);
 
         // Check if change is needed

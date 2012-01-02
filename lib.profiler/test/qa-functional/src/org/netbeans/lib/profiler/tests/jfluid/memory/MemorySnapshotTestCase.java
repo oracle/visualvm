@@ -169,7 +169,7 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
                 }
 
                 if (match) {
-                    StringBuffer out = new StringBuffer();
+                    StringBuilder out = new StringBuilder();
                     out.append(complete(StringUtils.userFormClassName(classnames[i]), 32));
                     //out.append(complete(StringUtils.nBytesToString(objsizes[i]), 10));
                     out.append(complete(String.valueOf(objcnts[i]), 8));
@@ -208,7 +208,7 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
                 }
 
                 if (match) {
-                    StringBuffer out = new StringBuffer();
+                    StringBuilder out = new StringBuilder();
                     out.append(complete(StringUtils.userFormClassName(classnames[i]), 32));
                     //out.append(complete(StringUtils.nBytesToString(trackedLiveObjectsSize[i]), 10));
                     out.append(complete(String.valueOf(ntrackedliveobjects[i]), 10));

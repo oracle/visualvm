@@ -65,13 +65,13 @@ import org.netbeans.lib.profiler.heap.JavaClass;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "InstanceNode_LoopToString=(loop to {0})",
+    "InstanceNode_References=Computing references..."
+})
 public abstract class InstanceNode extends AbstractHeapWalkerNode implements HeapWalkerInstanceNode {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String LOOP_TO_STRING = NbBundle.getMessage(InstanceNode.class, "InstanceNode_LoopToString"); // NOI18N
-    private static final String REFERENCES_STRING = NbBundle.getMessage(InstanceNode.class, "InstanceNode_References"); // NOI18N
     private static final NumberFormat numberFormat = NumberFormat.getInstance();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
             ProgressHandle pHandle = null;
 
             try {
-                pHandle = ProgressHandleFactory.createHandle(REFERENCES_STRING);
+                pHandle = ProgressHandleFactory.createHandle(Bundle.InstanceNode_References());
                 pHandle.setInitialDelay(200);
                 pHandle.start(HeapProgress.PROGRESS_MAX);
 
@@ -164,7 +164,7 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
 
     protected String computeName() {
         if (isLoop()) {
-            return name + " " + MessageFormat.format(LOOP_TO_STRING, new Object[] { BrowserUtils.getFullNodeName(getLoopTo()) });
+            return name + " " + Bundle.InstanceNode_LoopToString(BrowserUtils.getFullNodeName(getLoopTo()));
         }
 
         return name;

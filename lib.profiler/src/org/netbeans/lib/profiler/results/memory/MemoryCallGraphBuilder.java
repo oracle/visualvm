@@ -503,7 +503,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
     }
 
     protected void doShutdown() {
-        loadNamesForJMethodIds();
+        // #204978: 'loadNamesForJMethodIds()' must be called on SHUTDOWN_INITIATED command
     }
 
     protected void doStartup(ProfilerClient profilerClient) {

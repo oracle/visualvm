@@ -50,6 +50,7 @@ import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import java.util.ResourceBundle;
+import org.netbeans.lib.profiler.results.FilterSortSupport;
 
 
 /**
@@ -72,6 +73,8 @@ public class PresoObjAllocCCTNode implements CCTNode {
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_ALLOC_OBJ_SIZE = 2;
     public static final int SORT_BY_ALLOC_OBJ_NUMBER = 3;
+    
+    protected static final char MASK_FILTERED_NODE = 0x8;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -84,6 +87,8 @@ public class PresoObjAllocCCTNode implements CCTNode {
     String nodeName;
     PresoObjAllocCCTNode[] children;
     int methodId;
+    
+    protected char flags;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -167,7 +172,9 @@ public class PresoObjAllocCCTNode implements CCTNode {
     }
 
     public String getNodeName() {
-        if (methodId != 0) {
+        if (isFilteredNode()) {
+            return FilterSortSupport.FILTERED_OUT_LBL;
+        } else if (methodId != 0) {
             return nodeName;
         } else {
             return className;
@@ -209,6 +216,44 @@ public class PresoObjAllocCCTNode implements CCTNode {
 
     public String toString() {
         return getNodeName();
+    }
+    
+    public void setFilteredNode() {
+        flags |= MASK_FILTERED_NODE;
+    }
+    
+    public void resetFilteredNode() {
+        flags &= ~MASK_FILTERED_NODE;
+    }
+
+    public boolean isFilteredNode() {
+        return (flags & MASK_FILTERED_NODE) != 0;
+    }
+    
+    void merge(PresoObjAllocCCTNode node) {
+        nCalls += node.nCalls;
+        totalObjSize += totalObjSize;
+        
+        if (node.children != null) {
+            for (PresoObjAllocCCTNode ch : node.children)
+                ch.parent = this;
+            
+            int chl = children == null ? 0 : children.length;
+            int newchl = node.children.length;
+            PresoObjAllocCCTNode[] newch = new PresoObjAllocCCTNode[chl + newchl];
+            if (children != null) System.arraycopy(children, 0, newch, 0, chl);
+            System.arraycopy(node.children, 0, newch, chl, newchl);
+            children = newch;
+        }
+    }
+    
+    public boolean equals(Object o) {
+        if (!(o instanceof PresoObjAllocCCTNode)) return false;
+        return getNodeName().equals(((PresoObjAllocCCTNode)o).getNodeName());
+    }
+    
+    public int hashCode() {
+        return getNodeName().hashCode();
     }
 
     protected static void assignNamesToNodesFromSnapshot(MemoryResultsSnapshot snapshot, PresoObjAllocCCTNode rootNode,
@@ -452,10 +497,10 @@ public class PresoObjAllocCCTNode implements CCTNode {
     public void exportXMLData(ExportDataDumper eDD,String indent) {
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result = new StringBuffer(indent+"<Node>"+newline); //NOI18N
-        result.append(indent+" <Name>"+replaceHTMLCharacters(getNodeName())+"<Name>"+newline); //NOI18N
-        result.append(indent+" <Parent>"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"<Parent>"+newline); //NOI18N
-        result.append(indent+" <Bytes_Allocated>"+totalObjSize+"</Bytes_Allocated>"+newline); //NOI18N
-        result.append(indent+" <Objects_Allocated>"+nCalls+"</Objects_Allocated>"+newline); //NOI18N
+        result.append(indent).append(" <Name>").append(replaceHTMLCharacters(getNodeName())).append("<Name>").append(newline); //NOI18N
+        result.append(indent).append(" <Parent>").append(replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))).append("<Parent>").append(newline); //NOI18N
+        result.append(indent).append(" <Bytes_Allocated>").append(totalObjSize).append("</Bytes_Allocated>").append(newline); //NOI18N
+        result.append(indent).append(" <Objects_Allocated>").append(nCalls).append("</Objects_Allocated>").append(newline); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
@@ -472,7 +517,7 @@ public class PresoObjAllocCCTNode implements CCTNode {
         for (int i=0; i<depth; i++) {
             result.append("."); //NOI18N
         }
-        result.append(replaceHTMLCharacters(getNodeName())+"</pre></td><td class=\"right\">"+totalObjSize+"</td><td class=\"right\">"+nCalls+"</td><td class=\"parent\"><pre class=\"parent\">"+replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+"</pre></td></tr>"); //NOI18N
+        result.append(replaceHTMLCharacters(getNodeName())).append("</pre></td><td class=\"right\">").append(totalObjSize).append("</td><td class=\"right\">").append(nCalls).append("</td><td class=\"parent\"><pre class=\"parent\">").append(replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))).append("</pre></td></tr>"); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
@@ -483,7 +528,7 @@ public class PresoObjAllocCCTNode implements CCTNode {
     }
 
     private String replaceHTMLCharacters(String s) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int len = s.length();
         for (int i = 0; i < len; i++) {
           char c = s.charAt(i);
@@ -509,10 +554,10 @@ public class PresoObjAllocCCTNode implements CCTNode {
         for (int i=0; i<depth; i++) {
             result.append(indent); // to simulate the tree structure in CSV
         }
-        result.append(((nodeName==null)?(className):(nodeName)) + quote + separator);
-        result.append(quote+totalObjSize+quote+separator);
-        result.append(quote+nCalls+quote+separator);
-        result.append(quote+((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))+newLine); // NOI18N
+        result.append((nodeName==null)?(className):(nodeName)).append(quote).append(separator);
+        result.append(quote).append(totalObjSize).append(quote).append(separator);
+        result.append(quote).append(nCalls).append(quote).append(separator);
+        result.append(quote).append((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName())).append(newLine); // NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {

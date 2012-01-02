@@ -159,14 +159,14 @@ public class CodeRegionLivePanel extends JPanel implements LiveResultsPanel {
     }
 
     private String getResultsText(long[] results, long timerCountsInSecond) {
-        StringBuffer resultText = new StringBuffer(results.length * 10);
+        StringBuilder resultText = new StringBuilder(results.length * 10);
         StringBuffer summaryOfTimes = new StringBuffer();
         long sum = 0;
         long min;
         long max;
 
         if (results.length < 2) {
-            resultText.append("<i>" + NO_RESULTS_REGION_MSG + "</i>"); // NOI18N
+            resultText.append("<i>").append(NO_RESULTS_REGION_MSG).append("</i>"); // NOI18N
         } else {
             min = max = results[1];
 

@@ -106,7 +106,14 @@ public class ManualIntegrationPanel extends AttachWizardPanel {
                 for (Iterator it = TargetPlatformEnum.iterator(); it.hasNext();) {
                     TargetPlatformEnum jvm = (TargetPlatformEnum) it.next();
 
-                    if (settings.isDirect() || settings.isRemote() || (settings.isDynamic16() && (jvm.equals(TargetPlatformEnum.JDK6) || jvm.equals(TargetPlatformEnum.JDK7)))) {
+                    if (settings.isDirect() || settings.isRemote()
+                       || (settings.isDynamic16() 
+                            && (jvm.equals(TargetPlatformEnum.JDK6) 
+                                || jvm.equals(TargetPlatformEnum.JDK7)
+                                || jvm.equals(TargetPlatformEnum.JDK8)
+                               )
+                          )
+                       ) {
                         if (getContext().getIntegrationProvider().supportsJVM(jvm, settings)) {
                             supportedJvms.add(jvm);
                         }

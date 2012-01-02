@@ -56,20 +56,18 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_TelemetryOverviewAction=Telemetry &Overview",
+    "HINT_TelemetryOverviewAction=Telemetry Overview"
+})
 public final class TelemetryOverviewAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final String NAME_STRING = NbBundle.getMessage(TelemetryOverviewAction.class, "LBL_TelemetryOverviewAction"); // NOI18N
-    private static final String SHORT_DESCRIPTION_STRING = NbBundle.getMessage(TelemetryOverviewAction.class,
-                                                                               "HINT_TelemetryOverviewAction"); // NOI18N
-
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     private static TelemetryOverviewAction instance;
     
     private TelemetryOverviewAction() {
-        putValue(Action.NAME, NAME_STRING);
-        putValue(Action.SHORT_DESCRIPTION, SHORT_DESCRIPTION_STRING);
+        putValue(Action.NAME, Bundle.LBL_TelemetryOverviewAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_TelemetryOverviewAction());
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.WINDOW_TELEMETRY_OVERVIEW));
         putValue("iconBase", Icons.getResource(ProfilerIcons.WINDOW_TELEMETRY_OVERVIEW)); // NOI18N
     }

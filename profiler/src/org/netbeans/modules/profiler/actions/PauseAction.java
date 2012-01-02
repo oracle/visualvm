@@ -61,6 +61,10 @@ import org.openide.util.NbBundle;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_PauseAction=Pause",
+    "HINT_PauseAction=Pause"
+})
 public final class PauseAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -80,7 +84,7 @@ public final class PauseAction extends ProfilingAwareAction {
     }
 
     public String getName() {
-        return NbBundle.getMessage(PauseAction.class, "LBL_PauseAction"); //NOI18N
+        return Bundle.LBL_PauseAction();
     }
 
     public void performAction() {

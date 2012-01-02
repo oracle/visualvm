@@ -74,6 +74,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.openide.cookies.OpenCookie;
@@ -88,6 +89,39 @@ import org.openide.util.Lookup;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "ResultsManager_SnapshotSaveFailedMsg=Failed to save snapshot: {0}",
+    "ResultsManager_SnapshotCreateFailedMsg=Failed to create snapshot file: {0}",
+    "ResultsManager_ProfiledAppTerminatedMsg=Failed to obtain results snapshot. The profiled application terminated.",
+    "ResultsManager_DataNotAvailableMsg=Failed to obtain results snapshot. Data is not available yet.",
+    "ResultsManager_OutOfMemoryMsg=Too much data collected - the profiler ran out of memory.\n\nCollected profiling data has been deleted and profiling resumed.\nTo avoid this error, increase the -Xmx value\nin the etc/netbeans.conf file in NetBeans IDE installation\nor decrease the amount of detail in profiling settings.",
+    "ResultsManager_SnapshotDeleteFailedMsg=Failed to delete the snapshot file: {0}",
+    "ResultsManager_CantFindSnapshotLocationMsg=Cannot find default location for snapshot in project: {0}",
+    "ResultsManager_SnapshotCreateInProjectFailedMsg=Failed to create snapshot file in project: {0}",
+    "ResultsManager_SnapshotLoadFailedMsg=Error while loading snapshot: {0}",
+    "ResultsManager_SnapshotsLoadFailedMsg=Loading snapshots failed.",
+    "ResultsManager_ObtainSavedSnapshotsFailedMsg=Failed to obtain list of saved snaphshots for project: {0}",
+    "ResultsManager_SelectDirDialogCaption=Select Target Directory",
+    "ResultsManager_SaveButtonName=Save",
+    "ResultsManager_OverwriteFileDialogCaption=Overwrite Existing File?",
+    "ResultsManager_OverwriteFileDialogMsg=The target folder already contains file {0}\n Do you want to overwrite this file?",
+    "ResultsManager_FileDeleteFailedMsg=Cannot delete the existing file: {0}",
+    "ResultsManager_SnapshotExportFailedMsg=Failed to save snapshot: {0}",
+    "ResultsManager_SaveSnapshotsDialogCaption=Question",
+    "ResultsManager_SaveSnapshotsDialogMsg=You have {0} unsaved snapshot(s).\nDo you want to save them before exiting the IDE?",
+    "ResultsManager_SelectFileOrDirDialogCaption=Select File or Directory",
+    "ResultsManager_ProfilerSnapshotFileFilter=Profiler Snapshot File (*.{0})",
+    "ResultsManager_ProfilerHeapdumpFileFilter=Heap Dump File (*.{0})",
+    "ResultsManager_OutOfMemorySavingMsg=<html><b>Not enough memory to save the snapshot.</b><br><br>To avoid this error, increase the -Xmx value<br>in the etc/netbeans.conf file in NetBeans IDE installation.</html>",
+    "ResultsManager_CannotCompareSnapshotsMsg=<html><b>Cannot compare snapshots:</b><br><br>  {0}<br>  {1}<br><br>Make sure that both snaphots are the same type.</html>",
+    "ResultsManager_DirectoryDoesntExistCaption=Selected Directory Does Not Exist",
+    "ResultsManager_DirectoryDoesntExistMsg=The directory you have selected does not exist.\nDo you want to create the directory?",
+    "ResultsManager_SnapshotLoadFailed=<html>Snapshot <b>{0}</b> failed to load</html>",
+    "ResultsManager_CannotOpenSnapshotMsg=<html><b>Cannot open profiler snapshot.</b><br><br>Attempting to open null snapshot.<br>Check the logfile for details.</html>",
+    "ResultsManager_CpuSnapshotDisplayName=cpu: {0}",
+    "ResultsManager_MemorySnapshotDisplayName=mem: {0}",
+    "ResultsManager_HeapSnapshotDisplayName=heap: {0}"
+})
 public final class ResultsManager {
     final private static Logger LOGGER = Logger.getLogger(ResultsManager.class.getName());
     
@@ -126,62 +160,6 @@ public final class ResultsManager {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String PROFILED_APP_TERMINATED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                  "ResultsManager_ProfiledAppTerminatedMsg"); // NOI18N
-    private static final String DATA_NOT_AVAILABLE_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                             "ResultsManager_DataNotAvailableMsg"); // NOI18N
-    private static final String OUT_OF_MEMORY_MSG = NbBundle.getMessage(ResultsManager.class, "ResultsManager_OutOfMemoryMsg"); // NOI18N
-    private static final String SNAPSHOT_DELETE_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                 "ResultsManager_SnapshotDeleteFailedMsg"); // NOI18N
-    private static final String SNAPSHOT_SAVE_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                               "ResultsManager_SnapshotSaveFailedMsg"); // NOI18N
-    private static final String CANT_FIND_SNAPSHOT_LOCATION_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                      "ResultsManager_CantFindSnapshotLocationMsg"); // NOI18N
-    private static final String SNAPSHOT_CREATE_IN_PROJECT_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                            "ResultsManager_SnapshotCreateInProjectFailedMsg"); // NOI18N
-    private static final String SNAPSHOT_LOAD_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                               "ResultsManager_SnapshotLoadFailedMsg"); // NOI18N
-    private static final String SNAPSHOTS_LOAD_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                "ResultsManager_SnapshotsLoadFailedMsg"); // NOI18N
-    private static final String OBTAIN_SAVED_SNAPSHOTS_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                        "ResultsManager_ObtainSavedSnapshotsFailedMsg"); // NOI18N
-    private static final String SELECT_DIR_DIALOG_CAPTION = NbBundle.getMessage(ResultsManager.class,
-                                                                                "ResultsManager_SelectDirDialogCaption"); // NOI18N
-    private static final String SAVE_BUTTON_NAME = NbBundle.getMessage(ResultsManager.class, "ResultsManager_SaveButtonName"); // NOI18N
-    private static final String OVERWRITE_FILE_DIALOG_CAPTION = NbBundle.getMessage(ResultsManager.class,
-                                                                                    "ResultsManager_OverwriteFileDialogCaption"); // NOI18N
-    private static final String OVERWRITE_FILE_DIALOG_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                "ResultsManager_OverwriteFileDialogMsg"); // NOI18N
-    private static final String FILE_DELETE_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                             "ResultsManager_FileDeleteFailedMsg"); // NOI18N
-    private static final String SNAPSHOT_EXPORT_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                 "ResultsManager_SnapshotExportFailedMsg"); // NOI18N
-    private static final String SAVE_SNAPSHOTS_DIALOG_CAPTION = NbBundle.getMessage(ResultsManager.class,
-                                                                                    "ResultsManager_SaveSnapshotsDialogCaption"); // NOI18N
-    private static final String SAVE_SNAPSHOTS_DIALOG_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                "ResultsManager_SaveSnapshotsDialogMsg"); // NOI18N
-    private static final String SELECT_FILE_OR_DIR_DIALOG_CAPTION = NbBundle.getMessage(ResultsManager.class,
-                                                                                        "ResultsManager_SelectFileOrDirDialogCaption"); // NOI18N
-    private static final String PROFILER_SNAPSHOT_FILE_FILTER = NbBundle.getMessage(ResultsManager.class,
-                                                                                    "ResultsManager_ProfilerSnapshotFileFilter"); // NOI18N
-    private static final String PROFILER_HEAPDUMP_FILE_FILTER = NbBundle.getMessage(ResultsManager.class,
-                                                                                    "ResultsManager_ProfilerHeapdumpFileFilter"); // NOI18N
-    private static final String SNAPSHOT_CREATE_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,
-                                                                                 "ResultsManager_SnapshotCreateFailedMsg"); // NOI18N
-    private static final String OUT_OF_MEMORY_SAVING = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                           "ResultsManager_OutOfMemorySavingMsg"); // NOI18N
-    private static final String CANNOT_COMPARE_SNAPSHOTS_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                   "ResultsManager_CannotCompareSnapshotsMsg"); // NOI18N
-    private static final String DIRECTORY_DOESNT_EXIST_CAPTION = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                     "ResultsManager_DirectoryDoesntExistCaption"); // NOI18N
-    private static final String DIRECTORY_DOESNT_EXIST_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                 "ResultsManager_DirectoryDoesntExistMsg"); // NOI18N
-    private static final String CANNOT_OPEN_SNAPSHOT_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                 "ResultsManager_CannotOpenSnapshotMsg"); // NOI18N
-                                                                                                                            // -----
     public static final String SNAPSHOT_EXTENSION = "nps"; // NOI18N
     public static final String HEAPDUMP_EXTENSION = "hprof"; // NOI18N
     /* see  org.netbeans.core.ui.sampler.SampleOutputStream.FILE_EXT */
@@ -218,6 +196,48 @@ public final class ResultsManager {
 
     public String getDefaultSnapshotFileName(LoadedSnapshot ls) {
         return "snapshot-" + ls.getSnapshot().getTimeTaken(); // NOI18N
+    }
+        
+    public String getSnapshotDisplayName(String fileName, int snapshotType) {
+        String displayName;
+        if (fileName.startsWith("snapshot-")) { // NOI18N
+            String time = fileName.substring("snapshot-".length(), fileName.length()); // NOI18N
+            try {
+                long timeStamp = Long.parseLong(time);
+                displayName = StringUtils.formatUserDate(new Date(timeStamp));
+            } catch (NumberFormatException e) {
+                // file name is probably customized
+                displayName = fileName;
+            }
+        } else {
+            displayName = fileName;
+        }
+        switch (snapshotType) {
+            case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                return Bundle.ResultsManager_CpuSnapshotDisplayName(displayName);
+            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                return Bundle.ResultsManager_MemorySnapshotDisplayName(displayName);
+            default:
+                return displayName;
+        }
+    }
+    
+    public String getHeapDumpDisplayName(String fileName) {
+        String displayName;
+        if (fileName.startsWith("heapdump-")) { // NOI18N
+            String time = fileName.substring("heapdump-".length(), fileName.length()); // NOI18N
+            try {
+                long timeStamp = Long.parseLong(time);
+                displayName = StringUtils.formatUserDate(new Date(timeStamp));
+            } catch (NumberFormatException e) {
+                // file name is probably customized
+                displayName = fileName;
+            }
+        } else {
+            displayName = fileName;
+        }
+        return Bundle.ResultsManager_HeapSnapshotDisplayName(displayName);
     }
 
     public LoadedSnapshot[] getLoadedSnapshots() {
@@ -297,7 +317,7 @@ public final class ResultsManager {
                 s2 = loadSnapshotFromFileObject(snapshot2FO);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }), e);
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotLoadFailed(e.getMessage()), e);
 
             return;
         }
@@ -305,7 +325,7 @@ public final class ResultsManager {
         if ((s1 != null) && (s2 != null)) {
             compareSnapshots(s1, s2);
         } else {
-            ProfilerDialogs.displayError(SNAPSHOTS_LOAD_FAILED_MSG);
+            ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotsLoadFailedMsg());
         }
     }
 
@@ -327,8 +347,9 @@ public final class ResultsManager {
             sdw.open();
             sdw.requestActive();
         } else {
-            ProfilerDialogs.displayError(MessageFormat.format(CANNOT_COMPARE_SNAPSHOTS_MSG,
-                                                               new Object[] { s1.getFile().getName(), s2.getFile().getName() }));
+            ProfilerDialogs.displayError(Bundle.ResultsManager_CannotCompareSnapshotsMsg(
+                                            s1.getFile().getName(), 
+                                            s2.getFile().getName()));
         }
     }
 
@@ -338,7 +359,7 @@ public final class ResultsManager {
         try {
             snapshotFile.delete();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_DELETE_FAILED_MSG, new Object[] { e.getMessage() }), e);
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotDeleteFailedMsg(e.getMessage()), e);
 
             return; // do not proceed with removing the snapshot from internal structures
         }
@@ -367,8 +388,8 @@ public final class ResultsManager {
                 chooser.setCurrentDirectory(exportDir);
             }
 
-            chooser.setDialogTitle(SELECT_DIR_DIALOG_CAPTION);
-            chooser.setApproveButtonText(SAVE_BUTTON_NAME);
+            chooser.setDialogTitle(Bundle.ResultsManager_SelectDirDialogCaption());
+            chooser.setApproveButtonText(Bundle.ResultsManager_SaveButtonName());
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             chooser.setMultiSelectionEnabled(false);
 
@@ -376,7 +397,9 @@ public final class ResultsManager {
                 File file = chooser.getSelectedFile();
 
                 if (!file.exists()) {
-                    if (!ProfilerDialogs.displayConfirmation(DIRECTORY_DOESNT_EXIST_MSG, DIRECTORY_DOESNT_EXIST_CAPTION)) {
+                    if (!ProfilerDialogs.displayConfirmation(
+                            Bundle.ResultsManager_DirectoryDoesntExistMsg(), 
+                            Bundle.ResultsManager_DirectoryDoesntExistCaption())) {
                         return; // cancelled by the user
                     }
 
@@ -435,9 +458,9 @@ public final class ResultsManager {
         }
 
         if (unsaved.size() > 0) {
-            Boolean ret = ProfilerDialogs.displayCancellableConfirmation(MessageFormat.format(
-                    SAVE_SNAPSHOTS_DIALOG_MSG, new Object[] { "" + unsaved.size() }), // NOI18N
-                    SAVE_SNAPSHOTS_DIALOG_CAPTION);
+            Boolean ret = ProfilerDialogs.displayCancellableConfirmation(
+                    Bundle.ResultsManager_SaveSnapshotsDialogMsg("" + unsaved.size()), // NOI18N
+                    Bundle.ResultsManager_SaveSnapshotsDialogCaption());
 
             if (Boolean.TRUE.equals(ret)) {
                 Iterator unsIt = unsaved.iterator();
@@ -520,7 +543,7 @@ public final class ResultsManager {
 
             return ret;
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MessageFormat.format(OBTAIN_SAVED_SNAPSHOTS_FAILED_MSG, new Object[] { e.getMessage() }), e);
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);
 
             return new FileObject[0];
         }
@@ -569,7 +592,7 @@ public final class ResultsManager {
 
             return ret;
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MessageFormat.format(OBTAIN_SAVED_SNAPSHOTS_FAILED_MSG, new Object[] { e.getMessage() }), e);
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);
 
             return new FileObject[0];
         }
@@ -579,7 +602,7 @@ public final class ResultsManager {
         try {
             return loadSnapshotImpl(selectedFile);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }), e);
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotLoadFailed(e.getMessage()), e);
 
             return null;
         }
@@ -594,7 +617,7 @@ public final class ResultsManager {
                     ret[i] = loadSnapshotImpl(selectedFiles[i]);
                 }
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_LOAD_FAILED_MSG, new Object[] { e.getMessage() }), e);
+                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotLoadFailedMsg(selectedFiles[i].getNameExt()));
             }
         }
 
@@ -624,7 +647,7 @@ public final class ResultsManager {
     }
 
     public void openSnapshot(final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
-        if (ls == null) ProfilerDialogs.displayError(CANNOT_OPEN_SNAPSHOT_MSG);
+        if (ls == null) ProfilerDialogs.displayError(Bundle.ResultsManager_CannotOpenSnapshotMsg());
         else CommonUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls, sortingColumn, sortingOrder);
@@ -655,12 +678,8 @@ public final class ResultsManager {
         } catch (Exception e) {
             ProfilerLogger.log(e);
 
-            NotifyDescriptor.Message loadFailed = new NotifyDescriptor.Message(NbBundle.getMessage(ResultsManager.class,
-                                                                                                   "ResultsManager_SnapshotLoadFailed",
-                                                                                                   new Object[] {
-                                                                                                       loadedSnapshot.getFile()
-                                                                                                                     .getAbsolutePath()
-                                                                                                   })); // NOI18N
+            NotifyDescriptor.Message loadFailed = new NotifyDescriptor.Message(Bundle.ResultsManager_SnapshotLoadFailed(
+                                                                                loadedSnapshot.getFile().getAbsolutePath()));
             DialogDisplayer.getDefault().notify(loadFailed);
         }
     }
@@ -700,9 +719,9 @@ public final class ResultsManager {
                         break;
                 }
             } catch (ClientUtils.TargetAppOrVMTerminated e1) {
-                LOGGER.log(Level.SEVERE, PROFILED_APP_TERMINATED_MSG, e1);
+                LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ProfiledAppTerminatedMsg(), e1);
             } catch (CPUResultsSnapshot.NoDataAvailableException e2) {
-                LOGGER.log(Level.SEVERE, DATA_NOT_AVAILABLE_MSG, e2);
+                LOGGER.log(Level.SEVERE, Bundle.ResultsManager_DataNotAvailableMsg(), e2);
             } catch (OutOfMemoryError e) {
                 try {
                     reset(); // reset the client data
@@ -712,7 +731,7 @@ public final class ResultsManager {
                     runner.getProfilerClient().resetClientData();
                 }
 
-                LOGGER.log(Level.SEVERE, OUT_OF_MEMORY_MSG, e);
+                LOGGER.log(Level.SEVERE, Bundle.ResultsManager_OutOfMemoryMsg(), e);
             }
         } finally {
             if (snapshot != null) {
@@ -771,7 +790,7 @@ public final class ResultsManager {
             } catch (Exception e2) {
             }
 
-            ProfilerDialogs.displayError(MessageFormat.format(SNAPSHOT_SAVE_FAILED_MSG, new Object[] { e.getMessage() }));
+            ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotSaveFailedMsg(e.getMessage()));
 
             return false; // failure => we wont continue with firing the event
         } catch (OutOfMemoryError e) {
@@ -786,7 +805,7 @@ public final class ResultsManager {
             } catch (Exception e2) {
             }
 
-            ProfilerDialogs.displayError(OUT_OF_MEMORY_SAVING);
+            ProfilerDialogs.displayError(Bundle.ResultsManager_OutOfMemorySavingMsg());
 
             return false; // failure => we wont continue with firing the event
         } finally {
@@ -807,7 +826,7 @@ public final class ResultsManager {
         try {
             saveDir = ProjectStorage.getSettingsFolder(p, true);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MessageFormat.format(CANT_FIND_SNAPSHOT_LOCATION_MSG, new Object[] { e.getMessage() }), e);
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_CantFindSnapshotLocationMsg(e.getMessage()), e);
 
             return false;
         }
@@ -815,7 +834,7 @@ public final class ResultsManager {
         try {
             profFile = saveDir.createData(getDefaultSnapshotFileName(ls), SNAPSHOT_EXTENSION);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_CREATE_IN_PROJECT_FAILED_MSG, new Object[] { e.getMessage() }), e);
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotCreateInProjectFailedMsg(e.getMessage()), e);
 
             return false;
         }
@@ -959,16 +978,15 @@ public final class ResultsManager {
 
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         chooser.setMultiSelectionEnabled(false);
-        chooser.setDialogTitle(SELECT_FILE_OR_DIR_DIALOG_CAPTION);
-        chooser.setApproveButtonText(SAVE_BUTTON_NAME);
+        chooser.setDialogTitle(Bundle.ResultsManager_SelectFileOrDirDialogCaption());
+        chooser.setApproveButtonText(Bundle.ResultsManager_SaveButtonName());
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
                 public boolean accept(File f) {
                     return f.isDirectory() || f.getName().endsWith("." + (heapdump ? HEAPDUMP_EXTENSION : SNAPSHOT_EXTENSION)); //NOI18N
                 }
 
                 public String getDescription() {
-                    return MessageFormat.format(PROFILER_SNAPSHOT_FILE_FILTER,
-                                                new Object[] { heapdump ? HEAPDUMP_EXTENSION : SNAPSHOT_EXTENSION });
+                    return Bundle.ResultsManager_ProfilerSnapshotFileFilter(heapdump ? HEAPDUMP_EXTENSION : SNAPSHOT_EXTENSION);
                 }
             });
 
@@ -992,7 +1010,7 @@ public final class ResultsManager {
             String fName = file.getName();
 
             // divide the file name into name and extension
-            int idx = fName.lastIndexOf("."); // NOI18N
+            int idx = fName.lastIndexOf('.'); // NOI18N
 
             if (idx == -1) { // no extension
                 targetName = fName;
@@ -1013,18 +1031,17 @@ public final class ResultsManager {
         FileObject existingFile = sf.folder.getFileObject(sf.fileName, sf.fileExt);
 
         if (existingFile != null) {
-            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(OVERWRITE_FILE_DIALOG_MSG,
-                                                                                                  new Object[] {
-                                                                                                      sf.fileName + "." //NOI18N
-                                                                                                      + sf.fileExt
-                                                                                                  }), OVERWRITE_FILE_DIALOG_CAPTION)) {
+            if (!ProfilerDialogs.displayConfirmation(Bundle.ResultsManager_OverwriteFileDialogMsg(
+                                                        sf.fileName + "." //NOI18N
+                                                        + sf.fileExt), 
+                                                     Bundle.ResultsManager_OverwriteFileDialogCaption())) {
                 return false; // cancelled by the user
             }
 
             try {
                 existingFile.delete();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, MessageFormat.format(FILE_DELETE_FAILED_MSG, new Object[] { e.getMessage() }), e);
+                LOGGER.log(Level.SEVERE, Bundle.ResultsManager_FileDeleteFailedMsg(e.getMessage()), e);
 
                 return false;
             }
@@ -1038,7 +1055,7 @@ public final class ResultsManager {
             try {
                 FileUtil.copyFile(selectedSnapshot, targetFolder, fileName, fileExt);
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_EXPORT_FAILED_MSG, new Object[] { e.getMessage() }), e);
+                LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotExportFailedMsg(e.getMessage()), e);
             }
         }
     }
