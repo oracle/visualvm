@@ -46,11 +46,6 @@ package org.netbeans.modules.profiler;
 import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.actions.FindAction;
-import org.openide.cookies.SaveCookie;
-import org.openide.nodes.AbstractNode;
-import org.openide.nodes.Children;
-import org.openide.nodes.CookieSet;
-import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CallbackSystemAction;
 import org.openide.util.actions.SystemAction;
@@ -67,7 +62,11 @@ import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.spi.actions.AbstractSavable;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.lookup.AbstractLookup;
+import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 
 
@@ -128,37 +127,38 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class SaveNode extends AbstractNode {
-        //~ Constructors ---------------------------------------------------------------------------------------------------------
-
-        /**
-         * Create a new abstract node with a given child set.
-         */
-        public SaveNode() {
-            super(Children.LEAF);
-            setCookieSet(CookieSet.createGeneric(null));
-        }
-
+    private class SavePerformer extends AbstractSavable {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public void setSaveEnabled(boolean saveEnabled) {
-            if (saveEnabled) {
-                if (getCookie(SaveCookie.class) == null) {
-                    getCookieSet().add(savePerformer);
-                }
-            } else {
-                if (getCookie(SaveCookie.class) != null) {
-                    getCookieSet().remove(savePerformer);
-                }
-            }
+        private void add() {
+            register();
+            ic.add(this);
         }
-    }
+        
+        private void remove() {
+             unregister();
+             ic.remove(this);
+        }
+        
+        @Override
+        protected String findDisplayName() {
+            return tabName;
+        }
 
-    private class SavePerformer implements SaveCookie {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public void save() throws IOException {
+        @Override
+        protected void handleSave() {
             ResultsManager.getDefault().saveSnapshot(snapshot);
+            ic.remove(this);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return this == obj;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(this);
         }
     }
 
@@ -172,7 +172,7 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     private Component lastFocusOwner;
     private LoadedSnapshot snapshot;
-    private SaveNode saveSupport = new SaveNode();
+    private InstanceContent ic = new InstanceContent();
     private SavePerformer savePerformer = new SavePerformer();
     private SnapshotPanel displayedPanel;
     private String tabName = ""; // NOI18N // default
@@ -195,6 +195,8 @@ public final class SnapshotResultsWindow extends TopComponent {
      * @param ls The results snapshot to display
      */
     public SnapshotResultsWindow(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
+        associateLookup(new AbstractLookup(ic));
+        ic.add(getActionMap());
         this.snapshot = ls;
         updateSaveState();
 
@@ -276,9 +278,7 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     public boolean canClose() {
         if (forcedClose) {
-            // clean up to avoid being held in memory
-            setActivatedNodes(new Node[0]);
-
+            savePerformer.remove();
             return true;
         }
 
@@ -290,15 +290,15 @@ public final class SnapshotResultsWindow extends TopComponent {
                 null, null, "org.netbeans.modules.profiler.SnapshotResultsWindow.canClose", false); // NOI18N
 
         if (Boolean.TRUE.equals(ret)) {
-            ResultsManager.getDefault().saveSnapshot(snapshot);
-            // clean up to avoid being held in memory
-            setActivatedNodes(new Node[0]);
-
+            try {
+                savePerformer.save();
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
             return true;
         } else if (Boolean.FALSE.equals(ret)) {
             // clean up to avoid being held in memory
-            setActivatedNodes(new Node[0]);
-
+            savePerformer.remove();
             return true;
         } else {
             return false;
@@ -416,12 +416,18 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     private void updateSaveState() {
         if (snapshot != null) { // snapshot == null means the window has been closed (#202992)
-            saveSupport.setSaveEnabled(!snapshot.isSaved());
-            setActivatedNodes(new Node[] { saveSupport });
+            if (snapshot.isSaved()) {
+                savePerformer.remove();
+            } else {
+                savePerformer.add();
+            }
 
             if (displayedPanel != null) {
                 displayedPanel.updateSavedState();
             }
+        } else {
+            // just to be sure
+            savePerformer.remove();
         }
     }
 }
