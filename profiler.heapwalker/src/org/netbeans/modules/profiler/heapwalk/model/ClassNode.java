@@ -75,13 +75,6 @@ public class ClassNode extends AbstractHeapWalkerNode {
         public abstract void refreshView();
     }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String NONE_STRING = NbBundle.getMessage(ClassNode.class, "ClassNode_NoneString"); // NOI18N
-                                                                                                            // -----
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private JavaClass javaClass;
@@ -149,8 +142,9 @@ public class ClassNode extends AbstractHeapWalkerNode {
         return javaClass.getName();
     }
 
+    @NbBundle.Messages("ClassNode_NoneString=<none>")
     protected String computeValue() {
-        return NONE_STRING;
+        return Bundle.ClassNode_NoneString();
     }
 
     protected String computeSize() {

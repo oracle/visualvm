@@ -65,45 +65,31 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import javax.management.openmbean.CompositeData;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.openide.util.Lookup;
 
-
+@NbBundle.Messages({
+    "LoadedSnapshot_IllegalSnapshotDataMsg=Illegal snapshot data",
+    "LoadedSnapshot_InvalidSnapshotFileMsg=Not a valid NetBeans Profiler snapshot file",
+    "LoadedSnapshot_UnsupportedSnapshotVersionMsg=Unsupported file version",
+    "LoadedSnapshot_WrongSnapshotTypeMsg=Incorrect snapshot type",
+    "LoadedSnapshot_CannotReadSnapshotDataMsg=Cannot read snapshot data",
+    "LoadedSnapshot_CannotReadSettingsDataMsg=Cannot read settings data",
+    "LoadedSnapshot_UnrecognizedSnapshotTypeMsg=Unrecognized snapshot type",
+    "LoadedSnapshot_SnapshotDataCorruptedMsg=Snapshot data corrupted",
+    "LoadedSnapshot_SnapshotFileShortMsg=File too short",
+    "LoadedSnapshot_SnapshotFileCorrupted=Snapshot file corrupted",
+    "LoadedSnapshot_SnapshotFileCorruptedReason=Snapshot file is corrupted: {0}",
+    "LoadedSnapshot_OutOfMemoryLoadingMsg=Not enough memory to load snapshot.\n\nTo avoid this error, increase the -Xmx value\nin the etc/netbeans.conf file in NetBeans IDE installation and restart the IDE."
+})
 public class LoadedSnapshot {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Logger LOGGER = Logger.getLogger(LoadedSnapshot.class.getName());
-
-    // -----
-    // I18N String constants
-    private static final String ILLEGAL_SNAPSHOT_DATA_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                "LoadedSnapshot_IllegalSnapshotDataMsg"); // NOI18N
-    private static final String INVALID_SNAPSHOT_FILE_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                "LoadedSnapshot_InvalidSnapshotFileMsg"); // NOI18N
-    private static final String UNSUPPORTED_SNAPSHOT_VERSION_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                       "LoadedSnapshot_UnsupportedSnapshotVersionMsg"); // NOI18N
-    private static final String WRONG_SNAPSHOT_TYPE_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                              "LoadedSnapshot_WrongSnapshotTypeMsg"); // NOI18N
-    private static final String CANNOT_READ_SNAPSHOT_DATA_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                    "LoadedSnapshot_CannotReadSnapshotDataMsg"); // NOI18N
-    private static final String CANNOT_READ_SETTINGS_DATA_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                    "LoadedSnapshot_CannotReadSettingsDataMsg"); // NOI18N
-    private static final String UNRECOGNIZED_SNAPSHOT_TYPE_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                     "LoadedSnapshot_UnrecognizedSnapshotTypeMsg"); // NOI18N
-    private static final String SNAPSHOT_DATA_CORRUPTED_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                  "LoadedSnapshot_SnapshotDataCorruptedMsg"); // NOI18N
-    private static final String SNAPSHOT_FILE_SHORT_MSG = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                              "LoadedSnapshot_SnapshotFileShortMsg"); // NOI18N
-    private static final String SNAPSHOT_FILE_CORRUPTED = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                              "LoadedSnapshot_SnapshotFileCorrupted"); // NOI18N
-    private static final String SNAPSHOT_FILE_CORRUPTED_REASON = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                                     "LoadedSnapshot_SnapshotFileCorruptedReason"); // NOI18N
-    private static final String OUT_OF_MEMORY_LOADING = NbBundle.getMessage(LoadedSnapshot.class,
-                                                                            "LoadedSnapshot_OutOfMemoryLoadingMsg"); // NOI18N
-                                                                                                                     // -----
 
     //  private static final boolean DEBUG = true; //System.getProperty("org.netbeans.modules.profiler.LoadedSnapshot") != null; // TODO [m7] : change to property
     public static final int SNAPSHOT_TYPE_UNKNOWN = 0;
@@ -114,7 +100,7 @@ public class LoadedSnapshot {
     public static final int SNAPSHOT_TYPE_MEMORY = SNAPSHOT_TYPE_MEMORY_ALLOCATIONS | SNAPSHOT_TYPE_MEMORY_LIVENESS;
     public static final String PROFILER_FILE_MAGIC_STRING = "nBpRoFiLeR"; // NOI18N
     private static final byte SNAPSHOT_FILE_VERSION_MAJOR = 1;
-    private static final byte SNAPSHOT_FILE_VERSION_MINOR = 1;
+    private static final byte SNAPSHOT_FILE_VERSION_MINOR = 2;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -122,6 +108,7 @@ public class LoadedSnapshot {
     private ProfilingSettings settings;
     private Lookup.Provider project = null;
     private ResultsSnapshot snapshot;
+    private String userComments = ""; // NOI18N
     private boolean saved = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -157,6 +144,12 @@ public class LoadedSnapshot {
     public void setFile(File file) {
         this.file = file;
         saved = true;
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (SnapshotResultsWindow.hasSnapshotWindow(LoadedSnapshot.this))
+                        SnapshotResultsWindow.get(LoadedSnapshot.this).refreshTabName();
+                }
+            });
     }
 
     /**
@@ -176,6 +169,17 @@ public class LoadedSnapshot {
 
     public boolean isSaved() {
         return saved;
+    }
+    
+    public void setUserComments(String userComments) {
+        if (!this.userComments.equals(userComments)) {
+            this.userComments = userComments;
+            setSaved(false);
+        }
+    }
+    
+    public String getUserComments() {
+        return userComments;
     }
 
     /**
@@ -202,7 +206,7 @@ public class LoadedSnapshot {
         } else if (snapshot instanceof AllocMemoryResultsSnapshot) {
             return SNAPSHOT_TYPE_MEMORY_ALLOCATIONS;
         } else {
-            throw new IllegalStateException(ILLEGAL_SNAPSHOT_DATA_MSG);
+            throw new IllegalStateException(Bundle.LoadedSnapshot_IllegalSnapshotDataMsg());
         }
     }
 
@@ -225,7 +229,7 @@ public class LoadedSnapshot {
                 return null;
             }
         } catch (IOException ex) {
-            if (INVALID_SNAPSHOT_FILE_MSG.equals(ex.getMessage())) {
+            if (Bundle.LoadedSnapshot_InvalidSnapshotFileMsg().equals(ex.getMessage())) {
                 dis.reset();
                 return loadSnapshotFromStackTraces(dis);
             }
@@ -307,6 +311,7 @@ public class LoadedSnapshot {
             // 4. snapshot data bytes
             // 5. int length of settings data size
             // 6. settings data bytes (.properties plain text file format)
+            // 7. String (UTF) custom comments
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("save version:" + SNAPSHOT_FILE_VERSION_MAJOR //NOI18N
                               + "." + SNAPSHOT_FILE_VERSION_MINOR); // NOI18N
@@ -325,6 +330,7 @@ public class LoadedSnapshot {
             dos.write(compressedBytes, 0, compressedLen); // 6. compressed snapshot data bytes
             dos.writeInt(baos2.size()); // 7. int length of settings data size
             dos.write(baos2.toByteArray()); // 8. settings data bytes (.properties plain text file format)
+            dos.writeUTF(userComments);
         } catch (OutOfMemoryError e) {
             baos = null;
             bufBaos = null;
@@ -359,12 +365,12 @@ public class LoadedSnapshot {
 
         if (message == null) {
             if (e instanceof EOFException) {
-                return MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON, new Object[] { SNAPSHOT_FILE_SHORT_MSG });
+                return Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_SnapshotFileShortMsg());
             } else {
-                return SNAPSHOT_FILE_CORRUPTED;
+                return Bundle.LoadedSnapshot_SnapshotFileCorrupted();
             }
         } else {
-            return MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON, new Object[] { message });
+            return Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(message);
         }
     }
 
@@ -380,13 +386,14 @@ public class LoadedSnapshot {
             // 4. snapshot data bytes
             // 5. int length of settings data size
             // 6. settings data bytes (.properties plain text file format)
+            // 7. String (UTF) custom comments
 
             // 1. magic number: "nbprofiler"
             byte[] magicArray = new byte[PROFILER_FILE_MAGIC_STRING.length()];
             int len = dis.read(magicArray);
 
             if ((len != PROFILER_FILE_MAGIC_STRING.length()) || !PROFILER_FILE_MAGIC_STRING.equals(new String(magicArray))) {
-                throw new IOException(INVALID_SNAPSHOT_FILE_MSG);
+                throw new IOException(Bundle.LoadedSnapshot_InvalidSnapshotFileMsg());
             }
 
             // 2. int type
@@ -394,16 +401,14 @@ public class LoadedSnapshot {
             byte minorVersion = dis.readByte();
 
             if (majorVersion > SNAPSHOT_FILE_VERSION_MAJOR) {
-                throw new IOException(MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON,
-                                                           new Object[] { UNSUPPORTED_SNAPSHOT_VERSION_MSG }));
+                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_UnsupportedSnapshotVersionMsg()));
             }
 
             // 3. int type
             int type = dis.readInt();
 
             if (type == -1) {
-                throw new IOException(MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON,
-                                                           new Object[] { WRONG_SNAPSHOT_TYPE_MSG }));
+                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_WrongSnapshotTypeMsg()));
             }
 
             // 4. int length of snapshot data size
@@ -415,8 +420,7 @@ public class LoadedSnapshot {
             int readLen1 = dis.read(dataBytes, 0, compressedDataLen);
 
             if (compressedDataLen != readLen1) {
-                throw new IOException(MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON,
-                                                           new Object[] { CANNOT_READ_SNAPSHOT_DATA_MSG }));
+                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_CannotReadSnapshotDataMsg()));
             }
 
             // 6. int length of settings data size
@@ -427,8 +431,11 @@ public class LoadedSnapshot {
             int readLen2 = dis.read(settingsBytes);
 
             if (settingsLen != readLen2) {
-                throw new IOException(MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON,
-                                                           new Object[] { CANNOT_READ_SETTINGS_DATA_MSG }));
+                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_CannotReadSettingsDataMsg()));
+            }
+            
+            if (minorVersion >= SNAPSHOT_FILE_VERSION_MINOR) {
+                userComments = dis.readUTF();
             }
 
             // Process read data:
@@ -458,8 +465,7 @@ public class LoadedSnapshot {
 
                     break;
                 default:
-                    throw new IOException(MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON,
-                                                               new Object[] { UNRECOGNIZED_SNAPSHOT_TYPE_MSG })); // not supported
+                    throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_UnrecognizedSnapshotTypeMsg())); // not supported
             }
 
             Inflater d = new Inflater();
@@ -471,12 +477,10 @@ public class LoadedSnapshot {
                 int decLen = d.inflate(decompressedBytes);
 
                 if (decLen != uncompressedDataLen) {
-                    throw new IOException(MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON,
-                                                               new Object[] { SNAPSHOT_DATA_CORRUPTED_MSG }));
+                    throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_SnapshotDataCorruptedMsg()));
                 }
             } catch (DataFormatException e) {
-                throw new IOException(MessageFormat.format(SNAPSHOT_FILE_CORRUPTED_REASON,
-                                                           new Object[] { SNAPSHOT_DATA_CORRUPTED_MSG }));
+                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorrupted());
             }
 
             d.end();
@@ -513,7 +517,7 @@ public class LoadedSnapshot {
                 LOGGER.finest("-------------------------------------------------------------------------------"); // NOI18N
             }
         } catch (OutOfMemoryError e) {
-            ProfilerDialogs.displayError(OUT_OF_MEMORY_LOADING);
+            ProfilerDialogs.displayError(Bundle.LoadedSnapshot_OutOfMemoryLoadingMsg());
 
             return false;
         }

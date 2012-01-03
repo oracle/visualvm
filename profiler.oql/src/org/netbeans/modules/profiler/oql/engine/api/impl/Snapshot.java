@@ -114,7 +114,7 @@ public class Snapshot {
     private String preprocessClassName(String className) {
         int arrDim = 0;
         if (className.startsWith("[")) { // NOI18N
-            arrDim = className.lastIndexOf("[") + 1; // NOI18N
+            arrDim = className.lastIndexOf('[') + 1; // NOI18N
 
             className = className.substring(arrDim);
         }

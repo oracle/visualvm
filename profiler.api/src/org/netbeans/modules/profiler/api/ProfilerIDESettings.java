@@ -59,13 +59,6 @@ import java.util.prefs.Preferences;
 public final class ProfilerIDESettings implements GlobalProfilingSettings {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String PROFILER_IDE_SETTINGS_NAME = NbBundle.getMessage(ProfilerIDESettings.class,
-                                                                                 "ProfilerIDESettings_Name" // NOI18N
-    );
-
-    // -----
     public static final String DO_NOT_SHOW_ATTACH_SETTINGS = "dns-attach-settings"; // NOI18N
     public static final String DO_NOT_SHOW_JDK_DIALOG = "dns-jdk-dialog"; // NOI18N
     public static final String DO_NOT_SHOW_PID_WINDOWS = "dns-pid-windows4"; // NOI18N
@@ -165,11 +158,34 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private ProfilerIDESettings() {
         try {
             if (contains55Settings()) convert55Settings();
+            else if (contains701Settings()) convert701Settings();
         } catch (BackingStoreException e) {
             // Silently skip exception in NB55 settings
         }
     }
     
+    //~ Conversion of 7.0 / 7.0.1 settings ---------------------------------------------------------------------------------------
+    
+    private boolean contains701Settings() throws BackingStoreException {
+        return get701Preferences().keys().length > 0;
+    }
+    
+    private void convert701Settings() throws BackingStoreException {
+        Preferences preferences = getPreferences();
+        Preferences pref701 = get701Preferences();
+        
+        for (String key : pref701.keys()) {
+            String oldValue = pref701.get(key, null);
+            
+            assert oldValue != null;
+            preferences.put(key, oldValue);
+        }
+        pref701.clear();
+    }
+    
+    private Preferences get701Preferences() {
+        return NbPreferences.root().node("org/netbeans/modules/profiler");  // NOI18N
+    }
     
     //~ Conversion of 5.5 / 5.5.1 settings ---------------------------------------------------------------------------------------
     
@@ -493,8 +509,11 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     }
 
     // -------------------------
+    @NbBundle.Messages({
+        "ProfilerIDESettings_Name=Profiler Settings"
+    })
     public String displayName() {
-        return PROFILER_IDE_SETTINGS_NAME;
+        return Bundle.ProfilerIDESettings_Name();
     }
 
     private Map<String, String> getDNSAMap() {
@@ -525,7 +544,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     }
 
     private void storeDNSAMap() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (Iterator it = getDNSAMap().entrySet().iterator(); it.hasNext();) {
             Map.Entry e = (Map.Entry) it.next();

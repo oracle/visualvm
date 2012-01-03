@@ -56,6 +56,10 @@ import org.openide.windows.WindowManager;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "OpenHeapWalkerAction_ActionName=Load Heap D&ump...",
+    "OpenHeapWalkerAction_DialogCaption=Open Heap Dump File"
+})
 public final class OpenHeapWalkerAction implements ActionListener {
     private static File importDir;
 
@@ -80,7 +84,7 @@ public final class OpenHeapWalkerAction implements ActionListener {
         chooser.setMultiSelectionEnabled(false);
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
         chooser.setDialogTitle(
-            NbBundle.getMessage(OpenHeapWalkerAction.class, "OpenHeapWalkerAction_DialogCaption") // NOI18N
+            Bundle.OpenHeapWalkerAction_DialogCaption()
         );
 
         if (chooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {

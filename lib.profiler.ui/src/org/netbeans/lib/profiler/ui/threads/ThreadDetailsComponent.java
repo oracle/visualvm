@@ -358,7 +358,7 @@ public class ThreadDetailsComponent extends JPanel {
             int wMarkStringNoMillis = g.getFontMetrics().stringWidth(markStringNoMillis); // width of the mark's string without milliseconds
             String markStringMillis = TimeLineUtils.getTimeMarkMillisString(currentMark, optimalUnits);
 
-            if (!markStringMillis.equals("")) {
+            if (!markStringMillis.isEmpty()) {
                 markStringMillis = "." + markStringMillis; // NOI18N
             }
 
@@ -1148,7 +1148,7 @@ public class ThreadDetailsComponent extends JPanel {
                 resetData();
             }
 
-            StringBuffer detailsToAppend = new StringBuffer();
+            StringBuilder detailsToAppend = new StringBuilder();
 
             for (int i = lastStatesCount; i < threadData.size(); i++) {
                 long timeStamp = threadData.getTimeStampAt(i);

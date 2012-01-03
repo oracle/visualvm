@@ -161,16 +161,20 @@ public abstract class ProfilingSettingsSupportProvider {
     public static class Default extends Basic {
 
         @Override
+        @NbBundle.Messages({
+            "ProfilingSettingsSupportProvider_ProfileProjectClassesString=Profile only project classes"
+        })
         public String getProjectOnlyFilterName() {
-            return NbBundle.getMessage(ProfilingSettingsSupportProvider.class,
-                    "ProfilingSettingsSupportProvider_ProfileProjectClassesString"); // NOI18N
+            return Bundle.ProfilingSettingsSupportProvider_ProfileProjectClassesString();
         }
         
         @Override
+        @NbBundle.Messages({
+            "ProfilingSettingsSupportProvider_ProfileProjectSubprojectClassesString=Profile project & subprojects classes"
+        })
         public String getProjectSubprojectsFilterName() {
             return !ProjectUtilities.hasSubprojects(getProject()) ? null :
-                    NbBundle.getMessage(ProfilingSettingsSupportProvider.class,
-                    "ProfilingSettingsSupportProvider_ProfileProjectSubprojectClassesString"); // NOI18N
+                    Bundle.ProfilingSettingsSupportProvider_ProfileProjectSubprojectClassesString();
         }
         
         public Default(Lookup.Provider project) {
