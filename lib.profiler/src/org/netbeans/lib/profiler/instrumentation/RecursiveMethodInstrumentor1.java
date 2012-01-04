@@ -108,7 +108,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             tryInstrumentSpawnedThreads(loadedClassInfos[j]);
 
             for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {
-                String rootClassName = rootMethods.classNames[rIdx].intern();
+                String rootClassName = rootMethods.classNames[rIdx];
 
                 boolean isMatch = false;
 
@@ -163,7 +163,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
         boolean isRootClass = false;
 
         for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {
-            final String rootClassName = rootMethods.classNames[rIdx].intern();
+            final String rootClassName = rootMethods.classNames[rIdx];
 
             if (rootMethods.classesWildcard[rIdx]) {
                 if (Wildcards.matchesWildcard(rootClassName, className)) {
@@ -205,7 +205,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
             // Check to see if this class has been marked as root by the user:
             for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {
-                final String rootClassName = rootMethods.classNames[rIdx].intern();
+                final String rootClassName = rootMethods.classNames[rIdx];
 
                 boolean isMatch = false;
 

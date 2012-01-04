@@ -80,6 +80,32 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
+@NbBundle.Messages({
+    "OverviewController_NotAvailableMsg=<not available>",
+    "OverviewController_SystemPropertiesString=System properties:",
+    "OverviewController_SummaryString=Basic info:",
+    "OverviewController_EnvironmentString=Environment:",
+    "OverviewController_FileItemString=<b>File: </b>{0}",
+    "OverviewController_FileSizeItemString=<b>File size: </b>{0}",
+    "OverviewController_DateTakenItemString=<b>Date taken: </b>{0}",
+    "OverviewController_TotalBytesItemString=<b>Total bytes: </b>{0}",
+    "OverviewController_TotalClassesItemString=<b>Total classes: </b>{0}",
+    "OverviewController_TotalInstancesItemString=<b>Total instances: </b>{0}",
+    "OverviewController_ClassloadersItemString=<b>Classloaders: </b>{0}",
+    "OverviewController_GcRootsItemString=<b>GC roots: </b>{0}",
+    "OverviewController_FinalizersItemString=<b>Number of objects pending for finalization: </b>{0}",
+    "OverviewController_OOMELabelString=<b>Heap dumped on OutOfMemoryError exception</b>",
+    "OverviewController_OOMEItemString=<b>Thread causing OutOfMemoryError exception: </b>{0}",
+    "OverviewController_OsItemString=<b>OS: </b>{0} ({1}) {2}",
+    "OverviewController_ArchitectureItemString=<b>Architecture: </b>{0} {1}",
+    "OverviewController_JavaHomeItemString=<b>Java Home: </b>{0}",
+    "OverviewController_JavaVersionItemString=<b>Java Version: </b>{0}",
+    "OverviewController_JavaVendorItemString=<b>Java Vendor: </b>{0}",
+    "OverviewController_JvmItemString=<b>JVM: </b>{0}  ({1}, {2})",
+    "OverviewController_ShowSysPropsLinkString=Show System Properties",
+    "OverviewController_ThreadsString=Threads at the heap dump:",
+    "OverviewController_ShowThreadsLinkString=Show Threads"
+})
 public class OverviewController extends AbstractController {
 
     public static final String SHOW_SYSPROPS_URL = "file:/sysprops"; // NOI18N
@@ -88,62 +114,6 @@ public class OverviewController extends AbstractController {
     private static final String CLASS_URL_PREFIX = "file://class/"; // NOI18N
     private static final String INSTANCE_URL_PREFIX = "file://instance/";   // NOI18N
     private static final String THREAD_URL_PREFIX = "file://thread/";   // NOI18N
-
-    // -----
-    // I18N String constants
-    private static final String NOT_AVAILABLE_MSG = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_NotAvailableMsg"); // NOI18N
-    private static final String SYSTEM_PROPERTIES_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_SystemPropertiesString"); // NOI18N
-    private static final String SUMMARY_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_SummaryString"); // NOI18N
-    private static final String ENVIRONMENT_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_EnvironmentString"); // NOI18N
-    private static final String FILE_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_FileItemString"); // NOI18N
-    private static final String FILE_SIZE_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_FileSizeItemString"); // NOI18N
-    private static final String DATE_TAKEN_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_DateTakenItemString"); // NOI18N
-    private static final String TOTAL_BYTES_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_TotalBytesItemString"); // NOI18N
-    private static final String TOTAL_CLASSES_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_TotalClassesItemString"); // NOI18N
-    private static final String TOTAL_INSTANCES_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_TotalInstancesItemString"); // NOI18N
-    private static final String CLASSLOADERS_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_ClassloadersItemString"); // NOI18N
-    private static final String GCROOTS_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_GcRootsItemString"); // NOI18N
-    private static final String FINALIZERS_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_FinalizersItemString"); // NOI18N
-    private static final String OOME_LABEL_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_OOMELabelString"); // NOI18N
-    private static final String OOME_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_OOMEItemString"); // NOI18N
-    private static final String OS_ITEM_STRING = NbBundle.getMessage(OverviewController.class, 
-            "OverviewController_OsItemString"); // NOI18N
-    private static final String ARCHITECTURE_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_ArchitectureItemString"); // NOI18N
-    private static final String JAVA_HOME_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_JavaHomeItemString"); // NOI18N
-    private static final String JAVA_VERSION_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_JavaVersionItemString"); // NOI18N
-    private static final String JAVA_VENDOR_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_JavaVendorItemString"); // NOI18N
-    private static final String JVM_ITEM_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_JvmItemString"); // NOI18N
-    private static final String SHOW_SYSPROPS_LINK_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_ShowSysPropsLinkString"); // NOI18N
-    private static final String THREADS_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_ThreadsString"); // NOI18N
-    private static final String SHOW_THREADS_LINK_STRING = NbBundle.getMessage(OverviewController.class,
-            "OverviewController_ShowThreadsLinkString"); // NOI18N
-    private static final String CANNOT_RESOLVE_CLASS_MSG = NbBundle.getMessage(AnalysisController.class,
-            "AnalysisController_CannotResolveClassMsg"); // NOI18N
-    private static final String CANNOT_RESOLVE_INSTANCE_MSG = NbBundle.getMessage(AnalysisController.class,
-            "AnalysisController_CannotResolveInstanceMsg"); // NOI18N
-    // -----
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     private HeapFragmentWalker heapFragmentWalker;
@@ -205,47 +175,36 @@ public class OverviewController extends AbstractController {
         }
         
         String filename = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(FILE_ITEM_STRING,
-                new Object[] {
-            file != null && file.exists() ? file.getAbsolutePath() : NOT_AVAILABLE_MSG
-        });
+                + Bundle.OverviewController_FileItemString(
+                    file != null && file.exists() ? file.getAbsolutePath() : 
+                        Bundle.OverviewController_NotAvailableMsg());
         
         String filesize = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(FILE_SIZE_ITEM_STRING,
-                new Object[] {
-            file != null && file.exists() ?
-                numberFormat.format(file.length()/(1024 * 1024.0)) + " MB" : // NOI18N
-                NOT_AVAILABLE_MSG
-        });
+                + Bundle.OverviewController_FileSizeItemString(
+                    file != null && file.exists() ?
+                        numberFormat.format(file.length()/(1024 * 1024.0)) + " MB" : // NOI18N
+                        Bundle.OverviewController_NotAvailableMsg());
         
         String dateTaken = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(DATE_TAKEN_ITEM_STRING, new Object[] { new Date(hsummary.getTime()).toString() });
+                + Bundle.OverviewController_DateTakenItemString(new Date(hsummary.getTime()).toString());
         
         String liveBytes = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(TOTAL_BYTES_ITEM_STRING,
-                new Object[] { numberFormat.format(hsummary.getTotalLiveBytes()) });
+                + Bundle.OverviewController_TotalBytesItemString(numberFormat.format(hsummary.getTotalLiveBytes()));
         
         String liveClasses = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(TOTAL_CLASSES_ITEM_STRING,
-                new Object[] { numberFormat.format(heap.getAllClasses().size()) });
+                + Bundle.OverviewController_TotalClassesItemString(numberFormat.format(heap.getAllClasses().size()));
         
         String liveInstances = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(TOTAL_INSTANCES_ITEM_STRING,
-                new Object[] {
-            numberFormat.format(hsummary.getTotalLiveInstances())
-        });
+                + Bundle.OverviewController_TotalInstancesItemString(numberFormat.format(hsummary.getTotalLiveInstances()));
         
         String classloaders = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(CLASSLOADERS_ITEM_STRING,
-                new Object[] { numberFormat.format(nclassloaders) });
+                + Bundle.OverviewController_ClassloadersItemString(numberFormat.format(nclassloaders));
         
         String gcroots = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(GCROOTS_ITEM_STRING,
-                new Object[] { numberFormat.format(heap.getGCRoots().size()) });
+                + Bundle.OverviewController_GcRootsItemString(numberFormat.format(heap.getGCRoots().size()));
         
         String finalizersInfo = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(FINALIZERS_ITEM_STRING,
-                new Object[] { numberFormat.format(finalizers) });
+                + Bundle.OverviewController_FinalizersItemString(numberFormat.format(finalizers));
 
         String oomeString = "";
         if (oome != null) {
@@ -253,13 +212,12 @@ public class OverviewController extends AbstractController {
             String threadName = htmlize(getThreadName(thread));
             String threadUrl = "<a href='"+ THREAD_URL_PREFIX + thread.getJavaClass().getName() + "/" + thread.getInstanceId() + "'>" + threadName + "</a>"; // NOI18N
             oomeString = "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + OOME_LABEL_STRING + "<br>&nbsp;&nbsp;&nbsp;&nbsp;"
-                + MessageFormat.format(OOME_ITEM_STRING,
-                new Object[] {  threadUrl });
+                + Bundle.OverviewController_OOMELabelString() + "<br>&nbsp;&nbsp;&nbsp;&nbsp;"
+                + Bundle.OverviewController_OOMEItemString(threadUrl);
         }
         String memoryRes = Icons.getResource(ProfilerIcons.MEMORY);
         return "<b><img border='0' align='bottom' src='nbresloc:/" + memoryRes + "'>&nbsp;&nbsp;" // NOI18N
-                + SUMMARY_STRING + "</b><br><hr>" + dateTaken + "<br>" + filename + "<br>" + filesize + "<br><br>" + liveBytes // NOI18N
+                + Bundle.OverviewController_SummaryString() + "</b><br><hr>" + dateTaken + "<br>" + filename + "<br>" + filesize + "<br><br>" + liveBytes // NOI18N
                 + "<br>" + liveClasses + "<br>" + liveInstances + "<br>" + classloaders + "<br>" + gcroots + "<br>" + finalizersInfo + oomeString; // NOI18N
     }
     
@@ -267,70 +225,67 @@ public class OverviewController extends AbstractController {
         Properties sysprops = getSystemProperties();
         
         if (sysprops == null) {
-            return NOT_AVAILABLE_MSG;
+            return Bundle.OverviewController_NotAvailableMsg();
         }
         
         String patchLevel = sysprops.getProperty("sun.os.patch.level", ""); // NOI18N
         String os = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(OS_ITEM_STRING,
-                new Object[] {
-            sysprops.getProperty("os.name", NOT_AVAILABLE_MSG), // NOI18N
-            sysprops.getProperty("os.version", ""), // NOI18N
-            ("unknown".equals(patchLevel) ? "" : patchLevel) // NOI18N
-        });
+                + Bundle.OverviewController_OsItemString(
+                    sysprops.getProperty("os.name", Bundle.OverviewController_NotAvailableMsg()), // NOI18N
+                    sysprops.getProperty("os.version", ""), // NOI18N
+                    ("unknown".equals(patchLevel) ? "" : patchLevel) // NOI18N
+        );
         
         String arch = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(ARCHITECTURE_ITEM_STRING,
-                new Object[] {
-            sysprops.getProperty("os.arch", NOT_AVAILABLE_MSG), // NOI18N
-            sysprops.getProperty("sun.arch.data.model", "?") + "bit" // NOI18N
-        });
+                + Bundle.OverviewController_ArchitectureItemString(
+                    sysprops.getProperty("os.arch", Bundle.OverviewController_NotAvailableMsg()), // NOI18N
+                    sysprops.getProperty("sun.arch.data.model", "?") + "bit" // NOI18N
+        );
         
         String jdk = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(JAVA_HOME_ITEM_STRING,
-                new Object[] { sysprops.getProperty("java.home", NOT_AVAILABLE_MSG) }); // NOI18N
+                + Bundle.OverviewController_JavaHomeItemString(
+                    sysprops.getProperty("java.home", Bundle.OverviewController_NotAvailableMsg())); // NOI18N
 
         String version = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(JAVA_VERSION_ITEM_STRING,
-                new Object[] { sysprops.getProperty("java.version", NOT_AVAILABLE_MSG) }); // NOI18N
+                + Bundle.OverviewController_JavaVersionItemString(
+                    sysprops.getProperty("java.version", Bundle.OverviewController_NotAvailableMsg())); // NOI18N
         
         String jvm = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(JVM_ITEM_STRING,
-                new Object[] {
-            sysprops.getProperty("java.vm.name", NOT_AVAILABLE_MSG), // NOI18N
-            sysprops.getProperty("java.vm.version", ""), // NOI18N
-            sysprops.getProperty("java.vm.info", "") // NOI18N
-        });
+                + Bundle.OverviewController_JvmItemString(
+                    sysprops.getProperty("java.vm.name", Bundle.OverviewController_NotAvailableMsg()), // NOI18N
+                    sysprops.getProperty("java.vm.version", ""), // NOI18N
+                    sysprops.getProperty("java.vm.info", "") // NOI18N
+        );
 
         String vendor = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + MessageFormat.format(JAVA_VENDOR_ITEM_STRING,
-                new Object[] { sysprops.getProperty("java.vendor", NOT_AVAILABLE_MSG) }); // NOI18N
+                + Bundle.OverviewController_JavaVendorItemString(
+                    sysprops.getProperty("java.vendor", Bundle.OverviewController_NotAvailableMsg())); // NOI18N
         
         String sysinfoRes = Icons.getResource(HeapWalkerIcons.SYSTEM_INFO);
         return "<b><img border='0' align='bottom' src='nbresloc:/" + sysinfoRes + "'>&nbsp;&nbsp;" // NOI18N
-                + ENVIRONMENT_STRING + "</b><br><hr>" + os + "<br>" + arch + "<br>" + jdk + "<br>" + version + "<br>" + jvm + "<br>" + vendor; // NOI18N
+                + Bundle.OverviewController_EnvironmentString() + "</b><br><hr>" + os + "<br>" + arch + "<br>" + jdk + "<br>" + version + "<br>" + jvm + "<br>" + vendor; // NOI18N
     }
     
     public String computeSystemProperties(boolean showSystemProperties) {
         Properties sysprops = getSystemProperties();
         
         if (sysprops == null) {
-            return NOT_AVAILABLE_MSG;
+            return Bundle.OverviewController_NotAvailableMsg();
         }
         
         String propertiesRes = Icons.getResource(HeapWalkerIcons.PROPERTIES);
         return "<b><img border='0' align='bottom' src='nbresloc:/" + propertiesRes + "'>&nbsp;&nbsp;" // NOI18N
-                + SYSTEM_PROPERTIES_STRING + "</b><br><hr>" // NOI18N
+                + Bundle.OverviewController_SystemPropertiesString() + "</b><br><hr>" // NOI18N
                 + (showSystemProperties ? formatSystemProperties(sysprops)
-                : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_SYSPROPS_URL + "'>" + SHOW_SYSPROPS_LINK_STRING + "</a>")); // NOI18N
+                : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_SYSPROPS_URL + "'>" + Bundle.OverviewController_ShowSysPropsLinkString() + "</a>")); // NOI18N
     }
     
     public String computeThreads(boolean showThreads) {
         String threadsWindowRes = Icons.getResource(ProfilerIcons.WINDOW_THREADS);
         return "<b><img border='0' align='bottom' src='nbresloc:/" + threadsWindowRes + "'>&nbsp;&nbsp;" // NOI18N
-                + THREADS_STRING + "</b><br><hr>" // NOI18N
+                + Bundle.OverviewController_ThreadsString() + "</b><br><hr>" // NOI18N
                 + (showThreads ? getStackTrace()
-                : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_THREADS_URL + "'>" + SHOW_THREADS_LINK_STRING + "</a><br>&nbsp;")); // NOI18N
+                : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_THREADS_URL + "'>" + Bundle.OverviewController_ShowThreadsLinkString() + "</a><br>&nbsp;")); // NOI18N
         // NOTE: the above HTML string should be terminated by newline to workaround HTML rendering bug in JDK 5, see Issue 120157
     }
     
@@ -352,8 +307,7 @@ public class OverviewController extends AbstractController {
             if (i != null) {
                 heapFragmentWalker.getClassesController().showInstance(i);
             } else {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
-                        new Object[] { id[1], id[0] }));
+                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveInstanceMsg(id[1], id[0]));
             }
         } else if (urls.startsWith(CLASS_URL_PREFIX)) {
             urls = urls.substring(CLASS_URL_PREFIX.length());
@@ -365,7 +319,7 @@ public class OverviewController extends AbstractController {
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[] { id[0] }));
+                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(id[0]));
             }
         }   else if (urls.startsWith(THREAD_URL_PREFIX)) {
             urls = urls.substring(THREAD_URL_PREFIX.length());
@@ -421,7 +375,7 @@ public class OverviewController extends AbstractController {
     }
     
     private String formatSystemProperties(Properties properties) {
-        StringBuffer text = new StringBuffer(200);
+        StringBuilder text = new StringBuilder(200);
         List keys = new ArrayList();
         Enumeration en = properties.propertyNames();
         Iterator keyIt;
@@ -480,15 +434,15 @@ public class OverviewController extends AbstractController {
                         }                        
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
                         // sw.append("&nbsp;&nbsp;<span style=\"color: #0033CC\">"); // NOI18N
-                        sb.append("&nbsp;&nbsp;<a name="+threadInstance.getInstanceId()+"></a><b "+style+">");   // NOI18N
+                        sb.append("&nbsp;&nbsp;<a name=").append(threadInstance.getInstanceId()).append("></a><b ").append(style).append(">");   // NOI18N
                         // -------------------------------------------------------------------
-                        sb.append("\""+htmlize(threadName)+"\""+(daemon.booleanValue() ? " daemon" : "")+" prio="+priority);   // NOI18N
+                        sb.append("\"").append(htmlize(threadName)).append("\"").append(daemon.booleanValue() ? " daemon" : "").append(" prio=").append(priority);   // NOI18N
                         if (threadId != null) {
-                            sb.append(" tid="+threadId);    // NOI18N
+                            sb.append(" tid=").append(threadId);    // NOI18N
                         }
                         if (threadStatus != null) {
                             State tState = sun.misc.VM.toThreadState(threadStatus.intValue());
-                            sb.append(" "+tState);          // NOI18N
+                            sb.append(" ").append(tState);          // NOI18N
                         }
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
                         // sw.append("</span><br>"); // NOI18N
@@ -513,7 +467,7 @@ public class OverviewController extends AbstractController {
                                 } else {
                                     stackElHref = stackElementText;
                                 }
-                                sb.append("\tat "+stackElHref+"<br>");  // NOI18N
+                                sb.append("\tat ").append(stackElHref).append("<br>");  // NOI18N
                                 if (localsMap != null) {
                                     List<JavaFrameGCRoot> locals = localsMap.get(Integer.valueOf(i));
                                     
@@ -522,7 +476,7 @@ public class OverviewController extends AbstractController {
                                             Instance localInstance = localVar.getInstance();
                                             
                                             if (localInstance != null) {
-                                                sb.append("\t   Local Variable: "+printInstance(localInstance)+"<br>"); // NOI18N
+                                                sb.append("\t   Local Variable: ").append(printInstance(localInstance)).append("<br>"); // NOI18N
                                             } else {
                                                 sb.append("\t   Unknown Local Variable<br>"); // NOI18N                                                
                                             }

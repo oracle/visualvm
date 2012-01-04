@@ -73,15 +73,14 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
+@NbBundle.Messages({
+    "HintsControllerUI_ViewTitleHints=Inspect",
+    "HintsControllerUI_FindButton=Find",
+    "HintsControllerUI_FindButtonTooltip=Find objects with biggest retained size",
+    "HintsControllerUI_Label1String=Find",
+    "HintsControllerUI_Label2String=biggest objects by retained size:"
+})
 public class HintsControllerUI extends JTitledPanel {
-    // -----
-    // I18N String constants
-    private static final String VIEW_TITLE_HINTS = NbBundle.getMessage(HintsControllerUI.class, "HintsControllerUI_ViewTitleHints"); // NOI18N
-    private static final String FIND_BUTTON_TITLE = NbBundle.getMessage(HintsControllerUI.class, "HintsControllerUI_FindButton"); // NOI18N
-    private static final String FIND_BUTTON_TOOLTIP = NbBundle.getMessage(HintsControllerUI.class, "HintsControllerUI_FindButtonTooltip"); // NOI18N
-    private static final String LABEL1_STRING = NbBundle.getMessage(HintsControllerUI.class, "HintsControllerUI_Label1String"); // NOI18N
-    private static final String LABEL2_STRING = NbBundle.getMessage(HintsControllerUI.class, "HintsControllerUI_Label2String"); // NOI18N
-    
     private static final Number OBJECTS_DEFAULT = 20;
     private static final int OBJECTS_MAX = 100;
     
@@ -100,7 +99,7 @@ public class HintsControllerUI extends JTitledPanel {
     
     // --- Constructors ----------------------------------------------------------
     public HintsControllerUI(HintsController hintsController) {
-        super(VIEW_TITLE_HINTS, Icons.getIcon(GeneralIcons.FIND), true);
+        super(Bundle.HintsControllerUI_ViewTitleHints(), Icons.getIcon(GeneralIcons.FIND), true);
         
         this.hintsController = hintsController;
        
@@ -133,7 +132,7 @@ public class HintsControllerUI extends JTitledPanel {
                                         UIUtils.getProfilerResultsBackground()));
 
         // text
-        textLabel1 = new JLabel(LABEL1_STRING);
+        textLabel1 = new JLabel(Bundle.HintsControllerUI_Label1String());
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -159,7 +158,7 @@ public class HintsControllerUI extends JTitledPanel {
         hintsTextContainer.add(spinner, constraints);
         
         // text
-        textLabel2 = new JLabel(LABEL2_STRING);
+        textLabel2 = new JLabel(Bundle.HintsControllerUI_Label2String());
         constraints = new GridBagConstraints();
         constraints.gridx = 2;
         constraints.gridy = 0;
@@ -170,14 +169,14 @@ public class HintsControllerUI extends JTitledPanel {
         hintsTextContainer.add(textLabel2, constraints);
 
         // findButton
-        findButton = new JButton(FIND_BUTTON_TITLE) {
+        findButton = new JButton(Bundle.HintsControllerUI_FindButton()) {
             protected void fireActionPerformed(ActionEvent event) {
                 findButton.setEnabled(false);
                 int selectedValue = ((Number)spinner.getValue()).intValue();
                 hintsController.computeBiggestObjects(selectedValue);
             }
         };
-        findButton.setToolTipText(FIND_BUTTON_TOOLTIP);
+        findButton.setToolTipText(Bundle.HintsControllerUI_FindButtonTooltip());
         constraints = new GridBagConstraints();
         constraints.gridx = 3;
         constraints.gridy = 0;

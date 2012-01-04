@@ -144,6 +144,30 @@ import org.openide.awt.Mnemonics;
  * @author Misha Dmitriev
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "NetBeansProfiler_ProgressDialogCaption=Progress...",
+    "NetBeansProfiler_EntireApplicationProfilingWarning=In the Entire Application profiling mode,\nprofiling data collection will not start\nuntil your application starts a new Thread,\nand will be done only for new Threads.\n\nConsider switching to \"Part of Application\" mode\nif you want to profile already running threads.",
+    "NetBeansProfiler_DirectoryDoesNotExistMessage=The directory does not exist.",
+    "NetBeansProfiler_DirectoryIsWriteProtectedMessage=The directory is write-protected.\nPlease make it writeable.",
+    "NetBeansProfiler_ErrorLoadingProfilingSettingsMessage=Error encountered while loading profiling settings: {0}",
+    "NetBeansProfiler_ErrorSavingProfilingSettingsMessage=Error encountered while saving global filters: {0}",
+    "NetBeansProfiler_ErrorSavingFilterSetsMessage=Error encountered while saving defined filter sets: {0}",
+    "NetBeansProfiler_ErrorSavingGlobalSettingsMessage=Error encountered while saving global settings: {0}",
+    "NetBeansProfiler_ErrorSavingAttachSettingsMessage=Error encountered while saving attach settings: {0}",
+    "NetBeansProfiler_CannotFindLibsMsg=Cannot find profiler libs directory",
+    "NetBeansProfiler_EngineInitFailedMsg=Failed to initialize the Profiler engine: {0}",
+    "NetBeansProfiler_InitialCalibrationMsg=Profiler will now perform an initial calibration of your machine and target JVM.\n\nThis calibration needs to be performed the first time you run the profiler to\nensure that timing results are accurate when profiling your application. To\nensure the calibration data is accurate, please make sure that other\napplications are not placing a noticeable load on your machine at this time.\n\nYou can run the calibration again by choosing\n\"Profile | Advanced Commands | Run Profiler Calibration\"\n\nWarning: If your computer uses dynamic CPU frequency switching, please\ndisable it and do not use it when  profiling.",
+    "NetBeansProfiler_MustCalibrateFirstMsg=Profiling will STOP now because the calibration data is missing or is corrupt.\n\nIf this is the first time you are using the profiler or target JVM on this machine,\nyou first need to run the calibration for your target JVM.\nThe obtained calibration data will be saved and re-used\non subsequent runs, so you will not see this message again.\n\nTo perform calibration, choose\n\"Profile | Advanced Commands | Run Profiler Calibration\".\n\n",
+    "NetBeansProfiler_MustCalibrateFirstShortMsg=<html><b>Calibration data missing.</b><br><br>Profiling cannot be started on this JDK. Please perform<br>profiler calibration first and start the profiling session again.</html>",
+    "NetBeansProfiler_TerminateVMOnExitMsg=<b>The profiled application has finished execution.</b>\n Press OK to terminate the VM.",
+    "NetBeansProfiler_TakeSnapshotOnExitMsg=<b>The profiled application has finished execution.</b>\nDo you want to take a snapshot of the collected results?",
+    "NetBeansProfiler_TakeSnapshotOnExitDialogTitle=Application Finished",
+    "NetBeansProfiler_TargetAppNotRespondingMsg=The profiled application does not respond.\n Do you want to close the connection and stop profiling?",
+    "NetBeansProfiler_TargetAppNotRespondingDialogTitle=Question",
+    "NetBeansProfiler_ModifyingInstrumentationMsg=Modifying instrumentation...",
+    "NetBeansProfiler_StartingSession=Starting profiling session...",
+    "NetBeansProfiler_CancelBtn=&Cancel"
+})
 public abstract class NetBeansProfiler extends Profiler {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
     
@@ -192,7 +216,7 @@ public abstract class NetBeansProfiler extends Profiler {
         
         private void initUI() {
             Frame mainWindow = WindowManager.getDefault().getMainWindow();
-            dialog = new JDialog(mainWindow, PROGRESS_DIALOG_CAPTION, true);
+            dialog = new JDialog(mainWindow, Bundle.NetBeansProfiler_ProgressDialogCaption(), true);
             
             JPanel panel = new JPanel(new BorderLayout(5, 5));
             panel.setBorder(new EmptyBorder(15, 15, 15, 10));
@@ -211,7 +235,7 @@ public abstract class NetBeansProfiler extends Profiler {
                         cancelHandler.run();
                     }
                 };
-                Mnemonics.setLocalizedText(cancelButton, CANCEL_BTN);
+                Mnemonics.setLocalizedText(cancelButton, Bundle.NetBeansProfiler_CancelBtn());
                 JPanel buttonPanel = new JPanel(new BorderLayout(0, 0));
                 buttonPanel.setBorder(new EmptyBorder(5, 15, 10, 10));
                 buttonPanel.add(cancelButton, BorderLayout.EAST);
@@ -259,8 +283,9 @@ public abstract class NetBeansProfiler extends Profiler {
 
         public boolean confirmWaitForConnectionReply() {
             // FIXXX: should display a NotifyDescriptor.WARNING_MESSAGE confirmation!
-            return (!ProfilerDialogs.displayConfirmation(TARGET_APP_NOT_RESPONDING_MSG,
-                                                         TARGET_APP_NOT_RESPONDING_DIALOG_TITLE));
+            return (!ProfilerDialogs.displayConfirmation(
+                    Bundle.NetBeansProfiler_TargetAppNotRespondingMsg(),
+                    Bundle.NetBeansProfiler_TargetAppNotRespondingDialogTitle()));
         }
 
         // The following methods should display messages asynchronously, i.e. they shouldn't block the current
@@ -315,8 +340,8 @@ public abstract class NetBeansProfiler extends Profiler {
 
             if ((getTargetAppRunner().getProfilerClient().getCurrentInstrType() == CommonConstants.INSTR_NONE)
                     || !ResultsManager.getDefault().resultsAvailable()) {
-                ProfilerDialogs.displayInfoDNSA(TERMINATE_VM_ON_EXIT_MSG, null, null, "NetBeansProfiler.handleShutdown.noResults", false); //NOI18N
-            } else if (ProfilerDialogs.displayConfirmationDNSA(TAKE_SNAPSHOT_ON_EXIT_MSG, TAKE_SNAPSHOT_ON_EXIT_DIALOG_TITLE, null, "NetBeansProfiler.handleShutdown", false)) { //NOI18N
+                ProfilerDialogs.displayInfoDNSA(Bundle.NetBeansProfiler_TerminateVMOnExitMsg(), null, null, "NetBeansProfiler.handleShutdown.noResults", false); //NOI18N
+            } else if (ProfilerDialogs.displayConfirmationDNSA(Bundle.NetBeansProfiler_TakeSnapshotOnExitMsg(), Bundle.NetBeansProfiler_TakeSnapshotOnExitDialogTitle(), null, "NetBeansProfiler.handleShutdown", false)) { //NOI18N
                 ResultsManager.getDefault().takeSnapshot();
             }
 
@@ -350,49 +375,6 @@ public abstract class NetBeansProfiler extends Profiler {
 
     private static final Logger LOGGER = Logger.getLogger(NetBeansProfiler.class.getName());
 
-    // -----
-    // I18N String constants
-    private static final String CALIBRATION_FAILED_MESSAGE = NbBundle.getMessage(ProfilerModule.class,
-                                                                                 "ProfilerModule_CalibrationFailedMessage"); //NOI18N
-    private static final String CALIBRATION_MISSING_MESSAGE = NbBundle.getMessage(ProfilerModule.class,
-                                                                                  "NetBeansProfiler_MustCalibrateFirstMsg"); //NOI18N
-    private static final String CALIBRATION_MISSING_SHORT_MESSAGE = NbBundle.getMessage(ProfilerModule.class,
-                                                                                        "NetBeansProfiler_MustCalibrateFirstShortMsg"); //NOI18N
-    private static final String PROGRESS_DIALOG_CAPTION = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                              "NetBeansProfiler_ProgressDialogCaption"); //NOI18N
-    private static final String ENTIRE_APPLICATION_PROFILING_WARNING = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                           "NetBeansProfiler_EntireApplicationProfilingWarning"); //NOI18N
-    private static final String DIRECTORY_DOES_NOT_EXIST_MESSAGE = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                       "NetBeansProfiler_DirectoryDoesNotExistMessage"); //NOI18N
-    private static final String DIRECTORY_IS_WRITE_PROTECTED_MESSAGE = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                           "NetBeansProfiler_DirectoryIsWriteProtectedMessage"); //NOI18N
-    private static final String ERROR_LOADING_PROFILING_SETTINGS_MESSAGE = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                               "NetBeansProfiler_ErrorLoadingProfilingSettingsMessage"); //NOI18N
-    private static final String ERROR_SAVING_PROFILING_SETTINGS_MESSAGE = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                              "NetBeansProfiler_ErrorSavingProfilingSettingsMessage"); //NOI18N
-    private static final String ERROR_SAVING_FILTER_SETS_MESSAGE = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                       "NetBeansProfiler_ErrorSavingFilterSetsMessage"); //NOI18N
-    private static final String CANNOT_FIND_LIBS_MSG = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                           "NetBeansProfiler_CannotFindLibsMsg"); //NOI18N
-    private static final String ENGINE_INIT_FAILED_MSG = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                             "NetBeansProfiler_EngineInitFailedMsg"); //NOI18N
-    private static final String INITIAL_CALIBRATION_MSG = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                              "NetBeansProfiler_InitialCalibrationMsg"); //NOI18N
-    private static final String TERMINATE_VM_ON_EXIT_MSG = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                               "NetBeansProfiler_TerminateVMOnExitMsg"); //NOI18N
-    private static final String TAKE_SNAPSHOT_ON_EXIT_MSG = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                "NetBeansProfiler_TakeSnapshotOnExitMsg"); //NOI18N
-    private static final String TAKE_SNAPSHOT_ON_EXIT_DIALOG_TITLE = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                         "NetBeansProfiler_TakeSnapshotOnExitDialogTitle"); //NOI18N
-    private static final String TARGET_APP_NOT_RESPONDING_MSG = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                    "NetBeansProfiler_TargetAppNotRespondingMsg"); //NOI18N
-    private static final String TARGET_APP_NOT_RESPONDING_DIALOG_TITLE = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                             "NetBeansProfiler_TargetAppNotRespondingDialogTitle"); //NOI18N
-    private static final String MODIFYING_INSTRUMENTATION_MSG = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                    "NetBeansProfiler_ModifyingInstrumentationMsg"); //NOI18N
-    private static final String CANCEL_BTN = NbBundle.getMessage(NetBeansProfiler.class,
-                                                                                    "NetBeansProfiler_CancelBtn"); //NOI18N
-                                                                                                                                     // -----
     private static final String GLOBAL_FILTERS_FILENAME = "filters"; //NOI18N
     private static final String DEFINED_FILTERSETS_FILENAME = "filtersets"; //NOI18N
     private static final String DEFAULT_FILE_SUFFIX = "-default"; //NOI18N
@@ -445,7 +427,7 @@ public abstract class NetBeansProfiler extends Profiler {
             String libsDir = getLibsDir();
 
             if (libsDir == null) {
-                throw new IOException(CANNOT_FIND_LIBS_MSG);
+                throw new IOException(Bundle.NetBeansProfiler_CannotFindLibsMsg());
             }
 
             sharedSettings.initialize(libsDir);
@@ -458,7 +440,7 @@ public abstract class NetBeansProfiler extends Profiler {
             ProfilerDialogs.displayError(e.getMessage());
             initFailed = true;
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MessageFormat.format(ENGINE_INIT_FAILED_MSG, new Object[] { e.getLocalizedMessage() }), e);
+            LOGGER.log(Level.SEVERE, Bundle.NetBeansProfiler_EngineInitFailedMsg(e.getLocalizedMessage()), e);
             initFailed = true;
         }
 
@@ -701,7 +683,7 @@ public abstract class NetBeansProfiler extends Profiler {
     public boolean attachToApp(final ProfilingSettings profilingSettings, final AttachSettings attachSettings) {
         profilingMode = MODE_ATTACH;
 
-        ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(NetBeansProfiler.class, "NetBeansProfiler_StartingSession")); // NOI18N
+        ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.NetBeansProfiler_StartingSession());
         ph.setInitialDelay(500);
         
         ph.start();
@@ -737,12 +719,13 @@ public abstract class NetBeansProfiler extends Profiler {
             
             setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
             
-            CommonUtils.runInEventDispatchThread(new Runnable() {
-
-                public void run() {
-                    openWindowsOnProfilingStart();
-                }
-            });
+            if (shouldOpenWindowsOnProfilingStart()) {
+                CommonUtils.runInEventDispatchThread(new Runnable() {
+                    public void run() {
+                        openWindowsOnProfilingStart();
+                    }
+                });
+            }
             
             if (attachSettings.isDirect()) { // Previously known as "attach on startup"
                 // The VM is already started with all necessary options and waiting for us to connect.
@@ -880,7 +863,7 @@ public abstract class NetBeansProfiler extends Profiler {
         lastSessionSettings = sessionSettings;
         lastMode = MODE_PROFILE;
 
-        ProgressHandle ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(NetBeansProfiler.class, "NetBeansProfiler_StartingSession")); // NOI18N
+        ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.NetBeansProfiler_StartingSession());
         try {
             ph.setInitialDelay(500);
             ph.start();
@@ -930,15 +913,17 @@ public abstract class NetBeansProfiler extends Profiler {
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
 
-        CommonUtils.runInEventDispatchThread(new Runnable() {
+        if (shouldOpenWindowsOnProfilingStart()) {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     openWindowsOnProfilingStart();
                 }
             });
-
+        }
         if (!CalibrationDataFileIO.validateCalibrationInput(sessionSettings.getJavaVersionString(),
                                                                 sessionSettings.getJavaExecutable())) {
-            ProfilerDialogs.displayError(CALIBRATION_MISSING_SHORT_MESSAGE, null, CALIBRATION_MISSING_MESSAGE);
+            ProfilerDialogs.displayError(
+                Bundle.NetBeansProfiler_MustCalibrateFirstMsg(), null, Bundle.NetBeansProfiler_MustCalibrateFirstShortMsg());
             changeStateTo(PROFILING_INACTIVE);
 
             return false; // failed, cannot proceed
@@ -1074,7 +1059,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     }
 
                     AppStatusHandler.AsyncDialog waitDialog = getTargetAppRunner().getAppStatusHandler()
-                                                .getAsyncDialogInstance(MODIFYING_INSTRUMENTATION_MSG, true, null);
+                                                .getAsyncDialogInstance(Bundle.NetBeansProfiler_ModifyingInstrumentationMsg(), true, null);
                     waitDialog.display();
 
                     try {
@@ -1111,7 +1096,11 @@ public abstract class NetBeansProfiler extends Profiler {
     }
     
     public boolean processesProfilingPoints() {
-        return getProfilingPointsManager().getSupportedProfilingPoints().length > 0;
+        ProfilingPointsProcessor ppp = getProfilingPointsManager();
+        if (ppp != null) {
+            return ppp.getSupportedProfilingPoints().length > 0;
+        }
+        return false;
     }
 
     /**
@@ -1153,7 +1142,9 @@ public abstract class NetBeansProfiler extends Profiler {
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
         //    System.err.println("------------------------------------------ 3: "+ (System.currentTimeMillis() - time));
-        openWindowsOnProfilingStart();
+        if (shouldOpenWindowsOnProfilingStart()) {
+            openWindowsOnProfilingStart();
+        }
 
         //    System.err.println("------------------------------------- 4: "+ (System.currentTimeMillis() - time));
         final Window mainWindow = WindowManager.getDefault().getMainWindow();
@@ -1169,7 +1160,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     try {
                         if (!runCalibration(true, sessionSettings.getJavaExecutable(), sessionSettings.getJavaVersionString(),
                                                 sessionSettings.getSystemArchitecture())) {
-                            ProfilerDialogs.displayError(CALIBRATION_FAILED_MESSAGE);
+                            ProfilerDialogs.displayError(Bundle.ProfilerModule_CalibrationFailedMessage());
                             changeStateTo(PROFILING_INACTIVE);
 
                             return; // failed, cannot proceed
@@ -1217,6 +1208,21 @@ public abstract class NetBeansProfiler extends Profiler {
         return true;
     }
 
+    protected boolean shouldOpenWindowsOnProfilingStart() {
+        return true;
+    }
+
+    // NOTE: used from com.sun.tools.visualvm.profiler.ProfilerSupport.calibrateJVM(),
+    //       requires targetAppRunner to be configured correctly. Most likely you want to use
+    //       runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) !!!
+    public boolean runConfiguredCalibration() {
+        calibrating = true;
+        boolean result = targetAppRunner.calibrateInstrumentationCode();
+        calibrating = false;
+
+        return result;
+    }
+
     public boolean runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) {
         calibrating = true;
 
@@ -1245,23 +1251,28 @@ public abstract class NetBeansProfiler extends Profiler {
             result = getTargetAppRunner().readSavedCalibrationData();
 
             if (!result) {
-                ProfilerDialogs.displayInfo(INITIAL_CALIBRATION_MSG);
+                ProfilerDialogs.displayInfo(Bundle.NetBeansProfiler_InitialCalibrationMsg());
                 result = getTargetAppRunner().calibrateInstrumentationCode();
             }
-
-            boolean shouldCalibrate = false;
-            getTargetAppRunner().getProfilingSessionStatus().beginTrans(false);
-            try {
-                // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
-                // ---> recalibrate <---
-                shouldCalibrate = Platform.isLinux() &&
-                                  Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
-                                  getTargetAppRunner().getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
-            } finally {
-                getTargetAppRunner().getProfilingSessionStatus().endTrans();
-            }
-            if (shouldCalibrate) {
-                result = getTargetAppRunner().calibrateInstrumentationCode();
+            
+            // NOTE: use -Dprofiler.disableFTSRecalibration=true to skip fast
+            //       timestamp recalibration for each profiling session on old
+            //       linux kernels not supporting Time Stamp Counter.
+            if (!Boolean.getBoolean("profiler.disableFTSRecalibration")) { // NOI18N
+                boolean shouldCalibrate = false;
+                getTargetAppRunner().getProfilingSessionStatus().beginTrans(false);
+                try {
+                    // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
+                    // ---> recalibrate <---
+                    shouldCalibrate = Platform.isLinux() &&
+                                      Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
+                                      getTargetAppRunner().getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
+                } finally {
+                    getTargetAppRunner().getProfilingSessionStatus().endTrans();
+                }
+                if (shouldCalibrate) {
+                    result = getTargetAppRunner().calibrateInstrumentationCode();
+                }
             }
         } else {
             result = getTargetAppRunner().calibrateInstrumentationCode();
@@ -1364,8 +1375,8 @@ public abstract class NetBeansProfiler extends Profiler {
             bos.close();
         } catch (Exception e) {
             ProfilerLogger.log(e);
-            ProfilerDialogs.displayError(MessageFormat.format(ERROR_SAVING_PROFILING_SETTINGS_MESSAGE,
-                                                             new Object[] { e.getMessage() }));
+            ProfilerDialogs.displayError(
+                Bundle.NetBeansProfiler_ErrorSavingProfilingSettingsMessage(e.getMessage()));
         } finally {
             if (lock != null) {
                 lock.releaseLock();
@@ -1395,8 +1406,8 @@ public abstract class NetBeansProfiler extends Profiler {
             bos.close();
         } catch (Exception e) {
             ProfilerLogger.log(e);
-            ProfilerDialogs.displayError(MessageFormat.format(ERROR_SAVING_FILTER_SETS_MESSAGE,
-                                                             new Object[] { e.getMessage() }));
+            ProfilerDialogs.displayError(
+                Bundle.NetBeansProfiler_ErrorSavingFilterSetsMessage(e.getMessage()));
         } finally {
             if (lock != null) {
                 lock.releaseLock();
@@ -1551,7 +1562,7 @@ public abstract class NetBeansProfiler extends Profiler {
     }
 
     private void displayWarningAboutEntireAppProfiling() {
-        ProfilerDialogs.displayWarning(ENTIRE_APPLICATION_PROFILING_WARNING);
+        ProfilerDialogs.displayWarning(Bundle.NetBeansProfiler_EntireApplicationProfilingWarning());
     }
 
     // -- Package-Private stuff --------------------------------------------------------------------------------------------
@@ -1603,8 +1614,8 @@ public abstract class NetBeansProfiler extends Profiler {
             }
         } catch (Exception e) {
             ProfilerLogger.log(e);
-            ProfilerDialogs.displayError(MessageFormat.format(ERROR_LOADING_PROFILING_SETTINGS_MESSAGE,
-                                                              new Object[] { e.getMessage() }));
+            ProfilerDialogs.displayError(
+                Bundle.NetBeansProfiler_ErrorLoadingProfilingSettingsMessage(e.getMessage()));
         }
     }
 
@@ -1634,7 +1645,8 @@ public abstract class NetBeansProfiler extends Profiler {
 
         // 3. Live Results
         if ((ideSettings.getDisplayLiveResultsCPU()
-                && ((type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)))
+                && ((type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)
+                    || (type == ProfilingSettings.PROFILE_CPU_SAMPLING)))
                 || (ideSettings.getDisplayLiveResultsFragment() && (type == ProfilingSettings.PROFILE_CPU_STOPWATCH))
                 || (ideSettings.getDisplayLiveResultsMemory()
                        && ((type == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS)
@@ -1739,7 +1751,8 @@ public abstract class NetBeansProfiler extends Profiler {
                 }
             }
 
-            getProfilingPointsManager().init(getProfiledProject());
+            ProfilingPointsProcessor ppp = getProfilingPointsManager();
+            if (ppp != null) ppp.init(getProfiledProject());
 
             ProfilingResultsDispatcher.getDefault().startup(client);
         }
