@@ -89,7 +89,8 @@ public final class TelemetryOverviewPanel extends TopComponent {
      */
     public TelemetryOverviewPanel() {
         setName(Bundle.LAB_TelemetryOverviewPanelName());
-        getAccessibleContext().setAccessibleDescription(Bundle.TelemetryOverviewPanel_TelemetryOverviewAccessDescr());
+        setIcon(windowIcon);
+        setToolTipText(Bundle.TelemetryOverviewPanel_TelemetryOverviewAccessDescr());
 
         graphsPanel = new MonitoringGraphsPanel();
         JScrollPane graphsPanelScroll = new JScrollPane(graphsPanel,
