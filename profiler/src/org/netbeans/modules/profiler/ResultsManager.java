@@ -69,7 +69,6 @@ import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 import java.awt.*;
 import java.io.*;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,8 +106,6 @@ import org.openide.util.Lookup;
     "ResultsManager_OverwriteFileDialogMsg=The target folder already contains file {0}\n Do you want to overwrite this file?",
     "ResultsManager_FileDeleteFailedMsg=Cannot delete the existing file: {0}",
     "ResultsManager_SnapshotExportFailedMsg=Failed to save snapshot: {0}",
-    "ResultsManager_SaveSnapshotsDialogCaption=Question",
-    "ResultsManager_SaveSnapshotsDialogMsg=You have {0} unsaved snapshot(s).\nDo you want to save them before exiting the IDE?",
     "ResultsManager_SelectFileOrDirDialogCaption=Select File or Directory",
     "ResultsManager_ProfilerSnapshotFileFilter=Profiler Snapshot File (*.{0})",
     "ResultsManager_ProfilerHeapdumpFileFilter=Heap Dump File (*.{0})",
@@ -443,42 +440,6 @@ public final class ResultsManager {
         }
 
         return null;
-    }
-
-    public boolean ideClosing() {
-        Iterator it = loadedSnapshots.iterator();
-        ArrayList /*<LoadedSnapshot*/ unsaved = new ArrayList();
-
-        while (it.hasNext()) {
-            LoadedSnapshot ls = (LoadedSnapshot) it.next();
-
-            if (!ls.isSaved()) {
-                unsaved.add(ls);
-            }
-        }
-
-        if (unsaved.size() > 0) {
-            Boolean ret = ProfilerDialogs.displayCancellableConfirmation(
-                    Bundle.ResultsManager_SaveSnapshotsDialogMsg("" + unsaved.size()), // NOI18N
-                    Bundle.ResultsManager_SaveSnapshotsDialogCaption());
-
-            if (Boolean.TRUE.equals(ret)) {
-                Iterator unsIt = unsaved.iterator();
-
-                while (unsIt.hasNext()) {
-                    LoadedSnapshot ls = (LoadedSnapshot) unsIt.next();
-                    saveSnapshot(ls);
-                }
-
-                return true; // exit the IDE
-            } else if (Boolean.FALSE.equals(ret)) {
-                return true; // exit the IDE
-            } else {
-                return false; // cancel
-            }
-        }
-
-        return true;
     }
     
     private static final String HPROF_HEADER = "JAVA PROFILE 1.0"; // NOI18H

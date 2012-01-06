@@ -1,2 +1,2 @@
 # cluster incompatible release version
-6
+7
