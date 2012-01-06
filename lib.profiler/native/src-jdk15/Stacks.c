@@ -402,4 +402,5 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks_getAl
     /* this one Deallocate call frees all data allocated by GetAllStackTraces */
     err = (*_jvmti)->Deallocate(_jvmti, (unsigned char*)stack_info);
     assert(err == JVMTI_ERROR_NONE);
+    free(state_buffer);
 }
