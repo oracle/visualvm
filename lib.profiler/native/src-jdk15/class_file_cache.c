@@ -114,21 +114,16 @@ void set_system_loader(JNIEnv *env, jvmtiEnv *jvmti_env) {
     jclass object_class;
   
     (*jvmti_env)->GetPhase(jvmti_env, &phase);
-    if (phase >= JVMTI_PHASE_LIVE) {  /* Call ClassLoader.getSystemClassLoader() */
+    if (phase >= JVMTI_PHASE_LIVE) {  /* Call ProfilerInterface.getSystemClassLoader() */
         jthrowable ex;
-        jclass class_loader_clazz = (*env)->FindClass(env, "java/lang/ClassLoader");
-        jmethodID get_system_loader_method = (*env)->GetStaticMethodID(env, class_loader_clazz, "getSystemClassLoader", "()Ljava/lang/ClassLoader;");
+        jclass profiler_interface_clazz = (*env)->FindClass(env, "org/netbeans/lib/profiler/server/ProfilerInterface");
+        jmethodID get_system_loader_method = (*env)->GetStaticMethodID(env, profiler_interface_clazz, "getSystemClassLoader", "()Ljava/lang/ClassLoader;");
         
-        _system_loader = (*env)->CallStaticObjectMethod(env, class_loader_clazz, get_system_loader_method);
+        _system_loader = (*env)->CallStaticObjectMethod(env, profiler_interface_clazz, get_system_loader_method);
         ex = (*env)->ExceptionOccurred(env);
-        if (ex != NULL) {
-            jclass ise_cls;
-            
+        if (ex != NULL) {            
             (*env)->ExceptionClear(env);
-            ise_cls = (*env)->FindClass(env, "java/lang/IllegalStateException");
-            if (!(*env)->IsInstanceOf(env, ex, ise_cls)) {
-                fprintf(stderr, "Profiler Agent Error: Exception from ClassLoader.getSystemClassLoader()\n");
-            }
+            fprintf(stderr, "Profiler Agent Error: Exception from ProfilerInterface.getSystemClassLoader()\n");
             _system_loader = NULL;
             return;
         }
