@@ -283,6 +283,7 @@ public class ProfilerInterface implements CommonConstants {
     private static ProfilerServer profilerServer;
     private static ProfilingSessionStatus status;
     private static EventBufferManager evBufManager;
+    private static ClassLoader scl;
     private static Class[] loadedClassesArray; // Temporary array, used to send all loaded class names to client
                                                // on instrumentation initiation.
     private static int[] loadedClassesLoaders; // Ditto, for loaders
@@ -499,7 +500,8 @@ public class ProfilerInterface implements CommonConstants {
         Threads.initialize();
         HeapDump.initialize(Platform.getJDKVersionNumber() == Platform.JDK_15);
         ClassLoaderManager.initialize(profilerServer);
-        ClassLoaderManager.addLoader(ClassLoader.getSystemClassLoader());
+        scl = ClassLoader.getSystemClassLoader();
+        ClassLoaderManager.addLoader(scl);
         reflectMethods = new WeakHashMap();
 
         evBufManager = new EventBufferManager(profilerServer);
@@ -1357,5 +1359,9 @@ public class ProfilerInterface implements CommonConstants {
         } finally {
             status.endTrans();
         }
+    }
+    
+    public static ClassLoader getSystemClassLoader() {
+        return scl;
     }
 }
