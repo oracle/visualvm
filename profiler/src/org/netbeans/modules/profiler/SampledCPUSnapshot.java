@@ -165,7 +165,9 @@ public final class SampledCPUSnapshot {
         } catch (NoDataAvailableException ex) {
             throw new IOException(ex);
         }
-        return new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
+        LoadedSnapshot ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
+        ls.setSaved(true);
+        return ls;
     }
 
     private SamplesInputStream seek(final int sampleIndex) throws IOException {
