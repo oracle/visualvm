@@ -54,6 +54,11 @@ import java.util.List;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "PrimitiveArrayNode_TruncatedString=...<truncated>",
+    "PrimitiveArrayNode_ItemsNumberString=({0} items)",
+    "PrimitiveArrayNode_LoopToString=(loop to {0})"
+})
 public class PrimitiveArrayNode extends ArrayNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -85,7 +90,7 @@ public class PrimitiveArrayNode extends ArrayNode {
 
             if (isLoop()) {
                 return name + " " // NOI18N
-                       + MessageFormat.format(LOOP_TO_STRING, new Object[] { BrowserUtils.getFullNodeName(getLoopTo()) });
+                       + Bundle.PrimitiveArrayNode_LoopToString(BrowserUtils.getFullNodeName(getLoopTo()));
             }
 
             return name;
@@ -117,15 +122,6 @@ public class PrimitiveArrayNode extends ArrayNode {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String TRUNCATED_STRING = NbBundle.getMessage(PrimitiveArrayNode.class,
-                                                                       "PrimitiveArrayNode_TruncatedString"); // NOI18N
-    private static final String ITEMS_NUMBER_STRING = NbBundle.getMessage(PrimitiveArrayNode.class,
-                                                                          "PrimitiveArrayNode_ItemsNumberString"); // NOI18N
-    private static final String LOOP_TO_STRING = NbBundle.getMessage(PrimitiveArrayNode.class, "PrimitiveArrayNode_LoopToString"); // NOI18N
-                                                                                                                                   // -----
     private static final int MAX_CHAR_ARRAY_STRING_SIZE = 128;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -201,7 +197,7 @@ public class PrimitiveArrayNode extends ArrayNode {
         if (getInstance().getJavaClass().getName().equals("char[]")) { // NOI18N
 
             List fields = getInstance().getValues();
-            StringBuffer logicalValue = new StringBuffer();
+            StringBuilder logicalValue = new StringBuilder();
             int fieldsSize = fields.size();
             boolean truncated = false;
 
@@ -215,12 +211,12 @@ public class PrimitiveArrayNode extends ArrayNode {
             }
 
             if (truncated) {
-                logicalValue.append(TRUNCATED_STRING);
+                logicalValue.append(Bundle.PrimitiveArrayNode_TruncatedString());
             }
 
             return super.computeValue() + " (\"" + logicalValue.toString() + "\"" + ")"; // NOI18N
         }
 
-        return super.computeValue() + " " + MessageFormat.format(ITEMS_NUMBER_STRING, new Object[] { getInstance().getLength() }); // NOI18N
+        return super.computeValue() + " " + Bundle.PrimitiveArrayNode_ItemsNumberString(getInstance().getLength());
     }
 }

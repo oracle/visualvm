@@ -140,6 +140,11 @@ public class TargetPlatform {
             return TargetPlatformEnum.JDK7;
         }
 
+        if (this.version.startsWith("1.8") || this.version.startsWith("8")) { // NOI18N
+
+            return TargetPlatformEnum.JDK8;
+        }
+
         return TargetPlatformEnum.JDK5;
     }
 

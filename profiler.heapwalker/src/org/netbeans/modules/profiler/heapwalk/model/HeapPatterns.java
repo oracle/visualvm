@@ -58,16 +58,11 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "HeapPatterns_InstanceOfString=1 instance of {0}",
+    "HeapPatterns_InstancesOfString={0} instances of {1}"
+})
 final class HeapPatterns {
-
-    // -----
-    // I18N String constants
-    private static final String INSTANCE_OF_STRING = NbBundle.getMessage(
-            HeapPatterns.class, "HeapPatterns_InstanceOfString"); // NOI18N
-    private static final String INSTANCES_OF_STRING = NbBundle.getMessage(
-            HeapPatterns.class, "HeapPatterns_InstancesOfString"); // NOI18N
-    // -----
-
     private static final String LINKED_LIST_CLASSNAME = "java.util.LinkedList"; // NOI18N
     private static final String LINKED_LIST_ENTRY_CLASSNAME = "java.util.LinkedList$Entry"; // NOI18N
 
@@ -179,12 +174,10 @@ final class HeapPatterns {
         List<Instance> instances;
 
         if (e1.equals(e2)) {
-            nodesCount = MessageFormat.format(INSTANCE_OF_STRING,
-                    new Object[] { LINKED_LIST_ENTRY_CLASSNAME });
+            nodesCount = Bundle.HeapPatterns_InstanceOfString(LINKED_LIST_ENTRY_CLASSNAME);
             instances = Collections.singletonList(e1);
         } else {
-            nodesCount = MessageFormat.format(INSTANCES_OF_STRING,
-                    new Object[] { 2, LINKED_LIST_ENTRY_CLASSNAME });
+            nodesCount = Bundle.HeapPatterns_InstancesOfString(2, LINKED_LIST_ENTRY_CLASSNAME);
             instances = Arrays.asList(new Instance[] { e1, e2 });
         }
         String collapsedNodeName = "previous, next (" + nodesCount + ")"; // NOI18N

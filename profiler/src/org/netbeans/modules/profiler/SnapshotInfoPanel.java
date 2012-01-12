@@ -54,116 +54,86 @@ import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.RequestProcessor;
 
-
+@NbBundle.Messages({
+    "SnapshotInfoPanel_DataCollectedFromString=Data collected from:",
+    "SnapshotInfoPanel_SnapshotTakenAtString=Snapshot taken at:",
+    "SnapshotInfoPanel_FileString=File:",
+    "SnapshotInfoPanel_NotSavedString=Not Saved",
+    "SnapshotInfoPanel_FileSizeString=File Size:",
+    "SnapshotInfoPanel_SettingsString=Settings:",
+    "SnapshotInfoPanel_SettingsNameString=Settings Name:",
+    "SnapshotInfoPanel_ProfilingTypeString=Profiling Type:",
+    "SnapshotInfoPanel_CodeRegionString=Code Region",
+    "SnapshotInfoPanel_ProfiledCodeRegionString=Profiled Code Region:",
+    "SnapshotInfoPanel_ExcludeSleepWaitString=Exclude time spent in Thread.sleep() and Object.wait():",
+    "SnapshotInfoPanel_BufferSizeString=Buffer Size:",
+    "SnapshotInfoPanel_LimitProfiledThreadsString=Limit number of profiled threads:",
+    "SnapshotInfoPanel_UnlimitedString=Unlimited",
+    "SnapshotInfoPanel_CpuEntireString=CPU Profiling (Entire Application)",
+    "SnapshotInfoPanel_CpuPartString=CPU Profiling (Part of Application)",
+    "SnapshotInfoPanel_MemoryAllocString=Memory (Allocations Only)",
+    "SnapshotInfoPanel_MemoryLivenessString=Memory (Liveness)",
+    "SnapshotInfoPanel_TrackingAllInstancesString=Tracking All Instances",
+    "SnapshotInfoPanel_TrackEveryString=Track Every:",
+    "SnapshotInfoPanel_RecordStackTracesString=Record Stack Traces:",
+    "SnapshotInfoPanel_LimitStackDepthString=Limit Stack Depth:",
+    "SnapshotInfoPanel_RunGcString=Run Garbage Collection When Getting Results:",
+    "SnapshotInfoPanel_RootMethodsString=Root Methods:",
+    "SnapshotInfoPanel_CpuProfilingTypeString=CPU Profiling Type:",
+    "SnapshotInfoPanel_SamplingPeriodString=Sampling Period:",
+    "SnapshotInfoPanel_CpuTimerString=CPU Timer:",
+    "SnapshotInfoPanel_InstrumentationFilterString=Instrumentation Filter:",
+    "SnapshotInfoPanel_InstrumentationSchemeString=Instrumentation Scheme:",
+    "SnapshotInfoPanel_InstrumentMethodInvokeString=Instrument Method Invoke:",
+    "SnapshotInfoPanel_InstrumentNewThreadsString=Instrument New Threads:",
+    "SnapshotInfoPanel_InstrumentGettersSettersString=Instrument Getters and Setters:",
+    "SnapshotInfoPanel_InstrumentEmptyMethodsString=Instrument Empty Methods:",
+    "SnapshotInfoPanel_OverridenGlobalPropertiesString=Overridden Global Properties:",
+    "SnapshotInfoPanel_WorkingDirectoryString=Working Directory:",
+    "SnapshotInfoPanel_ProjectPlatformNameString=<project>",
+    "SnapshotInfoPanel_JavaPlatformString=Java Platform:",
+    "SnapshotInfoPanel_JvmArgumentsString=JVM Arguments:",
+    "SnapshotInfoPanel_CommPortString=Communication Port:",
+    "SnapshotInfoPanel_YesString=Yes",
+    "SnapshotInfoPanel_NoString=No",
+    "SnapshotInfoPanel_OnString=On",
+    "SnapshotInfoPanel_OffString=Off",
+    "SnapshotInfoPanel_InvalidString=<Invalid>",
+    "SnapshotInfoPanel_NoMethodsString=No methods, main(String[] args) method of first loaded class becomes root method",
+    "SnapshotInfoPanel_MethodsCountString={0} methods:",
+    "SnapshotInfoPanel_LinesDefString={0}, lines: {1} to {2}",
+    "SnapshotInfoPanel_InstrumentationProfTypeString=Instrumentation",
+    "SnapshotInfoPanel_SampledInstrProfTypeString=Sampled Instrumentation",
+    "SnapshotInfoPanel_SampledProfTypeString=Sampled",
+    "SnapshotInfoPanel_TotalProfSchemeString=Total",
+    "SnapshotInfoPanel_EagerProfSchemeString=Eager",
+    "SnapshotInfoPanel_LazyProfSchemeString=Lazy",
+    "SnapshotInfoPanel_InstancesCountString={0} instances",
+    "SnapshotInfoPanel_InfoAreaAccessName=Snapshot properties.",
+    "SnapshotInfoPanel_UserCommentsLbl=&User comments:",
+    "SnapshotInfoPanel_UserCommentsCaption=Edit User Comments",
+    "SnapshotInfoPanel_SummaryString=Summary:",
+    "SnapshotInfoPanel_CommentsString=User comments:",
+    "SnapshotInfoPanel_EditCommentsLink=edit...",
+    "SnapshotInfoPanel_NoCommentsString=none"
+})
 public class SnapshotInfoPanel extends JPanel {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String DATA_COLLECTED_FROM_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                 "SnapshotInfoPanel_DataCollectedFromString"); // NOI18N
-    private static final String SNAPSHOT_TAKEN_AT_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                               "SnapshotInfoPanel_SnapshotTakenAtString"); // NOI18N
-    private static final String FILE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_FileString"); // NOI18N
-    private static final String NOT_SAVED_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_NotSavedString"); // NOI18N
-    private static final String FILE_SIZE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_FileSizeString"); // NOI18N
-    private static final String SETTINGS_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_SettingsString"); // NOI18N
-    private static final String SETTINGS_NAME_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                           "SnapshotInfoPanel_SettingsNameString"); // NOI18N
-    private static final String PROFILING_TYPE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                            "SnapshotInfoPanel_ProfilingTypeString"); // NOI18N
-    private static final String CODE_REGION_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                         "SnapshotInfoPanel_CodeRegionString"); // NOI18N
-    private static final String PROFILED_CODE_REGION_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                  "SnapshotInfoPanel_ProfiledCodeRegionString"); // NOI18N
-    private static final String EXCLUDE_SLEEP_WAIT_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                "SnapshotInfoPanel_ExcludeSleepWaitString"); // NOI18N
-    private static final String BUFFER_SIZE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                         "SnapshotInfoPanel_BufferSizeString"); // NOI18N
-    private static final String LIMIT_PROFILED_THREADS_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                    "SnapshotInfoPanel_LimitProfiledThreadsString"); // NOI18N
-    private static final String UNLIMITED_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                       "SnapshotInfoPanel_UnlimitedString"); // NOI18N
-    private static final String CPU_ENTIRE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                        "SnapshotInfoPanel_CpuEntireString"); // NOI18N
-    private static final String CPU_PART_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_CpuPartString"); // NOI18N
-    private static final String MEMORY_ALLOC_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                          "SnapshotInfoPanel_MemoryAllocString"); // NOI18N
-    private static final String MEMORY_LIVENESS_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                             "SnapshotInfoPanel_MemoryLivenessString"); // NOI18N
-    private static final String TRACKING_ALL_INSTANCES_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                    "SnapshotInfoPanel_TrackingAllInstancesString"); // NOI18N
-    private static final String TRACK_EVERY_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                         "SnapshotInfoPanel_TrackEveryString"); // NOI18N
-    private static final String RECORD_STACK_TRACES_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                 "SnapshotInfoPanel_RecordStackTracesString"); // NOI18N
-    private static final String LIMIT_STACK_DEPTH_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                               "SnapshotInfoPanel_LimitStackDepthString"); // NOI18N
-    private static final String RUN_GC_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_RunGcString"); // NOI18N
-    private static final String ROOT_METHODS_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                          "SnapshotInfoPanel_RootMethodsString"); // NOI18N
-    private static final String CPU_PROFILING_TYPE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                "SnapshotInfoPanel_CpuProfilingTypeString"); // NOI18N
-    private static final String SAMPLING_PERIOD_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                             "SnapshotInfoPanel_SamplingPeriodString"); // NOI18N
-    private static final String CPU_TIMER_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_CpuTimerString"); // NOI18N
-    private static final String INSTRUMENTATION_FILTER_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                    "SnapshotInfoPanel_InstrumentationFilterString"); // NOI18N
-    private static final String INSTRUMENTATION_SCHEME_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                    "SnapshotInfoPanel_InstrumentationSchemeString"); // NOI18N
-    private static final String INSTRUMENT_METHOD_INVOKE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                      "SnapshotInfoPanel_InstrumentMethodInvokeString"); // NOI18N
-    private static final String INSTRUMENT_NEW_THREADS_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                    "SnapshotInfoPanel_InstrumentNewThreadsString"); // NOI18N
-    private static final String INSTRUMENT_GETTERS_SETTERS_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                        "SnapshotInfoPanel_InstrumentGettersSettersString"); // NOI18N
-    private static final String INSTRUMENT_EMPTY_METHODS_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                      "SnapshotInfoPanel_InstrumentEmptyMethodsString"); // NOI18N
-    private static final String OVERRIDEN_GLOBAL_PROPERTIES_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                         "SnapshotInfoPanel_OverridenGlobalPropertiesString"); // NOI18N
-    private static final String WORKING_DIRECTORY_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                               "SnapshotInfoPanel_WorkingDirectoryString"); // NOI18N
-    private static final String PROJECT_PLATFORM_NAME_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                   "SnapshotInfoPanel_ProjectPlatformNameString"); // NOI18N
-    private static final String JAVA_PLATFORM_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                           "SnapshotInfoPanel_JavaPlatformString"); // NOI18N
-    private static final String JVM_ARGUMENTS_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                           "SnapshotInfoPanel_JvmArgumentsString"); // NOI18N
-    private static final String COMM_PORT_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_CommPortString"); // NOI18N
-    private static final String YES_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_YesString"); // NOI18N
-    private static final String NO_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_NoString"); // NOI18N
-    private static final String ON_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_OnString"); // NOI18N
-    private static final String OFF_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_OffString"); // NOI18N
-    private static final String INVALID_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_InvalidString"); // NOI18N
-    private static final String NO_METHODS_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                        "SnapshotInfoPanel_NoMethodsString"); // NOI18N
-    private static final String METHODS_COUNT_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                           "SnapshotInfoPanel_MethodsCountString"); // NOI18N
-    private static final String LINES_DEF_STRING = NbBundle.getMessage(SnapshotInfoPanel.class, "SnapshotInfoPanel_LinesDefString"); // NOI18N
-    private static final String INSTRUMENTATION_PROF_TYPE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                                       "SnapshotInfoPanel_InstrumentationProfTypeString"); // NOI18N
-    private static final String SAMPLED_INSTR_PROF_TYPE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                               "SnapshotInfoPanel_SampledInstrProfTypeString"); // NOI18N
-    private static final String SAMPLED_PROF_TYPE_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                               "SnapshotInfoPanel_SampledProfTypeString"); // NOI18N
-    private static final String TOTAL_PROF_SCHEME_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                               "SnapshotInfoPanel_TotalProfSchemeString"); // NOI18N
-    private static final String EAGER_PROF_SCHEME_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                               "SnapshotInfoPanel_EagerProfSchemeString"); // NOI18N
-    private static final String LAZY_PROF_SCHEME_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                              "SnapshotInfoPanel_LazyProfSchemeString"); // NOI18N
-    private static final String INSTANCES_COUNT_STRING = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                             "SnapshotInfoPanel_InstancesCountString"); // NOI18N
-    private static final String INFO_AREA_ACCESS_NAME = NbBundle.getMessage(SnapshotInfoPanel.class,
-                                                                            "SnapshotInfoPanel_InfoAreaAccessName"); // NOI18N
-                                                                                                                     // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -175,9 +145,28 @@ public class SnapshotInfoPanel extends JPanel {
 
     public SnapshotInfoPanel(LoadedSnapshot snapshot) {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        infoArea = new HTMLTextArea();
-        infoArea.getAccessibleContext().setAccessibleName(INFO_AREA_ACCESS_NAME);
+        infoArea = new HTMLTextArea() {
+            protected void showURL(URL url) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        String userComments = loadedSnapshot.getUserComments();
+                        NotifyDescriptor.InputLine nd = createDescriptor(
+                                Bundle.SnapshotInfoPanel_UserCommentsLbl(),
+                                Bundle.SnapshotInfoPanel_UserCommentsCaption());
+                        nd.setInputText(userComments);
+                        Object ret = DialogDisplayer.getDefault().notify(nd);
+                        if (ret == NotifyDescriptor.OK_OPTION) {
+                            setUserComments(nd.getInputText());
+                        }
+                    }
+                });
+            }
+            public void scrollRectToVisible(Rectangle aRect) {
+                if (isShowing()) super.scrollRectToVisible(aRect);
+            }
+        };
+        infoArea.getAccessibleContext().setAccessibleName(Bundle.SnapshotInfoPanel_InfoAreaAccessName());
+        infoArea.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         infoAreaScrollPane = new JScrollPane(infoArea);
         add(infoAreaScrollPane, BorderLayout.CENTER);
         this.loadedSnapshot = snapshot;
@@ -197,117 +186,190 @@ public class SnapshotInfoPanel extends JPanel {
     public boolean fitsVisibleArea() {
         return !infoAreaScrollPane.getVerticalScrollBar().isVisible();
     }
+    
+    private NotifyDescriptor.InputLine createDescriptor(String label, String caption) {
+        return new NotifyDescriptor.InputLine(label, caption) {
+            private JTextArea textArea;
+            
+            public String getInputText() {
+                return textArea.getText();
+            }
+
+            public void setInputText(final String text) {
+                textArea.setText(text);
+                textArea.selectAll();
+            }
+            
+            protected Component createDesign(final String text) {
+                JPanel panel = new JPanel(new BorderLayout(5, 5));
+                panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
+                panel.setOpaque(false);
+
+                JLabel textLabel = new JLabel();
+                Mnemonics.setLocalizedText(textLabel, text);
+
+                textArea = new JTextArea();
+                textLabel.setLabelFor(textArea);
+
+                textArea.requestFocus();
+                
+                JScrollPane textAreaScroll = new JScrollPane(textArea);
+                textAreaScroll.setPreferredSize(new Dimension(350, 150));
+                panel.add(textAreaScroll, BorderLayout.CENTER);
+                panel.add(textLabel, BorderLayout.NORTH);
+                
+                panel.getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputPanel") // NOI18N
+                );
+                textArea.getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputField") // NOI18N
+                );
+
+                return panel;
+            }
+        };
+    }
+    
+    public void setUserComments(String userComments) {
+        loadedSnapshot.setUserComments(userComments);
+        if (!loadedSnapshot.isSaved()) {
+            updateInfo();
+            final File snapshotFile = loadedSnapshot.getFile();
+            if (snapshotFile != null)
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        ResultsManager.getDefault().saveSnapshot(loadedSnapshot,
+                                FileUtil.toFileObject(snapshotFile));
+                    }
+                });
+        }
+    }
 
     public void updateInfo() {
         ProfilingSettings ps = loadedSnapshot.getSettings();
 
         StringBuffer htmlText = new StringBuffer(1000);
 
+        String infoRes = Icons.getResource(GeneralIcons.INFO);
+        String summaryStr = Bundle.SnapshotInfoPanel_SummaryString();
+        htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/").append(infoRes).append("'>&nbsp;&nbsp;").append(summaryStr).append("</b><br><hr>"); // NOI18N
+        htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(DATA_COLLECTED_FROM_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_DataCollectedFromString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(StringUtils.formatFullDate(new Date(loadedSnapshot.getSnapshot().getBeginTime())));
         htmlText.append("<br>"); // NOI18N
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(SNAPSHOT_TAKEN_AT_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_SnapshotTakenAtString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(StringUtils.formatFullDate(new Date(loadedSnapshot.getSnapshot().getTimeTaken())));
         htmlText.append("<br>"); // NOI18N
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(FILE_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_FileString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
 
         File f = loadedSnapshot.getFile();
 
         if (f == null) {
-            htmlText.append(NOT_SAVED_STRING);
+            htmlText.append(Bundle.SnapshotInfoPanel_NotSavedString());
         } else {
             htmlText.append(f.getAbsolutePath());
             htmlText.append("<br>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(FILE_SIZE_STRING + " "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_FileSizeString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
 
             NumberFormat format = NumberFormat.getIntegerInstance();
             format.setGroupingUsed(true);
-            htmlText.append(format.format(f.length()) + " B"); // NOI18N
+            htmlText.append(format.format(f.length())).append(" B"); // NOI18N
         }
+        htmlText.append("</div>"); // NOI18N
+        
+        String commentsRes = Icons.getResource(GeneralIcons.INFO);
+        String commentsStr = Bundle.SnapshotInfoPanel_CommentsString();
+        String commentsLink = Bundle.SnapshotInfoPanel_EditCommentsLink();
+        String noCommentsStr = Bundle.SnapshotInfoPanel_NoCommentsString();
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/").append(commentsRes).append("'>&nbsp;&nbsp;").append(commentsStr).append("&nbsp;&nbsp;" + "</b><a href='#'>").append(commentsLink).append("</a><br><hr>"); // NOI18N
+        htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
+        String comments = loadedSnapshot.getUserComments();
+        comments = comments.replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+        htmlText.append(comments.isEmpty() ? "&lt;" + noCommentsStr + "&gt;" : comments); // NOI18N
+        htmlText.append("</div>"); // NOI18N
 
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<br>"); // NOI18N
+        String settingsRes = Icons.getResource(GeneralIcons.INFO);
+        htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/").append(settingsRes).append("'>&nbsp;&nbsp;").append(Bundle.SnapshotInfoPanel_SettingsString()).append("</b><br><hr>"); // NOI18N
+        htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(SETTINGS_STRING);
-        htmlText.append("</strong>"); // NOI18N
-        htmlText.append("<br>"); // NOI18N
-        htmlText.append("<br>"); // NOI18N
-        htmlText.append("<blockquote>"); // NOI18N
-        htmlText.append("<strong>"); // NOI18N
-        htmlText.append(" " + SETTINGS_NAME_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_SettingsNameString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(ps.getSettingsName());
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(" " + PROFILING_TYPE_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
 
         switch (ps.getProfilingType()) {
             case ProfilingSettings.PROFILE_CPU_STOPWATCH:
-                htmlText.append(CODE_REGION_STRING);
+                htmlText.append(Bundle.SnapshotInfoPanel_CodeRegionString());
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<strong>"); // NOI18N
-                htmlText.append(PROFILED_CODE_REGION_STRING + " "); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_ProfiledCodeRegionString()).append(" "); // NOI18N
                 htmlText.append("</strong>"); // NOI18N
                 htmlText.append(formatRootMethod(ps.getCodeFragmentSelection()));
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<strong>"); // NOI18N
-                htmlText.append(EXCLUDE_SLEEP_WAIT_STRING + " "); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_ExcludeSleepWaitString()).append(" "); // NOI18N
                 htmlText.append("</strong>"); // NOI18N
                 htmlText.append(getYesNo(ps.getExcludeWaitTime()));
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<strong>"); // NOI18N
-                htmlText.append(BUFFER_SIZE_STRING + " "); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_BufferSizeString()).append(" "); // NOI18N
                 htmlText.append("</strong>"); // NOI18N
                 htmlText.append(ps.getCodeRegionCPUResBufSize());
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<strong>"); // NOI18N
-                htmlText.append(LIMIT_PROFILED_THREADS_STRING + " "); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_LimitProfiledThreadsString()).append(" "); // NOI18N
                 htmlText.append("</strong>"); // NOI18N
 
                 if (ps.getNProfiledThreadsLimit() < 0) {
-                    htmlText.append(UNLIMITED_STRING);
+                    htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
                 } else {
-                    htmlText.append("" + ps.getNProfiledThreadsLimit()); // NOI18N
+                    htmlText.append("").append(ps.getNProfiledThreadsLimit()); // NOI18N
                 }
 
                 htmlText.append("<br>"); // NOI18N
 
                 break;
             case ProfilingSettings.PROFILE_CPU_ENTIRE:
-                htmlText.append(CPU_ENTIRE_STRING);
+                htmlText.append(Bundle.SnapshotInfoPanel_CpuEntireString());
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<br>"); // NOI18N
                 appendCPUText(htmlText, ps);
 
                 break;
             case ProfilingSettings.PROFILE_CPU_PART:
-                htmlText.append(CPU_PART_STRING);
+                htmlText.append(Bundle.SnapshotInfoPanel_CpuPartString());
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<br>"); // NOI18N
                 appendCPUText(htmlText, ps);
 
                 break;
             case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
-                htmlText.append(MEMORY_ALLOC_STRING);
+                htmlText.append(Bundle.SnapshotInfoPanel_MemoryAllocString());
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<br>"); // NOI18N
                 appendMemoryText(htmlText, ps);
 
                 break;
             case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
-                htmlText.append(MEMORY_LIVENESS_STRING);
+                htmlText.append(Bundle.SnapshotInfoPanel_MemoryLivenessString());
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<br>"); // NOI18N
                 appendMemoryText(htmlText, ps);
@@ -317,115 +379,116 @@ public class SnapshotInfoPanel extends JPanel {
 
         appendOverridenGlobalProperties(htmlText, ps);
 
-        htmlText.append("</blockquote>"); // NOI18N
+        htmlText.append("</div>"); // NOI18N
         htmlText.append("<br>"); // NOI18N
 
         infoArea.setText(htmlText.toString());
+        infoArea.setCaretPosition(0);
     }
 
     private static String getOnOff(boolean b) {
-        return b ? ON_STRING : OFF_STRING;
+        return b ? Bundle.SnapshotInfoPanel_OnString() : Bundle.SnapshotInfoPanel_OffString();
     }
 
     private static String getYesNo(boolean b) {
-        return b ? YES_STRING : NO_STRING;
+        return b ? Bundle.SnapshotInfoPanel_YesString() : Bundle.SnapshotInfoPanel_NoString();
     }
 
     private String getCPUProfilingScheme(int type) {
         switch (type) {
             case CommonConstants.INSTRSCHEME_TOTAL:
-                return TOTAL_PROF_SCHEME_STRING;
+                return Bundle.SnapshotInfoPanel_TotalProfSchemeString();
             case CommonConstants.INSTRSCHEME_EAGER:
-                return EAGER_PROF_SCHEME_STRING;
+                return Bundle.SnapshotInfoPanel_EagerProfSchemeString();
             case CommonConstants.INSTRSCHEME_LAZY:
-                return LAZY_PROF_SCHEME_STRING;
+                return Bundle.SnapshotInfoPanel_LazyProfSchemeString();
             default:
-                return INVALID_STRING;
+                return Bundle.SnapshotInfoPanel_InvalidString();
         }
     }
 
     private String getCPUProfilingType(int type) {
         switch (type) {
             case CommonConstants.CPU_INSTR_FULL:
-                return INSTRUMENTATION_PROF_TYPE_STRING;
+                return Bundle.SnapshotInfoPanel_InstrumentationProfTypeString();
             case CommonConstants.CPU_INSTR_SAMPLED:
-                return SAMPLED_INSTR_PROF_TYPE_STRING;
+                return Bundle.SnapshotInfoPanel_SampledInstrProfTypeString();
             case CommonConstants.CPU_SAMPLED:
-                return SAMPLED_INSTR_PROF_TYPE_STRING;                
+                return Bundle.SnapshotInfoPanel_SampledProfTypeString();
             default:
-                return INVALID_STRING;
+                return Bundle.SnapshotInfoPanel_InvalidString();
         }
     }
 
     private void appendCPUText(StringBuffer htmlText, ProfilingSettings ps) {
         // Done
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(ROOT_METHODS_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_RootMethodsString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(formatRootMethods(ps.getInstrumentationRootMethods()));
         htmlText.append("<br>"); // NOI18N // TODO: formatting
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(CPU_PROFILING_TYPE_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_CpuProfilingTypeString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getCPUProfilingType(ps.getCPUProfilingType()));
         htmlText.append("<br>"); // NOI18N
 
         if (ps.getCPUProfilingType() == CommonConstants.CPU_INSTR_SAMPLED) {
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(SAMPLING_PERIOD_STRING + " "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_SamplingPeriodString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(ps.getSamplingInterval());
             htmlText.append(" ms<br>"); // NOI18N
         }
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(CPU_TIMER_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_CpuTimerString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getOnOff(ps.getThreadCPUTimerOn()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(EXCLUDE_SLEEP_WAIT_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_ExcludeSleepWaitString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getExcludeWaitTime()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(LIMIT_PROFILED_THREADS_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_LimitProfiledThreadsString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
 
         if (ps.getNProfiledThreadsLimit() < 0) {
-            htmlText.append(UNLIMITED_STRING);
+            htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
         } else {
-            htmlText.append("" + ps.getNProfiledThreadsLimit()); // NOI18N
+            htmlText.append("").append(ps.getNProfiledThreadsLimit()); // NOI18N
         }
 
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENTATION_FILTER_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentationFilterString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(ps.getSelectedInstrumentationFilter().toString());
         htmlText.append("<br>"); // NOI18N // TODO: text
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENTATION_SCHEME_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentationSchemeString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getCPUProfilingScheme(ps.getInstrScheme()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENT_METHOD_INVOKE_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentMethodInvokeString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getInstrumentMethodInvoke()));
         htmlText.append("<br>"); //NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENT_NEW_THREADS_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentNewThreadsString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getInstrumentSpawnedThreads()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENT_GETTERS_SETTERS_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentGettersSettersString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getInstrumentGetterSetterMethods()));
         htmlText.append("<br>"); // NOI18N
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(INSTRUMENT_EMPTY_METHODS_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentEmptyMethodsString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getInstrumentEmptyMethods()));
         htmlText.append("<br>"); // NOI18N
@@ -435,30 +498,30 @@ public class SnapshotInfoPanel extends JPanel {
         // Done
         if (ps.getAllocTrackEvery() == 1) {
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(TRACKING_ALL_INSTANCES_STRING + " "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_TrackingAllInstancesString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
         } else {
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(TRACK_EVERY_STRING + " "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_TrackEveryString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
-            htmlText.append(MessageFormat.format(INSTANCES_COUNT_STRING, new Object[] { "" + ps.getAllocTrackEvery() })); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_InstancesCountString("" + ps.getAllocTrackEvery())); // NOI18N
         }
 
         htmlText.append("<br>"); // NOI18N
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(RECORD_STACK_TRACES_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_RecordStackTracesString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getAllocStackTraceLimit() != 0));
         htmlText.append("<br>"); // NOI18N
 
         if (ps.getAllocStackTraceLimit() != 0) {
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(LIMIT_STACK_DEPTH_STRING + " "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_LimitStackDepthString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
 
             if (ps.getAllocStackTraceLimit() < 0) {
-                htmlText.append(UNLIMITED_STRING);
+                htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
             } else {
                 htmlText.append(ps.getAllocStackTraceLimit());
             }
@@ -467,7 +530,7 @@ public class SnapshotInfoPanel extends JPanel {
         }
 
         htmlText.append("<strong>"); // NOI18N
-        htmlText.append(RUN_GC_STRING + " "); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_RunGcString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
         htmlText.append(getYesNo(ps.getRunGCOnGetResultsInMemoryProfiling()));
         htmlText.append("<br>"); // NOI18N
@@ -478,12 +541,12 @@ public class SnapshotInfoPanel extends JPanel {
         if (ps.getOverrideGlobalSettings()) {
             htmlText.append("<br>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(OVERRIDEN_GLOBAL_PROPERTIES_STRING + " "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_OverridenGlobalPropertiesString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append("<br>"); // NOI18N
-            htmlText.append("<blockquote>"); //NOI18N
+            htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(WORKING_DIRECTORY_STRING + " "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_WorkingDirectoryString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(ps.getWorkingDir());
             htmlText.append("<br>"); // NOI18N
@@ -491,20 +554,20 @@ public class SnapshotInfoPanel extends JPanel {
             String platformName = ps.getJavaPlatformName();
 
             if (platformName == null) {
-                platformName = PROJECT_PLATFORM_NAME_STRING;
+                platformName = Bundle.SnapshotInfoPanel_ProjectPlatformNameString();
             }
 
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(JAVA_PLATFORM_STRING + " "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_JavaPlatformString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(platformName);
             htmlText.append("<br>"); // NOI18N
             htmlText.append("<strong>"); // NOI18N
-            htmlText.append(JVM_ARGUMENTS_STRING + " "); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_JvmArgumentsString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             htmlText.append(ps.getJVMArgs());
+            htmlText.append("</div>"); // NOI18N
             htmlText.append("<br>"); // NOI18N
-            htmlText.append("</blockquote>"); // NOI18N
         }
     }
 
@@ -520,10 +583,10 @@ public class SnapshotInfoPanel extends JPanel {
             ret = ret.replace("<", "&lt;"); // NOI18N
             ret = ret.replace(">", "&gt;"); // NOI18N
         } else {
-            ret = MessageFormat.format(LINES_DEF_STRING,
-                                       new String[] {
-                                           method.getClassName(), "" + method.getStartLine(), "" + method.getEndLine()
-                                       } // NOI18N
+            ret = Bundle.SnapshotInfoPanel_LinesDefString(
+                    method.getClassName(), 
+                    "" + method.getStartLine(), 
+                    "" + method.getEndLine()
             );
         }
 
@@ -532,16 +595,14 @@ public class SnapshotInfoPanel extends JPanel {
 
     private String formatRootMethods(ClientUtils.SourceCodeSelection[] methods) {
         if ((methods == null) || (methods.length == 0)) {
-            return NO_METHODS_STRING;
+            return Bundle.SnapshotInfoPanel_NoMethodsString();
         } else if (methods.length == 1) {
             return formatRootMethod(methods[0]);
         } else {
-            StringBuffer ret = new StringBuffer();
+            StringBuilder ret = new StringBuilder();
 
-            ret.append(MessageFormat.format(METHODS_COUNT_STRING, new Object[] { "" + methods.length })); // NOI18N
+            ret.append(Bundle.SnapshotInfoPanel_MethodsCountString("" + methods.length)); // NOI18N
             ret.append("<br>"); // NOI18N
-
-            ret.append("<blockquote>"); // NOI18N
 
             java.util.List<String> rootNames = new ArrayList<String>();
 
@@ -553,11 +614,11 @@ public class SnapshotInfoPanel extends JPanel {
             Collections.sort(rootNames);
 
             for (String rootName : rootNames) {
+                ret.append("&nbsp;&nbsp;&nbsp;&nbsp;"); // NOI18N
                 ret.append(rootName);
                 ret.append("<br>"); // NOI18N
             }
-
-            ret.append("</blockquote>"); // NOI18N
+            
 
             return ret.toString();
         }

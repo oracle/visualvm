@@ -144,7 +144,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     }
 
     public synchronized String getStatus(int status) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         if (status == STATUS_ERROR) {
             sb.append("ERROR");
@@ -202,7 +202,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     }
 
     public void log(double[] ar) {
-        StringBuffer sb = new StringBuffer(ar.length * 10);
+        StringBuilder sb = new StringBuilder(ar.length * 10);
         sb.append("[");
 
         for (int i = 0; i < ar.length; i++) {
@@ -218,7 +218,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     }
 
     public void log(int[] ar) {
-        StringBuffer sb = new StringBuffer(ar.length * 10);
+        StringBuilder sb = new StringBuilder(ar.length * 10);
         sb.append("[");
 
         for (int i = 0; i < ar.length; i++) {
@@ -483,7 +483,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     }
 
     protected String complete(String s, int chars) {
-        StringBuffer sb = new StringBuffer(chars);
+        StringBuilder sb = new StringBuilder(chars);
         int tot = chars - s.length();
         sb.append(s);
 
@@ -638,7 +638,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
 
         System.err.println("Starting VM with " + cmdArray.length + " commands."); // NOI18N
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < cmdArray.length; i++) {
             sb.append(cmdArray[i]);
@@ -716,7 +716,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         if ((roots != null) && (roots.length > 0)) {
             map.put("profiler.settings.instrumentation.root.methods.size", Integer.toString(roots.length));
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             for (int i = 0; i < roots.length; i++) {
                 if (roots[i].getStartLine() > -1) {
@@ -775,7 +775,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     }
 
     protected String toString(String[] array) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < array.length; i++) {
             sb.append(array[i]);
@@ -786,7 +786,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
     }
 
     protected String toString(int[] array) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < array.length; i++) {
             sb.append(array[i]);

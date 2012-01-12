@@ -29,6 +29,7 @@
                 </test-type>
             </test-dependencies>
             <friend-packages>
+                <friend>com.sun.tools.visualvm.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.categorization.api</friend>
                 <friend>org.netbeans.modules.profiler.drilldown</friend>

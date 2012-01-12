@@ -50,7 +50,6 @@ import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.memory.*;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.actions.FindNextAction;
 import org.netbeans.modules.profiler.actions.FindPreviousAction;
@@ -63,8 +62,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.text.MessageFormat;
-import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -85,6 +82,16 @@ import org.openide.util.Lookup;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "MemorySnapshotPanel_MemoryResultsTabName=Memory Results",
+    "MemorySnapshotPanel_StackTracesTabName=Allocation Stack Traces",
+    "MemorySnapshotPanel_InfoTabName=Info",
+    "MemorySnapshotPanel_MemoryResultsTabDescr=Memory Results - Allocated objects and memory sizes",
+    "MemorySnapshotPanel_StackTracesTabDescr=Reverse call trees for object allocations",
+    "MemorySnapshotPanel_InfoTabDescr=Snapshot Information",
+    "MemorySnapshotPanel_StringNotFoundMsg=String not found in results",
+    "MemorySnapshotPanel_FindActionTooltip=Find in Results... (Ctrl+F)"
+})
 public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener, SnapshotResultsWindow.FindPerformer,
                                                                   SaveViewAction.ViewProvider, ExportAction.ExportProvider {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -110,24 +117,6 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String MEMORY_RESULTS_TAB_NAME = NbBundle.getMessage(MemorySnapshotPanel.class,
-                                                                              "MemorySnapshotPanel_MemoryResultsTabName"); // NOI18N
-    private static final String STACK_TRACES_TAB_NAME = NbBundle.getMessage(MemorySnapshotPanel.class,
-                                                                            "MemorySnapshotPanel_StackTracesTabName"); // NOI18N
-    private static final String INFO_TAB_NAME = NbBundle.getMessage(MemorySnapshotPanel.class, "MemorySnapshotPanel_InfoTabName"); // NOI18N
-    private static final String MEMORY_RESULTS_TAB_DESCR = NbBundle.getMessage(MemorySnapshotPanel.class,
-                                                                               "MemorySnapshotPanel_MemoryResultsTabDescr"); // NOI18N
-    private static final String STACK_TRACES_TAB_DESCR = NbBundle.getMessage(MemorySnapshotPanel.class,
-                                                                             "MemorySnapshotPanel_StackTracesTabDescr"); // NOI18N
-    private static final String INFO_TAB_DESCR = NbBundle.getMessage(MemorySnapshotPanel.class, "MemorySnapshotPanel_InfoTabDescr"); // NOI18N
-    private static final String PANEL_TITLE = NbBundle.getMessage(MemorySnapshotPanel.class, "MemorySnapshotPanel_PanelTitle"); // NOI18N
-    private static final String STRING_NOT_FOUND_MSG = NbBundle.getMessage(MemorySnapshotPanel.class,
-                                                                           "MemorySnapshotPanel_StringNotFoundMsg"); // NOI18N
-    private static final String FIND_ACTION_TOOLTIP = NbBundle.getMessage(MemorySnapshotPanel.class,
-                                                                           "MemorySnapshotPanel_FindActionTooltip"); // NOI18N
-                                                                                                                     // -----
     private static final Icon MEMORY_RESULTS_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_MEMORY_RESULTS);
     private static final Icon INFO_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_INFO);
     private static final Icon STACK_TRACES_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_STACK_TRACES);
@@ -174,16 +163,16 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
         infoPanel.updateInfo();
 
-        tabs.addTab(MEMORY_RESULTS_TAB_NAME, MEMORY_RESULTS_TAB_ICON, memoryPanel, MEMORY_RESULTS_TAB_DESCR);
+        tabs.addTab(Bundle.MemorySnapshotPanel_MemoryResultsTabName(), MEMORY_RESULTS_TAB_ICON, memoryPanel, Bundle.MemorySnapshotPanel_StackTracesTabDescr());
 
         if (snapshot.containsStacks()) {
             reversePanel = new SnapshotReverseMemCallGraphPanel(snapshot, memoryActionsHandler);
             reversePanel.prepareResults();
-            tabs.addTab(STACK_TRACES_TAB_NAME, STACK_TRACES_TAB_ICON, reversePanel, STACK_TRACES_TAB_DESCR);
+            tabs.addTab(Bundle.MemorySnapshotPanel_StackTracesTabName(), STACK_TRACES_TAB_ICON, reversePanel, Bundle.MemorySnapshotPanel_StackTracesTabDescr());
             tabs.setEnabledAt(tabs.getTabCount() - 1, false);
         }
 
-        tabs.addTab(INFO_TAB_NAME, INFO_TAB_ICON, infoPanel, INFO_TAB_DESCR);
+        tabs.addTab(Bundle.MemorySnapshotPanel_InfoTabName(), INFO_TAB_ICON, infoPanel, Bundle.MemorySnapshotPanel_InfoTabDescr());
         add(tabs, BorderLayout.CENTER);
 
         tabs.addChangeListener(this);
@@ -217,7 +206,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             AbstractButton ab = (AbstractButton)findActionPresenter;
             ab.setIcon(Icons.getIcon(GeneralIcons.FIND));
             ab.setText(""); // NOI18N
-            ab.setToolTipText(FIND_ACTION_TOOLTIP);
+            ab.setToolTipText(Bundle.MemorySnapshotPanel_FindActionTooltip());
         }
 
         toolBar.addSeparator();
@@ -274,10 +263,6 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
     public ResultsSnapshot getSnapshot() {
         return snapshot;
-    }
-
-    public String getTitle() {
-        return MessageFormat.format(PANEL_TITLE, new Object[] { StringUtils.formatUserDate(new Date(snapshot.getTimeTaken())) });
     }
 
     public BufferedImage getViewImage(boolean onlyVisibleArea) {
@@ -343,7 +328,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             if (reversePanel != null) reversePanel.setFindString(findString);
 
             if (!memoryPanel.findFirst()) {
-                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
             }
         } else if (tabs.getSelectedComponent() == reversePanel) {
             String findString = FindDialog.getFindString();
@@ -356,7 +341,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             reversePanel.setFindString(findString);
 
             if (!reversePanel.findFirst()) {
-                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
             }
         }
     }
@@ -375,7 +360,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
 
             if (!memoryPanel.findNext()) {
-                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
             }
         } else if (tabs.getSelectedComponent() == reversePanel) {
             if (!reversePanel.isFindStringDefined()) {
@@ -390,7 +375,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
 
             if (!reversePanel.findNext()) {
-                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
             }
         }
     }
@@ -409,7 +394,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
 
             if (!memoryPanel.findPrevious()) {
-                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
             }
         }
 
@@ -426,7 +411,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
 
             if (!reversePanel.findPrevious()) {
-                ProfilerDialogs.displayInfo(STRING_NOT_FOUND_MSG);
+                ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
             }
         }
     }
@@ -463,7 +448,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
         reversePanel.setClassId(selectedClassId);
         reversePanel.setSorting(sortingColumn, sortingOrder);
         reversePanel.prepareResults();
-        tabs.setEnabledAt(tabs.indexOfTab(STACK_TRACES_TAB_NAME), true);
+        tabs.setEnabledAt(tabs.indexOfTab(Bundle.MemorySnapshotPanel_StackTracesTabName()), true);
     }
 
     private void moveToNextSubTab() {
@@ -486,12 +471,12 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         if (tabs.getSelectedComponent() == memoryPanel) {
             if (memoryPanel instanceof SnapshotAllocResultsPanel) {
-                ((SnapshotAllocResultsPanel)memoryPanel).exportData(exportedFileType, eDD, MEMORY_RESULTS_TAB_NAME);
+                ((SnapshotAllocResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_MemoryResultsTabName());
             } else if (memoryPanel instanceof SnapshotLivenessResultsPanel) {
-                ((SnapshotLivenessResultsPanel)memoryPanel).exportData(exportedFileType, eDD, MEMORY_RESULTS_TAB_NAME);
+                ((SnapshotLivenessResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_StackTracesTabName());
             } 
         } else if (tabs.getSelectedComponent() == reversePanel) {
-            reversePanel.exportData(exportedFileType, eDD, STACK_TRACES_TAB_NAME);
+            reversePanel.exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_StackTracesTabName());
         }
     }
 

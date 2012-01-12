@@ -50,6 +50,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
@@ -94,15 +95,19 @@ public final class IdeSnapshotAction implements ActionListener {
         return tc;
     }
 
+    @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot: {0}")
     private IdeSnapshot snapshot() {
         File file = snapshotFile();
         if (file == null) return null;
         try {
             FileObject primary = FileUtil.toFileObject(file);
-            FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log");
+            FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
             
             return new IdeSnapshot(primary, uigestureFO);
-        } catch (Throwable t) { Exceptions.printStackTrace(t); return null; }
+        } catch (Throwable t) {
+            ProfilerDialogs.displayError(Bundle.MSG_SnapshotLoadFailedMsg(file.getName()));
+            return null;
+        }
     }
 
     private File snapshotFile() {
@@ -124,18 +129,20 @@ public final class IdeSnapshotAction implements ActionListener {
         }
     }
 
+    @NbBundle.Messages({
+        "ACTION_IdeSnapshot_dialog=Load IDE Snapshot",
+        "ACTION_IdeSnapshot_filter=IDE Snapshots"
+    })
     private static JFileChooser createFileChooser() {
         JFileChooser chooser = new JFileChooser();
 
-        chooser.setDialogTitle(NbBundle.getMessage(IdeSnapshotAction.class,
-                "ACTION_IdeSnapshot_dialog")); // NOI18N
+        chooser.setDialogTitle(Bundle.ACTION_IdeSnapshot_dialog());
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         chooser.setAcceptAllFileFilterUsed(false);
 
-        chooser.addChoosableFileFilter(Filter.create(NbBundle.getMessage(
-                IdeSnapshotAction.class, "ACTION_IdeSnapshot_filter"), ".npss")); // NOI18N
+        chooser.addChoosableFileFilter(Filter.create(Bundle.ACTION_IdeSnapshot_filter(), ".npss")); // NOI18N
 
         return chooser;
     }
@@ -170,7 +177,7 @@ public final class IdeSnapshotAction implements ActionListener {
         }
 
         private static String getFileExt(String fileName) {
-            int extIndex = fileName.lastIndexOf("."); // NOI18N
+            int extIndex = fileName.lastIndexOf('.'); // NOI18N
             if (extIndex == -1) return ""; // NOI18N
             return fileName.substring(extIndex);
         }

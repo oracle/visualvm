@@ -73,6 +73,26 @@ import org.openide.windows.WindowManager;
  *
  * @author cyhelsky
  */
+@NbBundle.Messages({
+    "ExportAction_ExportActionName=Export to...",
+    "ExportAction_ExportActionDescr=Export to...",
+    "ExportAction_ExportingViewMsg=Exporting...",
+    "ExportAction_NoViewMsg=No view to export.",
+    "ExportAction_OomeExportingMsg=<html><b>Not enough memory to save the file.</b><br><br>To avoid this error increase the -Xmx<br>value in the etc/netbeans.conf file in NetBeans IDE installation.</html>",
+    "ExportAction_IOException_Exporting_Msg=<html>IOException occurred during export, see IDE log for details</html>",
+    "ExportAction_OverwriteFileCaption=Overwrite Existing File",
+    "ExportAction_OverwriteFileMsg=<html><b>File {0} already exists.</b><br><br>Do you want to replace it?</html>",
+    "ExportAction_CannotOverwriteFileMsg=File {0} cannot be replaced. Check permissions.",
+    "ExportAction_InvalidLocationForFileMsg=Invalid location for file.",
+    "ExportAction_FileWriteErrorMsg=Failed to save image to {0}.",
+    "ExportAction_ExportDialogTitle=Select File or Directory",
+    "ExportAction_ExportDialogButton=Export",
+    "ExportAction_ExportDialogCSVFilter=CSV File (*.csv)",
+    "ExportAction_ExportDialogExcelFilter=Excel Compatible CSV (*.csv)",
+    "ExportAction_ExportDialogXMLFilter=XML File (*.xml)",
+    "ExportAction_ExportDialogHTMLFilter=Web page (*.html)",
+    "ExportAction_ExportDialogNPSFilter=Profiler Snapshot File (*.nps)"
+})
 public final class ExportAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(ExportAction.class.getName());
     
@@ -122,26 +142,6 @@ public final class ExportAction extends AbstractAction {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String EXPORT_ACTION_NAME = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportActionName"); //NOI18N
-    private static final String EXPORT_ACTION_DESCRIPTION = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportActionDescr"); //NOI18N
-    private static final String OVERWRITE_FILE_CAPTION = NbBundle.getMessage(ExportAction.class, "ExportAction_OverwriteFileCaption"); //NOI18N
-    private static final String OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_OverwriteFileMsg"); //NOI18N
-    private static final String INVALID_LOCATION_FOR_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_InvalidLocationForFileMsg"); //NOI18N
-    private static final String CANNOT_OVERWRITE_FILE_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_CannotOverwriteFileMsg"); //NOI18N
-    private static final String EXPORT_DIALOG_TITLE = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogTitle"); //NOI18N
-    private static final String EXPORT_DIALOG_BUTTON = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogButton"); //NOI18N
-    private static final String EXPORT_DIALOG_CSV_FILTER = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogCSVFilter"); //NOI18N
-    private static final String EXPORT_DIALOG_EXCEL_FILTER = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogExcelFilter"); //NOI18N
-    private static final String EXPORT_DIALOG_XML_FILTER = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogXMLFilter"); //NOI18N
-    private static final String EXPORT_DIALOG_HTML_FILTER = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogHTMLFilter"); //NOI18N
-    private static final String EXPORT_DIALOG_NPS_FILTER = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportDialogNPSFilter"); //NOI18N
-    private static final String NO_VIEW_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_NoViewMsg"); //NOI18N
-    private static final String EXPORTING_VIEW_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_ExportingViewMsg"); //NOI18N
-    private static final String OOME_EXPORTING_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_OomeExportingMsg"); //NOI18N
-    private static final String IOEXCEPTION_EXPORTING_MSG = NbBundle.getMessage(ExportAction.class, "ExportAction_IOException_Exporting_Msg"); //NOI18N
-    private static final String SNAPSHOT_CREATE_FAILED_MSG = NbBundle.getMessage(ResultsManager.class,"ResultsManager_SnapshotCreateFailedMsg"); // NOI18N
     private static final Icon ICON = Icons.getIcon(GeneralIcons.EXPORT);
     private static final String FILE_EXTENSION_CSV = "csv"; // NOI18N
     private static final String FILE_EXTENSION_XML = "xml"; // NOI18N
@@ -165,8 +165,8 @@ public final class ExportAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ExportAction(ExportProvider exportProvider, LoadedSnapshot loadedSnapshot) {
-        putValue(Action.NAME, EXPORT_ACTION_NAME);
-        putValue(Action.SHORT_DESCRIPTION, EXPORT_ACTION_DESCRIPTION);
+        putValue(Action.NAME, Bundle.ExportAction_ExportActionName());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.ExportAction_ExportActionDescr());
         putValue(Action.SMALL_ICON, ICON);
         putValue("iconBase", Icons.getResource(GeneralIcons.EXPORT)); // NOI18N
         this.exportProvider = exportProvider;
@@ -187,7 +187,7 @@ public final class ExportAction extends AbstractAction {
 
                 @Override
                 public String getDescription() {
-                    return EXPORT_DIALOG_XML_FILTER;
+                    return Bundle.ExportAction_ExportDialogXMLFilter();
                 }
             });
             fileChooser.addChoosableFileFilter(new FileFilter() {
@@ -198,7 +198,7 @@ public final class ExportAction extends AbstractAction {
 
                 @Override
                 public String getDescription() {
-                    return EXPORT_DIALOG_HTML_FILTER;
+                    return Bundle.ExportAction_ExportDialogHTMLFilter();
                 }
             });
             fileChooser.addChoosableFileFilter(new FileFilter() {
@@ -209,7 +209,7 @@ public final class ExportAction extends AbstractAction {
 
                 @Override
                 public String getDescription() {
-                    return EXPORT_DIALOG_EXCEL_FILTER;
+                    return Bundle.ExportAction_ExportDialogExcelFilter();
                 }
             });
             fileChooser.addChoosableFileFilter(new FileFilter() {
@@ -221,7 +221,7 @@ public final class ExportAction extends AbstractAction {
 
                 @Override
                 public String getDescription() {
-                    return EXPORT_DIALOG_CSV_FILTER;
+                    return Bundle.ExportAction_ExportDialogCSVFilter();
                 }
             });
         }
@@ -235,13 +235,13 @@ public final class ExportAction extends AbstractAction {
 
                 @Override
                 public String getDescription() {
-                    return EXPORT_DIALOG_NPS_FILTER;
+                    return Bundle.ExportAction_ExportDialogNPSFilter();
                 }
             });
             // If there is snapshot, .nps must be selected as file filter
             FileFilter[] currentFilters = fileChooser.getChoosableFileFilters();
             for (int i = 0; i < currentFilters.length; i++) {
-                if (currentFilters[i].getDescription().equals(EXPORT_DIALOG_NPS_FILTER)) {
+                if (currentFilters[i].getDescription().equals(Bundle.ExportAction_ExportDialogNPSFilter())) {
                     fileChooser.setFileFilter(currentFilters[i]);
                 }
             }
@@ -254,8 +254,8 @@ public final class ExportAction extends AbstractAction {
             fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             fileChooser.setMultiSelectionEnabled(false);
-            fileChooser.setDialogTitle(EXPORT_DIALOG_TITLE);
-            fileChooser.setApproveButtonText(EXPORT_DIALOG_BUTTON);
+            fileChooser.setDialogTitle(Bundle.ExportAction_ExportDialogTitle());
+            fileChooser.setApproveButtonText(Bundle.ExportAction_ExportDialogButton());
         }
         fileChooser.resetChoosableFileFilters();
         setFilters();
@@ -265,12 +265,12 @@ public final class ExportAction extends AbstractAction {
     private boolean checkFileExists(File file) {
         if (file.exists()) {
             if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(
-                    OVERWRITE_FILE_CAPTION,new Object[] { file.getName() }),
-                    OVERWRITE_FILE_CAPTION))
+                    Bundle.ExportAction_OverwriteFileCaption(),new Object[] { file.getName() }),
+                    Bundle.ExportAction_OverwriteFileCaption()))
                 return false; // cancelled by the user
 
             if (!file.delete()) {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_OVERWRITE_FILE_MSG, new Object[] { file.getName() }));
+                ProfilerDialogs.displayError(Bundle.ExportAction_CannotOverwriteFileMsg(file.getName()));
                 return false; // Insufficient rights to overwrite file
             }
         }
@@ -296,16 +296,16 @@ public final class ExportAction extends AbstractAction {
         // 2. process both cases and extract file name and extension to use and set exported file type
         File file = chooser.getSelectedFile();
         String targetExt;
-        if (chooser.getFileFilter().getDescription().equals(EXPORT_DIALOG_XML_FILTER)) {
+        if (chooser.getFileFilter().getDescription().equals(Bundle.ExportAction_ExportDialogXMLFilter())) {
             targetExt=FILE_EXTENSION_XML;
             exportedFileType=MODE_XML;
-        } else if (chooser.getFileFilter().getDescription().equals(EXPORT_DIALOG_HTML_FILTER)) {
+        } else if (chooser.getFileFilter().getDescription().equals(Bundle.ExportAction_ExportDialogHTMLFilter())) {
             targetExt=FILE_EXTENSION_HTML;
             exportedFileType=MODE_HTML;
-        } else if (chooser.getFileFilter().getDescription().equals(EXPORT_DIALOG_EXCEL_FILTER)) {
+        } else if (chooser.getFileFilter().getDescription().equals(Bundle.ExportAction_ExportDialogExcelFilter())) {
             targetExt = FILE_EXTENSION_CSV;
             exportedFileType=MODE_EXCEL;
-        } else if (chooser.getFileFilter().getDescription().equals(EXPORT_DIALOG_NPS_FILTER)) {
+        } else if (chooser.getFileFilter().getDescription().equals(Bundle.ExportAction_ExportDialogNPSFilter())) {
             targetExt = FILE_EXTENSION_NPS;
             exportedFileType=MODE_NPS;
         } else { // CSV is default
@@ -323,7 +323,7 @@ public final class ExportAction extends AbstractAction {
 
             // divide the file name into name and extension
             if (fName.endsWith("."+targetExt)) {
-                int idx = fName.lastIndexOf("."); // NOI18N
+                int idx = fName.lastIndexOf('.'); // NOI18N
                 if (idx == -1) { // no extension
                     targetName = fName; // extension from source file
                 } else { // extension exists
@@ -342,7 +342,7 @@ public final class ExportAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent evt) {
         if (!exportProvider.hasExportableView() && !exportProvider.hasLoadedSnapshot()) { // nothing to export
-            ProfilerDialogs.displayError(NO_VIEW_MSG);
+            ProfilerDialogs.displayError(Bundle.ExportAction_NoViewMsg());
             return;
         }
 
@@ -369,18 +369,18 @@ public final class ExportAction extends AbstractAction {
             }
             try {
                 if (!(file.getAbsolutePath().toLowerCase().endsWith("."+FILE_EXTENSION_NPS))) {
-                    ProfilerDialogs.displayError(INVALID_LOCATION_FOR_FILE_MSG);
+                    ProfilerDialogs.displayError(Bundle.ExportAction_InvalidLocationForFileMsg());
                     return;
                 }
                 FileObject fo=FileUtil.createData(file);
                 if (fo==null) {
-                    ProfilerDialogs.displayError(INVALID_LOCATION_FOR_FILE_MSG);
+                    ProfilerDialogs.displayError(Bundle.ExportAction_InvalidLocationForFileMsg());
                     return;
                 }
                 saveFile=null;
                 ResultsManager.getDefault().saveSnapshot(snapshot, fo);
             } catch (IOException e1) {
-                LOGGER.log(Level.SEVERE, MessageFormat.format(SNAPSHOT_CREATE_FAILED_MSG, new Object[] { e1.getMessage() }), e1);
+                LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotCreateFailedMsg(e1.getMessage()), e1);
             }
         } else {
             final File file = saveFile.getSelectedFile();
@@ -396,7 +396,7 @@ public final class ExportAction extends AbstractAction {
             ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() {
                         ProgressHandle pHandle = null;
-                        pHandle = ProgressHandleFactory.createHandle(EXPORTING_VIEW_MSG);
+                        pHandle = ProgressHandleFactory.createHandle(Bundle.ExportAction_ExportingViewMsg());
                         pHandle.setInitialDelay(500);
                         pHandle.start();
 
@@ -406,12 +406,12 @@ public final class ExportAction extends AbstractAction {
                             ExportDataDumper eDD = new ExportDataDumper(fo);
                             exportProvider.exportData(exportedFileType, eDD);
                             if (eDD.getCaughtException()!=null) {
-                                ProfilerDialogs.displayError(eDD.getNumExceptions()+IOEXCEPTION_EXPORTING_MSG);
+                                ProfilerDialogs.displayError(eDD.getNumExceptions()+Bundle.ExportAction_IOException_Exporting_Msg());
                             }
                         } catch (FileNotFoundException ex) {
                             ex.printStackTrace();
                         } catch (OutOfMemoryError e) {
-                            ProfilerDialogs.displayError(OOME_EXPORTING_MSG+e.getMessage());
+                            ProfilerDialogs.displayError(Bundle.ExportAction_OomeExportingMsg()+e.getMessage());
                         } finally {
                             if (pHandle != null) {
                                 pHandle.finish();

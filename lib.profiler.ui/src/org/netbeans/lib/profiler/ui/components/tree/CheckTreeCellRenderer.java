@@ -46,11 +46,13 @@ package org.netbeans.lib.profiler.ui.components.tree;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import javax.swing.ButtonModel;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 
@@ -77,6 +79,10 @@ public class CheckTreeCellRenderer extends JPanel implements TreeCellRendererPer
         setLayout(new BorderLayout());
         setOpaque(false);
         checkBox.setOpaque(false);
+        // --- Workaround for #205932 - not sure why, but works fine...
+        Font f = UIManager.getFont("Label.font"); // NOI18N
+        if (f != null) treeRenderer.setFont(f.deriveFont(f.getStyle()));
+        // --- 
         add(checkBox, BorderLayout.WEST);
     }
 

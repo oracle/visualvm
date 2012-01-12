@@ -167,7 +167,7 @@ public class ThreadStateHeaderRenderer extends JPanel implements TableCellRender
         int wMarkStringNoMillis = g.getFontMetrics().stringWidth(markStringNoMillis); // width of the mark's string without milliseconds
         String markStringMillis = TimeLineUtils.getTimeMarkMillisString(currentMark, optimalUnits);
 
-        if (!markStringMillis.equals("")) {
+        if (!markStringMillis.isEmpty()) {
             markStringMillis = "." + markStringMillis; // NOI18N
         }
 
