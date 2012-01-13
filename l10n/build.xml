@@ -168,8 +168,16 @@ made subject to such option by the copyright holder.
     </package-build>
     <unzip src="../visualvm/nb_ml.zip" dest="build"/>
     <zip destfile="dist/visualvm_ml.zip" duplicate="preserve">
+      <zipfileset dir="build/netbeans" filemode="755" prefix="visualvm">
+          <include name="**/lib/nbexec*"/>
+          <include name="profiler*/lib/deployed/**/hpux*/lib*.sl"/>
+          <include name="profiler*/lib/deployed/**/lib*.so"/>
+      </zipfileset>
       <zipfileset dir="build/netbeans" prefix="visualvm">
           <include name="p*/**"/>
+          <exclude name="**/lib/nbexec*"/>
+          <exclude name="profiler*/lib/deployed/**/hpux*/lib*.sl"/>
+          <exclude name="profiler*/lib/deployed/**/lib*.so"/>
       </zipfileset>
       <zipfileset src="../visualvm/dist/visualvm.zip"/>
       <zipfileset dir="build" prefix="visualvm">
