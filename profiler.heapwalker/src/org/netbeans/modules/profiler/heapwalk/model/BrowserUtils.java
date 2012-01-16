@@ -62,6 +62,10 @@ import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "BrowserUtils_OutOfMemoryMsg=<html><b>Out of memory in HeapWalker</b><br><br>To avoid this error, increase the -Xmx value<br>in the etc/netbeans.conf file in NetBeans IDE installation directory.</html>",
+    "BrowserUtils_TruncatedMsg=...<truncated>..."
+})
 public class BrowserUtils {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -81,11 +85,6 @@ public class BrowserUtils {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String OUT_OF_MEMORY_MSG = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_OutOfMemoryMsg"); // NOI18N
-    private static final String TRUNCATED_STRING = NbBundle.getMessage(BrowserUtils.class, "BrowserUtils_TruncatedMsg"); // NOI18N
-                                                                                                                            // -----
     public static final ImageIcon ICON_INSTANCE = Icons.getImageIcon(LanguageIcons.INSTANCE);
     public static final ImageIcon ICON_PRIMITIVE = Icons.getImageIcon(LanguageIcons.PRIMITIVE);
     public static final ImageIcon ICON_ARRAY = Icons.getImageIcon(LanguageIcons.ARRAY);
@@ -100,7 +99,7 @@ public class BrowserUtils {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static String getArrayItemType(String arrayTypeName) {
-        int arrayBracketsIdx = arrayTypeName.lastIndexOf("["); // NOI18N
+        int arrayBracketsIdx = arrayTypeName.lastIndexOf('['); // NOI18N
 
         return ((arrayBracketsIdx == -1) ? arrayTypeName : arrayTypeName.substring(0, arrayBracketsIdx));
     }
@@ -115,8 +114,8 @@ public class BrowserUtils {
                 sb.insert(0, "." + nodeName); // NOI18N
                 node = node.getParent();
             } else {
-                sb.delete(0, TRUNCATED_STRING.length());
-                sb.insert(0, TRUNCATED_STRING);
+                sb.delete(0, Bundle.BrowserUtils_TruncatedMsg().length());
+                sb.insert(0, Bundle.BrowserUtils_TruncatedMsg());
                 break;
             }
         }
@@ -149,7 +148,7 @@ public class BrowserUtils {
     }
 
     public static String getSimpleType(String fullType) {
-        int simpleTypeIdx = fullType.lastIndexOf("."); // NOI18N
+        int simpleTypeIdx = fullType.lastIndexOf('.'); // NOI18N
 
         if (simpleTypeIdx == -1) {
             return fullType;
@@ -250,7 +249,7 @@ public class BrowserUtils {
                                 }
                             });
 
-                            if (oome) ProfilerDialogs.displayError(OUT_OF_MEMORY_MSG);
+                            if (oome) ProfilerDialogs.displayError(Bundle.BrowserUtils_OutOfMemoryMsg());
                         }
                     }
                 });
@@ -269,7 +268,7 @@ public class BrowserUtils {
 
         if (name.endsWith(")")) { // NOI18N
             // filters out additional information in name, i.e. GC root type
-            name = name.substring(0, name.indexOf("(")).trim(); // NOI18N
+            name = name.substring(0, name.indexOf('(')).trim(); // NOI18N
         }
 
         return name;

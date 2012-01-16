@@ -54,6 +54,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,7 +72,7 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
 
     protected List /*<Runnable>*/ afterBatchCommands = new ArrayList /*<Runnable>*/();
     protected ProfilingSessionStatus status;
-    protected final Set cctListeners = new HashSet();
+    protected final Set cctListeners = new CopyOnWriteArraySet();
     protected WeakReference clientRef;
     protected boolean batchNotEmpty = false;
 
@@ -195,33 +196,13 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
             return;
         }
 
-        Set tmpListeners = null;
-
-        synchronized (cctListeners) {
-            if (cctListeners.isEmpty()) {
-                return;
-            }
-
-            tmpListeners = new HashSet(cctListeners);
-        }
-
-        for (Iterator iter = tmpListeners.iterator(); iter.hasNext();) {
+        for (Iterator iter = cctListeners.iterator(); iter.hasNext();) {
             ((CCTProvider.Listener) iter.next()).cctEstablished(appNode, empty);
         }
     }
 
     private void fireCCTReset() {
-        Set tmpListeners = null;
-
-        synchronized (cctListeners) {
-            if (cctListeners.isEmpty()) {
-                return;
-            }
-
-            tmpListeners = new HashSet(cctListeners);
-        }
-
-        for (Iterator iter = tmpListeners.iterator(); iter.hasNext();) {
+        for (Iterator iter = cctListeners.iterator(); iter.hasNext();) {
             ((CCTProvider.Listener) iter.next()).cctReset();
         }
     }

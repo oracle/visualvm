@@ -151,14 +151,14 @@ public final class Distribution {
 
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         result.append(NbBundle.getMessage(Distribution.class, "FMT_DistEntry",
                 allEntry.getCount(),
                 allEntry.getSize()));
 
         for (JavaClass key : getClasses()) {
-            result.append("  " + getResults(key) + "\n"); // NOI18N
+            result.append("  ").append(getResults(key)).append("\n"); // NOI18N
         }
 
         return result.toString();

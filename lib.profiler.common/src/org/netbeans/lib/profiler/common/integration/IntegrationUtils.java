@@ -369,7 +369,7 @@ public class IntegrationUtils {
     }
 
     public static String getManualRemoteStep1(String targetOS, String targetJVM) {
-        return MessageFormat.format(MANUAL_REMOTE_STEP1_MESSAGE, new Object[] { "JDK 5.0/6.0/7.0", targetOS, HTML_REMOTE_STRING }); //NOI18N
+        return MessageFormat.format(MANUAL_REMOTE_STEP1_MESSAGE, new Object[] { "JDK 5.0/6.0/7.0/8.0", targetOS, HTML_REMOTE_STRING }); //NOI18N
     }
 
     public static String getManualRemoteStep2(String targetOS, String targetJVM) {

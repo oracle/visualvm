@@ -47,6 +47,7 @@ import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import org.netbeans.lib.profiler.results.FilterSortSupport;
 
 
 /**
@@ -73,6 +74,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     protected static final char MASK_SELF_TIME_NODE = 0x1;
     protected static final char MASK_CONTEXT_CALLS_NODE = 0x2;
     protected static final char MASK_THREAD_NODE = 0x4;
+    protected static final char MASK_FILTERED_NODE = 0x8;
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_TIME_0 = 2;
     public static final int SORT_BY_TIME_1 = 3;
@@ -123,6 +125,12 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
             return new String[] { container.getThreadName(), "", "" }; // NOI18N
         }
     }
+    
+    protected void resetChildren() {
+        if (children != null)
+            for (PrestimeCPUCCTNode n : children)
+                n.resetChildren();
+    }
 
     public abstract int getMethodId();
 
@@ -131,7 +139,9 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     public abstract int getNChildren();
 
     public String getNodeName() {
-        if (isSelfTimeNode()) {
+        if (isFilteredNode()) {
+            return FilterSortSupport.FILTERED_OUT_LBL;
+        } else if (isSelfTimeNode()) {
             return SELF_TIME_STRING;
         } else if (isThreadNode()) {
             return container.getThreadName();
@@ -154,6 +164,19 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
             return res;
         }
     }
+    
+    public boolean equals(Object o) {
+        if (!(o instanceof PrestimeCPUCCTNode)) return false;
+        if (isThreadNode()) return super.equals(o); // #205942
+        if (parent == null) return super.equals(o); // Required for filtering & sorting
+        return getNodeName().equals(((PrestimeCPUCCTNode)o).getNodeName());
+    }
+    
+    public int hashCode() {
+        if (isThreadNode()) return super.hashCode(); // #205942
+        if (parent == null) return super.hashCode(); // Required for filtering & sorting
+        return getNodeName().hashCode();
+    }
 
     public CCTNode getParent() {
         return parent;
@@ -164,7 +187,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     public abstract int getThreadId();
 
     public void setSelfTimeNode() {
-        flags = MASK_SELF_TIME_NODE;
+        flags |= MASK_SELF_TIME_NODE;
     }
 
     public boolean isSelfTimeNode() {
@@ -172,11 +195,23 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     }
 
     public void setThreadNode() {
-        flags = MASK_THREAD_NODE;
+        flags |= MASK_THREAD_NODE;
     }
 
     public boolean isThreadNode() {
         return (flags & MASK_THREAD_NODE) != 0;
+    }
+    
+    public void setFilteredNode() {
+        flags |= MASK_FILTERED_NODE;
+    }
+    
+    public void resetFilteredNode() {
+        flags &= ~MASK_FILTERED_NODE;
+    }
+
+    public boolean isFilteredNode() {
+        return (flags & MASK_FILTERED_NODE) != 0;
     }
 
     public abstract long getTotalTime0();
@@ -190,6 +225,8 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     public abstract long getWaitTime0();
 
     public int getIndexOfChild(Object child) {
+//        if (children == null) JOptionPane.showMessageDialog(null, "Node: " + this + "\nindex of child: " + child);\
+        if (getNChildren() == 0) return -1;
         for (int i = 0; i < children.length; i++) {
             if ((PrestimeCPUCCTNode) child == children[i]) {
                 return i;
@@ -204,7 +241,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
      * more things, such as generating the children, or deciding to return immediately.
      */
     public abstract void sortChildren(int sortBy, boolean sortOrder);
-
+    
     public String toString() {
         return getNodeName();
     }

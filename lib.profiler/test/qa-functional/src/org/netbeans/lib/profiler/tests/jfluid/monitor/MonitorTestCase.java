@@ -116,7 +116,7 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
     }
 
     protected String getStates(byte[] states) {
-        StringBuffer sb = new StringBuffer(states.length);
+        StringBuilder sb = new StringBuilder(states.length);
 
         for (int i = 0; i < states.length; i++) {
             sb.append(getState(states[i]));

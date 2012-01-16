@@ -54,6 +54,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 
 
@@ -181,7 +182,7 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek();
         boolean filteredOut = (node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
 
-        if (!filteredOut && (node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
+        if (!filteredOut && (client.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED || node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
 
             String jvmClassName = status.getInstrMethodClasses()[node.getMethodId()].replace('.', '/');
 

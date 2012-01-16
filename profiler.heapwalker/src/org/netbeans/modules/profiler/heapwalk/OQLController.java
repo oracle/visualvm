@@ -77,15 +77,8 @@ import org.openide.util.NbBundle;
  */
 public class OQLController extends AbstractTopLevelController
                 implements NavigationHistoryManager.NavigationHistoryCapable {
-    // -----
-    // I18N String constants
-
-    private static final String CANNOT_RESOLVE_CLASS_MSG = NbBundle.getMessage(AnalysisController.class,
-            "AnalysisController_CannotResolveClassMsg"); // NOI18N
-    private static final String CANNOT_RESOLVE_INSTANCE_MSG = NbBundle.getMessage(AnalysisController.class,
-            "AnalysisController_CannotResolveInstanceMsg"); // NOI18N
     
-        private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
+    private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
     
     private HeapFragmentWalker heapFragmentWalker;
 
@@ -330,8 +323,8 @@ public class OQLController extends AbstractTopLevelController
         if (urls.startsWith("file://instance/")) { // NOI18N
             urls = urls.substring("file://instance/".length()); // NOI18N
 
-            int indexPos = urls.indexOf("#"); // NOI18N
-            int pointerPos = urls.indexOf("@"); // NOI18N
+            int indexPos = urls.indexOf('#'); // NOI18N
+            int pointerPos = urls.indexOf('@'); // NOI18N
             String clzName = null;
 
             if (indexPos > -1 || pointerPos > -1) {
@@ -351,7 +344,7 @@ public class OQLController extends AbstractTopLevelController
                         i = instances.get(instanceNumber - 1);
                     }
                 } else {
-                    ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[]{clzName}));
+                    ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(clzName));
                 }
             } else if (pointerPos > -1) {
                 identifier = urls.substring(pointerPos + 1);
@@ -362,8 +355,7 @@ public class OQLController extends AbstractTopLevelController
             if (i != null) {
                 heapFragmentWalker.getClassesController().showInstance(i);
             } else {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_INSTANCE_MSG,
-                        new Object[]{identifier, clzName}));
+                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveInstanceMsg(identifier, clzName));
             }
         } else if (urls.startsWith("file://class/")) { // NOI18N
             urls = urls.substring("file://class/".length()); // NOI18N
@@ -373,7 +365,7 @@ public class OQLController extends AbstractTopLevelController
             if (c != null) {
                 heapFragmentWalker.getClassesController().showClass(c);
             } else {
-                ProfilerDialogs.displayError(MessageFormat.format(CANNOT_RESOLVE_CLASS_MSG, new Object[]{urls}));
+                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(urls));
             }
         }
     }
