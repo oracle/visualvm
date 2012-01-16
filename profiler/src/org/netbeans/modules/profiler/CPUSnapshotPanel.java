@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler;
 
+import java.util.Collection;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
@@ -71,7 +72,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -297,7 +297,34 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             lastFocusOwner = e.getSource();
         }
     }
+    
+    private class CustomCCTDisplay extends CCTDisplay {
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler) {
+            super(actionsHandler);
+        }
 
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler) {
+            super(actionsHandler,selectionHandler);
+        }
+
+        protected JPopupMenu createPopupMenu() {
+            JPopupMenu popup = super.createPopupMenu();
+            enhancePopupMenu(popup,this);
+            return popup;
+        }
+
+        protected void enableDisablePopup(PrestimeCPUCCTNode node) {
+            super.enableDisablePopup(node);
+            CPUSnapshotPanel.this.enableDisablePopup(node);
+        }
+        
+    }
+    
+    public interface CCTPopupEnhancer {
+        public void enhancePopup(JPopupMenu popup, LoadedSnapshot snapshot, CCTDisplay cctDisplay);
+        public void enableDisablePopup(LoadedSnapshot snapshot, PrestimeCPUCCTNode node);
+    }
+    
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Icon CLASSES_ICON = Icons.getIcon(LanguageIcons.CLASS);
@@ -357,10 +384,10 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         setLayout(new BorderLayout());
 
         flatPanel = new SnapshotFlatProfilePanel(actionsHandler);
-        cctPanel = new CCTDisplay(actionsHandler);
+        cctPanel = new CustomCCTDisplay(actionsHandler);
         infoPanel = new SnapshotInfoPanel(ls);
         combinedFlat = new SnapshotFlatProfilePanel(actionsHandler, combinedActionsHandlerFlat);
-        combinedCCT = new CCTDisplay(actionsHandler, combinedActionsHandlerCCT);
+        combinedCCT = new CustomCCTDisplay(actionsHandler, combinedActionsHandlerCCT);
 
         flatPanel.setSorting(sortingColumn, sortingOrder);
         cctPanel.setSorting(sortingColumn, sortingOrder);
@@ -1113,6 +1140,20 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         combinedFlat.prepareResults();
     }
 
+    private void enhancePopupMenu(JPopupMenu popup, CCTDisplay customCCTDisplay) {
+        Collection<? extends CCTPopupEnhancer> col = Lookup.getDefault().lookupAll(CCTPopupEnhancer.class);
+        for(CCTPopupEnhancer en : col) {
+            en.enhancePopup(popup,loadedSnapshot,customCCTDisplay);
+        }
+    }
+
+    private void enableDisablePopup(PrestimeCPUCCTNode node) {
+        Collection<? extends CCTPopupEnhancer> col = Lookup.getDefault().lookupAll(CCTPopupEnhancer.class);
+        for(CCTPopupEnhancer en : col) {
+            en.enableDisablePopup(loadedSnapshot,node);
+        }
+    }
+    
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         if (tabs.getSelectedComponent() instanceof CCTDisplay) { // Call tree
             cctPanel.exportData(exportedFileType,eDD,false, Bundle.CPUSnapshotPanel_CallTreeString());
