@@ -370,7 +370,7 @@ final class TracerView {
         }
 
         private void enhancePopup(JPopupMenu popup, CCTDisplay cctd) {
-            popup.add(new JSeparator());
+            popup.add(new JPopupMenu.Separator());
             popup.add(new JMenuItem(findMethod));
             cctDisplay = cctd;
         }
