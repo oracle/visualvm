@@ -363,7 +363,17 @@ final class TracerView {
             assert cctDisplay != null;
             try {
                 List<Integer> ints = model.getIntervals(node);
-                System.out.println("Intervals "+ints.toString());
+                assert ints.size() % 2 == 0;
+                System.out.println("Intervals " + ints.toString());
+                TimelineSupport support = model.getTimelineSupport();
+                support.resetSelectedTimestamps();
+                Iterator<Integer> iter = ints.iterator();
+                while (iter.hasNext()) {
+                    int start = iter.next();
+                    int stop  = iter.next();
+                    for (int i = start; i <= stop; i++)
+                        model.getTimelineSupport().selectTimestamp(i, false);
+                }
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
