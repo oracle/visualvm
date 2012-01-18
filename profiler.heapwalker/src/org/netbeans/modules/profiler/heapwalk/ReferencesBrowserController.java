@@ -58,6 +58,8 @@ import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 //import java.util.Comparator;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
@@ -246,6 +248,22 @@ public class ReferencesBrowserController extends AbstractController {
                     } else {
                         ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
                         controlerUI.selectNode(gcRootNode);
+                        // #205250: also copy chain to clipboard for convenience.
+                        StringBuilder b = new StringBuilder();
+                        HeapWalkerNode n = gcRootNode;
+                        while (true) {
+                            b.append(n.getType()).append('.').append(n.getName());
+                            HeapWalkerNode p = n.getParent();
+                            if (p != null) {
+                                n = p;
+                                b.append(" ->\n");
+                            } else {
+                                break;
+                            }
+                        }
+                        StringSelection sel = new StringSelection(b.toString().replace("].[", ""));
+                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(sel, sel);
+                        // XXX somehow notify the user that the clipboard has been updated? ProfilerDialogs cannot do StatusDisplayer
                     }
                 } else {
                     ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_NoGcRootMsg());
