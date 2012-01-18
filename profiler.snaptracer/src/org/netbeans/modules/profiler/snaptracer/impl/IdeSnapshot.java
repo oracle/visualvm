@@ -48,11 +48,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.LogRecord;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
 import org.netbeans.modules.profiler.snaptracer.logs.LogReader;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
@@ -154,6 +157,10 @@ public final class IdeSnapshot {
 
     String getThreadDump(int sampleIndex) throws IOException {
         return cpuSnapshot.getThreadDump(sampleIndex);
+    }
+
+    List<Integer> getIntervals(int start, int end, PrestimeCPUCCTNode node) throws IOException {
+        return cpuSnapshot.getIntervals(start,end,node);
     }
 
     public static final class LogRecordInfo {
