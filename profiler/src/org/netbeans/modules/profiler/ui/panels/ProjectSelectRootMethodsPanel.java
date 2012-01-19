@@ -117,7 +117,6 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     private RequestProcessor rp = new RequestProcessor("SRM-UI Processor", 1); // NOI18N
     private RootSelectorTree advancedLogicalPackageTree;
     private volatile boolean changingBuilderList = false;
-    private boolean globalMode;
 
     private static final String HELP_CTX_KEY = "ProjectSelectRootMethodsPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
@@ -165,11 +164,13 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
      */
     public ClientUtils.SourceCodeSelection[] getRootMethods(final Lookup.Provider project,
             final ClientUtils.SourceCodeSelection[] currentSelection) {
+        if (project == null)
+            return RootMethodsPanel.getSelectedRootMethods(currentSelection, project);
+        
         this.currentProject = project;
 
         advancedLogicalPackageTree.reset();
         
-        setGlobalMode(project == null);
         advancedShowAllProjectsCheckBox.setSelected(project == null);
         advancedShowAllProjectsCheckBox.setEnabled(ProjectUtilities.getOpenedProjects().length > 1);
 
@@ -372,10 +373,6 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         Mnemonics.setLocalizedText(button,
                 Bundle.SelectRootMethodsPanel_AdvancedButtonText());
         return new Object[] { button };
-    }
-
-    private void setGlobalMode(boolean value) {
-        globalMode = value;
     }
 
     private String getHintString() {

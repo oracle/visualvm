@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.snaptracer.impl;
 
-import java.io.IOException;
 import org.netbeans.modules.profiler.snaptracer.PackageStateHandler;
 import org.netbeans.modules.profiler.snaptracer.ProbeItemDescriptor;
 import org.netbeans.modules.profiler.snaptracer.ProbeStateHandler;
@@ -63,15 +62,20 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import org.openide.util.Exceptions;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+        "Warning_NegativeValue=<html><b>One or more probes "
+        + "returned negative value.</b><br><br>Currently this is "
+        + "not supported in Tracer,<br>all negative values will be"
+        + " displayed as 0.</html>"
+    })
 final class TracerController  {
 
     private static final Logger LOGGER = Logger.getLogger(TracerController.class.getName());
@@ -437,11 +441,7 @@ final class TracerController  {
                 long value = itemValues[i];
                 if (value < 0) {
                     if (!wasNegativeValue) {
-                        DialogDisplayer.getDefault().notifyLater(
-                        new NotifyDescriptor.Message("<html><b>One or more probes "
-                        + "returned negative value.</b><br><br>Currently this is "
-                        + "not supported in Tracer,<br>all negative values will be"
-                        + " displayed as 0.</html>", NotifyDescriptor.WARNING_MESSAGE));
+                        ProfilerDialogs.displayWarning(Bundle.Warning_NegativeValue());
                         LOGGER.info("Probe " + model.getDescriptor(probe).getProbeName() + // NOI18N
                                     " returned negative value: " + value); // NOI18N
                         wasNegativeValue = true;
