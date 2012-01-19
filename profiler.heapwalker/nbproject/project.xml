@@ -134,6 +134,7 @@
                 </dependency>
             </module-dependencies>
             <friend-packages>
+                <friend>com.sun.tools.visualvm.heapdump</friend>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <package>org.netbeans.modules.profiler.heapwalk</package>
             </friend-packages>

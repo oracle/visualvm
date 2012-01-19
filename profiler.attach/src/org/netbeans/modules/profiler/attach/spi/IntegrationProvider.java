@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.attach.spi;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import java.util.List;

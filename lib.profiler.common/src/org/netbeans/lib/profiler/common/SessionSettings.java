@@ -211,23 +211,23 @@ public final class SessionSettings {
 
     public String debug() {
         final StringBuffer sb = new StringBuffer();
-        sb.append("mainClass: " + mainClass); //NOI18N
+        sb.append("mainClass: ").append(mainClass); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("mainClassPath: " + mainClassPath); //NOI18N
+        sb.append("mainClassPath: ").append(mainClassPath); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("mainArgs: " + mainArgs); //NOI18N
+        sb.append("mainArgs: ").append(mainArgs); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("jvmArgs =" + jvmArgs); //NOI18N
+        sb.append("jvmArgs =").append(jvmArgs); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("workingDir =" + workingDir); //NOI18N
+        sb.append("workingDir =").append(workingDir); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("javaExecutable =" + javaExecutable); //NOI18N
+        sb.append("javaExecutable =").append(javaExecutable); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("javaVersionString =" + javaVersionString); //NOI18N
+        sb.append("javaVersionString =").append(javaVersionString); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("architecture =" + architecture);
+        sb.append("architecture =").append(architecture);
         sb.append('\n');
-        sb.append("portNo =" + portNo); //NOI18N
+        sb.append("portNo =").append(portNo); //NOI18N
         sb.append('\n');
 
         return sb.toString();

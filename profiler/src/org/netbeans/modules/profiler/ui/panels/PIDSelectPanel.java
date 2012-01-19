@@ -62,6 +62,25 @@ import org.openide.DialogDisplayer;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "PIDSelectPanel_RefreshButtonName=&Refresh",
+    "PIDSelectPanel_PidLabelText=PID:",
+    "PIDSelectPanel_MainClassLabelText=Main Class:",
+    "PIDSelectPanel_ArgumentsLabelText=Arguments:",
+    "PIDSelectPanel_VmArgumentsLabelText=VM Arguments:",
+    "PIDSelectPanel_VmFlagsLabelText=VM Flags:",
+    "PIDSelectPanel_VmComboItemText={0} (pid: {1})",
+    "PIDSelectPanel_ProcessesListItemText=Getting list of running processes...",
+    "PIDSelectPanel_ErrorGettingProcessesItemText=<Error Getting Running Processes>",
+    "PIDSelectPanel_NoProcessesItemText=<No Processes Running>",
+    "PIDSelectPanel_SelectProcessItemText=<Select Process>",
+    "PIDSelectPanel_OkButtonName=OK",
+    "PIDSelectPanel_SelectProcessDialogCaption=Select Process To Attach",
+    "PIDSelectPanel_ComboAccessName=List of processes available for Profiler connection.",
+    "PIDSelectPanel_ComboAccessDescr=Select process which you want to attach the Profiler to.",
+    "PIDSelectPanel_SelectedProcessAccessName=Selected process details",
+    "PIDSelectPanel_ButtonAccessDescr=Refreshes list of processes available for Profiler connection."
+})
 public final class PIDSelectPanel extends JPanel implements ActionListener {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -80,7 +99,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
                     args = " " + args; //NOI18N
                 }
 
-                String text = MessageFormat.format(VM_COMBO_ITEM_TEXT, new Object[] { vm.getMainClass(), "" + vm.getPid() }); // NOI18N
+                String text = Bundle.PIDSelectPanel_VmComboItemText(vm.getMainClass(), "" + vm.getPid()); // NOI18N
 
                 return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
             } else {
@@ -90,35 +109,6 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String REFRESH_BUTTON_NAME = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_RefreshButtonName"); //NOI18N
-    private static final String PID_LABEL_TEXT = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_PidLabelText"); //NOI18N
-    private static final String MAIN_CLASS_LABEL_TEXT = NbBundle.getMessage(PIDSelectPanel.class,
-                                                                            "PIDSelectPanel_MainClassLabelText"); //NOI18N
-    private static final String ARGUMENTS_LABEL_TEXT = NbBundle.getMessage(PIDSelectPanel.class,
-                                                                           "PIDSelectPanel_ArgumentsLabelText"); //NOI18N
-    private static final String VM_ARGUMENTS_LABEL_TEXT = NbBundle.getMessage(PIDSelectPanel.class,
-                                                                              "PIDSelectPanel_VmArgumentsLabelText"); //NOI18N
-    private static final String VM_FLAGS_LABEL_TEXT = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_VmFlagsLabelText"); //NOI18N
-    private static final String VM_COMBO_ITEM_TEXT = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_VmComboItemText"); //NOI18N
-    private static final String PROCESSES_LIST_ITEM_TEXT = NbBundle.getMessage(PIDSelectPanel.class,
-                                                                               "PIDSelectPanel_ProcessesListItemText"); //NOI18N
-    private static final String ERROR_GETTING_PROCESSES_ITEM_TEXT = NbBundle.getMessage(PIDSelectPanel.class,
-                                                                                        "PIDSelectPanel_ErrorGettingProcessesItemText"); //NOI18N
-    private static final String NO_PROCESSES_ITEM_TEXT = NbBundle.getMessage(PIDSelectPanel.class,
-                                                                             "PIDSelectPanel_NoProcessesItemText"); //NOI18N
-    private static final String SELECT_PROCESS_ITEM_TEXT = NbBundle.getMessage(PIDSelectPanel.class,
-                                                                               "PIDSelectPanel_SelectProcessItemText"); //NOI18N
-    private static final String OK_BUTTON_NAME = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_OkButtonName"); //NOI18N
-    private static final String SELECT_PROCESS_DIALOG_CAPTION = NbBundle.getMessage(PIDSelectPanel.class,
-                                                                                    "PIDSelectPanel_SelectProcessDialogCaption"); //NOI18N
-    private static final String COMBO_ACCESS_NAME = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_ComboAccessName"); //NOI18N
-    private static final String COMBO_ACCESS_DESCR = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_ComboAccessDescr"); //NOI18N
-    private static final String BUTTON_ACCESS_DESCR = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_ButtonAccessDescr"); //NOI18N
-    private static final String PROCESS_DETAILS_ACCESS_NAME = NbBundle.getMessage(PIDSelectPanel.class, "PIDSelectPanel_SelectedProcessAccessName"); //NOI18N
-                                                                                                                                     // -----
     private static final int MAX_WIDTH = 500;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -135,11 +125,11 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
 
         combo = new JComboBox();
         button = new JButton();
-        org.openide.awt.Mnemonics.setLocalizedText(button, REFRESH_BUTTON_NAME);
+        org.openide.awt.Mnemonics.setLocalizedText(button, Bundle.PIDSelectPanel_RefreshButtonName());
 
         JPanel infoPanel = new JPanel(new BorderLayout());
         detailsArea = new HTMLTextArea();
-        detailsArea.getAccessibleContext().setAccessibleName(PROCESS_DETAILS_ACCESS_NAME);
+        detailsArea.getAccessibleContext().setAccessibleName(Bundle.PIDSelectPanel_SelectedProcessAccessName());
         detailsArea.setEditable(false);
         detailsArea.setOpaque(true);
         detailsArea.setBackground(UIManager.getDefaults().getColor("Panel.background")); //NOI18N
@@ -152,10 +142,10 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         infoPanel.add(detailsAreaScroll, BorderLayout.CENTER);
 
         combo.setRenderer(new PIDComboRenderer());
-        combo.getAccessibleContext().setAccessibleName(COMBO_ACCESS_NAME);
-        combo.getAccessibleContext().setAccessibleDescription(COMBO_ACCESS_DESCR);
+        combo.getAccessibleContext().setAccessibleName(Bundle.PIDSelectPanel_ComboAccessName());
+        combo.getAccessibleContext().setAccessibleDescription(Bundle.PIDSelectPanel_ComboAccessDescr());
 
-        button.getAccessibleContext().setAccessibleDescription(BUTTON_ACCESS_DESCR);
+        button.getAccessibleContext().setAccessibleDescription(Bundle.PIDSelectPanel_ButtonAccessDescr());
 
         setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
         setLayout(new BorderLayout(0, 10));
@@ -205,10 +195,10 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
     }
 
     public static int selectPID() {
-        JButton okButton = new JButton(OK_BUTTON_NAME);
+        JButton okButton = new JButton(Bundle.PIDSelectPanel_OkButtonName());
         PIDSelectPanel pidSelect = new PIDSelectPanel(okButton);
 
-        DialogDescriptor dd = new DialogDescriptor(pidSelect, SELECT_PROCESS_DIALOG_CAPTION, true,
+        DialogDescriptor dd = new DialogDescriptor(pidSelect, Bundle.PIDSelectPanel_SelectProcessDialogCaption(), true,
                                                    new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                    DialogDescriptor.BOTTOM_ALIGN, null, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
@@ -224,18 +214,18 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
     private void refreshCombo() {
         okButton.setEnabled(false);
         combo.setEnabled(false);
-        combo.setModel(new DefaultComboBoxModel(new Object[] { PROCESSES_LIST_ITEM_TEXT }));
+        combo.setModel(new DefaultComboBoxModel(new Object[] { Bundle.PIDSelectPanel_ProcessesListItemText() }));
         
         new SwingWorker<Object[],Object>() {
             protected Object[] doInBackground() throws Exception {
                 RunningVM[] vms = JpsProxy.getRunningVMs();
                 Object[] ar = new Object[((vms == null) ? 0 : vms.length) + 1];
                 if (vms == null) {
-                    ar[0] = ERROR_GETTING_PROCESSES_ITEM_TEXT;
+                    ar[0] = Bundle.PIDSelectPanel_ErrorGettingProcessesItemText();
                 } else if (vms.length == 0) {
-                    ar[0] = NO_PROCESSES_ITEM_TEXT;
+                    ar[0] = Bundle.PIDSelectPanel_NoProcessesItemText();
                 } else {
-                    ar[0] = SELECT_PROCESS_ITEM_TEXT;
+                    ar[0] = Bundle.PIDSelectPanel_SelectProcessItemText();
                     System.arraycopy(vms, 0, ar, 1, vms.length);
                 }
                 return ar;
@@ -271,7 +261,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
             vmFlags = vm.getVMFlags();
         }
         
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         
         buffer.append("<table cellspacing=\"3\" cellpadding=\"0\">"); //NOI18N
         
@@ -279,7 +269,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         buffer.append("<tr>"); //NOI18N
         
         buffer.append("<td><nobr><b>"); //NOI18N
-        buffer.append(PID_LABEL_TEXT);
+        buffer.append(Bundle.PIDSelectPanel_PidLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
         buffer.append("<td>"); //NOI18N
@@ -293,7 +283,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         buffer.append("<tr>"); //NOI18N
         
         buffer.append("<td><nobr><b>"); //NOI18N
-        buffer.append(MAIN_CLASS_LABEL_TEXT);
+        buffer.append(Bundle.PIDSelectPanel_MainClassLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
         buffer.append("<td>"); //NOI18N
@@ -307,7 +297,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         buffer.append("<tr>"); //NOI18N
         
         buffer.append("<td><nobr><b>"); //NOI18N
-        buffer.append(ARGUMENTS_LABEL_TEXT);
+        buffer.append(Bundle.PIDSelectPanel_ArgumentsLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
         buffer.append("<td>"); //NOI18N
@@ -321,7 +311,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         buffer.append("<tr>"); //NOI18N
         
         buffer.append("<td><nobr><b>"); //NOI18N
-        buffer.append(VM_ARGUMENTS_LABEL_TEXT);
+        buffer.append(Bundle.PIDSelectPanel_VmArgumentsLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
         buffer.append("<td>"); //NOI18N
@@ -335,7 +325,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
         buffer.append("<tr>"); //NOI18N
         
         buffer.append("<td><nobr><b>"); //NOI18N
-        buffer.append(VM_FLAGS_LABEL_TEXT);
+        buffer.append(Bundle.PIDSelectPanel_VmFlagsLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
         buffer.append("<td>"); //NOI18N

@@ -124,7 +124,7 @@ public class FlatProfileBuilder implements FlatProfileProvider, CPUCCTProvider.L
                 flattener,
                 collector
             );
-
+            
             lastFlatProfile = flattener.getFlatProfile();
 
         } finally {

@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.2" maxVersion="1.2" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
@@ -28,7 +28,7 @@
           <ComponentRef name="whichRadioGroup"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="CALL_CHAINS_RADIO_TEXT" type="code"/>
+          <Connection code="Bundle.ChooseExportTypePanel_CallChainsRadioText()" type="code"/>
         </Property>
       </Properties>
       <Constraints>
@@ -43,7 +43,7 @@
           <ComponentRef name="ccTypeRadioGroup"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="NAMES_INVOCATIONS_TIMINGS_RADIO_TEXT" type="code"/>
+          <Connection code="Bundle.ChooseExportTypePanel_NamesInvocationsTimingsRadioText()" type="code"/>
         </Property>
       </Properties>
       <Constraints>
@@ -58,7 +58,7 @@
           <ComponentRef name="ccTypeRadioGroup"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="NAMES_INVOCATIONS_RADIO_TEXT" type="code"/>
+          <Connection code="Bundle.ChooseExportTypePanel_NamesInvocationsRadioText()" type="code"/>
         </Property>
       </Properties>
       <Constraints>
@@ -73,7 +73,7 @@
           <ComponentRef name="ccTypeRadioGroup"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="NAMES_ONLY_RADIO_TEXT" type="code"/>
+          <Connection code="Bundle.ChooseExportTypePanel_NamesOnlyRadioText()" type="code"/>
         </Property>
       </Properties>
       <Constraints>
@@ -88,7 +88,7 @@
           <ComponentRef name="whichRadioGroup"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="FLAT_PROFILE_RADIO_TEXT" type="code"/>
+          <Connection code="Bundle.ChooseExportTypePanel_FlatProfileRadioText()" type="code"/>
         </Property>
       </Properties>
       <Constraints>

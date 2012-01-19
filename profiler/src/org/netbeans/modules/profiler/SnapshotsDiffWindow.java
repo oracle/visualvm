@@ -66,19 +66,15 @@ import org.openide.util.Lookup;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "SnapshotDiffWindow_AllocCaption=Allocations Comparison",
+    "SnapshotDiffWindow_LivenessCaption=Liveness Comparison",
+    "SnapshotDiffWindow_AllocAccessDescr=Comparison of two memory allocations snapshots",
+    "SnapshotDiffWindow_LivenessAccessDescr=Comparison of two memory liveness snapshots"
+})
 public final class SnapshotsDiffWindow extends TopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String ALLOC_CAPTION = NbBundle.getMessage(SnapshotResultsWindow.class, "SnapshotDiffWindow_AllocCaption"); // NOI18N
-    private static final String LIVENESS_CAPTION = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                       "SnapshotDiffWindow_LivenessCaption"); // NOI18N
-    private static final String ALLOC_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                         "SnapshotDiffWindow_AllocAccessDescr"); // NOI18N
-    private static final String LIVENESS_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                            "SnapshotDiffWindow_LivenessAccessDescr"); // NOI18N
-                                                                                                                       // -----
     private static final Image WINDOW_ICON_MEMORY = Icons.getImage(ProfilerIcons.SNAPSHOTS_COMPARE);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -107,10 +103,10 @@ public final class SnapshotsDiffWindow extends TopComponent {
         setRequestFocusEnabled(true);
 
         if (ls instanceof AllocMemoryResultsDiff) {
-            getAccessibleContext().setAccessibleDescription(ALLOC_ACCESS_DESCR);
+            getAccessibleContext().setAccessibleDescription(Bundle.SnapshotDiffWindow_AllocAccessDescr());
             displayMemoryAllocDiff((AllocMemoryResultsDiff) ls, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         } else if (ls instanceof LivenessMemoryResultsDiff) {
-            getAccessibleContext().setAccessibleDescription(LIVENESS_ACCESS_DESCR);
+            getAccessibleContext().setAccessibleDescription(Bundle.SnapshotDiffWindow_LivenessAccessDescr());
             displayMemoryLivenessDiff((LivenessMemoryResultsDiff) ls, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         }
     }
@@ -151,7 +147,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
         MemoryDiffPanel allocDiffPanel = new MemoryDiffPanel(getLookup(), diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         updateFind(true, allocDiffPanel);
         add(allocDiffPanel, BorderLayout.CENTER);
-        setName(ALLOC_CAPTION);
+        setName(Bundle.SnapshotDiffWindow_AllocCaption());
         setIcon(WINDOW_ICON_MEMORY);
     }
 
@@ -160,7 +156,7 @@ public final class SnapshotsDiffWindow extends TopComponent {
         MemoryDiffPanel livenessDiffPanel = new MemoryDiffPanel(getLookup(), diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         updateFind(true, livenessDiffPanel);
         add(livenessDiffPanel, BorderLayout.CENTER);
-        setName(LIVENESS_CAPTION);
+        setName(Bundle.SnapshotDiffWindow_LivenessCaption());
         setIcon(WINDOW_ICON_MEMORY);
     }
 

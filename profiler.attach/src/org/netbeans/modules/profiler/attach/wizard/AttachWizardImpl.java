@@ -63,33 +63,21 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "AttachWizard_AttachWizardCaption=Attach Wizard",
+    "AttachWizard_ChooseIntegrationTypeString=Choose Integration Type",
+    "AttachWizard_ReviewAttachSettingsString=Review Attach Settings",
+    "AttachWizard_SelectTargetTypeString=Select Target Type",
+    "AttachWizard_RemoteSystemString=Remote System",
+    "AttachWizard_PerformIntegrationString=Review Integration",
+    "AttachWizard_ReviewAdditionalStepsString=Review Additional Steps",
+    "AttachWizard_ManualIntegrationStep=Manual Integration",
+    "AttachWizard_AutomaticIntegrationStep=Automatic Integration",
+    "AttachWizard_ProviderSpecificSettings=Provider specific settings",
+    "AttachWizard_RefineAttachmentSettings=Refine attachments settings",
+    "AttachWizard_IntegrateProfiler=Integrate profiler"
+})
 public class AttachWizardImpl extends AbstractWizard {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // I18N String constants
-    private static final String ATTACH_WIZARD_CAPTION = NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_AttachWizardCaption"); // NOI18N
-    private static final String STEP_INTEGRATION_TYPE = NbBundle.getMessage(AttachWizardImpl.class,
-                                                                            "AttachWizard_ChooseIntegrationTypeString"); // NOI18N
-    private static final String STEP_REVIEW_ATTACHSETTINGS = NbBundle.getMessage(AttachWizardImpl.class,
-                                                                                 "AttachWizard_ReviewAttachSettingsString"); // NOI18N
-    private static final String STEP_SELECT_TARGETTYPE = NbBundle.getMessage(AttachWizardImpl.class,
-                                                                             "AttachWizard_SelectTargetTypeString"); // NOI18N
-    private static final String STEP_REMOTE_SETTINGS = NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_RemoteSystemString"); // NOI18N
-    private static final String STEP_DYNAMIC_SETTINGS = NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_DynamicAttachString"); // NOI18N
-    private static final String STEP_PERFORM_INTEGRATION = NbBundle.getMessage(AttachWizardImpl.class,
-                                                                               "AttachWizard_PerformIntegrationString"); // NOI18N
-    private static final String STEP_REVIEW_ADDITIONALSTEPS = NbBundle.getMessage(AttachWizardImpl.class,
-                                                                                  "AttachWizard_ReviewAdditionalStepsString"); // NOI18N
-    private static final String STEP_MANUAL_INTEGRATION = NbBundle.getMessage(AttachWizardImpl.class,
-                                                                              "AttachWizard_ManualIntegrationStep"); // NOI18N
-    private static final String STEP_AUTOMATIC_INTEGRATION = NbBundle.getMessage(AttachWizardImpl.class,
-                                                                                 "AttachWizard_AutomaticIntegrationStep"); // NOI18N
-    private static final String PROVIDER_SPECIFIC_SETTINGS = NbBundle.getMessage(AttachWizardImpl.class,
-                                                                                 "AttachWizard_ProviderSpecificSettings"); // NOI18N
-    private static final String REFINE_ATTACHMENT_SETTINGS = NbBundle.getMessage(AttachWizardImpl.class,
-                                                                                 "AttachWizard_RefineAttachmentSettings"); // NOI18N
-    private static final String INTEGRATE_PROFILER = NbBundle.getMessage(AttachWizardImpl.class, "AttachWizard_IntegrateProfiler"); // NOI18N
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private AttachWizardContext context = null;
@@ -145,7 +133,7 @@ public class AttachWizardImpl extends AbstractWizard {
     }
 
     protected String getTitle() {
-        return ATTACH_WIZARD_CAPTION;
+        return Bundle.AttachWizard_AttachWizardCaption();
     }
 
     protected String getTitleFormat() {
@@ -174,10 +162,10 @@ public class AttachWizardImpl extends AbstractWizard {
     private WizardStep buildWizardModel() {
         this.proxy = prepareProviderProxyStep();
 
-        CompositeWizardStep rootStep = new CompositeWizardStep(getContext(), ATTACH_WIZARD_CAPTION);
-        rootStep.addStep(STEP_SELECT_TARGETTYPE, new AttachSettingsPanel());
+        CompositeWizardStep rootStep = new CompositeWizardStep(getContext(), Bundle.AttachWizard_AttachWizardCaption());
+        rootStep.addStep(Bundle.AttachWizard_SelectTargetTypeString(), new AttachSettingsPanel());
         rootStep.addStep(prepareAdditionalSettingsStep());
-        rootStep.addStep(STEP_REVIEW_ATTACHSETTINGS, new ReviewSettingsPanel());
+        rootStep.addStep(Bundle.AttachWizard_ReviewAttachSettingsString(), new ReviewSettingsPanel());
         //    rootStep.addStep(new SimpleWizardStep(getContext(), "...", new NullWizardScreen(), new ConditionalFunctor() {
         //      public boolean evaluate(WizardContext context) {
         //        return ((AttachWizardContext)context).isHideIntegration();
@@ -189,67 +177,85 @@ public class AttachWizardImpl extends AbstractWizard {
     }
 
     private WizardStep prepareAdditionalSettingsStep() {
-        CompositeWizardStep additionalSettings = new CompositeWizardStep(getContext(), REFINE_ATTACHMENT_SETTINGS,
-                                                                         new ConditionalFunctor() { // NOI18N
+        CompositeWizardStep additionalSettings = new CompositeWizardStep(
+            getContext(), 
+            Bundle.AttachWizard_RefineAttachmentSettings(),
+            new ConditionalFunctor() { // NOI18N
                 public boolean evaluate(WizardContext context) {
                     AttachSettings settings = ((AttachWizardContext) context).getAttachSettings();
 
                     return settings.isRemote() || (!settings.isDirect() && !settings.isDynamic16());
                 }
-            });
+            }
+        );
 
-        WizardStep remoteAttach = new SimpleWizardStep(getContext(), STEP_REMOTE_SETTINGS, new RemoteAttachSettingsPanel(),
-                                                       new ConditionalFunctor() {
+        WizardStep remoteAttach = new SimpleWizardStep(
+            getContext(), 
+            Bundle.AttachWizard_RemoteSystemString(), 
+            new RemoteAttachSettingsPanel(),
+            new ConditionalFunctor() {
                 public boolean evaluate(WizardContext context) {
                     AttachSettings settings = ((AttachWizardContext) context).getAttachSettings();
 
                     return settings.isRemote();
                 }
-            });
+            }
+        );
         additionalSettings.addStep(remoteAttach);
 
         return additionalSettings;
     }
 
     private WizardStep prepareIntegrationStep() {
-        CompositeWizardStep integrationStep = new CompositeWizardStep(getContext(), INTEGRATE_PROFILER,
-                                                                      new ConditionalFunctor() { // NOI18N
+        CompositeWizardStep integrationStep = new CompositeWizardStep(
+            getContext(), 
+            Bundle.AttachWizard_IntegrateProfiler(),
+            new ConditionalFunctor() {
                 public boolean evaluate(WizardContext context) {
                     AttachWizardContext ctx = (AttachWizardContext) context;
                     AttachSettings settings = ctx.getAttachSettings();
 
                     return ctx.getIntegrationProvider().supportsManual() || ctx.getIntegrationProvider().supportsAutomation();
                 }
-            });
+            }
+        );
 
-        integrationStep.addStep(STEP_INTEGRATION_TYPE, new SelectIntegrationTypePanel(),
-                                new ConditionalFunctor() {
+        integrationStep.addStep(
+            Bundle.AttachWizard_ChooseIntegrationTypeString(), 
+            new SelectIntegrationTypePanel(),
+            new ConditionalFunctor() {
                 public boolean evaluate(WizardContext context) {
                     AttachWizardContext ctx = (AttachWizardContext) context;
 
                     return isAutomationAllowed(ctx);
                 }
-            });
+            }
+        );
 
-        CompositeWizardStep automaticIntegration = new CompositeWizardStep(getContext(), STEP_AUTOMATIC_INTEGRATION,
-                                                                           new ConditionalFunctor() {
+        CompositeWizardStep automaticIntegration = new CompositeWizardStep(
+            getContext(), 
+            Bundle.AttachWizard_AutomaticIntegrationStep(),
+            new ConditionalFunctor() {
                 public boolean evaluate(WizardContext context) {
                     AttachWizardContext ctx = (AttachWizardContext) context;
 
                     return ctx.isAutomatic();
                 }
-            });
+            }
+        );
 
         automaticIntegration.addStep(this.proxy);
-        automaticIntegration.addStep(STEP_PERFORM_INTEGRATION, new PerformIntegrationPanel(),
-                                     new ConditionalFunctor() {
+        automaticIntegration.addStep(
+            Bundle.AttachWizard_PerformIntegrationString(), 
+            new PerformIntegrationPanel(),
+            new ConditionalFunctor() {
                 public boolean evaluate(WizardContext context) {
                     //        AttachWizardContext ctx = (AttachWizardContext)context;
                     //        return ctx.isReadyToPerform();
                     return true;
                 }
             });
-        automaticIntegration.addStep(STEP_REVIEW_ADDITIONALSTEPS, new ReviewAdditionalStepsPanel());
+        automaticIntegration.addStep(Bundle.AttachWizard_ReviewAdditionalStepsString(), new ReviewAdditionalStepsPanel());
 
         integrationStep.addStep(automaticIntegration);
 
@@ -259,32 +265,39 @@ public class AttachWizardImpl extends AbstractWizard {
     }
 
     private WizardStep prepareManualIntegrationStep() {
-        return new SimpleWizardStep(getContext(), STEP_MANUAL_INTEGRATION, new ManualIntegrationPanel(),
-                                    new ConditionalFunctor() {
+        return new SimpleWizardStep(
+            getContext(), 
+            Bundle.AttachWizard_ManualIntegrationStep(), 
+            new ManualIntegrationPanel(),
+            new ConditionalFunctor() {
                 public boolean evaluate(WizardContext context) {
                     AttachWizardContext ctx = (AttachWizardContext) context;
 
                     return ctx.isManual();
                 }
-            });
+            }
+        );
     }
 
     private ProxyWizardStep prepareProviderProxyStep() {
-        return new ProxyWizardStep(getContext(), PROVIDER_SPECIFIC_SETTINGS,
-                                   new ConditionalFunctor() {
+        return new ProxyWizardStep(
+            getContext(), 
+            Bundle.AttachWizard_ProviderSpecificSettings(),
+            new ConditionalFunctor() {
                 public boolean evaluate(WizardContext context) {
                     AttachWizardContext ctx = (AttachWizardContext) context;
 
                     return ctx.isAutomatic();
                 }
-            }) {
-                public void setNext() {
-                    super.setNext();
+            }
+        ) {
+            public void setNext() {
+                super.setNext();
 
-                    if (canHandle()) {
-                        ((AttachWizardContext) getContext()).getIntegrationProvider().getSettingsPersistor().storeSettings();
-                    }
+                if (canHandle()) {
+                    ((AttachWizardContext) getContext()).getIntegrationProvider().getSettingsPersistor().storeSettings();
                 }
-            };
+            }
+        };
     }
 }

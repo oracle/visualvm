@@ -60,6 +60,17 @@ import org.openide.DialogDisplayer;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "JavaPlatformSelector_OkButtonName=OK",
+    "JavaPlatformSelector_UseSelPlatformChckBoxName=Always use the selected platform for profiling",
+    "JavaPlatformSelector_NoSupportedPlatformMsg=None of the installed Java Platforms can be used for profiling.\nNetBeans Profiler requires JDK 5.0 Update 4 and newer.\n\nPlease install a suitable Java Platform and run calibration again.",
+    "JavaPlatformSelector_SelectPlatformCalibrateMsg=Select Java Platform to calibrate:",
+    "JavaPlatformSelector_SelectPlatformCalibrateDialogCaption=Select Java Platform to calibrate",
+    "JavaPlatformSelector_SelectPlatformProfileMsg=Please select Java Platform to use:",
+    "JavaPlatformSelector_SelectPlatformProfileDialogCaption=Select Java Platform for Profiling",
+    "JavaPlatformSelector_CannotUsePlatform=The Java Platform this project runs on cannot be used for profiling.",
+    "JavaPlatformSelector_ListAccessName=List of Java Platforms available for profiling"
+})
 public final class JavaPlatformSelector extends JPanel implements ListSelectionListener {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -86,34 +97,12 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String OK_BUTTON_NAME = NbBundle.getMessage(JavaPlatformSelector.class,
-                                                                     "JavaPlatformSelector_OkButtonName"); // NOI18N
-    private static final String USE_SEL_PLATFORM_CHCKBOX_NAME = NbBundle.getMessage(JavaPlatformSelector.class,
-                                                                                    "JavaPlatformSelector_UseSelPlatformChckBoxName"); // NOI18N
-    private static final String NO_SUPPORTED_PLATFORM_MSG = NbBundle.getMessage(JavaPlatformSelector.class,
-                                                                                "JavaPlatformSelector_NoSupportedPlatformMsg"); // NOI18N
-    private static final String SELECT_PLATFORM_CALIBRATE_MSG = NbBundle.getMessage(JavaPlatformSelector.class,
-                                                                                    "JavaPlatformSelector_SelectPlatformCalibrateMsg"); // NOI18N
-    private static final String SELECT_PLATFORM_CALIBRATE_DIALOG_CAPTION = NbBundle.getMessage(JavaPlatformSelector.class,
-                                                                                               "JavaPlatformSelector_SelectPlatformCalibrateDialogCaption"); // NOI18N
-    private static final String SELECT_PLATFORM_PROFILE_MSG = NbBundle.getMessage(JavaPlatformSelector.class,
-                                                                                  "JavaPlatformSelector_SelectPlatformProfileMsg"); // NOI18N
-    private static final String SELECT_PLATFORM_PROFILE_DIALOG_CAPTION = NbBundle.getMessage(JavaPlatformSelector.class,
-                                                                                             "JavaPlatformSelector_SelectPlatformProfileDialogCaption"); // NOI18N
-    private static final String CANNOT_USE_PLATFORM_MSG = NbBundle.getMessage(JavaPlatformSelector.class,
-                                                                              "JavaPlatformSelector_CannotUsePlatform"); // NOI18N
-    private static final String LIST_ACCESS_NAME = NbBundle.getMessage(JavaPlatformSelector.class,
-                                                                       "JavaPlatformSelector_ListAccessName"); // NOI18N
-                                                                                                               // -----
     private static JavaPlatformSelector defaultPlatform;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private JLabel noteLabel;
-    private JButton okButton = new JButton(OK_BUTTON_NAME);
+    private JButton okButton = new JButton(Bundle.JavaPlatformSelector_OkButtonName());
     private JCheckBox alwaysCheckBox;
     private JList list;
 
@@ -126,11 +115,11 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
         list.setVisibleRowCount(6);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.addListSelectionListener(this);
-        list.getAccessibleContext().setAccessibleName(LIST_ACCESS_NAME);
+        list.getAccessibleContext().setAccessibleName(Bundle.JavaPlatformSelector_ListAccessName());
         noteLabel = new JLabel();
         noteLabel.setLabelFor(list);
         noteLabel.setFocusable(false);        
-        alwaysCheckBox = new JCheckBox(USE_SEL_PLATFORM_CHCKBOX_NAME, false);
+        alwaysCheckBox = new JCheckBox(Bundle.JavaPlatformSelector_UseSelPlatformChckBoxName(), false);
         add(new JScrollPane(list), BorderLayout.CENTER);
         add(noteLabel, BorderLayout.NORTH);
         add(alwaysCheckBox, BorderLayout.SOUTH);
@@ -150,25 +139,25 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
         java.util.List<JavaPlatform> platforms = JavaPlatform.getPlatforms();
 
         if (platforms.size() == 0) {
-            ProfilerDialogs.displayError(NO_SUPPORTED_PLATFORM_MSG);
+            ProfilerDialogs.displayError(Bundle.JavaPlatformSelector_NoSupportedPlatformMsg());
             JavaPlatform.showCustomizer();
 
             return null;
         }
 
-        noteLabel.setText(SELECT_PLATFORM_CALIBRATE_MSG);
-        noteLabel.getAccessibleContext().setAccessibleName(SELECT_PLATFORM_CALIBRATE_MSG);
-        list.getAccessibleContext().setAccessibleDescription(SELECT_PLATFORM_CALIBRATE_MSG);
+        noteLabel.setText(Bundle.JavaPlatformSelector_SelectPlatformCalibrateMsg());
+        noteLabel.getAccessibleContext().setAccessibleName(Bundle.JavaPlatformSelector_SelectPlatformCalibrateMsg());
+        list.getAccessibleContext().setAccessibleDescription(Bundle.JavaPlatformSelector_SelectPlatformCalibrateMsg());
         list.setModel(new JPListModel(platforms));
         alwaysCheckBox.setVisible(false);
 
-        DialogDescriptor dd = new DialogDescriptor(this, SELECT_PLATFORM_CALIBRATE_DIALOG_CAPTION, true,
+        DialogDescriptor dd = new DialogDescriptor(this, Bundle.JavaPlatformSelector_SelectPlatformCalibrateDialogCaption(), true,
                                                    new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                    DialogDescriptor.BOTTOM_ALIGN, null, null);
         list.setSelectedIndex(0);
         validateOKButton();
         Dialog selectDialog = DialogDisplayer.getDefault().createDialog(dd);
-        selectDialog.getAccessibleContext().setAccessibleDescription(SELECT_PLATFORM_CALIBRATE_DIALOG_CAPTION);
+        selectDialog.getAccessibleContext().setAccessibleDescription(Bundle.JavaPlatformSelector_SelectPlatformCalibrateDialogCaption());
         selectDialog.setVisible(true);
 
         if (dd.getValue() == okButton) {
@@ -184,21 +173,24 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
         java.util.List platforms = JavaPlatform.getPlatforms();
 
         if (platforms.size() == 0) {
-            ProfilerDialogs.displayError(NO_SUPPORTED_PLATFORM_MSG);
+            ProfilerDialogs.displayError(Bundle.JavaPlatformSelector_NoSupportedPlatformMsg());
             JavaPlatform.showCustomizer();
 
             return null;
         }
 
-        noteLabel.setText("<html>"+CANNOT_USE_PLATFORM_MSG + "<br>" // NOI18N
-                          + SELECT_PLATFORM_PROFILE_MSG+"</html>"); // NOI18N
-        noteLabel.getAccessibleContext().setAccessibleName(CANNOT_USE_PLATFORM_MSG + SELECT_PLATFORM_PROFILE_MSG);
-        list.getAccessibleContext().setAccessibleDescription(CANNOT_USE_PLATFORM_MSG + SELECT_PLATFORM_PROFILE_MSG);
+        noteLabel.setText("<html>"+Bundle.JavaPlatformSelector_CannotUsePlatform() + "<br>" // NOI18N
+                          + Bundle.JavaPlatformSelector_SelectPlatformProfileMsg()+"</html>"); // NOI18N
+        noteLabel.getAccessibleContext().setAccessibleName(
+            Bundle.JavaPlatformSelector_CannotUsePlatform() + 
+            Bundle.JavaPlatformSelector_SelectPlatformProfileMsg());
+        list.getAccessibleContext().setAccessibleDescription(
+            Bundle.JavaPlatformSelector_CannotUsePlatform() + Bundle.JavaPlatformSelector_SelectPlatformCalibrateMsg());
         list.setModel(new JPListModel(platforms));
         alwaysCheckBox.setSelected(false);
         alwaysCheckBox.setVisible(true);
 
-        DialogDescriptor dd = new DialogDescriptor(this, SELECT_PLATFORM_PROFILE_DIALOG_CAPTION, true,
+        DialogDescriptor dd = new DialogDescriptor(this, Bundle.JavaPlatformSelector_SelectPlatformProfileDialogCaption(), true,
                                                    new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton,
                                                    DialogDescriptor.BOTTOM_ALIGN, null, null);
         list.setSelectedIndex(0);

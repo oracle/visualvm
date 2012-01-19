@@ -56,17 +56,16 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_ControlPanelAction=Profiler &Control Panel",
+    "HINT_ControlPanelAction=Show Profiler Control Panel"
+})
 public final class ControlPanelAction extends AbstractAction {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final String NAME_STRING = NbBundle.getMessage(ControlPanelAction.class, "LBL_ControlPanelAction"); // NOI18N
-    private static final String SHORT_DESCRIPTION_STRING = NbBundle.getMessage(ControlPanelAction.class, "HINT_ControlPanelAction"); // NOI18N
-
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ControlPanelAction() {
-        putValue(Action.NAME, NAME_STRING);
-        putValue(Action.SHORT_DESCRIPTION, SHORT_DESCRIPTION_STRING);
+        putValue(Action.NAME, Bundle.LBL_ControlPanelAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_ControlPanelAction());
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.CONTROL_PANEL));
     }
 

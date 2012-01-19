@@ -46,10 +46,6 @@ package org.netbeans.modules.profiler;
 import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.actions.FindAction;
-import org.openide.cookies.SaveCookie;
-import org.openide.nodes.AbstractNode;
-import org.openide.nodes.Children;
-import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CallbackSystemAction;
 import org.openide.util.actions.SystemAction;
@@ -58,12 +54,19 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import javax.swing.*;
+import org.netbeans.lib.profiler.results.ResultsSnapshot;
+import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.spi.actions.AbstractSavable;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.lookup.AbstractLookup;
+import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 
 
@@ -73,6 +76,12 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "SnapshotResultsWindow_SaveSnapshotDialogMsg=The results snapshot is not saved. Do you want to save it?",
+    "SnapshotResultsWindow_CpuSnapshotAccessDescr=Profiler snapshot with CPU results",
+    "SnapshotResultsWindow_FragmentSnapshotAccessDescr=Profiler snapshot with code fragment results",
+    "SnapshotResultsWindow_MemorySnapshotAccessDescr=Profiler snapshot with memory results"
+})
 public final class SnapshotResultsWindow extends TopComponent {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
     
@@ -118,52 +127,42 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class SaveNode extends AbstractNode {
-        //~ Constructors ---------------------------------------------------------------------------------------------------------
-
-        /**
-         * Create a new abstract node with a given child set.
-         */
-        public SaveNode() {
-            super(Children.LEAF);
-        }
-
+    private class SavePerformer extends AbstractSavable {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public void setSaveEnabled(boolean saveEnabled) {
-            if (saveEnabled) {
-                if (getCookie(SaveCookie.class) == null) {
-                    getCookieSet().add(savePerformer);
-                }
-            } else {
-                if (getCookie(SaveCookie.class) != null) {
-                    getCookieSet().remove(savePerformer);
-                }
-            }
+        private void add() {
+            register();
+            ic.add(this);
         }
-    }
+        
+        private void remove() {
+             unregister();
+             ic.remove(this);
+        }
+        
+        @Override
+        protected String findDisplayName() {
+            return tabName;
+        }
 
-    private class SavePerformer implements SaveCookie {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public void save() throws IOException {
+        @Override
+        protected void handleSave() {
             ResultsManager.getDefault().saveSnapshot(snapshot);
+            ic.remove(this);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return this == obj;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(this);
         }
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String SAVE_SNAPSHOT_DIALOG_MSG = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                               "SnapshotResultsWindow_SaveSnapshotDialogMsg"); // NOI18N
-    private static final String CPU_SNAPSHOT_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                                "SnapshotResultsWindow_CpuSnapshotAccessDescr"); // NOI18N
-    private static final String FRAGMENT_SNAPSHOT_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                                     "SnapshotResultsWindow_FragmentSnapshotAccessDescr"); // NOI18N
-    private static final String MEMORY_SNAPSHOT_ACCESS_DESCR = NbBundle.getMessage(SnapshotResultsWindow.class,
-                                                                                   "SnapshotResultsWindow_MemorySnapshotAccessDescr"); // NOI18N
-                                                                                                                                       // -----
     private static final Image WINDOW_ICON_CPU = Icons.getImage(ProfilerIcons.CPU);
     private static final Image WINDOWS_ICON_FRAGMENT = Icons.getImage(ProfilerIcons.FRAGMENT);
     private static final Image WINDOWS_ICON_MEMORY = Icons.getImage(ProfilerIcons.MEMORY);
@@ -173,10 +172,11 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     private Component lastFocusOwner;
     private LoadedSnapshot snapshot;
-    private SaveNode saveSupport = new SaveNode();
+    private InstanceContent ic = new InstanceContent();
     private SavePerformer savePerformer = new SavePerformer();
     private SnapshotPanel displayedPanel;
     private String tabName = ""; // NOI18N // default
+    private SnapshotListener listener;
     private boolean forcedClose = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ public final class SnapshotResultsWindow extends TopComponent {
      * This constructor cannot be called, instances of this window cannot be persisted.
      */
     public SnapshotResultsWindow() {
-        throw new InternalError("This constructor should never be called");
+        throw new InternalError("This constructor should never be called"); // NOI18N
     } // NOI18N
 
     /**
@@ -195,32 +195,37 @@ public final class SnapshotResultsWindow extends TopComponent {
      * @param ls The results snapshot to display
      */
     public SnapshotResultsWindow(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
+        associateLookup(new AbstractLookup(ic));
+        ic.add(getActionMap());
         this.snapshot = ls;
         updateSaveState();
 
         setLayout(new BorderLayout());
         setFocusable(true);
         setRequestFocusEnabled(true);
+        
+        refreshTabName();
 
-        switch (ls.getType()) {
+        switch (snapshot.getType()) {
             case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                getAccessibleContext().setAccessibleDescription(CPU_SNAPSHOT_ACCESS_DESCR);
+                getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_CpuSnapshotAccessDescr());
                 displayCPUResults(ls, sortingColumn, sortingOrder);
 
                 break;
             case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                getAccessibleContext().setAccessibleDescription(FRAGMENT_SNAPSHOT_ACCESS_DESCR);
+                getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_FragmentSnapshotAccessDescr());
                 displayCodeRegionResults(ls);
 
                 break;
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                getAccessibleContext().setAccessibleDescription(MEMORY_SNAPSHOT_ACCESS_DESCR);
+                getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_MemorySnapshotAccessDescr());
                 displayMemoryResults(ls, sortingColumn, sortingOrder);
 
                 break;
         }
-        Lookup.getDefault().lookup(SnapshotListener.class).setDelegate(this);
+        listener = Lookup.getDefault().lookup(SnapshotListener.class);
+        listener.setDelegate(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -273,9 +278,7 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     public boolean canClose() {
         if (forcedClose) {
-            // clean up to avoid being held in memory
-            setActivatedNodes(new Node[0]);
-
+            savePerformer.remove();
             return true;
         }
 
@@ -283,19 +286,19 @@ public final class SnapshotResultsWindow extends TopComponent {
             return true; // already saved
         }
 
-        Boolean ret = ProfilerDialogs.displayCancellableConfirmationDNSA(SAVE_SNAPSHOT_DIALOG_MSG,
+        Boolean ret = ProfilerDialogs.displayCancellableConfirmationDNSA(Bundle.SnapshotResultsWindow_SaveSnapshotDialogMsg(),
                 null, null, "org.netbeans.modules.profiler.SnapshotResultsWindow.canClose", false); // NOI18N
 
         if (Boolean.TRUE.equals(ret)) {
-            ResultsManager.getDefault().saveSnapshot(snapshot);
-            // clean up to avoid being held in memory
-            setActivatedNodes(new Node[0]);
-
+            try {
+                savePerformer.save();
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
             return true;
         } else if (Boolean.FALSE.equals(ret)) {
             // clean up to avoid being held in memory
-            setActivatedNodes(new Node[0]);
-
+            savePerformer.remove();
             return true;
         } else {
             return false;
@@ -319,6 +322,23 @@ public final class SnapshotResultsWindow extends TopComponent {
             ((MemorySnapshotPanel) displayedPanel).displayStacksForClass(selectedClassId, sortingColumn, sortingOrder);
         }
     }
+    
+    public void refreshTabName() {
+        String fileName = snapshot.getFile() == null ? null : snapshot.getFile().getName();
+        int snapshotType = snapshot.getType();
+        if (fileName != null) {
+            setToolTipText(snapshot.getFile().getAbsolutePath());
+            int dotIndex = fileName.lastIndexOf('.'); // NOI18N
+            if (dotIndex > 0 && dotIndex <= fileName.length() - 2)
+                fileName = fileName.substring(0, dotIndex);
+            tabName = ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType);
+        } else {
+            ResultsSnapshot rs = snapshot.getSnapshot();
+            String snapshotTime = StringUtils.formatUserDate(new Date(rs.getTimeTaken()));
+            tabName = ResultsManager.getDefault().getSnapshotDisplayName(snapshotTime, snapshotType);
+        }
+        updateTitle();
+    }
 
     public void updateTitle() {
         if (snapshot.isSaved()) {
@@ -327,6 +347,9 @@ public final class SnapshotResultsWindow extends TopComponent {
             // XXX consider using DataEditorSupport.annotateName
             setName(tabName + " *"); // NOI18N
         }
+        // Called when snapshot is saved, update also tooltip
+        if (snapshot.getFile() != null)
+            setToolTipText(snapshot.getFile().getAbsolutePath());
     }
 
     protected void componentClosed() {
@@ -343,17 +366,12 @@ public final class SnapshotResultsWindow extends TopComponent {
     }
 
     // -- Private methods --------------------------------------------------------------------------------------------------
-    private void setTabName(String innerName) {
-        tabName = innerName;
-        updateTitle();
-    }
 
     private void displayCPUResults(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
         CPUSnapshotPanel cpuPanel = new CPUSnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
         displayedPanel = cpuPanel;
         updateFind(true, cpuPanel);
         add(cpuPanel, BorderLayout.CENTER);
-        setTabName(cpuPanel.getTitle());
         setIcon(WINDOW_ICON_CPU);
     }
 
@@ -364,7 +382,6 @@ public final class SnapshotResultsWindow extends TopComponent {
         displayedPanel = codeRegionPanel;
         add(codeRegionPanel, BorderLayout.CENTER);
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        setTabName(codeRegionPanel.getTitle());
         setIcon(WINDOWS_ICON_FRAGMENT);
     }
 
@@ -373,7 +390,6 @@ public final class SnapshotResultsWindow extends TopComponent {
         displayedPanel = memoryPanel;
         updateFind(true, memoryPanel);
         add(memoryPanel, BorderLayout.CENTER);
-        setTabName(memoryPanel.getTitle());
         setIcon(WINDOWS_ICON_MEMORY);
     }
 
@@ -400,12 +416,18 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     private void updateSaveState() {
         if (snapshot != null) { // snapshot == null means the window has been closed (#202992)
-            saveSupport.setSaveEnabled(!snapshot.isSaved());
-            setActivatedNodes(new Node[] { saveSupport });
+            if (snapshot.isSaved()) {
+                savePerformer.remove();
+            } else {
+                savePerformer.add();
+            }
 
             if (displayedPanel != null) {
                 displayedPanel.updateSavedState();
             }
+        } else {
+            // just to be sure
+            savePerformer.remove();
         }
     }
 }

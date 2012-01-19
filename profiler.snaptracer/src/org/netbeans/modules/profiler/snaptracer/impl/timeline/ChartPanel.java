@@ -78,6 +78,15 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ACTION_ZoomIn_name=Zoom in",
+    "ACTION_ZoomOut_name=Zoom out",
+    "ACTION_FixedScale_name=Fixed scale",
+    "ACTION_ScaleToFit_name=Scale to fit",
+    "ACTION_WheelZooms_name=Mouse wheel zooms",
+    "ACTION_WheelHScrolls_name=Mouse wheel scrolls horizontally",
+    "ACTION_WheelVScrolls_name=Mouse wheel scrolls vertically"
+})
 final class ChartPanel extends JPanel {
 
     private static final Icon ZOOM_IN_ICON = Icons.getIcon(GeneralIcons.ZOOM_IN);
@@ -218,8 +227,7 @@ final class ChartPanel extends JPanel {
 
     AbstractButton mouseZoom() {
         if (mouseZoom == null) {
-            mouseZoom = new OneWayToggleButton(ZMWHEEL_ICON, NbBundle.getMessage(
-                    ChartPanel.class, "ACTION_WheelZooms_name")) { // NOI18N
+            mouseZoom = new OneWayToggleButton(ZMWHEEL_ICON, Bundle.ACTION_WheelZooms_name()) {
                 protected void performAction() { mouseZoomImpl(); }
             };
             if (TracerOptions.getInstance().getMouseWheelAction().equals(
@@ -233,8 +241,7 @@ final class ChartPanel extends JPanel {
 
     AbstractButton mouseHScroll() {
         if (mouseHScroll == null) {
-            mouseHScroll = new OneWayToggleButton(HMWHEEL_ICON, NbBundle.getMessage(
-                    ChartPanel.class, "ACTION_WheelHScrolls_name")) { // NOI18N
+            mouseHScroll = new OneWayToggleButton(HMWHEEL_ICON, Bundle.ACTION_WheelHScrolls_name()) {
                 protected void performAction() { mouseHScrollImpl(); }
             };
             if (TracerOptions.getInstance().getMouseWheelAction().equals(
@@ -248,8 +255,7 @@ final class ChartPanel extends JPanel {
 
     AbstractButton mouseVScroll() {
         if (mouseVScroll == null) {
-            mouseVScroll = new OneWayToggleButton(VMWHEEL_ICON, NbBundle.getMessage(
-                    ChartPanel.class, "ACTION_WheelVScrolls_name")) { // NOI18N
+            mouseVScroll = new OneWayToggleButton(VMWHEEL_ICON, Bundle.ACTION_WheelVScrolls_name()) {
                 protected void performAction() { mouseVScrollImpl(); }
             };
             if (TracerOptions.getInstance().getMouseWheelAction().equals(
@@ -325,8 +331,7 @@ final class ChartPanel extends JPanel {
         public ZoomInAction() {
             super();
 
-            putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ChartPanel.class,
-                    "ACTION_ZoomIn_name")); // NOI18N
+            putValue(SHORT_DESCRIPTION, Bundle.ACTION_ZoomIn_name());
             putValue(SMALL_ICON, ZOOM_IN_ICON);
 
             updateAction();
@@ -355,8 +360,7 @@ final class ChartPanel extends JPanel {
         public ZoomOutAction() {
             super();
 
-            putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ChartPanel.class,
-                    "ACTION_ZoomOut_name")); // NOI18N
+            putValue(SHORT_DESCRIPTION, Bundle.ACTION_ZoomOut_name());
             putValue(SMALL_ICON, ZOOM_OUT_ICON);
 
             updateAction();
@@ -422,9 +426,7 @@ final class ChartPanel extends JPanel {
         private void updateAction() {
             boolean fitsWidth = chart.fitsWidth();
             Icon icon = fitsWidth ? FIXED_SCALE_ICON : SCALE_TO_FIT_ICON;
-            String name = fitsWidth ? NbBundle.getMessage(ChartPanel.class,
-                    "ACTION_FixedScale_name") : NbBundle.getMessage( // NOI18N
-                    ChartPanel.class, "ACTION_ScaleToFit_name"); // NOI18N
+            String name = fitsWidth ? Bundle.ACTION_FixedScale_name() : Bundle.ACTION_ScaleToFit_name();
             putValue(SHORT_DESCRIPTION, name);
             putValue(SMALL_ICON, icon);
         }
