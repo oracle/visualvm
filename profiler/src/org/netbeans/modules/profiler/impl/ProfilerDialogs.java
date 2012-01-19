@@ -336,7 +336,7 @@ final class ProfilerDialogs {
     public static final class MessageWithDetails extends DialogDescriptor {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private JButton showDetailsButton = new JButton(Bundle.ProfilerDialogs_DontShowAgainMsg());
+        private JButton showDetailsButton = new JButton(Bundle.ProfilerDialogs_ShowDetailsButtonText());
         private Object detailsMsg;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
