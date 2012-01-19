@@ -26,18 +26,17 @@ package com.sun.tools.visualvm.sampler.cpu;
 
 import java.util.Stack;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;
-import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTVisitorAdapter;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
 
 /**
  *
  * @author Tomas Hurka
  */
-final class CCTFlattener extends CPUCCTVisitorAdapter {
+final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -74,7 +73,7 @@ final class CCTFlattener extends CPUCCTVisitorAdapter {
         }
     }
 
-    public void afterWalk() {
+    public void onStop() {
         // Now convert the data into microseconds
         long wholeGraphTime0 = 0;
 
@@ -125,7 +124,7 @@ final class CCTFlattener extends CPUCCTVisitorAdapter {
 //        currentFilter = null;
     }
 
-    public void beforeWalk() {
+    public void onStart() {
         timePM0 = new long[nMethods];
         timePM1 = new long[collectingTwoTimeStamps ? nMethods : 0];
         invPM = new int[nMethods];
@@ -140,7 +139,7 @@ final class CCTFlattener extends CPUCCTVisitorAdapter {
         }
     }
 
-    public void visit(MethodCPUCCTNode node) {
+    public void onNode(MethodCPUCCTNode node) {
         MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek();
         boolean filteredOut = node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_YES; // filtered out by rootmethod/markermethod rules
 
@@ -177,11 +176,7 @@ final class CCTFlattener extends CPUCCTVisitorAdapter {
         parentStack.push(currentParent);
     }
 
-    public void visitPost(MethodCPUCCTNode node) {
+    public void onBackout(MethodCPUCCTNode node) {
         parentStack.pop();
-    }
-
-    public void visitPost(ThreadCPUCCTNode node) {
-        parentStack.clear();
     }
 }

@@ -42,6 +42,7 @@ import org.netbeans.modules.profiler.SnapshotsListener;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.SystemAction;
+import org.openide.util.lookup.ServiceProvider;
 
     
 /**
@@ -88,30 +89,6 @@ final class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
                 }
             });
 
-            ResultsManager.getDefault().addSnapshotsListener(new SnapshotsListener() {
-                public void snapshotLoaded(LoadedSnapshot snapshot) {}
-                public void snapshotRemoved(LoadedSnapshot snapshot) {}
-                public void snapshotTaken(LoadedSnapshot snapshot) {}
-
-                public void snapshotSaved(LoadedSnapshot snapshot) {
-                    try {
-                        Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
-                        File snapshotFile = snapshot.getFile();
-                        if (profiledApplication != null && snapshotFile.getCanonicalPath().contains(NB_PROFILER_SNAPSHOTS_STORAGE)) {
-                            File newSnapshotFile = Utils.getUniqueFile(profiledApplication.getStorage().getDirectory(), snapshotFile.getName());
-                            if (!snapshotFile.renameTo(newSnapshotFile)) {
-                                Utils.copyFile(snapshotFile, newSnapshotFile);
-                                snapshotFile.deleteOnExit();
-                            }
-                            snapshot.setFile(newSnapshotFile);
-                            ProfilerSnapshotsSupport.getInstance().createSnapshot(snapshot, profiledApplication, openNextSnapshot);
-                            openNextSnapshot = true;
-                        }
-                    } catch (Exception e) {
-                        LOGGER.log(Level.SEVERE, "Error handling saved profiler snapshot", e); // NOI18N
-                    }
-                }
-            });
         } else {
             setEnabled(false);
         }
@@ -122,5 +99,39 @@ final class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
         super(Application.class);
         putValue(NAME, NbBundle.getMessage(ProfilerSnapshotAction.class, "MSG_Profiler_Snapshot")); // NOI18N
         putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ProfilerSnapshotAction.class, "DESCR_Profiler_Snapshot"));    // NOI18N
+    }
+
+    @ServiceProvider(service=SnapshotsListener.class)
+    public static class SnapshotsListenerImpl implements SnapshotsListener {
+
+        public SnapshotsListenerImpl() {
+        }
+
+        public void snapshotLoaded(LoadedSnapshot snapshot) {}
+
+        public void snapshotRemoved(LoadedSnapshot snapshot) {}
+
+        public void snapshotTaken(LoadedSnapshot snapshot) {}
+
+        public void snapshotSaved(LoadedSnapshot snapshot) {
+            try {
+                Application profiledApplication = ProfilerSupport.getInstance().getProfiledApplication();
+                File snapshotFile = snapshot.getFile();
+                if (profiledApplication != null && snapshotFile.getCanonicalPath().contains(NB_PROFILER_SNAPSHOTS_STORAGE)) {
+                    File newSnapshotFile = Utils.getUniqueFile(profiledApplication.getStorage().getDirectory(), snapshotFile.getName());
+                    if (!snapshotFile.renameTo(newSnapshotFile)) {
+                        Utils.copyFile(snapshotFile, newSnapshotFile);
+                        snapshotFile.deleteOnExit();
+                    }
+                    snapshot.setFile(newSnapshotFile);
+                    ProfilerSnapshotsSupport pss = ProfilerSnapshotsSupport.getInstance();
+                    ProfilerSnapshotAction psa = ProfilerSnapshotAction.instance();
+                    pss.createSnapshot(snapshot, profiledApplication, psa.openNextSnapshot);
+                    psa.openNextSnapshot = true;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error handling saved profiler snapshot", e); // NOI18N
+            }
+        }
     }
 }

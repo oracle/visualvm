@@ -36,6 +36,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -93,7 +94,7 @@ final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> 
                         LOGGER.log(Level.INFO, "Error loading profiler snapshot", e); // NOI18N
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                NetBeansProfiler.getDefaultNB().displayError(
+                                ProfilerDialogs.displayError(
                                         NbBundle.getMessage(ProfilerSnapshotCategory.class,
                                                             "MSG_Opening_snapshot_failed")); // NOI18N
                             }   

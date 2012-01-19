@@ -41,7 +41,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 

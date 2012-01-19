@@ -39,7 +39,8 @@ import java.util.logging.Logger;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.openide.util.NbBundle;
 
 /**
@@ -267,8 +268,7 @@ final class ProfilerSupport {
         // TODO: this should be performed after all modules are loaded & initialized to not bias the calibration!!!
         
         // Display blocking notification
-        NetBeansProfiler.getDefaultNB().displayInfoAndWait(
-                NbBundle.getMessage(ProfilerSupport.class, "MSG_Calibration")); // NOI18N
+        ProfilerDialogs.displayInfo(NbBundle.getMessage(ProfilerSupport.class, "MSG_Calibration")); // NOI18N
 
         // Perform calibration
         boolean result = false;

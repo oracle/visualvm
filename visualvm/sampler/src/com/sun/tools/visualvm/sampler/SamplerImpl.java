@@ -506,7 +506,7 @@ final class SamplerImpl {
                                 try {
                                     long time = System.currentTimeMillis();
                                     CPUResultsSnapshot snapshot = builderF.createSnapshot(time);
-                                    ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null);
+                                    ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
                                     File file = Utils.getUniqueFile(application.getStorage().getDirectory(),
                                                                     Long.toString(time),
                                                                     "." + ResultsManager.SNAPSHOT_EXTENSION); // NOI18N
@@ -702,7 +702,7 @@ final class SamplerImpl {
                                                 NbBundle.getMessage(SamplerImpl.class, "MSG_No_save_data_memory"), // NOI18N
                                                 NotifyDescriptor.WARNING_MESSAGE));
                                     } else {
-                                        ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createMemoryPreset(), null);
+                                        ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createMemoryPreset(), null, null);
                                         File file = Utils.getUniqueFile(application.getStorage().getDirectory(),
                                                                         Long.toString(time),
                                                                         "." + ResultsManager.SNAPSHOT_EXTENSION); // NOI18N

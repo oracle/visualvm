@@ -39,6 +39,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
@@ -70,7 +71,7 @@ final class ProfilerSnapshotView extends DataSourceView {
         
     protected void removed() {
         if (srw != null) {
-            IDEUtils.runInEventDispatchThread(new Runnable() {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     try {
                         Method method = srw.getClass().getDeclaredMethod("componentClosed");   // NOI18N

@@ -77,6 +77,8 @@ import org.netbeans.lib.profiler.ui.components.table.JExtendedTablePanel;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -781,18 +783,14 @@ final class MemoryView extends JPanel {
     private void initFilterPanel() {
         filterComponent = new FilterComponent();
 
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-           .getResource("/org/netbeans/lib/profiler/ui/resources/filterStartsWith.png")), // NOI18N
-           NbBundle.getMessage(MemoryView.class, "LBL_Starts_with"), CommonConstants.FILTER_STARTS_WITH); // NOI18N
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-           .getResource("/org/netbeans/lib/profiler/ui/resources/filterContains.png")), // NOI18N
-           NbBundle.getMessage(MemoryView.class, "LBL_Contains"), CommonConstants.FILTER_CONTAINS); // NOI18N
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-           .getResource("/org/netbeans/lib/profiler/ui/resources/filterEndsWith.png")), // NOI18N
-           NbBundle.getMessage(MemoryView.class, "LBL_Ends_with"), CommonConstants.FILTER_ENDS_WITH); // NOI18N
-        filterComponent.addFilterItem(new ImageIcon(filterComponent.getClass()
-           .getResource("/org/netbeans/lib/profiler/ui/resources/filterRegExp.png")), // NOI18N
-           NbBundle.getMessage(MemoryView.class, "LBL_Regexp"), CommonConstants.FILTER_REGEXP); // NOI18N
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
+                NbBundle.getMessage(MemoryView.class, "LBL_Starts_with"), CommonConstants.FILTER_STARTS_WITH); // NOI18N
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS),
+                NbBundle.getMessage(MemoryView.class, "LBL_Contains"), CommonConstants.FILTER_CONTAINS); // NOI18N
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
+                NbBundle.getMessage(MemoryView.class, "LBL_Ends_with"), CommonConstants.FILTER_ENDS_WITH); // NOI18N
+        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP),
+                NbBundle.getMessage(MemoryView.class, "LBL_Regexp"), CommonConstants.FILTER_REGEXP); // NOI18N
 
         filterComponent.setFilterValues(filterString, filterType);
 

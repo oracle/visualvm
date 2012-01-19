@@ -23,21 +23,50 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.modules.appui;
+package com.sun.tools.visualvm.profiler;
 
-import org.openide.modules.ModuleInstall;
-import com.sun.tools.visualvm.modules.appui.proxysettings.ProxySettingsHack;
+import java.io.File;
+import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.ProfilerModule;
+import org.openide.modules.InstalledFileLocator;
+import org.openide.util.lookup.ServiceProvider;
+
 
 /**
  *
- * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-// Class implementing logic on VisualVM module install
-public class Install extends ModuleInstall {
+@ServiceProvider(service=Profiler.class)
+public class VisualVMProfiler extends NetBeansProfiler {
 
-    public void restored() {
-        // Initialize opening warning dialog on Proxy Settings
-        ProxySettingsHack.hackProxySettings();
+    @Override
+    public String getLibsDir() {
+        final File dir = InstalledFileLocator.getDefault().locate(ProfilerModule.LIBS_DIR + "/jfluid-server.jar", //NOI18N
+                                                     "org.netbeans.lib.profiler", false); //NOI18N
+        if (dir == null) {
+            return null;
+        }
+        return dir.getParentFile().getPath();
     }
-    
+
+    protected boolean shouldOpenWindowsOnProfilingStart() {
+        return false;
+    }
+
+    @Override
+    public boolean rerunAvailable() {
+        return false;
+    }
+
+    @Override
+    public boolean modifyAvailable() {
+        return false;
+    }
+
+    @Override
+    public void rerunLastProfiling() {
+        throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
+    }
+ 
 }

@@ -84,7 +84,7 @@ public abstract class ProfilerCPUPanel extends JPanel {
     
     
     public ProfilingSettings getSettings() {
-        ProfilingSettings settings = ProfilingSettingsPresets.createCPUPreset();
+        ProfilingSettings settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_ENTIRE);
         settings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
         
         String instrFilterString = getFilterValue();

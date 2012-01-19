@@ -22,7 +22,7 @@
         </pathconvert>
         <selector id="zip.platform.included.files">
             <custom classpath="${harness.dir}/tasks.jar" classname="org.netbeans.nbbuild.ModuleSelector">
-                <!-- <param name="excludeModules" value="${disabled.modules}"/>-->
+                <param name="excludeModules" value="${disabled.modules}"/>
                 <param name="includeClusters" value="${enabled.clusters}"/>
                 <param name="excludeClusters" value="${disabled.clusters}"/>
                 <param name="updateTrackingFiles" value="${zip.platform.update.tracking}"/>

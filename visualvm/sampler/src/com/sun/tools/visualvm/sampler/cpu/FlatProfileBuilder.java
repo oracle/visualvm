@@ -24,9 +24,9 @@
  */
 package com.sun.tools.visualvm.sampler.cpu;
 
+import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
-import org.netbeans.lib.profiler.results.cpu.cct.CompositeCPUCCTWalker;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 
 /**
@@ -52,13 +52,20 @@ final class FlatProfileBuilder implements FlatProfileProvider {
         if (appNode == null) {
             return null;
         }
-        
-        CompositeCPUCCTWalker walker = new CompositeCPUCCTWalker();
-        int index = 0;
-          
-        walker.add(index++, cctFlattener);
-        walker.walk(appNode);
-        lastFlatProfile = cctFlattener.getFlatProfile();
+//        client.getStatus().beginTrans(false);
+
+        try {
+            RuntimeCCTNodeProcessor.process(
+                appNode, 
+                cctFlattener
+            );
+
+            lastFlatProfile = cctFlattener.getFlatProfile();
+
+        } finally {
+//            client.getStatus().endTrans();
+        }
+
         return lastFlatProfile;
     }
 }

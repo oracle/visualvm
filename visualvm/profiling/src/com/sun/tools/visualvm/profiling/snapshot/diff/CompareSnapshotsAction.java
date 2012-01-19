@@ -31,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.util.Set;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
 
     
@@ -61,7 +62,7 @@ final class CompareSnapshotsAction extends MultiDataSourceAction<ProfilerSnapsho
             DataSourceWindowManager.sharedInstance().openDataSource(sdc);
         } else {
             String msg = NbBundle.getMessage(CompareSnapshotsAction.class, "MSG_Not_Comparable");    // NOI18N
-            NetBeansProfiler.getDefaultNB().displayError(msg);
+            ProfilerDialogs.displayError(msg);
         }
     }
     

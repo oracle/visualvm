@@ -30,6 +30,8 @@ import java.awt.Image;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -41,10 +43,8 @@ final class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapsh
     private static final Logger LOGGER =
             Logger.getLogger(ProfilerSnapshotDescriptor.class.getName());
     
-    private static final Image CPU_ICON = ImageUtilities.loadImage(
-            "org/netbeans/modules/profiler/resources/cpuSmall.png", true);    // NOI18N
-    private static final Image MEMORY_ICON = ImageUtilities.loadImage(
-            "org/netbeans/modules/profiler/resources/memorySmall.png", true);  // NOI18N
+    private static final Image CPU_ICON = Icons.getImage(ProfilerIcons.CPU);
+    private static final Image MEMORY_ICON = Icons.getImage(ProfilerIcons.MEMORY);
     private static final Image NODE_BADGE = ImageUtilities.loadImage(
             "com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
     

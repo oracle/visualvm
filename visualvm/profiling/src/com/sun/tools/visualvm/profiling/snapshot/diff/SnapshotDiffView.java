@@ -39,6 +39,7 @@ import javax.swing.JComponent;
 import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.MemoryDiffPanel;
 import org.netbeans.modules.profiler.SnapshotsDiffWindow;
 import org.netbeans.modules.profiler.utils.IDEUtils;
@@ -63,7 +64,7 @@ final class SnapshotDiffView extends DataSourceView {
         
     protected void removed() {
         if (sdw != null) {
-            IDEUtils.runInEventDispatchThread(new Runnable() {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     try {
                         Method method = sdw.getClass().getDeclaredMethod("componentClosed");   // NOI18N

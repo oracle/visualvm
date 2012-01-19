@@ -63,11 +63,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.modules.profiler.LiveResultsWindow;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -265,17 +268,17 @@ final class ApplicationProfilerView extends DataSourceView {
                 internalChange = true;
                 cpuButton.setSelected(false);
                 internalChange = false;
-                NetBeansProfiler.getDefaultNB().displayError(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Incorrect_CPU_settings")); // NOI18N
+                ProfilerDialogs.displayError(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Incorrect_CPU_settings")); // NOI18N
             } else {
                 cpuSettingsSupport.saveSettings();
                 if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
-                  IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                  ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() { NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(cpuSettingsSupport.getSettings()); }
                   });
                 } else {
                   disableControlButtons();
                   ProfilerSupport.getInstance().setProfiledApplication(application);
-                  IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+                  ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                     public void run() { startProfiling(application, cpuSettingsSupport.getSettings()); }
                   });
                 }
@@ -292,7 +295,7 @@ final class ApplicationProfilerView extends DataSourceView {
             internalChange = false;
             memorySettingsSupport.saveSettings();
             if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
-              IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+              ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {
                     NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(memorySettingsSupport.getSettings()); 
                 }
@@ -300,7 +303,7 @@ final class ApplicationProfilerView extends DataSourceView {
             } else {
               disableControlButtons();
               ProfilerSupport.getInstance().setProfiledApplication(application);
-              IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+              ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() { startProfiling(application, memorySettingsSupport.getSettings()); }
               });
             }
@@ -340,7 +343,7 @@ final class ApplicationProfilerView extends DataSourceView {
           if (internalChange) return;
 
           disableControlButtons();
-          IDEUtils.runInProfilerRequestProcessor(new Runnable() {
+          ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
             public void run() {
               ProfilerSupport.getInstance().setProfiledApplication(null);
               NetBeansProfiler.getDefaultNB().detachFromApp();
