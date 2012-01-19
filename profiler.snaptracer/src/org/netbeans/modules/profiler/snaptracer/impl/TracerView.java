@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.snaptracer.impl;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
 import java.awt.Component;
@@ -52,39 +53,44 @@ import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
+import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import org.netbeans.modules.profiler.snaptracer.TracerPackage;
+import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.netbeans.lib.profiler.ui.cpu.CCTDisplay;
+import org.netbeans.modules.profiler.CPUSnapshotPanel;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 final class TracerView {
 
+    private static List<WeakReference<TracerView>> views = new ArrayList();
+
     private final TracerModel model;
     private final TracerController controller;
-
+    private LoadedSnapshot lsF;
     private TimelineView timelineView;
-
+    private FindMethodAction findMethod;
     
     TracerView(TracerModel model, TracerController controller) {
         this.model = model;
         this.controller = controller;
+        findMethod = new FindMethodAction();
     }
 
     protected JComponent createComponent() {
@@ -224,19 +230,22 @@ final class TracerView {
             Exceptions.printStackTrace(ex);
         }
 
-        final LoadedSnapshot lsF = ls;
+        lsF = ls;
 
-        if (lsF != null) SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                SnapshotResultsWindow w = new SnapshotResultsWindow(lsF, 1, false);
+        if (lsF != null) {
+            register(this);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    SnapshotResultsWindow w = new SnapshotResultsWindow(lsF, 1, false);
 
-                JPanel c = new JPanel(new BorderLayout(0, 3));
-                c.setBorder(BorderFactory.createEmptyBorder(8, 5, 5, 5));
-                c.add(new JSeparator(), BorderLayout.NORTH);
-                c.add(w, BorderLayout.CENTER);
-                addContents(p, c);
-            }
-        });
+                    JPanel c = new JPanel(new BorderLayout(0, 3));
+                    c.setBorder(BorderFactory.createEmptyBorder(8, 5, 5, 5));
+                    c.add(new JSeparator(), BorderLayout.NORTH);
+                    c.add(w, BorderLayout.CENTER);
+                    addContents(p, c);
+                }
+            });
+        }
     }
 
     private void displayThreadDump(final JPanel p, final int s) {
@@ -249,27 +258,30 @@ final class TracerView {
 
         final String tdF = td;
 
-        if (tdF != null) SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                HTMLTextArea a = new HTMLTextArea(tdF) {
-                    protected void showURL(URL url) {
-                        if (url == null) return;
-                        String urls = url.toString();
-                        TracerView.this.showURL(urls);
-                    }
-                };
-                a.setCaretPosition(0);
-                JScrollPane sp = new JScrollPane(a);
+        if (tdF != null) {
+            lsF = null;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    HTMLTextArea a = new HTMLTextArea(tdF) {
+                        protected void showURL(URL url) {
+                            if (url == null) return;
+                            String urls = url.toString();
+                            TracerView.this.showURL(urls);
+                        }
+                    };
+                    a.setCaretPosition(0);
+                    JScrollPane sp = new JScrollPane(a);
 
 
-                JPanel c = new JPanel(new BorderLayout(0, 6));
-                c.setBorder(BorderFactory.createEmptyBorder(8, 5, 5, 5));
-                c.add(new JSeparator(), BorderLayout.NORTH);
-                c.add(sp, BorderLayout.CENTER);
+                    JPanel c = new JPanel(new BorderLayout(0, 6));
+                    c.setBorder(BorderFactory.createEmptyBorder(8, 5, 5, 5));
+                    c.add(new JSeparator(), BorderLayout.NORTH);
+                    c.add(sp, BorderLayout.CENTER);
 
-                addContents(p, c);
-            }
-        });
+                    addContents(p, c);
+                }
+            });
+        }
     }
 
     private static void addContents(JComponent container, JComponent contents) {
@@ -290,5 +302,97 @@ final class TracerView {
             int linenumber = Integer.parseInt(parts[2]);
             GoToSource.openSource(null, className, method, linenumber);
         }
+    }
+
+    private static void register(TracerView view) {
+        views.add(new WeakReference(view));
+    }
+    
+    private static TracerView getTracerView(LoadedSnapshot ls) {
+        Iterator<WeakReference<TracerView>> it = views.iterator();
+        
+        while(it.hasNext()) {
+            TracerView view = it.next().get();
+            
+            if (view == null) {
+                it.remove();
+            } else {
+                if (view.lsF == ls) {
+                    return view;
+                }
+            }
+        }
+        return null;
+    }
+    
+    @ServiceProvider(service=CPUSnapshotPanel.CCTPopupEnhancer.class)
+    public static final class CCTEnhancer implements CPUSnapshotPanel.CCTPopupEnhancer {
+
+        @Override
+        public void enhancePopup(JPopupMenu popup, LoadedSnapshot snapshot, CCTDisplay cctDisplay) {
+            TracerView tv = getTracerView(snapshot);
+            
+            if (tv != null) {
+                tv.findMethod.enhancePopup(popup,cctDisplay);
+            }
+        }
+
+        @Override
+        public void enableDisablePopup(LoadedSnapshot snapshot, PrestimeCPUCCTNode node) {
+            TracerView tv = getTracerView(snapshot);
+            
+            if (tv != null) {
+                tv.findMethod.enableDisablePopup(node);
+            }
+        }
+
+    }
+    
+    private class FindMethodAction extends AbstractAction {
+        
+        private CCTDisplay cctDisplay;
+        private PrestimeCPUCCTNode node;
+        
+        @NbBundle.Messages("LBL_FindMethod=Select intervals")
+        private FindMethodAction() {
+            super(Bundle.LBL_FindMethod());
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            assert cctDisplay != null;
+            try {
+                List<Integer> ints = model.getIntervals(node);
+                assert ints.size() % 2 == 0;
+                System.out.println("Intervals " + ints.toString());
+                TimelineSupport support = model.getTimelineSupport();
+                support.resetSelectedTimestamps();
+                Iterator<Integer> iter = ints.iterator();
+                while (iter.hasNext()) {
+                    int start = iter.next();
+                    int stop  = iter.next();
+                    for (int i = start; i <= stop; i++)
+                        model.getTimelineSupport().selectTimestamp(i, false);
+                }
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+
+        private void enhancePopup(JPopupMenu popup, CCTDisplay cctd) {
+            popup.add(new JPopupMenu.Separator());
+            popup.add(new JMenuItem(findMethod));
+            cctDisplay = cctd;
+        }
+
+        private boolean isRegular(PrestimeCPUCCTNode n) {
+            return  n.getThreadId() != -1 && n.getMethodId() > 0 && !n.isFilteredNode();
+        }
+        
+        private void enableDisablePopup(PrestimeCPUCCTNode n) {
+            node = n;
+            setEnabled(isRegular(node));
+        }
+
     }
 }
