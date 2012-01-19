@@ -101,7 +101,7 @@ public class ProfilerValidationTest extends JellyTestCase {
     public static NbTestSuite suite() {
         NbModuleSuite.Configuration conf = NbModuleSuite.createConfiguration(
             ProfilerValidationTest.class
-        ).clusters("profiler").enableModules(".*").honorAutoloadEager(true)
+        ).clusters("profiler|nb").enableModules(".*").honorAutoloadEager(true)
         .failOnException(Level.SEVERE)
         .failOnMessage(Level.SEVERE);
         
