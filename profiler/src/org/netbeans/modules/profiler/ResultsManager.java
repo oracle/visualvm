@@ -60,8 +60,6 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -639,9 +637,8 @@ public final class ResultsManager {
         } catch (Exception e) {
             ProfilerLogger.log(e);
 
-            NotifyDescriptor.Message loadFailed = new NotifyDescriptor.Message(Bundle.ResultsManager_SnapshotLoadFailed(
-                                                                                loadedSnapshot.getFile().getAbsolutePath()));
-            DialogDisplayer.getDefault().notify(loadFailed);
+            ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotLoadFailed(
+                    loadedSnapshot.getFile().getAbsolutePath()));
         }
     }
 
