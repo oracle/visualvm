@@ -135,7 +135,7 @@ public class ProfilerValidationTest extends JellyTestCase {
     public void setUp() {
         System.out.println("########  "+getName()+"  #######");
     }
-
+    
     /** Test Profiler Menus. */
     public void testProfilerMenus(){
         String ProfileMenu = org.netbeans.jellytools.Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "Menu/Profile"); //"Profile"
@@ -164,8 +164,8 @@ public class ProfilerValidationTest extends JellyTestCase {
         JTabbedPaneOperator tabbedPane = new JTabbedPaneOperator(options);
         tabbedPane.selectPage( Bundle.getStringTrimmed("org.netbeans.modules.profiler.options.Bundle", "ProfilerOptionsCategory_Title") ); //"Profiler"
 
-        JLabelOperator javaPlatform = new JLabelOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-                                                                "ProfilerOptionsPanel_JavaPlatformLabelText")); //"Profiler Java Platform"
+//        JLabelOperator javaPlatform = new JLabelOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
+//                                                                "ProfilerOptionsPanel_JavaPlatformLabelText")); //"Profiler Java Platform"
 
         JLabelOperator communicationPort = new JLabelOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
                                                                 "ProfilerOptionsPanel_CommPortLabelText") );//"Communication Port"
