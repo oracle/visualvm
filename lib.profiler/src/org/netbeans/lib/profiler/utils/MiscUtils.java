@@ -318,7 +318,7 @@ public class MiscUtils implements CommonConstants {
     /** For a string representing a class path, remove all entries that don't correspond to existing files, and return the remaining ones. */
     public static String getLiveClassPathSubset(String path, String workingDir) {
         List liveComponents = getPathComponents(path, true, workingDir);
-        StringBuffer buf = new StringBuffer(liveComponents.size() * 10);
+        StringBuilder buf = new StringBuilder(liveComponents.size() * 10);
 
         if (liveComponents.size() > 0) {
             buf.append((String) liveComponents.get(0));

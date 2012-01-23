@@ -43,16 +43,22 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
+import javax.swing.JOptionPane;
+import org.netbeans.lib.profiler.results.CCTNode;
+import org.netbeans.lib.profiler.results.FilterSortSupport;
 
 
 /**
@@ -155,13 +161,11 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     protected PrestimeCPUCCTNode[] rootNode; // Per-view root nodes
     protected CPUCCTContainer[][] threadCCTContainers; // [method|class|package aggregation level][0-nThreads] -> CPUCCTContainer
     protected boolean collectingTwoTimeStamps;
-    protected boolean sortNodesOrder;
 
     // Number of instrumented methods - may be smaller than the size of the above arrays
     protected int nInstrMethods;
-
-    // Remembered sorting parameters for CCT nodes
-    private int sortNodesBy;
+    
+    private final Map<CCTNode, FilterSortSupport.Configuration> sortInfos = new WeakHashMap();
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -293,13 +297,92 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
 
         return rootNode[view];
     }
-
-    public int getSortBy() {
-        return sortNodesBy;
+    
+    public FilterSortSupport.Configuration getFilterSortInfo(CCTNode node) {
+        return sortInfo(node);
     }
-
-    public boolean getSortOrder() {
-        return sortNodesOrder;
+    
+    private FilterSortSupport.Configuration sortInfo(CCTNode node) {
+        while (node.getParent() != null)
+            node = node.getParent();
+        FilterSortSupport.Configuration config = sortInfos.get(node);
+        if (config == null) {
+            config = new FilterSortSupport.Configuration();
+            sortInfos.put(node, config);
+        }
+        return config;
+    }
+    
+    public void filterForward(final String filter, final int filterType, final PrestimeCPUCCTNodeBacked root) {
+        FilterSortSupport.Configuration config = sortInfo(root);
+        config.setFilterInfo(filter, filterType);
+        
+        if (!FilterSortSupport.passesFilter(config, root.getNodeName())) {
+            root.setFilteredNode();
+        } else {
+            root.resetFilteredNode();
+        }
+        root.resetChildren();
+    }
+    
+    public void filterReverse(String filter, int filterType, PrestimeCPUCCTNodeFree root, int view) {
+        PrestimeCPUCCTNodeFree rev = (PrestimeCPUCCTNodeFree)getReverseCCT(
+                root.getContainer().getThreadId(), root.getMethodId(), view);
+        FilterSortSupport.Configuration config = sortInfo(root);
+        config.setFilterInfo(filter, filterType);
+        filter(config, rev);
+        root.children = rev.children;
+        if (root.children != null) {
+            for (PrestimeCPUCCTNode ch : root.children)
+                ch.parent = root;
+            
+            root.sortChildren(config.getSortBy(), config.getSortOrder());
+        }
+        if (!FilterSortSupport.passesFilter(config, root.getNodeName())) {
+            root.setFilteredNode();
+        } else {
+            root.resetFilteredNode();
+        }
+    }
+    
+    private void filter(FilterSortSupport.Configuration config, PrestimeCPUCCTNodeFree node) {
+        if (node.children != null) {
+            PrestimeCPUCCTNodeFree filtered = null;
+            List<PrestimeCPUCCTNodeFree> ch = new ArrayList();
+            for (PrestimeCPUCCTNode n : node.children) {
+                PrestimeCPUCCTNodeFree nn = (PrestimeCPUCCTNodeFree)n;
+                if (FilterSortSupport.passesFilter(config, nn.getNodeName())) {
+                    int i = ch.indexOf(nn);
+                    if (i == -1) ch.add(nn);
+                    else ch.get(i).merge(nn);
+                } else {
+                    if (filtered == null) {
+                        nn.setFilteredNode();
+                        filtered = nn;
+                        ch.add(nn);
+                    } else {
+                        filtered.merge(nn);
+                    }
+                }
+            }
+            
+            if (ch.isEmpty()) {
+                node.children = null;
+            } else {
+                if (node.isFilteredNode() && filtered != null && ch.size() == 1) {
+                    // "naive" approach, collapse simple chain of filtered out nodes
+                    PrestimeCPUCCTNodeFree n = ch.get(0);
+                    filter(config, n);
+                    node.children = n.children;
+                } else {
+                    node.children = ch.toArray(new PrestimeCPUCCTNodeFree[ch.size()]);
+                }
+            }
+            
+            if (node.children != null)
+                for (PrestimeCPUCCTNode n : node.children)
+                    filter(config, (PrestimeCPUCCTNodeFree)n);
+        }
     }
 
     public int[] getThreadIds() {
@@ -366,9 +449,9 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     }
 
     // -- Methods for saving/retrieving sorting parameters
-    public void saveSortParams(int sortBy, boolean sortOrder) {
-        sortNodesBy = sortBy;
-        sortNodesOrder = sortOrder;
+    public void saveSortParams(int sortBy, boolean sortOrder, CCTNode node) {
+        FilterSortSupport.Configuration config = sortInfo(node);
+        config.setSortInfo(sortBy, sortOrder);
     }
 
     public String toString() {
@@ -439,8 +522,8 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         LOGGER.log(Level.FINEST, "instrMethodNames.length: {0}", debugLength(instrMethodNames)); // NOI18N
         LOGGER.log(Level.FINEST, "instrMethodSignatures.length: {0}", debugLength(instrMethodSignatures));
         LOGGER.log(Level.FINEST, "nInstrMethods: {0}", nInstrMethods); // NOI18N
-        LOGGER.log(Level.FINEST, "sortNodesBy: {0}", sortNodesBy); // NOI18N
-        LOGGER.log(Level.FINEST, "sortNodesOrder: {0}", sortNodesOrder); // NOI18N
+//        LOGGER.log(Level.FINEST, "sortNodesBy: {0}", sortNodesBy); // NOI18N
+//        LOGGER.log(Level.FINEST, "sortNodesOrder: {0}", sortNodesOrder); // NOI18N
     }
 
     /**
@@ -479,4 +562,5 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
             instrMethodClassesViews[view] = methodIdMap.getInstrClassesOrPackages();
         }
     }
+    
 }

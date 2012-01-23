@@ -74,27 +74,19 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Ian Formanek
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ThreadsWindow_ThreadsWindowName=Threads",
+    "ThreadsWindow_ThreadsTimelineTabName=Timeline",
+    "ThreadsWindow_ThreadsTableTabName=Table",
+    "ThreadsWindow_ThreadsDetailsTabName=Details",
+    "ThreadsWindow_ThreadsTimelineTabDescr=Timeline showing application threads and their states",
+    "ThreadsWindow_ThreadsTableTabDescr=Table showing statistics about application threads and their states",
+    "ThreadsWindow_ThreadsDetailsTabDescr=List of application threads with detailed status data",
+    "ThreadsWindow_ThreadsAccessDescr=Profiler threads timeline and details"
+})
 public final class ThreadsWindow extends TopComponent implements ProfilingStateListener, ActionListener, ChangeListener,
                                                                  SaveViewAction.ViewProvider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    // -----
-    // I18N String constants
-    private static final String THREADS_WINDOW_NAME = NbBundle.getMessage(ThreadsWindow.class, "ThreadsWindow_ThreadsWindowName"); // NOI18N
-    private static final String THREADS_TIMELINE_TAB_NAME = NbBundle.getMessage(ThreadsWindow.class,
-                                                                                "ThreadsWindow_ThreadsTimelineTabName"); // NOI18N
-    private static final String THREADS_TABLE_TAB_NAME = NbBundle.getMessage(ThreadsWindow.class,
-                                                                                "ThreadsWindow_ThreadsTableTabName"); // NOI18N
-    private static final String THREADS_DETAILS_TAB_NAME = NbBundle.getMessage(ThreadsWindow.class,
-                                                                               "ThreadsWindow_ThreadsDetailsTabName"); // NOI18N
-    private static final String THREADS_TIMELINE_TAB_DESCR = NbBundle.getMessage(ThreadsWindow.class,
-                                                                                 "ThreadsWindow_ThreadsTimelineTabDescr"); // NOI18N
-    private static final String THREADS_TABLE_TAB_DESCR = NbBundle.getMessage(ThreadsWindow.class,
-                                                                                 "ThreadsWindow_ThreadsTableTabDescr"); // NOI18N
-    private static final String THREADS_DETAILS_TAB_DESCR = NbBundle.getMessage(ThreadsWindow.class,
-                                                                                "ThreadsWindow_ThreadsDetailsTabDescr"); // NOI18N
-    private static final String THREADS_ACCESS_DESCR = NbBundle.getMessage(ThreadsWindow.class, "ThreadsWindow_ThreadsAccessDescr"); // NOI18N
-                                                                                                                                     // -----
     private static final String HELP_CTX_KEY = "ThreadsWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static ThreadsWindow defaultInstance;
@@ -114,9 +106,9 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
 
     /** Initializes the window */
     public ThreadsWindow() {
-        setName(THREADS_WINDOW_NAME);
+        setName(Bundle.ThreadsWindow_ThreadsWindowName());
         setIcon(windowIcon);
-        getAccessibleContext().setAccessibleDescription(THREADS_ACCESS_DESCR);
+        getAccessibleContext().setAccessibleDescription(Bundle.ThreadsWindow_ThreadsAccessDescr());
         setLayout(new BorderLayout());
         tabs = new JTabbedPane();
 
@@ -169,9 +161,9 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
         threadsDetailsPanelContainer.add(threadsDetailsPanel, BorderLayout.CENTER);
         threadsDetailsPanel.addSaveViewAction(new SaveViewAction(this));
 
-        tabs.addTab(THREADS_TIMELINE_TAB_NAME, null, threadsTimelinePanelContainer, THREADS_TIMELINE_TAB_DESCR);
-        tabs.addTab(THREADS_TABLE_TAB_NAME, null, threadsTablePanel, THREADS_TABLE_TAB_DESCR);
-        tabs.addTab(THREADS_DETAILS_TAB_NAME, null, threadsDetailsPanelContainer, THREADS_DETAILS_TAB_DESCR);
+        tabs.addTab(Bundle.ThreadsWindow_ThreadsTimelineTabName(), null, threadsTimelinePanelContainer, Bundle.ThreadsWindow_ThreadsTimelineTabDescr());
+        tabs.addTab(Bundle.ThreadsWindow_ThreadsTableTabName(), null, threadsTablePanel, Bundle.ThreadsWindow_ThreadsTableTabDescr());
+        tabs.addTab(Bundle.ThreadsWindow_ThreadsDetailsTabName(), null, threadsDetailsPanelContainer, Bundle.ThreadsWindow_ThreadsDetailsTabDescr());
 
         profilingStateChanged(Profiler.getDefault().getProfilingState());
         threadsMonitoringChanged();

@@ -284,7 +284,7 @@ public class TimeLineUtils {
 
         String sMillis = ""; // NOI18N
 
-        if (!getTimeMarkMillisString(lastMark, optimalUnits).equals("")) {
+        if (!getTimeMarkMillisString(lastMark, optimalUnits).isEmpty()) {
             sMillis = "." + MILLISECONDS_LEGEND_ABBR; // NOI18N
         }
 

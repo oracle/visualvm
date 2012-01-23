@@ -77,7 +77,7 @@ public class WrongWeakHashMap extends IteratingRule {
 
         @Override
         public String toString() {
-            return NbBundle.getMessage(WrongWeakHashMap.class, "FMT_WWMH_Entry",
+            return NbBundle.getMessage(WrongWeakHashMap.class, "FMT_WWHM_Entry",
                     new Object[] {
                         Utils.printClass(getContext(), getContext().getRootIncommingString(hm)),
                         Utils.printInstance(hm),
@@ -101,8 +101,8 @@ public class WrongWeakHashMap extends IteratingRule {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public WrongWeakHashMap() {
-        super(NbBundle.getMessage(WrongWeakHashMap.class, "LBL_WWMH_Name"),
-                NbBundle.getMessage(WrongWeakHashMap.class, "LBL_WWMH_Desc"),
+        super(NbBundle.getMessage(WrongWeakHashMap.class, "LBL_WWHM_Name"),
+                NbBundle.getMessage(WrongWeakHashMap.class, "LBL_WWHM_Desc"),
                 "java.util.WeakHashMap");
         
     }
@@ -111,7 +111,7 @@ public class WrongWeakHashMap extends IteratingRule {
     
     @Override
     public String getHTMLDescription() {
-        return NbBundle.getMessage(WrongWeakHashMap.class, "LBL_WWMH_LongDesc");
+        return NbBundle.getMessage(WrongWeakHashMap.class, "LBL_WWHM_LongDesc");
     }
 
     protected void perform(Instance hm) {
