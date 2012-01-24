@@ -61,6 +61,10 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_TakeSnapshotAction=&Take Snapshot of Collected Results",
+    "HINT_TakeSnapshotAction=Take Snapshot of Collected Results"
+})
 public final class TakeSnapshotAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -68,8 +72,8 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
                                                     Profiler.PROFILING_RUNNING, Profiler.PROFILING_PAUSED,
                                                     Profiler.PROFILING_STOPPED
                                                 };
-    private static final String NAME_STRING = NbBundle.getMessage(TakeSnapshotAction.class, "LBL_TakeSnapshotAction"); // NOI18N
-    private static final String SHORT_DESCRIPTION_STRING = NbBundle.getMessage(TakeSnapshotAction.class, "HINT_TakeSnapshotAction"); // NOI18N
+    
+    private Listener listener;
 
     /*
      * The following code is an externalization of various listeners registered
@@ -95,7 +99,8 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     public TakeSnapshotAction() {
-        Lookup.getDefault().lookup(Listener.class).setDelegate(this);
+        listener = Lookup.getDefault().lookup(Listener.class);
+        listener.setDelegate(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -112,7 +117,7 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
     }
 
     public String getName() {
-        return NAME_STRING;
+        return Bundle.LBL_TakeSnapshotAction();
     }
 
     public void performAction() {

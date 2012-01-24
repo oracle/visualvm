@@ -63,14 +63,17 @@ import org.openide.DialogDisplayer;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_InternalStatsAction=&Display Internal Statistics",
+    "HINT_InternalStatsAction=Display Internal Statistics",
+    "CAPTION_InternalStatisticsInstrHotswap=Internal Statistics of Instrumentation and Hotswapping Operations"
+})
 public final class InternalStatsAction extends AbstractAction implements ProfilingStateListener {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public InternalStatsAction() {
-        putValue(Action.NAME, NbBundle.getMessage(InternalStatsAction.class, "LBL_InternalStatsAction" // NOI18N
-        ));
-        putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(InternalStatsAction.class, "HINT_InternalStatsAction" // NOI18N
-        ));
+        putValue(Action.NAME, Bundle.LBL_InternalStatsAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_InternalStatsAction());
         putValue("noIconInMenu", Boolean.TRUE); //NOI18N
         
         updateEnabledState();
@@ -90,7 +93,7 @@ public final class InternalStatsAction extends AbstractAction implements Profili
 
             final HTMLTextArea textArea = new HTMLTextArea(stats);
             textArea.getAccessibleContext()
-                    .setAccessibleName(NbBundle.getMessage(InternalStatsAction.class, "CAPTION_InternalStatisticsInstrHotswap")); // NOI18N
+                    .setAccessibleName(Bundle.CAPTION_InternalStatisticsInstrHotswap());
 
             final JPanel p = new JPanel();
             p.setLayout(new BorderLayout());
@@ -98,14 +101,12 @@ public final class InternalStatsAction extends AbstractAction implements Profili
             p.add(new JScrollPane(textArea), BorderLayout.CENTER);
 
             DialogDisplayer.getDefault().createDialog(new DialogDescriptor(p,
-                                                              NbBundle.getMessage(InternalStatsAction.class,
-                                                                                  "CAPTION_InternalStatisticsInstrHotswap"), // NOI18N
+                                                              Bundle.CAPTION_InternalStatisticsInstrHotswap(),
                                                               true, new Object[] { DialogDescriptor.CLOSED_OPTION },
                                                               DialogDescriptor.CLOSED_OPTION, DialogDescriptor.BOTTOM_ALIGN,
                                                               null, null)).setVisible(true);
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
-             ProfilerDialogs.displayWarning(MessageFormat.format(NbBundle.getMessage(InternalStatsAction.class, "MSG_NotAvailableNow"),
-                                                         new Object[] { e.getMessage() })); // NOI18N
+             ProfilerDialogs.displayWarning(Bundle.MSG_NotAvailableNow(e.getMessage()));
         }
     }
     
