@@ -320,19 +320,6 @@ made subject to such option by the copyright holder.
         </folder>
     </folder>
 
-    <folder name="Services">
-        <folder name="MIMEResolver">
-            <file name="NpsResolver.xml" url="NpsResolver.xml">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
-                <attr name="position" intvalue="99500"/>
-            </file>
-            <file name="DummyHprofResolver.xml" url="DummyHprofResolver.xml">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.Bundle"/>
-                <attr name="position" intvalue="99900"/>
-            </file>
-        </folder>
-    </folder>
-
     <folder name="NBProfiler">
         <folder name="Config">
             <file name="filters-default.xml" url="nbresloc:/org/netbeans/modules/profiler/filters-default.xml"/>
