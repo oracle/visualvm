@@ -61,6 +61,12 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
  *
  * @author Ian Formanek
  */
+@NbBundle.Messages({
+    "LBL_RerunAction=&Rerun Profiling Session",
+    "HINT_RerunAction=Rerun Last Profiling Session",
+    "MSG_ReRunOnProfile=Profiling session is currently in progress.\nDo you want to stop the current session and start it again?",
+    "MSG_ReRunOnAttach=Profiling session is currently in progress\nDo you want to detach from the target application and rerun the last profiling session?"
+})
 public final class RerunAction extends CallableSystemAction implements ProfilingStateListener {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -69,7 +75,7 @@ public final class RerunAction extends CallableSystemAction implements Profiling
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public RerunAction() {
-        putProperty(Action.SHORT_DESCRIPTION, NbBundle.getMessage(RerunAction.class, "HINT_RerunAction")); //NOI18N
+        putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_RerunAction());
         Profiler.getDefault().addProfilingStateListener(this);
     }
 
@@ -93,7 +99,7 @@ public final class RerunAction extends CallableSystemAction implements Profiling
     }
 
     public String getName() {
-        return NbBundle.getMessage(RerunAction.class, "LBL_RerunAction"); //NOI18N
+        return Bundle.LBL_RerunAction();
     }
 
     public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {
@@ -106,15 +112,17 @@ public final class RerunAction extends CallableSystemAction implements Profiling
 
         if ((state == Profiler.PROFILING_PAUSED) || (state == Profiler.PROFILING_RUNNING)) {
             if (mode == Profiler.MODE_PROFILE) {
-                if (!ProfilerDialogs.displayConfirmation(NbBundle.getMessage(RerunAction.class,
-                        "MSG_ReRunOnProfile"), NbBundle.getMessage(RerunAction.class, "CAPTION_Question"))) { // NOI18N
+                if (!ProfilerDialogs.displayConfirmation(
+                    Bundle.MSG_ReRunOnProfile(), 
+                    Bundle.CAPTION_Question())) {
                     return;
                 }
 
                 Profiler.getDefault().stopApp();
             } else {
-                if (!ProfilerDialogs.displayConfirmation(NbBundle.getMessage(RerunAction.class,
-                        "MSG_ReRunOnAttach"), NbBundle.getMessage(RerunAction.class, "CAPTION_Question"))) { //NOI18N
+                if (!ProfilerDialogs.displayConfirmation(
+                    Bundle.MSG_ReRunOnAttach(),
+                    Bundle.CAPTION_Question())) {
                     return;
                 }
 

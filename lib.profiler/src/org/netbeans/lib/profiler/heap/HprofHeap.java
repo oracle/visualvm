@@ -575,7 +575,6 @@ class HprofHeap implements Heap {
         new TreeObject(this,nearestGCRoot.getLeaves()).computeTrees();
         DominatorTree domTree = new DominatorTree(this,nearestGCRoot.getMultipleParents());
         domTree.computeDominators();
-        int idSize = dumpBuffer.getIDSize();
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
 
         while (offset[0] < allInstanceDumpBounds.endOffset) {

@@ -56,15 +56,15 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.OQLQuery;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
+import org.openide.util.NbBundle;
 
 /**
  * This is Object Query Language Interpreter
  *
  * @author A. Sundararajan
- * @authoe J. Bachorik
+ * @author J. Bachorik
  */
 public class OQLEngineImpl {
     final private static Logger LOGGER = Logger.getLogger(OQLEngineImpl.class.getName());
@@ -131,6 +131,15 @@ public class OQLEngineImpl {
         executeQuery((OQLQueryImpl)parsedQuery, visitor);
     }
 
+    @NbBundle.Messages({
+        "ERROR_NO_SELECT_CLAUSE=query syntax error: no 'select' clause",
+        "ERROR_EMPTY_SELECT=query syntax error: 'select' expression can not be empty",
+        "ERROR_INSTANCEOF_NO_CLASSNAME=no class name after 'instanceof'",
+        "ERROR_FROM_NO_CLASSNAME=query syntax error: class name must follow 'from'",
+        "ERROR_NO_IDENTIFIER=query syntax error: identifier should follow class name",
+        "ERROR_EXPECTING_WHERE=query syntax error: 'where' clause expected after 'from' clause",
+        "ERROR_EMPTY_WHERE=query syntax error: 'where' clause cannot have empty expression"
+    })
     public OQLQuery parseQuery(String query) throws OQLException {
         StringTokenizer st = new StringTokenizer(query);
         if (st.hasMoreTokens()) {
@@ -141,7 +150,7 @@ public class OQLEngineImpl {
                 return null;
             }
         } else {
-            throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_NO_SELECT_CLAUSE"));
+            throw new OQLException(Bundle.ERROR_NO_SELECT_CLAUSE());
         }
 
         String selectExpr = ""; // NOI18N
@@ -155,8 +164,8 @@ public class OQLEngineImpl {
             selectExpr += " " + tok; // NOI18N
         }
 
-        if (selectExpr.equals("")) { // NOI18N
-            throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EMPTY_SELECT"));
+        if (selectExpr.isEmpty()) { // NOI18N
+            throw new OQLException(Bundle.ERROR_EMPTY_SELECT());
         }
 
         String className = null;
@@ -170,37 +179,37 @@ public class OQLEngineImpl {
                 if (tmp.equals("instanceof")) { // NOI18N
                     isInstanceOf = true;
                     if (!st.hasMoreTokens()) {
-                        throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_INSTANCEOF_NO_CLASSNAME"));
+                        throw new OQLException(Bundle.ERROR_INSTANCEOF_NO_CLASSNAME());
                     }
                     className = st.nextToken();
                 } else {
                     className = tmp;
                 }
             } else {
-                throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_FROM_NO_CLASSNAME"));
+                throw new OQLException(Bundle.ERROR_FROM_NO_CLASSNAME());
             }
 
             if (st.hasMoreTokens()) {
                 identifier = st.nextToken();
                 if (identifier.equals("where")) { // NOI18N
-                    throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_NO_IDENTIFIER"));
+                    throw new OQLException(Bundle.ERROR_NO_IDENTIFIER());
                 }
                 if (st.hasMoreTokens()) {
                     String tmp = st.nextToken();
                     if (!tmp.equals("where")) { // NOI18N
-                        throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EXPECTING_WHERE"));
+                        throw new OQLException(Bundle.ERROR_EXPECTING_WHERE());
                     }
 
                     whereExpr = "";  // NOI18N
                     while (st.hasMoreTokens()) {
                         whereExpr += " " + st.nextToken(); // NOI18N
                     }
-                    if (whereExpr.equals("")) { // NOI18N
-                        throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_EMPTY_WHERE"));
+                    if (whereExpr.isEmpty()) { // NOI18N
+                        throw new OQLException(Bundle.ERROR_EMPTY_WHERE());
                     }
                 }
             } else {
-                throw new OQLException(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/oql/engine/api/impl/Bundle").getString("ERROR_NO_IDENTIFIER"));
+                throw new OQLException(Bundle.ERROR_NO_IDENTIFIER());
             }
         }
         return new OQLQueryImpl(selectExpr, isInstanceOf, className, identifier, whereExpr);

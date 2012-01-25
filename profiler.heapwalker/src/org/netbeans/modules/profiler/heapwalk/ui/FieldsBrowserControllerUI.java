@@ -109,6 +109,31 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "FieldsBrowserControllerUI_ViewTitleFields=Fields",
+    "FieldsBrowserControllerUI_ViewTitleStaticFields=Static Fields",
+    "FieldsBrowserControllerUI_NoInstanceSelectedMsg=<b>No instance selected.</b><br><br>To view instance fields, select an instance in {0}&nbsp;Instances list.",
+    "FieldsBrowserControllerUI_NoClassSelectedMsg=<b>No class selected.</b><br><br>To view static fields, select a class in {0}&nbsp;Classes list.",
+    "FieldsBrowserControllerUI_ShowLoopItemText=Select Loop Origin",
+    "FieldsBrowserControllerUI_ShowInstanceItemText=Show Instance",
+    "FieldsBrowserControllerUI_ShowInInstancesItemText=Show in Instances View",
+    "FieldsBrowserControllerUI_ShowClassItemText=Show Class",
+    "FieldsBrowserControllerUI_ShowInClassesItemText=Show in Classes View",
+    "FieldsBrowserControllerUI_GoToSourceItemText=Go To Source",
+    "FieldsBrowserControllerUI_ShowHideColumnsString=Show or hide columns",
+    "FieldsBrowserControllerUI_FieldColumnName=Field",
+    "FieldsBrowserControllerUI_FieldColumnDescr=Name of field",
+    "FieldsBrowserControllerUI_TypeColumnName=Type",
+    "FieldsBrowserControllerUI_TypeColumnDescr=Type of data or referenced instance",
+    "FieldsBrowserControllerUI_FullTypeColumnName=Full Type",
+    "FieldsBrowserControllerUI_FullTypeColumnDescr=Fully qualified type of data or referenced instance",
+    "FieldsBrowserControllerUI_ValueColumnName=Value",
+    "FieldsBrowserControllerUI_ValueColumnDescr=Field value or number of referenced instance",
+    "FieldsBrowserControllerUI_SizeColumnName=Size",
+    "FieldsBrowserControllerUI_SizeColumnDescr=Size of the field instance",
+    "FieldsBrowserControllerUI_RetainedSizeColumnName=Retained",
+    "FieldsBrowserControllerUI_RetainedSizeColumnDescr=Retained size of the field instance"
+})
 public class FieldsBrowserControllerUI extends JTitledPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -226,55 +251,6 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String VIEW_TITLE_FIELDS = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                        "FieldsBrowserControllerUI_ViewTitleFields"); // NOI18N
-    private static final String VIEW_TITLE_STATIC_FIELDS = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                               "FieldsBrowserControllerUI_ViewTitleStaticFields"); // NOI18N
-    private static final String NO_INSTANCE_SELECTED_MSG = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                               "FieldsBrowserControllerUI_NoInstanceSelectedMsg"); // NOI18N
-    private static final String NO_CLASS_SELECTED_MSG = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                            "FieldsBrowserControllerUI_NoClassSelectedMsg"); // NOI18N
-    private static final String SHOW_LOOP_ITEM_TEXT = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                          "FieldsBrowserControllerUI_ShowLoopItemText"); // NOI18N
-    private static final String SHOW_INSTANCE_ITEM_TEXT = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                              "FieldsBrowserControllerUI_ShowInstanceItemText"); // NOI18N
-    private static final String SHOW_IN_INSTANCES_ITEM_TEXT = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                                  "FieldsBrowserControllerUI_ShowInInstancesItemText"); // NOI18N
-    private static final String SHOW_CLASS_ITEM_TEXT = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                           "FieldsBrowserControllerUI_ShowClassItemText"); // NOI18N
-    private static final String SHOW_IN_CLASSES_ITEM_TEXT = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                                "FieldsBrowserControllerUI_ShowInClassesItemText"); // NOI18N
-    private static final String GO_TO_SOURCE_ITEM_TEXT = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                             "FieldsBrowserControllerUI_GoToSourceItemText"); // NOI18N
-    private static final String SHOW_HIDE_COLUMNS_STRING = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                               "FieldsBrowserControllerUI_ShowHideColumnsString"); // NOI18N
-    private static final String FIELD_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                        "FieldsBrowserControllerUI_FieldColumnName"); // NOI18N
-    private static final String FIELD_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                         "FieldsBrowserControllerUI_FieldColumnDescr"); // NOI18N
-    private static final String TYPE_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                       "FieldsBrowserControllerUI_TypeColumnName"); // NOI18N
-    private static final String TYPE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                        "FieldsBrowserControllerUI_TypeColumnDescr"); // NOI18N
-    private static final String FULL_TYPE_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                            "FieldsBrowserControllerUI_FullTypeColumnName"); // NOI18N
-    private static final String FULL_TYPE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                             "FieldsBrowserControllerUI_FullTypeColumnDescr"); // NOI18N
-    private static final String VALUE_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                        "FieldsBrowserControllerUI_ValueColumnName"); // NOI18N
-    private static final String VALUE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                         "FieldsBrowserControllerUI_ValueColumnDescr"); // NOI18N
-    private static final String SIZE_COLUMN_NAME = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                        "FieldsBrowserControllerUI_SizeColumnName"); // NOI18N
-    private static final String SIZE_COLUMN_DESCR = NbBundle.getMessage(FieldsBrowserControllerUI.class,
-                                                                         "FieldsBrowserControllerUI_SizeColumnDescr"); // NOI18N
-    private static final String RETAINED_SIZE_COLUMN_NAME = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                                "InstancesListControllerUI_RetainedSizeColumnName"); // NOI18N
-    private static final String RETAINED_SIZE_COLUMN_DESCR = NbBundle.getMessage(InstancesListControllerUI.class,
-                                                                                 "InstancesListControllerUI_RetainedSizeColumnDescr"); // NOI18N
-    // -----
     private static Icon ICON_FIELDS = Icons.getIcon(HeapWalkerIcons.DATA);
 
     // --- UI definition ---------------------------------------------------------
@@ -314,8 +290,9 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
     // --- Constructors ----------------------------------------------------------
     public FieldsBrowserControllerUI(FieldsBrowserController fieldsBrowserController) {
-        super((fieldsBrowserController.getRootMode() == FieldsBrowserController.ROOT_INSTANCE) ? VIEW_TITLE_FIELDS
-                                                                                               : VIEW_TITLE_STATIC_FIELDS,
+        super((fieldsBrowserController.getRootMode() == FieldsBrowserController.ROOT_INSTANCE) ? 
+                Bundle.FieldsBrowserControllerUI_ViewTitleFields()
+                : Bundle.FieldsBrowserControllerUI_ViewTitleStaticFields(),
               ICON_FIELDS, true);
 
         this.fieldsBrowserController = fieldsBrowserController;
@@ -481,7 +458,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
     private JButton createHeaderPopupCornerButton(final JPopupMenu headerPopup) {
         final JButton cornerButton = new JButton(Icons.getIcon(GeneralIcons.HIDE_COLUMN));
-        cornerButton.setToolTipText(SHOW_HIDE_COLUMNS_STRING);
+        cornerButton.setToolTipText(Bundle.FieldsBrowserControllerUI_ShowHideColumnsString());
         cornerButton.setDefaultCapable(false);
 
         if (UIUtils.isWindowsClassicLookAndFeel()) {
@@ -529,7 +506,8 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
         // Show Instance
         showInstanceItem = new JMenuItem((fieldsBrowserController.getRootMode() == FieldsBrowserController.ROOT_INSTANCE)
-                                         ? SHOW_INSTANCE_ITEM_TEXT : SHOW_IN_INSTANCES_ITEM_TEXT);
+                                         ? Bundle.FieldsBrowserControllerUI_ShowInstanceItemText() : 
+                                           Bundle.FieldsBrowserControllerUI_ShowInInstancesItemText());
         showInstanceItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     performDefaultAction();
@@ -539,7 +517,8 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
         // Show in Classes View
         showClassItem = new JMenuItem((fieldsBrowserController.getRootMode() == FieldsBrowserController.ROOT_INSTANCE)
-                                      ? SHOW_IN_CLASSES_ITEM_TEXT : SHOW_CLASS_ITEM_TEXT);
+                                      ? Bundle.FieldsBrowserControllerUI_ShowInClassesItemText() : 
+                                        Bundle.FieldsBrowserControllerUI_ShowClassItemText());
         showClassItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     int row = fieldsListTable.getSelectedRow();
@@ -560,7 +539,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
             });
 
         // Show Loop Origin
-        showLoopOriginItem = new JMenuItem(SHOW_LOOP_ITEM_TEXT);
+        showLoopOriginItem = new JMenuItem(Bundle.FieldsBrowserControllerUI_ShowLoopItemText());
         showLoopOriginItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     int row = fieldsListTable.getSelectedRow();
@@ -576,7 +555,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
             });
 
         if (GoToSource.isAvailable()) {
-            showSourceItem = new JMenuItem(GO_TO_SOURCE_ITEM_TEXT);
+            showSourceItem = new JMenuItem(Bundle.FieldsBrowserControllerUI_GoToSourceItemText());
             showSourceItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         int row = fieldsListTable.getSelectedRow();
@@ -610,24 +589,24 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         columnToolTips = new String[columnCount];
         columnRenderers = new TableCellRenderer[columnCount];
 
-        columnNames[0] = FIELD_COLUMN_NAME;
-        columnToolTips[0] = FIELD_COLUMN_DESCR;
+        columnNames[0] = Bundle.FieldsBrowserControllerUI_FieldColumnName();
+        columnToolTips[0] = Bundle.FieldsBrowserControllerUI_FieldColumnDescr();
 
-        columnNames[1] = TYPE_COLUMN_NAME;
-        columnToolTips[1] = TYPE_COLUMN_DESCR;
+        columnNames[1] = Bundle.FieldsBrowserControllerUI_TypeColumnName();
+        columnToolTips[1] = Bundle.FieldsBrowserControllerUI_TypeColumnDescr();
 
-        columnNames[2] = FULL_TYPE_COLUMN_NAME;
-        columnToolTips[2] = FULL_TYPE_COLUMN_DESCR;
+        columnNames[2] = Bundle.FieldsBrowserControllerUI_FullTypeColumnName();
+        columnToolTips[2] = Bundle.FieldsBrowserControllerUI_FullTypeColumnDescr();
 
-        columnNames[3] = VALUE_COLUMN_NAME;
-        columnToolTips[3] = VALUE_COLUMN_DESCR;
+        columnNames[3] = Bundle.FieldsBrowserControllerUI_ValueColumnName();
+        columnToolTips[3] = Bundle.FieldsBrowserControllerUI_ValueColumnDescr();
 
-        columnNames[4] = SIZE_COLUMN_NAME;
-        columnToolTips[4] = SIZE_COLUMN_DESCR;
+        columnNames[4] = Bundle.FieldsBrowserControllerUI_SizeColumnName();
+        columnToolTips[4] = Bundle.FieldsBrowserControllerUI_SizeColumnDescr();
 
         if (retainedSizeSupported) {
-            columnNames[5] = RETAINED_SIZE_COLUMN_NAME;
-            columnToolTips[5] = RETAINED_SIZE_COLUMN_DESCR;
+            columnNames[5] = Bundle.FieldsBrowserControllerUI_RetainedSizeColumnName();
+            columnToolTips[5] = Bundle.FieldsBrowserControllerUI_RetainedSizeColumnDescr();
         }
 
         int unitWidth = getFontMetrics(getFont()).charWidth('W'); // NOI18N // initial width of data columns
@@ -747,15 +726,11 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         String instancesRes = Icons.getResource(HeapWalkerIcons.INSTANCES);
         String classesRes = Icons.getResource(HeapWalkerIcons.CLASSES);
         String hintText = (fieldsBrowserController.getRootMode() == FieldsBrowserController.ROOT_INSTANCE)
-                          ? MessageFormat.format(NO_INSTANCE_SELECTED_MSG,
-                                                 new Object[] {
-                                                     "<img border='0' align='bottom' src='nbresloc:/" + instancesRes + "'>" // NOI18N
-                                                 })
-                          :
-        MessageFormat.format(NO_CLASS_SELECTED_MSG,
-                             new Object[] {
-                                 "<img border='0' align='bottom' src='nbresloc:/" + classesRes + "'>" // NOI18N
-                             });
+                          ? Bundle.FieldsBrowserControllerUI_NoInstanceSelectedMsg(
+                                "<img border='0' align='bottom' src='nbresloc:/" + instancesRes + "'>") // NOI18N
+                          : Bundle.FieldsBrowserControllerUI_NoClassSelectedMsg(
+                                 "<img border='0' align='bottom' src='nbresloc:/" + classesRes + "'>"); // NOI18N
+
         hintArea.setText(hintText);
         noDataPanel.add(hintArea, BorderLayout.CENTER);
 

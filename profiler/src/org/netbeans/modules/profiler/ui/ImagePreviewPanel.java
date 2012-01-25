@@ -63,6 +63,11 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ImagePreviewPanel_NotAvailableMsg=Preview not available",
+    "ImagePreviewPanel_GeneratingPreviewMsg=Generating preview...",
+    "ImagePreviewPanel_NoImageMsg=No image"
+})
 public class ImagePreviewPanel extends JPanel {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
@@ -74,14 +79,6 @@ public class ImagePreviewPanel extends JPanel {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    // -----
-    // I18N String constants
-    private static final String NOT_AVAILABLE_MSG = NbBundle.getMessage(ImagePreviewPanel.class,
-                                                                        "ImagePreviewPanel_NotAvailableMsg"); // NOI18N
-    private static final String GENERATING_PREVIEW_MSG = NbBundle.getMessage(ImagePreviewPanel.class,
-                                                                             "ImagePreviewPanel_GeneratingPreviewMsg"); // NOI18N
-    private static final String NO_IMAGE_MSG = NbBundle.getMessage(ImagePreviewPanel.class, "ImagePreviewPanel_NoImageMsg"); // NOI18N
-                                                                                                                             // -----
     private static final int PREVIEW_THRESHOLD = 2000000;
     private static int instanceCounter = 0;
     private static final Dimension ZERO_SIZE = new Dimension();
@@ -109,7 +106,7 @@ public class ImagePreviewPanel extends JPanel {
                     try {
                         if (Thread.interrupted()) {
                             displayer.setIcon(null);
-                            displayer.setText(NOT_AVAILABLE_MSG);
+                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
                         
@@ -120,7 +117,7 @@ public class ImagePreviewPanel extends JPanel {
                         
                         if (image == null) {
                             displayer.setIcon(null);
-                            displayer.setText(NOT_AVAILABLE_MSG);
+                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
 
@@ -132,7 +129,7 @@ public class ImagePreviewPanel extends JPanel {
                         if (Thread.interrupted()) {
                             image = null;
                             displayer.setIcon(null);
-                            displayer.setText(NOT_AVAILABLE_MSG);
+                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
 
@@ -147,7 +144,7 @@ public class ImagePreviewPanel extends JPanel {
                             if (Thread.interrupted()) {
                                 image = null;
                                 displayer.setIcon(null);
-                                displayer.setText(NOT_AVAILABLE_MSG);
+                                displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
                                 return;
                             }
 
@@ -160,7 +157,7 @@ public class ImagePreviewPanel extends JPanel {
                         if (Thread.interrupted()) {
                             image = null;
                             displayer.setIcon(null);
-                            displayer.setText(NOT_AVAILABLE_MSG);
+                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
 
@@ -172,7 +169,7 @@ public class ImagePreviewPanel extends JPanel {
 
                         if (Thread.interrupted()) {
                             displayer.setIcon(null);
-                            displayer.setText(NOT_AVAILABLE_MSG);
+                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
 
@@ -182,7 +179,7 @@ public class ImagePreviewPanel extends JPanel {
                         displayer.setIcon(scaledPreview);
                     } catch (OutOfMemoryError e) {
                         displayer.setIcon(null);
-                        displayer.setText(NOT_AVAILABLE_MSG);
+                        displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
                     }
                 }
             });
@@ -190,7 +187,7 @@ public class ImagePreviewPanel extends JPanel {
 
     public void clearImage() {
         displayer.setIcon(null);
-        displayer.setText(GENERATING_PREVIEW_MSG);
+        displayer.setText(Bundle.ImagePreviewPanel_GeneratingPreviewMsg());
 
         if (currentTask != null) {
             currentTask.cancel();
@@ -199,7 +196,7 @@ public class ImagePreviewPanel extends JPanel {
 
     public void reset() {
         displayer.setIcon(null);
-        displayer.setText(NO_IMAGE_MSG);
+        displayer.setText(Bundle.ImagePreviewPanel_NoImageMsg());
 
         if (currentTask != null) {
             currentTask.cancel();

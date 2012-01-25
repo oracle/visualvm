@@ -55,11 +55,6 @@ public class ServletRequestCPUCCTNode extends TimedCPUCCTNode {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static class Locator {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private ServletRequestCPUCCTNode cctNodeCandidate = null;
-        private String servletPath;
-        private int requestType;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 

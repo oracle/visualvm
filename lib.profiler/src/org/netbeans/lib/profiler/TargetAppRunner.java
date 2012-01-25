@@ -744,7 +744,7 @@ public class TargetAppRunner implements CommonConstants {
 
         commands.add("-Xbootclasspath/a:" + jFluidCP); // NOI18N
 
-        if ((classPathArg != null) && !classPathArg.equals("")) { // NOI18N
+        if ((classPathArg != null) && !classPathArg.isEmpty()) { // NOI18N
             commands.add("-classpath"); // NOI18N
             commands.add(classPathArg);
         }

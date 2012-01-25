@@ -65,12 +65,6 @@ public class StepsPanelComponent extends javax.swing.JPanel {
     private final String WARNING = messages.getString("WARNING"); //NOI18N
     private final String NOTE = messages.getString("NOTE"); // NOI18N
     private final String EMPTY_HINT = "<html>\n  <head>\n    \n  </head>\n  <body>\n  </body>\n</html>\n"; // NOI18N
-    private final int LOCATION_TOP = 1;
-    private final int LOCATION_MIDDLE = 2;
-    private final int LOCATION_BOTTOM = 3;
-    private boolean warningsFirst = true;
-    private boolean isLabelHidden = false;
-    private double lastLabelHeight = -1d;
 
     /**
      * Creates new form StepsPanelComponent
