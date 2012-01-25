@@ -586,7 +586,7 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
                                                            });
         threadsSelectionCombo = new JComboBox(comboModel) {
                 public Dimension getMaximumSize() {
-                    return new Dimension(250, getPreferredSize().height);
+                    return getPreferredSize();
                 }
                 ;
             };
