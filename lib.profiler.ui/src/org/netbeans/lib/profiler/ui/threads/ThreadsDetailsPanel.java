@@ -163,7 +163,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         // create components
         threadsSelectionCombo = new JComboBox() {
                 public Dimension getMaximumSize() {
-                    return new Dimension(250, getPreferredSize().height);
+                    return getPreferredSize();
                 }
                 ;
             };
