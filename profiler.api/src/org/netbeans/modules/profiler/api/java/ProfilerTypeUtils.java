@@ -43,6 +43,7 @@ package org.netbeans.modules.profiler.api.java;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import org.netbeans.modules.profiler.spi.java.ProfilerTypeUtilsProvider;
 import org.openide.util.Lookup;
 
@@ -88,5 +89,20 @@ final public class ProfilerTypeUtils {
         ProfilerTypeUtilsProvider p = getProvider(project);
         
         return p != null ? p.getPackages(subprojects, scope) : Collections.EMPTY_LIST;
+    }
+    
+    /**
+     * Case insensitive regexp class search
+     * @param pattern Class pattern as a regular expression
+     * @param scope A {@linkplain SourcePackageInfo.Scope} - SOURCE or DEPENDENCIES
+     * @param project A project to get the packages for
+     * @return Returns a collection of classes matching the given pattern
+     * 
+     * @since  1.3
+     */
+    public static Collection<SourceClassInfo> findClasses(String pattern, Set<SourcePackageInfo.Scope> scope, Lookup.Provider project) {
+        ProfilerTypeUtilsProvider p = getProvider(project);
+        
+        return p != null ? p.findClasses(pattern, scope) : Collections.EMPTY_LIST;
     }
 }
