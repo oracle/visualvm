@@ -49,6 +49,7 @@ import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -106,6 +107,10 @@ public class GestureSubmitter {
         fillParamsForAttach(attach, paramList);
 
         logUsage("ATTACH", paramList); // NOI18N
+    }
+    
+    public static void logRMSSearch(String pattern) {
+        logUsage("RMS_SEARCH", Arrays.asList(new Object[]{pattern}));
     }
 
     private static void fillProjectParam(Lookup.Provider profiledProject, List<Object> paramList) {
