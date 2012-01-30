@@ -42,6 +42,8 @@
 package org.netbeans.modules.profiler.spi.java;
 
 import java.util.Collection;
+import java.util.Set;
+import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.SourcePackageInfo;
 
@@ -69,4 +71,16 @@ public abstract class ProfilerTypeUtilsProvider {
      * @return Returns a list of project's packages
      */
     abstract public Collection<SourcePackageInfo> getPackages(boolean subprojects, SourcePackageInfo.Scope scope);
+    
+    /**
+     * Case insensitive regexp class search
+     * @param pattern Class pattern as a regular expression
+     * @param scope A {@linkplain SourcePackageInfo.Scope} - SOURCE or DEPENDENCIES
+     * @return Returns a collection of classes matching the given pattern
+     * 
+     * @since  1.3
+     */
+    public Collection<SourceClassInfo> findClasses(String pattern, Set<SourcePackageInfo.Scope> scope) {
+        throw new UnsupportedOperationException();
+    }
 }
