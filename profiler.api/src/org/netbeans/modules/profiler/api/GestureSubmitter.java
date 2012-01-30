@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.netbeans.modules.profiler.api;
 
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
@@ -49,6 +49,7 @@ import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -64,7 +65,7 @@ import org.openide.util.Lookup;
  * A utility class for submitting UI Gestures Collector records
  * @author Jaroslav Bachorik
  */
-class GestureSubmitter {
+public class GestureSubmitter {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Logger USG_LOGGER = Logger.getLogger("org.netbeans.ui.metrics.profiler"); // NOI18N
@@ -73,7 +74,7 @@ class GestureSubmitter {
     
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    static void logConfig(ProfilingSettings settings, InstrumentationFilter filter) {
+    public static void logConfig(ProfilingSettings settings, InstrumentationFilter filter) {
         List<Object> paramList = new ArrayList<Object>();
 
         fillParamsForProfiling(settings, filter, paramList);
@@ -81,7 +82,7 @@ class GestureSubmitter {
         logUsage("CONFIG", paramList); // NOI18N
     }
 
-    static void logProfileApp(Lookup.Provider profiledProject, SessionSettings session) {
+    public static void logProfileApp(Lookup.Provider profiledProject, SessionSettings session) {
         List<Object> paramList = new ArrayList<Object>();
 
         fillProjectParam(profiledProject, paramList);
@@ -90,7 +91,7 @@ class GestureSubmitter {
         logUsage("PROFILE_APP", paramList); // NOI18N
     }
 
-    static void logProfileClass(Lookup.Provider profiledProject, SessionSettings session) {
+    public static void logProfileClass(Lookup.Provider profiledProject, SessionSettings session) {
         List<Object> paramList = new ArrayList<Object>();
 
         fillProjectParam(profiledProject, paramList);
@@ -99,13 +100,17 @@ class GestureSubmitter {
         logUsage("PROFILE_CLASS", paramList); // NOI18N
     }
 
-    static void logAttach(Lookup.Provider profiledProject, AttachSettings attach) {
+    public static void logAttach(Lookup.Provider profiledProject, AttachSettings attach) {
         List<Object> paramList = new ArrayList<Object>();
 
         fillProjectParam(profiledProject, paramList);
         fillParamsForAttach(attach, paramList);
 
         logUsage("ATTACH", paramList); // NOI18N
+    }
+    
+    public static void logRMSSearch(String pattern) {
+        logUsage("RMS_SEARCH", Arrays.asList(new Object[]{pattern}));
     }
 
     private static void fillProjectParam(Lookup.Provider profiledProject, List<Object> paramList) {
@@ -192,8 +197,8 @@ class GestureSubmitter {
 
     private static void logUsage(String startType, List<Object> params) {
         LogRecord record = new LogRecord(Level.INFO, "USG_PROFILER_" + startType); // NOI18N
-        record.setResourceBundle(NbBundle.getBundle(NetBeansProfiler.class));
-        record.setResourceBundleName(NetBeansProfiler.class.getPackage().getName() + ".Bundle"); // NOI18N
+        record.setResourceBundle(NbBundle.getBundle(GestureSubmitter.class));
+        record.setResourceBundleName(GestureSubmitter.class.getPackage().getName() + ".Bundle"); // NOI18N
         record.setLoggerName(USG_LOGGER.getName());
         record.setParameters(params.toArray(new Object[params.size()]));
 

@@ -290,7 +290,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
                                                            });
         threadsSelectionCombo = new JComboBox(comboModel) {
                 public Dimension getMaximumSize() {
-                    return new Dimension(250, getPreferredSize().height);
+                    return getPreferredSize();
                 }
                 ;
             };
