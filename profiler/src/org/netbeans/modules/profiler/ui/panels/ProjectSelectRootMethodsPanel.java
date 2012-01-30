@@ -115,7 +115,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     private JComboBox treeBuilderList;
     private Lookup.Provider currentProject;
     private RequestProcessor rp = new RequestProcessor("SRM-UI Processor", 1); // NOI18N
-    private RootSelectorTree advancedLogicalPackageTree;
+    private RootSelectorTree pkgTreeView;
     private volatile boolean changingBuilderList = false;
 
     private static final String HELP_CTX_KEY = "ProjectSelectRootMethodsPanel.HelpCtx"; // NOI18N
@@ -169,7 +169,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         
         this.currentProject = project;
 
-        advancedLogicalPackageTree.reset();
+        pkgTreeView.reset();
         
         advancedShowAllProjectsCheckBox.setSelected(project == null);
         advancedShowAllProjectsCheckBox.setEnabled(ProjectUtilities.getOpenedProjects().length > 1);
@@ -183,18 +183,18 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         };
 
         try {
-            advancedLogicalPackageTree.addPropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
+            pkgTreeView.addPropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
 
             updateSelector(new Runnable() {
 
                 @Override
                 public void run() {
-                    advancedLogicalPackageTree.setContext(getContext());
-                    advancedLogicalPackageTree.setSelection(currentSelection);
+                    pkgTreeView.setContext(getContext());
+                    pkgTreeView.setSelection(currentSelection);
                 }
             });
 
-            if (advancedLogicalPackageTree.getBuilderTypes().isEmpty()) {
+            if (pkgTreeView.getBuilderTypes().isEmpty()) {
                 LOG.fine(Bundle.SelectRootMethodsPanel_NoSelectionProviders_MSG());
                 return RootMethodsPanel.getSelectedRootMethods(currentSelection, project);
             }
@@ -218,12 +218,12 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             this.currentProject = null;
 
             if (dd.getValue().equals(okButton)) {
-                ClientUtils.SourceCodeSelection[] selection = advancedLogicalPackageTree.getSelection();
+                ClientUtils.SourceCodeSelection[] selection = pkgTreeView.getSelection();
                 return selection;
             }
             return null;
         } finally {
-            advancedLogicalPackageTree.removePropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
+            pkgTreeView.removePropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
         }
     }
 
@@ -234,7 +234,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
         ProgressDisplayer pd = ProfilerProgressDisplayer.getDefault();
         
-        advancedLogicalPackageTree = new RootSelectorTree(pd, RootSelectorTree.DEFAULT_FILTER);
+        pkgTreeView = new RootSelectorTree(pd, RootSelectorTree.DEFAULT_FILTER);
 //        advancedLogicalPackageTree.setNodeFilter(getNodeFilter());
 
         advancedShowAllProjectsCheckBox = new JCheckBox();
@@ -254,7 +254,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
                         @Override
                         public void run() {
-                            advancedLogicalPackageTree.setBuilderType((Type) e.getItem());
+                            pkgTreeView.setBuilderType((Type) e.getItem());
                         }
                     });
                 }
@@ -272,10 +272,9 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             }
         };
 
-        advancedLogicalPackageTree.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+        pkgTreeView.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
 
-        JScrollPane advancedLogicalPackageTreeScrollPane = new JScrollPane(advancedLogicalPackageTree);
-        advancedLogicalPackageTreeScrollPane.setPreferredSize(PREFERRED_TOPTREE_DIMENSION);
+        pkgTreeView.setPreferredSize(PREFERRED_TOPTREE_DIMENSION);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -286,7 +285,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(10, 10, 0, 10);
-        container.add(advancedLogicalPackageTreeScrollPane, gridBagConstraints);
+        container.add(pkgTreeView, gridBagConstraints);
 
         Mnemonics.setLocalizedText(advancedShowAllProjectsCheckBox,
                 Bundle.SelectRootMethodsPanel_ShowAllProjectsLabel());
@@ -358,12 +357,12 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
                     public void run() {
                         final ClientUtils.SourceCodeSelection[] methods =
                                 RootMethodsPanel.getSelectedRootMethods(
-                                advancedLogicalPackageTree.getSelection(), currentProject);
+                                pkgTreeView.getSelection(), currentProject);
                         if (methods != null) updateSelector(new Runnable() {
                             @Override
                             public void run() {
-                                advancedLogicalPackageTree.setContext(getContext());
-                                advancedLogicalPackageTree.setSelection(methods); // TODO: seems to add methods instead of set methods!!!
+                                pkgTreeView.setContext(getContext());
+                                pkgTreeView.setSelection(methods); // TODO: seems to add methods instead of set methods!!!
                             }
                         });
                     }
@@ -380,7 +379,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private void refreshBuilderList() {
-        List<Type> builderTypes = advancedLogicalPackageTree.getBuilderTypes();
+        List<Type> builderTypes = pkgTreeView.getBuilderTypes();
         if (builderTypes == null || builderTypes.isEmpty()) return;
         
         try {
@@ -389,7 +388,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             treeBuilderList.setModel(new DefaultComboBoxModel(builderTypes.toArray(new Type[builderTypes.size()])));
 
             treeBuilderList.setSelectedIndex(0);
-            advancedLogicalPackageTree.setBuilderType((Type)treeBuilderList.getItemAt(0));
+            pkgTreeView.setBuilderType((Type)treeBuilderList.getItemAt(0));
         } finally {
             changingBuilderList = false;
         }
@@ -413,7 +412,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         boolean showAllEnabled = advancedShowAllProjectsCheckBox.isEnabled();
         try {
             treeBuilderList.setEnabled(false);
-            advancedLogicalPackageTree.setEnabled(false);
+            pkgTreeView.setEnabled(false);
             advancedShowAllProjectsCheckBox.setEnabled(false);
             okButton.setEnabled(false);
             updater.run();
@@ -421,7 +420,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             ph.finish();
             okButton.setEnabled(true);
             advancedShowAllProjectsCheckBox.setEnabled(showAllEnabled);
-            advancedLogicalPackageTree.setEnabled(true);
+            pkgTreeView.setEnabled(true);
             treeBuilderList.setEnabled(true);
         }
     }
@@ -431,7 +430,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
             @Override
             public void run() {
-                advancedLogicalPackageTree.setContext(getContext());
+                pkgTreeView.setContext(getContext());
             }
         });
     }
