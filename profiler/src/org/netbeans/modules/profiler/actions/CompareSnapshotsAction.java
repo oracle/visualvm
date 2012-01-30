@@ -77,7 +77,8 @@ import org.openide.windows.WindowManager;
 @NbBundle.Messages({
     "CompareSnapshotsAction_ActionName=&Compare Memory Snapshots...",
     "CompareSnapshotsAction_ActionDescr=Computes the difference between two comparable memory snapshots",
-    "CompareSnapshotsAction_SelectDialogCaption=Select Snapshot to Compare",
+    "CompareSnapshotsAction_SelectSnapshotDialogCaption=Select Snapshot to Compare",
+    "CompareSnapshotsAction_SelectSnapshotsDialogCaption=Select Snapshots to Compare",
     "CompareSnapshotsAction_OpenChooserCaption=Open Snapshot",
     "CompareSnapshotsAction_OpenChooserFilter=Profiler Snapshot File (*.{0})",
     "CompareSnapshotsAction_NoComparableSnapshotsFoundMsg=<No comparable snapshots found>",
@@ -981,7 +982,7 @@ public class CompareSnapshotsAction extends AbstractAction {
     private void compareDefinedSnapshot() {
         getSecondSnapshotSelector().populateSnapshotsList();
 
-        DialogDescriptor desc = new DialogDescriptor(getSecondSnapshotSelector(), Bundle.CompareSnapshotsAction_SelectDialogCaption(), true,
+        DialogDescriptor desc = new DialogDescriptor(getSecondSnapshotSelector(), Bundle.CompareSnapshotsAction_SelectSnapshotDialogCaption(), true,
                                                      new Object[] {
                                                          getSecondSnapshotSelector().getOKButton(), DialogDescriptor.CANCEL_OPTION
                                                      }, DialogDescriptor.OK_OPTION, 0, null, null);
@@ -1008,7 +1009,7 @@ public class CompareSnapshotsAction extends AbstractAction {
     }
 
     private void compareExternalSnapshots() {
-        DialogDescriptor desc = new DialogDescriptor(getExternalSnapshotsSelector(), Bundle.CompareSnapshotsAction_SelectDialogCaption(), true,
+        DialogDescriptor desc = new DialogDescriptor(getExternalSnapshotsSelector(), Bundle.CompareSnapshotsAction_SelectSnapshotsDialogCaption(), true,
                                                      new Object[] {
                                                          getExternalSnapshotsSelector().getOKButton(),
                                                          DialogDescriptor.CANCEL_OPTION
