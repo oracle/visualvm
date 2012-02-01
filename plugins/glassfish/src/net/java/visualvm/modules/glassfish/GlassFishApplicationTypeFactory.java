@@ -58,7 +58,7 @@ public class GlassFishApplicationTypeFactory extends MainClassApplicationTypeFac
         Jvm jvm = JvmFactory.getJVMFor(app);
         if (!jvm.isBasicInfoSupported()) return null;
         if (jvm.getMainClass() != null) return super.createModelFor(app);
-        if (jvm.isGetSystemPropertiesSupported()) {
+        if (jvm.isGetSystemPropertiesSupported() && !jvm.getJvmArgs().contains("felix.fileinstall.dir")) {
             if (jvm.getSystemProperties().get("com.sun.aas.instanceName") != null) {
                 return new GlassFishInstanceType(app, jvm);
             }
@@ -68,12 +68,13 @@ public class GlassFishApplicationTypeFactory extends MainClassApplicationTypeFac
     
     @Override
     public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
-        if ("com.sun.enterprise.server.PELaunch".equals(mainClass)) {
-            return new GlassFishInstanceType(app, jvm);
-        } else if ("com.sun.enterprise.ee.nodeagent.NodeAgentMain".equals(mainClass)) {
-            return new GlassFishNodeType(jvm, app.getPid());
+        if (!jvm.getJvmArgs().contains("felix.fileinstall.dir")) {
+            if ("com.sun.enterprise.server.PELaunch".equals(mainClass)) {
+                return new GlassFishInstanceType(app, jvm);
+            } else if ("com.sun.enterprise.ee.nodeagent.NodeAgentMain".equals(mainClass)) {
+                return new GlassFishNodeType(jvm, app.getPid());
+            }
         }
-
-        return super.createApplicationTypeFor(app, jvm, mainClass);
+        return null;
     }
 }
