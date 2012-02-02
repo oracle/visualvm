@@ -60,9 +60,9 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -322,14 +322,11 @@ public final class ExportAction extends AbstractAction {
             String fName = file.getName();
 
             // divide the file name into name and extension
-            if (fName.endsWith("."+targetExt)) {
+            if (fName.endsWith("."+targetExt)) {  //.nps extension exists
                 int idx = fName.lastIndexOf('.'); // NOI18N
-                if (idx == -1) { // no extension
-                    targetName = fName; // extension from source file
-                } else { // extension exists
-                    targetName = fName.substring(0, idx);
-                }
-                
+                targetName = fName.substring(0, idx);
+            } else {            // no extension
+                targetName=fName;
             }
         }
 

@@ -291,7 +291,7 @@ public class StackTraceSnapshotBuilderTest {
         System.out.println("add stacktrace");
 
         addStacktrace(stack0, 0);
-        assertTrue(instance.methodInfos.size() == elements0.length);
+        assertTrue(instance.methodInfos.size()-1  == elements0.length);
         assertTrue(instance.threadIds.size() == stack0.length);
         assertTrue(instance.threadNames.size() == stack0.length);
         assertFalse(-1L == instance.currentDumpTimeStamp);
@@ -304,7 +304,7 @@ public class StackTraceSnapshotBuilderTest {
         long stamp = 0;
         addStacktrace(stack0, stamp);
 
-        int miSize = instance.methodInfos.size();
+        int miSize = instance.methodInfos.size()-1;
         int tIdSize = instance.threadIds.size();
         long timestamp = instance.currentDumpTimeStamp;
 
@@ -324,7 +324,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackPlus, timestamp);
 
         assertEquals(Math.max(stack0.length, stackPlus.length), instance.threadIds.size());
-        assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
+        assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size()-1);
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
@@ -340,7 +340,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackPlus, timestamp);
 
         assertEquals(Math.max(stack0.length, stackPlus.length), instance.threadIds.size());
-        assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
+        assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size()-1);
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
@@ -356,7 +356,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackPlus, timestamp);
 
         assertEquals(Math.max(stack0.length, stackPlus.length), instance.threadIds.size());
-        assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
+        assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size()-1);
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
@@ -373,7 +373,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackPlus, timestamp);
 
         assertEquals(Math.max(stack0.length, stackPlus.length), instance.threadIds.size());
-        assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size());
+        assertEquals(Math.max(elements0.length, elementsPlus.length), instance.methodInfos.size()-1);
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
@@ -388,7 +388,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackMinus, timestamp);
 
         assertEquals(Math.max(stack0.length, stackMinus.length), instance.threadIds.size());
-        assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
+        assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size()-1);
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
@@ -403,7 +403,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackMinus, timestamp);
 
         assertEquals(Math.max(stack0.length, stackMinus.length), instance.threadIds.size());
-        assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
+        assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size()-1);
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
@@ -419,7 +419,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackMinus, timestamp);
 
         assertEquals(Math.max(stack0.length, stackMinus.length), instance.threadIds.size());
-        assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
+        assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size()-1);
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
@@ -435,7 +435,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(stackMinus, timestamp);
 
         assertEquals(Math.max(stack0.length, stackMinus.length), instance.threadIds.size());
-        assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size());
+        assertEquals(Math.max(elements0.length, elementsMinus.length), instance.methodInfos.size()-1);
         assertEquals(timestamp, instance.currentDumpTimeStamp);
     }
 
@@ -759,7 +759,7 @@ public class StackTraceSnapshotBuilderTest {
         addStacktrace(tbean.getThreadInfo(tbean.getAllThreadIds(), Integer.MAX_VALUE), System.nanoTime());
 
         instance.reset();
-        assertTrue(instance.methodInfos.size() == 0);
+        assertTrue(instance.methodInfos.size()-1 == 0);
         assertTrue(instance.threadIds.size() == 0);
         assertTrue(instance.threadNames.size() == 0);
         assertEquals(-1L, instance.currentDumpTimeStamp);
