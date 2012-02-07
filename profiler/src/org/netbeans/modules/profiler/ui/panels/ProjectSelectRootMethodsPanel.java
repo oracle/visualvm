@@ -60,20 +60,23 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
+import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
+import org.netbeans.modules.profiler.api.java.SourcePackageInfo;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
+import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderType;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
-import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
+import org.netbeans.modules.profiler.selector.ui.TreePathSearch;
 import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
@@ -240,7 +243,28 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
         ProgressDisplayer pd = ProfilerProgressDisplayer.getDefault();
         
-        pkgTreeView = new RootSelectorTree(pd, RootSelectorTree.DEFAULT_FILTER);
+        pkgTreeView = new RootSelectorTree(pd, new TreePathSearch.ClassIndex() {
+
+            @Override
+            public List<SourceClassInfo> getClasses(String pattern, Lookup context) {
+                Lookup.Provider project = context.lookup(Lookup.Provider.class);
+                
+                if (project != null) {
+                    List<SourceClassInfo> srcClzs = new ArrayList<SourceClassInfo>(ProfilerTypeUtils.findClasses(pattern, EnumSet.of(SourcePackageInfo.Scope.SOURCE), project));
+                    List<SourceClassInfo> libClzs = new ArrayList<SourceClassInfo>(ProfilerTypeUtils.findClasses(pattern, EnumSet.of(SourcePackageInfo.Scope.DEPENDENCIES), project));
+
+                    Collections.sort(srcClzs, SourceClassInfo.COMPARATOR);
+                    Collections.sort(libClzs, SourceClassInfo.COMPARATOR);
+
+                    List<SourceClassInfo> scis = new ArrayList<SourceClassInfo>(srcClzs);
+                    scis.addAll(libClzs);
+
+                    return scis;
+                }
+                
+                return Collections.EMPTY_LIST;
+            }
+        });
         
         additionalProjectsSelector.addActionListener(new ActionListener() {
             @Override
@@ -289,7 +313,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
                         @Override
                         public void run() {
-                            pkgTreeView.setBuilderType((Type) e.getItem());
+                            pkgTreeView.setBuilderType((SelectionTreeBuilderType) e.getItem());
                         }
                     });
                 }
@@ -405,16 +429,16 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private void refreshBuilderList() {
-        List<Type> builderTypes = pkgTreeView.getBuilderTypes();
+        List<SelectionTreeBuilderType> builderTypes = pkgTreeView.getBuilderTypes();
         if (builderTypes == null || builderTypes.isEmpty()) return;
         
         try {
             changingBuilderList = true;
 
-            treeBuilderList.setModel(new DefaultComboBoxModel(builderTypes.toArray(new Type[builderTypes.size()])));
+            treeBuilderList.setModel(new DefaultComboBoxModel(builderTypes.toArray(new SelectionTreeBuilderType[builderTypes.size()])));
 
             treeBuilderList.setSelectedIndex(0);
-            pkgTreeView.setBuilderType((Type)treeBuilderList.getItemAt(0));
+            pkgTreeView.setBuilderType((SelectionTreeBuilderType)treeBuilderList.getItemAt(0));
         } finally {
             changingBuilderList = false;
         }
