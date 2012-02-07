@@ -197,6 +197,12 @@ abstract class AbstractLongMap {
         }
         return index;
     }
+    
+    private static boolean isLinux() {
+        String osName = System.getProperty("os.name");  // NOI18N
+        
+        return osName.endsWith("Linux"); // NOI18N
+    }
 
     abstract Entry createEntry(long index);
     
@@ -325,8 +331,11 @@ abstract class AbstractLongMap {
         }
 
     }
-
+    
     private static class MemoryMappedData implements Data {
+        
+        private static final FileChannel.MapMode MAP_MODE = isLinux() ? FileChannel.MapMode.PRIVATE : FileChannel.MapMode.READ_WRITE;
+
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         MappedByteBuffer buf;
@@ -336,7 +345,7 @@ abstract class AbstractLongMap {
         MemoryMappedData(RandomAccessFile file, long length)
                   throws IOException {
             FileChannel channel = file.getChannel();
-            buf = channel.map(FileChannel.MapMode.READ_WRITE, 0, length);
+            buf = channel.map(MAP_MODE, 0, length);                
             channel.close();
         }
 
@@ -389,7 +398,7 @@ abstract class AbstractLongMap {
             for (int i = 0; i < dumpBuffer.length; i++) {
                 long position = i * BUFFER_SIZE;
                 long size = Math.min(BUFFER_SIZE + BUFFER_EXT, length - position);
-                dumpBuffer[i] = channel.map(FileChannel.MapMode.READ_WRITE, position, size);
+                dumpBuffer[i] = channel.map(MemoryMappedData.MAP_MODE, position, size);
             }
 
             channel.close();
