@@ -159,7 +159,7 @@ public class ProfilerValidationTest extends JellyTestCase {
          
         OptionsOperator options = OptionsOperator.invoke();
 
-        options.selectMiscellaneous();// "Miscellaneous"
+        options.selectCategory("Java");// Changed to Java from Miscellaneous - see #200878
         
         JTabbedPaneOperator tabbedPane = new JTabbedPaneOperator(options);
         tabbedPane.selectPage( Bundle.getStringTrimmed("org.netbeans.modules.profiler.options.Bundle", "ProfilerOptionsCategory_Title") ); //"Profiler"
