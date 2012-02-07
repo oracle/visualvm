@@ -210,14 +210,25 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             }
 
             final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+            
+            pkgTreeView.setCancelHandler(new Cancellable() {
+                @Override
+                public boolean cancel() {
+                    dd.setValue(DialogDescriptor.CANCEL_OPTION);
+                    d.setVisible(false);
+                    return true;
+                }
+            });
+            
             d.pack(); // To properly layout HTML hint area
             d.setVisible(true);
 
             //    ClientUtils.SourceCodeSelection[] rootMethods = this.currentSelectionSet.toArray(new ClientUtils.SourceCodeSelection[this.currentSelectionSet.size()]);
 
+            ClientUtils.SourceCodeSelection[] selection = pkgTreeView.getSelection();
+            
             if (dd.getValue().equals(okButton)) {
                 persist();
-                ClientUtils.SourceCodeSelection[] selection = pkgTreeView.getSelection();
                 return selection;
             }
             
