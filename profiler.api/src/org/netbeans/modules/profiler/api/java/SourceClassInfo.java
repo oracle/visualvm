@@ -41,6 +41,7 @@
  */
 package org.netbeans.modules.profiler.api.java;
 
+import java.util.Comparator;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.openide.filesystems.FileObject;
@@ -53,6 +54,13 @@ import org.openide.filesystems.FileObject;
  * @author Jaroslav Bachorik
  */
 abstract public class SourceClassInfo {
+    final public static Comparator<SourceClassInfo> COMPARATOR = new Comparator<SourceClassInfo>() {
+        @Override
+        public int compare(SourceClassInfo o1, SourceClassInfo o2) {
+            return o1.getVMName().compareTo(o2.getVMName());
+        }
+    };
+    
     final private static Pattern anonymousInnerClassPattern = Pattern.compile(".*?\\$[0-9]*$");
     
     private String simpleName, qualName, vmName;

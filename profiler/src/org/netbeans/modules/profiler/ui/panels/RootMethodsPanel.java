@@ -40,7 +40,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.profiler.ui.panels;
 
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -55,16 +54,20 @@ import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
+import org.openide.filesystems.FileChooserBuilder;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
-
+import org.openide.util.RequestProcessor;
 
 /**
  * @author Tomas Hurka
@@ -82,23 +85,22 @@ import org.openide.util.Lookup;
     "RootMethodsPanel_AddManuallyButtonAccessDescr=Add new profiling root.",
     "RootMethodsPanel_EditButtonAccessDescr=Edit defined profiling root.",
     "RootMethodsPanel_RemoveButtonAccessDescr=Remove selected profiling roots.",
-    "RootMethodsPanel_IncorrectManualRootMsg=<html><b>No method could be resolved based on the provided data.</b><br><br>Please make sure you have entered the method definition correctly.<br>Use <code>javap -s &lt;classname&gt;</code> for exact methods definitions in VM format."
+    "RootMethodsPanel_IncorrectManualRootMsg=<html><b>No method could be resolved based on the provided data.</b><br><br>Please make sure you have entered the method definition correctly.<br>Use <code>javap -s &lt;classname&gt;</code> for exact methods definitions in VM format.",
+    "RootMethodsPanel_AddFromJarButtonText=Add &JAR/Folder...",
+    "RootMethodsPanel_AddFromJarButtonAccessDescr=Add new profiling root from an external jar or folder."
 })
 public final class RootMethodsPanel extends JPanel implements ActionListener, ListSelectionListener, HelpCtx.Provider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-    
+
     private static final String HELP_CTX_KEY = "RootMethodsPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
-    
     private static RootMethodsPanel defaultInstance;
     private static MethodNameFormatterFactory formatterFactory = MethodNameFormatterFactory.getDefault(new DefaultMethodNameFormatter(DefaultMethodNameFormatter.VERBOSITY_FULLCLASSMETHOD));
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
     private ArrayList selectedRoots = new ArrayList();
     private DefaultListModel rootsListModel;
     private HTMLTextArea hintArea;
-//    private JButton addFromProjectButton;
+    private JButton addFromJarButton;
     private JButton addButton;
     private JButton editButton;
     private JButton removeButton;
@@ -107,7 +109,6 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     private boolean globalAttach = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     /**
      * Creates new form RootMethodsPanel
      */
@@ -117,17 +118,16 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-    
     public HelpCtx getHelpCtx() {
         return HELP_CTX;
     }
 
     public static ClientUtils.SourceCodeSelection[] getSelectedRootMethods(ClientUtils.SourceCodeSelection[] roots,
-                                                                           Lookup.Provider project) {
+            Lookup.Provider project) {
         final RootMethodsPanel rm = getDefault();
         rm.project = project;
         rm.globalAttach = rm.project == null;
-//        rm.addFromProjectButton.setEnabled(!rm.globalAttach || (ProjectUtilities.getOpenedProjects().length > 0));
+        rm.addFromJarButton.setEnabled(rm.globalAttach);
         rm.refreshList(roots);
 
         return performDisplay(rm);
@@ -137,24 +137,48 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        /*if (e.getSource() == addFromProjectButton) {
+        if (e.getSource() == addFromJarButton) {
             RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() {
-                        final ClientUtils.SourceCodeSelection[] sel = ProjectSelectRootMethodsPanel.getDefault()
-                                                                                                   .getRootMethods(project,
-                                                                                                                   (ClientUtils.SourceCodeSelection[]) selectedRoots
-                                                                                                                                                   .toArray(new ClientUtils.SourceCodeSelection[] {
-                                                                                                                                                                
-                                                                                                                                                            }));
 
-                        if (sel != null) {
-                            addNewRootMethods(sel, true);
+                public void run() {
+                    FileChooserBuilder b = new FileChooserBuilder(RootMethodsPanel.class);
+                    File jar = b.setFileFilter(new FileFilter() {
+
+                        @Override
+                        public boolean accept(File f) {
+                            if (f.isDirectory()) {
+                                return true;
+                            }
+                            String ext = null;
+                            String n = f.getName();
+                            int index = n.lastIndexOf(".");
+                            if (index > -1) {
+                                ext = n.substring(index + 1);
+                            }
+                            return ext != null && ext.equalsIgnoreCase("jar");
                         }
+
+                        @Override
+                        public String getDescription() {
+                            return "Class folders/JARs";
+                        }
+                    }).showOpenDialog();
+
+                    if (jar == null) {
+                        return;
                     }
-                });
-        } else*/ if (e.getSource() == addButton) {
+
+                    final ClientUtils.SourceCodeSelection[] sel = FileSelectRootMethodsPanel.getDefault().getRootMethods(FileUtil.toFileObject(jar),
+                            (ClientUtils.SourceCodeSelection[]) selectedRoots.toArray(new ClientUtils.SourceCodeSelection[]{}));
+
+                    if (sel != null) {
+                        addNewRootMethods(sel, true);
+                    }
+                }
+            });
+        } else if (e.getSource() == addButton) {
             final ClientUtils.SourceCodeSelection scs = ManualMethodSelect.selectMethod();
-            
+
             if (scs != null) {
                 String newItem = null;
                 try {
@@ -170,10 +194,10 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                 }
             }
         } else if (e.getSource() == editButton) {
-            ClientUtils.SourceCodeSelection sel = 
-                    (ClientUtils.SourceCodeSelection)selectedRoots.get(rootsList.getSelectedIndex());
+            ClientUtils.SourceCodeSelection sel =
+                    (ClientUtils.SourceCodeSelection) selectedRoots.get(rootsList.getSelectedIndex());
             ClientUtils.SourceCodeSelection scs = ManualMethodSelect.selectMethod(sel);
-            
+
             if (scs != null) {
                 String newItem = null;
                 try {
@@ -191,14 +215,16 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
             }
         } else if (e.getSource() == removeButton) {
             final int[] selectedSessionIndices = rootsList.getSelectedIndices();
-            
+
             Object[] selectedItems = rootsList.getSelectedValues();
-            for (Object selectedItem : selectedItems)
+            for (Object selectedItem : selectedItems) {
                 rootsListModel.removeElement(selectedItem);
-            
+            }
+
             ArrayList selRoots = new ArrayList();
-            for (int i : selectedSessionIndices)
+            for (int i : selectedSessionIndices) {
                 selRoots.add(selectedRoots.get(i));
+            }
             selectedRoots.removeAll(selRoots);
 
             int toSelect = -1;
@@ -238,9 +264,9 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
         final DialogDescriptor dd = new DialogDescriptor(rm, Bundle.RootMethodsPanel_SpecifyRootMethodsDialogCaption());
         final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
 
-//        if (rm.addFromProjectButton.isEnabled()) {
-//            rm.addFromProjectButton.grabFocus();
-//        }
+        if (rm.addFromJarButton.isEnabled()) {
+            rm.addFromJarButton.grabFocus();
+        }
 
         d.setVisible(true);
 
@@ -288,16 +314,17 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
         rootsList = new JList();
 
         JPanel buttonPanel = new JPanel();
-//        addFromProjectButton = new JButton();
+        addFromJarButton = new JButton();
         addButton = new JButton();
         editButton = new JButton();
         removeButton = new JButton();
         hintArea = new HTMLTextArea() {
-                public Dimension getPreferredSize() { // Workaround to force the text area not to consume horizontal space to fit the contents to just one line
 
-                    return new Dimension(1, super.getPreferredSize().height);
-                }
-            };
+            public Dimension getPreferredSize() { // Workaround to force the text area not to consume horizontal space to fit the contents to just one line
+
+                return new Dimension(1, super.getPreferredSize().height);
+            }
+        };
 
         org.openide.awt.Mnemonics.setLocalizedText(label, Bundle.RootMethodsPanel_RootMethodsLabelText());
         label.setLabelFor(rootsList);
@@ -330,14 +357,14 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
 
         buttonPanel.setOpaque(false);
 
-//        org.openide.awt.Mnemonics.setLocalizedText(addFromProjectButton, ADD_FROM_PROJECTBUTTON_TEXT);
-//        addFromProjectButton.getAccessibleContext().setAccessibleDescription(ADD_FROM_PROJECT_BUTTON_ACCESS_DESCR);
-//        buttonPanel.add(addFromProjectButton);
+        org.openide.awt.Mnemonics.setLocalizedText(addFromJarButton, Bundle.RootMethodsPanel_AddFromJarButtonText());
+        addFromJarButton.getAccessibleContext().setAccessibleDescription(Bundle.RootMethodsPanel_AddFromJarButtonAccessDescr());
+        buttonPanel.add(addFromJarButton);
 
         org.openide.awt.Mnemonics.setLocalizedText(addButton, Bundle.RootMethodsPanel_AddManualButtonText());
         addButton.getAccessibleContext().setAccessibleDescription(Bundle.RootMethodsPanel_AddManuallyButtonAccessDescr());
         buttonPanel.add(addButton);
-        
+
         org.openide.awt.Mnemonics.setLocalizedText(editButton, Bundle.RootMethodsPanel_EditButtonText());
         editButton.getAccessibleContext().setAccessibleDescription(Bundle.RootMethodsPanel_EditButtonAccessDescr());
         buttonPanel.add(editButton);
@@ -355,7 +382,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
 
         Color panelBackground = UIManager.getColor("Panel.background"); //NOI18N
         Color hintBackground = UIUtils.getSafeColor(panelBackground.getRed() - 10, panelBackground.getGreen() - 10,
-                                                    panelBackground.getBlue() - 10);
+                panelBackground.getBlue() - 10);
 
         // hintArea
         hintArea.setText(Bundle.RootMethodsPanel_MessageAreaText());
@@ -373,7 +400,7 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         add(hintArea, gridBagConstraints);
 
-//        addFromProjectButton.addActionListener(this);
+        addFromJarButton.addActionListener(this);
         addButton.addActionListener(this);
         editButton.addActionListener(this);
         removeButton.addActionListener(this);
