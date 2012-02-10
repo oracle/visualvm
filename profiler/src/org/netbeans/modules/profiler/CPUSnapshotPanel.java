@@ -77,6 +77,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -347,9 +348,9 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private CPUResultsSnapshot snapshot;
     private CombinedPanel combined;
     private CombinedViewTracker combinedViewTracker;
-    private JButton findActionPresenter;
-    private JButton findNextPresenter;
-    private JButton findPreviousPresenter;
+    private Component findActionPresenter;
+    private Component findNextPresenter;
+    private Component findPreviousPresenter;
     private JComboBox aggregationCombo;
     private JComboBox threadsCombo;
     private JTabbedPane tabs = new JTabbedPane(JTabbedPane.BOTTOM);
@@ -470,19 +471,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         tabs.addChangeListener(this);
 
-        JToolBar toolBar = new JToolBar() {
-            public Component add(Component comp) {
-                if (comp instanceof JButton) {
-                    UIUtils.fixButtonUI((JButton) comp);
-                }
-
-                return super.add(comp);
-            }
-        };
-
-        toolBar.setFloatable(false);
-        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+        ProfilerToolbar toolBar = ProfilerToolbar.create(false);
 
         toolBar.add(saveAction = new SaveSnapshotAction(loadedSnapshot));
         toolBar.add(new ExportAction(this, loadedSnapshot));
@@ -569,8 +558,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         toolBar.add(aggregationCombo);
         aggregationCombo.addActionListener(this);
 
-        // height is 0 to prevent painting grabber line
-        toolBar.addSeparator(new Dimension(6, 0));
+        toolBar.addSpace(6);
 
         slaveToggleButtonDown = new JToggleButton(SLAVE_DOWN_ICON);
         slaveToggleButtonDown.setSelected(slaveModeDown);
@@ -609,7 +597,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         updateToolbar();
 
-        add(toolBar, BorderLayout.NORTH);
+        add(toolBar.getComponent(), BorderLayout.NORTH);
 
         // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
         tabs.getActionMap().getParent().remove("navigatePageUp"); // NOI18N
