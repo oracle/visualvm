@@ -331,6 +331,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private static final Icon CLASSES_ICON = Icons.getIcon(LanguageIcons.CLASS);
     private static final Icon METHODS_ICON = Icons.getIcon(LanguageIcons.METHODS);
     private static final Icon PACKAGES_ICON = Icons.getIcon(LanguageIcons.PACKAGE);
+    private static final Icon THREADS_ICON = Icons.getIcon(ProfilerIcons.THREAD);
     private static final Icon CALL_TREE_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_CALL_TREE);
     private static final Icon HOTSPOTS_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS);
     private static final Icon COMBINED_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_COMBINED);
@@ -541,6 +542,23 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                         dlcr.setIcon(CLASSES_ICON);
                     } else if (Bundle.CPUSnapshotPanel_PackagesString().equals(value)) {
                         dlcr.setIcon(PACKAGES_ICON);
+                    }
+
+                    return dlcr;
+                }
+            });
+        threadsCombo.setRenderer(new DefaultListCellRenderer() {
+                public Component getListCellRendererComponent(final JList list, final Object value, final int index,
+                                                              final boolean isSelected, final boolean cellHasFocus) {
+                    DefaultListCellRenderer dlcr = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value,
+                                                                                                                index,
+                                                                                                                isSelected,
+                                                                                                                cellHasFocus);
+
+                    if (Bundle.CPUSnapshotPanel_AllThreadsItem().equals(value.toString())) {
+                        dlcr.setIcon(null);
+                    } else {
+                        dlcr.setIcon(THREADS_ICON);
                     }
 
                     return dlcr;
