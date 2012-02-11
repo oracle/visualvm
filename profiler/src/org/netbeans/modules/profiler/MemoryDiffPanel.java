@@ -47,16 +47,13 @@ import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.memory.*;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.actions.FindNextAction;
 import org.netbeans.modules.profiler.actions.FindPreviousAction;
 import org.netbeans.modules.profiler.ui.FindDialog;
 import org.openide.actions.FindAction;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.SystemAction;
 import java.awt.*;
@@ -67,10 +64,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.URL;
-import java.text.MessageFormat;
-import java.util.Date;
 import javax.swing.*;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
@@ -114,9 +110,9 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private JButton findActionPresenter;
-    private JButton findNextPresenter;
-    private JButton findPreviousPresenter;
+    private Component findActionPresenter;
+    private Component findNextPresenter;
+    private Component findPreviousPresenter;
     private MemoryResultsPanel memoryPanel;
     private Lookup.Provider project;
 
@@ -146,20 +142,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
 
         add(memoryPanel, BorderLayout.CENTER);
 
-        JToolBar toolBar = new JToolBar() {
-            public Component add(Component comp) {
-                if (comp instanceof JButton) {
-                    UIUtils.fixButtonUI((JButton) comp);
-                }
-
-                return super.add(comp);
-            }
-        };
-
-        toolBar.setFloatable(false);
-        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-
+        ProfilerToolbar toolBar = ProfilerToolbar.create(false);
         //    toolBar.add(saveAction = new SaveSnapshotAction(ls));
         toolBar.add(new ExportAction(this,null));
         toolBar.add(new SaveViewAction(this));
@@ -183,9 +166,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         findNextPresenter.setEnabled(true);
 
         // Filler to align rest of the toolbar to the right
-        JPanel toolBarFiller = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        toolBarFiller.setOpaque(false);
-        toolBar.add(toolBarFiller);
+        toolBar.addFiller();
 
         // Information about source snapshot
         final WeakReference<LoadedSnapshot>[] loadedSnapshots = new WeakReference[2];
@@ -200,14 +181,16 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         if (s2File == null) {
             loadedSnapshots[1] = new WeakReference(snapshot2);
         }
+        
+        final ResultsManager rm = ResultsManager.getDefault();
 
         final String SNAPSHOT_1_MASK = "file:/1"; //NOI18N
         final String SNAPSHOT_2_MASK = "file:/2"; //NOI18N
 
         final String SNAPSHOT_1_LINK = "<a href='" + SNAPSHOT_1_MASK + "'>" //NOI18N
-                                       + StringUtils.formatUserDate(new Date(snapshot1.getSnapshot().getTimeTaken())) + "</a>"; //NOI18N
+                                       + rm.getSnapshotDisplayName(snapshot1) + "</a>"; //NOI18N
         final String SNAPSHOT_2_LINK = "<a href='" + SNAPSHOT_2_MASK + "'>" //NOI18N
-                                       + StringUtils.formatUserDate(new Date(snapshot2.getSnapshot().getTimeTaken())) + "</a>"; //NOI18N
+                                       + rm.getSnapshotDisplayName(snapshot2) + "</a>"; //NOI18N
 
         HTMLLabel descriptionLabel = new HTMLLabel(Bundle.MemoryDiffPanel_SnapshotsComparisonString(
                                                     SNAPSHOT_1_LINK, 
@@ -226,14 +209,14 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
                 if (SNAPSHOT_1_MASK.equals(url.toString())) {
                     if (s1File != null) {
                         File f = new File(s1File);
-                        if (f.exists()) ls = ResultsManager.getDefault().loadSnapshot(FileUtil.toFileObject(f));
+                        if (f.exists()) ls = rm.loadSnapshot(FileUtil.toFileObject(f));
                     } else {
                         ls = loadedSnapshots[0].get();
                     }
                 } else if (SNAPSHOT_2_MASK.equals(url.toString())) {
                     if (s2File != null) {
                         File f = new File(s2File);
-                        if (f.exists()) ls = ResultsManager.getDefault().loadSnapshot(FileUtil.toFileObject(f));
+                        if (f.exists()) ls = rm.loadSnapshot(FileUtil.toFileObject(f));
                     } else {
                         ls = loadedSnapshots[1].get();
                     }
@@ -252,7 +235,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
         descriptionLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
         toolBar.add(descriptionLabel);
 
-        add(toolBar, BorderLayout.NORTH);
+        add(toolBar.getComponent(), BorderLayout.NORTH);
 
         // support for Find Next / Find Previous using F3 / Shift + F3
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_MASK), "FIND_PREVIOUS"); // NOI18N

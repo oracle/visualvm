@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.openide.util.NbBundle;
@@ -51,7 +50,6 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
@@ -59,7 +57,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
@@ -97,7 +95,7 @@ public class HeapFragmentWalkerUI extends JPanel {
     private JPanel controllerUIsPanel;
     private JPanel instancesControllerPanel;
     private JPanel summaryControllerPanel;
-    private JToolBar toolBar;
+    private ProfilerToolbar toolBar;
     private boolean analysisEnabled;
     private boolean oqlEnabled;
     private int subControllersIndex;
@@ -187,28 +185,6 @@ public class HeapFragmentWalkerUI extends JPanel {
         forwardAction.setEnabled(heapFragmentWalker.isNavigationForwardAvailable());
     }
 
-    private JToolBar createToolBar() {
-        JToolBar tb = new JToolBar() {
-            public Component add(Component comp) {
-                if (comp instanceof AbstractButton) {
-                    UIUtils.fixButtonUI((AbstractButton) comp);
-                }
-
-                return super.add(comp);
-            }
-
-            public Dimension getPreferredSize() {
-                Dimension dim = super.getPreferredSize();
-                return new Dimension(dim.width, dim.height + 4);
-            }
-        };
-
-        tb.setFloatable(false);
-        tb.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-
-        return tb;
-    }
-
     private void initComponents() {
         summaryControllerPanel = heapFragmentWalker.getSummaryController().getPanel();
         classesControllerPanel = heapFragmentWalker.getClassesController().getPanel();
@@ -250,7 +226,7 @@ public class HeapFragmentWalkerUI extends JPanel {
         setLayout(new BorderLayout());
 
         //unifyComponentsSize(classesControllerPresenter, instancesControllerPresenter);
-        toolBar = createToolBar();
+        toolBar = ProfilerToolbar.create(false);
         toolBar.add(backAction);
         toolBar.add(forwardAction);
         toolBar.addSeparator();
@@ -265,21 +241,8 @@ public class HeapFragmentWalkerUI extends JPanel {
         if (oqlEnabled) {
             toolBar.add(oqlControllerPresenter);
         }
-
-        JPanel toolBarFiller = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0)) {
-            public Dimension getPreferredSize() {
-                if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
-                    int currentWidth = toolBar.getSize().width;
-                    int minimumWidth = toolBar.getMinimumSize().width;
-                    int extraWidth = currentWidth - minimumWidth;
-                    return new Dimension(Math.max(extraWidth, 0), 0);
-                } else {
-                    return super.getPreferredSize();
-                }
-            }
-        };
-        toolBarFiller.setOpaque(false);
-        toolBar.add(toolBarFiller);
+        
+        toolBar.addFiller();
         subControllersIndex = toolBar.getComponentCount();
 
         controllerUIsLayout = new CardLayout();
@@ -297,7 +260,7 @@ public class HeapFragmentWalkerUI extends JPanel {
             controllerUIsPanel.add(oqlControllerPanel, oqlControllerPresenter.getText());
         }
 
-        add(toolBar, BorderLayout.NORTH);
+        add(toolBar.getComponent(), BorderLayout.NORTH);
         add(controllerUIsPanel, BorderLayout.CENTER);
 
         summaryControllerPresenter.setSelected(true);
@@ -494,8 +457,6 @@ public class HeapFragmentWalkerUI extends JPanel {
         for (int i = 0; i < clientPresenters.length; i++) {
             toolBar.add(clientPresenters[i]);
         }
-        
-        toolBar.repaint();
     }
 
     private void updatePresenters() {

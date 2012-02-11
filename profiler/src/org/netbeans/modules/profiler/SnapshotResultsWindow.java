@@ -52,6 +52,7 @@ import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -324,19 +325,9 @@ public final class SnapshotResultsWindow extends TopComponent {
     }
     
     public void refreshTabName() {
-        String fileName = snapshot.getFile() == null ? null : snapshot.getFile().getName();
-        int snapshotType = snapshot.getType();
-        if (fileName != null) {
-            setToolTipText(snapshot.getFile().getAbsolutePath());
-            int dotIndex = fileName.lastIndexOf('.'); // NOI18N
-            if (dotIndex > 0 && dotIndex <= fileName.length() - 2)
-                fileName = fileName.substring(0, dotIndex);
-            tabName = ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType);
-        } else {
-            ResultsSnapshot rs = snapshot.getSnapshot();
-            String snapshotTime = StringUtils.formatUserDate(new Date(rs.getTimeTaken()));
-            tabName = ResultsManager.getDefault().getSnapshotDisplayName(snapshotTime, snapshotType);
-        }
+        tabName = ResultsManager.getDefault().getSnapshotDisplayName(snapshot);
+        File snapshotFile = snapshot.getFile();
+        if (snapshotFile != null) setToolTipText(snapshotFile.getAbsolutePath());
         updateTitle();
     }
 
