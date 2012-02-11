@@ -66,6 +66,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
@@ -123,9 +124,9 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private JButton findActionPresenter;
-    private JButton findNextPresenter;
-    private JButton findPreviousPresenter;
+    private Component findActionPresenter;
+    private Component findNextPresenter;
+    private Component findPreviousPresenter;
     private JTabbedPane tabs = new JTabbedPane(JTabbedPane.BOTTOM);
     private MemoryResultsPanel memoryPanel;
     private MemoryResultsSnapshot snapshot;
@@ -177,20 +178,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
         tabs.addChangeListener(this);
 
-        JToolBar toolBar = new JToolBar() {
-            public Component add(Component comp) {
-                if (comp instanceof JButton) {
-                    UIUtils.fixButtonUI((JButton) comp);
-                }
-
-                return super.add(comp);
-            }
-        };
-
-        toolBar.setFloatable(false);
-        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-
+        ProfilerToolbar toolBar = ProfilerToolbar.create(false);
         toolBar.add(saveAction = new SaveSnapshotAction(ls));
         toolBar.add(new ExportAction(this,ls));
         toolBar.add(new SaveViewAction(this));
@@ -219,7 +207,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
         updateToolbar();
 
-        add(toolBar, BorderLayout.NORTH);
+        add(toolBar.getComponent(), BorderLayout.NORTH);
 
         // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
         tabs.getActionMap().getParent().remove("navigatePageUp"); // NOI18N

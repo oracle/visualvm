@@ -83,7 +83,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -115,6 +114,7 @@ import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.lib.profiler.ui.LiveResultsWindowContributor;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -464,7 +464,7 @@ public final class LiveResultsWindow extends TopComponent
 
     /*  private JComponent valueFilterComponent;
        private JSlider valueSlider; */
-    private JToolBar toolBar;
+    private ProfilerToolbar toolBar;
     private LiveResultsPanel currentDisplay;
     private MemoryResUserActionsHandler memoryActionsHandler;
     private HistoryActionsHandler historyActionsHandler;
@@ -507,7 +507,7 @@ public final class LiveResultsWindow extends TopComponent
 
         toolBar = createToolBar();
 
-        add(toolBar, BorderLayout.NORTH);
+        add(toolBar.getComponent(), BorderLayout.NORTH);
 
         noResultsPanel = new EmptyLiveResultsPanel();
         noResultsPanel.setLayout(new BorderLayout());
@@ -903,20 +903,8 @@ public final class LiveResultsWindow extends TopComponent
         return false;
     }
 
-    private JToolBar createToolBar() {
-        JToolBar toolBar = new JToolBar() {
-            public Component add(Component comp) {
-                if (comp instanceof JButton) {
-                    UIUtils.fixButtonUI((JButton) comp);
-                }
-
-                return super.add(comp);
-            }
-        };
-
-        toolBar.setFloatable(false);
-        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-        toolBar.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+    private ProfilerToolbar createToolBar() {
+        ProfilerToolbar tb = ProfilerToolbar.create(false);
 
         autoToggle = new JToggleButton(Icons.getIcon(GeneralIcons.UPDATE_AUTO));
         autoToggle.setSelected(true);
@@ -954,17 +942,17 @@ public final class LiveResultsWindow extends TopComponent
         runGCButton.getAccessibleContext().setAccessibleName(Bundle.LiveResultsWindow_RunGCTooltip());
 
         // todo: add profiler listener to enable/disable buttons
-        toolBar.add(autoToggle);
-        toolBar.add(updateNowButton);
-        toolBar.add(runGCButton);
-        toolBar.add(ResetResultsAction.getInstance());
-        toolBar.addSeparator();
-        toolBar.add(((Presenter.Toolbar) SystemAction.get(TakeSnapshotAction.class)).getToolbarPresenter());
-        toolBar.addSeparator();
-        toolBar.add(new ExportAction(this, null));
-        toolBar.add(new SaveViewAction(this));
+        tb.add(autoToggle);
+        tb.add(updateNowButton);
+        tb.add(runGCButton);
+        tb.add(ResetResultsAction.getInstance());
+        tb.addSeparator();
+        tb.add(((Presenter.Toolbar) SystemAction.get(TakeSnapshotAction.class)).getToolbarPresenter());
+        tb.addSeparator();
+        tb.add(new ExportAction(this, null));
+        tb.add(new SaveViewAction(this));
 
-        return toolBar;
+        return tb;
     }
 
     private LiveResultsPanel preparePanelForInstrType(int instrumentationType) {
