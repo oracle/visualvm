@@ -57,7 +57,7 @@ import java.util.List;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
-import org.netbeans.modules.profiler.ui.panels.ClassSelectRootMethodsPanel;
+import org.netbeans.modules.profiler.ui.panels.FileSelectRootMethodsPanel;
 import org.openide.util.Lookup;
 
 /**
@@ -140,7 +140,7 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
                         return; // cancelled by the user
                     }
 
-                    ClientUtils.SourceCodeSelection[] rootMethodsSelection = ClassSelectRootMethodsPanel.getDefault().getRootMethods(dobj.getPrimaryFile(),
+                    ClientUtils.SourceCodeSelection[] rootMethodsSelection = FileSelectRootMethodsPanel.getDefault().getRootMethods(dobj.getPrimaryFile(),
                             settings.getInstrumentationRootMethods());
 
                     if (rootMethodsSelection == null) {

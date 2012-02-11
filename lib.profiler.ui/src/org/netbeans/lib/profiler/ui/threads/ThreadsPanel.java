@@ -69,6 +69,7 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -232,7 +233,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
     private JScrollBar scrollBar; // scrollbar that is displayed in zoomed mode that allows to scroll in history
     private JScrollPane tableScroll;
     private JTable table; // table that displays individual threads
-    private JToolBar buttonsToolBar;
+    private ProfilerToolbar buttonsToolBar;
     private ThreadsDataManager manager;
     private ThreadsDetailsCallback detailsCallback;
     private boolean internalChange = false; // prevents cycles in event handling
@@ -305,15 +306,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         showLabel.setDisplayedMnemonic(showLabel.getText().charAt(mnemCharIndex));
         showLabel.setDisplayedMnemonicIndex(mnemCharIndex);
 
-        buttonsToolBar = new JToolBar(JToolBar.HORIZONTAL) {
-                public Component add(Component comp) {
-                    if (comp instanceof JButton) {
-                        UIUtils.fixButtonUI((JButton) comp);
-                    }
-
-                    return super.add(comp);
-                }
-            };
+        buttonsToolBar = ProfilerToolbar.create(false);
 
         JPanel tablePanel = new JPanel();
         JPanel scrollPanel = new JPanel();
@@ -369,14 +362,13 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         columnModel.setColumnMargin(0);
         table.setDefaultRenderer(ThreadNameCellRenderer.class, new ThreadNameCellRenderer(this));
         table.setDefaultRenderer(ThreadStateCellRenderer.class, new ThreadStateCellRenderer(this));
-        buttonsToolBar.setFloatable(false);
-        buttonsToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
 
         // perform layout
         tablePanel.setLayout(new BorderLayout());
         scrollPanel.setLayout(new BorderLayout());
         scrollPanel.setBackground(Color.WHITE);
 
+        buttonsToolBar.addSeparator();
         buttonsToolBar.add(zoomInButton);
         buttonsToolBar.add(zoomOutButton);
         buttonsToolBar.add(scaleToFitButton);
@@ -478,7 +470,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         contentPanel.add(notificationPanel, ENABLE_THREADS_PROFILING);
         contentPanel.add(tablePanel, THREADS_TABLE);
 
-        add(buttonsToolBar, BorderLayout.NORTH);
+        add(buttonsToolBar.getComponent(), BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
 
         scrollBar.addAdjustmentListener(this);
@@ -682,11 +674,9 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
 
     // --- Save Current View action support --------------------------------------
     public void addSaveViewAction(AbstractAction saveViewAction) {
-        JButton actionButton = buttonsToolBar.add(saveViewAction);
+        Component actionButton = buttonsToolBar.add(saveViewAction);
         buttonsToolBar.remove(actionButton);
-
         buttonsToolBar.add(actionButton, 0);
-        buttonsToolBar.add(new JToolBar.Separator(), 1);
     }
 
     // ---------------------------------------------------------------------------------------
