@@ -41,8 +41,8 @@
  */
 package org.netbeans.lib.profiler.ui;
 
-import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.LiveFlatProfilePanel;
 import org.openide.util.Lookup;
 
@@ -55,11 +55,11 @@ public interface LiveResultsWindowContributor {
     public static abstract class Adapter implements LiveResultsWindowContributor {
 
         @Override
-        public void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Lookup.Provider project) {
+        public void addToCpuResults(LiveFlatProfilePanel cpuPanel, ProfilerToolbar toolbar, ProfilerClient client, Lookup.Provider project) {
         }
 
         @Override
-        public void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Lookup.Provider project) {
+        public void addToMemoryResults(LiveFlatProfilePanel memoryPanel, ProfilerToolbar toolbar, ProfilerClient client, Lookup.Provider project) {
         }
 
         @Override
@@ -79,9 +79,9 @@ public interface LiveResultsWindowContributor {
         }
     }
 
-    void addToCpuResults(LiveFlatProfilePanel cpuPanel, JToolBar toolbar, ProfilerClient client, Lookup.Provider project);
+    void addToCpuResults(LiveFlatProfilePanel cpuPanel, ProfilerToolbar toolbar, ProfilerClient client, Lookup.Provider project);
 
-    void addToMemoryResults(LiveFlatProfilePanel memoryPanel, JToolBar toolbar, ProfilerClient client, Lookup.Provider project);
+    void addToMemoryResults(LiveFlatProfilePanel memoryPanel, ProfilerToolbar toolbar, ProfilerClient client, Lookup.Provider project);
 
     void show();
 
