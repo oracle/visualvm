@@ -435,7 +435,10 @@ public final class LiveResultsWindow extends TopComponent
     private static final Logger LOGGER = Logger.getLogger("org.netbeans.modules.profiler.LiveResultsWindow"); // NOI18N
 
     private static final String HELP_CTX_KEY = "LiveResultsWindow.HelpCtx"; // NOI18N
-    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+    private static final String HELP_CTX_KEY_CPU = "CpuLiveResultsWindow.HelpCtx"; // NOI18N
+    private static final String HELP_CTX_KEY_MEM = "MemoryLiveResultsWindow.HelpCtx"; // NOI18N
+    private static final HelpCtx HELP_CTX_DEFAULT = new HelpCtx(HELP_CTX_KEY);
+    private static HelpCtx HELP_CTX = HELP_CTX_DEFAULT;
     private static LiveResultsWindow defaultLiveInstance;
     private static final TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
     private static final Image liveWindowIcon = Icons.getImage(ProfilerIcons.WINDOW_LIVE_RESULTS);
@@ -956,8 +959,9 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private LiveResultsPanel preparePanelForInstrType(int instrumentationType) {
+        HELP_CTX = HELP_CTX_DEFAULT;
         LiveResultsPanel aPanel = null;
-
+        
         switch (instrumentationType) {
             case ProfilerEngineSettings.INSTR_OBJECT_ALLOCATIONS: {
                 LiveAllocResultsPanel allocPanel = new LiveAllocResultsPanel(runner,
@@ -975,6 +979,7 @@ public final class LiveResultsWindow extends TopComponent
                 tabs.addTab(Bundle.LiveResultsWindow_HistoryTabName(), historyPanel);
                 tabs.setEnabledAt(1, false);
                 aPanel = allocPanel;
+                HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
 
                 break;
             }
@@ -994,6 +999,7 @@ public final class LiveResultsWindow extends TopComponent
                 tabs.addTab(Bundle.LiveResultsWindow_HistoryTabName(), historyPanel);
                 tabs.setEnabledAt(1, false);
                 aPanel = livenessPanel;
+                HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
 
                 break;
             }
@@ -1012,6 +1018,7 @@ public final class LiveResultsWindow extends TopComponent
 
                 currentDisplayComponent.setBorder(new EmptyBorder(5, 5, 5, 5));
                 aPanel = cpuPanel;
+                HELP_CTX = new HelpCtx(HELP_CTX_KEY_CPU);
 
                 break;
             }
@@ -1065,6 +1072,7 @@ public final class LiveResultsWindow extends TopComponent
             repaint();
             hideContributors();
         }
+        HELP_CTX = HELP_CTX_DEFAULT;
     }
 
     private void updateActions(int newState) {
