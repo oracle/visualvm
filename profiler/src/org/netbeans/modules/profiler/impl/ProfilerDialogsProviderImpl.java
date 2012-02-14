@@ -42,6 +42,7 @@
 package org.netbeans.modules.profiler.impl;
 
 import org.netbeans.modules.profiler.spi.ProfilerDialogsProvider;
+import org.netbeans.modules.profiler.ui.NBHTMLLabel;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
@@ -102,8 +103,12 @@ public final class ProfilerDialogsProviderImpl extends ProfilerDialogsProvider {
     }
     
     private void displayMessage(String message, String caption, String details, int type) {
-        NotifyDescriptor nd = details == null ? new NotifyDescriptor.Message(message, type) :
-                        new ProfilerDialogs.MessageWithDetails(message, details, type, false);
+        Object msg = message;
+        Object det = details;
+        if (isHtmlString(message)) msg = new NBHTMLLabel(message);
+        if (isHtmlString(details)) det = new NBHTMLLabel(message);
+        NotifyDescriptor nd = det == null ? new NotifyDescriptor.Message(msg, type) :
+                        new ProfilerDialogs.MessageWithDetails(msg, det, type, false);
         if (caption != null) nd.setTitle(caption);
         ProfilerDialogs.notify(nd);
     }
@@ -114,6 +119,12 @@ public final class ProfilerDialogsProviderImpl extends ProfilerDialogsProvider {
         if (dnsaMessage != null) dnsa.setDNSAMessage(dnsaMessage);
         dnsa.setDNSADefault(dnsaDefault);
         ProfilerDialogs.notify(dnsa);
+    }
+    
+    private static boolean isHtmlString(String string) {
+        if (string == null) return false;
+        // Simple heuristics, seems to work fine
+        return string.contains("<") && string.contains(">"); // NOI18N
     }
     
 }

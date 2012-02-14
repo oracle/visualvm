@@ -47,11 +47,15 @@ import java.io.IOException;
 import java.lang.management.LockInfo;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
+import java.util.ArrayList;
+import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
+import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.modules.profiler.LoadedSnapshot.SamplesInputStream;
 import org.netbeans.modules.profiler.LoadedSnapshot.ThreadsSample;
@@ -120,6 +124,74 @@ public final class SampledCPUSnapshot {
         return ret;
     }
 
+    public List<Integer> getIntervals(int startIndex, int endIndex,PrestimeCPUCCTNode node) throws IOException {
+        List<Integer> intervals = new ArrayList();
+        SamplesInputStream stream = seek(startIndex);
+        CCTNode n = node;
+        List<String[]> stack = new ArrayList();
+        final String NATIVE_ID = "[native]"; // NOI18N 
+        boolean match = false;
+        do {
+            if (n instanceof PrestimeCPUCCTNode) {
+                PrestimeCPUCCTNode cctNode = (PrestimeCPUCCTNode) n;
+                if (isRegular(cctNode)) {
+                    String[] mid = cctNode.getMethodClassNameAndSig();
+                    
+                    if (mid[1].endsWith(NATIVE_ID)) {
+                        mid[1] = mid[1].substring(0,mid[1].length()-NATIVE_ID.length());
+                    }
+                    stack.add(0,mid);
+                }
+            }
+            n = n.getParent();
+        } while (n != null);
+
+        for (int i = startIndex; i <= endIndex; i++) {
+            LoadedSnapshot.ThreadsSample _sample = stream.readSample();
+            ThreadInfo[] threads = _sample.getTinfos();
+            if (findStack(stack, threads)) {// match found
+                if (!match) {
+                    intervals.add(i);
+                }
+                match = true;
+            } else {
+                if (match) {
+                    intervals.add(i-1);
+                }
+                match = false;
+            }
+        }
+        if (match) {
+            intervals.add(endIndex);
+        }
+        stream.close();
+        stream = null;
+        return intervals;
+    }
+
+    private boolean findStack(final List<String[]> stack, final ThreadInfo[] threads) {      
+        for (ThreadInfo t : threads) {
+            StackTraceElement[] els = t.getStackTrace();
+            
+            if (els == null || els.length < stack.size()) {
+                continue;
+            }
+            int j=0;
+            for (; j<stack.size(); j++) {
+                StackTraceElement el = els[els.length - j - 1];
+                String[] method = stack.get(j);
+                
+                if (!el.getClassName().equals(method[0]) || !el.getMethodName().equals(method[1])) {
+                    break;  // try next thread
+                }
+            }
+            if (j == stack.size()) { // match
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public String getThreadDump(int sampleIndex) throws IOException {
         StringBuilder sb = new StringBuilder(4096);
         SamplesInputStream stream = seek(sampleIndex);
@@ -165,7 +237,9 @@ public final class SampledCPUSnapshot {
         } catch (NoDataAvailableException ex) {
             throw new IOException(ex);
         }
-        return new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
+        LoadedSnapshot ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
+        ls.setSaved(true);
+        return ls;
     }
 
     private SamplesInputStream seek(final int sampleIndex) throws IOException {
@@ -291,6 +365,10 @@ public final class SampledCPUSnapshot {
     
     private static String htmlize(String value) {
             return value.replace(">", "&gt;").replace("<", "&lt;");     // NOI18N
+    }
+
+    private boolean isRegular(PrestimeCPUCCTNode n) {
+        return  n.getThreadId() != -1 && n.getMethodId() > 0 && !n.isFilteredNode();
     }
 
     private void initSamples() throws IOException {

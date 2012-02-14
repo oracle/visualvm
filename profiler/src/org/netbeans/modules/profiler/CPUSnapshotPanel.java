@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler;
 
+import java.util.Collection;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
@@ -71,12 +72,12 @@ import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -297,12 +298,40 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             lastFocusOwner = e.getSource();
         }
     }
+    
+    private class CustomCCTDisplay extends CCTDisplay {
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler) {
+            super(actionsHandler);
+        }
 
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler) {
+            super(actionsHandler,selectionHandler);
+        }
+
+        protected JPopupMenu createPopupMenu() {
+            JPopupMenu popup = super.createPopupMenu();
+            enhancePopupMenu(popup,this);
+            return popup;
+        }
+
+        protected void enableDisablePopup(PrestimeCPUCCTNode node) {
+            super.enableDisablePopup(node);
+            CPUSnapshotPanel.this.enableDisablePopup(node);
+        }
+        
+    }
+    
+    public interface CCTPopupEnhancer {
+        public void enhancePopup(JPopupMenu popup, LoadedSnapshot snapshot, CCTDisplay cctDisplay);
+        public void enableDisablePopup(LoadedSnapshot snapshot, PrestimeCPUCCTNode node);
+    }
+    
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Icon CLASSES_ICON = Icons.getIcon(LanguageIcons.CLASS);
     private static final Icon METHODS_ICON = Icons.getIcon(LanguageIcons.METHODS);
     private static final Icon PACKAGES_ICON = Icons.getIcon(LanguageIcons.PACKAGE);
+    private static final Icon THREADS_ICON = Icons.getIcon(ProfilerIcons.THREAD);
     private static final Icon CALL_TREE_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_CALL_TREE);
     private static final Icon HOTSPOTS_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS);
     private static final Icon COMBINED_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_COMBINED);
@@ -320,9 +349,9 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private CPUResultsSnapshot snapshot;
     private CombinedPanel combined;
     private CombinedViewTracker combinedViewTracker;
-    private JButton findActionPresenter;
-    private JButton findNextPresenter;
-    private JButton findPreviousPresenter;
+    private Component findActionPresenter;
+    private Component findNextPresenter;
+    private Component findPreviousPresenter;
     private JComboBox aggregationCombo;
     private JComboBox threadsCombo;
     private JTabbedPane tabs = new JTabbedPane(JTabbedPane.BOTTOM);
@@ -357,10 +386,10 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         setLayout(new BorderLayout());
 
         flatPanel = new SnapshotFlatProfilePanel(actionsHandler);
-        cctPanel = new CCTDisplay(actionsHandler);
+        cctPanel = new CustomCCTDisplay(actionsHandler);
         infoPanel = new SnapshotInfoPanel(ls);
         combinedFlat = new SnapshotFlatProfilePanel(actionsHandler, combinedActionsHandlerFlat);
-        combinedCCT = new CCTDisplay(actionsHandler, combinedActionsHandlerCCT);
+        combinedCCT = new CustomCCTDisplay(actionsHandler, combinedActionsHandlerCCT);
 
         flatPanel.setSorting(sortingColumn, sortingOrder);
         cctPanel.setSorting(sortingColumn, sortingOrder);
@@ -443,19 +472,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         tabs.addChangeListener(this);
 
-        JToolBar toolBar = new JToolBar() {
-            public Component add(Component comp) {
-                if (comp instanceof JButton) {
-                    UIUtils.fixButtonUI((JButton) comp);
-                }
-
-                return super.add(comp);
-            }
-        };
-
-        toolBar.setFloatable(false);
-        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+        ProfilerToolbar toolBar = ProfilerToolbar.create(false);
 
         toolBar.add(saveAction = new SaveSnapshotAction(loadedSnapshot));
         toolBar.add(new ExportAction(this, loadedSnapshot));
@@ -530,6 +547,23 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                     return dlcr;
                 }
             });
+        threadsCombo.setRenderer(new DefaultListCellRenderer() {
+                public Component getListCellRendererComponent(final JList list, final Object value, final int index,
+                                                              final boolean isSelected, final boolean cellHasFocus) {
+                    DefaultListCellRenderer dlcr = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value,
+                                                                                                                index,
+                                                                                                                isSelected,
+                                                                                                                cellHasFocus);
+
+                    if (Bundle.CPUSnapshotPanel_AllThreadsItem().equals(value.toString())) {
+                        dlcr.setIcon(null);
+                    } else {
+                        dlcr.setIcon(THREADS_ICON);
+                    }
+
+                    return dlcr;
+                }
+            });
 
         JLabel lab = new JLabel(Bundle.CPUSnapshotPanel_ViewLabelString());
         lab.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
@@ -542,8 +576,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         toolBar.add(aggregationCombo);
         aggregationCombo.addActionListener(this);
 
-        // height is 0 to prevent painting grabber line
-        toolBar.addSeparator(new Dimension(6, 0));
+        toolBar.addSpace(6);
 
         slaveToggleButtonDown = new JToggleButton(SLAVE_DOWN_ICON);
         slaveToggleButtonDown.setSelected(slaveModeDown);
@@ -582,7 +615,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         updateToolbar();
 
-        add(toolBar, BorderLayout.NORTH);
+        add(toolBar.getComponent(), BorderLayout.NORTH);
 
         // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
         tabs.getActionMap().getParent().remove("navigatePageUp"); // NOI18N
@@ -1113,6 +1146,20 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         combinedFlat.prepareResults();
     }
 
+    private void enhancePopupMenu(JPopupMenu popup, CCTDisplay customCCTDisplay) {
+        Collection<? extends CCTPopupEnhancer> col = Lookup.getDefault().lookupAll(CCTPopupEnhancer.class);
+        for(CCTPopupEnhancer en : col) {
+            en.enhancePopup(popup,loadedSnapshot,customCCTDisplay);
+        }
+    }
+
+    private void enableDisablePopup(PrestimeCPUCCTNode node) {
+        Collection<? extends CCTPopupEnhancer> col = Lookup.getDefault().lookupAll(CCTPopupEnhancer.class);
+        for(CCTPopupEnhancer en : col) {
+            en.enableDisablePopup(loadedSnapshot,node);
+        }
+    }
+    
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         if (tabs.getSelectedComponent() instanceof CCTDisplay) { // Call tree
             cctPanel.exportData(exportedFileType,eDD,false, Bundle.CPUSnapshotPanel_CallTreeString());

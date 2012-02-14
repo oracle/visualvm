@@ -63,13 +63,11 @@ import java.text.DateFormat;
 import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
@@ -114,28 +112,14 @@ public final class TelemetryWindow extends TopComponent {
 
             setLayout(new BorderLayout());
 
-            final JToolBar toolBar = new JToolBar() {
-                public Component add(Component comp) {
-                    if (comp instanceof JButton) {
-                        UIUtils.fixButtonUI((JButton) comp);
-                    }
-
-                    return super.add(comp);
-                }
-            };
-
+            ProfilerToolbar toolBar = ProfilerToolbar.create(false);
             exportActionButton = new ExportAction(this, null);
-
-            toolBar.setFloatable(false);
-            toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-            toolBar.setBorder(BorderFactory.createEmptyBorder(2, 0, 4, 0));
-
             toolBar.add(exportActionButton);
             toolBar.add(new SaveViewAction(this));
             toolBar.addSeparator();
             for (Action action : panel.getActions()) toolBar.add(action);
 
-            add(toolBar, BorderLayout.NORTH);
+            add(toolBar.getComponent(), BorderLayout.NORTH);
             add(panel, BorderLayout.CENTER);
         }
 

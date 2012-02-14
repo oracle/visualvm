@@ -60,8 +60,6 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -193,6 +191,18 @@ public final class ResultsManager {
 
     public String getDefaultSnapshotFileName(LoadedSnapshot ls) {
         return "snapshot-" + ls.getSnapshot().getTimeTaken(); // NOI18N
+    }
+    
+    public String getSnapshotDisplayName(LoadedSnapshot ls) {
+        String name = ls.getFile() == null ? null : ls.getFile().getName();
+        if (name == null) {
+            name = getDefaultSnapshotFileName(ls);
+        } else {
+            int dotIndex = name.lastIndexOf('.'); // NOI18N
+            if (dotIndex > 0 && dotIndex <= name.length() - 2)
+                name = name.substring(0, dotIndex);
+        }
+        return getSnapshotDisplayName(name, ls.getType());
     }
         
     public String getSnapshotDisplayName(String fileName, int snapshotType) {
@@ -639,9 +649,8 @@ public final class ResultsManager {
         } catch (Exception e) {
             ProfilerLogger.log(e);
 
-            NotifyDescriptor.Message loadFailed = new NotifyDescriptor.Message(Bundle.ResultsManager_SnapshotLoadFailed(
-                                                                                loadedSnapshot.getFile().getAbsolutePath()));
-            DialogDisplayer.getDefault().notify(loadFailed);
+            ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotLoadFailed(
+                    loadedSnapshot.getFile().getAbsolutePath()));
         }
     }
 

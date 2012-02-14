@@ -177,7 +177,7 @@ public class ProfilerControlPanelOperator extends TopComponentOperator {
 	public void showLiveResults(){
 		Container resultsPanel = (Container) findSubComponent(
 				new ClassChooser("ResultsSnippetPanel"));
-		JButtonOperator resultsButtonOperator = new JButtonOperator(new ContainerOperator(resultsPanel),1);
+		JButtonOperator resultsButtonOperator = new JButtonOperator(new ContainerOperator(resultsPanel),2);
 		System.out.println("pushing the button: "+ resultsButtonOperator.getText());
 		resultsButtonOperator.push();
 		resultsButtonOperator.doClick(500);

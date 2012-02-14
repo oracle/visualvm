@@ -798,7 +798,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             });
     }
 
-    private void enableDisablePopup(PrestimeCPUCCTNode node) {
+    protected void enableDisablePopup(PrestimeCPUCCTNode node) {
         boolean regularNode = node.getThreadId() != -1 && node.getMethodId() > 0 && !node.isFilteredNode();
         if (popupShowSource != null) popupShowSource.setEnabled(regularNode && isShowSourceAvailable());
         popupShowSubtree.setEnabled(regularNode);

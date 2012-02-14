@@ -80,7 +80,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Field;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -157,6 +156,7 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_TakeSnapshotButtonName=Take Snapshot",
     "ProfilerControlPanel2_DumpHeapButtonName=Dump Heap",
     "ProfilerControlPanel2_TakeSnapshotButtonToolTip=Obtains a snapshot of profiling results at the current moment",
+    "ProfilerControlPanel2_TakeHeapDumpButtonToolTip=Takes a heap snapshot of the application",
     "ProfilerControlPanel2_LiveResultsButtonName=Live Results",
     "ProfilerControlPanel2_LiveResultsButtonToolTip=Show live profiling results",
     "ProfilerControlPanel2_ResetResultsButtonName=Reset Collected Results",
@@ -712,10 +712,10 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private final JButton resetResultsButton;
         private final JButton takeCPUSnapshotButton;
         private final JButton takeFragmentSnapshotButton;
         private final JButton takeMemorySnapshotButton;
+        private final JButton takeHeapDumpButton;
         private final JPanel centerPanel;
         private JButton liveResultsButton;
         private LoadedSnapshot lastSnapshot;
@@ -725,7 +725,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
         ResultsSnippetPanel() {
             setLayout(new BorderLayout());
-            setBorder(BorderFactory.createEmptyBorder(7, 10, 12, 10));
+            setBorder(BorderFactory.createEmptyBorder(7, 5, 8, 0));
 
             final Border myRolloverBorder = new CompoundBorder(new FlatToolBar.FlatRolloverButtonBorder(Color.GRAY,
                                                                                                         Color.LIGHT_GRAY),
@@ -739,7 +739,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   .getImage()))));
             takeCPUSnapshotButton.addActionListener(this);
             takeCPUSnapshotButton.setContentAreaFilled(false);
-            takeCPUSnapshotButton.setMargin(new Insets(3, 3, 3, 3));
+            takeCPUSnapshotButton.setMargin(new Insets(1, 2, 1, 2));
             takeCPUSnapshotButton.setVerticalTextPosition(SwingConstants.BOTTOM);
             takeCPUSnapshotButton.setHorizontalTextPosition(SwingConstants.CENTER);
             takeCPUSnapshotButton.setRolloverEnabled(true);
@@ -747,25 +747,36 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             takeCPUSnapshotButton.setToolTipText(Bundle.ProfilerControlPanel2_TakeSnapshotButtonToolTip());
 
             // Take Memory snapshot
-            takeMemorySnapshotButton = new org.netbeans.lib.profiler.ui.components.PopupButton(new String[] {
-                                                                                                   Bundle.ProfilerControlPanel2_TakeSnapshotButtonName(),
-                                                                                                   Bundle.ProfilerControlPanel2_DumpHeapButtonName()
-                                                                                               },
-                                                                                               new ImageIcon[] {
-                                                                                                   (ImageIcon)TAKE_SNAPSHOT_MEMORY_ICON
-                                                                                               });
+            takeMemorySnapshotButton = new JButton(Bundle.ProfilerControlPanel2_TakeSnapshotButtonName(), TAKE_SNAPSHOT_MEMORY_ICON);
             UIUtils.fixButtonUI(takeMemorySnapshotButton);
             takeMemorySnapshotButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) takeMemorySnapshotButton
                                                                                                                        .getIcon())
                                                                                                                       .getImage()))));
             takeMemorySnapshotButton.addActionListener(this);
             takeMemorySnapshotButton.setContentAreaFilled(false);
-            takeMemorySnapshotButton.setMargin(new Insets(3, 3, 3, 3));
+            takeMemorySnapshotButton.setMargin(new Insets(1, 2, 1, 2));
             takeMemorySnapshotButton.setVerticalTextPosition(SwingConstants.BOTTOM);
             takeMemorySnapshotButton.setHorizontalTextPosition(SwingConstants.CENTER);
             takeMemorySnapshotButton.setRolloverEnabled(true);
             takeMemorySnapshotButton.setBorder(myRolloverBorder);
             takeMemorySnapshotButton.setToolTipText(Bundle.ProfilerControlPanel2_TakeSnapshotButtonToolTip());
+            
+            // Take Heap Dump
+            takeHeapDumpButton = new JButton(SharedClassObject.findObject(HeapDumpAction.class, true));
+            takeHeapDumpButton.setText(Bundle.ProfilerControlPanel2_DumpHeapButtonName());
+            takeHeapDumpButton.setIcon(TAKE_SNAPSHOT_MEMORY_ICON);
+            UIUtils.fixButtonUI(takeHeapDumpButton);
+            takeHeapDumpButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) takeHeapDumpButton
+                                                                                                                       .getIcon())
+                                                                                                                      .getImage()))));
+            takeHeapDumpButton.addActionListener(this);
+            takeHeapDumpButton.setContentAreaFilled(false);
+            takeHeapDumpButton.setMargin(new Insets(1, 2, 1, 2));
+            takeHeapDumpButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+            takeHeapDumpButton.setHorizontalTextPosition(SwingConstants.CENTER);
+            takeHeapDumpButton.setRolloverEnabled(true);
+            takeHeapDumpButton.setBorder(myRolloverBorder);
+            takeHeapDumpButton.setToolTipText(Bundle.ProfilerControlPanel2_TakeHeapDumpButtonToolTip());
 
             // Take Fragment snapshot
             takeFragmentSnapshotButton = new JButton(Bundle.ProfilerControlPanel2_TakeSnapshotButtonName(), TAKE_SNAPSHOT_FRAGMENT_ICON);
@@ -775,7 +786,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                                                                         .getImage()))));
             takeFragmentSnapshotButton.addActionListener(this);
             takeFragmentSnapshotButton.setContentAreaFilled(false);
-            takeFragmentSnapshotButton.setMargin(new Insets(3, 3, 3, 3));
+            takeFragmentSnapshotButton.setMargin(new Insets(1, 2, 1, 2));
             takeFragmentSnapshotButton.setVerticalTextPosition(SwingConstants.BOTTOM);
             takeFragmentSnapshotButton.setHorizontalTextPosition(SwingConstants.CENTER);
             takeFragmentSnapshotButton.setRolloverEnabled(true);
@@ -789,7 +800,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .getImage()))));
             liveResultsButton.addActionListener(this);
             liveResultsButton.setContentAreaFilled(false);
-            liveResultsButton.setMargin(new Insets(3, 3, 3, 3));
+            liveResultsButton.setMargin(new Insets(1, 2, 1, 2));
             liveResultsButton.setVerticalTextPosition(SwingConstants.BOTTOM);
             liveResultsButton.setHorizontalTextPosition(SwingConstants.CENTER);
             liveResultsButton.setRolloverEnabled(true);
@@ -798,37 +809,14 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
             displayedIcon = CPU;
 
-            resetResultsButton = new JButton(ResetResultsAction.getInstance()) {
-                public void setIcon(Icon icon) {
-                    super.setIcon(icon);
-                    setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon)getIcon()).getImage()))));
-                }
-            };
-            UIUtils.fixButtonUI(resetResultsButton);
-            resetResultsButton.setText(Bundle.ProfilerControlPanel2_ResetResultsButtonName());
-            resetResultsButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) resetResultsButton
-                                                                                                          .getIcon()).getImage()))));
-            
-            resetResultsButton.setMargin(new Insets(3, 8, 3, 8));
-            resetResultsButton.setContentAreaFilled(false);
-            resetResultsButton.setVerticalTextPosition(SwingConstants.CENTER);
-            resetResultsButton.setHorizontalTextPosition(SwingConstants.RIGHT);
-            resetResultsButton.setRolloverEnabled(true);
-            resetResultsButton.setBorder(myRolloverBorder);
-            resetResultsButton.setToolTipText(Bundle.ProfilerControlPanel2_ResetResultsButtonToolTip());
-
-            final JPanel southPanel = new JPanel();
             centerPanel = new JPanel();
-            southPanel.setOpaque(false);
-            southPanel.setLayout(new BorderLayout());
-            southPanel.add(resetResultsButton, BorderLayout.WEST);
             centerPanel.setOpaque(false);
-            centerPanel.setLayout(new EqualFlowLayout(EqualFlowLayout.LEFT));
+            centerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
             centerPanel.add(takeCPUSnapshotButton);
+            centerPanel.add(takeHeapDumpButton);
             centerPanel.add(liveResultsButton);
 
             add(centerPanel, BorderLayout.CENTER);
-            add(southPanel, BorderLayout.SOUTH);
 
             refreshStatus();
         }
@@ -843,19 +831,11 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         }
                     });
             } else if (e.getSource() == takeMemorySnapshotButton) {
-                if (Bundle.ProfilerControlPanel2_TakeSnapshotButtonName().equals(e.getActionCommand())) {
-                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                            public void run() {
-                                ResultsManager.getDefault().takeSnapshot();
-                            }
-                        });
-                } else {
-                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                            public void run() {
-                                SharedClassObject.findObject(HeapDumpAction.class, true).dumpToProject();
-                            }
-                        });
-                }
+                ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                        public void run() {
+                            ResultsManager.getDefault().takeSnapshot();
+                        }
+                    });
             } else if (e.getSource() == liveResultsButton) {
                 LiveResultsWindow.getDefault().open();
                 LiveResultsWindow.getDefault().requestActive();
@@ -1661,8 +1641,8 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         ViewPanel() {
-            setLayout(new EqualFlowLayout(FlowLayout.LEFT));
-            setBorder(BorderFactory.createEmptyBorder(7, 10, 12, 10));
+            setLayout(new EqualFlowLayout(FlowLayout.LEFT, 0, 0));
+            setBorder(BorderFactory.createEmptyBorder(7, 6, 8, 6));
 
             final Border myRolloverBorder = new CompoundBorder(new FlatToolBar.FlatRolloverButtonBorder(Color.GRAY,
                                                                                                         Color.LIGHT_GRAY),
@@ -1672,7 +1652,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             UIUtils.fixButtonUI(vmTelemetryButton);
             vmTelemetryButton.addActionListener(this);
             vmTelemetryButton.setContentAreaFilled(false);
-            vmTelemetryButton.setMargin(new Insets(3, 3, 3, 3));
+            vmTelemetryButton.setMargin(new Insets(1, 1, 1, 1));
             vmTelemetryButton.setVerticalTextPosition(SwingConstants.BOTTOM);
             vmTelemetryButton.setHorizontalTextPosition(SwingConstants.CENTER);
             vmTelemetryButton.setRolloverEnabled(true);
@@ -1683,7 +1663,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             UIUtils.fixButtonUI(threadsButton);
             threadsButton.addActionListener(this);
             threadsButton.setContentAreaFilled(false);
-            threadsButton.setMargin(new Insets(3, 3, 3, 3));
+            threadsButton.setMargin(new Insets(1, 1, 1, 1));
             threadsButton.setVerticalTextPosition(SwingConstants.BOTTOM);
             threadsButton.setHorizontalTextPosition(SwingConstants.CENTER);
             threadsButton.setRolloverEnabled(true);

@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.snaptracer.impl;
 
 import java.io.IOException;
+import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.modules.profiler.snaptracer.PackageStateHandler;
 import org.netbeans.modules.profiler.snaptracer.ProbeStateHandler;
 import org.netbeans.modules.profiler.snaptracer.TracerPackage;
@@ -323,6 +324,14 @@ final class TracerModel {
 
     TimelineSupport getTimelineSupport() {
         return timelineSupport;
+    }
+
+    List<Integer> getIntervals(PrestimeCPUCCTNode node) throws IOException {
+        TimelineSupport support = getTimelineSupport();
+        final int startIndex = Math.min(support.getStartIndex(), support.getEndIndex());
+        final int endIndex = Math.max(support.getStartIndex(), support.getEndIndex());
+        
+        return getSnapshot().getIntervals(startIndex,endIndex,node);
     }
 
 }

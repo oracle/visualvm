@@ -44,11 +44,10 @@
 package org.netbeans.modules.profiler.attach.panels;
 
 import javax.swing.JPanel;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.attach.spi.IntegrationProvider;
 import org.netbeans.modules.profiler.attach.spi.RunException;
 import org.netbeans.modules.profiler.attach.wizard.AttachWizardContext;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
 
 /**
@@ -138,7 +137,7 @@ public class ReviewAdditionalStepsPanel extends AttachWizardPanel {
             try {
                 getContext().getIntegrationProvider().run(getContext().getAttachSettings());
             } catch (RunException e) {
-                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(e.getMessage(), NotifyDescriptor.WARNING_MESSAGE));
+                ProfilerDialogs.displayWarning(e.getMessage());
             }
         }
     }

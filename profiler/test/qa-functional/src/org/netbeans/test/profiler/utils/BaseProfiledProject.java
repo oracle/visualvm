@@ -438,6 +438,9 @@ public class BaseProfiledProject {
             Thread.sleep(100);
             //enable profiler integration if run for the first time
             print("profile popup menu action performed");
+            Thread.sleep(2000);
+            //  to ensure the profile dialog is fully loaded and shown
+            print("waited 2s");
 //		try {
 //			new NbDialogOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.j2se.Bundle",
 //					"J2SEProjectTypeProfiler_ModifyBuildScriptCaption")).ok(); //"Enable Profiling of {0}"
