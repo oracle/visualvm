@@ -95,7 +95,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -114,6 +113,7 @@ import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.lib.profiler.ui.LiveResultsWindowContributor;
+import org.netbeans.lib.profiler.ui.ResultsView;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -422,9 +422,9 @@ public final class LiveResultsWindow extends TopComponent
 
                     Collections.reverse(chartActions);
 
-                    tabs.setEnabledAt(1, true);
-                    tabs.setTitleAt(1, Bundle.LiveResultsWindow_ClassHistoryTabName(className));
-                    tabs.setSelectedIndex(1);
+                    resultsView.setViewEnabled(historyPanel, true);
+                    resultsView.setViewName(historyPanel, Bundle.LiveResultsWindow_ClassHistoryTabName(className));
+                    resultsView.selectView(historyPanel);
                 }
             });
         }
@@ -453,7 +453,7 @@ public final class LiveResultsWindow extends TopComponent
     private JButton updateNowButton;
     private JPanel currentDisplayComponent;
     private JPanel memoryTabPanel;
-    private JTabbedPane tabs;
+    private ResultsView resultsView;
     private JToggleButton autoToggle;
     private JToolBar.Separator graphButtonsSeparator;
 
@@ -529,24 +529,18 @@ public final class LiveResultsWindow extends TopComponent
         add(noResultsPanel, BorderLayout.CENTER);
 
         //*************
-        memoryTabPanel = new JPanel(new java.awt.BorderLayout());
-
-        tabs = new JTabbedPane();
-        // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
-        tabs.getActionMap().getParent().remove("navigatePageUp"); // NOI18N
-        tabs.getActionMap().getParent().remove("navigatePageDown"); // NOI18N
-                                                                    // TODO: implement PreviousViewAction/NextViewAction handling for Live Memory Results
+        memoryTabPanel = new JPanel(new BorderLayout());
 
         graphButtonsSeparator = new JToolBar.Separator();
         toolBar.add(graphButtonsSeparator);
         final int chartButtonsOffset = toolBar.getComponentCount();
 
-        memoryTabPanel.add(tabs, BorderLayout.CENTER);
-        tabs.setTabPlacement(JTabbedPane.BOTTOM);
-        tabs.addChangeListener(new ChangeListener() {
+        resultsView = new ResultsView();
+        memoryTabPanel.add(resultsView, BorderLayout.CENTER);
+        resultsView.addChangeListener(new ChangeListener() {
             public void stateChanged(final ChangeEvent e) {
                 if (currentDisplayComponent == memoryTabPanel) {
-                    if (tabs.getSelectedComponent() == historyPanel) {
+                    if (resultsView.getSelectedView() == historyPanel) {
                         for (JButton b : chartActions)
                             toolBar.add(b, chartButtonsOffset);
                         graphButtonsSeparator.setVisible(true);
@@ -555,6 +549,8 @@ public final class LiveResultsWindow extends TopComponent
                             toolBar.remove(b);
                         graphButtonsSeparator.setVisible(false);
                     }
+                    toolBar.getComponent().revalidate();
+                    toolBar.getComponent().repaint();
                 }
             }
         });
@@ -638,7 +634,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     public BufferedImage getViewImage(boolean onlyVisibleArea) {
-        if ((currentDisplayComponent == memoryTabPanel) && (tabs.getSelectedComponent() == historyPanel)) {
+        if ((currentDisplayComponent == memoryTabPanel) && (resultsView.getSelectedView() == historyPanel)) {
             return UIUtils.createScreenshot(historyPanel);
         }
 
@@ -650,7 +646,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     public String getViewName() {
-        if ((currentDisplayComponent == memoryTabPanel) && (tabs.getSelectedComponent() == historyPanel)) {
+        if ((currentDisplayComponent == memoryTabPanel) && (resultsView.getSelectedView() == historyPanel)) {
             return "memory-history-" + classHistoryManager.getTrackedClassName(); // NOI18N
         }
 
@@ -678,7 +674,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     public boolean fitsVisibleArea() {
-        if ((currentDisplayComponent == memoryTabPanel) && (tabs.getSelectedComponent() == historyPanel)) {
+        if ((currentDisplayComponent == memoryTabPanel) && (resultsView.getSelectedView() == historyPanel)) {
             return true;
         }
 
@@ -714,7 +710,7 @@ public final class LiveResultsWindow extends TopComponent
 
     // --- Save Current View action support ------------------------------------
     public boolean hasView() {
-        if ((currentDisplayComponent == memoryTabPanel) && (tabs.getSelectedComponent() == historyPanel)) {
+        if ((currentDisplayComponent == memoryTabPanel) && (resultsView.getSelectedView() == historyPanel)) {
             return true;
         }
 
@@ -773,10 +769,11 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
+        Component selectedView = resultsView.getSelectedView();
         if (currentDisplayComponent == memoryTabPanel) {
-            if (tabs.getSelectedComponent() instanceof LiveAllocResultsPanel) {
+            if (selectedView instanceof LiveAllocResultsPanel) {
                 ((LiveAllocResultsPanel) currentDisplay).exportData(exportedFileType, eDD, Bundle.LAB_ResultsWindowName());
-            } else if (tabs.getSelectedComponent() instanceof LiveLivenessResultsPanel) {
+            } else if (selectedView instanceof LiveLivenessResultsPanel) {
                 ((LiveLivenessResultsPanel) currentDisplay).exportData(exportedFileType, eDD, Bundle.LAB_ResultsWindowName());
             }
         } else if (currentDisplayComponent instanceof LiveFlatProfilePanel) {
@@ -789,7 +786,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     public boolean hasExportableView() {
-        if ((currentDisplayComponent == memoryTabPanel) && (tabs.getSelectedComponent() == currentDisplay)) {
+        if ((currentDisplayComponent == memoryTabPanel) && (resultsView.getSelectedView() == currentDisplay)) {
             return true;
         }
 
@@ -971,13 +968,13 @@ public final class LiveResultsWindow extends TopComponent
                 currentDisplayComponent = memoryTabPanel;
                 currentDisplayComponent.setBorder(new EmptyBorder(5, 0, 0, 0));
 
-                if (tabs.getComponentCount() > 0) {
-                    tabs.removeAll();
+                if (resultsView.getViewsCount() > 0) {
+                    resultsView.removeViews();
                 }
 
-                tabs.addTab(Bundle.LiveResultsWindow_LiveResultsTabName(), allocPanel);
-                tabs.addTab(Bundle.LiveResultsWindow_HistoryTabName(), historyPanel);
-                tabs.setEnabledAt(1, false);
+                resultsView.addView(Bundle.LiveResultsWindow_LiveResultsTabName(), null, null, allocPanel, null);
+                resultsView.addView(Bundle.LiveResultsWindow_HistoryTabName(), null, null, historyPanel, null);
+                resultsView.setViewEnabled(historyPanel, false);
                 aPanel = allocPanel;
                 HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
 
@@ -991,13 +988,13 @@ public final class LiveResultsWindow extends TopComponent
                 currentDisplayComponent = memoryTabPanel;
                 currentDisplayComponent.setBorder(new EmptyBorder(5, 0, 0, 0));
 
-                if (tabs.getComponentCount() > 0) {
-                    tabs.removeAll();
+                if (resultsView.getViewsCount() > 0) {
+                    resultsView.removeViews();
                 }
 
-                tabs.addTab(Bundle.LiveResultsWindow_LiveResultsTabName(), livenessPanel);
-                tabs.addTab(Bundle.LiveResultsWindow_HistoryTabName(), historyPanel);
-                tabs.setEnabledAt(1, false);
+                resultsView.addView(Bundle.LiveResultsWindow_LiveResultsTabName(), null, null, livenessPanel, null);
+                resultsView.addView(Bundle.LiveResultsWindow_HistoryTabName(), null, null, historyPanel, null);
+                resultsView.setViewEnabled(historyPanel, false);
                 aPanel = livenessPanel;
                 HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
 

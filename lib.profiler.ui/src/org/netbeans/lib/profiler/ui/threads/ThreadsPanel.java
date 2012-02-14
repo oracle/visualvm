@@ -464,13 +464,11 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         notificationPanel.add(enableThreadsMonitoringLabel2);
         notificationPanel.add(enableThreadsMonitoringLabel3);
 
-        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
         setLayout(new BorderLayout());
 
         contentPanel.add(notificationPanel, ENABLE_THREADS_PROFILING);
         contentPanel.add(tablePanel, THREADS_TABLE);
-
-        add(buttonsToolBar.getComponent(), BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
 
         scrollBar.addAdjustmentListener(this);
@@ -562,6 +560,10 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public Component getToolbar() {
+        return buttonsToolBar.getComponent();
+    }
+    
     public BufferedImage getCurrentViewScreenshot(boolean onlyVisibleArea) {
         if (onlyVisibleArea) {
             return UIUtils.createScreenshot(tableScroll);
