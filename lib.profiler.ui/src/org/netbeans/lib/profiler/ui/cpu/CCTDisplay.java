@@ -622,6 +622,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             });
 
         treeTablePanel = new JTreeTablePanel(treeTable);
+        treeTablePanel.clearBorders();
         treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, cornerButton);
         add(treeTablePanel, java.awt.BorderLayout.CENTER);
         initFilterPanel();

@@ -135,6 +135,8 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
         headerPopup = new JPopupMenu();
         jScrollPane = createScrollPaneVerticalScrollBarAlways();
         jScrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(headerPopup));
+        jScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
 
         initFilterPanel();
     }
