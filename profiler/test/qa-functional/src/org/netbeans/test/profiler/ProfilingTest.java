@@ -77,7 +77,7 @@ public class ProfilingTest extends JellyTestCase {
             NbModuleSuite.Configuration conf = NbModuleSuite.createConfiguration(
             ProfilingTest.class);
             
-            conf.clusters("profiler").enableModules(".*").honorAutoloadEager(true)
+            conf.clusters("profiler|nb").enableModules(".*").honorAutoloadEager(true)
             .failOnException(Level.SEVERE)
             .failOnMessage(Level.SEVERE);
         

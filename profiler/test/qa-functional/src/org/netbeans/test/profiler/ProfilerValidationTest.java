@@ -101,7 +101,7 @@ public class ProfilerValidationTest extends JellyTestCase {
     public static NbTestSuite suite() {
         NbModuleSuite.Configuration conf = NbModuleSuite.createConfiguration(
             ProfilerValidationTest.class
-        ).clusters("profiler").enableModules(".*").honorAutoloadEager(true)
+        ).clusters("profiler|nb").enableModules(".*").honorAutoloadEager(true)
         .failOnException(Level.SEVERE)
         .failOnMessage(Level.SEVERE);
         
@@ -135,7 +135,7 @@ public class ProfilerValidationTest extends JellyTestCase {
     public void setUp() {
         System.out.println("########  "+getName()+"  #######");
     }
-
+    
     /** Test Profiler Menus. */
     public void testProfilerMenus(){
         String ProfileMenu = org.netbeans.jellytools.Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "Menu/Profile"); //"Profile"
@@ -159,13 +159,13 @@ public class ProfilerValidationTest extends JellyTestCase {
          
         OptionsOperator options = OptionsOperator.invoke();
 
-        options.selectMiscellaneous();// "Miscellaneous"
+        options.selectCategory("Java");// Changed to Java from Miscellaneous - see #200878
         
         JTabbedPaneOperator tabbedPane = new JTabbedPaneOperator(options);
         tabbedPane.selectPage( Bundle.getStringTrimmed("org.netbeans.modules.profiler.options.Bundle", "ProfilerOptionsCategory_Title") ); //"Profiler"
 
-        JLabelOperator javaPlatform = new JLabelOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-                                                                "ProfilerOptionsPanel_JavaPlatformLabelText")); //"Profiler Java Platform"
+//        JLabelOperator javaPlatform = new JLabelOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
+//                                                                "ProfilerOptionsPanel_JavaPlatformLabelText")); //"Profiler Java Platform"
 
         JLabelOperator communicationPort = new JLabelOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
                                                                 "ProfilerOptionsPanel_CommPortLabelText") );//"Communication Port"
