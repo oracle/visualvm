@@ -106,6 +106,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result = new StringBuffer("<tr><td class=\"method\"><pre class=\"method\">"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</pre></td>");
             result.append("<td class=\"right\">").append(percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)).append("</td>");
             result.append("<td class=\"right\">").append((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms</td>");
+            result.append("<td class=\"right\">").append((double) flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms</td>");
             result.append("<td class=\"right\">").append(flatProfileContainer.getNInvocationsAtRow(i)).append("</td></tr>");
             eDD.dumpData(result);
         }
@@ -131,6 +132,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline);
             result.append("    <TableColumn><![CDATA[").append(percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)).append("]]></TableColumn>").append(newline);
             result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline);
+            result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs1AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline);
             result.append("    <TableColumn><![CDATA[").append(flatProfileContainer.getNInvocationsAtRow(i)).append("]]></TableColumn>").append(newline).append("  </TableRow>").append(newline);
             eDD.dumpData(result);
         }
@@ -159,6 +161,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result.append(quote).append(flatProfileContainer.getMethodNameAtRow(i)).append(quote).append(separator);
             result.append(quote).append(flatProfileContainer.getPercentAtRow(i)).append(quote).append(separator);
             result.append(quote).append((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            result.append(quote).append((double)flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms").append(quote).append(separator);
             result.append(quote).append(flatProfileContainer.getNInvocationsAtRow(i)).append(quote).append(newLine);
             eDD.dumpData(result);
         }
