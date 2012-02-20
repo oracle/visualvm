@@ -57,16 +57,13 @@ import org.netbeans.lib.profiler.ui.graphs.ThreadsGraphPanel;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.text.DateFormat;
 import java.util.Date;
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.lib.profiler.ui.ResultsView;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -98,11 +95,11 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 public final class TelemetryWindow extends TopComponent {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private static final class GraphTab extends JPanel implements /*ActionListener, ChartActionListener,*/
-                                                                  SaveViewAction.ViewProvider, ExportAction.ExportProvider {
+    private static final class GraphTab implements SaveViewAction.ViewProvider, ExportAction.ExportProvider {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private final GraphPanel panel;
+        private final ProfilerToolbar toolBar;
         private final ExportAction exportActionButton;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -110,21 +107,24 @@ public final class TelemetryWindow extends TopComponent {
         public GraphTab(final GraphPanel panel) {
             this.panel = panel;
 
-            setLayout(new BorderLayout());
-
-            ProfilerToolbar toolBar = ProfilerToolbar.create(false);
+            toolBar = ProfilerToolbar.create(false);
             exportActionButton = new ExportAction(this, null);
             toolBar.add(exportActionButton);
             toolBar.add(new SaveViewAction(this));
             toolBar.addSeparator();
             for (Action action : panel.getActions()) toolBar.add(action);
-
-            add(toolBar.getComponent(), BorderLayout.NORTH);
-            add(panel, BorderLayout.CENTER);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        public Component getToolbar() {
+            return toolBar.getComponent();
+        }
+        
+        public Component getComponent() {
+            return panel;
+        }
+        
         public BufferedImage getViewImage(boolean onlyVisibleArea) {
             return UIUtils.createScreenshot(panel);
         }
@@ -323,7 +323,7 @@ public final class TelemetryWindow extends TopComponent {
     private final GraphTab generationsPanel;
     private final GraphTab heapPanel;
     private final GraphTab threadsStatsPanel;
-    private final JTabbedPane tabs;
+    private final ResultsView telemetryView;
     private final MemoryGraphPanel heapGraph;
     private final SurvivingGenerationsGraphPanel generationsGraph;
     private final ThreadsGraphPanel threadsStatsGraph;
@@ -337,10 +337,9 @@ public final class TelemetryWindow extends TopComponent {
         setIcon(windowIcon);
         getAccessibleContext().setAccessibleDescription(Bundle.TelemetryWindow_TelemetryAccessDescr());
         setLayout(new BorderLayout());
-        tabs = new JTabbedPane();
-
-        tabs.setTabPlacement(JTabbedPane.BOTTOM);
-        add(tabs, BorderLayout.CENTER);
+        
+        telemetryView = new ResultsView();
+        add(telemetryView, BorderLayout.CENTER);
 
         heapGraph = MemoryGraphPanel.createBigPanel(NetBeansProfiler.getDefaultNB().
                                                     getVMTelemetryModels());
@@ -354,25 +353,12 @@ public final class TelemetryWindow extends TopComponent {
         generationsPanel = new GraphTab(generationsGraph);
         threadsStatsPanel = new GraphTab(threadsStatsGraph);
 
-        tabs.addTab(Bundle.TelemetryWindow_MemoryHeapTabName(), null, heapPanel, Bundle.TelemetryWindow_MemoryHeapTabDescr());
-        tabs.addTab(Bundle.TelemetryWindow_MemoryGCTabName(), null, generationsPanel, Bundle.TelemetryWindow_MemoryGCTabDescr());
-        tabs.addTab(Bundle.TelemetryWindow_ThreadsStatisticsTabName(), null, threadsStatsPanel, Bundle.TelemetryWindow_ThreadsStatisticsTabDescr());
-
-        // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
-        tabs.getActionMap().getParent().remove("navigatePageUp"); // NOI18N
-        tabs.getActionMap().getParent().remove("navigatePageDown"); // NOI18N
-
-        // support for traversing subtabs using Ctrl-Alt-PgDn/PgUp
-        getActionMap().put("PreviousViewAction", new AbstractAction() { // NOI18N
-                public void actionPerformed(ActionEvent e) {
-                    moveToPreviousSubTab();
-                }
-            });
-        getActionMap().put("NextViewAction", new AbstractAction() { // NOI18N
-                public void actionPerformed(ActionEvent e) {
-                    moveToNextSubTab();
-                }
-            });
+        telemetryView.addView(Bundle.TelemetryWindow_MemoryHeapTabName(), null,
+                Bundle.TelemetryWindow_MemoryHeapTabDescr(), heapPanel.getComponent(), heapPanel.getToolbar());
+        telemetryView.addView(Bundle.TelemetryWindow_MemoryGCTabName(), null,
+                Bundle.TelemetryWindow_MemoryGCTabDescr(), generationsPanel.getComponent(), generationsPanel.getToolbar());
+        telemetryView.addView(Bundle.TelemetryWindow_ThreadsStatisticsTabName(), null,
+                Bundle.TelemetryWindow_ThreadsStatisticsTabDescr(), threadsStatsPanel.getComponent(), threadsStatsPanel.getToolbar());
 
         setFocusable(true);
         setRequestFocusEnabled(true);
@@ -421,19 +407,19 @@ public final class TelemetryWindow extends TopComponent {
     }
 
     public void showGC() {
-        tabs.setSelectedComponent(generationsPanel);
+        telemetryView.selectView(generationsPanel.getComponent());
         open();
         requestActive();
     }
 
     public void showHeap() {
-        tabs.setSelectedComponent(heapPanel);
+        telemetryView.selectView(heapPanel.getComponent());
         open();
         requestActive();
     }
 
     public void showThreads() {
-        tabs.setSelectedComponent(threadsStatsPanel);
+        telemetryView.selectView(threadsStatsPanel.getComponent());
         open();
         requestActive();
     }
@@ -446,13 +432,5 @@ public final class TelemetryWindow extends TopComponent {
      */
     protected String preferredID() {
         return this.getClass().getName();
-    }
-
-    private void moveToNextSubTab() {
-        tabs.setSelectedIndex(UIUtils.getNextSubTabIndex(tabs, tabs.getSelectedIndex()));
-    }
-
-    private void moveToPreviousSubTab() {
-        tabs.setSelectedIndex(UIUtils.getPreviousSubTabIndex(tabs, tabs.getSelectedIndex()));
     }
 }
