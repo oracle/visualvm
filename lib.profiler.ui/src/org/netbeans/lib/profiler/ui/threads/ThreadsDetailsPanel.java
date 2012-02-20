@@ -199,7 +199,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
 
         // perform layout
-        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
         setLayout(new BorderLayout());
         content.setLayout(new GridLayout(0, 1)); /*new GridLayout(0, 1) {
            public void layoutContainer(Container parent) {
@@ -230,7 +230,6 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         buttonsToolBar.addSeparator();
         buttonsToolBar.add(showLabel);
         buttonsToolBar.add(threadsSelectionCombo);
-        add(buttonsToolBar.getComponent(), BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         //add (scrollBar, BorderLayout.EAST);
         threadsSelectionCombo.addActionListener(this);
@@ -247,6 +246,10 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public Component getToolbar() {
+        return buttonsToolBar.getComponent();
+    }
+    
     public BufferedImage getCurrentViewScreenshot(boolean onlyVisibleArea) {
         if (onlyVisibleArea) {
             return UIUtils.createScreenshot(scrollPane);
