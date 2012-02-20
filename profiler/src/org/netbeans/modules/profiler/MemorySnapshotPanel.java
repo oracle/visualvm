@@ -48,7 +48,6 @@ import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.memory.*;
 import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.actions.FindNextAction;
@@ -127,7 +126,6 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     private Component findActionPresenter;
     private Component findNextPresenter;
     private Component findPreviousPresenter;
-    private JTabbedPane tabs = new JTabbedPane(JTabbedPane.BOTTOM);
     private MemoryResultsPanel memoryPanel;
     private MemoryResultsSnapshot snapshot;
     private Lookup.Provider project;
@@ -164,19 +162,18 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
         infoPanel.updateInfo();
 
-        tabs.addTab(Bundle.MemorySnapshotPanel_MemoryResultsTabName(), MEMORY_RESULTS_TAB_ICON, memoryPanel, Bundle.MemorySnapshotPanel_StackTracesTabDescr());
+        addView(Bundle.MemorySnapshotPanel_MemoryResultsTabName(), MEMORY_RESULTS_TAB_ICON, Bundle.MemorySnapshotPanel_StackTracesTabDescr(), memoryPanel, null);
 
         if (snapshot.containsStacks()) {
             reversePanel = new SnapshotReverseMemCallGraphPanel(snapshot, memoryActionsHandler);
             reversePanel.prepareResults();
-            tabs.addTab(Bundle.MemorySnapshotPanel_StackTracesTabName(), STACK_TRACES_TAB_ICON, reversePanel, Bundle.MemorySnapshotPanel_StackTracesTabDescr());
-            tabs.setEnabledAt(tabs.getTabCount() - 1, false);
+            addView(Bundle.MemorySnapshotPanel_StackTracesTabName(), STACK_TRACES_TAB_ICON, Bundle.MemorySnapshotPanel_StackTracesTabDescr(), reversePanel, null);
+            setViewEnabled(reversePanel, false);
         }
 
-        tabs.addTab(Bundle.MemorySnapshotPanel_InfoTabName(), INFO_TAB_ICON, infoPanel, Bundle.MemorySnapshotPanel_InfoTabDescr());
-        add(tabs, BorderLayout.CENTER);
+        addView(Bundle.MemorySnapshotPanel_InfoTabName(), INFO_TAB_ICON, Bundle.MemorySnapshotPanel_InfoTabDescr(), infoPanel, null);
 
-        tabs.addChangeListener(this);
+        addChangeListener(this);
 
         ProfilerToolbar toolBar = ProfilerToolbar.create(false);
         toolBar.add(saveAction = new SaveSnapshotAction(ls));
@@ -209,24 +206,6 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
         add(toolBar.getComponent(), BorderLayout.NORTH);
 
-        // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
-        tabs.getActionMap().getParent().remove("navigatePageUp"); // NOI18N
-        tabs.getActionMap().getParent().remove("navigatePageDown"); // NOI18N
-
-        // support for traversing subtabs using Ctrl-Alt-PgDn/PgUp
-        getActionMap().put("PreviousViewAction",
-                           new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    moveToPreviousSubTab();
-                }
-            }); // NOI18N
-        getActionMap().put("NextViewAction",
-                           new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    moveToNextSubTab();
-                }
-            }); // NOI18N
-
         // support for Find Next / Find Previous using F3 / Shift + F3
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_MASK), "FIND_PREVIOUS"); // NOI18N
         getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
@@ -254,11 +233,12 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     }
 
     public BufferedImage getViewImage(boolean onlyVisibleArea) {
-        if (tabs.getSelectedComponent() == memoryPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == memoryPanel) {
             return memoryPanel.getCurrentViewScreenshot(onlyVisibleArea);
-        } else if (tabs.getSelectedComponent() == reversePanel) {
+        } else if (selectedView == reversePanel) {
             return reversePanel.getCurrentViewScreenshot(onlyVisibleArea);
-        } else if (tabs.getSelectedComponent() == infoPanel) {
+        } else if (selectedView == infoPanel) {
             return infoPanel.getCurrentViewScreenshot(onlyVisibleArea);
         }
 
@@ -266,11 +246,12 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     }
 
     public String getViewName() {
-        if (tabs.getSelectedComponent() == memoryPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == memoryPanel) {
             return getDefaultSnapshotFileName(getSnapshot()) + "-memory_results"; // NOI18N
-        } else if (tabs.getSelectedComponent() == reversePanel) {
+        } else if (selectedView == reversePanel) {
             return getDefaultSnapshotFileName(getSnapshot()) + "-allocation_stack_traces"; // NOI18N
-        } else if (tabs.getSelectedComponent() == infoPanel) {
+        } else if (selectedView == infoPanel) {
             return getDefaultSnapshotFileName(getSnapshot()) + "-info"; // NOI18N
         }
 
@@ -279,15 +260,16 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
     public void displayStacksForClass(int selectedClassId, int sortingColumn, boolean sortingOrder) {
         setReverseCallGraphClass(selectedClassId, sortingColumn, sortingOrder);
-        tabs.setSelectedComponent(reversePanel);
+        selectView(reversePanel);
     }
 
     public boolean fitsVisibleArea() {
-        if (tabs.getSelectedComponent() == memoryPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == memoryPanel) {
             return memoryPanel.fitsVisibleArea();
-        } else if (tabs.getSelectedComponent() == reversePanel) {
+        } else if (selectedView == reversePanel) {
             return reversePanel.fitsVisibleArea();
-        } else if (tabs.getSelectedComponent() == infoPanel) {
+        } else if (selectedView == infoPanel) {
             return infoPanel.fitsVisibleArea();
         }
 
@@ -295,9 +277,10 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     }
 
     public boolean hasView() {
-        if (tabs.getSelectedComponent() == memoryPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == memoryPanel) {
             return true;
-        } else if (tabs.getSelectedComponent() == reversePanel) {
+        } else if (selectedView == reversePanel) {
             return reversePanel.hasView();
         }
         
@@ -305,7 +288,8 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     }
 
     public void performFind() {
-        if (tabs.getSelectedComponent() == memoryPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == memoryPanel) {
             String findString = FindDialog.getFindString();
 
             if (findString == null) {
@@ -318,7 +302,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             if (!memoryPanel.findFirst()) {
                 ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
             }
-        } else if (tabs.getSelectedComponent() == reversePanel) {
+        } else if (selectedView == reversePanel) {
             String findString = FindDialog.getFindString();
 
             if (findString == null) {
@@ -335,7 +319,8 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     }
 
     public void performFindNext() {
-        if (tabs.getSelectedComponent() == memoryPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == memoryPanel) {
             if (!memoryPanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -350,7 +335,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             if (!memoryPanel.findNext()) {
                 ProfilerDialogs.displayInfo(Bundle.MemorySnapshotPanel_StringNotFoundMsg());
             }
-        } else if (tabs.getSelectedComponent() == reversePanel) {
+        } else if (selectedView == reversePanel) {
             if (!reversePanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -369,7 +354,8 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     }
 
     public void performFindPrevious() {
-        if (tabs.getSelectedComponent() == memoryPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == memoryPanel) {
             if (!memoryPanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -386,7 +372,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             }
         }
 
-        if (tabs.getSelectedComponent() == reversePanel) {
+        if (selectedView == reversePanel) {
             if (!reversePanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -413,10 +399,11 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     public void stateChanged(ChangeEvent e) {
         updateToolbar();
 
-        if (tabs.getSelectedComponent() != null) {
+        final Component selectedView = getSelectedView();
+        if (selectedView != null) {
             SwingUtilities.invokeLater(new Runnable() { // must be invoked lazily to override default focus of first component (top-right cornerButton)
                     public void run() {
-                        tabs.getSelectedComponent().requestFocus();
+                        selectedView.requestFocus();
                     }
                 });
 
@@ -436,34 +423,28 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
         reversePanel.setClassId(selectedClassId);
         reversePanel.setSorting(sortingColumn, sortingOrder);
         reversePanel.prepareResults();
-        tabs.setEnabledAt(tabs.indexOfTab(Bundle.MemorySnapshotPanel_StackTracesTabName()), true);
-    }
-
-    private void moveToNextSubTab() {
-        tabs.setSelectedIndex(UIUtils.getNextSubTabIndex(tabs, tabs.getSelectedIndex()));
-    }
-
-    private void moveToPreviousSubTab() {
-        tabs.setSelectedIndex(UIUtils.getPreviousSubTabIndex(tabs, tabs.getSelectedIndex()));
+        setViewEnabled(reversePanel, true);
     }
 
     private void updateToolbar() {
+        Component selectedView = getSelectedView();
         // update the toolbar if selected tab changed
-        boolean findEnabled = (tabs.getSelectedComponent() != infoPanel)
-                              && ((tabs.getSelectedComponent() != reversePanel) || !reversePanel.isEmpty());
+        boolean findEnabled = (selectedView != infoPanel)
+                              && ((selectedView != reversePanel) || !reversePanel.isEmpty());
         findActionPresenter.setEnabled(findEnabled);
         findPreviousPresenter.setEnabled(findEnabled);
         findNextPresenter.setEnabled(findEnabled);
     }
 
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
-        if (tabs.getSelectedComponent() == memoryPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == memoryPanel) {
             if (memoryPanel instanceof SnapshotAllocResultsPanel) {
                 ((SnapshotAllocResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_MemoryResultsTabName());
             } else if (memoryPanel instanceof SnapshotLivenessResultsPanel) {
                 ((SnapshotLivenessResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_StackTracesTabName());
             } 
-        } else if (tabs.getSelectedComponent() == reversePanel) {
+        } else if (selectedView == reversePanel) {
             reversePanel.exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_StackTracesTabName());
         }
     }
@@ -473,9 +454,10 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     }
 
     public boolean hasExportableView() {
-        if (tabs.getSelectedComponent() == memoryPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == memoryPanel) {
             return true;
-        } else if (tabs.getSelectedComponent() == reversePanel) {
+        } else if (selectedView == reversePanel) {
             return reversePanel.hasView();
         }
         return false;

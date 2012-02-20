@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import javax.swing.JToggleButton;
 import org.netbeans.modules.profiler.heapwalk.SummaryController;
 import javax.swing.AbstractButton;
@@ -83,7 +84,16 @@ public class SummaryControllerUI extends JPanel {
             setText(Bundle.SummaryControllerUI_ViewTitle());
             setToolTipText(Bundle.SummaryControllerUI_ViewDescr());
             setIcon(ICON_INFO);
-            setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            d.width += 4;
+            return d;
+        }
+        
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
         }
     }
 
