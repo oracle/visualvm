@@ -109,31 +109,12 @@ public abstract class ProfilerToolbar {
             toolbar.setRollover(true);
             toolbar.setFloatable(false);
             
-            final boolean customPaint = UIUtils.isNimbus();
-            
             if (showSeparator) {
-                JSeparator separator = new JSeparator() {
-                    public Dimension getMaximumSize() {
-                        return new Dimension(super.getMaximumSize().width, 1);
-                    }
-                    public Dimension getPreferredSize() {
-                        return new Dimension(super.getPreferredSize().width, 1);
-                    }
-                    public void paint(Graphics g) {
-                        if (customPaint) {
-                            g.setColor(UIUtils.getDisabledLineColor());
-                            g.fillRect(0, 0, getWidth(), getHeight());
-                        } else {
-                            super.paint(g);
-                        }
-                    }
-                };
-                separator.setBackground(toolbar.getBackground());
-                
                 component = new JPanel(new BorderLayout(0, 0));
                 component.setOpaque(false);
                 component.add(toolbar, BorderLayout.CENTER);
-                component.add(separator, BorderLayout.SOUTH);
+                component.add(UIUtils.createHorizontalLine(toolbar.getBackground()),
+                        BorderLayout.SOUTH);
             } else {
                 component = toolbar;
             }

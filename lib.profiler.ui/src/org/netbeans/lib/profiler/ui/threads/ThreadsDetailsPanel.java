@@ -181,7 +181,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         showLabel.setDisplayedMnemonic(showLabel.getText().charAt(mnemCharIndex));
         showLabel.setDisplayedMnemonicIndex(mnemCharIndex);
 
-        buttonsToolBar = ProfilerToolbar.create(false);
+        buttonsToolBar = ProfilerToolbar.create(true);
         content = new JPanel() {
                 public Dimension getPreferredSize() {
                     Dimension dim = super.getPreferredSize();
@@ -197,9 +197,10 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         scrollPane = new JScrollPane(contentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
 
         // perform layout
-        setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
         setLayout(new BorderLayout());
         content.setLayout(new GridLayout(0, 1)); /*new GridLayout(0, 1) {
            public void layoutContainer(Container parent) {

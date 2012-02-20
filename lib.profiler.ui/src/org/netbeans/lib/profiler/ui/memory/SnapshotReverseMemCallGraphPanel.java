@@ -538,6 +538,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
             removeAll();
             treeTablePanel = new JTreeTablePanel(treeTable);
+            treeTablePanel.clearBorders();
             treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, cornerButton);
             add(treeTablePanel, BorderLayout.CENTER);
             initFilterPanel();

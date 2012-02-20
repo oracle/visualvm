@@ -904,7 +904,7 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private ProfilerToolbar createToolBar() {
-        ProfilerToolbar tb = ProfilerToolbar.create(false);
+        ProfilerToolbar tb = ProfilerToolbar.create(true);
 
         autoToggle = new JToggleButton(Icons.getIcon(GeneralIcons.UPDATE_AUTO));
         autoToggle.setSelected(true);
@@ -966,7 +966,6 @@ public final class LiveResultsWindow extends TopComponent
                                                     historyActionsHandler,
                                                     classHistoryManager);
                 currentDisplayComponent = memoryTabPanel;
-                currentDisplayComponent.setBorder(new EmptyBorder(5, 0, 0, 0));
 
                 if (resultsView.getViewsCount() > 0) {
                     resultsView.removeViews();
@@ -986,7 +985,6 @@ public final class LiveResultsWindow extends TopComponent
                                                     historyActionsHandler,
                                                     classHistoryManager);
                 currentDisplayComponent = memoryTabPanel;
-                currentDisplayComponent.setBorder(new EmptyBorder(5, 0, 0, 0));
 
                 if (resultsView.getViewsCount() > 0) {
                     resultsView.removeViews();
@@ -1012,8 +1010,6 @@ public final class LiveResultsWindow extends TopComponent
                 }
 
                 currentDisplayComponent = cpuPanel;
-
-                currentDisplayComponent.setBorder(new EmptyBorder(5, 5, 5, 5));
                 aPanel = cpuPanel;
                 HELP_CTX = new HelpCtx(HELP_CTX_KEY_CPU);
 
@@ -1022,7 +1018,6 @@ public final class LiveResultsWindow extends TopComponent
             case ProfilerEngineSettings.INSTR_CODE_REGION: {
                 CodeRegionLivePanel regionPanel = new CodeRegionLivePanel(runner.getProfilerClient());
                 currentDisplayComponent = regionPanel;
-                currentDisplayComponent.setBorder(new EmptyBorder(5, 5, 5, 5));
                 aPanel = regionPanel;
 
                 break;

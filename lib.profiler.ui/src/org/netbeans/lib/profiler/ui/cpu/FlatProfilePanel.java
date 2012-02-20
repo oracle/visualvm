@@ -156,6 +156,8 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
 
         jScrollPane = createScrollPaneVerticalScrollBarAlways();
         jScrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
+        jScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
         jScrollPane.addMouseWheelListener(new MouseWheelListener() {
                 public void mouseWheelMoved(MouseWheelEvent e) {
                     if (resTable != null) {
