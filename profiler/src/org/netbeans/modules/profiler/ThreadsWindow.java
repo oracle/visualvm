@@ -47,7 +47,6 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.openide.util.HelpCtx;
@@ -61,6 +60,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.lib.profiler.ui.ResultsView;
 import org.netbeans.lib.profiler.ui.threads.ThreadsTablePanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -95,7 +95,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final JPanel threadsTimelinePanelContainer;
-    private final JTabbedPane tabs;
+    private final ResultsView threadsView;
     private final ThreadsPanel threadsPanel;
     private final ThreadsTablePanel threadsTablePanel;
     private Component lastFocusOwner;
@@ -110,10 +110,8 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
         setIcon(windowIcon);
         getAccessibleContext().setAccessibleDescription(Bundle.ThreadsWindow_ThreadsAccessDescr());
         setLayout(new BorderLayout());
-        tabs = new JTabbedPane();
-
-        tabs.setTabPlacement(JTabbedPane.BOTTOM);
-        add(tabs, BorderLayout.CENTER);
+        threadsView = new ResultsView();
+        add(threadsView, BorderLayout.CENTER);
 
         final boolean tvmSupportsSleepingState = Platform.supportsThreadSleepingStateMonitoring(Profiler.getDefault()
                                                                                                         .getTargetAppRunner()
@@ -128,7 +126,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
                  */
                 public void showDetails(final int[] indexes) {
                     threadsDetailsPanel.showDetails(indexes);
-                    tabs.setSelectedComponent(threadsDetailsPanelContainer);
+                    threadsView.selectView(threadsDetailsPanelContainer);
                 }
             }, tvmSupportsSleepingState); // TODO [project] - this is wrong - the JVM can change and the supportSleeping state as well
         threadsTimelinePanelContainer = new JPanel() {
@@ -146,7 +144,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
                 new ThreadsTablePanel.ThreadsDetailsCallback() {
                 public void showDetails(final int[] indexes) {
                     threadsDetailsPanel.showDetails(indexes);
-                    tabs.setSelectedComponent(threadsDetailsPanelContainer);
+                    threadsView.selectView(threadsDetailsPanelContainer);
                 }
             }, tvmSupportsSleepingState);
         threadsTablePanel.addSaveViewAction(new SaveViewAction(this));
@@ -161,35 +159,20 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
         threadsDetailsPanelContainer.add(threadsDetailsPanel, BorderLayout.CENTER);
         threadsDetailsPanel.addSaveViewAction(new SaveViewAction(this));
 
-        tabs.addTab(Bundle.ThreadsWindow_ThreadsTimelineTabName(), null, threadsTimelinePanelContainer, Bundle.ThreadsWindow_ThreadsTimelineTabDescr());
-        tabs.addTab(Bundle.ThreadsWindow_ThreadsTableTabName(), null, threadsTablePanel, Bundle.ThreadsWindow_ThreadsTableTabDescr());
-        tabs.addTab(Bundle.ThreadsWindow_ThreadsDetailsTabName(), null, threadsDetailsPanelContainer, Bundle.ThreadsWindow_ThreadsDetailsTabDescr());
+        threadsView.addView(Bundle.ThreadsWindow_ThreadsTimelineTabName(), null,
+                Bundle.ThreadsWindow_ThreadsTimelineTabDescr(), threadsTimelinePanelContainer, threadsPanel.getToolbar());
+        threadsView.addView(Bundle.ThreadsWindow_ThreadsTableTabName(), null,
+                Bundle.ThreadsWindow_ThreadsTableTabDescr(), threadsTablePanel, threadsTablePanel.getToolbar());
+        threadsView.addView(Bundle.ThreadsWindow_ThreadsDetailsTabName(), null,
+                Bundle.ThreadsWindow_ThreadsDetailsTabDescr(), threadsDetailsPanelContainer, threadsDetailsPanel.getToolbar());
 
         profilingStateChanged(Profiler.getDefault().getProfilingState());
         threadsMonitoringChanged();
 
-        // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
-        tabs.getActionMap().getParent().remove("navigatePageUp"); // NOI18N
-        tabs.getActionMap().getParent().remove("navigatePageDown"); // NOI18N
-
-        // support for traversing subtabs using Ctrl-Alt-PgDn/PgUp
-        getActionMap().put("PreviousViewAction",
-                           new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    moveToPreviousSubTab();
-                }
-            }); // NOI18N
-        getActionMap().put("NextViewAction",
-                           new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    moveToNextSubTab();
-                }
-            }); // NOI18N
-
         setFocusable(true);
         setRequestFocusEnabled(true);
 
-        tabs.addChangeListener(this);
+        threadsView.addChangeListener(this);
         Profiler.getDefault().addProfilingStateListener(this);
     }
 
@@ -228,11 +211,12 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     }
 
     public BufferedImage getViewImage(boolean onlyVisibleArea) {
-        if (tabs.getSelectedComponent() == threadsTimelinePanelContainer) {
+        Component selectedView = threadsView.getSelectedView();
+        if (selectedView == threadsTimelinePanelContainer) {
             return threadsPanel.getCurrentViewScreenshot(onlyVisibleArea);
-        } else if (tabs.getSelectedComponent() == threadsTablePanel) {
+        } else if (selectedView == threadsTablePanel) {
             return threadsTablePanel.getCurrentViewScreenshot(onlyVisibleArea);
-        } else if (tabs.getSelectedComponent() == threadsDetailsPanelContainer) {
+        } else if (selectedView == threadsDetailsPanelContainer) {
             return threadsDetailsPanel.getCurrentViewScreenshot(onlyVisibleArea);
         }
 
@@ -240,11 +224,12 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     }
 
     public String getViewName() {
-        if (tabs.getSelectedComponent() == threadsTimelinePanelContainer) {
+        Component selectedView = threadsView.getSelectedView();
+        if (selectedView == threadsTimelinePanelContainer) {
             return "threads-timeline"; // NOI18N
-        } else if (tabs.getSelectedComponent() == threadsTablePanel) {
+        } else if (selectedView == threadsTablePanel) {
             return "threads-table"; // NOI18N
-        } else if (tabs.getSelectedComponent() == threadsDetailsPanelContainer) {
+        } else if (selectedView == threadsDetailsPanelContainer) {
             return "threads-details"; // NOI18N
         }
 
@@ -264,11 +249,12 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     }
 
     public boolean fitsVisibleArea() {
-        if (tabs.getSelectedComponent() == threadsTimelinePanelContainer) {
+        Component selectedView = threadsView.getSelectedView();
+        if (selectedView == threadsTimelinePanelContainer) {
             return threadsPanel.fitsVisibleArea();
-        } else if (tabs.getSelectedComponent() == threadsTablePanel) {
+        } else if (selectedView == threadsTablePanel) {
             return threadsTablePanel.fitsVisibleArea();
-        } else if (tabs.getSelectedComponent() == threadsDetailsPanelContainer) {
+        } else if (selectedView == threadsDetailsPanelContainer) {
             return threadsDetailsPanel.fitsVisibleArea();
         }
 
@@ -277,11 +263,12 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
 
     // --- Export Current View action support ------------------------------------
     public boolean hasView() {
-        if (tabs.getSelectedComponent() == threadsTimelinePanelContainer) {
+        Component selectedView = threadsView.getSelectedView();
+        if (selectedView == threadsTimelinePanelContainer) {
             return threadsPanel.hasView();
-        } else if (tabs.getSelectedComponent() == threadsTablePanel) {
+        } else if (selectedView == threadsTablePanel) {
             return threadsTablePanel.hasView();
-        } else if (tabs.getSelectedComponent() == threadsDetailsPanelContainer) {
+        } else if (selectedView == threadsDetailsPanelContainer) {
             return threadsDetailsPanel.hasView();
         }
 
@@ -297,7 +284,7 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     }
 
     public void showThreads() {
-        tabs.setSelectedComponent(threadsTimelinePanelContainer);
+        threadsView.selectView(threadsTimelinePanelContainer);
         open();
         requestActive();
     }
@@ -305,8 +292,9 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     public void stateChanged(ChangeEvent e) {
         SwingUtilities.invokeLater(new Runnable() { // must be invoked lazily to override default focus of first component
                 public void run() {
-                    if (tabs.getSelectedComponent() != null) {
-                        tabs.getSelectedComponent().requestFocus(); // move focus to results table when tab is switched
+                    Component selectedView = threadsView.getSelectedView();
+                    if (selectedView != null) {
+                        selectedView.requestFocus(); // move focus to results table when tab is switched
                     }
                 }
             });
@@ -315,13 +303,13 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     public void threadsMonitoringChanged() {
         if (Profiler.getDefault().getThreadsMonitoringEnabled()) {
             threadsPanel.threadsMonitoringEnabled();
-            tabs.setEnabledAt(1, true);
-            tabs.setEnabledAt(2, true);
+            threadsView.setViewEnabled(threadsTablePanel, true);
+            threadsView.setViewEnabled(threadsDetailsPanelContainer, true);
         } else {
             threadsPanel.threadsMonitoringDisabled();
-            tabs.setSelectedIndex(0);
-            tabs.setEnabledAt(1, false);
-            tabs.setEnabledAt(2, false);
+            threadsView.selectView(threadsTimelinePanelContainer);
+            threadsView.setViewEnabled(threadsTablePanel, false);
+            threadsView.setViewEnabled(threadsDetailsPanelContainer, false);
         }
     }
 
@@ -333,14 +321,6 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
      */
     protected String preferredID() {
         return this.getClass().getName();
-    }
-
-    private void moveToNextSubTab() {
-        tabs.setSelectedIndex(UIUtils.getNextSubTabIndex(tabs, tabs.getSelectedIndex()));
-    }
-
-    private void moveToPreviousSubTab() {
-        tabs.setSelectedIndex(UIUtils.getPreviousSubTabIndex(tabs, tabs.getSelectedIndex()));
     }
 
     private void profilingStateChanged(final boolean enable) {
