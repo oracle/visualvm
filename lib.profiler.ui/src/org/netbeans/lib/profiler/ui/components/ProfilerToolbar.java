@@ -44,7 +44,11 @@ package org.netbeans.lib.profiler.ui.components;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.Lookup;
 
 /**
@@ -93,6 +97,8 @@ public abstract class ProfilerToolbar {
     
     public static class Impl extends ProfilerToolbar {
         
+        protected static int preferredHeight = -1;
+        
         protected final JComponent component;
         protected final JToolBar toolbar;
         
@@ -102,6 +108,29 @@ public abstract class ProfilerToolbar {
                     if (comp instanceof JButton)
                         UIUtils.fixButtonUI((JButton) comp);
                     return super.add(comp);
+                }
+                public Dimension getPreferredSize() {
+                    Dimension dim = super.getPreferredSize();
+                    if (preferredHeight == -1) {
+                        JToolBar tb = new JToolBar();
+                        tb.setBorder(toolbar.getBorder());
+                        tb.setBorderPainted(toolbar.isBorderPainted());
+                        tb.setRollover(toolbar.isRollover());
+                        tb.setFloatable(toolbar.isFloatable());
+                        Icon icon = Icons.getIcon(GeneralIcons.SAVE);
+                        JButton b = new JButton("Button", icon); // NOI18N
+                        tb.add(b);
+                        JToggleButton t = new JToggleButton("Button", icon); // NOI18N
+                        tb.add(t);
+                        JComboBox c = new JComboBox();
+                        c.setEditor(new BasicComboBoxEditor());
+                        c.setRenderer(new BasicComboBoxRenderer());
+                        tb.add(c);
+                        tb.addSeparator();
+                        preferredHeight = tb.getPreferredSize().height;
+                    }
+                    dim.height = Math.max(dim.height, preferredHeight);
+                    return dim;
                 }
             };
             toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
