@@ -154,6 +154,8 @@ public abstract class FilterComponent implements CommonConstants {
             if (UIUtils.isWindowsLookAndFeel() || UIUtils.isMetalLookAndFeel()) {
                 Insets i = filterCombo.getInsets();
                 component.setBorder(BorderFactory.createEmptyBorder(0, -i.left, 0, -i.right));
+            } else if (UIUtils.isGTKLookAndFeel()) {
+                component.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
             }
             component.add(filterCombo, BorderLayout.CENTER);
             
