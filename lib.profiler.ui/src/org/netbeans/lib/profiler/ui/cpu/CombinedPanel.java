@@ -96,7 +96,7 @@ public class CombinedPanel extends JSplitPane implements ScreenshotProvider {
         if (divider != null) {
             Color c = UIUtils.isNimbus() ? UIUtils.getDisabledLineColor() :
                     new JSeparator().getForeground();
-            divider.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, c));
+            divider.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, c));
         }
     }
 }

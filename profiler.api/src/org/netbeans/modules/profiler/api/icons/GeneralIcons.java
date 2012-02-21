@@ -47,8 +47,12 @@ package org.netbeans.modules.profiler.api.icons;
  */
 public interface GeneralIcons extends Icons.Keys {
     
+    public static final String FILTER = "GeneralIcons.Filter"; // NOI18N
+    public static final String FILTER_HIGHL = "GeneralIcons.FilterHighl"; // NOI18N
     public static final String SET_FILTER = "GeneralIcons.SetFilter"; // NOI18N
+    public static final String SET_FILTER_HIGHL = "GeneralIcons.SetFilterHighl"; // NOI18N
     public static final String CLEAR_FILTER = "GeneralIcons.ClearFilter"; // NOI18N
+    public static final String CLEAR_FILTER_HIGHL = "GeneralIcons.ClearFilterHighl"; // NOI18N
     public static final String CLOSE_PANEL = "GeneralIcons.ClosePanel"; // NOI18N
     public static final String FILTER_CONTAINS = "GeneralIcons.FilterContains"; // NOI18N
     public static final String FILTER_ENDS_WITH = "GeneralIcons.FilterEndsWith"; // NOI18N

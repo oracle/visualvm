@@ -245,7 +245,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         }
 
         // Reinit bar max value here - operations necessary for correct bar representation of results
-        flatProfileContainer.filterOriginalData(FilterComponent.getFilterStrings(filterString), filterType, valueFilterValue);
+        flatProfileContainer.filterOriginalData(FilterComponent.getFilterValues(filterString), filterType, valueFilterValue);
         flatProfileContainer.sortBy(sortBy, sortOrder); // This will actually create the below-used percent()
                                                         // thing for proper timer
 

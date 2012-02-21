@@ -423,8 +423,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         combinedFlat.prepareResults();
         infoPanel.updateInfo();
 
-        flatPanel.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
+        flatPanel.addFilterListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
                     if (!internalFilterChange) {
                         internalFilterChange = true;
                         combinedFlat.setFilterValues(flatPanel.getFilterValue(), flatPanel.getFilterType());
@@ -433,8 +433,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                 }
             });
 
-        combinedFlat.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
+        combinedFlat.addFilterListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
                     if (!internalFilterChange) {
                         internalFilterChange = true;
                         flatPanel.setFilterValues(combinedFlat.getFilterValue(), combinedFlat.getFilterType());
@@ -1122,6 +1122,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         flatPanel.prepareResults();
         combinedCCT.prepareResults();
         combinedFlat.prepareResults();
+        revalidate();
+        repaint();
     }
 
     private void enhancePopupMenu(JPopupMenu popup, CCTDisplay customCCTDisplay) {

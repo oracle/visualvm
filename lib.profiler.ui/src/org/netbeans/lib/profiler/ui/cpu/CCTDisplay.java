@@ -76,6 +76,8 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
@@ -102,10 +104,13 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
     private static final String METHOD_COLUMN_NAME = messages.getString("CCTDisplay_MethodColumnName"); // NOI18N
     private static final String METHOD_COLUMN_TOOLTIP = messages.getString("CCTDisplay_MethodColumnToolTip"); // NOI18N
+    private static final String METHOD_FILTER_HINT = messages.getString("FlatProfilePanel_MethodFilterHint"); // NOI18N
     private static final String CLASS_COLUMN_NAME = messages.getString("CCTDisplay_ClassColumnName"); // NOI18N
     private static final String CLASS_COLUMN_TOOLTIP = messages.getString("CCTDisplay_ClassColumnToolTip"); // NOI18N
+    private static final String CLASS_FILTER_HINT = messages.getString("FlatProfilePanel_ClassFilterHint"); // NOI18N
     private static final String PACKAGE_COLUMN_NAME = messages.getString("CCTDisplay_PackageColumnName"); // NOI18N
     private static final String PACKAGE_COLUMN_TOOLTIP = messages.getString("CCTDisplay_PackageColumnToolTip"); // NOI18N
+    private static final String PACKAGE_FILTER_HINT = messages.getString("FlatProfilePanel_PackageFilterHint"); // NOI18N
     private static final String TIME_REL_COLUMN_NAME = messages.getString("CCTDisplay_TimeRelColumnName"); // NOI18N
     private static final String TIME_COLUMN_NAME = messages.getString("CCTDisplay_TimeColumnName"); // NOI18N
     private static final String TIME_CPU_COLUMN_NAME = messages.getString("CCTDisplay_TimeCpuColumnName"); // NOI18N
@@ -356,8 +361,12 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         if (treeTable != null) {
             sortingColumn = treeTable.getSortingColumn();
         }
-
+        
         reset();
+        
+        if (filterComponent == null)
+            filterComponent = FilterComponent.create(true, true);
+        
         initFirstColumnName();
 
         abstractTreeTableModel = new AbstractTreeTableModel(snapshot.getRootNode(currentView), sortingColumn, sortOrder) {
@@ -628,27 +637,14 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         initFilterPanel();
     }
     
-    private void initFilterPanel() {
-        filterComponent = new FilterComponent();
-
-        //filterComponent.setEmptyFilterText("[Method Name Filter]");
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
-//                "Starts with", CommonConstants.FILTER_STARTS_WITH);
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS
-//        ), "Contains", CommonConstants.FILTER_CONTAINS);
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
-//                "Ends with", CommonConstants.FILTER_ENDS_WITH);
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP), // NOI18N
-//                                      "Regular expression", CommonConstants.FILTER_REGEXP);
-        //filterComponent.addSeparatorItem();
-        
+    private void initFilterPanel() {        
         FilterSortSupport.Configuration config = snapshot.getFilterSortInfo(
                 (PrestimeCPUCCTNode)treeTableModel.getRoot());
-        filterComponent.setFilterValues(config.getFilterString(), config.getFilterType());
+        filterComponent.setFilter(config.getFilterString(), config.getFilterType());
 
-        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
-                    String filterString = filterComponent.getFilterString();
+        filterComponent.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    String filterString = filterComponent.getFilterValue();
                     int filterType = filterComponent.getFilterType();
                     snapshot.filterForward(filterString, filterType, (PrestimeCPUCCTNodeBacked)treeTableModel.getRoot());
                     
@@ -656,7 +652,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
                 }
             });
 
-        add(filterComponent, BorderLayout.SOUTH);
+        add(filterComponent.getComponent(), BorderLayout.SOUTH);
     }
 
     public void removeResultsViewFocusListener(FocusListener listener) {
@@ -677,7 +673,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         if (treeTablePanel != null) {
             remove(treeTablePanel);
             treeTablePanel = null;
-            remove(filterComponent);
+            remove(filterComponent.getComponent());
             filterComponent = null;
         }
 
@@ -881,16 +877,19 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             case CPUResultsSnapshot.METHOD_LEVEL_VIEW:
                 columnNames[0] = METHOD_COLUMN_NAME;
                 columnToolTips[0] = METHOD_COLUMN_TOOLTIP;
+                filterComponent.setHint(METHOD_FILTER_HINT);
 
                 break;
             case CPUResultsSnapshot.CLASS_LEVEL_VIEW:
                 columnNames[0] = CLASS_COLUMN_NAME;
                 columnToolTips[0] = CLASS_COLUMN_TOOLTIP;
+                filterComponent.setHint(CLASS_FILTER_HINT);
 
                 break;
             case CPUResultsSnapshot.PACKAGE_LEVEL_VIEW:
                 columnNames[0] = PACKAGE_COLUMN_NAME;
                 columnToolTips[0] = PACKAGE_COLUMN_TOOLTIP;
+                filterComponent.setHint(PACKAGE_FILTER_HINT);
 
                 break;
         }
