@@ -413,13 +413,14 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         dataPanel.setLayout(new BorderLayout());
 
         tableScroll = new JScrollPane();
-        tableScroll.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0));
         tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, new JPanel());
         tableScroll.getCorner(JScrollPane.UPPER_RIGHT_CORNER).setBackground(Color.WHITE);
         viewPort = new CustomTimeLineViewport(this);
         viewPort.setView(table);
         viewPort.setBackground(table.getBackground());
         tableScroll.setViewport(viewPort);
+        tableScroll.setBorder(BorderFactory.createEmptyBorder());
+        tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
         tableScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         tableScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         dataPanel.add(tableScroll, BorderLayout.CENTER);
