@@ -89,6 +89,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
     private void exportHTML(ExportDataDumper eDD, boolean combine, String viewName) {
          // Header
         StringBuffer result;
+        boolean iCTTS = flatProfileContainer.isCollectingTwoTimeStamps();
         if (!combine) {
             result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE><style type=\"text/css\">pre.method{overflow:auto;width:600;height:30;vertical-align:baseline}pre.parent{overflow:auto;width:400;height:30;vertical-align:baseline}td.method{text-align:left;width:600}td.parent{text-align:left;width:400}td.right{text-align:right;white-space:nowrap}</style></HEAD><BODY><TABLE border=\"1\"><tr>");
         } else {
@@ -106,6 +107,9 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result = new StringBuffer("<tr><td class=\"method\"><pre class=\"method\">"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</pre></td>");
             result.append("<td class=\"right\">").append(percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)).append("</td>");
             result.append("<td class=\"right\">").append((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms</td>");
+            if (iCTTS) {
+                result.append("<td class=\"right\">").append((double) flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms</td>");
+            }
             result.append("<td class=\"right\">").append(flatProfileContainer.getNInvocationsAtRow(i)).append("</td></tr>");
             eDD.dumpData(result);
         }
@@ -116,6 +120,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
          // Header
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result;
+        boolean iCTTS = flatProfileContainer.isCollectingTwoTimeStamps();
         if (!combine) {
             result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newline+"<ExportedView Name=\""+viewName+"\" type=\"table\">"+newline+" <TableData NumRows=\""+flatProfileContainer.getNRows()+"\" NumColumns=\"4\">"+newline+"  <TableHeader>"); // NOI18N
         } else {
@@ -131,6 +136,9 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline);
             result.append("    <TableColumn><![CDATA[").append(percentFormat.format(((double)flatProfileContainer.getPercentAtRow(i))/100)).append("]]></TableColumn>").append(newline);
             result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline);
+            if (iCTTS) {
+                result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs1AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline);
+            }
             result.append("    <TableColumn><![CDATA[").append(flatProfileContainer.getNInvocationsAtRow(i)).append("]]></TableColumn>").append(newline).append("  </TableRow>").append(newline);
             eDD.dumpData(result);
         }
@@ -142,7 +150,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         StringBuffer result = new StringBuffer();
         String newLine = "\r\n"; // NOI18N
         String quote = "\""; // NOI18N
-
+        boolean iCTTS = flatProfileContainer.isCollectingTwoTimeStamps();
         if (combine) {
             result.append(quote).append(quote).append(separator).append(quote).append(quote).append(separator).append(quote).append(quote).append(separator).append(quote).append(quote).append(newLine);
         }
@@ -159,6 +167,9 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result.append(quote).append(flatProfileContainer.getMethodNameAtRow(i)).append(quote).append(separator);
             result.append(quote).append(flatProfileContainer.getPercentAtRow(i)).append(quote).append(separator);
             result.append(quote).append((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            if (iCTTS) {
+                result.append(quote).append((double)flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            }
             result.append(quote).append(flatProfileContainer.getNInvocationsAtRow(i)).append(quote).append(newLine);
             eDD.dumpData(result);
         }
@@ -234,7 +245,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         }
 
         // Reinit bar max value here - operations necessary for correct bar representation of results
-        flatProfileContainer.filterOriginalData(FilterComponent.getFilterStrings(filterString), filterType, valueFilterValue);
+        flatProfileContainer.filterOriginalData(FilterComponent.getFilterValues(filterString), filterType, valueFilterValue);
         flatProfileContainer.sortBy(sortBy, sortOrder); // This will actually create the below-used percent()
                                                         // thing for proper timer
 

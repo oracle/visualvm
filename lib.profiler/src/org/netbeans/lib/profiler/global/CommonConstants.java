@@ -253,6 +253,7 @@ public interface CommonConstants {
     public static final int FILTER_NONE = 0;
     public static final int FILTER_STARTS_WITH = 10;
     public static final int FILTER_CONTAINS = 20;
+    public static final int FILTER_NOT_CONTAINS = 25;
     public static final int FILTER_ENDS_WITH = 30;
     public static final int FILTER_EQUALS = 40;
     public static final int FILTER_REGEXP = 50;

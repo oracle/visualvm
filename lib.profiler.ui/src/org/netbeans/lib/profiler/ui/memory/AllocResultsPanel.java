@@ -373,7 +373,7 @@ public abstract class AllocResultsPanel extends MemoryResultsPanel {
         if (filterComponent == null) {
             filterMenuItem.setState(true);
         } else {
-            filterMenuItem.setState(filterComponent.isVisible());
+            filterMenuItem.setState(filterComponent.getComponent().isVisible());
         }
 
         headerPopup.add(filterMenuItem);
@@ -448,7 +448,7 @@ public abstract class AllocResultsPanel extends MemoryResultsPanel {
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (e.getActionCommand().equals("Filter")) { // NOI18N
-                        filterComponent.setVisible(!filterComponent.isVisible());
+                        filterComponent.getComponent().setVisible(!filterComponent.getComponent().isVisible());
 
                         // TODO [ui-persistence]
                         return;
