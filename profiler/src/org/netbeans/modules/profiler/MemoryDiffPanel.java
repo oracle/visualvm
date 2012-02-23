@@ -142,7 +142,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
 
         add(memoryPanel, BorderLayout.CENTER);
 
-        ProfilerToolbar toolBar = ProfilerToolbar.create(false);
+        ProfilerToolbar toolBar = ProfilerToolbar.create(true);
         //    toolBar.add(saveAction = new SaveSnapshotAction(ls));
         toolBar.add(new ExportAction(this,null));
         toolBar.add(new SaveViewAction(this));
