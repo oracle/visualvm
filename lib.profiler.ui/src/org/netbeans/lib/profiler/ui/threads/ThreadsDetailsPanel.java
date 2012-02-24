@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import javax.swing.*;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
@@ -123,7 +124,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
     private JPanel content;
     private JPanel noContentPanel;
     private JScrollPane scrollPane;
-    private JToolBar buttonsToolBar;
+    private ProfilerToolbar buttonsToolBar;
     private ThreadsDataManager manager;
     private boolean internalChange = false;
     private boolean noContent = false;
@@ -180,15 +181,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         showLabel.setDisplayedMnemonic(showLabel.getText().charAt(mnemCharIndex));
         showLabel.setDisplayedMnemonicIndex(mnemCharIndex);
 
-        buttonsToolBar = new JToolBar(JToolBar.HORIZONTAL) {
-                public Component add(Component comp) {
-                    if (comp instanceof JButton) {
-                        UIUtils.fixButtonUI((JButton) comp);
-                    }
-
-                    return super.add(comp);
-                }
-            };
+        buttonsToolBar = ProfilerToolbar.create(false);
         content = new JPanel() {
                 public Dimension getPreferredSize() {
                     Dimension dim = super.getPreferredSize();
@@ -205,13 +198,8 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
                                      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
 
-        // set properties
-        buttonsToolBar.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        buttonsToolBar.setFloatable(false);
-        buttonsToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
-
         // perform layout
-        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
         setLayout(new BorderLayout());
         content.setLayout(new GridLayout(0, 1)); /*new GridLayout(0, 1) {
            public void layoutContainer(Container parent) {
@@ -239,9 +227,9 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
            });*/
 
         contentPanel.add(content, BorderLayout.NORTH);
+        buttonsToolBar.addSeparator();
         buttonsToolBar.add(showLabel);
         buttonsToolBar.add(threadsSelectionCombo);
-        add(buttonsToolBar, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         //add (scrollBar, BorderLayout.EAST);
         threadsSelectionCombo.addActionListener(this);
@@ -258,6 +246,10 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public Component getToolbar() {
+        return buttonsToolBar.getComponent();
+    }
+    
     public BufferedImage getCurrentViewScreenshot(boolean onlyVisibleArea) {
         if (onlyVisibleArea) {
             return UIUtils.createScreenshot(scrollPane);
@@ -369,11 +361,9 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
 
     // --- Save Current View action support --------------------------------------
     public void addSaveViewAction(AbstractAction saveViewAction) {
-        JButton actionButton = buttonsToolBar.add(saveViewAction);
+        Component actionButton = buttonsToolBar.add(saveViewAction);
         buttonsToolBar.remove(actionButton);
-
         buttonsToolBar.add(actionButton, 0);
-        buttonsToolBar.add(new JToolBar.Separator(), 1);
     }
 
     /** Called when data in manager change */

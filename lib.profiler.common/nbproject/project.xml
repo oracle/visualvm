@@ -74,6 +74,7 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.sampler</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.netbeans.modules.javame.profiler</friend>
+                <friend>org.netbeans.modules.javame.profiler.j2me</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.api</friend>
