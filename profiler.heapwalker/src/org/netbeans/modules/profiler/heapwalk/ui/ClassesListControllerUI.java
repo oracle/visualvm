@@ -71,7 +71,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -91,6 +90,8 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
@@ -101,7 +102,6 @@ import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
@@ -122,7 +122,7 @@ import org.openide.util.RequestProcessor;
     "ClassesListControllerUI_FilterRegexp=Regular expression",
     "ClassesListControllerUI_FilterImplementation=Subclass/implementation",
     "ClassesListControllerUI_FilterSubclass=Subclass of",
-    "ClassesListControllerUI_DefaultFilterText=[Class Name Filter]",
+    "ClassesListControllerUI_DefaultFilterText=Class Name Filter",
     "ClassesListControllerUI_ShowInInstancesString=Show in Instances View",
     "ClassesListControllerUI_ShowImplementationsString=Show Only Subclasses or Implementations",
     "ClassesListControllerUI_ShowSubclassesString=Show Only Subclasses",
@@ -345,7 +345,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                     }, 100);
                     
                     displayCache = classesListController.getData(
-                         FilterComponent.getFilterStrings(filterValue), filterType,
+                         FilterComponent.getFilterValues(filterValue), filterType,
                          showZeroInstances, showZeroSize, sortingColumn, sortingOrder, columnCount);
                     
                     initInProgress.set(false);
@@ -536,7 +536,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
     public void ensureWillBeVisible(JavaClass javaClass) {
         // TODO: add showZeroSize and showZeroInstances checking
-        if (ClassesListController.matchesFilter(javaClass, FilterComponent.getFilterStrings(filterValue), filterType,
+        if (ClassesListController.matchesFilter(javaClass, FilterComponent.getFilterValues(filterValue), filterType,
                                                     showZeroInstances, showZeroSize)) {
             return;
         }
@@ -545,7 +545,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         //      filterComponent.setFilterString(filterValue + " " + javaClass.getName()); // NOI18N
         //      return;
         //    }
-        filterComponent.setFilterString(""); // NOI18N
+        filterComponent.setFilterValue(""); // NOI18N
     }
 
     // --- Public interface ------------------------------------------------------
@@ -590,7 +590,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         if (filterComponent == null) {
             filterMenuItem.setState(true);
         } else {
-            filterMenuItem.setState(filterComponent.isVisible());
+            filterMenuItem.setState(filterComponent.getComponent().isVisible());
         }
 
         cornerPopup.add(filterMenuItem);
@@ -628,7 +628,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         menuItem.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     if (e.getActionCommand().equals("Filter")) { // NOI18N
-                        filterComponent.setVisible(!filterComponent.isVisible());
+                        filterComponent.getComponent().setVisible(!filterComponent.getComponent().isVisible());
 
                         return;
                     }
@@ -899,26 +899,17 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         setColumnsData(true);
 
-        filterComponent = new FilterComponent();
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
-                Bundle.ClassesListControllerUI_FilterStartsWith(), CommonConstants.FILTER_STARTS_WITH);
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS),
-                Bundle.ClassesListControllerUI_FilterContains(), CommonConstants.FILTER_CONTAINS);
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
-                Bundle.ClassesListControllerUI_FilterEndsWith(), CommonConstants.FILTER_ENDS_WITH);
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP),
-                Bundle.ClassesListControllerUI_FilterRegexp(), CommonConstants.FILTER_REGEXP);
-        filterComponent.addFilterItem(Icons.getImageIcon(LanguageIcons.CLASS),
-                hasProjectContext ? 
+        filterComponent = FilterComponent.create(true, true);
+        filterComponent.addFilterType(hasProjectContext ? 
                     Bundle.ClassesListControllerUI_FilterImplementation() : 
                     Bundle.ClassesListControllerUI_FilterSubclass(),
                 ClassesListController.FILTER_SUBCLASS);
-        filterComponent.setEmptyFilterText(Bundle.ClassesListControllerUI_DefaultFilterText());
-        filterComponent.setFilterValues(filterValue, filterType);
-        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
+        filterComponent.setHint(Bundle.ClassesListControllerUI_DefaultFilterText());
+        filterComponent.setFilter(filterValue, filterType);
+        filterComponent.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
                     JavaClass selected = realClassesListTableModel.getSelectedClass();
-                    filterValue = filterComponent.getFilterString();
+                    filterValue = filterComponent.getFilterValue();
                     filterType = filterComponent.getFilterType();
                     realClassesListTableModel.resetDisplayCache();
                     realClassesListTableModel.preselect(selected);
@@ -954,7 +945,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         contents.show(contentsPanel, NO_DATA);
 
         add(contentsPanel, BorderLayout.CENTER);
-        add(filterComponent, BorderLayout.SOUTH);
+        add(filterComponent.getComponent(), BorderLayout.SOUTH);
 
         classesListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
@@ -1102,7 +1093,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
     private void showSubclassesForClass(JavaClass jClass) {
         saveSelection();
-        filterComponent.setFilterValues(jClass.getName(),ClassesListController.FILTER_SUBCLASS);
+        filterComponent.setFilter(jClass.getName(),ClassesListController.FILTER_SUBCLASS);
     }
     
     private void adjustRenderers() {
