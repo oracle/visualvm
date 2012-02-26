@@ -223,7 +223,7 @@ public class ThreadStateHeaderRenderer extends JPanel implements TableCellRender
             if ((wLegend + 7) <= getWidth()) {
                 g.setFont(plainFont);
                 g.setColor(Color.WHITE);
-                g.fillRect(getWidth() - wLegend - 6, 5, wLegend + 7, 4 + plainFont.getSize());
+                g.fillRect(getWidth() - wLegend - 7, 5, wLegend + 7, 4 + plainFont.getSize());
                 g.setColor(Color.BLACK);
                 g.drawString(sLegend, getWidth() - wLegend - 2, 5 + plainFont.getSize());
                 g.setFont(origFont);

@@ -306,7 +306,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         showLabel.setDisplayedMnemonic(showLabel.getText().charAt(mnemCharIndex));
         showLabel.setDisplayedMnemonicIndex(mnemCharIndex);
 
-        buttonsToolBar = ProfilerToolbar.create(false);
+        buttonsToolBar = ProfilerToolbar.create(true);
 
         JPanel tablePanel = new JPanel();
         JPanel scrollPanel = new JPanel();
@@ -392,8 +392,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         monitorLegend = new JLabel(CommonConstants.THREAD_STATUS_MONITOR_STRING, monitorIcon, SwingConstants.LEADING);
         monitorLegend.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
-        JPanel legendPanel = new JPanel();
-        legendPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 0));
+        JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 8));
         legendPanel.add(runningLegend);
         legendPanel.add(sleepingLegend);
 
@@ -405,23 +404,23 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         legendPanel.add(monitorLegend);
 
         //legendPanel.add(unknownLegend);
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new BorderLayout());
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(UIUtils.createHorizontalLine(bottomPanel.getBackground()), BorderLayout.NORTH);
         bottomPanel.add(legendPanel, BorderLayout.EAST);
 
         //scrollPanel.add(bottomPanel, BorderLayout.SOUTH);
         JPanel dataPanel = new JPanel();
         dataPanel.setLayout(new BorderLayout());
-        dataPanel.setBorder(BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         tableScroll = new JScrollPane();
-        tableScroll.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0));
         tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, new JPanel());
         tableScroll.getCorner(JScrollPane.UPPER_RIGHT_CORNER).setBackground(Color.WHITE);
         viewPort = new CustomTimeLineViewport(this);
         viewPort.setView(table);
         viewPort.setBackground(table.getBackground());
         tableScroll.setViewport(viewPort);
+        tableScroll.setBorder(BorderFactory.createEmptyBorder());
+        tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
         tableScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         tableScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         dataPanel.add(tableScroll, BorderLayout.CENTER);
@@ -464,7 +463,6 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         notificationPanel.add(enableThreadsMonitoringLabel2);
         notificationPanel.add(enableThreadsMonitoringLabel3);
 
-        setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
         setLayout(new BorderLayout());
 
         contentPanel.add(notificationPanel, ENABLE_THREADS_PROFILING);
