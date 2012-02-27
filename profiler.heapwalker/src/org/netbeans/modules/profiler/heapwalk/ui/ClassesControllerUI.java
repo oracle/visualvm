@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.modules.profiler.heapwalk.ClassesController;
 import org.netbeans.modules.profiler.heapwalk.LegendPanel;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -87,7 +86,16 @@ public class ClassesControllerUI extends JPanel {
             setText(Bundle.ClassesControllerUI_ControllerName());
             setToolTipText(Bundle.ClassesControllerUI_ControllerDescr());
             setIcon(ICON_CLASS);
-            setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            d.width += 4;
+            return d;
+        }
+        
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
         }
     }
 

@@ -196,6 +196,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(LanguageIcons.ARRAY, "array.png");
         cache.put(LanguageIcons.INSTANCE, "instance.png");
         cache.put(LanguageIcons.PRIMITIVE, "primitive.png");
+        cache.put(LanguageIcons.JAR, "jar.png");
     }
     
 }

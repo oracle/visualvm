@@ -67,21 +67,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -91,6 +77,7 @@ import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedTable;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.components.table.ExtendedTableModel;
 import org.netbeans.lib.profiler.ui.components.table.JExtendedTablePanel;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
@@ -343,11 +330,9 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
     
     // --- Save Current View action support --------------------------------------
     public void addSaveViewAction(AbstractAction saveViewAction) {
-        JButton actionButton = buttonsToolBar.add(saveViewAction);
+        Component actionButton = buttonsToolBar.add(saveViewAction);
         buttonsToolBar.remove(actionButton);
-
         buttonsToolBar.add(actionButton, 0);
-        buttonsToolBar.add(new JToolBar.Separator(), 1);
     }
     
     public boolean fitsVisibleArea() {
@@ -586,7 +571,7 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
                                                            });
         threadsSelectionCombo = new JComboBox(comboModel) {
                 public Dimension getMaximumSize() {
-                    return new Dimension(250, getPreferredSize().height);
+                    return getPreferredSize();
                 }
                 ;
             };
@@ -601,25 +586,12 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
         showLabel.setDisplayedMnemonic(showLabel.getText().charAt(mnemCharIndex));
         showLabel.setDisplayedMnemonicIndex(mnemCharIndex);
 
-        buttonsToolBar = new JToolBar(JToolBar.HORIZONTAL) {
-            public Component add(Component comp) {
-                if (comp instanceof JButton) {
-                    UIUtils.fixButtonUI((JButton) comp);
-                }
-
-                return super.add(comp);
-            }
-        };
-        buttonsToolBar.setFloatable(false);
-        buttonsToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
-        buttonsToolBar.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5, 5, 0, 5),
-                buttonsToolBar.getBorder()));
+        buttonsToolBar = ProfilerToolbar.create(false);
         
+        buttonsToolBar.addSeparator();
         buttonsToolBar.add(showLabel);
         buttonsToolBar.add(threadsSelectionCombo);
         
-        add(buttonsToolBar, BorderLayout.NORTH);
         add(resTablePanel, BorderLayout.CENTER);
         
         threadsSelectionCombo.addActionListener(this);
@@ -683,13 +655,17 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
         });
     }
     
+    public Component getToolbar() {
+        return buttonsToolBar.getComponent();
+    }
+    
     private ThreadsDataManager tdmanager;
     private ThreadsDetailsCallback detailsCallback;
     private JExtendedTable resTable;
     private ExtendedTableModel resTableModel;
     private JExtendedTablePanel resTablePanel;
     private JComboBox threadsSelectionCombo;
-    private JToolBar buttonsToolBar;
+    private ProfilerToolbar buttonsToolBar;
     
     private JMenuItem showOnlySelectedThreads;
     private JMenuItem showThreadsDetails;
