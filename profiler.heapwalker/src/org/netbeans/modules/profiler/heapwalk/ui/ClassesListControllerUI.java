@@ -423,15 +423,14 @@ public class ClassesListControllerUI extends JTitledPanel {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
                                                                                                                                        // -----
     private static Icon ICON_CLASSES = Icons.getIcon(HeapWalkerIcons.CLASSES);
-    private static String filterValue = ""; // NOI18N
-    private static int filterType = CommonConstants.FILTER_CONTAINS;
-
     // --- UI definition ---------------------------------------------------------
     private static final String DATA = "Data"; // NOI18N
     private static final String NO_DATA = "No data"; // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    private String filterValue = ""; // NOI18N
+    private int filterType = CommonConstants.FILTER_CONTAINS;
     private CardLayout contents;
     private ClassesListController classesListController;
     private ClassesListTableModel realClassesListTableModel = new ClassesListTableModel();
