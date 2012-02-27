@@ -138,6 +138,11 @@ public class JExtendedTablePanel extends JPanel {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public void clearBorders() {
+        extendedTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        extendedTableScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
+    }
+    
     public void setCorner(String key, java.awt.Component corner) {
         extendedTableScrollPane.setCorner(key, corner);
     }
@@ -181,11 +186,10 @@ public class JExtendedTablePanel extends JPanel {
     }
 
     private void initComponents() {
-        setBorder(BorderFactory.createLoweredBevelBorder());
+        setBorder(BorderFactory.createEmptyBorder());
 
         extendedTableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                                   JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        extendedTableScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         extendedTableViewport = new CustomExtendedTableViewport(extendedTable);
         extendedTableScrollPane.setViewport(extendedTableViewport);
         extendedTableScrollPane.addMouseWheelListener(extendedTable);

@@ -99,6 +99,10 @@ final class TracerView {
 
         // create timeline support
         timelineView = new TimelineView(model);
+        JPanel timelinePanel = new JPanel(new BorderLayout());
+        timelinePanel.add(timelineView.getView(), BorderLayout.CENTER);
+        timelinePanel.add(new JSeparator(), BorderLayout.SOUTH);
+        
         // add the timeline component to the UI
         final JPanel container = new JPanel(null) {
             public void doLayout() {
@@ -126,7 +130,7 @@ final class TracerView {
         glass.addMouseMotionListener(new MouseMotionAdapter() {});
         glass.addKeyListener(new KeyAdapter() {});
         container.add(glass); // Consumes event
-        container.add(timelineView.getView());
+        container.add(timelinePanel);
         
         component.add(container, BorderLayout.NORTH);
 
@@ -237,12 +241,7 @@ final class TracerView {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     SnapshotResultsWindow w = new SnapshotResultsWindow(lsF, 1, false);
-
-                    JPanel c = new JPanel(new BorderLayout(0, 3));
-                    c.setBorder(BorderFactory.createEmptyBorder(8, 5, 5, 5));
-                    c.add(new JSeparator(), BorderLayout.NORTH);
-                    c.add(w, BorderLayout.CENTER);
-                    addContents(p, c);
+                    addContents(p, w);
                 }
             });
         }
@@ -271,14 +270,9 @@ final class TracerView {
                     };
                     a.setCaretPosition(0);
                     JScrollPane sp = new JScrollPane(a);
-
-
-                    JPanel c = new JPanel(new BorderLayout(0, 6));
-                    c.setBorder(BorderFactory.createEmptyBorder(8, 5, 5, 5));
-                    c.add(new JSeparator(), BorderLayout.NORTH);
-                    c.add(sp, BorderLayout.CENTER);
-
-                    addContents(p, c);
+                    sp.setBorder(BorderFactory.createEmptyBorder());
+                    sp.setViewportBorder(BorderFactory.createEmptyBorder());
+                    addContents(p, sp);
                 }
             });
         }

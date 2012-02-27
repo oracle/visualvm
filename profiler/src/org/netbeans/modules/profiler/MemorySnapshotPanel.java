@@ -175,7 +175,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
         addChangeListener(this);
 
-        ProfilerToolbar toolBar = ProfilerToolbar.create(false);
+        ProfilerToolbar toolBar = ProfilerToolbar.create(true);
         toolBar.add(saveAction = new SaveSnapshotAction(ls));
         toolBar.add(new ExportAction(this,ls));
         toolBar.add(new SaveViewAction(this));

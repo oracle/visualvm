@@ -57,11 +57,11 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**
@@ -84,11 +84,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
     // -----
     // I18N String constants
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
-    private static final String DEFAULT_FILTER_HINT = messages.getString("MemoryResultsPanel_DefaultFilterHint"); // NOI18N
-    private static final String STARTS_WITH_FILTER_NAME = messages.getString("MemoryResultsPanel_StartsWithFilterName"); // NOI18N
-    private static final String CONTAINS_FILTER_NAME = messages.getString("MemoryResultsPanel_ContainsFilterName"); // NOI18N
-    private static final String ENDS_WITH_FILTER_NAME = messages.getString("MemoryResultsPanel_EndsWithFilterName"); // NOI18N
-    private static final String REGEXP_FILTER_NAME = messages.getString("MemoryResultsPanel_RegExpFilterName"); // NOI18N
+    private static final String CLASS_NAME_FILTER = messages.getString("MemoryResultsPanel_ClassNameFilterHint"); // NOI18N
                                                                                                                 // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -135,6 +131,8 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
         headerPopup = new JPopupMenu();
         jScrollPane = createScrollPaneVerticalScrollBarAlways();
         jScrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(headerPopup));
+        jScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
 
         initFilterPanel();
     }
@@ -630,21 +628,12 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
 
     // ---
     private void initFilterPanel() {
-        filterComponent = new FilterComponent();
-        filterComponent.setEmptyFilterText(DEFAULT_FILTER_HINT);
+        filterComponent = FilterComponent.create(true, true);
+        filterComponent.setHint(CLASS_NAME_FILTER);
 
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
-                                      STARTS_WITH_FILTER_NAME, CommonConstants.FILTER_STARTS_WITH); // NOI18N
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS),
-                                      CONTAINS_FILTER_NAME, CommonConstants.FILTER_CONTAINS); // NOI18N
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
-                                      ENDS_WITH_FILTER_NAME, CommonConstants.FILTER_ENDS_WITH); // NOI18N
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP),
-                                      REGEXP_FILTER_NAME, CommonConstants.FILTER_REGEXP); // NOI18N
-
-        filterComponent.setFilterValues(filterString, filterType);
-        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
+        filterComponent.setFilter(filterString, filterType);
+        filterComponent.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
                     String selectedRowContents = null;
                     int selectedRow = resTable.getSelectedRow();
 
@@ -652,7 +641,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                         selectedRowContents = (String) resTable.getValueAt(selectedRow, 0);
                     }
 
-                    filterString = filterComponent.getFilterString();
+                    filterString = filterComponent.getFilterValue();
                     filterType = filterComponent.getFilterType();
                     createFilteredIndexes();
                     resTable.invalidate();
@@ -665,7 +654,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
                 }
             });
 
-        add(filterComponent, BorderLayout.SOUTH);
+        add(filterComponent.getComponent(), BorderLayout.SOUTH);
     }
 
     private boolean passesFilter(int idx, String filter) {
@@ -691,16 +680,22 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
 
         // Case insensitive comparison (except regexp):
         switch (filterType) {
-            case CommonConstants.FILTER_STARTS_WITH:
-                return value.regionMatches(true, 0, filter, 0, filter.length()); // case insensitive startsWith, optimized
+//            case CommonConstants.FILTER_STARTS_WITH:
+//                return value.regionMatches(true, 0, filter, 0, filter.length()); // case insensitive startsWith, optimized
             case CommonConstants.FILTER_CONTAINS:
-                return value.toLowerCase().indexOf(filter.toLowerCase()) != -1; // case insensitive indexOf, NOT OPTIMIZED!!!
-            case CommonConstants.FILTER_ENDS_WITH:
-                return value.regionMatches(true, value.length() - filter.length(), filter, 0, filter.length()); // case insensitive endsWith, optimized
-            case CommonConstants.FILTER_EQUALS:
-                return value.equalsIgnoreCase(filter); // case insensitive equals
+                return value.toLowerCase().contains(filter); // case insensitive indexOf, NOT OPTIMIZED!!!
+            case CommonConstants.FILTER_NOT_CONTAINS:
+                return !value.toLowerCase().contains(filter);
+//            case CommonConstants.FILTER_ENDS_WITH:
+//                return value.regionMatches(true, value.length() - filter.length(), filter, 0, filter.length()); // case insensitive endsWith, optimized
+//            case CommonConstants.FILTER_EQUALS:
+//                return value.equalsIgnoreCase(filter); // case insensitive equals
             case CommonConstants.FILTER_REGEXP:
-                return value.matches(filter); // still case sensitive!
+                try {
+                    return value.matches(filter); //  case sensitive!
+                } catch (java.util.regex.PatternSyntaxException e) {
+                    return false;
+                }
         }
 
         return false;
@@ -711,7 +706,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
             return true;
         }
 
-        String[] filters = FilterComponent.getFilterStrings(filterString);
+        String[] filters = FilterComponent.getFilterValues(filterString);
 
         if (filters == null) {
             return true;
