@@ -272,9 +272,13 @@ public class ResultsView extends JPanel {
             }
         };
         tp.setOpaque(false);
-        tp.setBorder(BorderFactory.createEmptyBorder());
-        Insets i = UIManager.getInsets("TabbedPane.contentBorderInsets"); // NOI18N
-        if (i != null) tp.setBorder(BorderFactory.createEmptyBorder(-i.top, -i.left, 0, -i.right));
+        if (UIUtils.isAquaLookAndFeel()) {
+            tp.setBorder(BorderFactory.createEmptyBorder(-13, -11, 0, -10));
+        } else {
+            tp.setBorder(BorderFactory.createEmptyBorder());
+            Insets i = UIManager.getInsets("TabbedPane.contentBorderInsets"); // NOI18N
+            if (i != null) tp.setBorder(BorderFactory.createEmptyBorder(-i.top, -i.left, 0, -i.right));
+        }
         
         // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
         tp.getActionMap().getParent().remove("navigatePageUp"); // NOI18N
