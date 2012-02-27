@@ -56,6 +56,8 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
@@ -82,9 +84,8 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         //    setCPUSelectionHandler(selectionHandler);
         this.runner = runner;
 
-        addFilterListener(new FilterComponent.FilterListener() {
-
-            public void filterChanged() {
+        addFilterListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
                 if (flatProfileContainer != null) {
                     setDataToDisplay(flatProfileContainer);
                 }
@@ -106,7 +107,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         flatProfileContainer = fpc;
         collectingTwoTimeStamps = flatProfileContainer.isCollectingTwoTimeStamps();
 
-        flatProfileContainer.filterOriginalData(FilterComponent.getFilterStrings(filterString), filterType, valueFilterValue);
+        flatProfileContainer.filterOriginalData(FilterComponent.getFilterValues(filterString), filterType, valueFilterValue);
 
         prepareResults(firstTime);
         firstTime = false;
@@ -283,7 +284,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
         }
 
         // Reinit bar max value here - operations necessary for correct bar representation of results
-        flatProfileContainer.filterOriginalData(FilterComponent.getFilterStrings(filterString), filterType, valueFilterValue);
+        flatProfileContainer.filterOriginalData(FilterComponent.getFilterValues(filterString), filterType, valueFilterValue);
         flatProfileContainer.sortBy(sortBy, sortOrder); // This will actually create the below-used percent() thing for proper timer
     }
 

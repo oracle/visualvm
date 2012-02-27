@@ -75,6 +75,7 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemMarker;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
@@ -214,7 +215,7 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
 
         // Chart container (chart panel & scrollbar)
         JPanel chartContainer = new JPanel(new BorderLayout());
-        chartContainer.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        chartContainer.setBorder(BorderFactory.createEmptyBorder());
         chartContainer.add(chartPanel, BorderLayout.CENTER);
         chartContainer.add(hScrollBar, BorderLayout.SOUTH);
 
@@ -233,14 +234,18 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
         allocBytesBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
         // Legend container
-        JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 10, 10));
+        JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 8));
         bigLegendPanel.add(allocObjectsBig);
         bigLegendPanel.add(allocBytesBig);
+        
+        JPanel legendContainer = new JPanel(new BorderLayout(0, 0));
+        legendContainer.add(UIUtils.createHorizontalLine(legendContainer.getBackground()), BorderLayout.NORTH);
+        legendContainer.add(bigLegendPanel, BorderLayout.CENTER);
 
         // Master UI
         setLayout(new BorderLayout());
         add(chartContainer, BorderLayout.CENTER);
-        add(bigLegendPanel, BorderLayout.SOUTH);
+        add(legendContainer, BorderLayout.SOUTH);
 
 
         // Toolbar actions

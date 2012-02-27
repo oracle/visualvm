@@ -560,9 +560,7 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
         
         resTable = initTable();
         resTablePanel = new JExtendedTablePanel(resTable);
-        resTablePanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 5, 5, 5),
-                resTablePanel.getBorder()));
+        resTablePanel.clearBorders();
         
         comboModel = new DefaultComboBoxModel(new Object[] { VIEW_THREADS_ALL, VIEW_THREADS_LIVE, VIEW_THREADS_FINISHED });
         comboModelWithSelection = new DefaultComboBoxModel(new Object[] {
@@ -586,7 +584,7 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
         showLabel.setDisplayedMnemonic(showLabel.getText().charAt(mnemCharIndex));
         showLabel.setDisplayedMnemonicIndex(mnemCharIndex);
 
-        buttonsToolBar = ProfilerToolbar.create(false);
+        buttonsToolBar = ProfilerToolbar.create(true);
         
         buttonsToolBar.addSeparator();
         buttonsToolBar.add(showLabel);

@@ -107,7 +107,7 @@ public final class TelemetryWindow extends TopComponent {
         public GraphTab(final GraphPanel panel) {
             this.panel = panel;
 
-            toolBar = ProfilerToolbar.create(false);
+            toolBar = ProfilerToolbar.create(true);
             exportActionButton = new ExportAction(this, null);
             toolBar.add(exportActionButton);
             toolBar.add(new SaveViewAction(this));
