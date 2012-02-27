@@ -146,6 +146,11 @@ public class JTreeTablePanel extends JPanel {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public void clearBorders() {
+        treeTableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        treeTableScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
+    }
+    
     public void setCorner(String key, java.awt.Component corner) {
         treeTableScrollPane.setCorner(key, corner);
     }
@@ -207,10 +212,9 @@ public class JTreeTablePanel extends JPanel {
     }
 
     private void initComponents() {
-        setBorder(BorderFactory.createLoweredBevelBorder());
+        setBorder(BorderFactory.createEmptyBorder());
 
         treeTableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        treeTableScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         treeTableViewport = new CustomTreeTableViewport(treeTable);
         treeTableScrollPane.setViewport(treeTableViewport);
         treeTableScrollPane.addMouseWheelListener(treeTable);

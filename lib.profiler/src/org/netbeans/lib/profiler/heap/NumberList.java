@@ -46,6 +46,8 @@ package org.netbeans.lib.profiler.heap;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -67,6 +69,8 @@ class NumberList {
     private final Map/*offset,block*/ blockCache;
     private final Set dirtyBlocks;
     private long blocks;
+    private MappedByteBuffer buf;
+    private long mappedSize;
     
     NumberList(long dumpFileSize) throws IOException {
         this(bytes(dumpFileSize));
@@ -196,10 +200,22 @@ class NumberList {
         }
     }
     
+    private void mmapData() {
+        if (buf == null && blockSize*blocks < Integer.MAX_VALUE) {
+            try {
+                buf = data.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, data.length());
+                mappedSize = blockSize*blocks;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    
     void flush() {
         try {
             flushDirtyBlocks();
             blockCache.clear();
+            mmapData();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -245,30 +261,47 @@ class NumberList {
     }
         
     private void writeNumber(long blockOffset,byte[] block,int slot,long element) throws IOException {
-        Long offsetObj = new Long(blockOffset);
-        int offset = slot*numberSize;
-        for (int i=numberSize-1;i>=0;i--) {
-            byte el = (byte)(element >> (i*8));
-            block[offset++]=el;
-        }
-        dirtyBlocks.add(offsetObj);
-        if (dirtyBlocks.size()>10000) {
-            flushDirtyBlocks();
+        if (blockOffset < mappedSize) {
+            long offset = blockOffset+slot*numberSize;
+            buf.position((int)offset);
+            for (int i=numberSize-1;i>=0;i--) {
+                byte el = (byte)(element >> (i*8));
+                
+                buf.put(el);
+            }            
+        } else {
+            Long offsetObj = new Long(blockOffset);
+            int offset = slot*numberSize;
+            for (int i=numberSize-1;i>=0;i--) {
+                byte el = (byte)(element >> (i*8));
+                block[offset++]=el;
+            }
+            dirtyBlocks.add(offsetObj);
+            if (dirtyBlocks.size()>10000) {
+                flushDirtyBlocks();
+            }
         }
     }
     
     private byte[] getBlock(long offset) throws IOException {
         byte[] block;
-        Long offsetObj = new Long(offset);
-        
-        block = (byte[]) blockCache.get(offsetObj);
-        if (block == null) {
+        if (offset < mappedSize) {
             block = new byte[blockSize];
-            data.seek(offset);
-            data.readFully(block);
-            blockCache.put(offsetObj,block);
+            buf.position((int)offset);
+            buf.get(block);
+            return block;
+        } else {
+            Long offsetObj = new Long(offset);
+
+            block = (byte[]) blockCache.get(offsetObj);
+            if (block == null) {
+                block = new byte[blockSize];
+                data.seek(offset);
+                data.readFully(block);
+                blockCache.put(offsetObj,block);
+            }
+            return block;
         }
-        return block;
     }
 
     private long addBlock() throws IOException {
@@ -279,6 +312,9 @@ class NumberList {
     }
 
     private void flushDirtyBlocks() throws IOException {
+        if (dirtyBlocks.isEmpty()) {
+            return;
+        }
         Long[] dirty=new Long[dirtyBlocks.size()];
         dirtyBlocks.toArray(dirty);
         Arrays.sort(dirty);
