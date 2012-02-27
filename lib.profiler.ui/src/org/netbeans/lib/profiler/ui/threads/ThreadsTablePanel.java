@@ -592,10 +592,6 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
         buttonsToolBar.add(showLabel);
         buttonsToolBar.add(threadsSelectionCombo);
         
-        JComponent toolbarComponent = (JComponent)buttonsToolBar.getComponent();
-        UIUtils.addBorder(toolbarComponent, BorderFactory.createEmptyBorder(5, 5, 0, 5));
-        
-        add(toolbarComponent, BorderLayout.NORTH);
         add(resTablePanel, BorderLayout.CENTER);
         
         threadsSelectionCombo.addActionListener(this);
@@ -657,6 +653,10 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
             }
 
         });
+    }
+    
+    public Component getToolbar() {
+        return buttonsToolBar.getComponent();
     }
     
     private ThreadsDataManager tdmanager;

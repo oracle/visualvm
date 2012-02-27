@@ -50,10 +50,10 @@ import org.netbeans.modules.profiler.heapwalk.LegendPanel;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.net.URL;
-import java.text.MessageFormat;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -87,7 +87,16 @@ public class InstancesControllerUI extends JPanel {
             setText(Bundle.InstancesControllerUI_ViewCaption());
             setToolTipText(Bundle.InstancesControllerUI_ViewDescr());
             setIcon(BrowserUtils.ICON_INSTANCE);
-            setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            d.width += 4;
+            return d;
+        }
+        
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
         }
     }
 
