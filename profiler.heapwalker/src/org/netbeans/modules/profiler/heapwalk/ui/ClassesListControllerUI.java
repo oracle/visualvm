@@ -958,6 +958,9 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         classesListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
+                if (e.getFirstIndex() != e.getLastIndex()) {
+                    realClassesListTableModel.setSelectedRow(e.getLastIndex());
+                }
                 restoreSelection();
             }
         });
