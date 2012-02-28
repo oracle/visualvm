@@ -52,13 +52,17 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.openide.awt.Mnemonics;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class ProjectSelectorPanel extends javax.swing.JPanel {
+public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.Provider {
+    private static final String HELP_CTX_KEY = "ProjectSelectorPanel.HelpCtx"; // NOI18N
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+    
     private List<Lookup.Provider> pool = new ArrayList<Lookup.Provider>();
     private List<Lookup.Provider> selection = new ArrayList<Lookup.Provider>();
     
@@ -116,6 +120,10 @@ public class ProjectSelectorPanel extends javax.swing.JPanel {
         initComponents();
         postInit();
         loadPool();
+    }
+    
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
     }
 
     /**
