@@ -57,8 +57,12 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
     
     @Override
     protected final void initStaticImages(Map<String, String> cache) {
+        cache.put(GeneralIcons.FILTER, "filter.png");
+        cache.put(GeneralIcons.FILTER_HIGHL, "filterHighl.png");
         cache.put(GeneralIcons.SET_FILTER, "setFilter.png");
+        cache.put(GeneralIcons.SET_FILTER_HIGHL, "setFilterHighl.png");
         cache.put(GeneralIcons.CLEAR_FILTER, "clearFilter.png");
+        cache.put(GeneralIcons.CLEAR_FILTER_HIGHL, "clearFilterHighl.png");
         cache.put(GeneralIcons.CLOSE_PANEL, "closePanel.png");
         cache.put(GeneralIcons.FILTER_CONTAINS, "filterContains.png");
         cache.put(GeneralIcons.FILTER_ENDS_WITH, "filterEndsWith.png");

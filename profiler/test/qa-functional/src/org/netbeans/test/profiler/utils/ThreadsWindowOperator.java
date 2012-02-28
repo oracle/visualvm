@@ -48,6 +48,7 @@ import javax.swing.table.TableModel;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jemmy.ComponentChooser;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.operators.ContainerOperator;
 import org.netbeans.jemmy.operators.JTableOperator;
 import org.netbeans.lib.profiler.ui.components.JExtendedTable;
@@ -126,9 +127,9 @@ public class ThreadsWindowOperator extends TopComponentOperator {
 	 */
 	protected ThreadsTablePanel getThreadsTablePanel(){
 		System.out.println("getting thread table panel");
-		MainWindowOperator.getDefault().toFront();
+		MainWindowOperator.getDefault().toFront();                
 		JTabbedPane jtp = (JTabbedPane) findSubComponent(
-				new ClassChooser("JTabbedPane"));
+				new ClassChooser("ResultsView$1"));
 		jtp.setSelectedIndex(1);
 		ThreadsTablePanel threadsTablePanel = (ThreadsTablePanel) findSubComponent(
 				new ClassChooser("ThreadsTablePanel"));
