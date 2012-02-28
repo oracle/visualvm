@@ -104,6 +104,28 @@ public final class UIUtils {
         return horizontalSeparator;
     }
     
+    public static JSeparator createHorizontalLine(Color background) {
+        final boolean customPaint = isNimbus();
+        JSeparator separator = new JSeparator() {
+            public Dimension getMaximumSize() {
+                return new Dimension(super.getMaximumSize().width, 1);
+            }
+            public Dimension getPreferredSize() {
+                return new Dimension(super.getPreferredSize().width, 1);
+            }
+            public void paint(Graphics g) {
+                if (customPaint) {
+                    g.setColor(getDisabledLineColor());
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                } else {
+                    super.paint(g);
+                }
+            }
+        };
+        separator.setBackground(background);
+        return separator;
+    }
+    
     /** Determines if current L&F is AquaLookAndFeel */
     public static boolean isAquaLookAndFeel() {
         // is current L&F some kind of AquaLookAndFeel?
