@@ -261,7 +261,7 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
             Lookup.Provider[] newProjs = new Lookup.Provider[projects.length - 1];
             int cntr = 0;
             for(int i=0;i<projects.length;i++) {
-                if (projects[i] != curProj) {
+                if (!projects[i].equals(curProj)) {
                     newProjs[cntr++] = projects[i];
                 }
             }
