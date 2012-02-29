@@ -52,6 +52,7 @@ import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.HelpCtx;
 
 
 /**
@@ -59,6 +60,9 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Jiri Sedlacek
  */
 public class HeapWalkerUI extends TopComponent {
+    private static final String HELP_CTX_KEY = "HeapWalker.HelpCtx"; // NOI18N
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HeapWalker heapWalker;
@@ -99,6 +103,10 @@ public class HeapWalkerUI extends TopComponent {
 
     protected String preferredID() {
         return this.getClass().getName();
+    }
+    
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
     }
 
     // --- UI definition ---------------------------------------------------------
