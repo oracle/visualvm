@@ -44,6 +44,7 @@ package org.netbeans.modules.profiler.ui;
 import java.io.IOException;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.MIMEResolver;
 import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
@@ -57,6 +58,11 @@ import org.openide.util.Lookup;
  *
  * @author Tomas Hurka
  */
+@MIMEResolver.Registration(
+    displayName="org.netbeans.modules.profiler.Bundle#HprofResolver",
+    position=99900,
+    resource="../DummyHprofResolver.xml"
+)
 public class HprofDataObject extends MultiDataObject implements OpenCookie {
     
     public HprofDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
