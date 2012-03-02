@@ -48,7 +48,11 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -59,14 +63,20 @@ import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
-import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
+import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderType;
 import org.netbeans.modules.profiler.api.ProgressDisplayer;
+import org.netbeans.modules.profiler.api.java.ExternalPackages;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
+import org.netbeans.modules.profiler.api.java.SourcePackageInfo;
 import org.netbeans.modules.profiler.selector.ui.RootSelectorTree;
+import org.netbeans.modules.profiler.selector.ui.TreePathSearch;
 import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 
@@ -79,14 +89,14 @@ import org.openide.util.lookup.Lookups;
     "SelectRootMethodsPanel_ParsingProjectStructureMessage=Parsing project structure...",
     "SelectRootMethodsPanel_Title=Edit Profiling Roots"
 })
-final public class ClassSelectRootMethodsPanel extends JPanel {
+final public class FileSelectRootMethodsPanel extends JPanel {
 
     final private static class Singleton {
 
-        final private static ClassSelectRootMethodsPanel INSTANCE = new ClassSelectRootMethodsPanel();
+        final private static FileSelectRootMethodsPanel INSTANCE = new FileSelectRootMethodsPanel();
     }
 
-    final public static ClassSelectRootMethodsPanel getDefault() {
+    final public static FileSelectRootMethodsPanel getDefault() {
         return Singleton.INSTANCE;
     }
     private static final String HELP_CTX_KEY = "ClassSelectRootMethodsPanel.HelpCtx"; // NOI18N
@@ -95,7 +105,7 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
     private JButton okButton;
     private RootSelectorTree advancedLogicalPackageTree;
 
-    private ClassSelectRootMethodsPanel() {
+    private FileSelectRootMethodsPanel() {
         init(this);
     }
 
@@ -106,7 +116,49 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
 
         ProgressDisplayer pd = ProfilerProgressDisplayer.getDefault();
 
-        advancedLogicalPackageTree = new RootSelectorTree(pd, RootSelectorTree.DEFAULT_FILTER);
+        advancedLogicalPackageTree = new RootSelectorTree(pd, new TreePathSearch.ClassIndex() {
+
+            @Override
+            public List<SourceClassInfo> getClasses(String pattern, Lookup context) {
+                Pattern p = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+                List<SourceClassInfo> rslt = new ArrayList<SourceClassInfo>();
+                SourceClassInfo clz = context.lookup(SourceClassInfo.class);
+                if (clz != null) {                    
+                    addClassRecursively(clz, rslt);
+                } else {
+                    FileObject fo = context.lookup(FileObject.class);
+                    if (FileUtil.isArchiveFile(fo) || fo.isFolder()) {
+                        for(SourcePackageInfo spi : ExternalPackages.forPath(fo)) {
+                            addPackageRecursively(spi, rslt);
+                        }
+                    }
+                }
+                for(Iterator<SourceClassInfo> iter = rslt.iterator();iter.hasNext();) {
+                    clz=iter.next();
+                    if (!p.matcher(clz.getSimpleName()).matches()) {
+                        iter.remove();
+                    }
+                }
+                Collections.sort(rslt, SourceClassInfo.COMPARATOR);
+                return rslt;
+            }
+            
+            private void addPackageRecursively(SourcePackageInfo spi, List<SourceClassInfo> clzs) {
+                for(SourcePackageInfo sub : spi.getSubpackages()) {
+                    addPackageRecursively(sub, clzs);
+                }
+                for(SourceClassInfo sci : spi.getClasses()) {
+                    addClassRecursively(sci, clzs);
+                }
+            }
+            
+            private void addClassRecursively(SourceClassInfo sc, List<SourceClassInfo> clzs) {
+                clzs.add(sc);
+                for(SourceClassInfo scInner : sc.getInnerClases()) {
+                    addClassRecursively(scInner, clzs);
+                }
+            }
+        });
 
         container.setLayout(new GridBagLayout());
 
@@ -138,7 +190,7 @@ final public class ClassSelectRootMethodsPanel extends JPanel {
                 advancedLogicalPackageTree.setContext(Lookups.fixed((Object[])builders.toArray(new SelectionTreeBuilder[builders.size()])));
                 advancedLogicalPackageTree.setSelection(currentSelection);
 
-                List<Type> builderTypes = advancedLogicalPackageTree.getBuilderTypes();
+                List<SelectionTreeBuilderType> builderTypes = advancedLogicalPackageTree.getBuilderTypes();
                 if (builderTypes.size() > 0) {
                     advancedLogicalPackageTree.setBuilderType(builderTypes.get(0));
                 }

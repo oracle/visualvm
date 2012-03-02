@@ -52,6 +52,7 @@ import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -64,6 +65,7 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.Exceptions;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
@@ -163,6 +165,10 @@ public final class SnapshotResultsWindow extends TopComponent {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+    private static final String HELP_CTX_KEY_CPU = "CpuSnapshot.HelpCtx"; // NOI18N
+    private static final String HELP_CTX_KEY_MEM = "MemorySnapshot.HelpCtx"; // NOI18N
+    private static HelpCtx HELP_CTX = HelpCtx.DEFAULT_HELP;
+    
     private static final Image WINDOW_ICON_CPU = Icons.getImage(ProfilerIcons.CPU);
     private static final Image WINDOWS_ICON_FRAGMENT = Icons.getImage(ProfilerIcons.FRAGMENT);
     private static final Image WINDOWS_ICON_MEMORY = Icons.getImage(ProfilerIcons.MEMORY);
@@ -275,6 +281,10 @@ public final class SnapshotResultsWindow extends TopComponent {
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;
     }
+    
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
+    }
 
     public boolean canClose() {
         if (forcedClose) {
@@ -324,19 +334,9 @@ public final class SnapshotResultsWindow extends TopComponent {
     }
     
     public void refreshTabName() {
-        String fileName = snapshot.getFile() == null ? null : snapshot.getFile().getName();
-        int snapshotType = snapshot.getType();
-        if (fileName != null) {
-            setToolTipText(snapshot.getFile().getAbsolutePath());
-            int dotIndex = fileName.lastIndexOf('.'); // NOI18N
-            if (dotIndex > 0 && dotIndex <= fileName.length() - 2)
-                fileName = fileName.substring(0, dotIndex);
-            tabName = ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType);
-        } else {
-            ResultsSnapshot rs = snapshot.getSnapshot();
-            String snapshotTime = StringUtils.formatUserDate(new Date(rs.getTimeTaken()));
-            tabName = ResultsManager.getDefault().getSnapshotDisplayName(snapshotTime, snapshotType);
-        }
+        tabName = ResultsManager.getDefault().getSnapshotDisplayName(snapshot);
+        File snapshotFile = snapshot.getFile();
+        if (snapshotFile != null) setToolTipText(snapshotFile.getAbsolutePath());
         updateTitle();
     }
 
@@ -373,6 +373,7 @@ public final class SnapshotResultsWindow extends TopComponent {
         updateFind(true, cpuPanel);
         add(cpuPanel, BorderLayout.CENTER);
         setIcon(WINDOW_ICON_CPU);
+        HELP_CTX = new HelpCtx(HELP_CTX_KEY_CPU);
     }
 
     private void displayCodeRegionResults(LoadedSnapshot ls) {
@@ -391,6 +392,7 @@ public final class SnapshotResultsWindow extends TopComponent {
         updateFind(true, memoryPanel);
         add(memoryPanel, BorderLayout.CENTER);
         setIcon(WINDOWS_ICON_MEMORY);
+        HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
     }
 
     private void forcedClose() {

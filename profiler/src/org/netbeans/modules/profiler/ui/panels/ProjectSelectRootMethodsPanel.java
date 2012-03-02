@@ -42,6 +42,7 @@
  */
 package org.netbeans.modules.profiler.ui.panels;
 
+import java.awt.*;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -52,43 +53,37 @@ import org.openide.DialogDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
+import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
+import org.netbeans.modules.profiler.api.java.SourcePackageInfo;
+import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
+import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderType;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
-import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder.Type;
+import org.netbeans.modules.profiler.selector.ui.TreePathSearch;
 import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
-import org.openide.util.HelpCtx;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.*;
+import org.openide.util.Lookup.Provider;
 import org.openide.util.lookup.Lookups;
 
 /**
@@ -101,7 +96,7 @@ import org.openide.util.lookup.Lookups;
     "SelectRootMethodsPanel_SelectViewLabel=Select &View: ",
     "SelectRootMethodsPanel_AdvancedButtonText=&Advanced..."
 })
-final public class ProjectSelectRootMethodsPanel extends JPanel {
+final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpCtx.Provider {
     final private static Logger LOG = Logger.getLogger(ProjectSelectRootMethodsPanel.class.getName());
     
     private static ProjectSelectRootMethodsPanel instance = null;
@@ -111,11 +106,14 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     private HTMLTextArea hintArea;
     private JButton okButton;
-    private JCheckBox advancedShowAllProjectsCheckBox;
     private JComboBox treeBuilderList;
     private Lookup.Provider currentProject;
+    private List<Lookup.Provider> additionalProjects = new ArrayList<Provider>();
+    
     private RequestProcessor rp = new RequestProcessor("SRM-UI Processor", 1); // NOI18N
-    private RootSelectorTree advancedLogicalPackageTree;
+    private RootSelectorTree pkgTreeView;
+//    private ProjectSelectorPanel projectListPanel;
+    private JButton additionalProjectsSelector;
     private volatile boolean changingBuilderList = false;
 
     private static final String HELP_CTX_KEY = "ProjectSelectRootMethodsPanel.HelpCtx"; // NOI18N
@@ -167,12 +165,13 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         if (project == null)
             return RootMethodsPanel.getSelectedRootMethods(currentSelection, project);
         
-        this.currentProject = project;
+//        projectListPanel.setProject(project);
 
-        advancedLogicalPackageTree.reset();
+        currentProject = project;
         
-        advancedShowAllProjectsCheckBox.setSelected(project == null);
-        advancedShowAllProjectsCheckBox.setEnabled(ProjectUtilities.getOpenedProjects().length > 1);
+        unpersist();
+        
+        pkgTreeView.reset();
 
         PropertyChangeListener pcl = new PropertyChangeListener() {
 
@@ -183,18 +182,18 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         };
 
         try {
-            advancedLogicalPackageTree.addPropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
+            pkgTreeView.addPropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
 
             updateSelector(new Runnable() {
 
                 @Override
                 public void run() {
-                    advancedLogicalPackageTree.setContext(getContext());
-                    advancedLogicalPackageTree.setSelection(currentSelection);
+                    pkgTreeView.setContext(getContext());
+                    pkgTreeView.setSelection(currentSelection);
                 }
             });
 
-            if (advancedLogicalPackageTree.getBuilderTypes().isEmpty()) {
+            if (pkgTreeView.getBuilderTypes().isEmpty()) {
                 LOG.fine(Bundle.SelectRootMethodsPanel_NoSelectionProviders_MSG());
                 return RootMethodsPanel.getSelectedRootMethods(currentSelection, project);
             }
@@ -211,35 +210,106 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             }
 
             final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+            
+            pkgTreeView.setCancelHandler(new Cancellable() {
+                @Override
+                public boolean cancel() {
+                    dd.setValue(DialogDescriptor.CANCEL_OPTION);
+                    d.setVisible(false);
+                    return true;
+                }
+            });
+            
             d.pack(); // To properly layout HTML hint area
             d.setVisible(true);
 
             //    ClientUtils.SourceCodeSelection[] rootMethods = this.currentSelectionSet.toArray(new ClientUtils.SourceCodeSelection[this.currentSelectionSet.size()]);
-            this.currentProject = null;
 
+            ClientUtils.SourceCodeSelection[] selection = pkgTreeView.getSelection();
+            
             if (dd.getValue().equals(okButton)) {
-                ClientUtils.SourceCodeSelection[] selection = advancedLogicalPackageTree.getSelection();
+                persist();
                 return selection;
             }
+            
+            this.currentProject = null;
+            
             return null;
         } finally {
-            advancedLogicalPackageTree.removePropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
+            pkgTreeView.removePropertyChangeListener(RootSelectorTree.SELECTION_TREE_VIEW_LIST_PROPERTY, pcl);
         }
     }
 
+    @NbBundle.Messages({
+        "TIT_EditProjects=Edit Projects",
+        "LBL_EditProjects=&Edit Projects..."
+    })
     protected void initComponents(final Container container) {
         GridBagConstraints gridBagConstraints;
 
+        additionalProjectsSelector = new JButton(Bundle.LBL_EditProjects());
+        Mnemonics.setLocalizedText(additionalProjectsSelector, Bundle.LBL_EditProjects());
+        
         okButton = new JButton(Bundle.SelectRootMethodsPanel_OkButtonText());
 
         ProgressDisplayer pd = ProfilerProgressDisplayer.getDefault();
         
-        advancedLogicalPackageTree = new RootSelectorTree(pd, RootSelectorTree.DEFAULT_FILTER);
+        pkgTreeView = new RootSelectorTree(pd, new TreePathSearch.ClassIndex() {
+
+            @Override
+            public List<SourceClassInfo> getClasses(String pattern, Lookup context) {
+                Lookup.Provider project = context.lookup(Lookup.Provider.class);
+                
+                if (project != null) {
+                    List<SourceClassInfo> srcClzs = new ArrayList<SourceClassInfo>(ProfilerTypeUtils.findClasses(pattern, EnumSet.of(SourcePackageInfo.Scope.SOURCE), project));
+                    List<SourceClassInfo> libClzs = new ArrayList<SourceClassInfo>(ProfilerTypeUtils.findClasses(pattern, EnumSet.of(SourcePackageInfo.Scope.DEPENDENCIES), project));
+
+                    Collections.sort(srcClzs, SourceClassInfo.COMPARATOR);
+                    Collections.sort(libClzs, SourceClassInfo.COMPARATOR);
+
+                    List<SourceClassInfo> scis = new ArrayList<SourceClassInfo>(srcClzs);
+                    scis.addAll(libClzs);
+
+                    return scis;
+                }
+                
+                return Collections.EMPTY_LIST;
+            }
+        });
+        
+        additionalProjectsSelector.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ProjectSelectorPanel psp = new ProjectSelectorPanel() {
+
+                    @Override
+                    protected Provider getCurrentProject() {
+                        return currentProject;
+                    }
+                };
+                
+                psp.setSelection(additionalProjects);
+                
+                DialogDescriptor dd = new DialogDescriptor(psp, Bundle.TIT_EditProjects());
+                Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+                d.setVisible(true);
+                if (dd.getValue() == DialogDescriptor.OK_OPTION) {
+                    additionalProjects = psp.getSelection();
+                    updateSelectorProjects();
+                }
+            }
+        });
+        
 //        advancedLogicalPackageTree.setNodeFilter(getNodeFilter());
 
-        advancedShowAllProjectsCheckBox = new JCheckBox();
-        advancedShowAllProjectsCheckBox.setVisible(true);
-
+//        projectListPanel = new ProjectSelectorPanel(currentProject) {
+//            @Override
+//            protected void projectSelected(Provider project) {
+//                currentProject = project;
+//                updateSelectorProjects();
+//            }
+//        };
+        
         treeBuilderList = new JComboBox();
         treeBuilderList.addItemListener(new ItemListener() {
 
@@ -254,7 +324,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
                         @Override
                         public void run() {
-                            advancedLogicalPackageTree.setBuilderType((Type) e.getItem());
+                            pkgTreeView.setBuilderType((SelectionTreeBuilderType) e.getItem());
                         }
                     });
                 }
@@ -272,11 +342,10 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             }
         };
 
-        advancedLogicalPackageTree.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+        pkgTreeView.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
 
-        JScrollPane advancedLogicalPackageTreeScrollPane = new JScrollPane(advancedLogicalPackageTree);
-        advancedLogicalPackageTreeScrollPane.setPreferredSize(PREFERRED_TOPTREE_DIMENSION);
-
+        pkgTreeView.setPreferredSize(PREFERRED_TOPTREE_DIMENSION);
+                
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -285,47 +354,38 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
         gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(10, 10, 0, 10);
-        container.add(advancedLogicalPackageTreeScrollPane, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(3, 10, 0, 10);
+        container.add(pkgTreeView, gridBagConstraints);
 
-        Mnemonics.setLocalizedText(advancedShowAllProjectsCheckBox,
-                Bundle.SelectRootMethodsPanel_ShowAllProjectsLabel());
-        advancedShowAllProjectsCheckBox.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                rp.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        refreshBuilderList();
-                        updateSelectorProjects();
-                    }
-                });
-            }
-        });
-
-        JPanel comboPanel = new JPanel(new FlowLayout());
+        JPanel comboPanel = new JPanel();
+        comboPanel.setLayout(new BoxLayout(comboPanel, BoxLayout.X_AXIS));
         JLabel label = new JLabel();
         Mnemonics.setLocalizedText(label, Bundle.SelectRootMethodsPanel_SelectViewLabel());
         label.setLabelFor(treeBuilderList);
+        
         comboPanel.add(label);
         comboPanel.add(treeBuilderList);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.gridwidth = GridBagConstraints.RELATIVE;
         gridBagConstraints.insets = new Insets(5, 10, 5, 10);
         container.add(comboPanel, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(10, 10, 5, 10);
-        container.add(advancedShowAllProjectsCheckBox, gridBagConstraints);
-
+        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagConstraints.insets = new Insets(5, 10, 5, 10);
+        container.add(additionalProjectsSelector, gridBagConstraints);
+        
         // hintArea
         String hintString = getHintString();
 
@@ -358,12 +418,12 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
                     public void run() {
                         final ClientUtils.SourceCodeSelection[] methods =
                                 RootMethodsPanel.getSelectedRootMethods(
-                                advancedLogicalPackageTree.getSelection(), currentProject);
+                                pkgTreeView.getSelection(), currentProject);
                         if (methods != null) updateSelector(new Runnable() {
                             @Override
                             public void run() {
-                                advancedLogicalPackageTree.setContext(getContext());
-                                advancedLogicalPackageTree.setSelection(methods); // TODO: seems to add methods instead of set methods!!!
+                                pkgTreeView.setContext(getContext());
+                                pkgTreeView.setSelection(methods); // TODO: seems to add methods instead of set methods!!!
                             }
                         });
                     }
@@ -380,24 +440,19 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     }
 
     private void refreshBuilderList() {
-        List<Type> builderTypes = advancedLogicalPackageTree.getBuilderTypes();
+        List<SelectionTreeBuilderType> builderTypes = pkgTreeView.getBuilderTypes();
         if (builderTypes == null || builderTypes.isEmpty()) return;
         
         try {
             changingBuilderList = true;
 
-            treeBuilderList.setModel(new DefaultComboBoxModel(builderTypes.toArray(new Type[builderTypes.size()])));
+            treeBuilderList.setModel(new DefaultComboBoxModel(builderTypes.toArray(new SelectionTreeBuilderType[builderTypes.size()])));
 
             treeBuilderList.setSelectedIndex(0);
-            advancedLogicalPackageTree.setBuilderType((Type)treeBuilderList.getItemAt(0));
+            pkgTreeView.setBuilderType((SelectionTreeBuilderType)treeBuilderList.getItemAt(0));
         } finally {
             changingBuilderList = false;
         }
-    }
-
-    private Lookup.Provider[] relevantProjects() {
-        return advancedShowAllProjectsCheckBox.isSelected() ? ProjectUtilities.getOpenedProjects()
-                : new Lookup.Provider[]{currentProject};
     }
 
     private void updateSelector(Runnable updater) {
@@ -410,18 +465,15 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
             }
         });
 
-        boolean showAllEnabled = advancedShowAllProjectsCheckBox.isEnabled();
         try {
             treeBuilderList.setEnabled(false);
-            advancedLogicalPackageTree.setEnabled(false);
-            advancedShowAllProjectsCheckBox.setEnabled(false);
+            pkgTreeView.setEnabled(false);
             okButton.setEnabled(false);
             updater.run();
         } finally {
             ph.finish();
             okButton.setEnabled(true);
-            advancedShowAllProjectsCheckBox.setEnabled(showAllEnabled);
-            advancedLogicalPackageTree.setEnabled(true);
+            pkgTreeView.setEnabled(true);
             treeBuilderList.setEnabled(true);
         }
     }
@@ -431,7 +483,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
 
             @Override
             public void run() {
-                advancedLogicalPackageTree.setContext(getContext());
+                pkgTreeView.setContext(getContext());
             }
         });
     }
@@ -439,9 +491,89 @@ final public class ProjectSelectRootMethodsPanel extends JPanel {
     private Lookup getContext() {
         List<SelectionTreeBuilder> builders = new ArrayList<SelectionTreeBuilder>();
         
-        for(Lookup.Provider p : relevantProjects()) {
+        if (currentProject != null) {
+            builders.addAll(SelectionTreeBuilderFactory.buildersFor(currentProject));
+        }
+
+        for(Lookup.Provider p : additionalProjects) {
             builders.addAll(SelectionTreeBuilderFactory.buildersFor(p));
         }
+
         return Lookups.fixed((Object[]) builders.toArray(new SelectionTreeBuilder[builders.size()]));
+    }
+    
+    private static final String PROP_PROJECTLIST = "projectList"; // NOI18N
+    private static final String PROPS_FILE_NAME = "root_selector.properties"; // NOI18N
+    
+    private void persist() {
+        Properties props = loadProjectProperties();
+        if (props != null) {
+            StringBuilder sb = new StringBuilder();
+            for (Lookup.Provider p : additionalProjects) {
+                sb.append(ProjectUtilities.getProjectDirectory(p).getPath()).append(File.pathSeparator);
+            }
+            props.setProperty(PROP_PROJECTLIST, sb.toString());
+            
+            saveProjectProperties(props);
+            additionalProjects.clear(); // don't want any leaks here
+        }
+    }
+    
+    private void unpersist() {
+        Properties props = loadProjectProperties();
+        if (props != null) {
+            additionalProjects.clear();
+            String data = props.getProperty(PROP_PROJECTLIST, ""); // NOI18N
+            StringTokenizer st = new StringTokenizer(data, File.pathSeparator);
+                
+            while (st.hasMoreTokens()) {
+                String dir = st.nextToken();
+                FileObject pDir = FileUtil.toFileObject(new File(dir));
+                Lookup.Provider p = ProjectUtilities.getProject(pDir);
+                additionalProjects.add(p);
+            }
+        }
+    }
+    
+    private Properties loadProjectProperties() {
+        InputStream is = null;
+        try {
+            Properties p = new Properties();
+            is = getProjectPropertiesFile().getInputStream();
+            p.load(is);
+            return p;
+        } catch (IOException e) {
+            
+        } finally {
+            try {
+                is.close();
+            } catch (Exception e) {}
+        }
+        return null;
+    }
+
+    private void saveProjectProperties(Properties props) {
+        OutputStream os = null;
+        try {
+            os = getProjectPropertiesFile().getOutputStream();
+            props.store(os, ""); // NOI18N
+        } catch (IOException e) {
+            
+        } finally {
+            try {
+                os.close();
+            } catch (Exception e) {}
+        }
+    }
+    
+    private FileObject getProjectPropertiesFile() throws IOException {
+        FileObject propsFolder = ProjectStorage.getSettingsFolder(currentProject, true);
+        FileObject propsFile = propsFolder.getFileObject(PROPS_FILE_NAME);
+
+        if (propsFile == null) {
+            propsFile = propsFolder.createData(PROPS_FILE_NAME);
+        }
+
+        return propsFile;
     }
 }
