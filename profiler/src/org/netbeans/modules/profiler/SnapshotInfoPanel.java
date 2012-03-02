@@ -169,6 +169,8 @@ public class SnapshotInfoPanel extends JPanel {
         infoArea.getAccessibleContext().setAccessibleName(Bundle.SnapshotInfoPanel_InfoAreaAccessName());
         infoArea.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         infoAreaScrollPane = new JScrollPane(infoArea);
+        infoAreaScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        infoAreaScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
         add(infoAreaScrollPane, BorderLayout.CENTER);
         this.loadedSnapshot = snapshot;
         updateInfo();

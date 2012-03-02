@@ -51,10 +51,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ResourceBundle;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.*;
 import javax.swing.text.DefaultCaret;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
@@ -717,7 +716,8 @@ public class ThreadDetailsComponent extends JPanel {
 
         setLayout(new GridBagLayout());
 
-        setBorder(new CompoundBorder(new BevelBorder(BevelBorder.RAISED), new EmptyBorder(new Insets(5, 5, 5, 5))));
+        setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, UIUtils.getDisabledLineColor()),
+                new EmptyBorder(new Insets(5, 5, 5, 5))));
         titlePanel.setLayout(new BorderLayout(5, 5));
 
         JPanel namePanel = new JPanel();
@@ -811,8 +811,10 @@ public class ThreadDetailsComponent extends JPanel {
         jPanel6.setLayout(new BorderLayout());
 
         jPanel11.setLayout(new BorderLayout());
+//XXX        jPanel11.setOpaque(false);
 
         jPanel10.setLayout(new GridBagLayout());
+//XXX        jPanel10.setOpaque(false);
 
         runningTitleLabel.setText(CommonConstants.THREAD_STATUS_RUNNING_STRING);
         runningTitleLabel.setIcon(runningIcon);
@@ -947,6 +949,7 @@ public class ThreadDetailsComponent extends JPanel {
         jPanel11.add(jPanel10, BorderLayout.WEST);
 
         JPanel northPanel = new JPanel();
+//XXX        northPanel.setOpaque(false);
         northPanel.setLayout(new BorderLayout());
         northPanel.setBorder(new EmptyBorder(new Insets(10, 0, 0, 0)));
         northPanel.add(jPanel11, BorderLayout.NORTH);
@@ -954,6 +957,7 @@ public class ThreadDetailsComponent extends JPanel {
         jPanel6.add(northPanel, BorderLayout.CENTER);
 
         jPanel12.setLayout(new BorderLayout());
+//XXX        jPanel12.setOpaque(false);
 
         pieChart.setPreferredSize(new Dimension(230, 100));
         pieChart.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
@@ -962,6 +966,7 @@ public class ThreadDetailsComponent extends JPanel {
         pieChart.setAccessibleContext(jPanel12.getAccessibleContext());
 
         jPanel6.add(jPanel12, BorderLayout.WEST);
+//XXX        jPanel6.setOpaque(false);
 
         jTabbedPane1.addTab(GENERAL_TAB_NAME, jPanel6);
 
@@ -970,7 +975,9 @@ public class ThreadDetailsComponent extends JPanel {
         detailsArea.setEditable(false);
         detailsArea.setRows(1);
         jScrollPane1.setViewportView(detailsArea);
-
+        jScrollPane1.setBorder(BorderFactory.createEmptyBorder());
+        jScrollPane1.setViewportBorder(BorderFactory.createEmptyBorder());
+        
         jPanel7.add(jScrollPane1, BorderLayout.CENTER);
 
         jTabbedPane1.addTab(DETAILS_TAB_NAME, jPanel7);
@@ -1002,6 +1009,12 @@ public class ThreadDetailsComponent extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 5, 5, 5);
         add(timeLinePanel, gridBagConstraints);
+        
+//        gridBagConstraints = new GridBagConstraints();
+//        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+//        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+//        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+//        add(UIUtils.createHorizontalSeparator(), gridBagConstraints);
     }
 
     private void initPieChartComponents() {
