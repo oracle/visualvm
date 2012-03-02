@@ -474,6 +474,23 @@ public class IntegrationUtils {
                append(getLibsDir(targetPlatform, isRemote)).append(",").append(portNumber); //NOI18N
         return args.toString();
     }
+    
+    public static String getProfilerAgentCommandLineArgsWithoutQuotes(String targetPlatform, String targetJVM, boolean isRemote,
+                                                                      int portNumber, String pathSpaceChar) {
+        StringBuilder args = new StringBuilder();
+        
+        if ((targetJVM.equals(PLATFORM_JAVA_60) || targetJVM.equals(PLATFORM_JAVA_70) || targetJVM.equals(PLATFORM_JAVA_80)) && 
+            (targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS))) {
+            args.append(" -XX:+UseLinuxPosixThreadCPUClocks "); // NOI18N
+        }
+        String natLibs = getNativeLibrariesPath(targetPlatform, targetJVM, isRemote).replace(" ", pathSpaceChar != null ? pathSpaceChar : " ");
+        String libsDir = getLibsDir(targetPlatform, isRemote).replace(" ", pathSpaceChar != null ? pathSpaceChar : " ");
+        String agentFile = getProfilerAgentLibraryFile(targetPlatform).replace(" ", pathSpaceChar != null ? pathSpaceChar : " ");
+        args.append("-agentpath:").append(natLibs). // NOI18N
+               append(getDirectorySeparator(targetPlatform)).append(agentFile).append("="). //NOI18N
+               append(libsDir).append(",").append(portNumber); //NOI18N
+        return args.toString();
+    }
 
     // Returns filename of profiler agent library
     public static String getProfilerAgentLibraryFile(String targetPlatform) {
