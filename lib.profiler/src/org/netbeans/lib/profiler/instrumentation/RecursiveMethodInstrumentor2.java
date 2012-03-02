@@ -105,6 +105,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
                 continue; // Can this happen?
             }
 
+            markProfilingPonitForInstrumentation(loadedClassInfos[j]);
             tryInstrumentSpawnedThreads(loadedClassInfos[j]); // This only checks for Runnable.run()
 
             for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {
@@ -154,10 +155,12 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
         return createInstrumentedMethodPack();
     }
 
-    public Object[] getMethodsToInstrumentUponClassLoad(String className, int classLoaderId, boolean threadInCallGraph) {
+    public Object[] getMethodsToInstrumentUponClassLoad(String classNameDot, int classLoaderId, boolean threadInCallGraph) {
         //System.out.println("*** MS2: instr. upon CL: " + className);
-        className = className.replace('.', '/').intern(); // NOI18N
+        String className = classNameDot.replace('.', '/').intern(); // NOI18N
 
+        initInstrMethodData();
+        markProfilingPointForInstrumentation(classNameDot,className,classLoaderId);
         // If a class doesn't pass the current instrumentation filter, we can't immediately reject it, since there is a chance
         // it contains some root methods. So we have to check that first.
         boolean isRootClass = false;
@@ -185,7 +188,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
 
         if (!isRootClass) {
             if (normallyFilteredOut) {
-                return null;
+                return createInstrumentedMethodPack();  // profile points!
             }
         }
 
@@ -195,7 +198,6 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
             return null; // Warning already issued
         }
 
-        initInstrMethodData();
         boolean instrumentClinit = threadInCallGraph;
 
         if (!clazz.isLoaded()) {
