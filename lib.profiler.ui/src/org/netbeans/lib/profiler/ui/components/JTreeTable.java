@@ -1106,7 +1106,11 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     private boolean matchesFindCriterion(Object node) {
         // find is always performed on values of the first column
         // first column is always visible and has always index=0
-        return treeTableModel.getValueAt(node, 0).toString().toLowerCase().indexOf(internalFindString) != -1;
+        Object o = treeTableModel.getValueAt(node, 0);
+        if (o == null) return false; // #207622, probably caused by updating the table while searching
+        String s = o.toString();
+        if (s == null) return false; // #207622, likely won't happen but just to be sure
+        return s.toLowerCase().indexOf(internalFindString) != -1;
     }
 
     private boolean selectFoundNode(CCTNode nodeToSelect, boolean requestFocus) {

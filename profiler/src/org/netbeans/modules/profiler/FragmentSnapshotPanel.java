@@ -54,6 +54,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 
 
 /**
@@ -96,24 +97,11 @@ public class FragmentSnapshotPanel extends SnapshotPanel implements ChangeListen
 
         tabs.addChangeListener(this);
 
-        JToolBar toolBar = new JToolBar() {
-            public Component add(Component comp) {
-                if (comp instanceof JButton) {
-                    UIUtils.fixButtonUI((JButton) comp);
-                }
-
-                return super.add(comp);
-            }
-        };
-
-        toolBar.setFloatable(false);
-        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-
+        ProfilerToolbar toolBar = ProfilerToolbar.create(false);
         toolBar.add(saveAction = new SaveSnapshotAction(ls));
         toolBar.add(new ExportAction(this,ls));
 
-        add(toolBar, BorderLayout.NORTH);
+        add(toolBar.getComponent(), BorderLayout.NORTH);
 
         // support for traversing subtabs using Ctrl-Alt-PgDn/PgUp
         getActionMap().put("PreviousViewAction",

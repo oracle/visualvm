@@ -51,6 +51,8 @@ import java.awt.image.PixelGrabber;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.plaf.basic.BasicButtonListener;
@@ -77,6 +79,7 @@ public final class UIUtils {
     private static boolean toolTipValuesInitialized = false;
     private static Color unfocusedSelBg;
     private static Color unfocusedSelFg;
+    private static Color disabledLineColor;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     public static JPanel createFillerPanel() {
@@ -99,6 +102,28 @@ public final class UIUtils {
         };
 
         return horizontalSeparator;
+    }
+    
+    public static JSeparator createHorizontalLine(Color background) {
+        final boolean customPaint = isNimbus();
+        JSeparator separator = new JSeparator() {
+            public Dimension getMaximumSize() {
+                return new Dimension(super.getMaximumSize().width, 1);
+            }
+            public Dimension getPreferredSize() {
+                return new Dimension(super.getPreferredSize().width, 1);
+            }
+            public void paint(Graphics g) {
+                if (customPaint) {
+                    g.setColor(getDisabledLineColor());
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                } else {
+                    super.paint(g);
+                }
+            }
+        };
+        separator.setBackground(background);
+        return separator;
     }
     
     /** Determines if current L&F is AquaLookAndFeel */
@@ -614,6 +639,22 @@ public final class UIUtils {
             }
         }
     }
+    
+    public static void addBorder(JComponent c, Border b) {
+        Border cb = c.getBorder();
+        Border nb = cb == null ? b : new CompoundBorder(cb, b);
+        c.setBorder(nb);
+    }
+    
+    public static Color getDisabledLineColor() {
+        if (disabledLineColor == null) {
+            disabledLineColor = UIManager.getColor("Label.disabledForeground"); // NOI18N
+            if (disabledLineColor == null)
+                disabledLineColor = UIManager.getColor("Label.disabledText"); // NOI18N
+            if (disabledLineColor == null) disabledLineColor = Color.GRAY;
+        }
+        return disabledLineColor;
+    } 
 
     private static BufferedImage createComponentScreenshot(final Component component) {
         final BufferedImage[] result = new BufferedImage[1];
