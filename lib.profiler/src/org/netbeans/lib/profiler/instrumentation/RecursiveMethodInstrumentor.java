@@ -355,7 +355,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     /** Create a multi-class packet of instrumented methods or classes */
     protected Object[] createInstrumentedMethodPack() {
-        if (nInstrMethods == 0) {
+        if (nInstrClasses == 0) {
             return null;
         }
 
@@ -372,16 +372,34 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     protected void markClassAndMethodForInstrumentation(DynamicClassInfo clazz, int methodIdx) {
         if ((status.getStartingMethodId() + nInstrMethods) < 65535) {
-            String classNameAndLoader = clazz.getNameAndLoader();
-
-            if (!instrClasses.containsKey(classNameAndLoader)) {
-                instrClasses.put(classNameAndLoader, clazz);
-                nInstrClasses++;
-            }
+            addInsrClass(clazz);
 
             nInstrMethods++;
         } else { // Can't instrument more than 64K methods - mark this method as already instrumented
             clazz.setMethodInstrumented(methodIdx);
+        }
+    }
+
+    protected void markProfilingPointForInstrumentation(String classNameDot, String className, int classLoaderId) {
+        RuntimeProfilingPoint[] pp = engineSettings.getRuntimeProfilingPoints();
+        for (RuntimeProfilingPoint point : pp) {
+            if (classNameDot.equals(point.getClassName())) {
+                DynamicClassInfo clazz = javaClassForName(className, classLoaderId);
+                
+                if (clazz != null) {
+                    markProfilingPonitForInstrumentation(clazz);
+                }
+                return;
+            }
+        }
+    }
+
+    protected void markProfilingPonitForInstrumentation(DynamicClassInfo clazz) {
+        RuntimeProfilingPoint[] pp = engineSettings.getRuntimeProfilingPoints();
+        RuntimeProfilingPoint[] ppclass = getRuntimeProfilingPoints(pp,clazz);
+        
+        if (ppclass.length > 0) {
+            addInsrClass(clazz);
         }
     }
 
@@ -427,7 +445,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
         return true;
     }
-
+    
     //---------------------------- Private implementation of instrumentation data packing ---------------------------
 
     /** Create a multi-class packet of instrumented 1.5-style data */
@@ -519,6 +537,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                                                                                                              normalInjectionType,
                                                                                                              points);
                         clazz.saveMethodInfo(i, replacementMethodInfos[i]);
+                        imInClass++;
                     }
                 } else {
                     replacementMethodInfos[i] = clazz.getMethodInfo(i); // Will return the previously instrumented methodInfo
@@ -606,6 +625,15 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 replacementMethodInfos[midx] = InstrumentationFactory.instrumentAsServletDoMethod(clazz, midx);
                 clazz.saveMethodInfo(midx, replacementMethodInfos[midx]);
             }
+        }
+    }
+
+    private void addInsrClass(final DynamicClassInfo clazz) {
+        String classNameAndLoader = clazz.getNameAndLoader();
+
+        if (!instrClasses.containsKey(classNameAndLoader)) {
+            instrClasses.put(classNameAndLoader, clazz);
+            nInstrClasses++;
         }
     }
 }
