@@ -96,7 +96,7 @@ import org.openide.util.lookup.Lookups;
     "SelectRootMethodsPanel_SelectViewLabel=Select &View: ",
     "SelectRootMethodsPanel_AdvancedButtonText=&Advanced..."
 })
-final public class ProjectSelectRootMethodsPanel extends JPanel {
+final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpCtx.Provider {
     final private static Logger LOG = Logger.getLogger(ProjectSelectRootMethodsPanel.class.getName());
     
     private static ProjectSelectRootMethodsPanel instance = null;
