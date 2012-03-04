@@ -365,16 +365,22 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
     private void selectPath(final CCTNode[] path, final int length) {
         if (length >= path.length) {
-            fieldsListTable.getTree().setSelectionPath(new TreePath(path));
+            final CCTNode node = (CCTNode)new TreePath(path).getLastPathComponent();
+            
+            // --- #208900 make sure the row is visible even if displaying a scrollbar
+            fieldsListTable.selectNode(node, true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    fieldsListTable.selectNode(node, true);
+                }
+            });
+            // --- 
         } else {
             Object[] shortPath = new Object[length];
             System.arraycopy(path, 0, shortPath, 0, length);
             final TreePath p = new TreePath(shortPath);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-//                    System.err.println(">>> Selecting length " + length);
-                    fieldsListTable.getTree().setSelectionPath(p);
-                    fieldsListTable.scrollRectToVisible(fieldsListTable.getCellRect(fieldsListTable.getSelectedRow(), 0, true));
                     selectPath(path, length + MAX_STEP);
                 }
             });
