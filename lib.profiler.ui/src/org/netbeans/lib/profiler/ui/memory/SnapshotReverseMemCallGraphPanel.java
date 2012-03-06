@@ -68,6 +68,8 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
@@ -90,6 +92,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
     private static final String NO_STACK_TRACES_MSG = messages.getString("SnapshotReverseMemCallGraphPanel_NoStackTracesMsg"); // NOI18N
     private static final String TREETABLE_ACCESS_NAME = messages.getString("SnapshotReverseMemCallGraphPanel_TreeTableAccessName"); // NOI18N
+    private static final String METHOD_NAME_FILTER = messages.getString("MemoryResultsPanel_MethodNameFilterHint"); // NOI18N
                                                                                                                                     // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -538,6 +541,7 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
 
             removeAll();
             treeTablePanel = new JTreeTablePanel(treeTable);
+            treeTablePanel.clearBorders();
             treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, cornerButton);
             add(treeTablePanel, BorderLayout.CENTER);
             initFilterPanel();
@@ -545,23 +549,11 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
     }
     
     private void initFilterPanel() {
-        filterComponent = new FilterComponent();
+        filterComponent = FilterComponent.create(true, true);
 
-        //filterComponent.setEmptyFilterText("[Method Name Filter]");
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
-//                "Starts with", CommonConstants.FILTER_STARTS_WITH);
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS
-//        ), "Contains", CommonConstants.FILTER_CONTAINS);
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
-//                "Ends with", CommonConstants.FILTER_ENDS_WITH);
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP), // NOI18N
-//                                      "Regular expression", CommonConstants.FILTER_REGEXP);
-        //filterComponent.addSeparatorItem();
-////        filterComponent.setFilterValues(snapshot.getFilter(), filterComponent.getDefaultFilterType());
-
-        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
-                    String filterString = filterComponent.getFilterString();
+        filterComponent.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    String filterString = filterComponent.getFilterValue();
                     int filterType = filterComponent.getFilterType();
                     snapshot.filterReverse(filterString, filterType, treeTable.getSortingColumn(), treeTable.getSortingOrder(),
                             (PresoObjAllocCCTNode)abstractTreeTableModel.getRoot(), classId, true);
@@ -569,8 +561,8 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
                     treeTable.updateTreeTable();
                 }
             });
-
-        add(filterComponent, BorderLayout.SOUTH);
+        filterComponent.setHint(METHOD_NAME_FILTER);
+        add(filterComponent.getComponent(), BorderLayout.SOUTH);
     }
     
     private void enableDisablePopup(PresoObjAllocCCTNode node) {

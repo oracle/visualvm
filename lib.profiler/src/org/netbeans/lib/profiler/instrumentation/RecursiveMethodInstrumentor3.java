@@ -108,6 +108,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
         boolean isRootClass = false;
         int rootIdxForAll = -1;
 
+        markProfilingPonitForInstrumentation(clazz);
         isRootClass = tryInstrumentSpawnedThreads(clazz); // This only checks for Runnable.run()
 
         if (noExplicitRootsSpecified && !mainMethodInstrumented) { // Check if this class has main method. The first loaded class with main method should be main class.
@@ -251,6 +252,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
                 continue; // Can this happen?
             }
 
+            markProfilingPonitForInstrumentation(loadedClassInfos[j]);
             tryInstrumentSpawnedThreads(loadedClassInfos[j]); // This only checks for Runnable.run()
 
             for (int rIdx = 0; rIdx < rootMethods.classNames.length; rIdx++) {

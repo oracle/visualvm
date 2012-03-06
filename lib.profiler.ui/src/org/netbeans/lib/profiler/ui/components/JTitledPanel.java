@@ -285,6 +285,16 @@ public class JTitledPanel extends JPanel {
                     }
                 });
         }
+        
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            d.width += 20;
+            return d;
+        }
+        
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
+        }
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
