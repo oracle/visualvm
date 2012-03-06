@@ -69,6 +69,8 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
 
     protected ModifyProfilingAction() {
         super();
+        setIcon(Icons.getIcon(ProfilerIcons.MODIFY_PROFILING));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.MODIFY_PROFILING)); // NOI18N
         putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_ModifyProfilingAction());
     }
 
@@ -106,9 +108,5 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
 
     protected int[] enabledStates() {
         return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return Icons.getResource(ProfilerIcons.MODIFY_PROFILING);
     }
 }

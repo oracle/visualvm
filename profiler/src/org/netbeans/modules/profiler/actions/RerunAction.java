@@ -75,6 +75,8 @@ public final class RerunAction extends CallableSystemAction implements Profiling
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public RerunAction() {
+        setIcon(Icons.getIcon(GeneralIcons.RERUN));
+        putValue("iconBase", Icons.getResource(GeneralIcons.RERUN)); // NOI18N
         putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_RerunAction());
         Profiler.getDefault().addProfilingStateListener(this);
     }
@@ -150,9 +152,5 @@ public final class RerunAction extends CallableSystemAction implements Profiling
 
     protected boolean asynchronous() {
         return false; // run in event queue
-    }
-
-    protected String iconResource() {
-        return Icons.getResource(GeneralIcons.RERUN);
     }
 }

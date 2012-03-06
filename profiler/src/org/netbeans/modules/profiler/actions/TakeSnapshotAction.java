@@ -101,6 +101,8 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
     public TakeSnapshotAction() {
         listener = Lookup.getDefault().lookup(Listener.class);
         listener.setDelegate(this);
+        setIcon(Icons.getIcon(ProfilerIcons.SNAPSHOT_TAKE));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.SNAPSHOT_TAKE)); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -131,10 +133,6 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
     @Override
     protected int[] enabledStates() {
         return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return Icons.getResource(ProfilerIcons.SNAPSHOT_TAKE);
     }
 
     protected boolean requiresInstrumentation() {
