@@ -42,12 +42,13 @@
 package org.netbeans.lib.profiler.results;
 
 import java.util.ResourceBundle;
+import org.netbeans.lib.profiler.global.CommonConstants;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class FilterSortSupport {
+public final class FilterSortSupport implements CommonConstants {
     
     public static final String FILTERED_OUT_LBL;
     
@@ -61,8 +62,21 @@ public final class FilterSortSupport {
     }
     
     public static boolean passesFilter(String filter, int filterType, String nodeName) {
-        if (filter == null || filter.isEmpty()) return true;
-        return !nodeName.contains(filter);
+        switch (filterType) {
+            case FILTER_NONE:
+                return true;
+            case FILTER_CONTAINS:
+                return nodeName.toLowerCase().contains(filter);
+            case FILTER_NOT_CONTAINS:
+                return !nodeName.toLowerCase().contains(filter);
+            case FILTER_REGEXP:
+                try {
+                    return nodeName.matches(filter); // case sensitive!
+                } catch (java.util.regex.PatternSyntaxException e) {
+                    return false;
+                }
+        }
+        return false;
     }
     
     
@@ -70,8 +84,8 @@ public final class FilterSortSupport {
         
         private int sortBy;
         private boolean sortOrder;
-        private String filterString;
-        private int filterType;
+        private String filterString = ""; // NOI18N
+        private int filterType = CommonConstants.FILTER_CONTAINS;
         
         
         public int getSortBy() {

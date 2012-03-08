@@ -44,7 +44,7 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
-import javax.swing.*;
+import org.netbeans.lib.profiler.ui.ResultsView;
 
 
 /**
@@ -53,7 +53,7 @@ import javax.swing.*;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
-public abstract class SnapshotPanel extends JPanel {
+public abstract class SnapshotPanel extends ResultsView {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public abstract ResultsSnapshot getSnapshot();
