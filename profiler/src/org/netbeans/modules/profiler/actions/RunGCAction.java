@@ -72,6 +72,8 @@ public final class RunGCAction extends ProfilingAwareAction {
 
     protected RunGCAction() {
         super();
+        setIcon(Icons.getIcon(ProfilerIcons.RUN_GC));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.RUN_GC)); // NOI18N
         putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_RunGCAction());
     }
 
@@ -99,9 +101,5 @@ public final class RunGCAction extends ProfilingAwareAction {
 
     protected int[] enabledStates() {
         return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return Icons.getResource(ProfilerIcons.RUN_GC);
     }
 }

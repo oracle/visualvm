@@ -70,13 +70,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -311,6 +305,11 @@ public final class HeapDumpAction extends ProfilingAwareAction {
     private ChooseHeapdumpTargetPanel heapdumpTargetSelector;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public HeapDumpAction() {
+        setIcon(Icons.getIcon(ProfilerIcons.SNAPSHOT_HEAP));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.SNAPSHOT_HEAP)); // NOI18N
+    }
 
     public HelpCtx getHelpCtx() {
         return HelpCtx.DEFAULT_HELP;
@@ -335,10 +334,6 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
     protected int[] enabledStates() {
         return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return Icons.getResource(ProfilerIcons.SNAPSHOT_HEAP);
     }
 
     private String getCurrentHeapDumpFilename(String targetFolder) {
