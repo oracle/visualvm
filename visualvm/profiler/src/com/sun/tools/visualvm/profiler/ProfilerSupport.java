@@ -62,6 +62,7 @@ final class ProfilerSupport {
     
     private static final String JAVA_RT_16_PREFIX = "1.6.0";  // NOI18N
     private static final String JAVA_RT_17_PREFIX = "1.7.0";  // NOI18N
+    private static final String JAVA_RT_18_PREFIX = "1.8.0";  // NOI18N
     
     private static ProfilerSupport instance;
     
@@ -100,8 +101,8 @@ final class ProfilerSupport {
         // User explicitly requests to profile any VM
         if (FORCE_PROFILING_SUPPORTED) return true;
         
-        // Profiled application needs to be running JDK 6.0 or 7.0
-        if (!jvm.is16() && !jvm.is17()) return false;
+        // Profiled application needs to be running JDK 6.0 or 7.0 or 8.0
+        if (!jvm.is16() && !jvm.is17() && !jvm.is18()) return false;
         
         String vmName = jvm.getVmName();
         String vmVendor = jvm.getVmVendor();
@@ -136,6 +137,8 @@ final class ProfilerSupport {
             // JDK 7.0 is OK from Build 26
             } else if (javaRTVersion.startsWith(JAVA_RT_17_PREFIX)) {
                 if (buildNumber >= 26) return false;
+            } else if (javaRTVersion.startsWith(JAVA_RT_18_PREFIX)) {
+                return false;
             }
         // OpenJDK -------------------------------------------------------------
         } else if(vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) {
@@ -145,6 +148,10 @@ final class ProfilerSupport {
             // OpenJDK 7 is assumed to be OK from Build 26 (not tested)
             } else if (javaRTVersion.startsWith(JAVA_RT_17_PREFIX)) {
                 if (buildNumber >= 26) return false;
+            }
+            // OpenJDK 8 should be OK
+            else if (javaRTVersion.startsWith(JAVA_RT_18_PREFIX)) {
+                return false;
             }
         }
         

@@ -55,6 +55,10 @@ class DefaultJvm extends Jvm {
     public boolean is17() {
         return false;
     }
+        
+    public boolean is18() {
+        return false;
+    }
     
     public boolean isAttachable() {
         return false;

@@ -59,8 +59,8 @@ final class VisualVMStartup extends ModuleInstall {
         if (DISABLE_STARTUP_CHECK) {
             System.err.println("Starting with com.sun.tools.visualvm.modules.startup.DisableStartupCheck=true"); // NOI18N
         } else {
-            if (!isJava6or7()) {
-                displayError6or7();
+            if (!isJava6or7or8()) {
+                displayError6or7or8();
                 return false;
             } else if (!isJDK()) {
                 displayErrorJRE();
@@ -71,7 +71,7 @@ final class VisualVMStartup extends ModuleInstall {
         return true;
     }
     
-    private static void displayError6or7() {
+    private static void displayError6or7or8() {
         Utils.setSystemLaF();
         JDialog d = Utils.assertiveErrorDialog(ERROR_STARTUP_CAPTION, MessageFormat.format(INCORRECT_VERSION_MSG,
                 new Object[] { System.getProperty("java.specification.version"), getJavaInfo(), // NOI18N
@@ -87,10 +87,10 @@ final class VisualVMStartup extends ModuleInstall {
         d.setVisible(true);
     }
     
-    private static boolean isJava6or7() {
+    private static boolean isJava6or7or8() {
         String javaVersion = System.getProperty("java.specification.version"); // NOI18N
         if (javaVersion == null) return false;
-        return javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7"); // NOI18N
+        return javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8"); // NOI18N
     }
     
     private static boolean isJDK() {

@@ -204,6 +204,14 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         return false;
     }
     
+    public boolean is18() {
+        String ver = getJavaVersion();
+        if (ver != null && ver.startsWith("1.8.")) {
+            return true;
+        }
+        return false;
+    }
+    
     public boolean isDumpOnOOMEnabled() {
         if (isDumpOnOOMEnabled == null) {
             AttachModel attach = getAttach();
