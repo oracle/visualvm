@@ -145,7 +145,6 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             setText(Bundle.OQLControllerUI_ControllerName());
             setToolTipText(Bundle.OQLControllerUI_ControllerDescr());
             setIcon(OQL_ICON);
-            setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
 
             addKeyListener(new KeyAdapter() {
                 public void keyTyped(final KeyEvent e) {
@@ -157,6 +156,16 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                     });
                 }
             });
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            d.width += 4;
+            return d;
+        }
+        
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
         }
 
         public HelpCtx getHelpCtx() {

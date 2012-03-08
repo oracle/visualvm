@@ -58,6 +58,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
 
@@ -75,6 +76,10 @@ import org.openide.util.Lookup;
 public final class SnapshotsDiffWindow extends TopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    //private static final String HELP_CTX_KEY_CPU = "CpuDiff.HelpCtx"; // NOI18N
+    private static final String HELP_CTX_KEY_MEM = "MemoryDiff.HelpCtx"; // NOI18N
+    private static HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
+    
     private static final Image WINDOW_ICON_MEMORY = Icons.getImage(ProfilerIcons.SNAPSHOTS_COMPARE);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -125,6 +130,10 @@ public final class SnapshotsDiffWindow extends TopComponent {
 
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;
+    }
+    
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
     }
 
     public void componentActivated() {

@@ -154,7 +154,16 @@ public class AnalysisControllerUI extends JPanel {
             setText(Bundle.AnalysisControllerUI_ControllerName());
             setToolTipText(Bundle.AnalysisControllerUI_ControllerDescr());
             setIcon(ICON_INFO);
-            setMargin(new java.awt.Insets(getMargin().top, getMargin().top, getMargin().bottom, getMargin().top));
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            d.width += 4;
+            return d;
+        }
+        
+        public Dimension getMinimumSize() {
+            return getPreferredSize();
         }
     }
     
