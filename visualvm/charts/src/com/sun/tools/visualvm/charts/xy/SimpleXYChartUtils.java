@@ -28,13 +28,7 @@ package com.sun.tools.visualvm.charts.xy;
 import com.sun.tools.visualvm.charts.swing.RotateLabelUI;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import com.sun.tools.visualvm.uisupport.UISupport;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -168,9 +162,9 @@ public class SimpleXYChartUtils {
     }
 
     public static JComponent createChartUI(String chartTitle, String xAxisDescription,
-                                           String yAxisDescription,
-                                           int chartType, Color[] itemColors,
-                                           long initialYMargin, boolean hideItems,
+                                           String yAxisDescription, int chartType,
+                                           Color[] itemColors, long initialYMargin,
+                                           boolean hideItems, boolean legendVisible,
                                            double chartFactor, XYStorage storage,
                                            SynchronousXYItemsModel itemsModel,
                                            XYPaintersModel paintersModel) {
@@ -286,8 +280,10 @@ public class SimpleXYChartUtils {
         // Legend panel
         JComponent legendPanel = createLegendPanel(itemColors, hideItems,
                                                    itemsModel, paintersModel);
+        legendPanel.setVisible(legendVisible);
 
         // Chart view
+        // Update alse setLegendVisible() if changing this code
         JPanel chartView = new JPanel(new BorderLayout());
         chartView.setBackground(BACKGROUND_COLOR);
         chartView.add(captionPanel, BorderLayout.NORTH);
@@ -380,6 +376,11 @@ public class SimpleXYChartUtils {
         legendContainer.add(legendPanel);
 
         return legendContainer;
+    }
+    
+    public static void setLegendVisible(JComponent chartUI, boolean visible) {
+        BorderLayout layout = (BorderLayout)chartUI.getLayout();
+        layout.getLayoutComponent(BorderLayout.SOUTH).setVisible(visible);
     }
 
     public static XYTooltipModel createTooltipModel(final int chartType,

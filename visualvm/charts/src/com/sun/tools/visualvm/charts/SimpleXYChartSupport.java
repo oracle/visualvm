@@ -73,6 +73,7 @@ public final class SimpleXYChartSupport {
     
     private JComponent chartUI;
     private SimpleXYChartUtils.DetailsHandle detailsHandle;
+    private boolean legendVisible;
     
 
     // --- Public interface ----------------------------------------------------
@@ -88,7 +89,8 @@ public final class SimpleXYChartSupport {
             chartUI = SimpleXYChartUtils.createChartUI(chartTitle, xAxisDescription,
                                                      yAxisDescription, chartType,
                                                      itemColors, initialYMargin,
-                                                     hideItems, chartFactor, storage,
+                                                     hideItems, legendVisible,
+                                                     chartFactor, storage,
                                                      itemsModel, paintersModel);
             if (detailsItems != null)
                 detailsHandle = SimpleXYChartUtils.createDetailsArea(detailsItems,
@@ -161,6 +163,36 @@ public final class SimpleXYChartSupport {
         };
         if (SwingUtilities.isEventDispatchThread()) detailsUpdater.run();
         else SwingUtilities.invokeLater(detailsUpdater);
+    }
+    
+    
+    /**
+     * Shows or hides legend section of the chart.
+     * <br><br><b>Note:</b> This method can be called from any thread.
+     *
+     * @param visible new visibility of the legend section of the chart
+     */
+    public void setLegendVisible(final boolean visible) {
+        Runnable visibilityUpdater = new Runnable() {
+            public void run() {
+                if (legendVisible == visible) return;
+                legendVisible = visible;
+                if (chartUI != null)
+                    SimpleXYChartUtils.setLegendVisible(chartUI, legendVisible);
+            }
+        };
+        if (SwingUtilities.isEventDispatchThread()) visibilityUpdater.run();
+        else SwingUtilities.invokeLater(visibilityUpdater);
+    }
+    
+    /**
+     * Returns true if legend section of the chart is visible, false otherwise.
+     * <br><br><b>Note:</b> This method must be called in the Event Dispatch Thread.
+     *
+     * @return true if legend section of the chart is visible, false otherwise
+     */
+    public boolean isLegendVisible() {
+        return legendVisible;
     }
 
 
@@ -243,6 +275,8 @@ public final class SimpleXYChartSupport {
         itemsModel = SimpleXYChartUtils.createItemsModel(storage, itemNames, minValue, maxValue);
         paintersModel = SimpleXYChartUtils.createPaintersModel(lineWidths, lineColors,
                                             fillColors1, fillColors2, itemsModel);
+        
+        legendVisible = true;
     }
 
 }
