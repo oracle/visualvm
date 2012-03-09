@@ -44,11 +44,21 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.modules.profiler.api.EditorSupport;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.JavaProfilerSource;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
+import org.openide.util.NbBundle;
 
 /**
  * Action enabled on Java sources allowing to select root method(s) for Profiling of Part of Application.
  * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
  */
+@NbBundle.Messages({
+    "LBL_SelectRootMethodsAction1=Select Profiling Root Methods..."
+})
+@ActionID(id = "org.netbeans.modules.profiler.actions.SelectJavaRootMethodsAction", category = "Profile")
+@ActionRegistration(displayName = "#LBL_SelectRootMethodsAction1")
+@ActionReference(path = "Editors/text/x-java/Popup/Profiling", name = "org-netbeans-modules-profiler-actions-SelectRootMethodsAction", position = 200)
 final public class SelectJavaRootMethodsAction extends BaseSelectRootMethodsAction {
 
     @Override

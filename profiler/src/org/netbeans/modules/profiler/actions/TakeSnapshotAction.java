@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
+import java.awt.event.ActionEvent;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
@@ -50,6 +51,10 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -97,6 +102,19 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
         
     }
     
+    private static final class Singleton {
+        final private static TakeSnapshotAction INSTANCE = new TakeSnapshotAction();
+    }
+    
+    @ActionID(id = "org.netbeans.modules.profiler.actions.TakeSnapshotAction", category = "Profile")
+    @ActionRegistration(displayName = "#LBL_TakeSnapshotAction")
+    @ActionReferences(value = {
+        @ActionReference(path = "Shortcuts", name = "C-F2"),
+        @ActionReference(path = "Menu/Profile", position = 1200)})
+    public static TakeSnapshotAction getInstance() {
+        return Singleton.INSTANCE;
+    }
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     public TakeSnapshotAction() {
         listener = Lookup.getDefault().lookup(Listener.class);
@@ -122,6 +140,7 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
         return Bundle.LBL_TakeSnapshotAction();
     }
 
+    @Override
     public void performAction() {
         ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 public void run() {

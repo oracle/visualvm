@@ -47,8 +47,12 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import javax.swing.Action;
+import javax.swing.KeyStroke;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 
 
 /**
@@ -65,32 +69,29 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
 
     private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING, Profiler.PROFILING_PAUSED };
 
+    final private static class Singleton {
+        final private static ModifyProfilingAction INSTANCE = new ModifyProfilingAction();
+    }
+    
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
+    @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ModifyProfilingAction")
+    @ActionRegistration(displayName="#LBL_ModifyProfilingAction", iconBase="org/netbeans/modules/profiler/impl/icons/modifyProfiling.png", lazy=false)
+    @ActionReference(path="Menu/Profile", position=600)
+    public static ModifyProfilingAction getInstance() {
+        return Singleton.INSTANCE;
+    }
 
     protected ModifyProfilingAction() {
         super();
         setIcon(Icons.getIcon(ProfilerIcons.MODIFY_PROFILING));
         putValue("iconBase", Icons.getResource(ProfilerIcons.MODIFY_PROFILING)); // NOI18N
         putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_ModifyProfilingAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_ModifyProfilingAction());
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt shift F2"));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    @Override
-    public boolean isEnabled() {
-        return super.isEnabled() && Profiler.getDefault().modifyAvailable();
-    }
-
-    /**
-     *  Updates the action to react to rename or delete of the profiled project only
-     */
-    public void updateAction() {
-        if (!Profiler.getDefault().modifyAvailable()) {
-            boolean shouldBeEnabled = isEnabled();
-            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
-        }
-    }
-
     public HelpCtx getHelpCtx() {
         return HelpCtx.DEFAULT_HELP;
 
@@ -102,6 +103,7 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
         return Bundle.LBL_ModifyProfilingAction();
     }
 
+    @Override
     public void performAction() {
         ProfilingSupport.getDefault().modifyProfiling();
     }

@@ -946,7 +946,7 @@ public final class LiveResultsWindow extends TopComponent
         tb.add(runGCButton);
         tb.add(ResetResultsAction.getInstance());
         tb.addSeparator();
-        tb.add(((Presenter.Toolbar) SystemAction.get(TakeSnapshotAction.class)).getToolbarPresenter());
+        tb.add(TakeSnapshotAction.getInstance().getToolbarPresenter());
         tb.addSeparator();
         tb.add(new ExportAction(this, null));
         tb.add(new SaveViewAction(this));

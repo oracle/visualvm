@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
+import java.awt.event.ActionEvent;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;

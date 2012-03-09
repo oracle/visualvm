@@ -54,12 +54,15 @@ import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.text.MessageFormat;
 import javax.swing.*;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
+import org.openide.util.HelpCtx;
 
 
 /**
@@ -76,16 +79,18 @@ import org.openide.DialogDisplayer;
     "CAPTION_JVMandMainClassCommandLineArguments=JVM and Main Class Command-line Arguments",
     "MSG_NotAvailableNow=Not available at this time: {0}"
 })
-public final class GetCmdLineArgumentsAction extends AbstractAction implements ProfilingStateListener {
+@ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.GetCmdLineArgumentsAction")
+@ActionRegistration(displayName="#LBL_GetCmdLineArgumentsAction")
+@ActionReference(path="Menu/Profile/Advanced", position=200)
+public final class GetCmdLineArgumentsAction extends ProfilingAwareAction {
+    final private static int[] enabledStates = new int[]{Profiler.PROFILING_RUNNING};
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public GetCmdLineArgumentsAction() {
         putValue(Action.NAME, Bundle.LBL_GetCmdLineArgumentsAction());
         putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_GetCmdLineArgumentsAction());
         putValue("noIconInMenu", Boolean.TRUE); //NOI18N
-        
-        updateEnabledState();
-        Profiler.getDefault().addProfilingStateListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -93,7 +98,7 @@ public final class GetCmdLineArgumentsAction extends AbstractAction implements P
     /**
      * Invoked when an action occurs.
      */
-    public void actionPerformed(final ActionEvent evt) {
+    public void performAction() {
         try {
             final TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
             final ProfilerClient profilerClient = runner.getProfilerClient();
@@ -145,15 +150,19 @@ public final class GetCmdLineArgumentsAction extends AbstractAction implements P
             ProfilerDialogs.displayWarning(Bundle.MSG_NotAvailableNow(e.getMessage()));
         }
     }
-    
-    public void profilingStateChanged(final ProfilingStateEvent e) {
-        updateEnabledState();
+
+    @Override
+    protected int[] enabledStates() {
+        return enabledStates;
     }
-    
-    public void threadsMonitoringChanged() {} // ignore
-    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {} // ignore
-    
-    private void updateEnabledState() {
-        setEnabled(Profiler.getDefault().getProfilingState() == Profiler.PROFILING_RUNNING);
+
+    @Override
+    public HelpCtx getHelpCtx() {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return Bundle.LBL_GetCmdLineArgumentsAction();
     }
 }
