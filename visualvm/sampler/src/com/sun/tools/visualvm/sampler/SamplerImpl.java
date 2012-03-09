@@ -300,10 +300,10 @@ final class SamplerImpl {
         if (cpuSettings != null && memorySettings != null) {
             switch (getState()) {
                 case INACTIVE:
-                    cpuSettings.setEnabled(cpuProfilingSupported);
-                    memorySettings.setEnabled(memoryProfilingSupported);
-                    break;
                 case TERMINATED:
+                    cpuSettings.setEnabled(true);
+                    memorySettings.setEnabled(true);
+                    break;
                 case CPU:
                 case MEMORY:
                 case TRANSITION:

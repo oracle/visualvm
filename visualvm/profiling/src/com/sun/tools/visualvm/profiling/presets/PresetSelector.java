@@ -175,7 +175,8 @@ public final class PresetSelector extends JPanel {
     }
     
     private void updatePresetsButton(boolean enabled) {
-        presetsButton.setEnabled(enabled && getSelectedPreset().isValid());
+        ProfilerPreset preset = getSelectedPreset();
+        presetsButton.setEnabled(enabled && preset != null && preset.isValid());
         if (refSelector != null)
             refSelector.presetsButton.setEnabled(presetsButton.isEnabled());
     }
