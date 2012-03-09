@@ -120,7 +120,13 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
         noteLabel.setLabelFor(list);
         noteLabel.setFocusable(false);        
         alwaysCheckBox = new JCheckBox(Bundle.JavaPlatformSelector_UseSelPlatformChckBoxName(), false);
-        add(new JScrollPane(list), BorderLayout.CENTER);
+        add(new JScrollPane(list) {
+            public Dimension getPreferredSize() {
+                Dimension d = super.getPreferredSize();
+                d.width = Math.max(d.width, 400);
+                return d;
+            }
+        }, BorderLayout.CENTER);
         add(noteLabel, BorderLayout.NORTH);
         add(alwaysCheckBox, BorderLayout.SOUTH);
     }

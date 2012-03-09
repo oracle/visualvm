@@ -51,20 +51,17 @@ import org.netbeans.modules.profiler.snaptracer.impl.swing.VisibilityHandler;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelinePanel;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.axis.TimeAxisUtils;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
@@ -163,10 +160,7 @@ final class TimelineView {
             viewHandler = null;
         }
         
-        JToolBar toolbar = new JToolBar();
-        toolbar.setFloatable(false);
-        toolbar.setRollover(true);
-        toolbar.setBorderPainted(false);
+        ProfilerToolbar toolbar = ProfilerToolbar.create(true);
 
         toolbar.add(panel.zoomInAction());
         toolbar.add(panel.zoomOutAction());
@@ -208,11 +202,7 @@ final class TimelineView {
 
         JPanel container = new JPanel(new BorderLayout());
 
-        JPanel toolbarContainer = new JPanel(new BorderLayout());
-        toolbarContainer.add(toolbar, BorderLayout.CENTER);
-        toolbarContainer.setBorder(BorderFactory.createEmptyBorder(2, 1, 2, 1));
-
-        container.add(toolbarContainer, BorderLayout.NORTH);
+        container.add(toolbar.getComponent(), BorderLayout.NORTH);
         container.add(panel, BorderLayout.CENTER);
 
         support.addSelectionListener( new TimelineSupport.SelectionListener() {

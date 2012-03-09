@@ -192,6 +192,18 @@ public final class ResultsManager {
     public String getDefaultSnapshotFileName(LoadedSnapshot ls) {
         return "snapshot-" + ls.getSnapshot().getTimeTaken(); // NOI18N
     }
+    
+    public String getSnapshotDisplayName(LoadedSnapshot ls) {
+        String name = ls.getFile() == null ? null : ls.getFile().getName();
+        if (name == null) {
+            name = getDefaultSnapshotFileName(ls);
+        } else {
+            int dotIndex = name.lastIndexOf('.'); // NOI18N
+            if (dotIndex > 0 && dotIndex <= name.length() - 2)
+                name = name.substring(0, dotIndex);
+        }
+        return getSnapshotDisplayName(name, ls.getType());
+    }
         
     public String getSnapshotDisplayName(String fileName, int snapshotType) {
         String displayName;

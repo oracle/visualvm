@@ -129,7 +129,7 @@ public final class SampledCPUSnapshot {
         SamplesInputStream stream = seek(startIndex);
         CCTNode n = node;
         List<String[]> stack = new ArrayList();
-        final String NATIVE_ID = "[native]"; // NoI18N 
+        final String NATIVE_ID = "[native]"; // NOI18N 
         boolean match = false;
         do {
             if (n instanceof PrestimeCPUCCTNode) {
