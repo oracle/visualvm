@@ -286,17 +286,17 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
                 memoryResPopupMenu.add(popupShowSource);
 
                 popupShowSource.addActionListener(this);
+                memoryResPopupMenu.addSeparator();
             }
 
             if (runner.getProfilerEngineSettings().getAllocStackTraceLimit() != 0) {
-                memoryResPopupMenu.addSeparator();
                 popupShowStacks = new JMenuItem();
                 popupShowStacks.setText(SHOW_STACK_TRACES_POPUP_ITEM_NAME);
                 memoryResPopupMenu.add(popupShowStacks);
                 popupShowStacks.addActionListener(this);
+                memoryResPopupMenu.addSeparator();
             }
 
-            memoryResPopupMenu.addSeparator();
             startHisto = new JMenuItem();
             startHisto.setText(LOG_CLASS_HISTORY);
             memoryResPopupMenu.add(startHisto);

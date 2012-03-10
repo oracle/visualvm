@@ -52,11 +52,13 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 import org.openide.windows.WindowManager;
 
 
@@ -74,6 +76,9 @@ import org.openide.windows.WindowManager;
     "LoadSnapshotAction_ProfilerSnapshotHeapdumpFileFilter=Profiler Snapshot or Heap Dump Files (*.{0} | *.{1})",
     "LoadSnapshotAction_No_Snapshot_Selected=Not a .nps snapshot file"
 })
+@ActionID(id = "org.netbeans.modules.profiler.actions.LoadSnapshotAction", category = "Profile")
+@ActionRegistration(iconInMenu = true, displayName = "#LoadSnapshotAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/openSnapshot.png")
+@ActionReference(path = "Menu/Profile", position = 1400)
 public final class LoadSnapshotAction extends AbstractAction {
     //~ Static fields/initializers ----------------------------------------------------------------------------------------------- 
     private static File importDir;
@@ -85,16 +90,6 @@ public final class LoadSnapshotAction extends AbstractAction {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    @Override
-    public boolean isEnabled() {
-        if (!NetBeansProfiler.isInitialized()) {
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * Invoked when an action occurs.
      */

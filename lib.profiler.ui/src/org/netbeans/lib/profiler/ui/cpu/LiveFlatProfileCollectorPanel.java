@@ -79,8 +79,8 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LiveFlatProfileCollectorPanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler,
-                                         CPUSelectionHandler selectionHandler) {
-        super(actionsHandler, selectionHandler);
+                                         CPUSelectionHandler selectionHandler, boolean sampling) {
+        super(actionsHandler, selectionHandler, sampling);
         //    setCPUSelectionHandler(selectionHandler);
         this.runner = runner;
 
