@@ -38,7 +38,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.15</specification-version>
+                        <specification-version>1.17</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -135,8 +135,10 @@
             </module-dependencies>
             <friend-packages>
                 <friend>com.sun.tools.visualvm.heapdump</friend>
+                <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <package>org.netbeans.modules.profiler.heapwalk</package>
+                <package>org.netbeans.modules.profiler.heapwalk.ui.icons</package>
             </friend-packages>
         </data>
     </configuration>
