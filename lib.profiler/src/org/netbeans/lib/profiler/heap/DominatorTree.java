@@ -119,7 +119,7 @@ class DominatorTree {
             Long instanceIdObj = new Long(instanceId);
             Long oldIdomObj = (Long) map.get(instanceIdObj);
             
-            if (oldIdomObj == null || (oldIdomObj.longValue() != 0 && (ignoreDirty || dirtySet.contains(oldIdomObj)))) {            
+            if (oldIdomObj == null || (oldIdomObj.longValue() != 0 && (ignoreDirty || dirtySet.contains(oldIdomObj) || dirtySet.contains(instanceIdObj)))) {            
 //processedId++;
                 LongMap.Entry entry = heap.idToOffsetMap.get(instanceId);
                 List refs = entry.getReferences();

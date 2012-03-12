@@ -65,12 +65,8 @@ public abstract class AbstractTopLevelController extends AbstractController {
         if (clientPresenters == null) {
             clientPresenters = createClientPresenters();
 
-            for (int i = 0; i < clientPresenters.length; i++) {
-                Insets presenterMargin = clientPresenters[i].getMargin();
-                clientPresenters[i].setMargin(new Insets(presenterMargin.top, presenterMargin.top + 10, presenterMargin.bottom,
-                                                         presenterMargin.top + 10));
+            for (int i = 0; i < clientPresenters.length; i++)
                 registerClientPresenterListener(clientPresenters[i]);
-            }
 
             updateClientPresentersEnabling(clientPresenters);
         }
