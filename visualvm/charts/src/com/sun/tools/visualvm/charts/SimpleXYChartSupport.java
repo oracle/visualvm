@@ -171,6 +171,8 @@ public final class SimpleXYChartSupport {
      * <br><br><b>Note:</b> This method can be called from any thread.
      *
      * @param visible new visibility of the legend section of the chart
+     * 
+     * @since VisualVM 1.3.4
      */
     public void setLegendVisible(final boolean visible) {
         Runnable visibilityUpdater = new Runnable() {
@@ -190,6 +192,8 @@ public final class SimpleXYChartSupport {
      * <br><br><b>Note:</b> This method must be called in the Event Dispatch Thread.
      *
      * @return true if legend section of the chart is visible, false otherwise
+     * 
+     * @since VisualVM 1.3.4
      */
     public boolean isLegendVisible() {
         return legendVisible;
