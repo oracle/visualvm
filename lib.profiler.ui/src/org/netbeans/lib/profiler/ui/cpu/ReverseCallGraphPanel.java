@@ -642,9 +642,9 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
             popupShowSource.setFont(boldfont);
             popupShowSource.setText(GO_TO_SOURCE_POPUP_ITEM);
             popup.add(popupShowSource);
+            popup.addSeparator();
         }
 
-        popup.addSeparator();
 
         popupAddToRoots.setText(ADD_ROOT_METHOD_POPUP_ITEM);
         popup.add(popupAddToRoots);

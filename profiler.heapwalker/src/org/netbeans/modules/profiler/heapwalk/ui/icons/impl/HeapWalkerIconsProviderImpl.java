@@ -39,8 +39,9 @@
  *
  * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.ui.icons;
+package org.netbeans.modules.profiler.heapwalk.ui.icons.impl;
 
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import java.util.Map;
 import org.netbeans.modules.profiler.spi.IconsProvider;
 

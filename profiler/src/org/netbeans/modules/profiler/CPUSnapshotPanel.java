@@ -76,6 +76,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
@@ -299,12 +300,12 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     }
     
     private class CustomCCTDisplay extends CCTDisplay {
-        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler) {
-            super(actionsHandler);
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+            super(actionsHandler, sampling);
         }
 
-        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler) {
-            super(actionsHandler,selectionHandler);
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, boolean sampling) {
+            super(actionsHandler, selectionHandler, sampling);
         }
 
         protected JPopupMenu createPopupMenu() {
@@ -380,12 +381,14 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         CPUActionsHandler actionsHandler = new CPUActionsHandler();
         CPUSnapshotSelectionHandler combinedActionsHandlerCCT = new CPUSnapshotSelectionHandler(true);
         CPUSnapshotSelectionHandler combinedActionsHandlerFlat = new CPUSnapshotSelectionHandler(false);
+        
+        boolean sampling = ls.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED;
 
-        flatPanel = new SnapshotFlatProfilePanel(actionsHandler);
-        cctPanel = new CustomCCTDisplay(actionsHandler);
+        flatPanel = new SnapshotFlatProfilePanel(actionsHandler, sampling);
+        cctPanel = new CustomCCTDisplay(actionsHandler, sampling);
         infoPanel = new SnapshotInfoPanel(ls);
-        combinedFlat = new SnapshotFlatProfilePanel(actionsHandler, combinedActionsHandlerFlat);
-        combinedCCT = new CustomCCTDisplay(actionsHandler, combinedActionsHandlerCCT);
+        combinedFlat = new SnapshotFlatProfilePanel(actionsHandler, combinedActionsHandlerFlat, sampling);
+        combinedCCT = new CustomCCTDisplay(actionsHandler, combinedActionsHandlerCCT, sampling);
 
         flatPanel.setSorting(sortingColumn, sortingOrder);
         cctPanel.setSorting(sortingColumn, sortingOrder);

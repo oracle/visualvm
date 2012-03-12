@@ -49,13 +49,13 @@ import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.text.MessageFormat;
 import javax.swing.*;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
+import org.openide.util.HelpCtx;
 
 
 /**
@@ -68,16 +68,18 @@ import org.openide.DialogDisplayer;
     "HINT_InternalStatsAction=Display Internal Statistics",
     "CAPTION_InternalStatisticsInstrHotswap=Internal Statistics of Instrumentation and Hotswapping Operations"
 })
-public final class InternalStatsAction extends AbstractAction implements ProfilingStateListener {
+@ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.InternalStatsAction")
+@ActionRegistration(displayName="#LBL_InternalStatsAction")
+@ActionReference(path="Menu/Profile/Advanced", position=300, separatorAfter=400)
+public final class InternalStatsAction extends ProfilingAwareAction {
+    final private static int[] enabledStates = new int[]{Profiler.PROFILING_RUNNING};
+            
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public InternalStatsAction() {
         putValue(Action.NAME, Bundle.LBL_InternalStatsAction());
         putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_InternalStatsAction());
         putValue("noIconInMenu", Boolean.TRUE); //NOI18N
-        
-        updateEnabledState();
-        Profiler.getDefault().addProfilingStateListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -85,7 +87,8 @@ public final class InternalStatsAction extends AbstractAction implements Profili
     /**
      * Invoked when an action occurs.
      */
-    public void actionPerformed(final ActionEvent evt) {
+    @Override
+    public void performAction() {
         String stats;
 
         try {
@@ -109,15 +112,20 @@ public final class InternalStatsAction extends AbstractAction implements Profili
              ProfilerDialogs.displayWarning(Bundle.MSG_NotAvailableNow(e.getMessage()));
         }
     }
-    
-    public void profilingStateChanged(final ProfilingStateEvent e) {
-        updateEnabledState();
+
+    @Override
+    protected int[] enabledStates() {
+        return enabledStates;
+    }
+
+    @Override
+    public HelpCtx getHelpCtx() {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return Bundle.LBL_InternalStatsAction();
     }
     
-    public void threadsMonitoringChanged() {} // ignore
-    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {} // ignore
-    
-    private void updateEnabledState() {
-        setEnabled(Profiler.getDefault().getProfilingState() == Profiler.PROFILING_RUNNING);
-    }
 }
