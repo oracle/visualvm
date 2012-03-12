@@ -151,7 +151,7 @@ public class InstrumentationFilter implements Cloneable {
     }
 
     public String debug() {
-        StringBuilder filterStringsBuffer = new StringBuilder();
+        StringBuffer filterStringsBuffer = new StringBuffer();
 
         switch (instrFilterType) {
             case INSTR_FILTER_NONE:
@@ -193,7 +193,7 @@ public class InstrumentationFilter implements Cloneable {
                 break;
         }
 
-        StringBuilder filterStringsBuffer = new StringBuilder();
+        StringBuffer filterStringsBuffer = new StringBuffer();
 
         for (int i = 0; i < instrFilterStrings.length; i++) {
             filterStringsBuffer.append(instrFilterStrings[i]);
