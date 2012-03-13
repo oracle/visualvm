@@ -77,6 +77,8 @@ public abstract class Jvm extends Model {
     /**
      * Tests if target JVM is JRE 1.8.
      * @return <CODE>true</CODE> if JVM is JRE 1.8, <CODE>false</CODE> otherwise
+     * 
+     * @since VisualVM 1.3.4
      */
     public boolean is18() {
         // default implementation for backward compatibility
