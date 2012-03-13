@@ -285,7 +285,8 @@ public class JmxApplicationProvider {
             }
             cleanupCreatedHost(hosts, host);
             throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                       "MSG_Cannot_connect_using", new Object[] { displayName, // NOI18N
+                                       "MSG_Cannot_connect_using", new Object[] { // NOI18N
+                                       displayName != null ? displayName : suggestedName,
                                        connectionName }));
         }
 
