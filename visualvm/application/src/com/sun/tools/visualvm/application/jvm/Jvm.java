@@ -42,7 +42,7 @@ public abstract class Jvm extends Model {
     protected static final Logger LOGGER = Logger.getLogger(Jvm.class.getName());
     
     /**
-     * Propety name for {@link #isDumpOnOOMEnabled()}. 
+     * Property name for {@link #isDumpOnOOMEnabled()}. 
      * If property dumpOnOOMEnabled changes its state, property change is fired
      * with this property name.
      */
