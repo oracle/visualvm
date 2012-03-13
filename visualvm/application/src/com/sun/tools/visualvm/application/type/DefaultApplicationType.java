@@ -66,6 +66,9 @@ public class DefaultApplicationType extends ApplicationType  {
             if (mainClassName != null && mainClassName.length() > 0) {
                 name = mainClassName;
             } else {
+                name = application.getStorage().getCustomProperty(PROPERTY_SUGGESTED_NAME);
+            }
+            if (name == null) {
                 name = application.isLocalApplication() ?
                         NbBundle.getMessage(DefaultApplicationType.class, "LBL_Local_Application") : // NOI18N
                         NbBundle.getMessage(DefaultApplicationType.class, "LBL_Remote_Application"); // NOI18N

@@ -116,12 +116,14 @@ public final class JmxApplicationsSupport {
 
         if (username == null) username = ""; // NOI18N
         if (password == null) password = ""; // NOI18N
-        if (displayName == null)
-            displayName = (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
+        
+        String suggestedName = JmxApplicationProvider.getSuggestedName(displayName,
+                connectionString, username);
 
         EnvironmentProvider epr = new CredentialsProvider.Custom(username,
                 password.toCharArray(), saveCredentials);
-        return this.createJmxApplicationImpl(connectionString, displayName, epr, persistent);
+        return createJmxApplicationImpl(connectionString, displayName, suggestedName,
+                epr, persistent);
     }
 
     /**
@@ -143,7 +145,11 @@ public final class JmxApplicationsSupport {
                                             EnvironmentProvider provider,
                                             boolean persistent) throws JmxApplicationException {
 
-        return this.createJmxApplicationImpl(connectionString, displayName, provider, persistent);
+        String username = getUsername(provider);
+        String suggestedName = JmxApplicationProvider.getSuggestedName(displayName,
+                connectionString, username);
+        return createJmxApplicationImpl(connectionString, displayName, suggestedName,
+                provider, persistent);
     }
 
     /**
@@ -193,17 +199,16 @@ public final class JmxApplicationsSupport {
 
         if (username == null) username = ""; // NOI18N
         if (password == null) password = ""; // NOI18N
-        if (displayName == null)
-            displayName = (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
         
         final ProgressHandle[] pHandle = new ProgressHandle[1];
         try {
-            final String displayNameF = displayName;
+            final String suggestedName = JmxApplicationProvider.getSuggestedName(
+                    displayName, connectionString, username);
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         pHandle[0] = ProgressHandleFactory.createHandle(
                                 NbBundle.getMessage(JmxApplicationsSupport.class,
-                                                    "LBL_Adding", displayNameF)); // NOI18N
+                                                    "LBL_Adding", suggestedName)); // NOI18N
                         pHandle[0].setInitialDelay(0);
                         pHandle[0].start();
                     }
@@ -211,7 +216,7 @@ public final class JmxApplicationsSupport {
             EnvironmentProvider epr = new CredentialsProvider.Custom(username,
                 password.toCharArray(), saveCredentials);
             return createJmxApplicationImpl(connectionString, displayName,
-                                            epr, persistent);
+                                            suggestedName, epr, persistent);
         } catch (JmxApplicationException e) {
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(e.
                     getMessage(), NotifyDescriptor.ERROR_MESSAGE));
@@ -250,18 +255,20 @@ public final class JmxApplicationsSupport {
 
         final ProgressHandle[] pHandle = new ProgressHandle[1];
         try {
-            final String displayNameF = displayName;
+            String username = getUsername(provider);
+            final String suggestedName = JmxApplicationProvider.getSuggestedName(
+                    displayName, connectionString, username);
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         pHandle[0] = ProgressHandleFactory.createHandle(
                                 NbBundle.getMessage(JmxApplicationsSupport.class,
-                                                    "LBL_Adding", displayNameF)); // NOI18N
+                                                    "LBL_Adding", suggestedName)); // NOI18N
                         pHandle[0].setInitialDelay(0);
                         pHandle[0].start();
                     }
                 });
             return createJmxApplicationImpl(connectionString, displayName,
-                                            provider, persistent);
+                                            suggestedName, provider, persistent);
         } catch (JmxApplicationException e) {
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(e.
                     getMessage(), NotifyDescriptor.ERROR_MESSAGE));
@@ -278,15 +285,19 @@ public final class JmxApplicationsSupport {
     }
 
     private Application createJmxApplicationImpl(String connectionString,
-                                            String displayName,
+                                            String displayName, String suggestedName,
                                             EnvironmentProvider provider,
                                             boolean persistent)
                                             throws JmxApplicationException {
 
         return applicationProvider.createJmxApplication(connectionString,
-                                            displayName, provider, persistent);
+                displayName, suggestedName, provider, persistent);
     }
     
+    private static String getUsername(EnvironmentProvider provider) {
+        return provider instanceof CredentialsProvider ?
+                ((CredentialsProvider)provider).getUsername(null) : null;
+    }
     
     static String getStorageDirectoryString() {
         synchronized(storageDirectoryStringLock) {

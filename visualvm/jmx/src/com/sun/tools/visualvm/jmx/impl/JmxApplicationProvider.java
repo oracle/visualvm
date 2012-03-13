@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.jmx.impl;
 import com.sun.tools.visualvm.jmx.CredentialsProvider;
 import com.sun.tools.visualvm.jmx.EnvironmentProvider;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
@@ -143,17 +144,27 @@ public class JmxApplicationProvider {
     public static String getConnectionString(JmxApplication application) {
         return application.getStorage().getCustomProperty(PROPERTY_CONNECTION_STRING);
     }
+    
+    public static String getSuggestedName(String displayName, String connectionString,
+                                          String username) {
+        // User-provided displayName always first
+        if (displayName != null) return displayName;
+        
+        // Generated name 'connectionString' or 'user@connectionString'
+        if (username == null) username = ""; // NOI18N
+        return (username.isEmpty() ? "" : username + "@") + connectionString; // NOI18N
+    }
 
-    public JmxApplication createJmxApplication(String connectionName, String displayName,
-            EnvironmentProvider provider, boolean persistent) throws JmxApplicationException {
+    public JmxApplication createJmxApplication(String connectionString, String displayName,
+            String suggestedName, EnvironmentProvider provider, boolean persistent) throws JmxApplicationException {
         // Initial check if the provided connectionName can be used for resolving the host/application
-        final String normalizedConnectionName = normalizeConnectionName(connectionName);
+        final String normalizedConnectionName = normalizeConnectionName(connectionString);
         final JMXServiceURL serviceURL;
         try {
             serviceURL = getServiceURL(normalizedConnectionName);
         } catch (MalformedURLException ex) {
             throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                "MSG_Invalid_JMX_connection",normalizedConnectionName),ex); // NOI18N
+                                "MSG_Invalid_JMX_connection", normalizedConnectionName),ex); // NOI18N
         }
 
         String hostName = getHostName(serviceURL);
@@ -170,24 +181,28 @@ public class JmxApplicationProvider {
             String[] keys = new String[] {
                 SNAPSHOT_VERSION,
                 PROPERTY_CONNECTION_STRING,
-                DataSourceDescriptor.PROPERTY_NAME
+                displayName != null ?
+                    DataSourceDescriptor.PROPERTY_NAME :
+                    ApplicationType.PROPERTY_SUGGESTED_NAME
             };
 
             String[] values = new String[] {
                 CURRENT_SNAPSHOT_VERSION,
                 normalizedConnectionName,
-                displayName
+                displayName != null ?
+                    displayName :
+                    suggestedName
             };
 
             storage.setCustomProperties(keys, values);
         }
 
         return addJmxApplication(true, serviceURL, normalizedConnectionName,
-                                 displayName, hostName, provider, storage);
+                displayName, suggestedName, hostName, provider, storage);
     }
 
     private JmxApplication addJmxApplication(boolean newApp, JMXServiceURL serviceURL,
-            String connectionName, String displayName, String hostName,
+            String connectionName, String displayName, String suggestedName, String hostName,
             EnvironmentProvider provider, Storage storage) throws JmxApplicationException {
 
         // Resolve JMXServiceURL, finish if not resolved
@@ -238,7 +253,11 @@ public class JmxApplicationProvider {
         // Update display name and new EnvironmentProvider for non-persistent storage
         if (storage == null) {
             Storage s = application.getStorage();
-            s.setCustomProperty(DataSourceDescriptor.PROPERTY_NAME, displayName);
+            if (displayName != null) {
+                s.setCustomProperty(DataSourceDescriptor.PROPERTY_NAME, displayName);
+            } else {
+                s.setCustomProperty(ApplicationType.PROPERTY_SUGGESTED_NAME, suggestedName);
+            }
             if (provider != null) provider.saveEnvironment(s);
         }
         
@@ -388,6 +407,7 @@ public class JmxApplicationProvider {
                             PROPERTY_CONNECTION_STRING,
                             PROPERTY_HOSTNAME,
                             DataSourceDescriptor.PROPERTY_NAME,
+                            ApplicationType.PROPERTY_SUGGESTED_NAME,
                             PROPERTY_ENV_PROVIDER_ID
                         };
 
@@ -405,7 +425,8 @@ public class JmxApplicationProvider {
                                         EnvironmentProvider ep = epid == null ? null :
                                                                  JmxConnectionSupportImpl.
                                                                  getProvider(epid);
-                                        addJmxApplication(false, null, values[0], values[2], values[1], ep, storage);
+                                        addJmxApplication(false, null, values[0], values[2],
+                                                          values[3], values[1], ep, storage);
                                     } catch (final JmxApplicationException e) {
                                         DialogDisplayer.getDefault().notifyLater(
                                                 new NotifyDescriptor.Message(e.

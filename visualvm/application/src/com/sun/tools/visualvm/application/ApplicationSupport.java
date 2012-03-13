@@ -77,7 +77,6 @@ final class ApplicationSupport {
     private ApplicationSupport() {
         DataSourceDescriptorFactory descriptorFactory = DataSourceDescriptorFactory.getDefault();
         descriptorFactory.registerProvider(new ApplicationDescriptorProvider());
-        descriptorFactory.registerProvider(new UserNameDescriptorProvider());
         PropertiesSupport.sharedInstance().registerPropertiesProvider(
                 new GeneralPropertiesProvider(), CurrentApplication.class);
         initCurrentApplication();

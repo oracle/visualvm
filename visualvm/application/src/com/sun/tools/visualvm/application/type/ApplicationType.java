@@ -45,6 +45,14 @@ import java.beans.PropertyChangeSupport;
  */
 public abstract class ApplicationType extends Model {
     public static final String PROPERTY_NAME = "name"; // NOI18N
+    /**
+     * Named property for suggested name of the application type. This name will
+     * eventually be used instead of "Local Application" or "Remote Application"
+     * in case the application type is not recognized.
+     * 
+     * @since VisualVM 1.3.4
+     */
+    public static final String PROPERTY_SUGGESTED_NAME = "prop_suggested_name"; // NOI18N
     public static final String PROPERTY_DESCRIPTION = "description"; // NOI18N
     public static final String PROPERTY_VERSION = "version"; // NOI18N
     public static final String PROPERTY_ICON = "icon"; // NOI18N

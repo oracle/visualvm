@@ -198,7 +198,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
          * @return connection name defined by the panel
          */
         public final String getDisplayName() {
-            return displaynameField.getText().trim();
+            return !displaynameCheckbox.isSelected() ? null :
+                displaynameField.getText().trim();
         }
 
         /**
@@ -266,7 +267,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
                     saveCheckbox.setEnabled(securityCheckbox.isSelected());
 
                     setSettingsValid(isValidConnectionString(url) &&
-                            displayname.length() > 0);
+                            (!displaynameCheckbox.isSelected() || displayname.length() > 0));
                 }
             });
         }
