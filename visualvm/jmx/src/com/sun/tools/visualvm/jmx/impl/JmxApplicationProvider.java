@@ -416,7 +416,7 @@ public class JmxApplicationProvider {
                             RequestProcessor.getDefault().post(new Runnable() {
                                 public void run() {
                                     try {
-                                        String epid = values[3];
+                                        String epid = values[4];
                                         if (epid == null) {
                                             // Check for ver 1.0 which didn't support PROPERTY_ENVIRONMENT_PROVIDER
                                             String sv = storage.getCustomProperty(SNAPSHOT_VERSION);
