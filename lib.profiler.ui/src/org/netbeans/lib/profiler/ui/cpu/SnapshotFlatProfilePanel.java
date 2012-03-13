@@ -65,12 +65,12 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SnapshotFlatProfilePanel(CPUResUserActionsHandler actionsHandler) {
-        this(actionsHandler, null);
+    public SnapshotFlatProfilePanel(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+        this(actionsHandler, null, sampling);
     }
 
-    public SnapshotFlatProfilePanel(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler) {
-        super(actionsHandler, selectionHandler);
+    public SnapshotFlatProfilePanel(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, boolean sampling) {
+        super(actionsHandler, selectionHandler, sampling);
     }
 
     public void exportData(int exportedFileType, ExportDataDumper eDD, boolean combine, String viewName) {

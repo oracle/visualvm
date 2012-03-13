@@ -43,10 +43,14 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 
 
 /**
@@ -61,26 +65,25 @@ import javax.swing.*;
 public final class AttachAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
+    final private static class Singleton {
+        final private static AttachAction INSTANCE = new AttachAction();
+    }
+    
     private AttachAction() {
         putValue(Action.NAME, Bundle.LBL_AttachMainProjectAction());
         putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_AddRootMethodAction());
+        putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.ATTACH));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.ATTACH));
     }
-
-    private static final AttachAction DEF = new AttachAction();
-    public static AttachAction getDefault() {
-        return DEF;
+    
+    @ActionID(id = "org.netbeans.modules.profiler.actions.AttachAction", category = "Profile")
+    @ActionRegistration(iconInMenu = true, displayName = "#LBL_AttachMainProjectAction", lazy=false)
+    @ActionReference(path = "Menu/Profile", position = 200)
+    public static AttachAction getInstance() {
+        return Singleton.INSTANCE;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    @Override
-    public boolean isEnabled() {
-        if (!NetBeansProfiler.isInitialized()) {
-            return false;
-        }
-
-        return super.isEnabled();
-    }
 
     /**
      * Invoked when an action occurs.

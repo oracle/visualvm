@@ -49,6 +49,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 
 
 /**
@@ -60,6 +63,9 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "LBL_ShowLiveResultsWindowAction=&Live Results",
     "HINT_ShowLiveResultsWindowAction=Show Live Results Window"
 })
+@ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ShowLiveResultsWindowAction")
+@ActionRegistration(displayName="#LBL_ShowLiveResultsWindowAction", iconBase="org/netbeans/modules/profiler/impl/icons/liveResultsWindow.png")
+@ActionReference(path="Menu/Window/Profile", position=300)
 public final class ShowLiveResultsWindowAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

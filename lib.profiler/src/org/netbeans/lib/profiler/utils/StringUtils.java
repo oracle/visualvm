@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.utils;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -64,26 +65,20 @@ public class StringUtils {
     private static final String THIS_WEEK_FORMAT;
     private static final String LAST_WEEK_FORMAT;
     private static final String YESTERDAY_FORMAT;
-    private static final String TODAY_FORMAT;
-    private static final String OTHER_DAY_FORMAT;
-    private static final String FULL_FORMAT;
     
     static {
         ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.utils.Bundle"); // NOI18N
         THIS_WEEK_FORMAT = messages.getString("StringUtils_ThisWeekFormat"); // NOI18N
         LAST_WEEK_FORMAT = messages.getString("StringUtils_LastWeekFormat"); // NOI18N
         YESTERDAY_FORMAT = messages.getString("StringUtils_YesterdayFormat"); // NOI18N
-        TODAY_FORMAT = messages.getString("StringUtils_TodayFormat"); // NOI18N
-        OTHER_DAY_FORMAT = messages.getString("StringUtils_OtherDayFormat"); // NOI18N
-        FULL_FORMAT = messages.getString("StringUtils_FullFormat"); // NOI18N
     }
                                                                                             // -----
     private static SimpleDateFormat thisWeekFormat = new SimpleDateFormat(THIS_WEEK_FORMAT);
     private static SimpleDateFormat lastWeekFormat = new SimpleDateFormat(LAST_WEEK_FORMAT);
     private static SimpleDateFormat yesterdayFormat = new SimpleDateFormat(YESTERDAY_FORMAT);
-    private static SimpleDateFormat todayFormat = new SimpleDateFormat(TODAY_FORMAT);
-    private static SimpleDateFormat otherFormat = new SimpleDateFormat(OTHER_DAY_FORMAT);
-    private static SimpleDateFormat fullFormat = new SimpleDateFormat(FULL_FORMAT);
+    private static DateFormat todayFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+    private static DateFormat otherFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+    private static DateFormat fullFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.MEDIUM);
 
     // ------------------------------------------------------------------------------------------------
     //    Varioius pretty-formating methods
