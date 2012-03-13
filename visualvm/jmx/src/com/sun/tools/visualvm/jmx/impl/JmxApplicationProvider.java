@@ -177,24 +177,7 @@ public class JmxApplicationProvider {
                     "" + System.currentTimeMillis(), JMX_SUFFIX);    // NOI18N
             Utils.prepareDirectory(storageDirectory);
             storage = new Storage(storageDirectory, PROPERTIES_FILE);
-
-            String[] keys = new String[] {
-                SNAPSHOT_VERSION,
-                PROPERTY_CONNECTION_STRING,
-                displayName != null ?
-                    DataSourceDescriptor.PROPERTY_NAME :
-                    ApplicationType.PROPERTY_SUGGESTED_NAME
-            };
-
-            String[] values = new String[] {
-                CURRENT_SNAPSHOT_VERSION,
-                normalizedConnectionName,
-                displayName != null ?
-                    displayName :
-                    suggestedName
-            };
-
-            storage.setCustomProperties(keys, values);
+            storage.setCustomProperty(SNAPSHOT_VERSION, CURRENT_SNAPSHOT_VERSION);
         }
 
         return addJmxApplication(true, serviceURL, normalizedConnectionName,
@@ -246,18 +229,28 @@ public class JmxApplicationProvider {
                 if (provider != null) provider.loadEnvironment(storage);
             }
         }
-
+        
         // Create the JmxApplication
         final JmxApplication application = new JmxApplication(host, serviceURL, provider, storage);
 
         // Update display name and new EnvironmentProvider for non-persistent storage
-        if (storage == null) {
+        if (newApp) {
             Storage s = application.getStorage();
-            if (displayName != null) {
-                s.setCustomProperty(DataSourceDescriptor.PROPERTY_NAME, displayName);
-            } else {
-                s.setCustomProperty(ApplicationType.PROPERTY_SUGGESTED_NAME, suggestedName);
-            }
+            String[] keys = new String[] {
+                PROPERTY_CONNECTION_STRING,
+                displayName != null ?
+                    DataSourceDescriptor.PROPERTY_NAME :
+                    ApplicationType.PROPERTY_SUGGESTED_NAME
+            };
+
+            String[] values = new String[] {
+                connectionName,
+                displayName != null ?
+                    displayName :
+                    suggestedName
+            };
+
+            s.setCustomProperties(keys, values);
             if (provider != null) provider.saveEnvironment(s);
         }
         

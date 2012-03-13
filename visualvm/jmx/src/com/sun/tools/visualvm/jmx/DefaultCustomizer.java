@@ -544,17 +544,18 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             Storage storage = application.getStorage();
             CredentialsProvider provider = (CredentialsProvider)app.getEnvironmentProvider();
             String username = provider.getUsername(storage);
-            boolean password = provider.hasPassword(storage);
-            boolean persistent = provider.isPersistent(storage);
+            boolean isusername = username != null && !username.isEmpty();
+            boolean ispassword = provider.hasPassword(storage);
+            boolean ispersistent = provider.isPersistent(storage);
 
             connectionField.setText(connectionString);
             connectionField.setCaretPosition(0);
-            securityCheckbox.setSelected(username != null || password);
+            securityCheckbox.setSelected(isusername || ispassword);
             usernameField.setText(username);
             usernameField.setCaretPosition(0);
-            passwordField.setText(password ? "----------" : ""); // NOI18N
+            passwordField.setText(ispassword ? "----------" : ""); // NOI18N
             passwordField.setCaretPosition(0);
-            saveCheckbox.setSelected(persistent);
+            saveCheckbox.setSelected(ispersistent);
 
         }
 

@@ -98,6 +98,10 @@ public final class JmxConnectionSupportImpl {
             throw new UnsupportedOperationException("Default customizer already set"); // NOI18N
         defaultCustomizer = customizer;
     }
+    
+    static JmxConnectionCustomizer getDefaultCustomizer() {
+        return defaultCustomizer;
+    }
 
 
     private static List<JmxConnectionCustomizer> customizers() {

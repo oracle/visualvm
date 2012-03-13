@@ -62,10 +62,13 @@ public final class OpenJmxApplication extends OptionProcessor {
     private void openJmxApplication(final String connectionString) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                Application application = JmxApplicationsSupport.getInstance().
+                JmxApplication application = (JmxApplication)JmxApplicationsSupport.getInstance().
                         createJmxApplicationInteractive(connectionString, null, null, null);
-                if (application != null)
+                if (application != null) {
+                    JmxPropertiesProvider.setCustomizer(application,
+                            JmxConnectionSupportImpl.getDefaultCustomizer());
                     DataSourceWindowManager.sharedInstance().openDataSource(application);
+                }
             }
         });
     }
