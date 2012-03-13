@@ -115,10 +115,12 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     private static final String TIME_COLUMN_NAME = messages.getString("CCTDisplay_TimeColumnName"); // NOI18N
     private static final String TIME_CPU_COLUMN_NAME = messages.getString("CCTDisplay_TimeCpuColumnName"); // NOI18N
     private static final String INVOCATIONS_COLUMN_NAME = messages.getString("CCTDisplay_InvocationsColumnName"); // NOI18N
+    private static final String SAMPLES_COLUMN_NAME = messages.getString("CCTDisplay_SamplesColumnName"); // NOI18N
     private static final String TIME_REL_COLUMN_TOOLTIP = messages.getString("CCTDisplay_TimeRelColumnToolTip"); // NOI18N
     private static final String TIME_COLUMN_TOOLTIP = messages.getString("CCTDisplay_TimeColumnToolTip"); // NOI18N
     private static final String TIME_CPU_COLUMN_TOOLTIP = messages.getString("CCTDisplay_TimeCpuColumnToolTip"); // NOI18N
     private static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("CCTDisplay_InvocationsColumnToolTip"); // NOI18N
+    private static final String SAMPLES_COLUMN_TOOLTIP = messages.getString("CCTDisplay_SamplesColumnToolTip"); // NOI18N
     private static final String TREETABLE_ACCESS_NAME = messages.getString("CCTDisplay_TreeTableAccessName"); // NOI18N
                                                                                                               // -----
     private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.ui.cpu.CCTDisplay") != null; // NOI18N
@@ -138,17 +140,19 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     private Icon nodeIcon = Icons.getIcon(ProfilerIcons.NODE_FORWARD);
     private JButton cornerButton;
     private int minNamesColumnWidth; // minimal width of classnames columns
+    private boolean sampling;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public CCTDisplay(CPUResUserActionsHandler actionsHandler) {
-        this(actionsHandler, null);
+    public CCTDisplay(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+        this(actionsHandler, null, sampling);
     }
 
-    public CCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler) {
+    public CCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, boolean sampling) {
         super(actionsHandler);
 
         this.selectionHandler = selectionHandler;
+        this.sampling = sampling;
 
         enhancedTreeCellRenderer.setLeafIcon(leafIcon);
         enhancedTreeCellRenderer.setClosedIcon(nodeIcon);
@@ -367,7 +371,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         if (filterComponent == null)
             filterComponent = FilterComponent.create(true, true);
         
-        initFirstColumnName();
+        initVariableColumnNames();
 
         abstractTreeTableModel = new AbstractTreeTableModel(snapshot.getRootNode(currentView), sortingColumn, sortOrder) {
                 public int getColumnCount() {
@@ -816,7 +820,10 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         columnWidths = new int[columnCount - 1]; // Width of the first column fits to width
         columnNames = new String[columnCount];
         columnRenderers = new TableCellRenderer[columnCount];
-        columnsVisibility = null;
+        columnsVisibility = new boolean[columnCount];
+        for (int i = 0; i < columnCount - 1; i++)
+            columnsVisibility[i] = true;
+        if (!sampling) columnsVisibility[columnCount - 1] = true;
 
         int idx = 0;
         columnNames = new String[columnCount];
@@ -828,7 +835,8 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             columnNames[idx++] = TIME_CPU_COLUMN_NAME;
         }
 
-        columnNames[idx++] = INVOCATIONS_COLUMN_NAME;
+        columnNames[idx++] = sampling ? SAMPLES_COLUMN_NAME :
+                                        INVOCATIONS_COLUMN_NAME;
 
         if (DEBUG) {
             columnNames[idx++] = "JMethodID"; // NOI18N
@@ -844,7 +852,8 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             columnToolTips[idx++] = TIME_CPU_COLUMN_TOOLTIP;
         }
 
-        columnToolTips[idx++] = INVOCATIONS_COLUMN_TOOLTIP;
+        columnToolTips[idx++] = sampling ? SAMPLES_COLUMN_TOOLTIP :
+                                           INVOCATIONS_COLUMN_TOOLTIP;
 
         if (DEBUG) {
             columnToolTips[idx++] = "JMethodID for the method"; // NOI18N
@@ -872,7 +881,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         }
     }
 
-    private void initFirstColumnName() {
+    private void initVariableColumnNames() {
         switch (currentView) {
             case CPUResultsSnapshot.METHOD_LEVEL_VIEW:
                 columnNames[0] = METHOD_COLUMN_NAME;

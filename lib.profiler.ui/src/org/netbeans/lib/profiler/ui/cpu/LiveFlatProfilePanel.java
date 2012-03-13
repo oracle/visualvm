@@ -76,7 +76,7 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
                                                                                                                 // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
+    
     private CPUResUserActionsHandler actionsHandler = null;
     private Collection statModules = null;
     private CPUSelectionHandler handler = new CPUSelectionHandler() {
@@ -95,7 +95,7 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     //  public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler, DrillDownContext context, List additionalStats) {
-    public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler, Collection additionalStats) {
+    public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler, Collection additionalStats, boolean sampling) {
         this.actionsHandler = actionsHandler;
         this.runner = runner;
 
@@ -105,11 +105,11 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
         //    drilldownContext.update(); // get the latest context state
         initComponents();
 
-        setupFlatCollector();
+        setupFlatCollector(sampling);
     }
     
-    public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler) {
-        this(runner, actionsHandler, Collections.EMPTY_LIST);
+    public LiveFlatProfilePanel(TargetAppRunner runner, CPUResUserActionsHandler actionsHandler, boolean sampling) {
+        this(runner, actionsHandler, Collections.EMPTY_LIST, sampling);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -199,8 +199,8 @@ public class LiveFlatProfilePanel extends JPanel implements LiveResultsPanel {
         add(resultsTable, BorderLayout.CENTER);
     }
 
-    private void setupFlatCollector() {
-        fpCollectorPanel = new LiveFlatProfileCollectorPanel(runner, actionsHandler, handler);
+    private void setupFlatCollector(boolean sampling) {
+        fpCollectorPanel = new LiveFlatProfileCollectorPanel(runner, actionsHandler, handler, sampling);
         resultsTable.add(fpCollectorPanel, "RESULTS"); // NOI18N
                                                        //    ((CardLayout)resultsTable.getLayout()).show(resultsTable, "NORESULTS");
 

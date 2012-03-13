@@ -390,17 +390,17 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
                 popupRemoveProfForClassesBelow.setText(STOP_BELOW_LINE_POPUP_ITEM_NAME);
 
                 popup.add(popupShowSource);
+                popup.addSeparator();
             }
 
             if (runner.getProfilerEngineSettings().getAllocStackTraceLimit() != 0) {
-                popup.addSeparator();
                 popupShowStacks = new JMenuItem();
                 popupShowStacks.setText(SHOW_STACK_TRACES_POPUP_ITEM_NAME);
                 popup.add(popupShowStacks);
                 popupShowStacks.addActionListener(this);
+                popup.addSeparator();
             }
 
-            popup.addSeparator();
             popup.add(popupRemoveProfForClass);
             popup.add(popupRemoveProfForClassesBelow);
 
