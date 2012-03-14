@@ -858,7 +858,8 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private boolean callForceObtainedResultsDump(final ProfilerClient client, final boolean refreshDisplay) {
-        if (!resultsAvailableinTA) { // if the results are not available in profiled application, return immediatelly
+        int instrType = client.getCurrentInstrType();
+        if (!resultsAvailableinTA && instrType != ProfilerEngineSettings.INSTR_NONE_SAMPLING) { // if the results are not available in profiled application, return immediatelly
             return false;
         }
         if (refreshDisplay) {
@@ -866,7 +867,7 @@ public final class LiveResultsWindow extends TopComponent
         }
 
         try {
-            if (client.getCurrentInstrType() != ProfilerEngineSettings.INSTR_CODE_REGION) {
+            if (instrType != ProfilerEngineSettings.INSTR_CODE_REGION) {
                 client.forceObtainedResultsDump(true);
             }
 

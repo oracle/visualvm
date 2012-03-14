@@ -55,15 +55,19 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 import org.openide.windows.WindowManager;
 import java.awt.*;
 import java.io.*;
@@ -289,15 +293,19 @@ public final class ResultsManager {
         return type.intValue();
     }
 
-    public void cctEstablished(RuntimeCCTNode runtimeCCTNode) {
-        if (NetBeansProfiler.getDefaultNB().getProfilingState() == Profiler.PROFILING_INACTIVE) return; // Calibration, ignore
-        resultsAvailable = true;
-        fireResultsAvailable();
-    }
+    @ServiceProviders({@ServiceProvider(service=CPUCCTProvider.Listener.class), @ServiceProvider(service=MemoryCCTProvider.Listener.class)})
+    public static final class ResultsMonitor implements CPUCCTProvider.Listener, MemoryCCTProvider.Listener {
+        //~ Methods --------------------------------------------------------------------------------------------------------------
 
-    public void cctReset() {
-        resultsAvailable = false;
-        fireResultsReset();
+        public void cctEstablished(RuntimeCCTNode runtimeCCTNode, boolean empty) {
+            if (!empty) {
+                getDefault().resultsBecameAvailable();
+            }
+        }
+
+        public void cctReset() {
+            getDefault().resultsReset();
+        }
     }
 
     public void closeSnapshot(LoadedSnapshot ls) {
