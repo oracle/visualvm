@@ -106,7 +106,7 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
-import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
+import org.netbeans.modules.profiler.heapwalk.model.*;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
@@ -124,6 +124,7 @@ import org.openide.util.RequestProcessor;
     "ReferencesBrowserControllerUI_ShowInstanceItemText=Show Instance",
     "ReferencesBrowserControllerUI_ShowInClassesItemText=Show in Classes View",
     "ReferencesBrowserControllerUI_ShowGcRootItemText=Show Nearest GC Root",
+    "ReferencesBrowserControllerUI_CopyPathFromRoot=Copy Path From Root",
     "ReferencesBrowserControllerUI_GoToSourceItemText=Go To Source",
     "ReferencesBrowserControllerUI_ShowInThreadsItemText=Show In Threads",
     "ReferencesBrowserControllerUI_ShowHideColumnsString=Show or hide columns",
@@ -271,6 +272,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     private JMenuItem showGcRootItem;
     private JMenuItem showInstanceItem;
     private JMenuItem showLoopOriginItem;
+    private JMenuItem copyPathFromRootItem;
     private JMenuItem showSourceItem;
     private JMenuItem showInThreadsItem;
     private JPanel dataPanel;
@@ -601,6 +603,18 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                     }
                 }
             });
+        
+        // Copy Path From Root
+        copyPathFromRootItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_CopyPathFromRoot());
+        copyPathFromRootItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int row = fieldsListTable.getSelectedRow();
+                if (row != -1) {
+                    TreePath path = fieldsListTable.getTree().getPathForRow(row);
+                    BrowserUtils.copyPathFromRoot(path);
+                }
+            };
+        });
 
         if (GoToSource.isAvailable()) {
             showSourceItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_GoToSourceItemText());
@@ -641,6 +655,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 //        popup.add(showClassItem);
         popup.add(showGcRootItem);
         popup.add(showInThreadsItem);
+        popup.addSeparator();
+        popup.add(copyPathFromRootItem);
         popup.addSeparator();
         popup.add(showLoopOriginItem);
         if (showSourceItem != null) popup.add(showSourceItem);
@@ -856,9 +872,11 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
         if (node.isRoot()) {
             showInstanceItem.setEnabled(false);
+            copyPathFromRootItem.setEnabled(false);
         } else {
             showInstanceItem.setEnabled(node instanceof HeapWalkerInstanceNode
                                         && !(node instanceof HeapWalkerFieldNode && ((HeapWalkerFieldNode) node).isStatic()));
+            copyPathFromRootItem.setEnabled(true);
         }
 
 //        showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode || node instanceof ClassNode);
