@@ -57,6 +57,7 @@ public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,A
             appTypeFactory.registerProvider(new JavaWebStartApplicationTypeFactory());
             appTypeFactory.registerProvider(new JDeveloperApplicationTypeFactory());
             appTypeFactory.registerProvider(new MavenApplicationTypeFactory());
+            appTypeFactory.registerProvider(new IntellijApplicationTypeFactory());
         }
         return appTypeFactory;
     }
