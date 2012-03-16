@@ -44,16 +44,17 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.CallableSystemAction;
 import javax.swing.Action;
+import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
 
 
 /**
@@ -67,28 +68,31 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
     "MSG_ReRunOnProfile=Profiling session is currently in progress.\nDo you want to stop the current session and start it again?",
     "MSG_ReRunOnAttach=Profiling session is currently in progress\nDo you want to detach from the target application and rerun the last profiling session?"
 })
-public final class RerunAction extends CallableSystemAction implements ProfilingStateListener {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private boolean lastState = false;
+@ActionID(id = "org.netbeans.modules.profiler.actions.RerunAction", category = "Profile")
+@ActionRegistration(displayName = "#LBL_RerunAction", lazy=false, asynchronous=false)
+@ActionReferences(value = {
+    @ActionReference(path = "Shortcuts", name = "CS-F2"),
+    @ActionReference(path = "Menu/Profile", position = 500, separatorBefore=490)})
+public final class RerunAction extends ProfilingAwareAction {
+    final private static int[] ENABLED_STATES = new int[]{Profiler.PROFILING_STOPPED, Profiler.PROFILING_PAUSED, Profiler.PROFILING_INACTIVE};    
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public RerunAction() {
+        setIcon(Icons.getIcon(GeneralIcons.RERUN));
+        putValue("iconBase", Icons.getResource(GeneralIcons.RERUN)); // NOI18N
         putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_RerunAction());
-        Profiler.getDefault().addProfilingStateListener(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public boolean isEnabled() {
-        if (!NetBeansProfiler.isInitialized()) {
-            return false;
-        }
-
-        lastState = Profiler.getDefault().rerunAvailable();
-
-        return lastState;
+        return super.isEnabled() && Profiler.getDefault().rerunAvailable();
+    }
+    
+    @Override
+    protected int[] enabledStates() {
+        return ENABLED_STATES;
     }
 
     public HelpCtx getHelpCtx() {
@@ -102,10 +106,7 @@ public final class RerunAction extends CallableSystemAction implements Profiling
         return Bundle.LBL_RerunAction();
     }
 
-    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {
-        // ignore
-    }
-
+    @Override
     public void performAction() {
         final int state = Profiler.getDefault().getProfilingState();
         final int mode = Profiler.getDefault().getProfilingMode();
@@ -131,28 +132,5 @@ public final class RerunAction extends CallableSystemAction implements Profiling
         }
 
         Profiler.getDefault().rerunLastProfiling();
-    }
-
-    public void profilingStateChanged(final ProfilingStateEvent e) {
-        updateAction();
-    }
-
-    public void threadsMonitoringChanged() {
-        // ignore
-    }
-
-    public void updateAction() {
-        if (lastState != Profiler.getDefault().rerunAvailable()) {
-            boolean shouldBeEnabled = isEnabled();
-            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
-        }
-    }
-
-    protected boolean asynchronous() {
-        return false; // run in event queue
-    }
-
-    protected String iconResource() {
-        return Icons.getResource(GeneralIcons.RERUN);
     }
 }

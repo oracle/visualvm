@@ -43,13 +43,15 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
-import javax.swing.Icon;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import org.netbeans.lib.profiler.heap.*;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -64,7 +66,8 @@ import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
  */
 @NbBundle.Messages({
     "BrowserUtils_OutOfMemoryMsg=<html><b>Out of memory in HeapWalker</b><br><br>To avoid this error, increase the -Xmx value<br>in the etc/netbeans.conf file in NetBeans IDE installation directory.</html>",
-    "BrowserUtils_TruncatedMsg=...<truncated>..."
+    "BrowserUtils_TruncatedMsg=...<truncated>...",
+    "BrowserUtils_PathCopiedToClipboard=Path from root copied to the clipboard."
 })
 public class BrowserUtils {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -257,6 +260,80 @@ public class BrowserUtils {
         });
 
         return new HeapWalkerNode[] { HeapWalkerNodeFactory.createProgressNode(parent) };
+    }
+    
+    public static void copyPathFromRoot(final TreePath path) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                StringSelection s = new StringSelection(pathFromRoot(path));
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(s, s);
+                ProfilerDialogs.displayInfo(Bundle.BrowserUtils_PathCopiedToClipboard());
+            }
+        });
+    }
+    
+    private static String pathFromRoot(TreePath path) {
+        int m = ((HeapWalkerNode)path.getLastPathComponent()).getMode();
+        Object[] nodes = path.getPath();
+        StringBuilder b = new StringBuilder();
+        int s = nodes.length;
+        for (int i = 0; i < s; i++) {
+            HeapWalkerNode n = (HeapWalkerNode)nodes[i];
+            if (m == HeapWalkerNode.MODE_FIELDS) fieldFromRoot(n, b, i, s);
+            else referenceFromRoot(n, b, i, s);
+            b.append("\n"); // NOI18N
+        }
+        return b.toString().replace("].[", ""); // NOI18N
+    }
+    
+    private static void fieldFromRoot(HeapWalkerNode n, StringBuilder b, int i, int s) {
+        if (i == 0) {
+            b.append(n.getName());
+            b.append("     - "); // NOI18N
+            b.append("value: "); // NOI18N
+            b.append(n.getType());
+            b.append(" "); // NOI18N
+            b.append(n.getValue());
+        } else {
+            indent(b, i);
+            b.append("-> "); // NOI18N
+            b.append(n.getName());
+            b.append("     - "); // NOI18N
+            b.append("class: "); // NOI18N
+            b.append(n.getParent().getType());
+            b.append(", "); // NOI18N
+            b.append("value: "); // NOI18N
+            b.append(n.getType());
+            b.append(" "); // NOI18N
+            b.append(n.getValue());
+        }
+    }
+    
+    private static void referenceFromRoot(HeapWalkerNode n, StringBuilder b, int i, int s) {
+        if (i == 0) {
+            b.append(n.getName());
+            b.append("     - "); // NOI18N
+            b.append("value: "); // NOI18N
+            b.append(n.getType());
+            b.append(" "); // NOI18N
+            b.append(n.getValue());
+        } else {
+            indent(b, i);
+            b.append("<- "); // NOI18N
+            b.append(n.getName());
+            b.append("     - "); // NOI18N
+            b.append("class: "); // NOI18N
+            b.append(n.getType());
+            b.append(", "); // NOI18N
+            b.append("value: "); // NOI18N
+            b.append(n.getParent().getType());
+            b.append(" "); // NOI18N
+            b.append(n.getParent().getValue());
+        }
+    }
+    
+    private static void indent(StringBuilder b, int i) {
+        while (i-- > 0) b.append(" "); // NOI18N
     }
 
     public static void performTask(Runnable task) {
