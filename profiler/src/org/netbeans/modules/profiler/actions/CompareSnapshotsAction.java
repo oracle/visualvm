@@ -71,6 +71,9 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.DialogDisplayer;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.windows.WindowManager;
 
@@ -106,6 +109,9 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsAction_SnapshotAccessDescr=Selected snapshot file",
     "CompareSnapshotsAction_SnapshotsListAccessDescr=List of comparable snapshots in current project"
 })
+@ActionID(id = "org.netbeans.modules.profiler.actions.CompareSnapshotsAction", category = "Profile")
+@ActionRegistration(iconInMenu = true, displayName = "#CompareSnapshotsAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/compareSnapshots.png")
+@ActionReference(path = "Menu/Profile", position = 1600, separatorAfter=1700)
 public class CompareSnapshotsAction extends AbstractAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -843,10 +849,6 @@ public class CompareSnapshotsAction extends AbstractAction {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isEnabled() {
-        return NetBeansProfiler.isInitialized();
-    }
 
     public void actionPerformed(ActionEvent e) {
         if (snapshot != null) {

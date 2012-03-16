@@ -49,6 +49,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 
 
 /**
@@ -60,23 +63,26 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "LBL_TelemetryOverviewAction=Telemetry &Overview",
     "HINT_TelemetryOverviewAction=Telemetry Overview"
 })
-public final class TelemetryOverviewAction extends AbstractAction {
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    private static TelemetryOverviewAction instance;
+public final class TelemetryOverviewAction extends AbstractAction {
+    final private static class Singleton {
+        final private static TelemetryOverviewAction INSTANCE = new TelemetryOverviewAction();
+    }
+    
+    @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.TelemetryOverviewAction")
+    @ActionRegistration(displayName="#LBL_TelemetryOverviewAction", iconBase="org/netbeans/modules/profiler/impl/icons/telemetryOverviewWindow.png")
+    @ActionReference(path="Menu/Window/Profile", position=200)
+    public static TelemetryOverviewAction getInstance() {
+        return Singleton.INSTANCE;
+    }
+    
+    //~ Constructors -------------------------------------------------------------------------------------------------------------
     
     private TelemetryOverviewAction() {
         putValue(Action.NAME, Bundle.LBL_TelemetryOverviewAction());
         putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_TelemetryOverviewAction());
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.WINDOW_TELEMETRY_OVERVIEW));
         putValue("iconBase", Icons.getResource(ProfilerIcons.WINDOW_TELEMETRY_OVERVIEW)); // NOI18N
-    }
-    
-    public static synchronized TelemetryOverviewAction getInstance() {
-        if (instance == null) {
-            instance = new TelemetryOverviewAction();
-        }
-        return instance;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
