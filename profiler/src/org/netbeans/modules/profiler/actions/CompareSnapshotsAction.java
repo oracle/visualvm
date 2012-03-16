@@ -71,13 +71,17 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.DialogDisplayer;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.windows.WindowManager;
 
 @NbBundle.Messages({
     "CompareSnapshotsAction_ActionName=&Compare Memory Snapshots...",
     "CompareSnapshotsAction_ActionDescr=Computes the difference between two comparable memory snapshots",
-    "CompareSnapshotsAction_SelectDialogCaption=Select Snapshot to Compare",
+    "CompareSnapshotsAction_SelectSnapshotDialogCaption=Select Snapshot to Compare",
+    "CompareSnapshotsAction_SelectSnapshotsDialogCaption=Select Snapshots to Compare",
     "CompareSnapshotsAction_OpenChooserCaption=Open Snapshot",
     "CompareSnapshotsAction_OpenChooserFilter=Profiler Snapshot File (*.{0})",
     "CompareSnapshotsAction_NoComparableSnapshotsFoundMsg=<No comparable snapshots found>",
@@ -105,6 +109,9 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsAction_SnapshotAccessDescr=Selected snapshot file",
     "CompareSnapshotsAction_SnapshotsListAccessDescr=List of comparable snapshots in current project"
 })
+@ActionID(id = "org.netbeans.modules.profiler.actions.CompareSnapshotsAction", category = "Profile")
+@ActionRegistration(iconInMenu = true, displayName = "#CompareSnapshotsAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/compareSnapshots.png")
+@ActionReference(path = "Menu/Profile", position = 1600, separatorAfter=1700)
 public class CompareSnapshotsAction extends AbstractAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
@@ -843,10 +850,6 @@ public class CompareSnapshotsAction extends AbstractAction {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public boolean isEnabled() {
-        return NetBeansProfiler.isInitialized();
-    }
-
     public void actionPerformed(ActionEvent e) {
         if (snapshot != null) {
             compareDefinedSnapshot();
@@ -981,7 +984,7 @@ public class CompareSnapshotsAction extends AbstractAction {
     private void compareDefinedSnapshot() {
         getSecondSnapshotSelector().populateSnapshotsList();
 
-        DialogDescriptor desc = new DialogDescriptor(getSecondSnapshotSelector(), Bundle.CompareSnapshotsAction_SelectDialogCaption(), true,
+        DialogDescriptor desc = new DialogDescriptor(getSecondSnapshotSelector(), Bundle.CompareSnapshotsAction_SelectSnapshotDialogCaption(), true,
                                                      new Object[] {
                                                          getSecondSnapshotSelector().getOKButton(), DialogDescriptor.CANCEL_OPTION
                                                      }, DialogDescriptor.OK_OPTION, 0, null, null);
@@ -1008,7 +1011,7 @@ public class CompareSnapshotsAction extends AbstractAction {
     }
 
     private void compareExternalSnapshots() {
-        DialogDescriptor desc = new DialogDescriptor(getExternalSnapshotsSelector(), Bundle.CompareSnapshotsAction_SelectDialogCaption(), true,
+        DialogDescriptor desc = new DialogDescriptor(getExternalSnapshotsSelector(), Bundle.CompareSnapshotsAction_SelectSnapshotsDialogCaption(), true,
                                                      new Object[] {
                                                          getExternalSnapshotsSelector().getOKButton(),
                                                          DialogDescriptor.CANCEL_OPTION

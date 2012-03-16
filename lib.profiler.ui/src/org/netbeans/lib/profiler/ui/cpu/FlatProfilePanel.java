@@ -64,12 +64,12 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
 
 
 /**
@@ -92,10 +92,6 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     // -----
     // I18N String constants
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
-    private static final String STARTS_WITH_STRING = messages.getString("FlatProfilePanel_StartsWithString"); // NOI18N
-    private static final String CONTAINS_STRING = messages.getString("FlatProfilePanel_ContainsString"); // NOI18N
-    private static final String ENDS_WITH_STRING = messages.getString("FlatProfilePanel_EndsWithString"); // NOI18N
-    private static final String REGEXP_STRING = messages.getString("FlatProfilePanel_RegExpString"); // NOI18N
     private static final String FILTER_ITEM_NAME = messages.getString("FlatProfilePanel_FilterItemName"); // NOI18N
     private static final String METHOD_COLUMN_NAME = messages.getString("FlatProfilePanel_MethodColumnName"); // NOI18N
     private static final String METHOD_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_MethodColumnToolTip"); // NOI18N
@@ -113,7 +109,9 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     private static final String SELFTIME_CPU_COLUMN_NAME = messages.getString("FlatProfilePanel_SelfTimeCpuColumnName"); // NOI18N
     private static final String SELFTIME_CPU_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_SelfTimeCpuColumnToolTip"); // NOI18N
     private static final String INVOCATIONS_COLUMN_NAME = messages.getString("FlatProfilePanel_InvocationsColumnName"); // NOI18N
+    private static final String SAMPLES_COLUMN_NAME = messages.getString("FlatProfilePanel_SamplesColumnName"); // NOI18N
     private static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_InvocationsColumnToolTip"); // NOI18N
+    private static final String SAMPLES_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_SamplesColumnToolTip"); // NOI18N
     private static final String TABLE_ACCESS_NAME = messages.getString("FlatProfilePanel_TableAccessName"); // NOI18N
     private static final String NO_RELEVANT_DATA = messages.getString("FlatProfilePanel_NoRelevantData"); // NOI18N
 // -----
@@ -138,16 +136,18 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     private JPanel noDataPanel;
     private int minNamesColumnWidth; // minimal width of classnames columns
     private int sortingColumn;
+    private boolean sampling;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public FlatProfilePanel(CPUResUserActionsHandler actionsHandler) {
-        this(actionsHandler, null);
+    public FlatProfilePanel(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+        this(actionsHandler, null, sampling);
     }
 
-    public FlatProfilePanel(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler) {
+    public FlatProfilePanel(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, boolean sampling) {
         super(actionsHandler);
         this.selectionHandler = selectionHandler;
+        this.sampling = sampling;
         setDefaultSorting();
 
         minNamesColumnWidth = getFontMetrics(getFont()).charWidth('W') * 30; // NOI18N
@@ -156,6 +156,8 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
 
         jScrollPane = createScrollPaneVerticalScrollBarAlways();
         jScrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
+        jScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
         jScrollPane.addMouseWheelListener(new MouseWheelListener() {
                 public void mouseWheelMoved(MouseWheelEvent e) {
                     if (resTable != null) {
@@ -191,11 +193,11 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     }
 
     public String getFilterValue() {
-        return filterComponent.getFilterString();
+        return filterComponent.getFilterValue();
     }
 
     public void setFilterValues(String filterValue, int filterType) {
-        filterComponent.setFilterValues(filterValue, filterType);
+        filterComponent.setFilter(filterValue, filterType);
     }
 
     /*  private void printPercents() {
@@ -282,8 +284,8 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         return resTableModel.getSortingOrder();
     }
 
-    public void addFilterListener(FilterComponent.FilterListener listener) {
-        filterComponent.addFilterListener(listener);
+    public void addFilterListener(ChangeListener listener) {
+        filterComponent.addChangeListener(listener);
     }
 
     public void addResultsViewFocusListener(FocusListener listener) {
@@ -307,8 +309,8 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         prepareResults(true);
     }
 
-    public void removeFilterListener(FilterComponent.FilterListener listener) {
-        filterComponent.removeFilterListener(listener);
+    public void removeFilterListener(ChangeListener listener) {
+        filterComponent.removeChangeListener(listener);
     }
 
     public void removeResultsViewFocusListener(FocusListener listener) {
@@ -426,7 +428,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         if (filterComponent == null) {
             filterMenuItem.setState(true);
         } else {
-            filterMenuItem.setState(filterComponent.isVisible());
+            filterMenuItem.setState(filterComponent.getComponent().isVisible());
         }
 
         cornerPopup.add(filterMenuItem);
@@ -437,7 +439,10 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     protected void initColumnsData() {
         columnCount = collectingTwoTimeStamps ? 5 : 4;
 
-        columnsVisibility = null;
+        columnsVisibility = new boolean[columnCount];
+        for (int i = 0; i < columnCount - 1; i++)
+            columnsVisibility[i] = true;
+        if (!sampling) columnsVisibility[columnCount - 1] = true;
 
         columnWidths = new int[columnCount - 1]; // Width of the first column fits to width
         columnNames = new String[columnCount];
@@ -456,11 +461,21 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         if (collectingTwoTimeStamps) {
             columnNames[3] = SELFTIME_CPU_COLUMN_NAME;
             columnToolTips[3] = SELFTIME_CPU_COLUMN_TOOLTIP;
-            columnNames[4] = INVOCATIONS_COLUMN_NAME;
-            columnToolTips[4] = INVOCATIONS_COLUMN_TOOLTIP;
+            if (sampling) {
+                columnNames[4] = SAMPLES_COLUMN_NAME;
+                columnToolTips[4] = SAMPLES_COLUMN_TOOLTIP;
+            } else {
+                columnNames[4] = INVOCATIONS_COLUMN_NAME;
+                columnToolTips[4] = INVOCATIONS_COLUMN_TOOLTIP;
+            }
         } else { // just absolute
-            columnNames[3] = INVOCATIONS_COLUMN_NAME;
-            columnToolTips[3] = INVOCATIONS_COLUMN_TOOLTIP;
+            if (sampling) {
+                columnNames[3] = SAMPLES_COLUMN_NAME;
+                columnToolTips[3] = SAMPLES_COLUMN_TOOLTIP;
+            } else {
+                columnNames[3] = INVOCATIONS_COLUMN_NAME;
+                columnToolTips[3] = INVOCATIONS_COLUMN_TOOLTIP;
+            }
         }
 
         int maxWidth = getFontMetrics(getFont()).charWidth('W') * 12; // NOI18N // initial width of data columns
@@ -618,7 +633,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         menuItem.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     if (e.getActionCommand().equals("Filter")) { // NOI18N
-                        filterComponent.setVisible(!filterComponent.isVisible());
+                        filterComponent.getComponent().setVisible(!filterComponent.getComponent().isVisible());
 
                         return;
                     }
@@ -917,22 +932,11 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     }
 
     private void initFilterPanel() {
-        filterComponent = new FilterComponent();
+        filterComponent = FilterComponent.create(true, true);
+        filterComponent.setFilter(filterString, filterType);
 
-        //filterComponent.setEmptyFilterText("[Method Name Filter]");
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
-                STARTS_WITH_STRING, CommonConstants.FILTER_STARTS_WITH);
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS
-        ), CONTAINS_STRING, CommonConstants.FILTER_CONTAINS);
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
-                ENDS_WITH_STRING, CommonConstants.FILTER_ENDS_WITH);
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP), // NOI18N
-                                      REGEXP_STRING, CommonConstants.FILTER_REGEXP);
-        //filterComponent.addSeparatorItem();
-        filterComponent.setFilterValues(filterString, filterType);
-
-        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
+        filterComponent.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
                     String selectedRowContents = null;
 
                     if (resTable != null) {
@@ -943,11 +947,11 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                         }
                     }
 
-                    filterString = filterComponent.getFilterString();
+                    filterString = filterComponent.getFilterValue();
                     filterType = filterComponent.getFilterType();
 
                     if (flatProfileContainer != null) { // can be null after reset, see Issue 65866
-                        flatProfileContainer.filterOriginalData(FilterComponent.getFilterStrings(filterString), filterType,
+                        flatProfileContainer.filterOriginalData(FilterComponent.getFilterValues(filterString), filterType,
                                                                 valueFilterValue);
                         flatProfileContainer.sortBy(sortBy, sortOrder);
                     }
@@ -964,7 +968,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                 }
             });
 
-        add(filterComponent, BorderLayout.SOUTH);
+        add(filterComponent.getComponent(), BorderLayout.SOUTH);
     }
 
     private void initFirstColumnName() {
@@ -972,19 +976,19 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
             case CPUResultsSnapshot.METHOD_LEVEL_VIEW:
                 columnNames[0] = METHOD_COLUMN_NAME;
                 columnToolTips[0] = METHOD_COLUMN_TOOLTIP;
-                filterComponent.setEmptyFilterText(METHOD_FILTER_HINT);
+                filterComponent.setHint(METHOD_FILTER_HINT);
 
                 break;
             case CPUResultsSnapshot.CLASS_LEVEL_VIEW:
                 columnNames[0] = CLASS_COLUMN_NAME;
                 columnToolTips[0] = CLASS_COLUMN_TOOLTIP;
-                filterComponent.setEmptyFilterText(CLASS_FILTER_HINT);
+                filterComponent.setHint(CLASS_FILTER_HINT);
 
                 break;
             case CPUResultsSnapshot.PACKAGE_LEVEL_VIEW:
                 columnNames[0] = PACKAGE_COLUMN_NAME;
                 columnToolTips[0] = PACKAGE_COLUMN_TOOLTIP;
-                filterComponent.setEmptyFilterText(PACKAGE_FILTER_HINT);
+                filterComponent.setHint(PACKAGE_FILTER_HINT);
 
                 break;
         }

@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler;
 
+import org.netbeans.modules.profiler.api.GestureSubmitter;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
@@ -107,7 +108,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
@@ -355,7 +355,9 @@ public abstract class NetBeansProfiler extends Profiler {
         }
 
         public void resultsAvailable() {
-            ResultsManager.getDefault().resultsBecameAvailable();
+            if (getLastProfilingSettings().getProfilingType() != ProfilingSettings.PROFILE_CPU_SAMPLING) {
+                ResultsManager.getDefault().resultsBecameAvailable();
+            }
         }
 
         public void resumeLiveUpdates() {

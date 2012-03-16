@@ -69,6 +69,7 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -232,7 +233,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
     private JScrollBar scrollBar; // scrollbar that is displayed in zoomed mode that allows to scroll in history
     private JScrollPane tableScroll;
     private JTable table; // table that displays individual threads
-    private JToolBar buttonsToolBar;
+    private ProfilerToolbar buttonsToolBar;
     private ThreadsDataManager manager;
     private ThreadsDetailsCallback detailsCallback;
     private boolean internalChange = false; // prevents cycles in event handling
@@ -290,7 +291,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
                                                            });
         threadsSelectionCombo = new JComboBox(comboModel) {
                 public Dimension getMaximumSize() {
-                    return new Dimension(250, getPreferredSize().height);
+                    return getPreferredSize();
                 }
                 ;
             };
@@ -305,15 +306,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         showLabel.setDisplayedMnemonic(showLabel.getText().charAt(mnemCharIndex));
         showLabel.setDisplayedMnemonicIndex(mnemCharIndex);
 
-        buttonsToolBar = new JToolBar(JToolBar.HORIZONTAL) {
-                public Component add(Component comp) {
-                    if (comp instanceof JButton) {
-                        UIUtils.fixButtonUI((JButton) comp);
-                    }
-
-                    return super.add(comp);
-                }
-            };
+        buttonsToolBar = ProfilerToolbar.create(true);
 
         JPanel tablePanel = new JPanel();
         JPanel scrollPanel = new JPanel();
@@ -369,14 +362,13 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         columnModel.setColumnMargin(0);
         table.setDefaultRenderer(ThreadNameCellRenderer.class, new ThreadNameCellRenderer(this));
         table.setDefaultRenderer(ThreadStateCellRenderer.class, new ThreadStateCellRenderer(this));
-        buttonsToolBar.setFloatable(false);
-        buttonsToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
 
         // perform layout
         tablePanel.setLayout(new BorderLayout());
         scrollPanel.setLayout(new BorderLayout());
         scrollPanel.setBackground(Color.WHITE);
 
+        buttonsToolBar.addSeparator();
         buttonsToolBar.add(zoomInButton);
         buttonsToolBar.add(zoomOutButton);
         buttonsToolBar.add(scaleToFitButton);
@@ -400,8 +392,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         monitorLegend = new JLabel(CommonConstants.THREAD_STATUS_MONITOR_STRING, monitorIcon, SwingConstants.LEADING);
         monitorLegend.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
-        JPanel legendPanel = new JPanel();
-        legendPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 0));
+        JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 8));
         legendPanel.add(runningLegend);
         legendPanel.add(sleepingLegend);
 
@@ -413,23 +404,23 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         legendPanel.add(monitorLegend);
 
         //legendPanel.add(unknownLegend);
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new BorderLayout());
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(UIUtils.createHorizontalLine(bottomPanel.getBackground()), BorderLayout.NORTH);
         bottomPanel.add(legendPanel, BorderLayout.EAST);
 
         //scrollPanel.add(bottomPanel, BorderLayout.SOUTH);
         JPanel dataPanel = new JPanel();
         dataPanel.setLayout(new BorderLayout());
-        dataPanel.setBorder(BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         tableScroll = new JScrollPane();
-        tableScroll.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0));
         tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, new JPanel());
         tableScroll.getCorner(JScrollPane.UPPER_RIGHT_CORNER).setBackground(Color.WHITE);
         viewPort = new CustomTimeLineViewport(this);
         viewPort.setView(table);
         viewPort.setBackground(table.getBackground());
         tableScroll.setViewport(viewPort);
+        tableScroll.setBorder(BorderFactory.createEmptyBorder());
+        tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
         tableScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         tableScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         dataPanel.add(tableScroll, BorderLayout.CENTER);
@@ -472,13 +463,10 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         notificationPanel.add(enableThreadsMonitoringLabel2);
         notificationPanel.add(enableThreadsMonitoringLabel3);
 
-        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new BorderLayout());
 
         contentPanel.add(notificationPanel, ENABLE_THREADS_PROFILING);
         contentPanel.add(tablePanel, THREADS_TABLE);
-
-        add(buttonsToolBar, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
 
         scrollBar.addAdjustmentListener(this);
@@ -570,6 +558,10 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    public Component getToolbar() {
+        return buttonsToolBar.getComponent();
+    }
+    
     public BufferedImage getCurrentViewScreenshot(boolean onlyVisibleArea) {
         if (onlyVisibleArea) {
             return UIUtils.createScreenshot(tableScroll);
@@ -682,11 +674,9 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
 
     // --- Save Current View action support --------------------------------------
     public void addSaveViewAction(AbstractAction saveViewAction) {
-        JButton actionButton = buttonsToolBar.add(saveViewAction);
+        Component actionButton = buttonsToolBar.add(saveViewAction);
         buttonsToolBar.remove(actionButton);
-
         buttonsToolBar.add(actionButton, 0);
-        buttonsToolBar.add(new JToolBar.Separator(), 1);
     }
 
     // ---------------------------------------------------------------------------------------

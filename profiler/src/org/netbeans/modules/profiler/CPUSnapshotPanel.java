@@ -50,7 +50,6 @@ import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FilterComponent;
 import org.netbeans.lib.profiler.ui.cpu.*;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
@@ -77,6 +76,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -160,11 +161,11 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         public void find(Object source, String findString) {
             if (source == cctPanel) {
                 setFindString(findString);
-                tabs.setSelectedComponent(flatPanel);
+                selectView(flatPanel);
                 flatPanel.selectMethod(findString);
             } else if (source == flatPanel) {
                 setFindString(findString);
-                tabs.setSelectedComponent(cctPanel);
+                selectView(cctPanel);
                 performFindFirst();
             } else if (source == combinedFlat) {
                 setFindString(findString);
@@ -180,7 +181,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         public void showReverseCallGraph(final CPUResultsSnapshot s, final int threadId, final int methodId, final int view,
                                          final int sortingColumn, final boolean sortingOrder) {
             if (backtraceView != null) {
-                tabs.remove(backtraceView);
+                removeView(backtraceView);
             }
 
             backtraceView = new ReverseCallGraphPanel(this);
@@ -189,8 +190,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             backtraceView.setSorting(sortingColumn, sortingOrder);
             backtraceView.prepareResults();
             backtraceView.setFindString(cctPanel.getFindString()); // must be after backtraceView.prepareResults()!
-            tabs.addTab(backtraceView.getShortTitle(), BACK_TRACES_TAB_ICON, backtraceView, backtraceView.getTitle());
-            tabs.setSelectedComponent(backtraceView);
+            addView(backtraceView.getShortTitle(), BACK_TRACES_TAB_ICON, backtraceView.getTitle(), backtraceView, null);
+            selectView(backtraceView);
         }
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
@@ -203,7 +204,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             if (subtreeView != null) {
-                tabs.remove(subtreeView);
+                removeView(subtreeView);
             }
 
             subtreeView = new SubtreeCallGraphPanel(this);
@@ -211,8 +212,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             subtreeView.setSorting(sortingColumn, sortingOrder);
             subtreeView.prepareResults();
             subtreeView.setFindString(cctPanel.getFindString()); // must be after backtraceView.prepareResults()!
-            tabs.addTab(subtreeView.getShortTitle(), SUBTREE_TAB_ICON, subtreeView, subtreeView.getTitle());
-            tabs.setSelectedComponent(subtreeView);
+            addView(subtreeView.getShortTitle(), SUBTREE_TAB_ICON, subtreeView.getTitle(), subtreeView, null);
+            selectView(subtreeView);
         }
     }
 
@@ -299,12 +300,12 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     }
     
     private class CustomCCTDisplay extends CCTDisplay {
-        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler) {
-            super(actionsHandler);
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+            super(actionsHandler, sampling);
         }
 
-        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler) {
-            super(actionsHandler,selectionHandler);
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, boolean sampling) {
+            super(actionsHandler, selectionHandler, sampling);
         }
 
         protected JPopupMenu createPopupMenu() {
@@ -330,6 +331,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private static final Icon CLASSES_ICON = Icons.getIcon(LanguageIcons.CLASS);
     private static final Icon METHODS_ICON = Icons.getIcon(LanguageIcons.METHODS);
     private static final Icon PACKAGES_ICON = Icons.getIcon(LanguageIcons.PACKAGE);
+    private static final Icon THREADS_ICON = Icons.getIcon(ProfilerIcons.THREAD);
     private static final Icon CALL_TREE_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_CALL_TREE);
     private static final Icon HOTSPOTS_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS);
     private static final Icon COMBINED_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_COMBINED);
@@ -347,12 +349,11 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private CPUResultsSnapshot snapshot;
     private CombinedPanel combined;
     private CombinedViewTracker combinedViewTracker;
-    private JButton findActionPresenter;
-    private JButton findNextPresenter;
-    private JButton findPreviousPresenter;
+    private Component findActionPresenter;
+    private Component findNextPresenter;
+    private Component findPreviousPresenter;
     private JComboBox aggregationCombo;
     private JComboBox threadsCombo;
-    private JTabbedPane tabs = new JTabbedPane(JTabbedPane.BOTTOM);
     private JToggleButton slaveToggleButtonDown;
     private JToggleButton slaveToggleButtonUp;
     private LoadedSnapshot loadedSnapshot;
@@ -380,14 +381,14 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         CPUActionsHandler actionsHandler = new CPUActionsHandler();
         CPUSnapshotSelectionHandler combinedActionsHandlerCCT = new CPUSnapshotSelectionHandler(true);
         CPUSnapshotSelectionHandler combinedActionsHandlerFlat = new CPUSnapshotSelectionHandler(false);
+        
+        boolean sampling = ls.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED;
 
-        setLayout(new BorderLayout());
-
-        flatPanel = new SnapshotFlatProfilePanel(actionsHandler);
-        cctPanel = new CustomCCTDisplay(actionsHandler);
+        flatPanel = new SnapshotFlatProfilePanel(actionsHandler, sampling);
+        cctPanel = new CustomCCTDisplay(actionsHandler, sampling);
         infoPanel = new SnapshotInfoPanel(ls);
-        combinedFlat = new SnapshotFlatProfilePanel(actionsHandler, combinedActionsHandlerFlat);
-        combinedCCT = new CustomCCTDisplay(actionsHandler, combinedActionsHandlerCCT);
+        combinedFlat = new SnapshotFlatProfilePanel(actionsHandler, combinedActionsHandlerFlat, sampling);
+        combinedCCT = new CustomCCTDisplay(actionsHandler, combinedActionsHandlerCCT, sampling);
 
         flatPanel.setSorting(sortingColumn, sortingOrder);
         cctPanel.setSorting(sortingColumn, sortingOrder);
@@ -425,8 +426,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         combinedFlat.prepareResults();
         infoPanel.updateInfo();
 
-        flatPanel.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
+        flatPanel.addFilterListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
                     if (!internalFilterChange) {
                         internalFilterChange = true;
                         combinedFlat.setFilterValues(flatPanel.getFilterValue(), flatPanel.getFilterType());
@@ -435,8 +436,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                 }
             });
 
-        combinedFlat.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
+        combinedFlat.addFilterListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
                     if (!internalFilterChange) {
                         internalFilterChange = true;
                         flatPanel.setFilterValues(combinedFlat.getFilterValue(), combinedFlat.getFilterType());
@@ -461,28 +462,15 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                     combined.setDividerLocation(SPLIT_HALF);
                 }
             });
+        
+        addView(Bundle.CPUSnapshotPanel_CallTreeString(), CALL_TREE_TAB_ICON, Bundle.CPUSnapshotPanel_CallTreeTabDescr(), cctPanel, null);
+        addView(Bundle.CPUSnapshotPanel_HotSpotsString(), HOTSPOTS_TAB_ICON, Bundle.CPUSnapshotPanel_HotSpotTabDescr(), flatPanel, null);
+        addView(Bundle.CPUSnapshotPanel_CombinedString(), COMBINED_TAB_ICON, Bundle.CPUSnapshotPanel_CombinedTabDescr(), combined, null);
+        addView(Bundle.CPUSnapshotPanel_InfoString(), INFO_TAB_ICON, Bundle.CPUSnapshotPanel_InfoTabDescr(), infoPanel, null);
 
-        tabs.addTab(Bundle.CPUSnapshotPanel_CallTreeString(), CALL_TREE_TAB_ICON, cctPanel, Bundle.CPUSnapshotPanel_CallTreeTabDescr());
-        tabs.addTab(Bundle.CPUSnapshotPanel_HotSpotsString(), HOTSPOTS_TAB_ICON, flatPanel, Bundle.CPUSnapshotPanel_HotSpotTabDescr());
-        tabs.addTab(Bundle.CPUSnapshotPanel_CombinedString(), COMBINED_TAB_ICON, combined, Bundle.CPUSnapshotPanel_CombinedTabDescr());
-        tabs.addTab(Bundle.CPUSnapshotPanel_InfoString(), INFO_TAB_ICON, infoPanel, Bundle.CPUSnapshotPanel_InfoTabDescr());
-        add(tabs, BorderLayout.CENTER);
+        addChangeListener(this);
 
-        tabs.addChangeListener(this);
-
-        JToolBar toolBar = new JToolBar() {
-            public Component add(Component comp) {
-                if (comp instanceof JButton) {
-                    UIUtils.fixButtonUI((JButton) comp);
-                }
-
-                return super.add(comp);
-            }
-        };
-
-        toolBar.setFloatable(false);
-        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+        ProfilerToolbar toolBar = ProfilerToolbar.create(true);
 
         toolBar.add(saveAction = new SaveSnapshotAction(loadedSnapshot));
         toolBar.add(new ExportAction(this, loadedSnapshot));
@@ -557,6 +545,23 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                     return dlcr;
                 }
             });
+        threadsCombo.setRenderer(new DefaultListCellRenderer() {
+                public Component getListCellRendererComponent(final JList list, final Object value, final int index,
+                                                              final boolean isSelected, final boolean cellHasFocus) {
+                    DefaultListCellRenderer dlcr = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value,
+                                                                                                                index,
+                                                                                                                isSelected,
+                                                                                                                cellHasFocus);
+
+                    if (Bundle.CPUSnapshotPanel_AllThreadsItem().equals(value.toString())) {
+                        dlcr.setIcon(null);
+                    } else {
+                        dlcr.setIcon(THREADS_ICON);
+                    }
+
+                    return dlcr;
+                }
+            });
 
         JLabel lab = new JLabel(Bundle.CPUSnapshotPanel_ViewLabelString());
         lab.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
@@ -569,8 +574,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         toolBar.add(aggregationCombo);
         aggregationCombo.addActionListener(this);
 
-        // height is 0 to prevent painting grabber line
-        toolBar.addSeparator(new Dimension(6, 0));
+        toolBar.addSpace(6);
 
         slaveToggleButtonDown = new JToggleButton(SLAVE_DOWN_ICON);
         slaveToggleButtonDown.setSelected(slaveModeDown);
@@ -608,26 +612,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         findNextPresenter.setEnabled(false);
 
         updateToolbar();
-
-        add(toolBar, BorderLayout.NORTH);
-
-        // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
-        tabs.getActionMap().getParent().remove("navigatePageUp"); // NOI18N
-        tabs.getActionMap().getParent().remove("navigatePageDown"); // NOI18N
-
-        // support for traversing subtabs using Ctrl-Alt-PgDn/PgUp
-        getActionMap().put("PreviousViewAction",
-                           new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    moveToPreviousSubTab();
-                }
-            }); // NOI18N
-        getActionMap().put("NextViewAction",
-                           new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    moveToNextSubTab();
-                }
-            }); // NOI18N
+        setMainToolbar(toolBar.getComponent());
 
         // support for Find Next / Find Previous using F3 / Shift + F3
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_MASK), "FIND_PREVIOUS"); // NOI18N
@@ -656,19 +641,21 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     }
 
     public BufferedImage getViewImage(boolean onlyVisibleArea) {
-        if (!(tabs.getSelectedComponent() instanceof ScreenshotProvider)) {
+        Component selectedView = getSelectedView();
+        if (!(selectedView instanceof ScreenshotProvider)) {
             return null;
         }
 
-        return ((ScreenshotProvider) tabs.getSelectedComponent()).getCurrentViewScreenshot(onlyVisibleArea);
+        return ((ScreenshotProvider) selectedView).getCurrentViewScreenshot(onlyVisibleArea);
     }
 
     public String getViewName() {
-        if (!(tabs.getSelectedComponent() instanceof ScreenshotProvider)) {
+        Component selectedView = getSelectedView();
+        if (!(selectedView instanceof ScreenshotProvider)) {
             return null;
         }
 
-        String viewName = ((ScreenshotProvider) tabs.getSelectedComponent()).getDefaultViewName();
+        String viewName = ((ScreenshotProvider) selectedView).getDefaultViewName();
 
         return getDefaultSnapshotFileName(getSnapshot()) + "-" + viewName; // NOI18N
     }
@@ -692,7 +679,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
         } else if (src == threadsCombo) {
             // this should only be possible if flatPanel is the currently selected tab
-            assert (tabs.getSelectedComponent() == flatPanel);
+            assert (getSelectedView() == flatPanel);
 
             int tid = -1; // all threads;
 
@@ -740,21 +727,23 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     }
 
     public boolean fitsVisibleArea() {
-        if (!(tabs.getSelectedComponent() instanceof ScreenshotProvider)) {
+        Component selectedView = getSelectedView();
+        if (!(selectedView instanceof ScreenshotProvider)) {
             return false;
         }
 
-        return ((ScreenshotProvider) tabs.getSelectedComponent()).fitsVisibleArea();
+        return ((ScreenshotProvider) selectedView).fitsVisibleArea();
     }
 
     // --- Save Current View action support --------------------------------------
     public boolean hasView() {
-        return ((tabs.getSelectedComponent() != null) && (tabs.getSelectedComponent() instanceof ScreenshotProvider) && (tabs.getSelectedComponent()!=infoPanel));
+        Component selectedView = getSelectedView();
+        return ((selectedView != null) && (selectedView instanceof ScreenshotProvider) && (selectedView != infoPanel));
     }
 
     // TODO use polymorphism instead of "if-else" dispatchig; curreant approach doesn't scale well
     public void performFind() {
-        if (tabs.getSelectedComponent() != infoPanel) {
+        if (getSelectedView() != infoPanel) {
             String findString = FindDialog.getFindString();
 
             if (findString == null) {
@@ -776,7 +765,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         boolean found = false;
 
-        if (tabs.getSelectedComponent() == cctPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == cctPanel) {
             if (!cctPanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -788,7 +778,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = cctPanel.findFirst();
-        } else if (tabs.getSelectedComponent() == flatPanel) {
+        } else if (selectedView == flatPanel) {
             if (!flatPanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -800,7 +790,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = flatPanel.findFirst();
-        } else if (tabs.getSelectedComponent() == combined) {
+        } else if (selectedView == combined) {
             if ((combinedViewTracker.getLastFocusOwner() == null)
                     || (combinedViewTracker.getLastFocusOwner() == combinedFlat.getResultsViewReference())) {
                 if (!combinedCCT.isFindStringDefined()) {
@@ -827,7 +817,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
                 found = combinedFlat.findFirst();
             }
-        } else if (tabs.getSelectedComponent() == backtraceView) {
+        } else if (selectedView == backtraceView) {
             if (!backtraceView.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -839,7 +829,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = backtraceView.findFirst();
-        } else if (tabs.getSelectedComponent() == subtreeView) {
+        } else if (selectedView == subtreeView) {
             if (!subtreeView.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -868,7 +858,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         boolean found = false;
 
-        if (tabs.getSelectedComponent() == cctPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == cctPanel) {
             if (!cctPanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -880,7 +871,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = cctPanel.findNext();
-        } else if (tabs.getSelectedComponent() == flatPanel) {
+        } else if (selectedView == flatPanel) {
             if (!flatPanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -892,7 +883,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = flatPanel.findNext();
-        } else if (tabs.getSelectedComponent() == combined) {
+        } else if (selectedView == combined) {
             if ((combinedViewTracker.getLastFocusOwner() == null)
                     || (combinedViewTracker.getLastFocusOwner() == combinedCCT.getResultsViewReference())) {
                 if (!combinedCCT.isFindStringDefined()) {
@@ -919,7 +910,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
                 found = combinedFlat.findNext();
             }
-        } else if (tabs.getSelectedComponent() == backtraceView) {
+        } else if (selectedView == backtraceView) {
             if (!backtraceView.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -931,7 +922,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = backtraceView.findNext();
-        } else if (tabs.getSelectedComponent() == subtreeView) {
+        } else if (selectedView == subtreeView) {
             if (!subtreeView.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -960,7 +951,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         boolean found = false;
 
-        if (tabs.getSelectedComponent() == cctPanel) {
+        Component selectedView = getSelectedView();
+        if (selectedView == cctPanel) {
             if (!cctPanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -972,7 +964,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = cctPanel.findPrevious();
-        } else if (tabs.getSelectedComponent() == flatPanel) {
+        } else if (selectedView == flatPanel) {
             if (!flatPanel.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -984,7 +976,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = flatPanel.findPrevious();
-        } else if (tabs.getSelectedComponent() == combined) {
+        } else if (selectedView == combined) {
             if ((combinedViewTracker.getLastFocusOwner() == null)
                     || (combinedViewTracker.getLastFocusOwner() == combinedCCT.getResultsViewReference())) {
                 if (!combinedCCT.isFindStringDefined()) {
@@ -1011,7 +1003,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
                 found = combinedFlat.findPrevious();
             }
-        } else if (tabs.getSelectedComponent() == backtraceView) {
+        } else if (selectedView == backtraceView) {
             if (!backtraceView.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -1023,7 +1015,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = backtraceView.findPrevious();
-        } else if (tabs.getSelectedComponent() == subtreeView) {
+        } else if (selectedView == subtreeView) {
             if (!subtreeView.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
 
@@ -1051,8 +1043,9 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     public void stateChanged(final ChangeEvent e) {
         updateToolbar();
 
-        if (tabs.getSelectedComponent() != null) {
-            tabs.getSelectedComponent().requestFocus(); // move focus to results table when tab is switched
+        Component selectedView = getSelectedView();
+        if (selectedView != null) {
+            selectedView.requestFocus(); // move focus to results table when tab is switched
         }
     }
 
@@ -1082,29 +1075,23 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
     private void closeReverseCallsGraphs() {
         if (backtraceView != null) {
-            tabs.remove(backtraceView);
+            removeView(backtraceView);
             backtraceView = null;
         }
     }
 
-    private void moveToNextSubTab() {
-        tabs.setSelectedIndex(UIUtils.getNextSubTabIndex(tabs, tabs.getSelectedIndex()));
-    }
-
-    private void moveToPreviousSubTab() {
-        tabs.setSelectedIndex(UIUtils.getPreviousSubTabIndex(tabs, tabs.getSelectedIndex()));
-    }
-
     private void updateToolbar() {
+        Component selectedView = getSelectedView();
+        
         // threads combo is only visible on the Hotspots tab
-        threadsCombo.setVisible(tabs.getSelectedComponent() == flatPanel);
-        slaveToggleButtonDown.setVisible(tabs.getSelectedComponent() == combined);
-        slaveToggleButtonUp.setVisible(tabs.getSelectedComponent() == combined);
-        aggregationCombo.setEnabled((tabs.getSelectedComponent() != backtraceView) && (tabs.getSelectedComponent() != infoPanel)
-                                    && (tabs.getSelectedComponent() != subtreeView));
+        threadsCombo.setVisible(selectedView == flatPanel);
+        slaveToggleButtonDown.setVisible(selectedView == combined);
+        slaveToggleButtonUp.setVisible(selectedView == combined);
+        aggregationCombo.setEnabled((selectedView != backtraceView) && (selectedView != infoPanel)
+                                    && (selectedView != subtreeView));
 
         // update the toolbar if selected tab changed
-        boolean findEnabled = tabs.getSelectedComponent() != infoPanel;
+        boolean findEnabled = selectedView != infoPanel;
         saveViewAction.setEnabled(findEnabled);
         findActionPresenter.setEnabled(findEnabled);
         findPreviousPresenter.setEnabled(findEnabled);
@@ -1138,6 +1125,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         flatPanel.prepareResults();
         combinedCCT.prepareResults();
         combinedFlat.prepareResults();
+        revalidate();
+        repaint();
     }
 
     private void enhancePopupMenu(JPopupMenu popup, CCTDisplay customCCTDisplay) {
@@ -1155,15 +1144,16 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     }
     
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
-        if (tabs.getSelectedComponent() instanceof CCTDisplay) { // Call tree
+        Component selectedView = getSelectedView();
+        if (selectedView instanceof CCTDisplay) { // Call tree
             cctPanel.exportData(exportedFileType,eDD,false, Bundle.CPUSnapshotPanel_CallTreeString());
-        } else if (tabs.getSelectedComponent() instanceof SnapshotFlatProfilePanel) { // Hot Spots
+        } else if (selectedView instanceof SnapshotFlatProfilePanel) { // Hot Spots
             flatPanel.exportData(exportedFileType,eDD,false, Bundle.CPUSnapshotPanel_HotSpotsString());
-        } else if (tabs.getSelectedComponent() instanceof SubtreeCallGraphPanel) { //Subtree
+        } else if (selectedView instanceof SubtreeCallGraphPanel) { //Subtree
             subtreeView.exportData(exportedFileType,eDD, subtreeView.getShortTitle());
-        } else if (tabs.getSelectedComponent() instanceof ReverseCallGraphPanel) { //Back Trace
+        } else if (selectedView instanceof ReverseCallGraphPanel) { //Back Trace
             backtraceView.exportData(exportedFileType,eDD, backtraceView.getShortTitle());
-        } else if (tabs.getSelectedComponent()==combined) { // Combined
+        } else if (selectedView==combined) { // Combined
             combined.exportData(exportedFileType,eDD, Bundle.CPUSnapshotPanel_CombinedString());
         }
     }
@@ -1173,6 +1163,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     }
 
     public boolean hasExportableView() {
-        return ((tabs.getSelectedComponent() != null) && (tabs.getSelectedComponent()!=infoPanel));
+        Component selectedView = getSelectedView();
+        return ((selectedView != null) && (selectedView!=infoPanel));
     }
 }

@@ -254,6 +254,10 @@ public class StackTraceSnapshotBuilder {
     final Set<String> ignoredThreadNames = new HashSet<String>();
     final Map<Long,Long> threadtimes = new HashMap();
     
+    {
+        registerNewMethodInfo(new MethodInfo("Thread","")); // NOI18N
+    }
+    
     public StackTraceSnapshotBuilder() {
         this(1, null);
     }
@@ -264,7 +268,6 @@ public class StackTraceSnapshotBuilder {
         setDefaultTiming();
         ccgb = b;
         status = s;
-        registerNewMethodInfo(new MethodInfo("Thread","")); // NOI18N
     }
     
     public StackTraceSnapshotBuilder(int batchSize, InstrumentationFilter f) {
@@ -584,12 +587,16 @@ public class StackTraceSnapshotBuilder {
     public final void reset() {
         synchronized (lock) {
             ccgb.reset();
+            if (status != null) {
+                status.resetInstrClassAndMethodInfo();
+            }
             methodInfos.clear();
             methodInfoMap.clear();
             threadIds.clear();
             threadNames.clear();
             stackTraceCount = 0;
             lastStackTrace.set(Collections.EMPTY_MAP);
+            registerNewMethodInfo(new MethodInfo("Thread","")); // NOI18N
             synchronized(stampLock) {
                 currentDumpTimeStamp = -1L;
             }
