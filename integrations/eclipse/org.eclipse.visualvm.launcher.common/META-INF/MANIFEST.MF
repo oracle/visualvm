@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: VisualVM Launcher Plug-in
+Bundle-SymbolicName: org.eclipse.visualvm.launcher.common;singleton:=true
+Bundle-Version: 1.1.1
+Bundle-Activator: org.eclipse.visualvm.launcher.Activator
+Bundle-Vendor: Oracle Corporation
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: com.ibm.icu.text,
+ org.eclipse.debug.core,
+ org.eclipse.jdt.launching
+Export-Package: org.eclipse.visualvm.launcher.api;version="1.1.0"
+Bundle-ActivationPolicy: lazy
