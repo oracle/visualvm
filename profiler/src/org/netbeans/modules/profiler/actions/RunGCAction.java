@@ -50,6 +50,9 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
@@ -68,10 +71,24 @@ public final class RunGCAction extends ProfilingAwareAction {
 
     private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING };
     
+    final private static class Singleton {
+        final private static RunGCAction INSTANCE = new RunGCAction();
+    }
+    
+    @ActionID(id = "org.netbeans.modules.profiler.actions.RunGCAction", category = "Profile")
+    @ActionRegistration(displayName = "#LBL_RunGCAction", lazy=false)
+    @ActionReference(path = "Menu/Profile", position = 1000, separatorAfter=1100)    
+    public static RunGCAction getInstance() {
+        return Singleton.INSTANCE;
+    }
+
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     protected RunGCAction() {
         super();
+        setIcon(Icons.getIcon(ProfilerIcons.RUN_GC));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.RUN_GC)); // NOI18N
         putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_RunGCAction());
     }
 
@@ -99,9 +116,5 @@ public final class RunGCAction extends ProfilingAwareAction {
 
     protected int[] enabledStates() {
         return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return Icons.getResource(ProfilerIcons.RUN_GC);
     }
 }

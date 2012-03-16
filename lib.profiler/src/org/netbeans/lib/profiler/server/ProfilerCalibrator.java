@@ -180,7 +180,7 @@ class ProfilerCalibrator extends ProfilerRuntime {
             double m2 = (((double) status.methodEntryExitCallTime[2]) * 1000000) / cntsInSec; // Ditto
             double m4 = (((double) status.methodEntryExitCallTime[4]) * 1000000) / cntsInSec; // Ditto
 
-            StringBuilder s = new StringBuilder();
+            StringBuffer s = new StringBuffer();
             s.append(MessageFormat.format(CALIBRATION_RESULTS_MSG,
                                           new Object[] { nf.format(m0), nf.format(m1), nf.format(m2), nf.format(m4) }));
 

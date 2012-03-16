@@ -98,7 +98,6 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.CommonUtils;
@@ -859,7 +858,8 @@ public final class LiveResultsWindow extends TopComponent
     }
 
     private boolean callForceObtainedResultsDump(final ProfilerClient client, final boolean refreshDisplay) {
-        if (!resultsAvailableinTA) { // if the results are not available in profiled application, return immediatelly
+        int instrType = client.getCurrentInstrType();
+        if (!resultsAvailableinTA && instrType != ProfilerEngineSettings.INSTR_NONE_SAMPLING) { // if the results are not available in profiled application, return immediatelly
             return false;
         }
         if (refreshDisplay) {
@@ -867,7 +867,7 @@ public final class LiveResultsWindow extends TopComponent
         }
 
         try {
-            if (client.getCurrentInstrType() != ProfilerEngineSettings.INSTR_CODE_REGION) {
+            if (instrType != ProfilerEngineSettings.INSTR_CODE_REGION) {
                 client.forceObtainedResultsDump(true);
             }
 
@@ -947,7 +947,7 @@ public final class LiveResultsWindow extends TopComponent
         tb.add(runGCButton);
         tb.add(ResetResultsAction.getInstance());
         tb.addSeparator();
-        tb.add(((Presenter.Toolbar) SystemAction.get(TakeSnapshotAction.class)).getToolbarPresenter());
+        tb.add(TakeSnapshotAction.getInstance().getToolbarPresenter());
         tb.addSeparator();
         tb.add(new ExportAction(this, null));
         tb.add(new SaveViewAction(this));
@@ -1003,7 +1003,8 @@ public final class LiveResultsWindow extends TopComponent
             case ProfilerEngineSettings.INSTR_NONE_SAMPLING: {
                 Lookup.Provider project = NetBeansProfiler.getDefaultNB().getProfiledProject();
 
-                final LiveFlatProfilePanel cpuPanel = new LiveFlatProfilePanel(runner, cpuActionsHandler);
+                boolean sampling = instrumentationType == ProfilerEngineSettings.INSTR_NONE_SAMPLING;
+                final LiveFlatProfilePanel cpuPanel = new LiveFlatProfilePanel(runner, cpuActionsHandler, sampling);
 
                 for(LiveResultsWindowContributor c : Lookup.getDefault().lookupAll(LiveResultsWindowContributor.class)) {
                     c.addToCpuResults(cpuPanel, toolBar, runner.getProfilerClient(), project);
