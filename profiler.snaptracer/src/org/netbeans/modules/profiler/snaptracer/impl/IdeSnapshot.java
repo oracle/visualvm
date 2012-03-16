@@ -55,7 +55,6 @@ import javax.swing.Icon;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
-import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
 import org.netbeans.modules.profiler.snaptracer.logs.LogReader;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
@@ -164,7 +163,8 @@ public final class IdeSnapshot {
     }
 
     public static final class LogRecordInfo {
-
+        private static final int MAX_DISPLAY_NAME = 40;
+        
         private String name;
         private String displayName;
         private String toolTip;
@@ -188,6 +188,29 @@ public final class IdeSnapshot {
         }
 
         public String getDisplayName() {
+            if (displayName == null) {
+                String message = record.getMessage();
+                
+                if (message != null && message.length() > 0) {
+                    StringBuilder sb = new StringBuilder(message);
+                    Object[] arr = record.getParameters();
+                    
+                    if (arr != null && arr.length > 0) {
+                        String sep = " (";  // NOI18N
+                        
+                        for (Object par : arr) {
+                            sb.append(sep);
+                            sb.append(par);
+                            sep = ", ";     // NOI18N
+                            if (sb.length() > MAX_DISPLAY_NAME) {
+                                return sb.substring(0,MAX_DISPLAY_NAME).concat(" ..."); // NOI18N
+                            }
+                        }
+                        sb.append(")");     // NOI18N
+                    }
+                    return sb.toString();
+                }
+            }
             return displayName;
         }
 

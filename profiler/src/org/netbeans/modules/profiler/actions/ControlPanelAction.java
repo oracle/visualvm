@@ -49,6 +49,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 
 
 /**
@@ -60,13 +63,16 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "LBL_ControlPanelAction=Profiler &Control Panel",
     "HINT_ControlPanelAction=Show Profiler Control Panel"
 })
+@ActionID(category="Profile", id="org.netbeans.modules.profiles.actions.ControlPanelAction")
+@ActionRegistration(displayName="#LBL_ControlPanelAction", iconBase="org/netbeans/modules/profiler/impl/icons/controlPanel.gif")
+@ActionReference(path="Menu/Window/Profile", position=100)
 public final class ControlPanelAction extends AbstractAction {
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
+    //~ Constructors -------------------------------------------------------------------------------------------------------------    
     public ControlPanelAction() {
         putValue(Action.NAME, Bundle.LBL_ControlPanelAction());
         putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_ControlPanelAction());
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.CONTROL_PANEL));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.CONTROL_PANEL));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
