@@ -316,7 +316,7 @@ public class Package extends Task {
         }
         ds.setBasedir(baseSrcDir);
         String[] includes = new String[]{"*/*/*", "*/*/ext/*", "*/*/ext/locale/*", "*/*/netbeans/*/*", "*/*/netbeans/*/locale/*", "*/*/netbeans/*/nblib/*", "*/*/netbeans/*/extra/*", "*/*/docs/*", "*/*/locale/*", "*/*/netbeans/config/*/*"};
-        String[] excludes = new String[]{"other/**", "*/*/netbeans", "*/*/netbeans/*", "*/*/netbeans/*/locale", "*/*/netbeans/*/nblib", "*/*/netbeans/*/extra", "*/*/docs", "*/*/ext", "*/*/ext/locale", "*/*/locale", "*/*/netbeans/config/*", "**/CVS/*", "**/CVS"};
+        String[] excludes = new String[]{"other/**", "*/*/netbeans", "*/*/netbeans/*", "*/*/netbeans/*/locale", "*/*/netbeans/*/nblib", "*/*/netbeans/*/extra", "*/*/docs", "*/*/ext", "*/*/ext/locale", "*/*/locale", "*/*/netbeans/config/*", "**/CVS/*", "**/CVS", "**/.svn/*", "**/.svn"};
         ds.setIncludes(includes);
         ds.setExcludes(excludes);
         ds.scan();
@@ -358,6 +358,7 @@ public class Package extends Task {
                 ds.setBasedir(new File(baseSrcDir, dir));
                 ds.setIncludes(new String[]{"**/*.hs"});
                 ds.setExcludes(new String[]{"**/CVS/*"});
+                ds.setExcludes(new String[]{"**/.svn/*"});
                 ds.scan();
                 if (ds.getIncludedFilesCount() != 1) {
                     throw new BuildException("Can't find .hs file for " + name + " module.");
