@@ -68,11 +68,8 @@ public abstract class ProfilingAwareAction extends CallableSystemAction implemen
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    @Override
     public boolean isEnabled() {
-        if (!NetBeansProfiler.isInitialized()) {
-            return false;
-        }
-
         boolean shouldBeEnabled = false;
         lastProfilingState = Profiler.getDefault().getProfilingState();
         lastInstrumentation = lastProfilingState != Profiler.PROFILING_INACTIVE ? 
@@ -118,7 +115,7 @@ public abstract class ProfilingAwareAction extends CallableSystemAction implemen
         return false;
     }
 
-    private void updateAction() {
+    protected void updateAction() {
         if (lastProfilingState != Profiler.getDefault().getProfilingState()) {
             boolean shouldBeEnabled = isEnabled();
             firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);

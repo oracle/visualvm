@@ -145,7 +145,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
 
         if (!isRootClass) {
             if (normallyFilteredOut) {
-                return null;
+                return createInstrumentedMethodPack(); // profile points !
             }
         }
 
