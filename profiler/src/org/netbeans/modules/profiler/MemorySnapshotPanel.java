@@ -162,7 +162,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
         infoPanel.updateInfo();
 
-        addView(Bundle.MemorySnapshotPanel_MemoryResultsTabName(), MEMORY_RESULTS_TAB_ICON, Bundle.MemorySnapshotPanel_StackTracesTabDescr(), memoryPanel, null);
+        addView(Bundle.MemorySnapshotPanel_MemoryResultsTabName(), MEMORY_RESULTS_TAB_ICON, Bundle.MemorySnapshotPanel_MemoryResultsTabDescr(), memoryPanel, null);
 
         if (snapshot.containsStacks()) {
             reversePanel = new SnapshotReverseMemCallGraphPanel(snapshot, memoryActionsHandler);
@@ -442,7 +442,7 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
             if (memoryPanel instanceof SnapshotAllocResultsPanel) {
                 ((SnapshotAllocResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_MemoryResultsTabName());
             } else if (memoryPanel instanceof SnapshotLivenessResultsPanel) {
-                ((SnapshotLivenessResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_StackTracesTabName());
+                ((SnapshotLivenessResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_MemoryResultsTabName());
             } 
         } else if (selectedView == reversePanel) {
             reversePanel.exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_StackTracesTabName());
