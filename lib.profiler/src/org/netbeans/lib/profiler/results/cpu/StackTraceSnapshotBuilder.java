@@ -587,6 +587,9 @@ public class StackTraceSnapshotBuilder {
     public final void reset() {
         synchronized (lock) {
             ccgb.reset();
+            if (status != null) {
+                status.resetInstrClassAndMethodInfo();
+            }
             methodInfos.clear();
             methodInfoMap.clear();
             threadIds.clear();

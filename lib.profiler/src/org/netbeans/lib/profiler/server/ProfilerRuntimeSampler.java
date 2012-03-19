@@ -111,13 +111,13 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                                 }
                                 writeThreadInfo(tid,status,mids);
                             } else if (status != CommonConstants.THREAD_STATUS_ZOMBIE) { // new thread
-                                tid = Integer.valueOf(++threadCount);
+                                tid = new Integer(++threadCount);
                                 ProfilerRuntime.writeThreadCreationEvent(t,tid.intValue());
                                 writeThreadInfo(tid,status,mids);
                             } else { // new thread which is not started yet
                                 continue; 
                             }
-                            newArrayOffsetMap.put(ltid, Integer.valueOf(i));
+                            newArrayOffsetMap.put(ltid, new Integer(i));
                             newThreadIdMap.put(ltid,tid);
                         }
                     }

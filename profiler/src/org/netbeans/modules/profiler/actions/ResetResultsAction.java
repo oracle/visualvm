@@ -44,21 +44,24 @@
 package org.netbeans.modules.profiler.actions;
 
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.actions.CallableSystemAction;
 import org.openide.util.lookup.ServiceProvider;
 
 
@@ -71,7 +74,7 @@ import org.openide.util.lookup.ServiceProvider;
     "LBL_ResetResultsAction=R&eset Collected Results",
     "HINT_ResetResultsAction=Reset Collected Results Buffer"
 })
-public final class ResetResultsAction extends AbstractAction implements ProfilingStateListener {
+public final class ResetResultsAction extends CallableSystemAction {
     
     Listener resultListener;
     
@@ -97,7 +100,9 @@ public final class ResetResultsAction extends AbstractAction implements Profilin
         }
     }
     
-    private static ResetResultsAction instance;
+    final private static class Singleton {
+        final private static ResetResultsAction INSTANCE = new ResetResultsAction();
+    }
     
     private ResetResultsAction() {
         putValue(Action.NAME, Bundle.LBL_ResetResultsAction());
@@ -105,37 +110,28 @@ public final class ResetResultsAction extends AbstractAction implements Profilin
         putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.RESET_RESULTS));
         putValue("iconBase", Icons.getResource(ProfilerIcons.RESET_RESULTS)); // NOI18N
         
-        updateEnabledState();
-        
         resultListener = Lookup.getDefault().lookup(Listener.class);
-        resultListener.setDelegate(this);        
-        Profiler.getDefault().addProfilingStateListener(this);
+        resultListener.setDelegate(this);
+        updateEnabledState();
     }
     
-    public static synchronized ResetResultsAction getInstance() {
-        if (instance == null) {
-            instance = new ResetResultsAction();
-        }
-        return instance;
+    @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ResetResultsAction")
+    @ActionRegistration(displayName="#LBL_ResetResultsAction", lazy=false)
+    @ActionReferences({
+        @ActionReference(path="Menu/Profile", position=900),
+        @ActionReference(path = "Shortcuts", name = "AS-F2")
+    })
+    public static ResetResultsAction getInstance() {
+        return Singleton.INSTANCE;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {
-    } // ignore
-
-    public void profilingStateChanged(final ProfilingStateEvent e) {
-        updateEnabledState();
-    }
-
-    public void threadsMonitoringChanged() {
-    } // ignore
     
     /**
      * Invoked when an action occurs.
      */
     @Override
-    public void actionPerformed(final ActionEvent e) {
+    public void performAction() {
         
         ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
             @Override
@@ -156,6 +152,21 @@ public final class ResetResultsAction extends AbstractAction implements Profilin
                 } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {} // ignore
             }
         });
+    }
+    
+    @Override
+    public HelpCtx getHelpCtx() {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return Bundle.LBL_ResetResultsAction();
+    }
+
+    @Override
+    protected String iconResource() {
+        return Icons.getResource(ProfilerIcons.RESET_RESULTS);
     }
     
     private void updateEnabledState() {
