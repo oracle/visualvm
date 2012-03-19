@@ -109,7 +109,9 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     private static final String SELFTIME_CPU_COLUMN_NAME = messages.getString("FlatProfilePanel_SelfTimeCpuColumnName"); // NOI18N
     private static final String SELFTIME_CPU_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_SelfTimeCpuColumnToolTip"); // NOI18N
     private static final String INVOCATIONS_COLUMN_NAME = messages.getString("FlatProfilePanel_InvocationsColumnName"); // NOI18N
+    private static final String SAMPLES_COLUMN_NAME = messages.getString("FlatProfilePanel_SamplesColumnName"); // NOI18N
     private static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_InvocationsColumnToolTip"); // NOI18N
+    private static final String SAMPLES_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_SamplesColumnToolTip"); // NOI18N
     private static final String TABLE_ACCESS_NAME = messages.getString("FlatProfilePanel_TableAccessName"); // NOI18N
     private static final String NO_RELEVANT_DATA = messages.getString("FlatProfilePanel_NoRelevantData"); // NOI18N
 // -----
@@ -134,16 +136,18 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     private JPanel noDataPanel;
     private int minNamesColumnWidth; // minimal width of classnames columns
     private int sortingColumn;
+    private boolean sampling;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public FlatProfilePanel(CPUResUserActionsHandler actionsHandler) {
-        this(actionsHandler, null);
+    public FlatProfilePanel(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+        this(actionsHandler, null, sampling);
     }
 
-    public FlatProfilePanel(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler) {
+    public FlatProfilePanel(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, boolean sampling) {
         super(actionsHandler);
         this.selectionHandler = selectionHandler;
+        this.sampling = sampling;
         setDefaultSorting();
 
         minNamesColumnWidth = getFontMetrics(getFont()).charWidth('W') * 30; // NOI18N
@@ -435,7 +439,10 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     protected void initColumnsData() {
         columnCount = collectingTwoTimeStamps ? 5 : 4;
 
-        columnsVisibility = null;
+        columnsVisibility = new boolean[columnCount];
+        for (int i = 0; i < columnCount - 1; i++)
+            columnsVisibility[i] = true;
+        if (!sampling) columnsVisibility[columnCount - 1] = true;
 
         columnWidths = new int[columnCount - 1]; // Width of the first column fits to width
         columnNames = new String[columnCount];
@@ -454,11 +461,21 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         if (collectingTwoTimeStamps) {
             columnNames[3] = SELFTIME_CPU_COLUMN_NAME;
             columnToolTips[3] = SELFTIME_CPU_COLUMN_TOOLTIP;
-            columnNames[4] = INVOCATIONS_COLUMN_NAME;
-            columnToolTips[4] = INVOCATIONS_COLUMN_TOOLTIP;
+            if (sampling) {
+                columnNames[4] = SAMPLES_COLUMN_NAME;
+                columnToolTips[4] = SAMPLES_COLUMN_TOOLTIP;
+            } else {
+                columnNames[4] = INVOCATIONS_COLUMN_NAME;
+                columnToolTips[4] = INVOCATIONS_COLUMN_TOOLTIP;
+            }
         } else { // just absolute
-            columnNames[3] = INVOCATIONS_COLUMN_NAME;
-            columnToolTips[3] = INVOCATIONS_COLUMN_TOOLTIP;
+            if (sampling) {
+                columnNames[3] = SAMPLES_COLUMN_NAME;
+                columnToolTips[3] = SAMPLES_COLUMN_TOOLTIP;
+            } else {
+                columnNames[3] = INVOCATIONS_COLUMN_NAME;
+                columnToolTips[3] = INVOCATIONS_COLUMN_TOOLTIP;
+            }
         }
 
         int maxWidth = getFontMetrics(getFont()).charWidth('W') * 12; // NOI18N // initial width of data columns

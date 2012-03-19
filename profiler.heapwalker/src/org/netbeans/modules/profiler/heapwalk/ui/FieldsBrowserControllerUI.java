@@ -58,7 +58,6 @@ import org.netbeans.modules.profiler.heapwalk.FieldsBrowserController;
 import org.netbeans.modules.profiler.heapwalk.model.ClassNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerInstanceNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -75,7 +74,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
@@ -94,12 +92,14 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
@@ -115,6 +115,7 @@ import org.openide.util.RequestProcessor;
     "FieldsBrowserControllerUI_NoInstanceSelectedMsg=<b>No instance selected.</b><br><br>To view instance fields, select an instance in {0}&nbsp;Instances list.",
     "FieldsBrowserControllerUI_NoClassSelectedMsg=<b>No class selected.</b><br><br>To view static fields, select a class in {0}&nbsp;Classes list.",
     "FieldsBrowserControllerUI_ShowLoopItemText=Select Loop Origin",
+    "FieldsBrowserControllerUI_CopyPathFromRoot=Copy Path From Root",
     "FieldsBrowserControllerUI_ShowInstanceItemText=Show Instance",
     "FieldsBrowserControllerUI_ShowInInstancesItemText=Show in Instances View",
     "FieldsBrowserControllerUI_ShowClassItemText=Show Class",
@@ -268,6 +269,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
     private JMenuItem showClassItem;
     private JMenuItem showInstanceItem;
     private JMenuItem showLoopOriginItem;
+    private JMenuItem copyPathFromRootItem;
     private JMenuItem showSourceItem;
     private JPanel dataPanel;
     private JPanel noDataPanel;
@@ -537,6 +539,19 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                     }
                 }
             });
+        
+        // Copy Path From Root
+        copyPathFromRootItem = new JMenuItem(Bundle.FieldsBrowserControllerUI_CopyPathFromRoot());
+        copyPathFromRootItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int row = fieldsListTable.getSelectedRow();
+                if (row != -1) {
+                    TreePath path = fieldsListTable.getTree().getPathForRow(row);
+                    BrowserUtils.copyPathFromRoot(path);
+                }
+            };
+        });
+        
 
         // Show Loop Origin
         showLoopOriginItem = new JMenuItem(Bundle.FieldsBrowserControllerUI_ShowLoopItemText());
@@ -576,6 +591,8 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
         popup.add(showInstanceItem);
         popup.add(showClassItem);
+        popup.addSeparator();
+        popup.add(copyPathFromRootItem);
         popup.addSeparator();
         popup.add(showLoopOriginItem);
         if (showSourceItem != null) popup.add(showSourceItem);
@@ -800,8 +817,10 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         // Show Instance
         if (node.isRoot()) {
             showInstanceItem.setEnabled(false);
+            copyPathFromRootItem.setEnabled(false);
         } else {
             showInstanceItem.setEnabled(node instanceof HeapWalkerInstanceNode && ((HeapWalkerInstanceNode) node).hasInstance());
+            copyPathFromRootItem.setEnabled(true);
         }
 
         // Show in Classes View

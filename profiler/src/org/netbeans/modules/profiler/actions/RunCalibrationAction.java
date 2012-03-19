@@ -51,6 +51,9 @@ import javax.swing.*;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 
 
 /**
@@ -65,6 +68,9 @@ import org.netbeans.modules.profiler.utilities.ProfilerUtils;
     "MSG_CalibrationOnAttach=Profiling session is currently in progress\nDo you want to detach from the target application and perform the calibration?",
     "MSG_CalibrationFailed=Calibration failed.\nPlease check your setup and run the calibration again."
 })
+@ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.RunCalibrationAction")
+@ActionRegistration(displayName="#LBL_RunCalibrationAction")
+@ActionReference(path="Menu/Profile/Advanced", position=100)
 public final class RunCalibrationAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -75,15 +81,6 @@ public final class RunCalibrationAction extends AbstractAction {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isEnabled() {
-        if (!NetBeansProfiler.isInitialized()) {
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * Invoked when an action occurs.
      */

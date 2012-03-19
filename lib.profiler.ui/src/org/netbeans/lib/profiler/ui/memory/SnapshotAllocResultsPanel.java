@@ -125,7 +125,7 @@ public class SnapshotAllocResultsPanel extends AllocResultsPanel implements Acti
             }
 
             if (snapshot.containsStacks()) {
-                memoryResPopupMenu.addSeparator();
+                if (GoToSource.isAvailable()) memoryResPopupMenu.addSeparator();
                 popupShowStacks = new JMenuItem();
                 popupShowStacks.setText(SHOW_STACK_TRACES_POPUP_ITEM_NAME);
                 memoryResPopupMenu.add(popupShowStacks);

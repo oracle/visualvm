@@ -182,13 +182,13 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
             }
         };
 
+        boolean separator = true;
         if (popupShowSource != null) {
             popupShowSource.setFont(boldfont);
             popupShowSource.setText(GO_TO_SOURCE_ITEM_NAME);
             popup.add(popupShowSource);
+            separator = false;
         }
-
-        boolean separator = false;
 
         if (supportsSubtreeCallGraph()) {
             if (!separator) {

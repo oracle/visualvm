@@ -610,7 +610,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             resetButton.setBorder(myRolloverBorder);
             add(resetButton);
 
-            JButton rungcButton = new JButton(SystemAction.get(RunGCAction.class));
+            JButton rungcButton = new JButton(RunGCAction.getInstance());
             rungcButton.setText(null);
             UIUtils.fixButtonUI(rungcButton);
             rungcButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) rungcButton
@@ -621,7 +621,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             rungcButton.setBorder(myRolloverBorder);
             add(rungcButton);
 
-            JButton modifyButton = new JButton(SystemAction.get(ModifyProfilingAction.class));
+            JButton modifyButton = new JButton(ModifyProfilingAction.getInstance());
             modifyButton.setText(null);
             UIUtils.fixButtonUI(modifyButton);
             modifyButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) modifyButton
@@ -762,7 +762,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             takeMemorySnapshotButton.setToolTipText(Bundle.ProfilerControlPanel2_TakeSnapshotButtonToolTip());
             
             // Take Heap Dump
-            takeHeapDumpButton = new JButton(SharedClassObject.findObject(HeapDumpAction.class, true));
+            takeHeapDumpButton = new JButton(HeapDumpAction.getInstance());
             takeHeapDumpButton.setText(Bundle.ProfilerControlPanel2_DumpHeapButtonName());
             takeHeapDumpButton.setIcon(TAKE_SNAPSHOT_MEMORY_ICON);
             UIUtils.fixButtonUI(takeHeapDumpButton);
