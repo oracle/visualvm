@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.attach.panels;
 
-import java.text.MessageFormat;
 import org.openide.util.NbBundle;
 
 /**
@@ -51,7 +50,8 @@ import org.openide.util.NbBundle;
  * @author  Jaroslav Bachorik
  */
 @NbBundle.Messages({
-    "AttachSettingsSummaryWizardPanelUI_FinishContinueMsg=If these settings are correct, click <strong>Finish</strong> to close the Attach Wizard and start profiling. If you have not integrated the {0} for profiling yet, click <strong>Next</strong> to continue with {0} integration."
+    "AttachSettingsSummaryWizardPanelUI_FinishContinueMsg=If these settings are correct, click <strong>Finish</strong> to close the Attach Wizard and start profiling. If you have not integrated the {0} for profiling yet, click <strong>Next</strong> to continue with {0} integration.",
+    "AttachSettingsSummaryWizardPanelUI_AttachSettingsOverviewString=You have entered these attach settings:"
 })
 public class ReviewSettingsPanelUI extends javax.swing.JPanel {
   private ReviewSettingsPanel.Model model;
