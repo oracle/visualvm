@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.attach.panels;
 import java.text.MessageFormat;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
 import org.openide.util.NbBundle;
 import java.awt.Font;
 import javax.swing.UIManager;
@@ -55,6 +54,11 @@ import javax.swing.UIManager;
  *
  * @author  j.bachorik
  */
+@NbBundle.Messages({
+    "AttachWizard_AttachInvocationString=Attach invocation",
+    "AttachWizard_SelectTargetForceString=<Select Target ...>",
+    "AttachWizard_SelectTargetTypeForceString=<Select Target Type ...>"
+})
 public class AttachSettingsPanelUI extends javax.swing.JPanel {
   private class ForceSelectionComboBoxModel extends DefaultComboBoxModel {
     private String firstLine = ""; // NOI18N

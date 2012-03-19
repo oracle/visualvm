@@ -143,10 +143,14 @@ public class ClientUtils implements CommonConstants {
                     return (startLine >= anotherSelection.startLine) && (endLine <= anotherSelection.endLine);
                 }
             } else {
-                String thisFlattened = toFlattened().replace('.', '\\').replace('$', '\\') + "\\"; //NOI18N
-                String anotherFlattened = anotherSelection.toFlattened().replace('.', '\\').replace('$', '\\'); //NOI18N
+                if (isDefaultPkg(this)) {
+                    return isDefaultPkg(anotherSelection);
+                } else {
+                    String thisFlattened = toFlattened().replace('.', '\\').replace('$', '\\') + "\\"; //NOI18N
+                    String anotherFlattened = anotherSelection.toFlattened().replace('.', '\\').replace('$', '\\'); //NOI18N
 
-                return anotherFlattened.startsWith(thisFlattened);
+                    return anotherFlattened.startsWith(thisFlattened);
+                }
             }
 
             return false;
@@ -179,9 +183,9 @@ public class ClientUtils implements CommonConstants {
 
             // length of classNames needs to be the same
             // normalizing the class name; result of #203446
-            String cn1 = this.className.replace("$**", ""); // NOI18N
+            String cn1 = this.className.replace("$**", "").replace(".**", "").replace(".*", ""); // NOI18N
             // normalizing the class name; result of #203446
-            String cn2 = other.className.replace("$**", ""); // NOI18N
+            String cn2 = other.className.replace("$**", "").replace(".**", "").replace(".*", ""); // NOI18N
             if (!cn1.equals(cn2)) {
                 return false;
             }
@@ -266,6 +270,13 @@ public class ClientUtils implements CommonConstants {
 
                 return sb.toString();
             }
+        }
+        
+        private static boolean isDefaultPkg(SourceCodeSelection sel) {
+            return ((".*".equals(sel.className) || ".**".equals(sel.className)) &&
+                     (sel.methodName == null || sel.methodName.isEmpty())) ||
+                   ((sel.className == null || sel.className.isEmpty()) &&
+                     (sel.methodName != null && !sel.methodName.isEmpty()));
         }
     }
 
