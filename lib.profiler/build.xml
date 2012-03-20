@@ -56,12 +56,6 @@ made subject to such option by the copyright holder.
             <include name="org/netbeans/lib/profiler/server/system/**"/>
             <compilerarg line="${javac.compilerargs}"/>
         </javac>
-        <mkdir dir="${buildcvm.classes.dir}"/>
-        <javac  srcdir="${srccvm.dir}" destdir="${buildcvm.classes.dir}" deprecation="${build.compiler.deprecation}"
-             debug="${build.compiler.debug}" source="1.4" target="1.4" includeantruntime="false" optimize="${build.compiler.optimize}" >
-             <include name="org/netbeans/lib/profiler/server/system/**"/>
-             <compilerarg line="${javac.compilerargs}"/>
-        </javac>
         <mkdir dir="${build.classes.dir}"/>
         <javac srcdir="${src.dir}" destdir="${build.classes.dir}" debug="${build.compiler.debug}" debuglevel="${build.compiler.debuglevel}" encoding="UTF-8"
                 classpath="${build15.classes.dir}" deprecation="${build.compiler.deprecation}" optimize="${build.compiler.optimize}" source="1.4" target="1.4" includeantruntime="false">
@@ -99,11 +93,6 @@ made subject to such option by the copyright holder.
        <jar destfile="${cluster}/${jfluid.server.15.jar}"
          manifest="${src15.dir}/manifest.mf"
          basedir="${build15.classes.dir}"
-         compress="false">
-       </jar>
-       <jar destfile="${cluster}/${jfluid.server.cvm.jar}"
-         manifest="${srccvm.dir}/manifest.mf"
-         basedir="${buildcvm.classes.dir}"
          compress="false">
        </jar>
     </target>
