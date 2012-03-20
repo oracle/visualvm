@@ -46,16 +46,13 @@ package org.netbeans.modules.profiler.attach.panels;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
-import org.openide.util.Lookup.Result;
 import org.openide.util.NbBundle;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import org.netbeans.modules.profiler.attach.providers.IntegrationCategorizer;
@@ -68,6 +65,9 @@ import org.netbeans.modules.profiler.attach.wizard.AttachWizardContext;
  * @author Jaroslav Bachorik
  */
 @NbBundle.Messages({
+    "AttachWizard_GroupApplication=Application",
+    "AttachWizard_GroupApplet=Applet",
+    "AttachWizard_GroupJ2EE=J2EE Web/App Server",
     "TargetSettingsWizardPanelUI_LocalHelpString=Choose <strong>Local</strong> to profile local {0}.",
     "TargetSettingsWizardPanelUI_RemoteHelpString=Choose <strong>Remote</strong> to profile remote {0}.",
     "TargetSettingsWizardPanelUI_RemoteNosuppHelpString=<b>Remote</b> profiling not supported by {0}.",
