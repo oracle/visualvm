@@ -297,8 +297,8 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     public void exportXMLData(ExportDataDumper eDD,String indent) {
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result = new StringBuffer(indent+"<Node>"+newline); //NOI18N
-        result.append(indent).append(" <Name>").append(replaceHTMLCharacters(getNodeName())).append("<Name>").append(newline); //NOI18N
-        result.append(indent).append(" <Parent>").append(replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))).append("<Parent>").append(newline); //NOI18N
+        result.append(indent).append(" <Name>").append(replaceHTMLCharacters(getNodeName())).append("</Name>").append(newline); //NOI18N
+        result.append(indent).append(" <Parent>").append(replaceHTMLCharacters((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName()))).append("</Parent>").append(newline); //NOI18N
         result.append(indent).append(" <Live_Bytes>").append(totalObjSize).append("</Live_Bytes>").append(newline); //NOI18N
         result.append(indent).append(" <Live_Objects>").append(nLiveObjects).append("</Live_Objects>").append(newline); //NOI18N
         result.append(indent).append(" <Allocated_Objects>").append(nCalls).append("</Allocated_Objects>").append(newline); //NOI18N

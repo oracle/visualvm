@@ -53,41 +53,8 @@ import org.openide.util.NbBundle;
  * @author Jaroslav Bachorik
  */
 @NbBundle.Messages({
-    "AttachWizard_GroupApplication=Application",
-    "AttachWizard_GroupApplet=Applet",
-    "AttachWizard_GroupJ2EE=J2EE Web/App Server",
-    "AttachWizard_AttachWizardCaption=Attach Wizard",
-    "AttachWizard_AttachWizardIntegrationCaption=Attach Wizard ({0} Integration)",
-    "AttachWizard_UnknownValueString=...",
     "AttachWizard_SelectTargetTypeString=Select Target Type",
-    "AttachWizard_SelectTargetTypeForceString=<Select Target Type ...>",
-    "AttachWizard_SelectTargetForceString=<Select Target ...>",
-    "AttachWizard_ProvideTargetSettingsString=Provide Target Settings",
-    "AttachWizard_ProvideDynamicAttachSettingsString=Provide Attach Settings",
-    "AttachWizard_ReviewAttachSettingsString=Review Attach Settings",
-    "AttachWizard_ChooseIntegrationTypeString=Choose Integration Type",
-    "AttachWizard_PerformIntegrationString=Review Integration",
-    "AttachWizard_ReviewAdditionalStepsString=Review Additional Steps",
-    "AttachWizard_ChooseTargetJvmString=Choose Target JVM",
-    "AttachWizard_ReviewIntegrationStepsString=Review Integration Steps",
-    "AttachWizard_TargetTypeString=Target type",
-    "AttachWizard_TargetNameTypeString=Target",
-    "AttachWizard_TargetNameLocationString=Target location",
-    "AttachWizard_RemoteSystemString=Remote system",
-    "AttachWizard_RemoteSystemHostNameString=Remote system hostname",
-    "AttachWizard_RemoteSystemOsString=Remote system OS",
-    "AttachWizard_LocalMachineString=Local machine",
-    "AttachWizard_AttachMethodString=Attach method",
-    "AttachWizard_DirectAttachString=Direct attach",
-    "AttachWizard_DynamicAttachString=Dynamic attach",
-    "AttachWizard_AttachInvocationString=Attach invocation",
-    "AttachWizard_TargetNamePidString=Target {0} PID",
-    "AttachWizard_WorkingDirectoryString=Working directory",
-    "AttachWizard_AutomaticIntegrationSuccMsg=Automatic integration performed successfuly.",
-    "AttachWizard_ReviewAdditionalStepsMsg=Please review additional steps:",
-    "AttachWizard_NoStepsRequiredMsg=No additional steps are required.",
-    "AttachWizard_AutomaticIntegrationFailedMsg=Automatic integration failed.",
-    "AttachWizard_TheTargetNameString=the {0}"
+    "AttachWizard_AttachMethodString=Attach method"
 })
 public abstract class AttachWizardPanel extends AbstractWizardScreen {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
