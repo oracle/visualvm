@@ -43,11 +43,9 @@
 
 package org.netbeans.modules.profiler.attach.panels;
 
-import java.text.MessageFormat;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.modules.profiler.attach.wizard.AttachWizardContext;
-import org.netbeans.modules.profiler.attach.wizard.AttachWizardImpl;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
@@ -55,6 +53,17 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "AttachWizard_DirectAttachString=Direct attach",
+    "AttachWizard_DynamicAttachString=Dynamic attach",
+    "AttachWizard_LocalMachineString=Local machine",
+    "AttachWizard_RemoteSystemOsString=Remote system OS:",
+    "AttachWizard_RemoteSystemHostNameString=Remote system hostname:",
+    "AttachWizard_TargetNameLocationString=Target location:",
+    "AttachWizard_RemoteSystemString=Remote system:",
+    "AttachWizard_TargetNameTypeString=Target:",
+    "AttachWizard_TargetTypeString=Target type:"
+})
 public class ReviewSettingsPanel extends AttachWizardPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
