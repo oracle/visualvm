@@ -94,6 +94,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
             
             if (newThreads[0] != null && eventBuffer != null) { // ignore samples without data 
                 synchronized (eventBuffer) {
+                    if (resetData) return;  // skip this sample if the collectors was not reset yet
                     writeThreadDumpStart(timestamp);
                     for (int i = 0; i < newThreads[0].length; i++) {
                         Thread t = newThreads[0][i];
@@ -108,8 +109,9 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                             if (index != null) {
                                 if (status == states[index.intValue()] && Arrays.equals(mids,methodIds[index.intValue()])) {
                                     writeThreadInfoNoChange(tid);
+                                } else {
+                                    writeThreadInfo(tid,status,mids);
                                 }
-                                writeThreadInfo(tid,status,mids);
                             } else if (status != CommonConstants.THREAD_STATUS_ZOMBIE && mids.length>0) { 
                                 // new thread with a stacktrace
                                 tid = new Integer(++threadCount);
