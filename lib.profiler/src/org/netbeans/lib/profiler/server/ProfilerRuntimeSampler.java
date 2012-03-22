@@ -99,7 +99,7 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                         Thread t = newThreads[0][i];
                         int[] mids = newMethodIds[0][i];
 
-                        if (!ThreadInfo.isProfilerServerThread(t) && mids.length>0) {
+                        if (!ThreadInfo.isProfilerServerThread(t)) {
                             int status = newStates[0][i];
                             Long ltid = Long.valueOf(t.getId());
                             Integer index = (Integer) arrayOffsetMap.get(ltid);
@@ -110,11 +110,12 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                                     writeThreadInfoNoChange(tid);
                                 }
                                 writeThreadInfo(tid,status,mids);
-                            } else if (status != CommonConstants.THREAD_STATUS_ZOMBIE) { // new thread
+                            } else if (status != CommonConstants.THREAD_STATUS_ZOMBIE && mids.length>0) { 
+                                // new thread with a stacktrace
                                 tid = new Integer(++threadCount);
                                 ProfilerRuntime.writeThreadCreationEvent(t,tid.intValue());
                                 writeThreadInfo(tid,status,mids);
-                            } else { // new thread which is not started yet
+                            } else { // new thread which is not started yet or it did not ever have stacktrace 
                                 continue; 
                             }
                             newArrayOffsetMap.put(ltid, new Integer(i));
