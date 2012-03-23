@@ -356,11 +356,10 @@ public abstract class NetBeansProfiler extends Profiler {
 
         public void resultsAvailable() {
             ProfilingSettings ps = getLastProfilingSettings();
-            if (ps != null) {
-                if (ps.getProfilingType() != ProfilingSettings.PROFILE_CPU_SAMPLING) {
-                    ResultsManager.getDefault().resultsBecameAvailable();
-                }
+            if (ps != null && ps.getProfilingType() == ProfilingSettings.PROFILE_CPU_SAMPLING) {
+                return;
             }
+            ResultsManager.getDefault().resultsBecameAvailable();
         }
 
         public void resumeLiveUpdates() {
