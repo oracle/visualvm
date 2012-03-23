@@ -86,11 +86,9 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsAction_OpenChooserFilter=Profiler Snapshot File (*.{0})",
     "CompareSnapshotsAction_NoComparableSnapshotsFoundMsg=<No comparable snapshots found>",
     "CompareSnapshotsAction_ComparingSameSnapshotsMsg=The snapshot cannot be compared to itself.",
-    "CompareSnapshotsAction_DifferentSnapshotTypeMsg=Snapshots must be of same type.",
     "CompareSnapshotsAction_DifferentSnapshotsTypeMsg=Snapshots must be of same type.",
     "CompareSnapshotsAction_OnlyMemorySnapshotsMsg=Only memory snapshots can be compared!",
-    "CompareSnapshotsAction_DifferentObjectsCountMsg=Track every N object allocations value doesn't match!",
-    "CompareSnapshotsAction_DifferentObjectsCountsMsg=Track every N object allocations values don't match!",
+    "CompareSnapshotsAction_DifferentObjectsCountsMsg=\"Track every N object allocations\" values don't match!",
     "CompareSnapshotsAction_InvalidFileMsg=Invalid snapshot file",
     "CompareSnapshotsAction_InvalidFilesMsg=Invalid snapshot file(s)",
     "CompareSnapshotsAction_EnterFileMsg=Enter snapshot file",
@@ -784,7 +782,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
                             if (snapshot.getType() != ResultsManager.getDefault().getSnapshotType(snapshot2f)) {
                                 // snapshot types doesn't match
-                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentSnapshotTypeMsg());
+                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentSnapshotsTypeMsg());
                             } else if ((snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
                                            && (snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
                                 // TODO: remove after Compare CPU snapshots is implemented
@@ -797,7 +795,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                                                                         .getSnapshotSettings(snapshot2f)
                                                                                                         .getAllocTrackEvery()) {
                                 // memory snapshots have different track every N objects
-                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentObjectsCountMsg());
+                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentObjectsCountsMsg());
                             } else {
                                 // comparable snapshots (from the hint point of view!)
                                 externalFileHintLabel.setText(" "); // NOI18N
