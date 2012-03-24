@@ -98,6 +98,7 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
     private static final String BYTES_ALLOC_COLUMN_TOOLTIP = messages.getString("ReverseMemCallGraphPanel_BytesAllocColumnToolTip"); // NOI18N
     private static final String OBJECTS_ALLOC_COLUMN_TOOLTIP = messages.getString("ReverseMemCallGraphPanel_ObjectsAllocColumnToolTip"); // NOI18N
     private static final String GO_SOURCE_POPUP_ITEM = messages.getString("ReverseMemCallGraphPanel_GoSourcePopupItem"); // NOI18N
+    private static final String FILTER_ITEM_NAME = messages.getString("AllocResultsPanel_FilterMenuItemName"); // NOI18N
                                                                                                                          // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -245,6 +246,20 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
 
             headerPopup.add(menuItem);
         }
+        
+        headerPopup.addSeparator();
+
+        JCheckBoxMenuItem filterMenuItem = new JCheckBoxMenuItem(FILTER_ITEM_NAME);
+        filterMenuItem.setActionCommand("Filter"); // NOI18N
+        addMenuItemListener(filterMenuItem);
+
+        if (filterComponent == null) {
+            filterMenuItem.setState(true);
+        } else {
+            filterMenuItem.setState(filterComponent.getComponent().isVisible());
+        }
+        
+        headerPopup.add(filterMenuItem);
 
         headerPopup.pack();
     }
@@ -286,6 +301,12 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
     private void addMenuItemListener(JCheckBoxMenuItem menuItem) {
         menuItem.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (e.getActionCommand().equals("Filter")) { // NOI18N
+                        filterComponent.getComponent().setVisible(!filterComponent.getComponent().isVisible());
+
+                        return;
+                    }
+                    
                     boolean sortResults = false;
                     int column = Integer.parseInt(e.getActionCommand());
                     boolean sortOrder = treeTable.getSortingOrder();
