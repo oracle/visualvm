@@ -122,6 +122,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     private static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("CCTDisplay_InvocationsColumnToolTip"); // NOI18N
     private static final String SAMPLES_COLUMN_TOOLTIP = messages.getString("CCTDisplay_SamplesColumnToolTip"); // NOI18N
     private static final String TREETABLE_ACCESS_NAME = messages.getString("CCTDisplay_TreeTableAccessName"); // NOI18N
+    private static final String FILTER_ITEM_NAME = messages.getString("FlatProfilePanel_FilterItemName"); // NOI18N
                                                                                                               // -----
     private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.ui.cpu.CCTDisplay") != null; // NOI18N
 
@@ -737,6 +738,20 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
 
             cornerPopup.add(menuItem);
         }
+        
+        cornerPopup.addSeparator();
+
+        JCheckBoxMenuItem filterMenuItem = new JCheckBoxMenuItem(FILTER_ITEM_NAME);
+        filterMenuItem.setActionCommand("Filter"); // NOI18N
+        addMenuItemListener(filterMenuItem);
+
+        if (filterComponent == null) {
+            filterMenuItem.setState(true);
+        } else {
+            filterMenuItem.setState(filterComponent.getComponent().isVisible());
+        }
+        
+        cornerPopup.add(filterMenuItem);
 
         cornerPopup.pack();
     }
@@ -761,6 +776,12 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     private void addMenuItemListener(JCheckBoxMenuItem menuItem) {
         menuItem.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (e.getActionCommand().equals("Filter")) { // NOI18N
+                        filterComponent.getComponent().setVisible(!filterComponent.getComponent().isVisible());
+
+                        return;
+                    }
+                    
                     boolean sortResults = false;
                     int column = Integer.parseInt(e.getActionCommand());
                     sortingColumn = treeTable.getSortingColumn();

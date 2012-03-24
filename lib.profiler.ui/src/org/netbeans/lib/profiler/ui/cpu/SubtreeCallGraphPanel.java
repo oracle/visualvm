@@ -113,6 +113,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private static final String INVOCATIONS_COLUMN_NAME = messages.getString("SubtreeCallGraphPanel_InvocationsColumnName"); // NOI18N
     private static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("SubtreeCallGraphPanel_InvocationsColumnToolTip"); // NOI18N
     private static final String TREETABLE_ACCESS_NAME = messages.getString("SubtreeCallGraphPanel_TreeTableAccessName"); // NOI18N
+    private static final String FILTER_ITEM_NAME = messages.getString("FlatProfilePanel_FilterItemName"); // NOI18N
                                                                                                                          // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -578,6 +579,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
         treeTablePanel = new JTreeTablePanel(treeTable);
         treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, cornerButton);
+        treeTablePanel.clearBorders();
         add(treeTablePanel, BorderLayout.CENTER);
         initFilterPanel();
     }
@@ -653,6 +655,20 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
             cornerPopup.add(menuItem);
         }
+        
+        cornerPopup.addSeparator();
+
+        JCheckBoxMenuItem filterMenuItem = new JCheckBoxMenuItem(FILTER_ITEM_NAME);
+        filterMenuItem.setActionCommand("Filter"); // NOI18N
+        addMenuItemListener(filterMenuItem);
+
+        if (filterComponent == null) {
+            filterMenuItem.setState(true);
+        } else {
+            filterMenuItem.setState(filterComponent.getComponent().isVisible());
+        }
+        
+        cornerPopup.add(filterMenuItem);
 
         cornerPopup.pack();
     }
@@ -706,6 +722,12 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private void addMenuItemListener(JCheckBoxMenuItem menuItem) {
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    if (e.getActionCommand().equals("Filter")) { // NOI18N
+                        filterComponent.getComponent().setVisible(!filterComponent.getComponent().isVisible());
+
+                        return;
+                    }
+                    
                     boolean sortResults = false;
                     int column = Integer.parseInt(e.getActionCommand());
                     boolean sortOrder = treeTable.getSortingOrder();

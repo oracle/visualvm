@@ -74,6 +74,8 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -145,6 +147,7 @@ import org.openide.util.RequestProcessor;
     "ClassesListControllerUI_ShowingDiffText=Showing heap dumps difference, {0}reset view{1}"
 })
 public class ClassesListControllerUI extends JTitledPanel {
+    private static final Logger LOG = Logger.getLogger(ClassesListTableModel.class.getName());
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private class ClassesListTableKeyListener extends KeyAdapter {
@@ -303,9 +306,13 @@ public class ClassesListControllerUI extends JTitledPanel {
                 Object[][] cache = getDisplayCache();
                 int index = 0;
                 for(Object[] row : cache) {
-                    if (row[4].equals(jc)) {
-                        setSelectedRow(index);
-                        break;
+                    if (row[4] != null) {
+                        if (row[4].equals(jc)) {
+                            setSelectedRow(index);
+                            break;
+                        }
+                    } else {
+                        LOG.log(Level.INFO, "{0} has no representation on heap", row[0]);
                     }
                     index++;
                 }
