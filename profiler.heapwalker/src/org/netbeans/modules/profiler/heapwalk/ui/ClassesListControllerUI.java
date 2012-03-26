@@ -326,6 +326,8 @@ public class ClassesListControllerUI extends JTitledPanel {
         }
         
         private void setSelectedRow(int row) {
+            if (getRowCount() <= row) row = -1;
+            
             int oldSelectedRow = selectedRow;
             selectedRow = row;
             pcs.firePropertyChange(SELECTED_ROW_PROPERTY, oldSelectedRow, selectedRow);
