@@ -186,8 +186,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
     private static final String ZOOM_OUT_TOOLTIP = messages.getString("ThreadsPanel_ZoomOutToolTip"); // NOI18N
     private static final String FIXED_SCALE_TOOLTIP = messages.getString("ThreadsPanel_FixedScaleToolTip"); // NOI18N
     private static final String SCALE_TO_FIT_TOOLTIP = messages.getString("ThreadsPanel_ScaleToFitToolTip"); // NOI18N
-    private static final String THREADS_MONITORING_DISABLED_1_MSG = messages.getString("ThreadsPanel_ThreadsMonitoringDisabled1Msg"); // NOI18N
-    private static final String THREADS_MONITORING_DISABLED_2_MSG = messages.getString("ThreadsPanel_ThreadsMonitoringDisabled2Msg"); // NOI18N
+    private static final String THREADS_MONITORING_DISABLED_MSG = messages.getString("ThreadsPanel_ThreadsMonitoringDisabledMsg"); // NOI18N
     private static final String NO_PROFILING_MSG = messages.getString("ThreadsPanel_NoProfilingMsg"); // NOI18N
     private static final String THREADS_COLUMN_NAME = messages.getString("ThreadsPanel_ThreadsColumnName"); // NOI18N
     private static final String TIMELINE_COLUMN_NAME = messages.getString("ThreadsPanel_TimelineColumnName"); // NOI18N
@@ -219,7 +218,6 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
     private JButton zoomOutButton;
     private JComboBox threadsSelectionCombo;
     private JLabel enableThreadsMonitoringLabel1;
-    private JLabel enableThreadsMonitoringLabel2;
     private JLabel enableThreadsMonitoringLabel3;
     private JLabel monitorLegend;
     private JLabel runningLegend;
@@ -436,22 +434,18 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         Border myRolloverBorder = new CompoundBorder(new FlatToolBar.FlatRolloverButtonBorder(Color.GRAY, Color.LIGHT_GRAY),
                                                      new FlatToolBar.FlatMarginBorder());
 
-        enableThreadsMonitoringLabel1 = new JLabel(THREADS_MONITORING_DISABLED_1_MSG);
+        enableThreadsMonitoringLabel1 = new JLabel(THREADS_MONITORING_DISABLED_MSG);
         enableThreadsMonitoringLabel1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 3));
         enableThreadsMonitoringLabel1.setForeground(Color.DARK_GRAY);
 
         enableThreadsMonitoringButton = new JButton(Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
         enableThreadsMonitoringButton.setContentAreaFilled(false);
-        enableThreadsMonitoringButton.setMargin(new Insets(3, 3, 0, 0));
+        enableThreadsMonitoringButton.setMargin(new Insets(3, 3, 3, 3));
         enableThreadsMonitoringButton.setVerticalTextPosition(SwingConstants.BOTTOM);
         enableThreadsMonitoringButton.setHorizontalTextPosition(SwingConstants.CENTER);
         enableThreadsMonitoringButton.setRolloverEnabled(true);
         enableThreadsMonitoringButton.setBorder(myRolloverBorder);
         enableThreadsMonitoringButton.getAccessibleContext().setAccessibleName(ENABLE_THREADS_MONITORING_BUTTON_ACCESS_NAME);
-
-        enableThreadsMonitoringLabel2 = new JLabel(THREADS_MONITORING_DISABLED_2_MSG);
-        enableThreadsMonitoringLabel2.setBorder(BorderFactory.createEmptyBorder(20, 3, 20, 0));
-        enableThreadsMonitoringLabel2.setForeground(Color.DARK_GRAY);
 
         enableThreadsMonitoringLabel3 = new JLabel(NO_PROFILING_MSG);
         enableThreadsMonitoringLabel3.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 0));
@@ -460,7 +454,6 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
 
         notificationPanel.add(enableThreadsMonitoringLabel1);
         notificationPanel.add(enableThreadsMonitoringButton);
-        notificationPanel.add(enableThreadsMonitoringLabel2);
         notificationPanel.add(enableThreadsMonitoringLabel3);
 
         setLayout(new BorderLayout());
@@ -764,7 +757,6 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
     public void profilingSessionFinished() {
         enableThreadsMonitoringButton.setEnabled(false);
         enableThreadsMonitoringLabel1.setVisible(false);
-        enableThreadsMonitoringLabel2.setVisible(false);
         enableThreadsMonitoringButton.setVisible(false);
         enableThreadsMonitoringLabel3.setVisible(true);
     }
@@ -772,7 +764,6 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
     public void profilingSessionStarted() {
         enableThreadsMonitoringButton.setEnabled(true);
         enableThreadsMonitoringLabel1.setVisible(true);
-        enableThreadsMonitoringLabel2.setVisible(true);
         enableThreadsMonitoringButton.setVisible(true);
         enableThreadsMonitoringLabel3.setVisible(false);
     }
