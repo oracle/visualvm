@@ -51,7 +51,8 @@ import org.openide.util.NbBundle;
  * @author  Jaroslav Bachorik
  */
 @NbBundle.Messages({
-    "AdditionalStepsWizardPanelUI_StartAutomaticallyString=&Automatically start the server"
+    "AdditionalStepsWizardPanelUI_StartAutomaticallyString=&Automatically start the server",
+    "AttachWizard_ReviewAdditionalStepsMsg=Please review additional steps:"
 })
 public class ReviewAdditionalStepsPanelUI extends javax.swing.JPanel {
   private ReviewAdditionalStepsPanel.Model model = null;
