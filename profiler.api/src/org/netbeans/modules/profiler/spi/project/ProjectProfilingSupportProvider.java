@@ -41,6 +41,7 @@
  */
 package org.netbeans.modules.profiler.spi.project;
 
+import java.util.Map;
 import java.util.Properties;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.modules.profiler.api.JavaPlatform;
@@ -103,7 +104,7 @@ public abstract class ProjectProfilingSupportProvider {
      * @param props properties
      * @param profiledClassFile profiled file or null for profiling the entire project
      */
-    public abstract void configurePropertiesForProfiling(Properties props, FileObject profiledClassFile);
+    public abstract void configurePropertiesForProfiling(Map<String, String> props, FileObject profiledClassFile);
     
     /**
      * Configures project-specific session settings.
@@ -175,7 +176,7 @@ public abstract class ProjectProfilingSupportProvider {
         }
 
         @Override
-        public void configurePropertiesForProfiling(Properties props, FileObject profiledClassFile) {
+        public void configurePropertiesForProfiling(Map<String, String> props, FileObject profiledClassFile) {
         }
 
         @Override
