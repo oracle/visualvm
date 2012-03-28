@@ -175,6 +175,10 @@ public abstract class ProjectProfilingSupportProvider {
             return true;
         }
 
+        public void configurePropertiesForProfiling(Properties props, FileObject profiledClassFile) {
+            // transitional implementation
+        }
+        
         @Override
         public void configurePropertiesForProfiling(Map<String, String> props, FileObject profiledClassFile) {
         }
