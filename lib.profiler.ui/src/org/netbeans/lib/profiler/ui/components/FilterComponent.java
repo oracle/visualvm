@@ -179,8 +179,13 @@ public abstract class FilterComponent implements CommonConstants {
         }
     
         public String getFilterValue() {
-            return toLowerCase && filterType != FILTER_REGEXP ?
+            return toLowerCase && isCaseInsensitiveFilter() ?
                     filterValue.toLowerCase() : filterValue;
+        }
+        
+        private boolean isCaseInsensitiveFilter() {
+            return filterType == FILTER_CONTAINS ||
+                   filterType == FILTER_NOT_CONTAINS;
         }
     
         public void addFilterType(String name, int type) {
