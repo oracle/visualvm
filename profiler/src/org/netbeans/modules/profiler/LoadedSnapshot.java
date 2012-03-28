@@ -241,7 +241,8 @@ public class LoadedSnapshot {
         SamplesInputStream is = new SamplesInputStream(dis);
         StackTraceSnapshotBuilder builder = new StackTraceSnapshotBuilder();
         ThreadsSample sample = is.readSample();
-        long startTime = sample.getTime();
+        // start time in milliseconds
+        long startTime = sample.getTime() / 1000000;
 
         for ( ;sample != null; sample = is.readSample()) {
             builder.addStacktrace(sample.getTinfos(),sample.getTime());
