@@ -84,8 +84,11 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -127,35 +130,52 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void addMethodToRoots(final String className, final String methodName, final String methodSig) {
-            Lookup.Provider project = loadedSnapshot.getProject();
-            ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project)
-                                                                          .getProfilingSettings();
-            List<ProfilingSettings> cpuSettings = new ArrayList();
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                @Override
+                public void run() {
+                    final Lookup.Provider project = loadedSnapshot.getProject();
+                    final ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project)
+                                                                                .getProfilingSettings();
+                    final List<ProfilingSettings> cpuSettings = new ArrayList();
 
-            for (ProfilingSettings settings : projectSettings) {
-                if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
-                    cpuSettings.add(settings);
+                    for (ProfilingSettings settings : projectSettings) {
+                        if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
+                            cpuSettings.add(settings);
+                        }
+                    }
+
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            final ProfilingSettings settings = IDEUtils.selectSettings(ProfilingSettings.PROFILE_CPU_PART,
+                                                                cpuSettings.toArray(new ProfilingSettings[cpuSettings.size()]),
+                                                                null);
+
+                            if (settings == null) {
+                                return; // cancelled by the user
+                            }
+                            
+                            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    settings.addRootMethod(className, methodName, methodSig);
+
+                                    if (cpuSettings.contains(settings)) {
+                                        ProfilingSettingsManager.storeProfilingSettings(projectSettings, settings, project);
+                                    } else {
+                                        ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
+                                        System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
+                                        newProjectSettings[projectSettings.length] = settings;
+                                        ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settings, project);
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
-            }
-
-            ProfilingSettings settings = IDEUtils.selectSettings(ProfilingSettings.PROFILE_CPU_PART,
-                                                                 cpuSettings.toArray(new ProfilingSettings[cpuSettings.size()]),
-                                                                 null);
-
-            if (settings == null) {
-                return; // cancelled by the user
-            }
-
-            settings.addRootMethod(className, methodName, methodSig);
-
-            if (cpuSettings.contains(settings)) {
-                ProfilingSettingsManager.storeProfilingSettings(projectSettings, settings, project);
-            } else {
-                ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
-                System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
-                newProjectSettings[projectSettings.length] = settings;
-                ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settings, project);
-            }
+            });
         }
 
         public void find(Object source, String findString) {
