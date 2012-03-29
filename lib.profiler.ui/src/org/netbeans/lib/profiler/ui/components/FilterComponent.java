@@ -175,6 +175,7 @@ public abstract class FilterComponent implements CommonConstants {
         public void setFilterValue(String value) {
             value = value == null ? value : value.trim();
             if (filterValue.equals(value)) return;
+            filterValue = value;
             filterCombo.setText(value);
         }
     
@@ -208,10 +209,11 @@ public abstract class FilterComponent implements CommonConstants {
             try {
                 setFilterType(type);
                 setFilterValue(value);
-                fireChange();
             } finally {
                 suppressEvents = false;
             }
+            
+            fireChange();
         }
 
         public void setHint(String hint) {
