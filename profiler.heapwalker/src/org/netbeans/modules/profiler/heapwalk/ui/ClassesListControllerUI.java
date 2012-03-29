@@ -126,7 +126,7 @@ import org.openide.util.RequestProcessor;
     "ClassesListControllerUI_FilterContains=Contains",
     "ClassesListControllerUI_FilterEndsWith=Ends with",
     "ClassesListControllerUI_FilterRegexp=Regular expression",
-    "ClassesListControllerUI_FilterImplementation=Subclass/implementation",
+    "ClassesListControllerUI_FilterImplementation=Subclass/Implementation of",
     "ClassesListControllerUI_FilterSubclass=Subclass of",
     "ClassesListControllerUI_DefaultFilterText=Class Name Filter",
     "ClassesListControllerUI_ShowInInstancesString=Show in Instances View",
