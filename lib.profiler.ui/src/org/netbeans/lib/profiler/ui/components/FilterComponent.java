@@ -119,6 +119,7 @@ public abstract class FilterComponent implements CommonConstants {
         private static final String CLEAR_TOOLTIP = messages.getString("FilterComponent_ClearFilterButtonToolTip"); // NOI18N
         private static final String ACCESS_NAME = messages.getString("FilterComponent_AccessName"); // NOI18N
         private static final String ACCESS_DESCR = messages.getString("FilterComponent_AccessDescr"); // NOI18N
+        private static final String FILTER_HINT = messages.getString("FilterComponent_FilterHint"); // NOI18N
         // -----
 
         private static final String FILTER_EMPTY = ""; // NOI18N
@@ -130,6 +131,7 @@ public abstract class FilterComponent implements CommonConstants {
         private final boolean toLowerCase;
         private String filterValue = FILTER_EMPTY;
         private int filterType = FILTER_NONE;
+        private String filterHint;
 
         private final JComponent component;
         private final FilterCombo filterCombo;
@@ -217,11 +219,18 @@ public abstract class FilterComponent implements CommonConstants {
         }
 
         public void setHint(String hint) {
-            filterCombo.setHint(hint);
+            if (filterHint != null && filterHint.equals(hint)) return;
+            filterHint = hint;
+            setHintImpl();
+        }
+        
+        private void setHintImpl() {
+            String type = filterTypeNames.get(filterTypes.indexOf(filterType));
+            filterCombo.setHint(MessageFormat.format(FILTER_HINT, filterHint, type));
         }
         
         public String getHint() {
-            return filterCombo.getHint();
+            return filterHint;
         }
         
         public void addChangeListener(ChangeListener listener) {
@@ -242,6 +251,7 @@ public abstract class FilterComponent implements CommonConstants {
         private void filterTypeChanged(int newType) {
             if (filterType == newType) return;
             filterType = newType;
+            setHintImpl();
             fireChange();
         }
         
@@ -289,10 +299,6 @@ public abstract class FilterComponent implements CommonConstants {
 
             public void setHint(String hint) {
                 getEditorImpl().setHint(hint);
-            }
-            
-            public String getHint() {
-                return getEditorImpl().getHint();
             }
 
             public String getText() {
@@ -509,10 +515,6 @@ public abstract class FilterComponent implements CommonConstants {
             public void setHint(String hint) {
                 hintLabel.setText(hint);
                 repaint();
-            }
-            
-            public String getHint() {
-                return hintLabel.getText();
             }
 
             @Override
