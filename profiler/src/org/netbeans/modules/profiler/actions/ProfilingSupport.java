@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.*;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.panels.PIDSelectPanel;
@@ -52,7 +51,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.io.IOException;
-import java.text.MessageFormat;
+import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.api.TaskConfigurator;
@@ -76,6 +75,7 @@ import org.openide.util.Lookup;
     "ProfilingSupport_FailedLoadSettingsMsg=Failed to load attach settings: {0}"
 })
 public final class ProfilingSupport {
+    public static final String RERUN_PROP = "profiler.rerun";
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static class AttachSTPData {

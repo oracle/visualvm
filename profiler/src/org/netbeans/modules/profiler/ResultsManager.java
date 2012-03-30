@@ -75,9 +75,13 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.cookies.OpenCookie;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
@@ -385,16 +389,23 @@ public final class ResultsManager {
         }
     }
 
+    @NbBundle.Messages({
+        "MSG_SavingSnapshots=Saving Snapshots"
+    })
     public void exportSnapshots(final FileObject[] selectedSnapshots) {
         assert (selectedSnapshots != null);
         assert (selectedSnapshots.length > 0);
 
+        final String[] fileName = new String[1], fileExt = new String[1];
+        final FileObject[] dir = new FileObject[1];
         if (selectedSnapshots.length == 1) {
             SelectedFile sf = selectSnapshotTargetFile(selectedSnapshots[0].getName(),
-                                                       selectedSnapshots[0].getExt().equals(HEAPDUMP_EXTENSION));
+                                selectedSnapshots[0].getExt().equals(HEAPDUMP_EXTENSION));
 
             if ((sf != null) && checkFileExists(sf)) {
-                exportSnapshot(selectedSnapshots[0], sf.folder, sf.fileName, sf.fileExt);
+                fileName[0] = sf.fileName;
+                fileExt[0] = sf.fileExt;
+                dir[0] = sf.folder;
             }
         } else {
             JFileChooser chooser = new JFileChooser();
@@ -423,12 +434,24 @@ public final class ResultsManager {
 
                 exportDir = file;
 
-                FileObject dir = FileUtil.toFileObject(FileUtil.normalizeFile(file));
-
-                for (int i = 0; i < selectedSnapshots.length; i++) {
-                    exportSnapshot(selectedSnapshots[i], dir, selectedSnapshots[i].getName(), selectedSnapshots[i].getExt());
-                }
+                dir[0] = FileUtil.toFileObject(FileUtil.normalizeFile(file));
             }
+            
+            final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshots());
+            ph.setInitialDelay(500);
+            ph.start();
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        for (int i = 0; i < selectedSnapshots.length; i++) {
+                            exportSnapshot(selectedSnapshots[i], dir[0], fileName[0] != null ? fileName[0] : selectedSnapshots[i].getName(), fileExt[0] != null ? fileExt[0] : selectedSnapshots[i].getExt());
+                        }
+                    } finally {
+                        ph.finish();
+                    }
+                }
+            });
         }
     }
 
