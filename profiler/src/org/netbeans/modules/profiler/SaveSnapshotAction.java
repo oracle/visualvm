@@ -46,8 +46,11 @@ package org.netbeans.modules.profiler;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.ui.NBSwingWorker;
 
 @NbBundle.Messages({
     "SaveSnapshotAction_ActionName=Save Snapshot",
@@ -72,8 +75,21 @@ class SaveSnapshotAction extends AbstractAction {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void actionPerformed(ActionEvent e) {
-        ResultsManager.getDefault().saveSnapshot(snapshot);
-        updateState();
+        new NBSwingWorker() {
+            final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshot());
+            @Override
+            protected void doInBackground() {
+                ph.setInitialDelay(500);
+                ph.start();
+                ResultsManager.getDefault().saveSnapshot(snapshot);
+            }
+
+            @Override
+            protected void done() {
+                ph.finish();
+                updateState();
+            }
+        }.execute();
     }
 
     public void updateState() {
