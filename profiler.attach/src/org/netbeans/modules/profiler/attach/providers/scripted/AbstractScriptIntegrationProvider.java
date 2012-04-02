@@ -275,7 +275,7 @@ public abstract class AbstractScriptIntegrationProvider extends AbstractIntegrat
                                throws ScriptModificationException {
         modifyScript(originalScriptName, originalScriptName, modifier, attachSettings);
     }
-
+    
     private void generateCompleteCommands(String targetOS, Collection commandsArray) {
         if (IntegrationUtils.isWindowsPlatform(targetOS)) {
             commandsArray.add("cmd.exe"); // NOI18N

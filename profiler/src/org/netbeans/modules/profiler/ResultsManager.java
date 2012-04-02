@@ -123,7 +123,9 @@ import org.openide.util.Lookup;
     "ResultsManager_CannotOpenSnapshotMsg=<html><b>Cannot open profiler snapshot.</b><br><br>Attempting to open null snapshot.<br>Check the logfile for details.</html>",
     "ResultsManager_CpuSnapshotDisplayName=cpu: {0}",
     "ResultsManager_MemorySnapshotDisplayName=mem: {0}",
-    "ResultsManager_HeapSnapshotDisplayName=heap: {0}"
+    "ResultsManager_HeapSnapshotDisplayName=heap: {0}",
+    "MSG_SavingSnapshots=Saving Snapshots",
+    "MSG_SavingSnapshot=Saving Snapshot"
 })
 public final class ResultsManager {
     final private static Logger LOGGER = Logger.getLogger(ResultsManager.class.getName());
@@ -389,9 +391,6 @@ public final class ResultsManager {
         }
     }
 
-    @NbBundle.Messages({
-        "MSG_SavingSnapshots=Saving Snapshots"
-    })
     public void exportSnapshots(final FileObject[] selectedSnapshots) {
         assert (selectedSnapshots != null);
         assert (selectedSnapshots.length > 0);
