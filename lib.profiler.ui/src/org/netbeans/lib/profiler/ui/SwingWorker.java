@@ -104,10 +104,18 @@ public abstract class SwingWorker {
         this(true, null);
     }
     
+    /**
+     * Creates a new instance of SwingWorker with <b>forceEQ=true</b>. Allows to control the throughput by a given {@linkplain Semaphore} instance
+     * @param throughputSemaphore A semaphore instance used to control the worker throughput
+     */
     public SwingWorker(Semaphore throughputSemaphore) {
         this(true, throughputSemaphore);
     }
-    
+    /**
+     * Creates a new instance of SwingWorker. Allows to control the throughput by a given {@linkplain Semaphore} instance
+     * @param forceEQ When set the corresponding {@linkplain SwingWorker#done() } method is executed on EDT
+     * @param throughputSemaphore A semaphore instance used to control the worker throughput
+     */
     public SwingWorker(boolean forceEQ, Semaphore throughputSemaphore) {
         sinit();
         this.useEQ = forceEQ;
