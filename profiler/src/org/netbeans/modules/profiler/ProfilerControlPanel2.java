@@ -1938,9 +1938,13 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     }
 
     public void updateStatus() {
-        statusSnippet.refreshStatus();
-        resultsSnippet.refreshStatus();
-        basicTelemetrySnippet.refreshStatus();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                statusSnippet.refreshStatus();
+                resultsSnippet.refreshStatus();
+                basicTelemetrySnippet.refreshStatus();
+            }
+        });
     }
 
     public void writeExternal(final ObjectOutput out) throws IOException {
