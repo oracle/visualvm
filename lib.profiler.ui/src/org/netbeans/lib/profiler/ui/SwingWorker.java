@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import javax.swing.SwingUtilities;
 
 
@@ -63,7 +64,8 @@ public abstract class SwingWorker {
 
     private final Object warmupLock = new Object();
     private boolean useEQ;
-
+    final private Semaphore throughputSemaphore;
+    
     //@GuardedBy warmupLock
     private boolean workerRunning;
     private Runnable warmupTimer = new Runnable() {
@@ -92,15 +94,24 @@ public abstract class SwingWorker {
      * @param forceEQ When set the corresponding {@linkplain SwingWorker#done() } method is executed on EDT
      */
     public SwingWorker(boolean forceEQ) {
-        sinit();
-        this.useEQ = forceEQ;
+        this(forceEQ, null);
     }
 
     /**
      * Creates a new instance of SwingWorker with <b>forceEQ=true</b>
      */
     public SwingWorker() {
-        this(true);
+        this(true, null);
+    }
+    
+    public SwingWorker(Semaphore throughputSemaphore) {
+        this(true, throughputSemaphore);
+    }
+    
+    public SwingWorker(boolean forceEQ, Semaphore throughputSemaphore) {
+        sinit();
+        this.useEQ = forceEQ;
+        this.throughputSemaphore = throughputSemaphore;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -110,14 +121,18 @@ public abstract class SwingWorker {
      * If the background task blocks for more than getWarmup() milis the nonResponding() method is invoked
      */
     public void execute() {
-        postRunnable(new Runnable() {
+        try {
+            if (throughputSemaphore != null) {
+                throughputSemaphore.acquire();
+            }
+            postRunnable(new Runnable() {
                 public void run() {
                     synchronized (warmupLock) {
                         workerRunning = true;
                     }
-
+                    
                     warmupService.submit(warmupTimer);
-
+                    
                     try {
                         doInBackground();
                     } finally {
@@ -125,19 +140,25 @@ public abstract class SwingWorker {
                             workerRunning = false;
                             warmupLock.notify();
                         }
-
+                        
                         if (useEQ) {
                             runInEventDispatchThread(new Runnable() {
-                                    public void run() {
-                                        done();
-                                    }
-                                });
+                                public void run() {
+                                    done();
+                                }
+                            });
                         } else {
                             done();
+                        }
+                        if (throughputSemaphore != null) {
+                            throughputSemaphore.release();
                         }
                     }
                 }
             });
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**
