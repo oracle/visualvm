@@ -1111,6 +1111,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             openSelectedSnapshots();
                         } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                             final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
+                            if (selectedSnapshotFiles.length == 0) return;
 
                             if (ProfilerDialogs.displayConfirmation(
                                     Bundle.ProfilerControlPanel2_ConfirmDeleteSnapshotMsg(), 
