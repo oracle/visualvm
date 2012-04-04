@@ -113,17 +113,21 @@ abstract public class BaseSelectRootMethodsAction extends NodeAction {
         new NBSwingWorker() {
 
             String className = null;
+            Lookup.Provider project = null;
+            ProfilingSettings[] projectSettings = null;
 
             @Override
             protected void doInBackground() {
                 className = getFileClassName(JavaProfilerSource.createFrom(dobj.getPrimaryFile()));
+                if (className != null) {
+                    project = ProjectUtilities.getProject(dobj.getPrimaryFile());
+                    projectSettings = ProfilingSettingsManager.getProfilingSettings(project).getProfilingSettings();
+                }
             }
 
             @Override
             protected void done() {
                 if (className != null) {
-                    Lookup.Provider project = ProjectUtilities.getProject(dobj.getPrimaryFile());
-                    ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project).getProfilingSettings();
                     List<ProfilingSettings> cpuSettings = new ArrayList();
 
                     for (ProfilingSettings settings : projectSettings) {

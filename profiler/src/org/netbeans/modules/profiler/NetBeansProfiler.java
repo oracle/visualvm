@@ -355,9 +355,11 @@ public abstract class NetBeansProfiler extends Profiler {
         }
 
         public void resultsAvailable() {
-            if (getLastProfilingSettings().getProfilingType() != ProfilingSettings.PROFILE_CPU_SAMPLING) {
-                ResultsManager.getDefault().resultsBecameAvailable();
+            ProfilingSettings ps = getLastProfilingSettings();
+            if (ps != null && ps.getProfilingType() == ProfilingSettings.PROFILE_CPU_SAMPLING) {
+                return;
             }
+            ResultsManager.getDefault().resultsBecameAvailable();
         }
 
         public void resumeLiveUpdates() {
@@ -1663,7 +1665,8 @@ public abstract class NetBeansProfiler extends Profiler {
         controlPanel2.requestActive();
     }
 
-    private void setupDispatcher(ProfilingSettings profilingSettings) {
+    public void setupDispatcher(ProfilingSettings profilingSettings) {
+        lastProfilingSettings = profilingSettings;
         synchronized (setupLock) {
             final Lookup.Provider project = getProfiledProject();
 
@@ -1752,7 +1755,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     }
                 }
             }
-
+            
             ProfilingPointsProcessor ppp = getProfilingPointsManager();
             if (ppp != null) ppp.init(getProfiledProject());
 
@@ -1763,6 +1766,8 @@ public abstract class NetBeansProfiler extends Profiler {
     // Used for killing an agent which could cause a collision on port
     // Returns true if TERMINATE_TARGET_JVM was invoked on agent (not necessarily killed!), false if the agent is already profiling (port is used)
     private boolean shutdownAgent(String host, int port) {
+        if (port == -1) return false; // invalid port
+        
         Socket clientSocket = null;
         ObjectOutputStream socketOut = null;
         ObjectInputStream socketIn = null;

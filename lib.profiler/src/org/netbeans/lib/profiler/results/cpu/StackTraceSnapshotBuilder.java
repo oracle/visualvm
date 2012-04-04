@@ -556,6 +556,12 @@ public class StackTraceSnapshotBuilder {
         TimingAdjusterOld.getInstance(pss);        
     }
 
+    /**
+     * Creates CPUResultsSnapsot
+     * @param since time in milliseconds
+     * @return snapshot
+     * @throws org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException 
+     */
     public final CPUResultsSnapshot createSnapshot(
             long since) throws CPUResultsSnapshot.NoDataAvailableException {
         if (stackTraceCount < 1) {
