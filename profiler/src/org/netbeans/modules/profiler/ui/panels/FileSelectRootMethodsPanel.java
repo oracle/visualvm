@@ -75,6 +75,7 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.Cancellable;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -103,7 +104,7 @@ final public class FileSelectRootMethodsPanel extends JPanel {
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static final Dimension PREFERRED_TOPTREE_DIMENSION = new Dimension(500, 250);
     private JButton okButton;
-    private RootSelectorTree advancedLogicalPackageTree;
+    private RootSelectorTree fileTreeView;
 
     private FileSelectRootMethodsPanel() {
         init(this);
@@ -116,7 +117,7 @@ final public class FileSelectRootMethodsPanel extends JPanel {
 
         ProgressDisplayer pd = ProfilerProgressDisplayer.getDefault();
 
-        advancedLogicalPackageTree = new RootSelectorTree(pd, new TreePathSearch.ClassIndex() {
+        fileTreeView = new RootSelectorTree(pd, new TreePathSearch.ClassIndex() {
 
             @Override
             public List<SourceClassInfo> getClasses(String pattern, Lookup context) {
@@ -162,9 +163,9 @@ final public class FileSelectRootMethodsPanel extends JPanel {
 
         container.setLayout(new GridBagLayout());
 
-        advancedLogicalPackageTree.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+        fileTreeView.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
 
-        JScrollPane advancedLogicalPackageTreeScrollPane = new JScrollPane(advancedLogicalPackageTree);
+        JScrollPane advancedLogicalPackageTreeScrollPane = new JScrollPane(fileTreeView);
         advancedLogicalPackageTreeScrollPane.setPreferredSize(PREFERRED_TOPTREE_DIMENSION);
 
         gridBagConstraints = new GridBagConstraints();
@@ -181,18 +182,18 @@ final public class FileSelectRootMethodsPanel extends JPanel {
 
     public ClientUtils.SourceCodeSelection[] getRootMethods(final FileObject javaFile,
             final ClientUtils.SourceCodeSelection[] currentSelection) {
-        advancedLogicalPackageTree.reset();
+        fileTreeView.reset();
 
         updateSelector(new Runnable() {
 
             public void run() {
                 List<SelectionTreeBuilder> builders = SelectionTreeBuilderFactory.buildersFor(javaFile);
-                advancedLogicalPackageTree.setContext(Lookups.fixed((Object[])builders.toArray(new SelectionTreeBuilder[builders.size()])));
-                advancedLogicalPackageTree.setSelection(currentSelection);
+                fileTreeView.setContext(Lookups.fixed((Object[])builders.toArray(new SelectionTreeBuilder[builders.size()])));
+                fileTreeView.setSelection(currentSelection);
 
-                List<SelectionTreeBuilderType> builderTypes = advancedLogicalPackageTree.getBuilderTypes();
+                List<SelectionTreeBuilderType> builderTypes = fileTreeView.getBuilderTypes();
                 if (builderTypes.size() > 0) {
-                    advancedLogicalPackageTree.setBuilderType(builderTypes.get(0));
+                    fileTreeView.setBuilderType(builderTypes.get(0));
                 }
             }
         });
@@ -209,11 +210,24 @@ final public class FileSelectRootMethodsPanel extends JPanel {
 //            }
 
         final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+        
+        Cancellable c = new Cancellable() {
+            @Override
+            public boolean cancel() {
+                dd.setValue(DialogDescriptor.CANCEL_OPTION);
+                d.setVisible(false);
+                fileTreeView.setCancelHandler(null);
+                return true;
+            }
+        };
+            
+        fileTreeView.setCancelHandler(c);
+        
         d.pack(); // To properly layout HTML hint area
         d.setVisible(true);
 
         if (dd.getValue().equals(okButton)) {
-            ClientUtils.SourceCodeSelection[] selection = advancedLogicalPackageTree.getSelection();
+            ClientUtils.SourceCodeSelection[] selection = fileTreeView.getSelection();
             return selection;
         }
         return null;
@@ -229,13 +243,13 @@ final public class FileSelectRootMethodsPanel extends JPanel {
         });
 
         try {
-            advancedLogicalPackageTree.setEnabled(false);
+            fileTreeView.setEnabled(false);
             okButton.setEnabled(false);
             updater.run();
         } finally {
             ph.finish();
             okButton.setEnabled(true);
-            advancedLogicalPackageTree.setEnabled(true);
+            fileTreeView.setEnabled(true);
         }
     }
 }
