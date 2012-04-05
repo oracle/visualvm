@@ -91,17 +91,21 @@ public abstract class IconsProvider {
         private Map<String, String> getImageCache() {
             synchronized (this) {
                 if (images == null) {
-                    final String packagePrefix = getClass().getPackage().getName().
-                                                 replace('.', '/') + "/"; // NOI18N
                     images = new HashMap<String, String>() {
                         public String put(String key, String value) {
-                            return super.put(key, packagePrefix + value);
+                            return super.put(key, getImagePath(value));
                         }
                     };
                     initStaticImages(images);
                 }
             }
             return images;
+        }
+        
+        protected String getImagePath(String imageFile) {
+            String packagePrefix = getClass().getPackage().getName().
+                                   replace('.', '/') + "/"; // NOI18N
+            return packagePrefix + imageFile;
         }
 
         protected void initStaticImages(Map<String, String> cache) {}
