@@ -768,9 +768,12 @@ public final class LiveResultsWindow extends TopComponent
         } else {
             // -----------------------------------------------------------------------
             // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
+            // Temporary workaround to refresh sampling data when LiveResultsWindow is not refreshing
             // TODO: move this code to a separate class performing the update if necessary
-            if (NetBeansProfiler.getDefaultNB().processesProfilingPoints()) {
-                callForceObtainedResultsDump(runner.getProfilerClient(), false);
+            ProfilerClient client = runner.getProfilerClient();
+            if (NetBeansProfiler.getDefaultNB().processesProfilingPoints() 
+                || client.getCurrentInstrType() == ProfilerEngineSettings.INSTR_NONE_SAMPLING) {
+                callForceObtainedResultsDump(client, false);
             }
 
             // -----------------------------------------------------------------------
