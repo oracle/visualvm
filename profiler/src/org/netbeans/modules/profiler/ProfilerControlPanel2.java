@@ -82,6 +82,7 @@ import java.io.ObjectOutput;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1110,6 +1111,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             openSelectedSnapshots();
                         } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                             final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
+                            if (selectedSnapshotFiles.length == 0) return;
 
                             if (ProfilerDialogs.displayConfirmation(
                                     Bundle.ProfilerControlPanel2_ConfirmDeleteSnapshotMsg(), 
@@ -1398,10 +1400,11 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             }
         }
 
+        final private Semaphore refreshListSemaphore = new Semaphore(1);
         private void refreshList() {
             final Object[] sel = list.getSelectedValues();
             
-            org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker() {
+            org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker(refreshListSemaphore) {
                 private final java.util.List modelElements = new ArrayList<Object>();
                 
                 @Override
@@ -1938,9 +1941,13 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     }
 
     public void updateStatus() {
-        statusSnippet.refreshStatus();
-        resultsSnippet.refreshStatus();
-        basicTelemetrySnippet.refreshStatus();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                statusSnippet.refreshStatus();
+                resultsSnippet.refreshStatus();
+                basicTelemetrySnippet.refreshStatus();
+            }
+        });
     }
 
     public void writeExternal(final ObjectOutput out) throws IOException {
