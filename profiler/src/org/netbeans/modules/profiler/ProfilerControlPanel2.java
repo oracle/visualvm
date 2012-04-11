@@ -951,6 +951,61 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
     private static final class SnapshotsPanel extends CPPanel implements ListSelectionListener, ActionListener,
                                                                          ChangeListener {
+        private static class Snapshot {
+            private FileObject fo;
+            private String displayName;
+            private Icon icon;
+            private boolean isHeapDump;
+            
+            Snapshot(FileObject fo) {
+                this.fo = fo;
+                loadDetails();
+            }
+
+            public String getDisplayName() {
+                return displayName;
+            }
+
+            public Icon getIcon() {
+                return icon;
+            }
+
+            public FileObject getFile() {
+                return fo;
+            }
+            
+            public boolean isHeapDump() {
+                return isHeapDump;
+            }
+            
+            private void loadDetails() {
+                if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
+                    // Heap Dump
+                    this.icon = memoryIcon;
+                    this.displayName = ResultsManager.getDefault().getHeapDumpDisplayName(fo.getName());
+                    this.isHeapDump = true;
+                } else {
+                    int snapshotType = ResultsManager.getDefault().getSnapshotType(fo);
+                    this.displayName = ResultsManager.getDefault().getSnapshotDisplayName(fo.getName(), snapshotType);
+                    this.icon = getIcon(snapshotType);
+                    this.isHeapDump = false;
+                }
+            }
+            
+            private static Icon getIcon(int snapshotType) {
+                switch (snapshotType) {
+                    case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                        return cpuIcon;
+                    case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
+                        return fragmentIcon;
+                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                        return memoryIcon;
+                    default:
+                        return null;
+                }
+            }
+        }
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private DefaultListModel listModel;
@@ -1039,14 +1094,12 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             setBackground(list.getBackground());
                         }
 
-                        if (value instanceof FileObject) {
+                        if (value instanceof Snapshot) {
+                            Snapshot s = (Snapshot)value;
                             // FileObject
-                            final FileObject fo = (FileObject) value;
+                            final FileObject fo = s.getFile();
 
-                            if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
-                                // Heap Dump
-                                c.setIcon(memoryIcon);
-
+                            if (s.isHeapDump()) {
                                 Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
                                 for (TopComponent tc : tcs) {
                                     Object o = tc.getClientProperty("HeapDumpFileName"); // NOI18N
@@ -1055,47 +1108,14 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                         break;
                                     }
                                 }
-
-                                c.setText(ResultsManager.getDefault().getHeapDumpDisplayName(fo.getName()));
                             } else {
-                                // Profiler snapshot
-                                new NBSwingWorker(true) {
-                                    LoadedSnapshot ls = null;
-                                    int snapshotType = -1;
-                                    String fileName = null;
-                                    
-                                    @Override
-                                    protected void doInBackground() {
-                                        ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
-                                        snapshotType = ls != null ? ls.getType() : ResultsManager.getDefault().getSnapshotType(fo);
-                                        fileName = fo.getName();
-                                    }
-                                    
-                                    @Override
-                                    protected void done() {
-                                        c.setText(ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType));
-                                        if (ls != null) c.setFont(c.getFont().deriveFont(Font.BOLD));
-
-                                        switch (snapshotType) {
-                                            case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                                                c.setIcon(cpuIcon);
-                                                break;
-                                            case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                                                c.setIcon(fragmentIcon);
-                                                break;
-                                            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                                            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                                                c.setIcon(memoryIcon);
-                                                break;
-                                        }
-                                    }
-
-                                    @Override
-                                    protected void nonResponding() {
-                                        c.setText(Bundle.MSG_Loading_Progress());
-                                    }
-                                }.execute();
+                                LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
+                                if (ls != null) {
+                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
+                                }
                             }
+                            c.setText(s.getDisplayName());
+                            c.setIcon(s.getIcon());
                         } else {
                             c.setText(value.toString());
                         }
@@ -1301,7 +1321,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             FileObject[] ret = new FileObject[sel.length];
 
             for (int i = 0; i < sel.length; i++) {
-                ret[i] = (FileObject) sel[i];
+                ret[i] = ((Snapshot) sel[i]).getFile();
             }
 
             return ret;
@@ -1405,15 +1425,17 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             final Object[] sel = list.getSelectedValues();
             
             org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker(refreshListSemaphore) {
-                private final java.util.List modelElements = new ArrayList<Object>();
+                private final java.util.List<Snapshot> modelElements = new ArrayList<Snapshot>();
                 
                 @Override
                 protected void doInBackground() {
-                    FileObject[] snapshotsOnDisk = ResultsManager.getDefault().listSavedSnapshots(displayedProject, null);
-                    modelElements.addAll(Arrays.asList(snapshotsOnDisk));
+                    for(FileObject fo : ResultsManager.getDefault().listSavedSnapshots(displayedProject, null)) {
+                        modelElements.add(new Snapshot(fo));
+                    }
 
-                    FileObject[] heapdumpsOnDisk = ResultsManager.getDefault().listSavedHeapdumps(displayedProject, null);
-                    modelElements.addAll(Arrays.asList(heapdumpsOnDisk));
+                    for(FileObject fo : ResultsManager.getDefault().listSavedHeapdumps(displayedProject, null)) {
+                        modelElements.add(new Snapshot(fo));
+                    }
                 }
 
                 @Override
