@@ -103,7 +103,6 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -708,6 +707,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         private static final Icon TAKE_SNAPSHOT_CPU_ICON = Icons.getIcon(ProfilerIcons.TAKE_SNAPSHOT_CPU_32);
         private static final Icon TAKE_SNAPSHOT_MEMORY_ICON = Icons.getIcon(ProfilerIcons.TAKE_SNAPSHOT_MEMORY_32);
         private static final Icon TAKE_SNAPSHOT_FRAGMENT_ICON = Icons.getIcon(ProfilerIcons.TAKE_SNAPSHOT_FRAGMENT_32);
+        private static final Icon TAKE_HEAP_DUMP_ICON = Icons.getIcon(ProfilerIcons.TAKE_HEAP_DUMP_32);
         private static final Icon LIVE_RESULTS_CPU_ICON = Icons.getIcon(ProfilerIcons.VIEW_LIVE_RESULTS_CPU_32);
         private static final Icon LIVE_RESULTS_MEMORY_ICON = Icons.getIcon(ProfilerIcons.VIEW_LIVE_RESULTS_MEMORY_32);
         private static final Icon LIVE_RESULTS_FRAGMENT_ICON = Icons.getIcon(ProfilerIcons.VIEW_LIVE_RESULTS_FRAGMENT_32);
@@ -766,7 +766,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             // Take Heap Dump
             takeHeapDumpButton = new JButton(HeapDumpAction.getInstance());
             takeHeapDumpButton.setText(Bundle.ProfilerControlPanel2_DumpHeapButtonName());
-            takeHeapDumpButton.setIcon(TAKE_SNAPSHOT_MEMORY_ICON);
+            takeHeapDumpButton.setIcon(TAKE_HEAP_DUMP_ICON);
             UIUtils.fixButtonUI(takeHeapDumpButton);
             takeHeapDumpButton.setDisabledIcon(new IconUIResource(new ImageIcon(WhiteFilter.createDisabledImage(((ImageIcon) takeHeapDumpButton
                                                                                                                        .getIcon())
@@ -981,7 +981,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             private void loadDetails() {
                 if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
                     // Heap Dump
-                    this.icon = memoryIcon;
+                    this.icon = heapDumpIcon;
                     this.displayName = ResultsManager.getDefault().getHeapDumpDisplayName(fo.getName());
                     this.isHeapDump = true;
                 } else {
@@ -1736,6 +1736,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     private static final Icon cpuIcon = Icons.getIcon(ProfilerIcons.CPU);
     private static final Icon fragmentIcon = Icons.getIcon(ProfilerIcons.FRAGMENT);
     private static final Icon memoryIcon = Icons.getIcon(ProfilerIcons.MEMORY);
+    private static final Icon heapDumpIcon = Icons.getIcon(ProfilerIcons.HEAP_DUMP);
     private static final Icon emptyIcon = Icons.getIcon(GeneralIcons.EMPTY);
     private static final String ID = "profiler_cp"; // NOI18N // for winsys persistence
     private static final Integer EXTERNALIZABLE_VERSION_WITH_SNAPSHOTS = Integer.valueOf(3);

@@ -118,7 +118,7 @@ public class HeapWalkerUI extends TopComponent {
     @NbBundle.Messages("HeapWalkerUI_ComponentDescr=Profiler HeapWalker")
     private void initDefaults() {
         setName(heapWalker.getName());
-        setIcon(Icons.getImage(ProfilerIcons.MEMORY));
+        setIcon(Icons.getImage(ProfilerIcons.HEAP_DUMP));
         if (heapWalker.getHeapDumpFile() != null)
             setToolTipText(heapWalker.getHeapDumpFile().getAbsolutePath());
         getAccessibleContext().setAccessibleDescription(Bundle.HeapWalkerUI_ComponentDescr());
