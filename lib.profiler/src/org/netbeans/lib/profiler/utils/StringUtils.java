@@ -80,16 +80,6 @@ public class StringUtils {
     private static DateFormat otherFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
     private static DateFormat fullFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.MEDIUM);
 
-    // ------------------------------------------------------------------------------------------------
-    //    Varioius pretty-formating methods
-    // ------------------------------------------------------------------------------------------------  
-    static StringBuffer tmpBuf = new StringBuffer();
-
-    // ------------------------------------------------------------------------------------------------
-    //    Various string conversion methods
-    // ------------------------------------------------------------------------------------------------  
-    private static char[] strBuf;
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static void appendSplittedLongString(StringBuffer sb, String s, int maxLineLen) {
@@ -137,7 +127,7 @@ public class StringUtils {
 
     /** Used to print per cent figures with one digit after decimal point */
     public static String floatPerCentToString(float t) {
-        tmpBuf.setLength(0);
+        StringBuilder tmpBuf = new StringBuilder();
 
         double floor = Math.floor(t);
         double diff = t - floor;
@@ -205,7 +195,7 @@ public class StringUtils {
 
     /** Represent time (given in microsecond) in milliseconds, with roughly the same number of meaningful digits */
     public static String mcsTimeToString(long t) {
-        tmpBuf.setLength(0);
+        StringBuilder tmpBuf = new StringBuilder();
 
         if (t >= 100000) {
             return Long.toString(t / 1000);
@@ -242,7 +232,7 @@ public class StringUtils {
 
     /** Represents the given number of bytes as is, or as "xxx K" (if >= 100 KBytes), or as "xxx M" (if >= 100 MBytes) */
     public static String nBytesToString(long b) {
-        tmpBuf.setLength(0);
+        StringBuilder tmpBuf = new StringBuilder();
 
         if (b < (100 * 1024)) {
             return Long.toString(b) + " B"; // NOI18N
@@ -349,7 +339,7 @@ public class StringUtils {
             }
 
             int nDims = lastBrackPos + 1;
-            tmpBuf.setLength(0);
+            StringBuilder tmpBuf = new StringBuilder();
             tmpBuf.append(elemType);
 
             for (int i = 0; i < nDims; i++) {
@@ -363,10 +353,7 @@ public class StringUtils {
     }
 
     public static String utf8ToString(byte[] src, int stPos, int utf8Len) {
-        if ((strBuf == null) || (strBuf.length < utf8Len)) {
-            strBuf = new char[utf8Len];
-        }
-
+        char[] strBuf = new char[utf8Len];
         int i = stPos;
         int j = 0;
         int limit = stPos + utf8Len;
