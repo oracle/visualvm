@@ -119,6 +119,7 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 
@@ -271,49 +272,63 @@ public final class LiveResultsWindow extends TopComponent
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void addMethodToRoots(final String className, final String methodName, final String methodSig) {
-            Lookup.Provider project = NetBeansProfiler.getDefaultNB().getProfiledProject();
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
 
-            ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project)
-                                                                          .getProfilingSettings();
-            List<ProfilingSettings> cpuSettings = new ArrayList<ProfilingSettings>();
+                @Override
+                public void run() {
+                    final Lookup.Provider project = NetBeansProfiler.getDefaultNB().getProfiledProject();
+                    final ProfilingSettings[] projectSettings = ProfilingSettingsManager.getProfilingSettings(project).getProfilingSettings();
+                    final List<ProfilingSettings> cpuSettings = new ArrayList<ProfilingSettings>();
 
-            for (ProfilingSettings settings : projectSettings) {
-                if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
-                    cpuSettings.add(settings);
+                    for (ProfilingSettings settings : projectSettings) {
+                        if (ProfilingSettings.isCPUSettings(settings.getProfilingType())) {
+                            cpuSettings.add(settings);
+                        }
+                    }
+
+                    final ProfilingSettings[] lastProfilingSettings = new ProfilingSettings[1];
+                    String lastProfilingSettingsName = Profiler.getDefault().getLastProfilingSettings().getSettingsName();
+
+                    // Resolve current settings
+                    for (ProfilingSettings settings : cpuSettings) {
+                        if (settings.getSettingsName().equals(lastProfilingSettingsName)) {
+                            lastProfilingSettings[0] = settings;
+
+                            break;
+                        }
+                    }
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            final ProfilingSettings settingsToModify = IDEUtils.selectSettings(ProfilingSettings.PROFILE_CPU_PART,
+                                                                    cpuSettings.toArray(new ProfilingSettings[cpuSettings                                                                                                                                                .size()]),
+                                                                    lastProfilingSettings[0]);
+
+                            if (settingsToModify == null) {
+                                return; // cancelled by the user
+                            }
+                            
+                            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                                @Override
+                                public void run() {
+                                    settingsToModify.addRootMethod(className, methodName, methodSig);
+
+                                    if (cpuSettings.contains(settingsToModify)) {
+                                        ProfilingSettingsManager.storeProfilingSettings(projectSettings, settingsToModify, project);
+                                    } else {
+                                        ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
+                                        System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
+                                        newProjectSettings[projectSettings.length] = settingsToModify;
+                                        ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settingsToModify, project);
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
-            }
-
-            ProfilingSettings lastProfilingSettings = null;
-            String lastProfilingSettingsName = Profiler.getDefault().getLastProfilingSettings().getSettingsName();
-
-            // Resolve current settings
-            for (ProfilingSettings settings : cpuSettings) {
-                if (settings.getSettingsName().equals(lastProfilingSettingsName)) {
-                    lastProfilingSettings = settings;
-
-                    break;
-                }
-            }
-
-            ProfilingSettings settingsToModify = IDEUtils.selectSettings(ProfilingSettings.PROFILE_CPU_PART,
-                                                                         cpuSettings.toArray(new ProfilingSettings[cpuSettings
-                                                                                                                                                                                                                                                   .size()]),
-                                                                         lastProfilingSettings);
-
-            if (settingsToModify == null) {
-                return; // cancelled by the user
-            }
-
-            settingsToModify.addRootMethod(className, methodName, methodSig);
-
-            if (cpuSettings.contains(settingsToModify)) {
-                ProfilingSettingsManager.storeProfilingSettings(projectSettings, settingsToModify, project);
-            } else {
-                ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
-                System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
-                newProjectSettings[projectSettings.length] = settingsToModify;
-                ProfilingSettingsManager.storeProfilingSettings(newProjectSettings, settingsToModify, project);
-            }
+            });
         }
 
         public void showReverseCallGraph(final CPUResultsSnapshot snapshot, final int threadId, final int methodId, int view,
@@ -753,9 +768,12 @@ public final class LiveResultsWindow extends TopComponent
         } else {
             // -----------------------------------------------------------------------
             // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
+            // Temporary workaround to refresh sampling data when LiveResultsWindow is not refreshing
             // TODO: move this code to a separate class performing the update if necessary
-            if (NetBeansProfiler.getDefaultNB().processesProfilingPoints()) {
-                callForceObtainedResultsDump(runner.getProfilerClient(), false);
+            ProfilerClient client = runner.getProfilerClient();
+            if (NetBeansProfiler.getDefaultNB().processesProfilingPoints() 
+                || client.getCurrentInstrType() == ProfilerEngineSettings.INSTR_NONE_SAMPLING) {
+                callForceObtainedResultsDump(client, false);
             }
 
             // -----------------------------------------------------------------------

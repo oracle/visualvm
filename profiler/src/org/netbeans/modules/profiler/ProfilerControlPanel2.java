@@ -82,6 +82,7 @@ import java.io.ObjectOutput;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -102,6 +103,7 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -1021,7 +1023,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             list.setCellRenderer(new DefaultListCellRenderer() {
                     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
                                                                   boolean cellHasFocus) {
-                        JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                        final JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
                         // Colors
                         if (isSelected && list.isEnabled()) {
@@ -1039,7 +1041,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
 
                         if (value instanceof FileObject) {
                             // FileObject
-                            FileObject fo = (FileObject) value;
+                            final FileObject fo = (FileObject) value;
 
                             if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
                                 // Heap Dump
@@ -1057,25 +1059,42 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                                 c.setText(ResultsManager.getDefault().getHeapDumpDisplayName(fo.getName()));
                             } else {
                                 // Profiler snapshot
-                                LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
-                                int snapshotType = ls != null ? ls.getType() : ResultsManager.getDefault().getSnapshotType(fo);
+                                new NBSwingWorker(true) {
+                                    LoadedSnapshot ls = null;
+                                    int snapshotType = -1;
+                                    String fileName = null;
+                                    
+                                    @Override
+                                    protected void doInBackground() {
+                                        ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
+                                        snapshotType = ls != null ? ls.getType() : ResultsManager.getDefault().getSnapshotType(fo);
+                                        fileName = fo.getName();
+                                    }
+                                    
+                                    @Override
+                                    protected void done() {
+                                        c.setText(ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType));
+                                        if (ls != null) c.setFont(c.getFont().deriveFont(Font.BOLD));
 
-                                    String fileName = fo.getName();
-                                c.setText(ResultsManager.getDefault().getSnapshotDisplayName(fileName, snapshotType));
-                                if (ls != null) c.setFont(c.getFont().deriveFont(Font.BOLD));
+                                        switch (snapshotType) {
+                                            case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                                                c.setIcon(cpuIcon);
+                                                break;
+                                            case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
+                                                c.setIcon(fragmentIcon);
+                                                break;
+                                            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+                                            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                                                c.setIcon(memoryIcon);
+                                                break;
+                                        }
+                                    }
 
-                                switch (snapshotType) {
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                                        c.setIcon(cpuIcon);
-                                        break;
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                                        c.setIcon(fragmentIcon);
-                                        break;
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                                        c.setIcon(memoryIcon);
-                                        break;
-                                }
+                                    @Override
+                                    protected void nonResponding() {
+                                        c.setText(Bundle.MSG_Loading_Progress());
+                                    }
+                                }.execute();
                             }
                         } else {
                             c.setText(value.toString());
@@ -1092,6 +1111,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                             openSelectedSnapshots();
                         } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                             final FileObject[] selectedSnapshotFiles = getSelectedSnapshotFiles();
+                            if (selectedSnapshotFiles.length == 0) return;
 
                             if (ProfilerDialogs.displayConfirmation(
                                     Bundle.ProfilerControlPanel2_ConfirmDeleteSnapshotMsg(), 
@@ -1380,10 +1400,11 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             }
         }
 
+        final private Semaphore refreshListSemaphore = new Semaphore(1);
         private void refreshList() {
             final Object[] sel = list.getSelectedValues();
             
-            org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker() {
+            org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker(refreshListSemaphore) {
                 private final java.util.List modelElements = new ArrayList<Object>();
                 
                 @Override
@@ -1920,9 +1941,13 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     }
 
     public void updateStatus() {
-        statusSnippet.refreshStatus();
-        resultsSnippet.refreshStatus();
-        basicTelemetrySnippet.refreshStatus();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                statusSnippet.refreshStatus();
+                resultsSnippet.refreshStatus();
+                basicTelemetrySnippet.refreshStatus();
+            }
+        });
     }
 
     public void writeExternal(final ObjectOutput out) throws IOException {
