@@ -150,6 +150,7 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
         lblAvailable.setText(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.lblAvailable.text")); // NOI18N
 
         projectList.setModel(poolModel);
+        projectList.setVisibleRowCount(13);
         projectList.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 projectListMouseClicked(evt);
@@ -159,16 +160,19 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
 
         addButton.setAction(selectProjectAction);
         addButton.setText(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.addButton.text")); // NOI18N
+        addButton.setMargin(new java.awt.Insets(2, 8, 2, 8));
 
         removeButton.setAction(unselectProjectAction);
         removeButton.setText(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.removeButton.text")); // NOI18N
         removeButton.setActionCommand(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.removeButton.actionCommand")); // NOI18N
+        removeButton.setMargin(new java.awt.Insets(2, 8, 2, 8));
 
         lblSelected.setDisplayedMnemonic('S');
         lblSelected.setLabelFor(scroller1);
         lblSelected.setText(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.lblSelected.text")); // NOI18N
 
         selectionList.setModel(selectionModel);
+        selectionList.setVisibleRowCount(13);
         selectionList.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 selectionListMouseClicked(evt);
@@ -187,11 +191,11 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(12, 12, 12)
-                        .addComponent(scroller, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
                         .addGap(5, 5, 5)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(removeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(addButton)
+                            .addComponent(removeButton))
                         .addGap(6, 6, 6))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
@@ -202,11 +206,11 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
                         .addComponent(lblSelected)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(scroller1, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                        .addComponent(scroller1, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
                         .addGap(13, 13, 13))))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -222,7 +226,7 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
                         .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(removeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                    .addComponent(scroller)
                     .addComponent(scroller1))
                 .addGap(10, 10, 10)
                 .addComponent(jLabel1)
