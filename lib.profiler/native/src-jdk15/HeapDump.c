@@ -71,12 +71,12 @@ JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_HeapDump_ini
   /* Get the address of JVM_DumpHeap function */
    HMODULE hModule = GetModuleHandle("jvm.dll");
   if (hModule == NULL) {
-    fprintf(stderr, "Profiler Agent: Unable to get handle to jvm.dll\n");
+    fprintf(stderr, "Profiler Agent Error: Unable to get handle to jvm.dll\n");
     return ; /* Unable to get handle to jvm.dll */
   }
   JVM_DumpHeap15 = (jint (JNICALL *)(JNIEnv*,jstring,jboolean)) GetProcAddress(hModule, "JVM_DumpHeap");
   if (JVM_DumpHeap15 == NULL) {
-    fprintf(stderr, "Profiler Agent: Unable to get address of JVM_DumpHeap function\n");
+    fprintf(stderr, "Profiler Agent Error: Unable to get address of JVM_DumpHeap function\n");
     return; /* Unable to get address of JVM_DumpHeap function */
   }
 #else  
@@ -100,9 +100,9 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_HeapDump_tak
   jint error = -1;
 
   if (JVM_DumpHeap15 != NULL) {
-    fprintf(stderr,"Profiler Agent: Heap dump..");
+    fprintf(stdout,"Profiler Agent: Heap dump..");
     error = (*JVM_DumpHeap15)(env,outputfile,JNI_TRUE);
-    fprintf(stderr," end, status %d\n",(int)error);
+    fprintf(stdout," end, status %d\n",(int)error);
   }
   return error;
 }
