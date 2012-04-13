@@ -109,6 +109,7 @@ class NearestGCRoot {
 
     private synchronized void computeGCRoots() {
         if (gcRootsComputed) {
+            HeapProgress.progressFinish();
             return;
         }
         referenceClasses = new HashSet();
