@@ -261,7 +261,7 @@ void save_class_file_bytes(JNIEnv *env, const char* name, jobject loader,
   
     /* Check if we should try to do some pruning */
     if (++_total_cached_class_count % 250 == 0) {
-        fprintf(stderr, "Profiler Agent: 250 classes cached.\n");
+        fprintf(stdout, "Profiler Agent: 250 classes cached.\n");
         try_removing_bytes_for_unloaded_classes(env);
     }
   
