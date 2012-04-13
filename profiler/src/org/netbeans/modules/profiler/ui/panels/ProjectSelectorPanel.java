@@ -160,10 +160,12 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
 
         addButton.setAction(selectProjectAction);
         addButton.setText(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.addButton.text")); // NOI18N
+        addButton.setToolTipText(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.addButton.toolTipText")); // NOI18N
         addButton.setMargin(new java.awt.Insets(2, 8, 2, 8));
 
         removeButton.setAction(unselectProjectAction);
         removeButton.setText(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.removeButton.text")); // NOI18N
+        removeButton.setToolTipText(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.removeButton.toolTipText")); // NOI18N
         removeButton.setActionCommand(org.openide.util.NbBundle.getMessage(ProjectSelectorPanel.class, "ProjectSelectorPanel.removeButton.actionCommand")); // NOI18N
         removeButton.setMargin(new java.awt.Insets(2, 8, 2, 8));
 
