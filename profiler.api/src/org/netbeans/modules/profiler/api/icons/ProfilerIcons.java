@@ -80,6 +80,7 @@ public interface ProfilerIcons extends Icons.Keys {
     public static final String TAKE_SNAPSHOT_CPU_32 = "ProfilerIcons.TakeSnapshotCpu32"; // NOI18N
     public static final String TAKE_SNAPSHOT_FRAGMENT_32 = "ProfilerIcons.TakeSnapshotFragment32"; // NOI18N
     public static final String TAKE_SNAPSHOT_MEMORY_32 = "ProfilerIcons.TakeSnapshotMemory32"; // NOI18N
+    public static final String TAKE_HEAP_DUMP_32 = "ProfilerIcons.TakeHeapDump32"; // NOI18N
     
     public static final String TAB_BACK_TRACES = "ProfilerIcons.TabBackTraces"; // NOI18N
     public static final String TAB_CALL_TREE = "ProfilerIcons.TabCallTree"; // NOI18N
@@ -107,6 +108,7 @@ public interface ProfilerIcons extends Icons.Keys {
     public static final String FRAGMENT = "ProfilerIcons.Fragment"; // NOI18N
     public static final String MEMORY = "ProfilerIcons.Memory"; // NOI18N
     public static final String MEMORY_32 = "ProfilerIcons.Memory32"; // NOI18N
+    public static final String HEAP_DUMP = "ProfilerIcons.HeapDump"; // NOI18N
     
     public static final String CUSTOM_32 = "ProfilerIcons.Custom32"; // NOI18N
     public static final String MONITORING = "ProfilerIcons.Monitoring"; // NOI18N
