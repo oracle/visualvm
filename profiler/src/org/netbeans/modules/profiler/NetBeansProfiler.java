@@ -1669,6 +1669,9 @@ public abstract class NetBeansProfiler extends Profiler {
         controlPanel2.requestActive();
     }
 
+    @NbBundle.Messages({
+        "MSG_StartingProfilerClient=Starting Profiler Client"
+    })
     public boolean startEx(final ProfilingSettings profilingSettings, final SessionSettings sessionSettings) {
         final boolean[] rslt = new boolean[1];
         final CountDownLatch latch = new CountDownLatch(1);
@@ -1694,7 +1697,7 @@ public abstract class NetBeansProfiler extends Profiler {
             @Override
             protected void nonResponding() {
                 final SwingWorker thiz = this;
-                pd = ProfilerProgressDisplayer.getDefault().showProgress("Starting profiler client", new ProgressDisplayer.ProgressController() {
+                pd = ProfilerProgressDisplayer.getDefault().showProgress(Bundle.MSG_StartingProfilerClient(), new ProgressDisplayer.ProgressController() {
                     @Override
                     public boolean cancel() {
                         thiz.cancel();
