@@ -140,6 +140,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(ProfilerIcons.TAKE_SNAPSHOT_CPU_32, "takeSnapshotCPU32.png");
         cache.put(ProfilerIcons.TAKE_SNAPSHOT_FRAGMENT_32, "takeSnapshotFragment32.png");
         cache.put(ProfilerIcons.TAKE_SNAPSHOT_MEMORY_32, "takeSnapshotMem32.png");
+        cache.put(ProfilerIcons.TAKE_HEAP_DUMP_32, "takeSnapshotMem32.png");
         cache.put(ProfilerIcons.TAB_BACK_TRACES, "backTracesTab.png");
         cache.put(ProfilerIcons.TAB_CALL_TREE, "callTreeTab.png");
         cache.put(ProfilerIcons.TAB_COMBINED, "combinedTab.png");
@@ -163,6 +164,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(ProfilerIcons.FRAGMENT, "fragment.png");
         cache.put(ProfilerIcons.MEMORY, "memory.png");
         cache.put(ProfilerIcons.MEMORY_32, "memory32.png");
+        cache.put(ProfilerIcons.HEAP_DUMP, "memory.png");
         cache.put(ProfilerIcons.CUSTOM_32, "custom32.png");
         cache.put(ProfilerIcons.MONITORING, "monitoring.png");
         cache.put(ProfilerIcons.MONITORING_32, "monitoring32.png");
