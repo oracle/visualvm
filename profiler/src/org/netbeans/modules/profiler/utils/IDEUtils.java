@@ -187,10 +187,18 @@ public final class IDEUtils {
 
     private static String getAntProfilerStartArgument(int port, int architecture, String jdkVersion) {
         String ld = Profiler.getDefault().getLibsDir();
-
+        String nativeLib = Platform.getAgentNativeLibFullName(ld, false, jdkVersion, architecture);
+        
+        if (ld.contains(" ")) { // NOI18N
+            ld = "\"" + ld + "\""; // NOI18N
+        }
+        if (nativeLib.contains(" ")) { // NOI18N
+            nativeLib = "\"" + nativeLib + "\""; // NOI18N
+        }
+        
         // -agentpath:D:/Testing/41 userdir/lib/deployed/jdk15/windows/profilerinterface.dll=D:\Testing\41 userdir\lib,5140
         return "-agentpath:" // NOI18N
-               + Platform.getAgentNativeLibFullName(ld, false, jdkVersion, architecture) + "=" // NOI18N
+               + nativeLib + "=" // NOI18N
                + ld + "," // NOI18N
                + port + "," // NOI18N
                + System.getProperty("profiler.agent.connect.timeout", "10"); // NOI18N // 10 seconds timeout by default
