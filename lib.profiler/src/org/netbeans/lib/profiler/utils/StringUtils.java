@@ -44,6 +44,8 @@
 package org.netbeans.lib.profiler.utils;
 
 import java.text.DateFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,12 +67,18 @@ public class StringUtils {
     private static final String THIS_WEEK_FORMAT;
     private static final String LAST_WEEK_FORMAT;
     private static final String YESTERDAY_FORMAT;
+    private static NumberFormat percentage;
+    private static NumberFormat intFormat = NumberFormat.getIntegerInstance();
+    private static char SEPARATOR = DecimalFormatSymbols.getInstance().getDecimalSeparator();
     
     static {
         ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.utils.Bundle"); // NOI18N
         THIS_WEEK_FORMAT = messages.getString("StringUtils_ThisWeekFormat"); // NOI18N
         LAST_WEEK_FORMAT = messages.getString("StringUtils_LastWeekFormat"); // NOI18N
         YESTERDAY_FORMAT = messages.getString("StringUtils_YesterdayFormat"); // NOI18N
+        percentage = NumberFormat.getNumberInstance();
+        percentage.setMaximumFractionDigits(1);
+        percentage.setMinimumFractionDigits(1);
     }
                                                                                             // -----
     private static SimpleDateFormat thisWeekFormat = new SimpleDateFormat(THIS_WEEK_FORMAT);
@@ -127,21 +135,7 @@ public class StringUtils {
 
     /** Used to print per cent figures with one digit after decimal point */
     public static String floatPerCentToString(float t) {
-        StringBuilder tmpBuf = new StringBuilder();
-
-        double floor = Math.floor(t);
-        double diff = t - floor;
-
-        if (diff >= 0.95) {
-            floor = Math.round(t);
-            diff = 0.0;
-        }
-
-        tmpBuf.append((int) floor);
-        tmpBuf.append('.'); // NOI18N
-        tmpBuf.append((int) Math.round(diff * 10));
-
-        return tmpBuf.toString();
+        return percentage.format(t);
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -198,11 +192,11 @@ public class StringUtils {
         StringBuilder tmpBuf = new StringBuilder();
 
         if (t >= 100000) {
-            return Long.toString(t / 1000);
+            return intFormat.format(t / 1000);
         } else if (t >= 10000) {
             long x = t / 1000;
-            tmpBuf.append(Long.toString(x));
-            tmpBuf.append('.');
+            tmpBuf.append(intFormat.format(x));
+            tmpBuf.append(SEPARATOR);
             tmpBuf.append(Long.toString((t - (x * 1000)) / 100));
 
             return tmpBuf.toString();
@@ -210,8 +204,8 @@ public class StringUtils {
             //return Long.toString(x) + "." + Long.toString((t - x*1000) / 100);
         } else if (t >= 1000) {
             long x = t / 1000;
-            tmpBuf.append(Long.toString(x));
-            tmpBuf.append('.');
+            tmpBuf.append(intFormat.format(x));
+            tmpBuf.append(SEPARATOR);
             tmpBuf.append(Long.toString((t - (x * 1000)) / 10));
 
             return tmpBuf.toString();
@@ -219,11 +213,16 @@ public class StringUtils {
             //return Long.toString(x) + "." + Long.toString((t - x*1000) / 10);
         } else {
             if (t >= 100) {
-                tmpBuf.append("0."); // NOI18N
+                tmpBuf.append("0"); // NOI18N
+                tmpBuf.append(SEPARATOR);
             } else if (t >= 10) {
-                tmpBuf.append("0.0"); // NOI18N
+                tmpBuf.append("0"); // NOI18N
+                tmpBuf.append(SEPARATOR);
+                tmpBuf.append("0"); // NOI18N
             } else {
-                tmpBuf.append("0.00"); // NOI18N
+                tmpBuf.append("0"); // NOI18N
+                tmpBuf.append(SEPARATOR);
+                tmpBuf.append("00"); // NOI18N
             }
 
             return (tmpBuf.append(Long.toString(t))).toString();
@@ -235,13 +234,13 @@ public class StringUtils {
         StringBuilder tmpBuf = new StringBuilder();
 
         if (b < (100 * 1024)) {
-            return Long.toString(b) + " B"; // NOI18N
+            return intFormat.format(b) + " B"; // NOI18N
         } else if (b < (100 * 1024 * 1024)) {
             long k = b >> 10;
-            tmpBuf.append(Long.toString(k));
+            tmpBuf.append(intFormat.format(k));
 
             if (b < (100 * 1024 * 1024)) {
-                tmpBuf.append('.'); // NOI18N
+                tmpBuf.append(SEPARATOR); // NOI18N
                 tmpBuf.append(Long.toString((b - (k << 10)) / 102)); // 102 stands for 1/10th of 1K
             }
 
@@ -250,10 +249,10 @@ public class StringUtils {
             return tmpBuf.toString();
         } else {
             long m = b >> 20;
-            tmpBuf.append(Long.toString(m));
+            tmpBuf.append(intFormat.format(m));
 
             if (b < 10737418240L) {
-                tmpBuf.append('.'); // NOI18N
+                tmpBuf.append(SEPARATOR);
                 tmpBuf.append(Long.toString((b - (m << 20)) / 104858)); // 104858 stands for 1/10th of 1M
             }
 
