@@ -716,9 +716,9 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                         case 3:
                             return collectingTwoTimeStamps
                                    ? (StringUtils.mcsTimeToString(flatProfileContainer.getTimeInMcs1AtRow(row)) + " ms" // NOI18N
-                            ) : Integer.toString(flatProfileContainer.getNInvocationsAtRow(row));
+                            ) : intFormat.format(flatProfileContainer.getNInvocationsAtRow(row));
                         case 4:
-                            return Integer.toString(flatProfileContainer.getNInvocationsAtRow(row));
+                            return intFormat.format(flatProfileContainer.getNInvocationsAtRow(row));
                         default:
                             return null;
                     }

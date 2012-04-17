@@ -54,6 +54,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.openide.DialogDisplayer;
 
 
@@ -146,9 +148,18 @@ public class FindDialog extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(findWhatField, gridBagConstraints);
+        findWhatField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { updateFindButton(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { updateFindButton(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { updateFindButton(); }
+        });
 
         // findButton
         findButton.setText(Bundle.FindDialog_FindButtonName());
+        updateFindButton();
 
         // panel filling bottom space
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -158,5 +169,9 @@ public class FindDialog extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(new JPanel(), gridBagConstraints);
+    }
+    
+    private void updateFindButton() {
+        findButton.setEnabled(!findWhatField.getText().trim().isEmpty());
     }
 }

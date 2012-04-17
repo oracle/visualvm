@@ -215,7 +215,7 @@ public class OverviewController extends AbstractController {
                 + Bundle.OverviewController_OOMELabelString() + "<br>&nbsp;&nbsp;&nbsp;&nbsp;"
                 + Bundle.OverviewController_OOMEItemString(threadUrl);
         }
-        String memoryRes = Icons.getResource(ProfilerIcons.MEMORY);
+        String memoryRes = Icons.getResource(ProfilerIcons.HEAP_DUMP);
         return "<b><img border='0' align='bottom' src='nbresloc:/" + memoryRes + "'>&nbsp;&nbsp;" // NOI18N
                 + Bundle.OverviewController_SummaryString() + "</b><br><hr>" + dateTaken + "<br>" + filename + "<br>" + filesize + "<br><br>" + liveBytes // NOI18N
                 + "<br>" + liveClasses + "<br>" + liveInstances + "<br>" + classloaders + "<br>" + gcroots + "<br>" + finalizersInfo + oomeString; // NOI18N

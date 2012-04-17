@@ -359,28 +359,6 @@ public abstract class ClassRepository implements CommonConstants {
         ClassFileCache.getDefault().addVMSuppliedClassFile(className, classLoaderId, buf);
     }
 
-    /** Utility method - read .class file and return class name stored in it. */
-    public static ClassInfo classInfoForFile(File f) throws ClassNotFoundException, IOException, ClassFormatError { // TODO CHECK: unused method
-
-        byte[] buf = MiscUtils.readFileIntoBuffer(new FileOrZipEntry(f));
-        ClassInfo clazz = new ClassInfo(buf) {
-            protected byte[] getClassFileBytes() {
-                return null;
-            }
-        };
-
-        String fileName = f.getCanonicalPath();
-        String className = clazz.getName() + ".class"; // NOI18N
-        String expectedClassName = fileName.substring(fileName.length() - className.length()).replace('\\', '/'); // NOI18N
-
-        if (!className.equals(expectedClassName)) {
-            throw new ClassNotFoundException("Mismatch between name in .class file and location for " + fileName // NOI18N
-                                             + "\nYour class path setting may be incorrect."); // NOI18N
-        }
-
-        return clazz;
-    }
-
     /** Should be called after profiling finishes to cleanup any static data, close opened files, etc. */
     public static void cleanup() {
         clearCache();
