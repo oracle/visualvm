@@ -1,6 +1,6 @@
  profilerinterface
 
- Timestamp is 4f0aec08 (Mon Jan 09 14:30:48 2012)
+ Timestamp is 4f7b3552 (Tue Apr 03 19:37:22 2012)
 
  Preferred load address is 10000000
 
@@ -17,8 +17,8 @@
  0003:00000004 00000004H .CRT$XCZ                DATA
  0003:00000008 00000004H .CRT$XIA                DATA
  0003:0000000c 00000004H .CRT$XIZ                DATA
- 0003:00000010 000015f0H .data                   DATA
- 0003:00001600 000001a4H .bss                    DATA
+ 0003:00000010 00001600H .data                   DATA
+ 0003:00001610 000001a4H .bss                    DATA
  0004:00000000 00000058H .rsrc$01                DATA
  0004:00000060 00000390H .rsrc$02                DATA
 
@@ -127,13 +127,13 @@
  0003:00000004       ___xc_z                    10006004     MSVCRT:cinitexe.obj
  0003:00000008       ___xi_a                    10006008     MSVCRT:cinitexe.obj
  0003:0000000c       ___xi_z                    1000600c     MSVCRT:cinitexe.obj
- 0003:00001788       __jvmti                    10007788     <common>
- 0003:0000178c       __jvmti_callbacks          1000778c     <common>
- 0003:00001790       _JVM_DumpHeap15            10007790     <common>
- 0003:00001794       __adjust_fdiv              10007794     <common>
- 0003:00001798       ___onexitend               10007798     <common>
- 0003:0000179c       ___onexitbegin             1000779c     <common>
- 0003:000017a0       __pRawDllMain              100077a0     <common>
+ 0003:00001798       __jvmti                    10007798     <common>
+ 0003:0000179c       __jvmti_callbacks          1000779c     <common>
+ 0003:000017a0       _JVM_DumpHeap15            100077a0     <common>
+ 0003:000017a4       __adjust_fdiv              100077a4     <common>
+ 0003:000017a8       ___onexitend               100077a8     <common>
+ 0003:000017ac       ___onexitbegin             100077ac     <common>
+ 0003:000017b0       __pRawDllMain              100077b0     <common>
 
  entry point at        0001:00003065
 

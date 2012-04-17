@@ -134,25 +134,25 @@ void initializeJVMTI(JavaVM *jvm) {
 /* The VM calls this function when the native library is loaded (for example, through System.loadLibrary). */
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
     if (_jvmti == NULL) {
-        fprintf(stderr, "Profiler Agent: JNI OnLoad Initializing...\n");
+        fprintf(stdout, "Profiler Agent: JNI OnLoad Initializing...\n");
 
         initializeJVMTI(jvm);
     
-        fprintf(stderr, "Profiler Agent: JNI OnLoad Initialized successfully\n");
+        fprintf(stdout, "Profiler Agent: JNI OnLoad Initialized successfully\n");
     }
     return JNI_VERSION_1_2;
 }
 
 /** This function is called automatically upon agent startup */
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
-    fprintf(stderr, "Profiler Agent: Initializing...\n");
+    fprintf(stdout, "Profiler Agent: Initializing...\n");
 
     initializeJVMTI(jvm);
 
     if (options != NULL) {
-      fprintf (stderr, "Profiler Agent: Options: >%s<\n", options);
+      fprintf (stdout, "Profiler Agent: Options: >%s<\n", options);
     } else {
-      fprintf (stderr, "Profiler Agent: No options\n");
+      fprintf (stdout, "Profiler Agent: No options\n");
     }    
 
     /* If it looks like the VM was started not from the tool, but on its own, e.g. like
@@ -171,7 +171,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
         }
     } // in case of calibration, the arguments are just empty, this is OK
 
-    fprintf(stderr, "Profiler Agent: Initialized successfully\n");
+    fprintf(stdout, "Profiler Agent: Initialized successfully\n");
     return 0;
 }
 
