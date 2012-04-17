@@ -41,6 +41,7 @@
  */
 package org.netbeans.modules.profiler.api.project;
 
+import java.util.Map;
 import java.util.Properties;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.modules.profiler.api.JavaPlatform;
@@ -122,7 +123,7 @@ public final class ProjectProfilingSupport {
      * @param props properties
      * @param profiledClassFile profiled file or null for profiling the entire project
      */
-    public void configurePropertiesForProfiling(Properties props, FileObject profiledClassFile) {
+    public void configurePropertiesForProfiling(Map props, FileObject profiledClassFile) {
         provider.configurePropertiesForProfiling(props, profiledClassFile);
     }
     

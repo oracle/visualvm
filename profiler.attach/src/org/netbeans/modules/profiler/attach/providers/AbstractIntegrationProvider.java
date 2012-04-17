@@ -154,9 +154,30 @@ public abstract class AbstractIntegrationProvider implements WizardIntegrationPr
     public boolean supportsRemote() {
         return true;
     }
+    
+    /**
+     * @see org.netbeans.modules.profiler.attach.providers.WizardIntegrationProvider#getProfilerBinariesLink(attachSettings)
+     */
+    @Override
+    final public String getProfilerBinariesLink(AttachSettings attachSettings) {
+        if (needsSIPWorkaround()) {
+            String agentArgs = IntegrationUtils.getProfilerAgentCommandLineArgs(attachSettings.getHostOS(), targetJava, attachSettings.isRemote(), attachSettings.getPort());
+            return IntegrationUtils.getTemporaryBinariesLink(agentArgs);
+        }
+        return null;
+    }
 
     protected abstract int getAttachWizardPriority();
 
+    /**
+     * 
+     * @return Returns true if a provider requires space-in-path workaround in 
+     * form of a temporary link (true is default)
+     */
+    protected boolean needsSIPWorkaround() {
+        return true;
+    }
+    
     protected final String getManualRemoteStep1(final String targetOS) {
         return Bundle.ManualRemoteStep1Message(HTML_REMOTE_STRING);
     }
@@ -164,4 +185,17 @@ public abstract class AbstractIntegrationProvider implements WizardIntegrationPr
     protected final String getManualRemoteStep2(final String targetOS) {
         return Bundle.ManualRemoteStep2Message(IntegrationUtils.getRemoteCalibrateCommandString(targetOS, getTargetJava()));
     }
+    
+    @NbBundle.Messages({
+        "# {0} - Actual profiler binaries link",
+        "# {1} - The section to be updated (JAVA_OPTS, CATALINA_OPTS etc.)",
+        "IntegrationProvider_TempLinkWarning=\"<i>{0}</i>\" is a temporary link. If you want to persist it across machine restarts copy the link to a permanent location and update the {1} section."
+    })
+    protected final void addLinkWarning(IntegrationHints instructions, String linkSection, AttachSettings attachSettings) {
+        String link = getProfilerBinariesLink(attachSettings);
+        if (link != null) {
+            instructions.addWarning(Bundle.IntegrationProvider_TempLinkWarning(link, linkSection));
+        }
+    }
+
 }
