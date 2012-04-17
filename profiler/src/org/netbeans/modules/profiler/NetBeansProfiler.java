@@ -111,6 +111,7 @@ import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -123,11 +124,14 @@ import javax.swing.border.EmptyBorder;
 import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
+import org.netbeans.lib.profiler.ui.SwingWorker;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
 import org.netbeans.modules.profiler.api.GlobalStorage;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.netbeans.modules.profiler.spi.SessionListener;
+import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.awt.Mnemonics;
 
@@ -1665,7 +1669,65 @@ public abstract class NetBeansProfiler extends Profiler {
         controlPanel2.requestActive();
     }
 
-    private void setupDispatcher(ProfilingSettings profilingSettings) {
+    @NbBundle.Messages({
+        "MSG_StartingProfilerClient=Starting Profiler Client"
+    })
+    public boolean startEx(final ProfilingSettings profilingSettings, final SessionSettings sessionSettings) {
+        final boolean[] rslt = new boolean[1];
+        final CountDownLatch latch = new CountDownLatch(1);
+        
+        new SwingWorker(false) {
+            private ProgressDisplayer pd;
+            @Override
+            protected void doInBackground() {
+                setupDispatcher(profilingSettings);
+                connectToStartedApp(profilingSettings, sessionSettings);
+            }
+
+            @Override
+            protected void done() {
+                if (pd != null && pd.isOpened()) {
+                    pd.close();
+                    pd = null;
+                }
+                rslt[0] = true;
+                latch.countDown();
+            }
+
+            @Override
+            protected void nonResponding() {
+                final SwingWorker thiz = this;
+                pd = ProfilerProgressDisplayer.getDefault().showProgress(Bundle.MSG_StartingProfilerClient(), new ProgressDisplayer.ProgressController() {
+                    @Override
+                    public boolean cancel() {
+                        thiz.cancel();
+                        return true;
+                    }
+                });
+            }
+
+            @Override
+            protected void cancelled() {
+                if (pd != null && pd.isOpened()) {
+                    pd.close();
+                    pd = null;
+                }
+                rslt[0] = false;
+                latch.countDown();
+            }
+        }.execute();
+        
+        try {
+            latch.await();
+            return rslt[0];
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return false;
+    }
+    
+    public void setupDispatcher(ProfilingSettings profilingSettings) {
+        lastProfilingSettings = profilingSettings;
         synchronized (setupLock) {
             final Lookup.Provider project = getProfiledProject();
 
@@ -1695,8 +1757,7 @@ public abstract class NetBeansProfiler extends Profiler {
             if ((cctProvider != null) && (cctListeners != null) && (cctListeners.size() > 0)) {
                 for (CCTProvider.Listener cctListener : cctListeners) {
                     if (LOGGER.isLoggable(Level.FINEST)) {
-                        LOGGER.finest("Adding listener " + cctListener.getClass().getName() + " to the provider "
-                                      + cctProvider.getClass().getName());
+                        LOGGER.log(Level.FINEST, "Adding listener {0} to the provider {1}", new Object[]{cctListener.getClass().getName(), cctProvider.getClass().getName()});
                     }
 
                     cctProvider.addListener(cctListener);
@@ -1705,7 +1766,7 @@ public abstract class NetBeansProfiler extends Profiler {
                 if (LOGGER.isLoggable(Level.WARNING)) {
                     if (cctProvider == null) {
                         LOGGER.warning("Could not find a CCT provider in lookup!");
-                    } else if ((cctListeners == null) || (cctListeners.size() == 0)) {
+                    } else if ((cctListeners == null) || (cctListeners.isEmpty())) {
                         LOGGER.warning("Could not find listeners in lookup!");
                     }
                 }
@@ -1754,7 +1815,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     }
                 }
             }
-
+            
             ProfilingPointsProcessor ppp = getProfilingPointsManager();
             if (ppp != null) ppp.init(getProfiledProject());
 
@@ -1765,6 +1826,8 @@ public abstract class NetBeansProfiler extends Profiler {
     // Used for killing an agent which could cause a collision on port
     // Returns true if TERMINATE_TARGET_JVM was invoked on agent (not necessarily killed!), false if the agent is already profiling (port is used)
     private boolean shutdownAgent(String host, int port) {
+        if (port == -1) return false; // invalid port
+        
         Socket clientSocket = null;
         ObjectOutputStream socketOut = null;
         ObjectInputStream socketIn = null;

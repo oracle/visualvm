@@ -480,7 +480,7 @@ public class CompareSnapshotsHelper {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static final Icon memoryIcon = Icons.getIcon(ProfilerIcons.MEMORY);
+    private static final Icon memoryIcon = Icons.getIcon(ProfilerIcons.HEAP_DUMP);
     private static JFileChooser snapshotFileChooser;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------

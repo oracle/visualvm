@@ -211,14 +211,17 @@ final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpC
 
             final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
             
-            pkgTreeView.setCancelHandler(new Cancellable() {
+            Cancellable c = new Cancellable() {
                 @Override
                 public boolean cancel() {
                     dd.setValue(DialogDescriptor.CANCEL_OPTION);
                     d.setVisible(false);
+                    pkgTreeView.setCancelHandler(null);
                     return true;
                 }
-            });
+            };
+            
+            pkgTreeView.setCancelHandler(c);
             
             d.pack(); // To properly layout HTML hint area
             d.setVisible(true);
