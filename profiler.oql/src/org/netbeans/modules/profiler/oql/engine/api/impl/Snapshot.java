@@ -273,10 +273,6 @@ public class Snapshot {
         return instances.iterator();
     }
 
-    public JavaClass[] getClassesArray() {
-        return (JavaClass[]) delegate.getAllClasses().toArray();
-    }
-
     public Iterator getFinalizerObjects() {
         JavaClass clazz = findClass("java.lang.ref.Finalizer"); // NOI18N
         Instance queue = ((ObjectFieldValue) clazz.getValueOfStaticField("queue")).getInstance(); // NOI18N
