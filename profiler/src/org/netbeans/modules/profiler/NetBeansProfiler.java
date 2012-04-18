@@ -1677,10 +1677,12 @@ public abstract class NetBeansProfiler extends Profiler {
         final CountDownLatch latch = new CountDownLatch(1);
         
         new SwingWorker(false) {
-            private ProgressDisplayer pd;
+            volatile private ProgressDisplayer pd;
             @Override
             protected void doInBackground() {
                 setupDispatcher(profilingSettings);
+                if (isCancelled()) return;
+                
                 connectToStartedApp(profilingSettings, sessionSettings);
             }
 
@@ -1714,6 +1716,11 @@ public abstract class NetBeansProfiler extends Profiler {
                 }
                 rslt[0] = false;
                 latch.countDown();
+            }
+
+            @Override
+            protected int getWarmup() {
+                return 1500;
             }
         }.execute();
         
