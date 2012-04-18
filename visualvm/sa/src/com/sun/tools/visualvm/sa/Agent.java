@@ -51,32 +51,32 @@ class Agent {
     }
     
     private SAWrapper saClassLoader;
-    private final SAObject bugspotAgent;
+    private final SAObject hotspotAgent;
     private VM vm;
     private Arguments args;
 
     private Agent(File jdkHome,File saJarFile) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException {
         saClassLoader = new SAWrapper(jdkHome,saJarFile);
-        bugspotAgent = new SAObject(saClassLoader.BugspotAgent().newInstance());
+        hotspotAgent = new SAObject(saClassLoader.HotSpotAgent().newInstance());
     }
 
     boolean attach(int pid) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        bugspotAgent.invoke("attach",pid);  // NOI18N
-        return isJavaMode();
+        hotspotAgent.invoke("attach",pid);  // NOI18N
+        return true;
     }
 
     boolean attach(String executable,String coredump) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        bugspotAgent.invoke("attach",executable,coredump);  // NOI18N
-        return isJavaMode();
+        hotspotAgent.invoke("attach",executable,coredump);  // NOI18N
+        return true;
     }
     
     boolean attach(String remoteServer) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        bugspotAgent.invoke("attach",remoteServer); // NOI18N
-        return isJavaMode();
+        hotspotAgent.invoke("attach",remoteServer); // NOI18N
+        return true;
     }
     
     void detach() throws IllegalAccessException, InvocationTargetException {
-        bugspotAgent.invoke("detach");  // NOI18N
+        hotspotAgent.invoke("detach");  // NOI18N
     }
 
     VM getVM() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -98,11 +98,5 @@ class Agent {
     SAObject getHeapHprofBinWriter() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         return new SAObject(saClassLoader.HeapHprofBinWriter().newInstance());
     }
-    
-    
-    private boolean isJavaMode() throws IllegalAccessException, InvocationTargetException {
-        Boolean b = (Boolean) bugspotAgent.invoke("isJavaMode");    // NOI18N
-        return b.booleanValue();
-    }    
     
 }

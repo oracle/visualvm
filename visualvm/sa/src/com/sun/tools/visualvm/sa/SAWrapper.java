@@ -84,8 +84,8 @@ class SAWrapper {
         return classForName("sun.jvm.hotspot.runtime.VM");  // NOI18N
     }
     
-    Class BugspotAgent() throws ClassNotFoundException {
-        return classForName("sun.jvm.hotspot.bugspot.BugSpotAgent");    // NOI18N
+    Class HotSpotAgent() throws ClassNotFoundException {
+        return classForName("sun.jvm.hotspot.HotSpotAgent");    // NOI18N
     }
     
     Class HeapHprofBinWriter() throws ClassNotFoundException {
