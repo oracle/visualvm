@@ -63,6 +63,7 @@ import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -358,27 +359,48 @@ public final class ExportAction extends AbstractAction {
             }
             return; // cancelled
         }
-
+        
         if (exportedFileType==MODE_NPS) {
             final File file = saveFile.getSelectedFile();
             if (!checkFileExists(file)) {
+                if (lrw != null) {
+                    statusHandler.resumeLiveUpdates();
+                }
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
-            try {
-                if (!(file.getAbsolutePath().toLowerCase().endsWith("."+FILE_EXTENSION_NPS))) {
-                    ProfilerDialogs.displayError(Bundle.ExportAction_InvalidLocationForFileMsg());
-                    return;
+            new NBSwingWorker(true) {
+                final private ProgressHandle ph = ProgressHandleFactory.createHandle("Saving snapshot");
+                @Override
+                protected void doInBackground() {
+                    try {
+                        ph.setInitialDelay(500);
+                        ph.start();
+                        
+                        if (!(file.getAbsolutePath().toLowerCase().endsWith("."+FILE_EXTENSION_NPS))) {
+                            ProfilerDialogs.displayError(Bundle.ExportAction_InvalidLocationForFileMsg());
+                            return;
+                        }
+                        FileObject fo=FileUtil.createData(file);
+                        if (fo==null) {
+                            ProfilerDialogs.displayError(Bundle.ExportAction_InvalidLocationForFileMsg());
+                            return;
+                        }
+
+                        ResultsManager.getDefault().saveSnapshot(snapshot, fo);
+                    } catch (IOException e1) {
+                        LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotCreateFailedMsg(e1.getMessage()), e1);
+                    }
                 }
-                FileObject fo=FileUtil.createData(file);
-                if (fo==null) {
-                    ProfilerDialogs.displayError(Bundle.ExportAction_InvalidLocationForFileMsg());
-                    return;
+
+                @Override
+                protected void done() {
+                    ph.finish();
+                    if (lrw != null) {
+                        statusHandler.resumeLiveUpdates();
+                    }
                 }
-                saveFile=null;
-                ResultsManager.getDefault().saveSnapshot(snapshot, fo);
-            } catch (IOException e1) {
-                LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotCreateFailedMsg(e1.getMessage()), e1);
-            }
+            }.execute();
+            
         } else {
             final File file = saveFile.getSelectedFile();
             saveFile = null;
@@ -390,35 +412,36 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
 
-            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                    public void run() {
-                        ProgressHandle pHandle = null;
-                        pHandle = ProgressHandleFactory.createHandle(Bundle.ExportAction_ExportingViewMsg());
-                        pHandle.setInitialDelay(500);
-                        pHandle.start();
+            new NBSwingWorker(true) {
+                final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.ExportAction_ExportingViewMsg());
+                @Override
+                protected void doInBackground() {
+                    ph.setInitialDelay(500);
+                    ph.start();
 
-                        try {
-                            FileOutputStream fo;
-                            fo = new FileOutputStream(file);
-                            ExportDataDumper eDD = new ExportDataDumper(fo);
-                            exportProvider.exportData(exportedFileType, eDD);
-                            if (eDD.getCaughtException()!=null) {
-                                ProfilerDialogs.displayError(eDD.getNumExceptions()+Bundle.ExportAction_IOException_Exporting_Msg());
-                            }
-                        } catch (FileNotFoundException ex) {
-                            ex.printStackTrace();
-                        } catch (OutOfMemoryError e) {
-                            ProfilerDialogs.displayError(Bundle.ExportAction_OomeExportingMsg()+e.getMessage());
-                        } finally {
-                            if (pHandle != null) {
-                                pHandle.finish();
-                            }
-                            if (lrw != null) {
-                                statusHandler.resumeLiveUpdates();
-                            }
+                    try {
+                        FileOutputStream fo;
+                        fo = new FileOutputStream(file);
+                        ExportDataDumper eDD = new ExportDataDumper(fo);
+                        exportProvider.exportData(exportedFileType, eDD);
+                        if (eDD.getCaughtException()!=null) {
+                            ProfilerDialogs.displayError(eDD.getNumExceptions()+Bundle.ExportAction_IOException_Exporting_Msg());
                         }
+                    } catch (FileNotFoundException ex) {
+                        ex.printStackTrace();
+                    } catch (OutOfMemoryError e) {
+                        ProfilerDialogs.displayError(Bundle.ExportAction_OomeExportingMsg()+e.getMessage());
                     }
-                });
+                }
+
+                @Override
+                protected void done() {
+                    ph.finish();
+                    if (lrw != null) {
+                        statusHandler.resumeLiveUpdates();
+                    }
+                }
+            }.execute();
         }
     }
 }
