@@ -115,9 +115,11 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         final private static HeapDumpAction INSTANCE = new HeapDumpAction();
     }
     
-    private static class ChooseHeapdumpTargetPanel extends JPanel {
+    private static class ChooseHeapdumpTargetPanel extends JPanel implements HelpCtx.Provider {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
+        private static final String HELP_CTX_KEY = "ChooseHeapdumpTargetPanel.HelpCtx";  // NOI18N
+        private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
         public static final int DESTINATION_DEFAULT = 0;
         public static final int DESTINATION_CUSTOM = 1;
 
@@ -138,6 +140,11 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
+        public HelpCtx getHelpCtx() {
+            return HELP_CTX;
+        }
+        
         public String getCustomDirectory() {
             return customLocationField.getText();
         }
