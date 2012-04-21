@@ -617,7 +617,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
     }
 
     /**
-     * Given the classId anmd the array of methodIds of the stack trace for
+     * Given the classId and the array of methodIds of the stack trace for
      * the newly allocated object, update the reverse Calling Context Tree for this
      * class. Adds new nodes and/or increases allocated object counters/size in nodes. Returns the terminating
      * node in the resulting CCT branch.
