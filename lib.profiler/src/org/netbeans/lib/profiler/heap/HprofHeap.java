@@ -360,7 +360,6 @@ class HprofHeap implements Heap {
 
     synchronized void computeInstances() {
         if (instancesCountComputed) {
-            HeapProgress.progressFinish();
             return;
         }
 
@@ -483,7 +482,6 @@ class HprofHeap implements Heap {
 
     synchronized void computeReferences() {
         if (referencesComputed) {
-            HeapProgress.progressFinish();
             return;
         }
 
