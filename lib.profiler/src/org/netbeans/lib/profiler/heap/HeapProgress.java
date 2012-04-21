@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.heap;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -84,15 +85,25 @@ public final class HeapProgress {
         BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
         if (model != null) {
             long val = PROGRESS_MAX*(value - startOffset)/(endOffset - startOffset);
-            model.setValue((int)val);
+            setValue(model, (int)val);
         }
     }
     
     static void progressFinish() {
         BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
         if (model != null) {
-            model.setValue(PROGRESS_MAX);
+            setValue(model, PROGRESS_MAX);
             progressThreadLocal.remove();
+        }
+    }
+    
+    private static void setValue(final BoundedRangeModel model, final int val) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            model.setValue(val);
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { model.setValue(val); }
+            });
         }
     }
 }
