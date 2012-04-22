@@ -51,11 +51,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
+import javax.swing.*;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
 
@@ -105,8 +101,7 @@ public class ImagePreviewPanel extends JPanel {
                 public void run() {
                     try {
                         if (Thread.interrupted()) {
-                            displayer.setIcon(null);
-                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
+                            setImageImpl(null, Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
                         
@@ -116,8 +111,7 @@ public class ImagePreviewPanel extends JPanel {
                         if (Thread.interrupted()) image = null;
                         
                         if (image == null) {
-                            displayer.setIcon(null);
-                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
+                            setImageImpl(null, Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
 
@@ -128,8 +122,7 @@ public class ImagePreviewPanel extends JPanel {
 
                         if (Thread.interrupted()) {
                             image = null;
-                            displayer.setIcon(null);
-                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
+                            setImageImpl(null, Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
 
@@ -143,21 +136,17 @@ public class ImagePreviewPanel extends JPanel {
 
                             if (Thread.interrupted()) {
                                 image = null;
-                                displayer.setIcon(null);
-                                displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
+                                setImageImpl(null, Bundle.ImagePreviewPanel_NotAvailableMsg());
                                 return;
                             }
 
                             // update preview area (short-running)
-                            displayer.setText(null);
-                            repaint();
-                            displayer.setIcon(scaledPreview);
+                            setImageImpl(scaledPreview, null);
                         }
 
                         if (Thread.interrupted()) {
                             image = null;
-                            displayer.setIcon(null);
-                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
+                            setImageImpl(null, Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
 
@@ -168,21 +157,27 @@ public class ImagePreviewPanel extends JPanel {
                         image = null;
 
                         if (Thread.interrupted()) {
-                            displayer.setIcon(null);
-                            displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
+                            setImageImpl(null, Bundle.ImagePreviewPanel_NotAvailableMsg());
                             return;
                         }
 
                         // update preview area (short-running)
-                        displayer.setText(null);
-                        repaint();
-                        displayer.setIcon(scaledPreview);
+                        setImageImpl(scaledPreview, null);
                     } catch (OutOfMemoryError e) {
-                        displayer.setIcon(null);
-                        displayer.setText(Bundle.ImagePreviewPanel_NotAvailableMsg());
+                        setImageImpl(null, Bundle.ImagePreviewPanel_NotAvailableMsg());
                     }
                 }
             });
+    }
+    
+    private void setImageImpl(final Icon icon, final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                displayer.setText(text);
+                if (icon != null) repaint();
+                displayer.setIcon(icon);
+            }
+        });
     }
 
     public void clearImage() {

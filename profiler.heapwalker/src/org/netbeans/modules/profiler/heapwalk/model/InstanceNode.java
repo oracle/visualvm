@@ -123,17 +123,21 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
     protected List getReferences() {
         if (hasInstance()) {
             ProgressHandle pHandle = null;
-
+            ChangeListener cl = null;
+            
             try {
                 pHandle = ProgressHandleFactory.createHandle(Bundle.InstanceNode_References());
                 pHandle.setInitialDelay(200);
                 pHandle.start(HeapProgress.PROGRESS_MAX);
 
-                setProgress(pHandle);
+                cl = setProgress(pHandle);
                 return getInstance().getReferences();
             } finally {
                 if (pHandle != null) {
                     pHandle.finish();
+                }
+                if (cl != null) {
+                    HeapProgress.getProgress().removeChangeListener(cl);
                 }
             }
         }
@@ -218,12 +222,14 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
         return BrowserUtils.createLoopIcon(icon);
     }
     
-    private static void setProgress(final ProgressHandle pHandle) {
+    private static ChangeListener setProgress(final ProgressHandle pHandle) {
         final BoundedRangeModel progress = HeapProgress.getProgress();
-        progress.addChangeListener(new ChangeListener() {
+        ChangeListener cl = new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 pHandle.progress(progress.getValue());
             }
-        });
+        };
+        progress.addChangeListener(cl);
+        return cl;
     }
 }

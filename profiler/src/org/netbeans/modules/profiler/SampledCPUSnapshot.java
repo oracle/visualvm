@@ -93,6 +93,10 @@ public final class SampledCPUSnapshot {
         return samples;
     }
 
+    /**
+     * Returns start time
+     * @return start time in nanoseconds
+     */
     public long getStartTime() {
         return startTime;
     }
@@ -209,17 +213,17 @@ public final class SampledCPUSnapshot {
 
         if (builder != null && samplesStream == null &&
             startIndex == 0 && endIndex == getSamplesCount()-1) { // full snapshot prepared in advance
-            snapshot = createSnapshot(startTime,builder);
+            snapshot = createSnapshot(startTime/1000000,builder);
             builder = null;
         } else {
             SamplesInputStream stream = seek(startIndex);
             StackTraceSnapshotBuilder _builder = new StackTraceSnapshotBuilder();
-            long _startTime = 0;
+            long _startTime = 0;  // in milliseconds
 
             for (int i = startIndex; i <= endIndex; i++) {
                 LoadedSnapshot.ThreadsSample _sample = stream.readSample();
                 if (_startTime == 0) {
-                    _startTime = _sample.getTime();
+                    _startTime = _sample.getTime() / 1000000;
                 }
                 _builder.addStacktrace(_sample.getTinfos(),_sample.getTime());
             }
@@ -230,6 +234,13 @@ public final class SampledCPUSnapshot {
         return snapshot;
     }
 
+    /**
+     * 
+     * @param startTime start time in milliseconds
+     * @param builder StackTraceSnapshotBuilder
+     * @return snapshot
+     * @throws IOException 
+     */
     private LoadedSnapshot createSnapshot(final long startTime, final StackTraceSnapshotBuilder builder) throws IOException {
         CPUResultsSnapshot snapshot;
         try {

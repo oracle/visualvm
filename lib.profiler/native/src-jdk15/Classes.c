@@ -268,7 +268,7 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_doRe
         // First, disable the NativeMethodBind event, assume that Thread.sleep and Object.wait have already been intercepted
         res = (*_jvmti)->SetEventNotificationMode(_jvmti, JVMTI_DISABLE, JVMTI_EVENT_NATIVE_METHOD_BIND, NULL);
         if (res != JVMTI_ERROR_NONE) {
-            fprintf (stderr, "Profiler Agent: Error while turning NativeMethodBind off: %d\n",res);
+            fprintf (stderr, "Profiler Agent Error: Error while turning NativeMethodBind off: %d\n",res);
             assert(res == JVMTI_ERROR_NONE);
         }
         nativeMethodBindDisabled = TRUE;
@@ -305,7 +305,7 @@ JNIEXPORT jint JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_doRe
             if (redefineCount > 100) {
                 redefineCount = 100;
             }
-            fprintf (stderr, "Profiler Agent: Redefining %d classes at idx %d, out of total %d \n",redefineCount, idx, (int)nClasses);
+            fprintf (stdout, "Profiler Agent: Redefining %d classes at idx %d, out of total %d \n",redefineCount, idx, (int)nClasses);
             res = (*_jvmti)->RedefineClasses(_jvmti, redefineCount, classDefs + idx);
             idx += 100;
         }
