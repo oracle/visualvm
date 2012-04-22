@@ -54,6 +54,7 @@ import javax.swing.event.ListSelectionListener;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
+import org.openide.util.HelpCtx;
 
 
 /**
@@ -72,7 +73,7 @@ import org.openide.DialogDisplayer;
     "JavaPlatformSelector_CannotUsePlatform=The Java Platform this project runs on cannot be used for profiling.",
     "JavaPlatformSelector_ListAccessName=List of Java Platforms available for profiling"
 })
-public final class JavaPlatformSelector extends JPanel implements ListSelectionListener {
+public final class JavaPlatformSelector extends JPanel implements ListSelectionListener, HelpCtx.Provider {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static class JPListModel extends AbstractListModel {
@@ -98,6 +99,8 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+    private static final String HELP_CTX_KEY = "JavaPlatformSelector.HelpCtx";
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static JavaPlatformSelector defaultPlatform;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -133,6 +136,11 @@ public final class JavaPlatformSelector extends JPanel implements ListSelectionL
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
+    }
 
     public static synchronized JavaPlatformSelector getDefault() {
         if (defaultPlatform == null) {
