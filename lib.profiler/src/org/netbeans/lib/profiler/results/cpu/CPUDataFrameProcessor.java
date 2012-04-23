@@ -316,6 +316,9 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                                              | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
                                              | ((long) buffer[position++] & 0xFF);
                             int threadId = (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.finest("Profile Point Hit " + id + ", threadId=" + id + ", timeStamp=" + timeStamp); // NOI18N
+                            }
                             fireProfilingPoint(threadId, id, timeStamp);
 
                             break;
