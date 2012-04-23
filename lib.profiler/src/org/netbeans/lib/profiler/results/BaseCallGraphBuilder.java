@@ -55,6 +55,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,6 +77,8 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
     protected WeakReference clientRef;
     protected boolean batchNotEmpty = false;
 
+    final private AtomicLong batchCounter = new AtomicLong(0);
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of BaseCallGraphBuilder */
@@ -95,6 +98,7 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
 
         afterBatchCommands.clear();
         batchNotEmpty = false;
+        batchCounter.incrementAndGet();
         doBatchStart();
     }
 
@@ -187,6 +191,10 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
         }
 
         return (ProfilerClient) clientRef.get();
+    }
+    
+    final protected long getBatchId() {
+        return batchCounter.get();
     }
 
     private void fireCCTEstablished(boolean empty) {
