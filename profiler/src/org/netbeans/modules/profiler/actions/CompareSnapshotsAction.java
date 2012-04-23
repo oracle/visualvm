@@ -75,6 +75,7 @@ import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.windows.WindowManager;
 
@@ -114,7 +115,11 @@ import org.openide.windows.WindowManager;
 public class CompareSnapshotsAction extends AbstractAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private static class SelectExternalSnapshotsPanel extends JPanel {
+    private static class SelectExternalSnapshotsPanel extends JPanel implements HelpCtx.Provider {
+        //~ Static fields/initializers -------------------------------------------------------------------------------------------
+        private static final String HELP_CTX_KEY = "SelectExternalSnapshotsPanel.HelpCtx";
+        private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+            
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private JButton okButton;
@@ -134,6 +139,11 @@ public class CompareSnapshotsAction extends AbstractAction {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
+        public HelpCtx getHelpCtx() {
+            return HELP_CTX;
+        }        
+        
         public JButton getOKButton() {
             return okButton;
         }
