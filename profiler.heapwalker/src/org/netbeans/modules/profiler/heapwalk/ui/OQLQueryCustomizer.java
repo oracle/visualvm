@@ -84,6 +84,7 @@ import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
+import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
 /**
@@ -107,6 +108,8 @@ import org.openide.util.NbBundle;
     "OQLQueryCustomizer_UpdateQueryLabelText=&Query to update:"
 })
 public class OQLQueryCustomizer {
+    private static HelpCtx HELP_CTX_SAVE_QUERY = new HelpCtx("OQLQueryCustomizer.SaveQuery.HelpCtx");  //NOI18N
+    private static HelpCtx HELP_CTX_QUERY_PROPS = new HelpCtx("OQLQueryCustomizer.QueryProps.HelpCtx");//NOI18N
     private static Icon ICON_UP = Icons.getIcon(GeneralIcons.UP);
     private static Icon ICON_DOWN = Icons.getIcon(GeneralIcons.DOWN);
 
@@ -122,7 +125,7 @@ public class OQLQueryCustomizer {
                                             Bundle.OQLQueryCustomizer_SaveQueryCaption(), true,
                                             new Object[] { okButton,
                                             DialogDescriptor.CANCEL_OPTION },
-                                            okButton, 0, null, null);
+                                            okButton, 0, HELP_CTX_SAVE_QUERY, null);
         final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.pack();
         d.setVisible(true);
@@ -214,7 +217,7 @@ public class OQLQueryCustomizer {
 
         final DialogDescriptor dd = new DialogDescriptor(customizer,
                                             Bundle.OQLQueryCustomizer_QueryPropertiesCaption(node.getCaption()),
-                                            true, options, defaultButton, 0, null, null);
+                                            true, options, defaultButton, 0, HELP_CTX_QUERY_PROPS, null);
         dd.setAdditionalOptions(new Object[] { upDownButtons[0],
                                                upDownButtons[1] });
         updateButtons(upDownButtons, node);
