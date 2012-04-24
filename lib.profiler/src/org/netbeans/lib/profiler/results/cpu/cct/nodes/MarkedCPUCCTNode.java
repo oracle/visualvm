@@ -81,8 +81,8 @@ public class MarkedCPUCCTNode extends TimedCPUCCTNode {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of MarkedCPUCCTNode */
-    public MarkedCPUCCTNode(CPUCCTNodeFactory factory, Mark mark, boolean collectingTwoTimeStamps) {
-        super(factory, collectingTwoTimeStamps);
+    public MarkedCPUCCTNode(long batchId, CPUCCTNodeFactory factory, Mark mark, boolean collectingTwoTimeStamps) {
+        super(batchId, factory, collectingTwoTimeStamps);
         this.mark = mark;
     }
 
@@ -113,6 +113,6 @@ public class MarkedCPUCCTNode extends TimedCPUCCTNode {
     }
 
     protected TimedCPUCCTNode createSelfInstance() {
-        return getFactory().createCategory(mark);
+        return getFactory().createCategory(getBatchId(), mark);
     }
 }

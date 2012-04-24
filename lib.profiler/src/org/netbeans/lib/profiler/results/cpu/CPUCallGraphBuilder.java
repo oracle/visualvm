@@ -391,10 +391,12 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             return;
         }
 
+        long bId = getBatchId();
+        
         TimedCPUCCTNode curNode = ti.peek();
 
         if (curNode == null) {
-            curNode = factory.createThreadNode(threadId);
+            curNode = factory.createThreadNode(bId, threadId);
             ti.totalNNodes++;
             ti.push(curNode);
             ti.totalNInv--;
@@ -404,7 +406,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                                                                                        curNode.getChildren());
 
         if (servletNode == null) {
-            servletNode = factory.createServletRequestNode(requestType, servletPath);
+            servletNode = factory.createServletRequestNode(bId, requestType, servletPath);
             curNode.attachNodeAsChild(servletNode);
         }
 
@@ -672,7 +674,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         threadInfos.beginTrans(false);
 
         try {
-            appNode = new SimpleCPUCCTNode(true);
+            appNode = new SimpleCPUCCTNode(getBatchId(), true);
 
             int len = (threadInfos.getThreadNames() != null) ? threadInfos.getThreadNames().length : 0;
 
@@ -937,23 +939,24 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             LOGGER.log(Level.FINEST, "MarkerMEntry{0} for tId = {1}, time: {2}, method:  {3}, inRoot: {4}, rootEntryTimeThread: {5}", new Object[]{(!stamped) ? "(unstamped)" : "", (int) ti.threadId, timeStamp0, debugMethod(methodId), ti.rootMethodEntryTimeAbs, ti.rootMethodEntryTimeThreadCPU});
         }
 
+        long bId = getBatchId();
         TimedCPUCCTNode curNode = ti.peek();
 
         if (curNode == null) {
-            TimedCPUCCTNode rootNode = factory.createThreadNode(ti.threadId);
+            TimedCPUCCTNode rootNode = factory.createThreadNode(bId, ti.threadId);
             ti.totalNNodes++;
             ti.push(rootNode);
             ti.totalNInv--;
 
             if (!mark.isDefault()) {
-                curNode = factory.createCategory(mark);
+                curNode = factory.createCategory(bId, mark);
                 rootNode.attachNodeAsChild(curNode);
                 ti.totalNNodes++;
                 ti.push(curNode);
                 rootNode = curNode;
             }
 
-            curNode = factory.createMethodNode(methodId);
+            curNode = factory.createMethodNode(bId, methodId);
             rootNode.attachNodeAsChild(curNode);
             ti.totalNNodes++;
             ti.push(curNode);
@@ -995,7 +998,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 calleeNode = MarkedCPUCCTNode.Locator.locate(mark, curNode.getChildren());
 
                 if (calleeNode == null) {
-                    calleeNode = factory.createCategory(mark);
+                    calleeNode = factory.createCategory(bId, mark);
                     curNode.attachNodeAsChild(calleeNode);
                     ti.totalNNodes++;
                 }
@@ -1008,7 +1011,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             calleeNode = MethodCPUCCTNode.Locator.locate(methodId, curNode.getChildren());
 
             if (calleeNode == null) {
-                calleeNode = factory.createMethodNode(methodId);
+                calleeNode = factory.createMethodNode(bId, methodId);
                 curNode.attachNodeAsChild(calleeNode);
                 ti.totalNNodes++;
             }
@@ -1071,6 +1074,8 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
         TimedCPUCCTNode curNode = ti.peek();
 
+        long bId = getBatchId();
+        
         if (stamped) {
             long diff = timeStamp0 - ti.topMethodEntryTime0;
 
@@ -1105,7 +1110,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         // Appropriate sub-node not found, or there are no sub-nodes yet - create one
-        methodNode = factory.createMethodNode(methodId);
+        methodNode = factory.createMethodNode(bId, methodId);
         curNode.attachNodeAsChild(methodNode);
 
         curNode = methodNode;
@@ -1258,22 +1263,24 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             LOGGER.severe(buffer.toString());
         }
 
+        long bId = getBatchId();
+        
         if (curNode == null) { // no node on stack
 
-            TimedCPUCCTNode rootNode = factory.createThreadNode(ti.threadId); // create a new thread node
+            TimedCPUCCTNode rootNode = factory.createThreadNode(bId, ti.threadId); // create a new thread node
             ti.totalNNodes++;
             ti.push(rootNode); // and place it on the stack
             ti.totalNInv--;
 
             if (!mark.isDefault()) {
-                curNode = factory.createCategory(mark);
+                curNode = factory.createCategory(bId, mark);
                 rootNode.attachNodeAsChild(curNode);
                 ti.totalNNodes++;
                 ti.push(curNode);
                 rootNode = curNode;
             }
 
-            curNode = factory.createMethodNode(methodId); // now create the root method node
+            curNode = factory.createMethodNode(bId, methodId); // now create the root method node
             rootNode.attachNodeAsChild(curNode); // and attach it to the previously created thread node
             ti.totalNNodes++;
         } else {
@@ -1284,7 +1291,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 calleeNode = MarkedCPUCCTNode.Locator.locate(mark, curNode.getChildren());
 
                 if (calleeNode == null) {
-                    calleeNode = factory.createCategory(mark);
+                    calleeNode = factory.createCategory(bId, mark);
                     curNode.attachNodeAsChild(calleeNode);
                     ti.totalNNodes++;
                 }
@@ -1296,7 +1303,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             calleeNode = MethodCPUCCTNode.Locator.locate(methodId, curNode.getChildren());
 
             if (calleeNode == null) {
-                calleeNode = factory.createMethodNode(methodId);
+                calleeNode = factory.createMethodNode(bId, methodId);
                 curNode.attachNodeAsChild(calleeNode);
                 ti.totalNNodes++;
             }
