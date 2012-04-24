@@ -158,6 +158,9 @@ public class MemoryDataFrameProcessor extends AbstractDataFrameProcessor {
                                      | (((long) buffer[curPos++] & 0xFF) << 16) | (((long) buffer[curPos++] & 0xFF) << 8)
                                      | ((long) buffer[curPos++] & 0xFF);
                     int threadId = (((int) buffer[curPos++] & 0xFF) << 8) | ((int) buffer[curPos++] & 0xFF);
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("Profile Point Hit " + id + ", threadId=" + id + ", timeStamp=" + timeStamp); // NOI18N
+                    }
 
                     fireProfilingPoint(threadId, id, timeStamp);
 
