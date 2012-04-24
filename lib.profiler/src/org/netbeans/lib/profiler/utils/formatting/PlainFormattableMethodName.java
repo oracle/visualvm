@@ -148,45 +148,49 @@ public class PlainFormattableMethodName implements Formattable {
                     returnType = sig.substring(idx1);
                     curPos = 0;
 
-                    while (returnType.charAt(curPos) == '[') { // NOI18N
-                        arrayIndicator.append("[]"); // NOI18N
-                        curPos++;
-                    }
-
-                    nextChar = returnType.charAt(curPos++);
-
-                    if (nextChar == BOOLEAN_CODE) {
-                        returnType = BOOLEAN_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == CHAR_CODE) {
-                        returnType = CHAR_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == BYTE_CODE) {
-                        returnType = BYTE_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == SHORT_CODE) {
-                        returnType = SHORT_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == INT_CODE) {
-                        returnType = INT_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == LONG_CODE) {
-                        returnType = LONG_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == FLOAT_CODE) {
-                        returnType = FLOAT_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == DOUBLE_CODE) {
-                        returnType = DOUBLE_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == VOID_CODE) {
-                        returnType = VOID_TEXT + arrayIndicator.toString();
-                    } else {
-                        // return type is a class
-                        // Check if the class belongs to the java.lang.* package, and replace it with simple name if so.
-                        // However, avoid doing so if it's from say java.lang.ref.* package - otherwise we'll get confusing
-                        // names like ref.Reference
-                        returnType = returnType.substring(curPos, returnType.length() - 1); //strip "L" at the beginning
-                                                                                            // and ";" at end
-
-                        if (returnType.startsWith("java/lang/") && (returnType.indexOf('/', 10) == -1)) { // NOI18N
-                            returnType = returnType.substring(10);
+                    try {
+                        while (returnType.charAt(curPos) == '[') { // NOI18N
+                            arrayIndicator.append("[]"); // NOI18N
+                            curPos++;
                         }
+                        
+                        nextChar = returnType.charAt(curPos++);
+                        
+                        if (nextChar == BOOLEAN_CODE) {
+                            returnType = BOOLEAN_TEXT + arrayIndicator.toString();
+                        } else if (nextChar == CHAR_CODE) {
+                            returnType = CHAR_TEXT + arrayIndicator.toString();
+                        } else if (nextChar == BYTE_CODE) {
+                            returnType = BYTE_TEXT + arrayIndicator.toString();
+                        } else if (nextChar == SHORT_CODE) {
+                            returnType = SHORT_TEXT + arrayIndicator.toString();
+                        } else if (nextChar == INT_CODE) {
+                            returnType = INT_TEXT + arrayIndicator.toString();
+                        } else if (nextChar == LONG_CODE) {
+                            returnType = LONG_TEXT + arrayIndicator.toString();
+                        } else if (nextChar == FLOAT_CODE) {
+                            returnType = FLOAT_TEXT + arrayIndicator.toString();
+                        } else if (nextChar == DOUBLE_CODE) {
+                            returnType = DOUBLE_TEXT + arrayIndicator.toString();
+                        } else if (nextChar == VOID_CODE) {
+                            returnType = VOID_TEXT + arrayIndicator.toString();
+                        } else {
+                            // return type is a class
+                            // Check if the class belongs to the java.lang.* package, and replace it with simple name if so.
+                            // However, avoid doing so if it's from say java.lang.ref.* package - otherwise we'll get confusing
+                            // names like ref.Reference
+                            returnType = returnType.substring(curPos, returnType.length() - 1); //strip "L" at the beginning
+                            // and ";" at end
 
-                        returnType = returnType.replace('$', '.'); // NOI18N
-                        returnType = returnType.replace('/', '.') + arrayIndicator.toString(); // NOI18N
+                            if (returnType.startsWith("java/lang/") && (returnType.indexOf('/', 10) == -1)) { // NOI18N
+                                returnType = returnType.substring(10);
+                            }
+                            
+                            returnType = returnType.replace('$', '.'); // NOI18N
+                            returnType = returnType.replace('/', '.') + arrayIndicator.toString(); // NOI18N
+                        }
+                    } catch (StringIndexOutOfBoundsException e) {
+                        LOGGER.log(Level.INFO, "Can not format return type \"{0}\"", sig.substring(idx1));
                     }
                 } else {
                     // constructor or no end parenthesis
@@ -202,59 +206,63 @@ public class PlainFormattableMethodName implements Formattable {
                     arrayIndicator.setLength(0);
                     curPos = 0;
 
-                    while (curPos < paramsString.length()) {
-                        while (paramsString.charAt(curPos) == '[') { // NOI18N
-                            arrayIndicator.append("[]"); // NOI18N
-                            curPos++;
-                        }
-
-                        nextChar = paramsString.charAt(curPos++);
-
-                        if (nextChar == BOOLEAN_CODE) {
-                            paramsBuf.append(BOOLEAN_TEXT);
-                        } else if (nextChar == CHAR_CODE) {
-                            paramsBuf.append(CHAR_TEXT);
-                        } else if (nextChar == BYTE_CODE) {
-                            paramsBuf.append(BYTE_TEXT);
-                        } else if (nextChar == SHORT_CODE) {
-                            paramsBuf.append(SHORT_TEXT);
-                        } else if (nextChar == INT_CODE) {
-                            paramsBuf.append(INT_TEXT);
-                        } else if (nextChar == LONG_CODE) {
-                            paramsBuf.append(LONG_TEXT);
-                        } else if (nextChar == FLOAT_CODE) {
-                            paramsBuf.append(FLOAT_TEXT);
-                        } else if (nextChar == DOUBLE_CODE) {
-                            paramsBuf.append(DOUBLE_TEXT);
-                        } else {
-                            // it's a class
-                            int startPos = curPos;
-
-                            while (paramsString.charAt(curPos) != ';') { // NOI18N
+                    try {
+                        while (curPos < paramsString.length()) {
+                            while (paramsString.charAt(curPos) == '[') { // NOI18N
+                                arrayIndicator.append("[]"); // NOI18N
                                 curPos++;
                             }
+                            
+                            nextChar = paramsString.charAt(curPos++);
+                            
+                            if (nextChar == BOOLEAN_CODE) {
+                                paramsBuf.append(BOOLEAN_TEXT);
+                            } else if (nextChar == CHAR_CODE) {
+                                paramsBuf.append(CHAR_TEXT);
+                            } else if (nextChar == BYTE_CODE) {
+                                paramsBuf.append(BYTE_TEXT);
+                            } else if (nextChar == SHORT_CODE) {
+                                paramsBuf.append(SHORT_TEXT);
+                            } else if (nextChar == INT_CODE) {
+                                paramsBuf.append(INT_TEXT);
+                            } else if (nextChar == LONG_CODE) {
+                                paramsBuf.append(LONG_TEXT);
+                            } else if (nextChar == FLOAT_CODE) {
+                                paramsBuf.append(FLOAT_TEXT);
+                            } else if (nextChar == DOUBLE_CODE) {
+                                paramsBuf.append(DOUBLE_TEXT);
+                            } else {
+                                // it's a class
+                                int startPos = curPos;
+                                
+                                while (paramsString.charAt(curPos) != ';') { // NOI18N
+                                    curPos++;
+                                }
+                                
+                                String typeName = paramsString.substring(startPos, curPos); //strip "L" at the beginning and ";" at end
 
-                            String typeName = paramsString.substring(startPos, curPos); //strip "L" at the beginning and ";" at end
-
-                            if (typeName.startsWith("java/lang/") && (typeName.indexOf('/', 10) == -1)) { // NOI18N
-                                typeName = typeName.substring(10);
+                                if (typeName.startsWith("java/lang/") && (typeName.indexOf('/', 10) == -1)) { // NOI18N
+                                    typeName = typeName.substring(10);
+                                }
+                                
+                                typeName = typeName.replace('$', '.'); // NOI18N
+                                typeName = typeName.replace('/', '.'); // NOI18N
+                                paramsBuf.append(typeName);
+                                curPos++;
                             }
-
-                            typeName = typeName.replace('$', '.'); // NOI18N
-                            typeName = typeName.replace('/', '.'); // NOI18N
-                            paramsBuf.append(typeName);
-                            curPos++;
+                            
+                            if (arrayIndicator.length() > 0) {
+                                paramsBuf.append(arrayIndicator.toString());
+                            }
+                            
+                            arrayIndicator.setLength(0);
+                            
+                            if (curPos < paramsString.length()) {
+                                paramsBuf.append(", "); // NOI18N
+                            }
                         }
-
-                        if (arrayIndicator.length() > 0) {
-                            paramsBuf.append(arrayIndicator.toString());
-                        }
-
-                        arrayIndicator.setLength(0);
-
-                        if (curPos < paramsString.length()) {
-                            paramsBuf.append(", "); // NOI18N
-                        }
+                    } catch (StringIndexOutOfBoundsException e) {
+                        LOGGER.log(Level.INFO, "Can not format param list \"{0}\"", paramsString);
                     }
 
                     params = paramsBuf.toString();
@@ -266,10 +274,10 @@ public class PlainFormattableMethodName implements Formattable {
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("Formattable method name for:"); // NOI18N
-            LOGGER.finest("Class: " + this.className); // NOI18N
-            LOGGER.finest("Method: " + this.methodName); // NOI18N
-            LOGGER.finest("Return type: " + this.returnType); // NOI18N
-            LOGGER.finest("Parameters: " + this.params); // NOI18N
+            LOGGER.log(Level.FINEST, "Class: {0}", this.className); // NOI18N
+            LOGGER.log(Level.FINEST, "Method: {0}", this.methodName); // NOI18N
+            LOGGER.log(Level.FINEST, "Return type: {0}", this.returnType); // NOI18N
+            LOGGER.log(Level.FINEST, "Parameters: {0}", this.params); // NOI18N
         }
     }
 
@@ -300,7 +308,7 @@ public class PlainFormattableMethodName implements Formattable {
      */
     public String getFormattedMethod() {
         if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer("Getting formatted method name for " + methodName); // NOI18N
+            LOGGER.log(Level.FINER, "Getting formatted method name for {0}", methodName); // NOI18N
         }
 
         if ((methodName == null) || (methodName.length() == 0)) {
@@ -330,7 +338,7 @@ public class PlainFormattableMethodName implements Formattable {
      */
     public String getFullFormattedMethod() {
         if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer("Getting full formatted method name for " + methodName); // NOI18N
+            LOGGER.log(Level.FINER, "Getting full formatted method name for {0}", methodName); // NOI18N
         }
 
         if ((methodName == null) || (methodName.length() == 0)) {
@@ -361,6 +369,7 @@ public class PlainFormattableMethodName implements Formattable {
         return returnType;
     }
 
+    @Override
     public String toFormatted() {
         switch (verbosity) {
             case DefaultMethodNameFormatter.VERBOSITY_CLASS:return getFormattedClass();
@@ -372,6 +381,7 @@ public class PlainFormattableMethodName implements Formattable {
         }
     }
 
+    @Override
     public String toString() {
         return getFullFormattedClassAndMethod();
     }

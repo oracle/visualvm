@@ -1,6 +1,6 @@
  profilerinterface
 
- Timestamp is 4f0aeaea (Mon Jan 09 14:26:02 2012)
+ Timestamp is 4f7b35c4 (Tue Apr 03 19:39:16 2012)
 
  Preferred load address is 0000000010000000
 
@@ -18,8 +18,8 @@
  0002:00000990 000000a0H .idata$4                DATA
  0002:00000a30 000000ecH .idata$6                DATA
  0002:00000b20 00000d6eH .edata                  DATA
- 0003:00000000 00001784H .data                   DATA
- 0003:00001790 000002e8H .bss                    DATA
+ 0003:00000000 000017a4H .data                   DATA
+ 0003:000017b0 000002e8H .bss                    DATA
  0004:00000000 00000564H .pdata                  DATA
  0005:00000000 00000058H .rsrc$01                DATA
  0005:00000060 00000390H .rsrc$02                DATA
@@ -134,13 +134,13 @@
  0002:00000954       __IMPORT_DESCRIPTOR_msvcrt 0000000010006954     MSVCRT:msvcrt.dll
  0002:00000968       __IMPORT_DESCRIPTOR_KERNEL32 0000000010006968     kernel32:KERNEL32.dll
  0002:0000097c       __NULL_IMPORT_DESCRIPTOR   000000001000697c     MSVCRT:msvcrt.dll
- 0003:00001780       _fltused                   0000000010009780     MSVCRT:dllsupp.obj
- 0003:00001a48       _jvmti                     0000000010009a48     <common>
- 0003:00001a50       _jvmti_callbacks           0000000010009a50     <common>
- 0003:00001a58       JVM_DumpHeap15             0000000010009a58     <common>
- 0003:00001a60       __onexitend                0000000010009a60     <common>
- 0003:00001a68       __onexitbegin              0000000010009a68     <common>
- 0003:00001a70       _pRawDllMain               0000000010009a70     <common>
+ 0003:000017a0       _fltused                   00000000100097a0     MSVCRT:dllsupp.obj
+ 0003:00001a68       _jvmti                     0000000010009a68     <common>
+ 0003:00001a70       _jvmti_callbacks           0000000010009a70     <common>
+ 0003:00001a78       JVM_DumpHeap15             0000000010009a78     <common>
+ 0003:00001a80       __onexitend                0000000010009a80     <common>
+ 0003:00001a88       __onexitbegin              0000000010009a88     <common>
+ 0003:00001a90       _pRawDllMain               0000000010009a90     <common>
 
  entry point at        0001:00004980
 

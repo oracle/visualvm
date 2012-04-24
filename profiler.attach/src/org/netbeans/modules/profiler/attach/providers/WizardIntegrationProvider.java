@@ -152,6 +152,11 @@ public interface WizardIntegrationProvider extends IntegrationProvider {
         public boolean supportsRemote() {
             return false;
         }
+
+        @Override
+        public String getProfilerBinariesLink(AttachSettings attachSettings) {
+            return null;
+        }        
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -168,5 +173,11 @@ public interface WizardIntegrationProvider extends IntegrationProvider {
 
     public boolean supportsJVM(TargetPlatformEnum jvm, AttachSettings attachSettings);
 
+    /**
+     * @param attachSettings The attach settings currently in use
+     * @return Returns an artifical link to profiler binaries created 
+     * to workaround space-in-path problem or NULL
+     */
+    public String getProfilerBinariesLink(AttachSettings attachSettings);
     // </editor-fold>
 }
