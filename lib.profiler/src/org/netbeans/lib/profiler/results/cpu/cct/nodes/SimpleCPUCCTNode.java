@@ -58,8 +58,8 @@ public class SimpleCPUCCTNode extends BaseCPUCCTNode {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of SimpleCPUCCTNode */
-    public SimpleCPUCCTNode(boolean root) {
-        super(null);
+    public SimpleCPUCCTNode(long batchId, boolean root) {
+        super(batchId, null);
         this.root = root;
     }
 

@@ -94,11 +94,16 @@ public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
 
     private final ArrayChildren children;
     private final WeakReference factoryRef;
+    final private long batchId;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    /** Creates a new instance of BaseCPUCCTNode */
-    public BaseCPUCCTNode(CPUCCTNodeFactory parentFactory) {
+    /** 
+     * Creates a new instance of BaseCPUCCTNode 
+     * @param batchId the batch number this node was created in
+     * @param parentFactory a {@linkplain CPUCCTNodeFactory} factory instance used to create this node or null
+     **/
+    public BaseCPUCCTNode(long batchId, CPUCCTNodeFactory parentFactory) {
         if (parentFactory != null) {
             this.factoryRef = new WeakReference(parentFactory);
         } else {
@@ -106,19 +111,24 @@ public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
         }
 
         this.children = new ArrayChildren();
+        this.batchId = batchId;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public RuntimeCCTNode[] getChildren() {
+    final public RuntimeCCTNode[] getChildren() {
         return children.toArray();
     }
 
-    public void attachNodeAsChild(RuntimeCPUCCTNode node) {
+    final public void attachNodeAsChild(RuntimeCPUCCTNode node) {
         children.attachNode(node);
     }
     
-    protected CPUCCTNodeFactory getFactory() {
+    final protected CPUCCTNodeFactory getFactory() {
         return (factoryRef != null) ? (CPUCCTNodeFactory) factoryRef.get() : null;
+    }
+    
+    final public long getBatchId() {
+        return batchId;
     }
 }
