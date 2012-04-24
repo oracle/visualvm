@@ -89,10 +89,16 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
                 if (!processorLives) return;
                 try {
                     fireBatchStart();
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("Frame start, size="+buffer.length); // NOI18N
+                    }
                     doProcessDataFrame(buffer);
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Error while processing data frame", e);
+                    LOGGER.log(Level.SEVERE, "Error while processing data frame", e); // NOI18N
                 } finally {
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("Frame stop"); // NOI18N
+                    }
                     fireBatchStop();
                 }
             }
