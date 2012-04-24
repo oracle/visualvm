@@ -170,8 +170,8 @@ public final class CategoryList extends JPanel {
     private static Icon centeredIcon(final Icon icon, final int width, final int height) {
         Icon centeredIcon = null;
 
-        if (icon instanceof SynthIcon) {
-            try {
+        try {
+            if (icon instanceof SynthIcon) {
                 centeredIcon = new SynthIcon() {
                     private final SynthIcon sicon = (SynthIcon)icon;
                     public void paintIcon(SynthContext sc, Graphics grphcs, int x, int y, int w, int h) {
@@ -188,8 +188,8 @@ public final class CategoryList extends JPanel {
                     public int getIconWidth(SynthContext sc)  { return width;  }
                     public int getIconHeight(SynthContext sc) { return height; }
                 };
-            } catch (Throwable t) {}
-        }
+            }
+        } catch (Throwable t) {}
 
         if (centeredIcon == null) {
             centeredIcon = new Icon() {
