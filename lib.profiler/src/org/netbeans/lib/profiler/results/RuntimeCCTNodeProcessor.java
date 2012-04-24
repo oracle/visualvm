@@ -41,6 +41,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.BaseCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
@@ -191,8 +192,12 @@ final public class RuntimeCCTNodeProcessor {
         @Override
         void process() {
             stack.add(new BackoutItem(instance, plugins));
+            long bId = ((BaseCPUCCTNode)instance).getBatchId();
+            
             for(RuntimeCCTNode n : instance.getChildren()) {
-                stack.add(new SimpleItem(stack, n, plugins));
+                if (((BaseCPUCCTNode)n).getBatchId() <= bId) {
+                    stack.add(new SimpleItem(stack, n, plugins));
+                }
             }
             for(Plugin p : plugins) {
                 if (p != null) {
