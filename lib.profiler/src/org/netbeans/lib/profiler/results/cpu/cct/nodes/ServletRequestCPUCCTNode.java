@@ -87,8 +87,8 @@ public class ServletRequestCPUCCTNode extends TimedCPUCCTNode {
     /**
      * Creates a new instance of ServletRequestCPUCCTNode
      */
-    public ServletRequestCPUCCTNode(CPUCCTNodeFactory factory, int requestType, String path, boolean collectingTwoTimestamps) {
-        super(factory, collectingTwoTimestamps);
+    public ServletRequestCPUCCTNode(long batchId, CPUCCTNodeFactory factory, int requestType, String path, boolean collectingTwoTimestamps) {
+        super(batchId, factory, collectingTwoTimestamps);
         this.servletPath = path;
         this.requestType = requestType;
         setFilteredStatus(FILTERED_YES); // boundary node is going to be filtered by default
@@ -133,6 +133,6 @@ public class ServletRequestCPUCCTNode extends TimedCPUCCTNode {
     protected TimedCPUCCTNode createSelfInstance() {
         CPUCCTNodeFactory factory = getFactory();
 
-        return (factory != null) ? factory.createServletRequestNode(requestType, servletPath) : null;
+        return (factory != null) ? factory.createServletRequestNode(getBatchId(), requestType, servletPath) : null;
     }
 }

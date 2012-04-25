@@ -185,8 +185,8 @@ public abstract class TimedCPUCCTNode extends BaseCPUCCTNode implements Cloneabl
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     //  volatile protected boolean twoStamps;
-    public TimedCPUCCTNode(CPUCCTNodeFactory factory, boolean collectingTwoTimestamps) {
-        super(factory);
+    public TimedCPUCCTNode(long batchId, CPUCCTNodeFactory factory, boolean collectingTwoTimestamps) {
+        super(batchId, factory);
 
         if (collectingTwoTimestamps) {
             timingData = new TimingDataExtended();

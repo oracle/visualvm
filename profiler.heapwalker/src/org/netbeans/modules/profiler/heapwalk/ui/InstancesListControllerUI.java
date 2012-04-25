@@ -722,12 +722,13 @@ public class InstancesListControllerUI extends JTitledPanel {
 
         instancesListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
-                    if (sorting || e.getValueIsAdjusting()) {
+                    int selectedRow = instancesListTable.getSelectedRow();
+                    
+                    if (sorting || e.getValueIsAdjusting() || selectedRow == -1) {
                         return;
                     }
-
+                    
                     Instance selectedInstance = null;
-                    int selectedRow = instancesListTable.getSelectedRow();
 
                     if (selectedRow != -1) {
                         HeapWalkerNode selectedNode = (HeapWalkerNode) instancesListTable.getTree().getPathForRow(selectedRow)
