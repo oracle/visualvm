@@ -68,19 +68,19 @@ public class CPUCCTNodeFactory {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public MarkedCPUCCTNode createCategory(Mark mark) {
-        return new MarkedCPUCCTNode(this, mark, twoStamps);
+    public MarkedCPUCCTNode createCategory(long batchId, Mark mark) {
+        return new MarkedCPUCCTNode(batchId, this, mark, twoStamps);
     }
 
-    public MethodCPUCCTNode createMethodNode(int methodId) {
-        return new MethodCPUCCTNode(this, methodId, twoStamps);
+    public MethodCPUCCTNode createMethodNode(long batchId, int methodId) {
+        return new MethodCPUCCTNode(batchId, this, methodId, twoStamps);
     }
 
-    public ServletRequestCPUCCTNode createServletRequestNode(int requestType, String path) {
-        return new ServletRequestCPUCCTNode(this, requestType, path, twoStamps);
+    public ServletRequestCPUCCTNode createServletRequestNode(long batchId, int requestType, String path) {
+        return new ServletRequestCPUCCTNode(batchId, this, requestType, path, twoStamps);
     }
 
-    public ThreadCPUCCTNode createThreadNode(int threadId) {
-        return new ThreadCPUCCTNode(this, threadId, twoStamps);
+    public ThreadCPUCCTNode createThreadNode(long batchId, int threadId) {
+        return new ThreadCPUCCTNode(batchId, this, threadId, twoStamps);
     }
 }
