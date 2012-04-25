@@ -100,18 +100,18 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
     public void onBatchStop() {
         doBatchStop();
 
+        if (batchNotEmpty) {
+            fireCCTEstablished(false);
+        } else {
+            fireCCTEstablished(true);
+        }
+
         if (!afterBatchCommands.isEmpty()) {
             for (Iterator iter = afterBatchCommands.iterator(); iter.hasNext();) {
                 ((Runnable) iter.next()).run();
             }
 
             afterBatchCommands.clear();
-        }
-
-        if (batchNotEmpty) {
-            fireCCTEstablished(false);
-        } else {
-            fireCCTEstablished(true);
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
