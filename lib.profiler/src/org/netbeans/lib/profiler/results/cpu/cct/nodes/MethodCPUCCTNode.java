@@ -80,8 +80,8 @@ public class MethodCPUCCTNode extends TimedCPUCCTNode {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of MethodCPUCCTNode */
-    public MethodCPUCCTNode(long batchId, CPUCCTNodeFactory factory, int methodId, boolean twoStamps) {
-        super(batchId, factory, twoStamps);
+    public MethodCPUCCTNode(CPUCCTNodeFactory factory, int methodId, boolean twoStamps) {
+        super(factory, twoStamps);
         this.methodId = methodId;
     }
 
@@ -98,6 +98,6 @@ public class MethodCPUCCTNode extends TimedCPUCCTNode {
     protected TimedCPUCCTNode createSelfInstance() {
         CPUCCTNodeFactory factory = getFactory();
 
-        return (factory != null) ? factory.createMethodNode(getBatchId(), getMethodId()) : null;
+        return (factory != null) ? factory.createMethodNode(getMethodId()) : null;
     }
 }
