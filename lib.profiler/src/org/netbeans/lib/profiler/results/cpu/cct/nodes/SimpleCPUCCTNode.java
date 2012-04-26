@@ -54,18 +54,30 @@ public class SimpleCPUCCTNode extends BaseCPUCCTNode {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final boolean root;
-
+    private final int maxMethodId;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of SimpleCPUCCTNode */
-    public SimpleCPUCCTNode(long batchId, boolean root) {
-        super(batchId, null);
+    public SimpleCPUCCTNode(boolean root) {
+        super(null);
         this.root = root;
+        this.maxMethodId = Integer.MAX_VALUE;
+    }
+    
+    public SimpleCPUCCTNode(int maxMethodId) {
+        super(null);
+        this.root = false;
+        this.maxMethodId = maxMethodId;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public boolean isRoot() {
         return root;
+    }
+    
+    public int getMaxMethodId() {
+        return maxMethodId;
     }
 }
