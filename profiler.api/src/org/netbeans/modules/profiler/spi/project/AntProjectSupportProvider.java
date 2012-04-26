@@ -49,17 +49,6 @@ import org.openide.filesystems.FileObject;
  * @author Jiri Sedlacek
  */
 public abstract class AntProjectSupportProvider {
-    
-    /**
-     * Returns Ant target to use for profiling.
-     * 
-     * @param buildScript build script
-     * @param type profiling type
-     * @param profiledClassFile profiled file or null for profiling entire project
-     * @return Ant target to use for profiling
-     */
-    public abstract String getProfilerTargetName(FileObject buildScript, int type, FileObject profiledClassFile);
-    
     /**
      * Returns build script of a project.
      * 
@@ -77,11 +66,6 @@ public abstract class AntProjectSupportProvider {
     
     
     public static class Basic extends AntProjectSupportProvider {
-
-        @Override
-        public String getProfilerTargetName(FileObject buildScript, int type, FileObject profiledClassFile) {
-            return null;
-        }
         
         @Override
         public FileObject getProjectBuildScript() {

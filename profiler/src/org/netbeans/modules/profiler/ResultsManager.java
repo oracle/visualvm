@@ -869,6 +869,9 @@ public final class ResultsManager {
     }
 
     protected void fireResultsAvailable() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.log(Level.FINEST, "fireResultsAvailable", new Exception());
+        }
         if (resultsListeners.allClasses().isEmpty()) {
             return;
         }
@@ -883,6 +886,9 @@ public final class ResultsManager {
     }
 
     protected void fireResultsReset() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.log(Level.FINEST, "fireResultsReset", new Exception());
+        }
         if (resultsListeners.allClasses().isEmpty()) {
             return;
         }
