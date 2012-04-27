@@ -49,6 +49,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 
 
 /**
@@ -60,6 +63,9 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "ShowThreadsViewAction_ActionName=&Threads",
     "ShowThreadsViewAction_ActionDescr=Show Threads View"
 })
+@ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ShowThreadsViewAction")
+@ActionRegistration(displayName="#ShowThreadsViewAction_ActionName", iconBase="org/netbeans/modules/profiler/impl/icons/threadsWindow.png")
+@ActionReference(path="Menu/Window/Profile", position=500)
 public final class ShowThreadsViewAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

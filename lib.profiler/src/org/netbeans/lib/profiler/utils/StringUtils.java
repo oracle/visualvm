@@ -43,6 +43,9 @@
 
 package org.netbeans.lib.profiler.utils;
 
+import java.text.DateFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -64,36 +67,26 @@ public class StringUtils {
     private static final String THIS_WEEK_FORMAT;
     private static final String LAST_WEEK_FORMAT;
     private static final String YESTERDAY_FORMAT;
-    private static final String TODAY_FORMAT;
-    private static final String OTHER_DAY_FORMAT;
-    private static final String FULL_FORMAT;
+    private static NumberFormat percentage;
+    private static NumberFormat intFormat = NumberFormat.getIntegerInstance();
+    private static char SEPARATOR = DecimalFormatSymbols.getInstance().getDecimalSeparator();
     
     static {
         ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.utils.Bundle"); // NOI18N
         THIS_WEEK_FORMAT = messages.getString("StringUtils_ThisWeekFormat"); // NOI18N
         LAST_WEEK_FORMAT = messages.getString("StringUtils_LastWeekFormat"); // NOI18N
         YESTERDAY_FORMAT = messages.getString("StringUtils_YesterdayFormat"); // NOI18N
-        TODAY_FORMAT = messages.getString("StringUtils_TodayFormat"); // NOI18N
-        OTHER_DAY_FORMAT = messages.getString("StringUtils_OtherDayFormat"); // NOI18N
-        FULL_FORMAT = messages.getString("StringUtils_FullFormat"); // NOI18N
+        percentage = NumberFormat.getNumberInstance();
+        percentage.setMaximumFractionDigits(1);
+        percentage.setMinimumFractionDigits(1);
     }
                                                                                             // -----
     private static SimpleDateFormat thisWeekFormat = new SimpleDateFormat(THIS_WEEK_FORMAT);
     private static SimpleDateFormat lastWeekFormat = new SimpleDateFormat(LAST_WEEK_FORMAT);
     private static SimpleDateFormat yesterdayFormat = new SimpleDateFormat(YESTERDAY_FORMAT);
-    private static SimpleDateFormat todayFormat = new SimpleDateFormat(TODAY_FORMAT);
-    private static SimpleDateFormat otherFormat = new SimpleDateFormat(OTHER_DAY_FORMAT);
-    private static SimpleDateFormat fullFormat = new SimpleDateFormat(FULL_FORMAT);
-
-    // ------------------------------------------------------------------------------------------------
-    //    Varioius pretty-formating methods
-    // ------------------------------------------------------------------------------------------------  
-    static StringBuffer tmpBuf = new StringBuffer();
-
-    // ------------------------------------------------------------------------------------------------
-    //    Various string conversion methods
-    // ------------------------------------------------------------------------------------------------  
-    private static char[] strBuf;
+    private static DateFormat todayFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+    private static DateFormat otherFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+    private static DateFormat fullFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.MEDIUM);
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -142,21 +135,7 @@ public class StringUtils {
 
     /** Used to print per cent figures with one digit after decimal point */
     public static String floatPerCentToString(float t) {
-        tmpBuf.setLength(0);
-
-        double floor = Math.floor(t);
-        double diff = t - floor;
-
-        if (diff >= 0.95) {
-            floor = Math.round(t);
-            diff = 0.0;
-        }
-
-        tmpBuf.append((int) floor);
-        tmpBuf.append('.'); // NOI18N
-        tmpBuf.append((int) Math.round(diff * 10));
-
-        return tmpBuf.toString();
+        return percentage.format(t);
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -210,14 +189,14 @@ public class StringUtils {
 
     /** Represent time (given in microsecond) in milliseconds, with roughly the same number of meaningful digits */
     public static String mcsTimeToString(long t) {
-        tmpBuf.setLength(0);
+        StringBuilder tmpBuf = new StringBuilder();
 
         if (t >= 100000) {
-            return Long.toString(t / 1000);
+            return intFormat.format(t / 1000);
         } else if (t >= 10000) {
             long x = t / 1000;
-            tmpBuf.append(Long.toString(x));
-            tmpBuf.append('.');
+            tmpBuf.append(intFormat.format(x));
+            tmpBuf.append(SEPARATOR);
             tmpBuf.append(Long.toString((t - (x * 1000)) / 100));
 
             return tmpBuf.toString();
@@ -225,8 +204,8 @@ public class StringUtils {
             //return Long.toString(x) + "." + Long.toString((t - x*1000) / 100);
         } else if (t >= 1000) {
             long x = t / 1000;
-            tmpBuf.append(Long.toString(x));
-            tmpBuf.append('.');
+            tmpBuf.append(intFormat.format(x));
+            tmpBuf.append(SEPARATOR);
             tmpBuf.append(Long.toString((t - (x * 1000)) / 10));
 
             return tmpBuf.toString();
@@ -234,11 +213,16 @@ public class StringUtils {
             //return Long.toString(x) + "." + Long.toString((t - x*1000) / 10);
         } else {
             if (t >= 100) {
-                tmpBuf.append("0."); // NOI18N
+                tmpBuf.append("0"); // NOI18N
+                tmpBuf.append(SEPARATOR);
             } else if (t >= 10) {
-                tmpBuf.append("0.0"); // NOI18N
+                tmpBuf.append("0"); // NOI18N
+                tmpBuf.append(SEPARATOR);
+                tmpBuf.append("0"); // NOI18N
             } else {
-                tmpBuf.append("0.00"); // NOI18N
+                tmpBuf.append("0"); // NOI18N
+                tmpBuf.append(SEPARATOR);
+                tmpBuf.append("00"); // NOI18N
             }
 
             return (tmpBuf.append(Long.toString(t))).toString();
@@ -247,16 +231,16 @@ public class StringUtils {
 
     /** Represents the given number of bytes as is, or as "xxx K" (if >= 100 KBytes), or as "xxx M" (if >= 100 MBytes) */
     public static String nBytesToString(long b) {
-        tmpBuf.setLength(0);
+        StringBuilder tmpBuf = new StringBuilder();
 
         if (b < (100 * 1024)) {
-            return Long.toString(b) + " B"; // NOI18N
+            return intFormat.format(b) + " B"; // NOI18N
         } else if (b < (100 * 1024 * 1024)) {
             long k = b >> 10;
-            tmpBuf.append(Long.toString(k));
+            tmpBuf.append(intFormat.format(k));
 
             if (b < (100 * 1024 * 1024)) {
-                tmpBuf.append('.'); // NOI18N
+                tmpBuf.append(SEPARATOR); // NOI18N
                 tmpBuf.append(Long.toString((b - (k << 10)) / 102)); // 102 stands for 1/10th of 1K
             }
 
@@ -265,10 +249,10 @@ public class StringUtils {
             return tmpBuf.toString();
         } else {
             long m = b >> 20;
-            tmpBuf.append(Long.toString(m));
+            tmpBuf.append(intFormat.format(m));
 
             if (b < 10737418240L) {
-                tmpBuf.append('.'); // NOI18N
+                tmpBuf.append(SEPARATOR);
                 tmpBuf.append(Long.toString((b - (m << 20)) / 104858)); // 104858 stands for 1/10th of 1M
             }
 
@@ -354,7 +338,7 @@ public class StringUtils {
             }
 
             int nDims = lastBrackPos + 1;
-            tmpBuf.setLength(0);
+            StringBuilder tmpBuf = new StringBuilder();
             tmpBuf.append(elemType);
 
             for (int i = 0; i < nDims; i++) {
@@ -368,10 +352,7 @@ public class StringUtils {
     }
 
     public static String utf8ToString(byte[] src, int stPos, int utf8Len) {
-        if ((strBuf == null) || (strBuf.length < utf8Len)) {
-            strBuf = new char[utf8Len];
-        }
-
+        char[] strBuf = new char[utf8Len];
         int i = stPos;
         int j = 0;
         int limit = stPos + utf8Len;

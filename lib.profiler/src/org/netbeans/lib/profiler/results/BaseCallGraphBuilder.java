@@ -50,7 +50,6 @@ import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -101,18 +100,18 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
     public void onBatchStop() {
         doBatchStop();
 
+        if (batchNotEmpty) {
+            fireCCTEstablished(false);
+        } else {
+            fireCCTEstablished(true);
+        }
+
         if (!afterBatchCommands.isEmpty()) {
             for (Iterator iter = afterBatchCommands.iterator(); iter.hasNext();) {
                 ((Runnable) iter.next()).run();
             }
 
             afterBatchCommands.clear();
-        }
-
-        if (batchNotEmpty) {
-            fireCCTEstablished(false);
-        } else {
-            fireCCTEstablished(true);
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {

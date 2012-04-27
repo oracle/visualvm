@@ -70,7 +70,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.openide.DialogDisplayer;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.windows.WindowManager;
 
@@ -83,11 +88,9 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsAction_OpenChooserFilter=Profiler Snapshot File (*.{0})",
     "CompareSnapshotsAction_NoComparableSnapshotsFoundMsg=<No comparable snapshots found>",
     "CompareSnapshotsAction_ComparingSameSnapshotsMsg=The snapshot cannot be compared to itself.",
-    "CompareSnapshotsAction_DifferentSnapshotTypeMsg=Snapshots must be of same type.",
     "CompareSnapshotsAction_DifferentSnapshotsTypeMsg=Snapshots must be of same type.",
     "CompareSnapshotsAction_OnlyMemorySnapshotsMsg=Only memory snapshots can be compared!",
-    "CompareSnapshotsAction_DifferentObjectsCountMsg=Track every N object allocations value doesn't match!",
-    "CompareSnapshotsAction_DifferentObjectsCountsMsg=Track every N object allocations values don't match!",
+    "CompareSnapshotsAction_DifferentObjectsCountsMsg=\"Track every N object allocations\" values don't match!",
     "CompareSnapshotsAction_InvalidFileMsg=Invalid snapshot file",
     "CompareSnapshotsAction_InvalidFilesMsg=Invalid snapshot file(s)",
     "CompareSnapshotsAction_EnterFileMsg=Enter snapshot file",
@@ -106,10 +109,17 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsAction_SnapshotAccessDescr=Selected snapshot file",
     "CompareSnapshotsAction_SnapshotsListAccessDescr=List of comparable snapshots in current project"
 })
+@ActionID(id = "org.netbeans.modules.profiler.actions.CompareSnapshotsAction", category = "Profile")
+@ActionRegistration(iconInMenu = true, displayName = "#CompareSnapshotsAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/compareSnapshots.png")
+@ActionReference(path = "Menu/Profile", position = 1600, separatorAfter=1700)
 public class CompareSnapshotsAction extends AbstractAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private static class SelectExternalSnapshotsPanel extends JPanel {
+    private static class SelectExternalSnapshotsPanel extends JPanel implements HelpCtx.Provider {
+        //~ Static fields/initializers -------------------------------------------------------------------------------------------
+        private static final String HELP_CTX_KEY = "SelectExternalSnapshotsPanel.HelpCtx";
+        private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+            
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private JButton okButton;
@@ -129,6 +139,11 @@ public class CompareSnapshotsAction extends AbstractAction {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
+        public HelpCtx getHelpCtx() {
+            return HELP_CTX;
+        }        
+        
         public JButton getOKButton() {
             return okButton;
         }
@@ -292,8 +307,8 @@ public class CompareSnapshotsAction extends AbstractAction {
 
             if ((s1f.length() > 0) && (s2f.length() > 0)) {
                 // filenames not empty string
-                File s1 = new File(s1f);
-                File s2 = new File(s2f);
+                final File s1 = new File(s1f);
+                final File s2 = new File(s2f);
 
                 if (s1.exists() && s1.isFile() && s2.exists() && s2.isFile()) {
                     // files exist
@@ -303,35 +318,45 @@ public class CompareSnapshotsAction extends AbstractAction {
                         okButton.setEnabled(false);
                     } else {
                         // comparing different snapshots
-                        FileObject s1fo = FileUtil.toFileObject(s1);
-                        FileObject s2fo = FileUtil.toFileObject(s2);
-                        int s1t = ResultsManager.getDefault().getSnapshotType(s1fo);
-                        int s2t = ResultsManager.getDefault().getSnapshotType(s2fo);
+                        new NBSwingWorker(true) {
+                            private String hintStr;
+                            private boolean enabledOk;
+                            
+                            @Override
+                            protected void doInBackground() {
+                                FileObject s1fo = FileUtil.toFileObject(s1);
+                                FileObject s2fo = FileUtil.toFileObject(s2);
+                                int s1t = ResultsManager.getDefault().getSnapshotType(s1fo);
+                                int s2t = ResultsManager.getDefault().getSnapshotType(s2fo);
 
-                        if (s1t != s2t) {
-                            // snapshot types don't match
-                            hintLabel.setText(Bundle.CompareSnapshotsAction_DifferentSnapshotsTypeMsg());
-                            okButton.setEnabled(false);
-                        } else if ((s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
+                                if (s1t != s2t) {
+                                    // snapshot types don't match
+                                    hintStr = Bundle.CompareSnapshotsAction_DifferentSnapshotsTypeMsg();
+                                    enabledOk = false;
+                                } else if ((s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
                                        && (s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
-                            // TODO: remove after Compare CPU snapshots is implemented
-                            // not a memory snapshot
-                            hintLabel.setText(Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg());
-                            okButton.setEnabled(false);
-
-                            return;
-                        } else if (ResultsManager.getDefault().getSnapshotSettings(s1fo).getAllocTrackEvery() != ResultsManager.getDefault()
+                                    // not a memory snapshot
+                                    hintStr = Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg();
+                                    enabledOk = false;
+                                } else if (ResultsManager.getDefault().getSnapshotSettings(s1fo).getAllocTrackEvery() != ResultsManager.getDefault()
                                                                                                                                    .getSnapshotSettings(s2fo)
                                                                                                                                    .getAllocTrackEvery()) {
-                            // memory snapshots have different track every N objects
-                            hintLabel.setText(Bundle.CompareSnapshotsAction_DifferentObjectsCountsMsg());
-                            okButton.setEnabled(false);
-                        } else {
-                            // comparable snapshots (from the hint point of view!)
-                            hintLabel.setText(" "); // NOI18N
-                        }
+                                    // memory snapshots have different track every N objects
+                                    hintStr = Bundle.CompareSnapshotsAction_DifferentObjectsCountsMsg();
+                                    enabledOk = false;
+                                } else {
+                                    // comparable snapshots (from the hint point of view!)
+                                    hintStr = " "; // NOI18N
+                                    enabledOk = areComparableSnapshots(s1fo, s2fo);
+                                }
+                            }
 
-                        okButton.setEnabled(areComparableSnapshots(s1fo, s2fo));
+                            @Override
+                            protected void done() {
+                                hintLabel.setText(hintStr);
+                                okButton.setEnabled(enabledOk);
+                            }
+                        }.execute();
                     }
                 } else {
                     // files don't exist
@@ -778,7 +803,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
                             if (snapshot.getType() != ResultsManager.getDefault().getSnapshotType(snapshot2f)) {
                                 // snapshot types doesn't match
-                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentSnapshotTypeMsg());
+                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentSnapshotsTypeMsg());
                             } else if ((snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
                                            && (snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
                                 // TODO: remove after Compare CPU snapshots is implemented
@@ -791,7 +816,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                                                                         .getSnapshotSettings(snapshot2f)
                                                                                                         .getAllocTrackEvery()) {
                                 // memory snapshots have different track every N objects
-                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentObjectsCountMsg());
+                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentObjectsCountsMsg());
                             } else {
                                 // comparable snapshots (from the hint point of view!)
                                 externalFileHintLabel.setText(" "); // NOI18N
@@ -843,10 +868,6 @@ public class CompareSnapshotsAction extends AbstractAction {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isEnabled() {
-        return NetBeansProfiler.isInitialized();
-    }
 
     public void actionPerformed(ActionEvent e) {
         if (snapshot != null) {

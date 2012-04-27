@@ -54,7 +54,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.openide.DialogDisplayer;
+import org.openide.util.HelpCtx;
 
 
 /**
@@ -68,9 +71,11 @@ import org.openide.DialogDisplayer;
     "FindDialog_FindButtonName=Find",
     "FindDialog_FindWhatFieldAccessDescr=First item starting with this string will be found in results."
 })
-public class FindDialog extends JPanel {
+public class FindDialog extends JPanel implements HelpCtx.Provider{
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    private static final String HELP_CTX_KEY = "ProfilerUiFindDialog.HelpCtx"; // NOI18N
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static FindDialog defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -88,6 +93,12 @@ public class FindDialog extends JPanel {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    @Override
+    public HelpCtx getHelpCtx()
+    {
+        return HELP_CTX;
+    }
+    
     public static String getFindString() {
         final FindDialog findDialog = getDefault();
         findDialog.findWhatField.selectAll();
@@ -146,9 +157,18 @@ public class FindDialog extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(findWhatField, gridBagConstraints);
+        findWhatField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { updateFindButton(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { updateFindButton(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { updateFindButton(); }
+        });
 
         // findButton
         findButton.setText(Bundle.FindDialog_FindButtonName());
+        updateFindButton();
 
         // panel filling bottom space
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -158,5 +178,9 @@ public class FindDialog extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(new JPanel(), gridBagConstraints);
+    }
+    
+    private void updateFindButton() {
+        findButton.setEnabled(!findWhatField.getText().trim().isEmpty());
     }
 }

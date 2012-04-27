@@ -657,7 +657,12 @@ public class ProfilerServer extends Thread implements CommonConstants {
         }
     }
 
+    /**
+     * reset data, including the data in event buffer
+     */
     public static void requestClientResetResults() {
+        // make sure resultsNotified flag is set to false
+        profilerServer.resetResultsNotifiedFlag();
         ProfilerInterface.resetProfilerCollectors();
         ProfilerCalibrator.resetInternalStatsCollectors();
     }
@@ -1504,11 +1509,6 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
                 break;
             case Command.RESET_PROFILER_COLLECTORS:
-
-                synchronized (resultsNotifiedLock) {
-                    resultsNotified = false;
-                }
-
                 // Since the resetProfilerCollectors() eventually invokes the dump results method, which in turn sends a command to the client
                 // and awaits response, we have to execute it in a separate thread. See comments in DUMP_EXISTING_RESULTS above.
                 executeInSeparateThread(cmd.getType());
@@ -1743,6 +1743,12 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 execInSeparateThreadLock.notify();
             } catch (IllegalMonitorStateException ex) {
             }
+        }
+    }
+    
+    private void resetResultsNotifiedFlag() {
+        synchronized (resultsNotifiedLock) {
+            resultsNotified = false;
         }
     }
 }

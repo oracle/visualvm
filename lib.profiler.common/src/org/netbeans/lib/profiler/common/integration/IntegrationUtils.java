@@ -51,6 +51,8 @@ import java.io.*;
 import java.nio.channels.FileChannel;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -111,6 +113,8 @@ public class IntegrationUtils {
 
     // -----
     public static final String FILE_BACKUP_EXTENSION = ".backup"; //NOI18N
+    private static final String BINARIES_TMP_PREFIX = "NBProfiler";
+    private static final String BINARIES_TMP_EXT = ".link";
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -431,6 +435,10 @@ public class IntegrationUtils {
 
     // Returns extra command line arguments required when attaching on startup
     public static String getProfilerAgentCommandLineArgs(String targetPlatform, String targetJVM, boolean isRemote, int portNumber) {
+        return getProfilerAgentCommandLineArgs(targetPlatform, targetJVM, isRemote, portNumber, true);
+    }
+    
+    public static String getProfilerAgentCommandLineArgs(String targetPlatform, String targetJVM, boolean isRemote, int portNumber, boolean createTemp) {
         if ((getNativeLibrariesPath(targetPlatform, targetJVM, isRemote).indexOf(' ') == -1)) {
             return getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber); //NOI18N
         }
@@ -439,7 +447,7 @@ public class IntegrationUtils {
             // create temporary link in /tmp directory and use it instead of directory with space
             String libsDirPath = getLibsDir(targetPlatform, isRemote);
             String args = getProfilerAgentCommandLineArgsWithoutQuotes(targetPlatform, targetJVM, isRemote, portNumber);
-            return fixLibsDirPath(libsDirPath, args);
+            return fixLibsDirPath(libsDirPath, args, createTemp);
         }
 
         return "-agentpath:" + "\"" + getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)
@@ -448,15 +456,23 @@ public class IntegrationUtils {
     }
 
     public static String fixLibsDirPath(final String libsDirPath, final String args) {
-        try {  
-            File tmpFile = File.createTempFile("NBProfiler",".link");   // NOI18N
-            String tmpPath = tmpFile.getAbsolutePath();
-            tmpFile.delete();
-            Runtime.getRuntime().exec(new String[]{"/bin/ln","-s",libsDirPath,tmpPath});    // NOI18N
-            new File(tmpPath).deleteOnExit();
-            return args.replace(libsDirPath,tmpPath);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+        return fixLibsDirPath(libsDirPath, args, true);
+    }
+    
+    public static String fixLibsDirPath(final String libsDirPath, final String args, boolean createTmp) {
+        if (createTmp) {
+            try {
+                File tmpFile = File.createTempFile(BINARIES_TMP_PREFIX, BINARIES_TMP_EXT);
+                String tmpPath = tmpFile.getAbsolutePath();
+                tmpFile.delete();
+                Runtime.getRuntime().exec(new String[]{"/bin/ln","-s",libsDirPath,tmpPath});    // NOI18N
+                new File(tmpPath).deleteOnExit();
+                return args.replace(libsDirPath,tmpPath);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        } else {
+            return args.replaceAll("agentpath:(.*?)=(.*?),(.*)", "agentpath:\"$1\"=\"$2\",$3");
         }
     }
 
@@ -472,6 +488,23 @@ public class IntegrationUtils {
         args.append("-agentpath:").append(getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)). // NOI18N
                append(getDirectorySeparator(targetPlatform)).append(getProfilerAgentLibraryFile(targetPlatform)).append("="). //NOI18N
                append(getLibsDir(targetPlatform, isRemote)).append(",").append(portNumber); //NOI18N
+        return args.toString();
+    }
+    
+    public static String getProfilerAgentCommandLineArgsWithoutQuotes(String targetPlatform, String targetJVM, boolean isRemote,
+                                                                      int portNumber, String pathSpaceChar) {
+        StringBuilder args = new StringBuilder();
+        
+        if ((targetJVM.equals(PLATFORM_JAVA_60) || targetJVM.equals(PLATFORM_JAVA_70) || targetJVM.equals(PLATFORM_JAVA_80)) && 
+            (targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS))) {
+            args.append(" -XX:+UseLinuxPosixThreadCPUClocks "); // NOI18N
+        }
+        String natLibs = getNativeLibrariesPath(targetPlatform, targetJVM, isRemote).replace(" ", pathSpaceChar != null ? pathSpaceChar : " ");
+        String libsDir = getLibsDir(targetPlatform, isRemote).replace(" ", pathSpaceChar != null ? pathSpaceChar : " ");
+        String agentFile = getProfilerAgentLibraryFile(targetPlatform).replace(" ", pathSpaceChar != null ? pathSpaceChar : " ");
+        args.append("-agentpath:").append(natLibs). // NOI18N
+               append(getDirectorySeparator(targetPlatform)).append(agentFile).append("="). //NOI18N
+               append(libsDir).append(",").append(portNumber); //NOI18N
         return args.toString();
     }
 
@@ -677,5 +710,16 @@ public class IntegrationUtils {
         }
 
         return true;
+    }
+    
+    public static String getTemporaryBinariesLink(String agentCmds) {
+        Pattern p = Pattern.compile("(/.*?" + BINARIES_TMP_PREFIX + ".*?" + BINARIES_TMP_EXT + ")");
+        Matcher m = p.matcher(agentCmds);
+        
+        if (m.find()) {
+            return m.group(1);
+        }
+        
+        return null;
     }
 }

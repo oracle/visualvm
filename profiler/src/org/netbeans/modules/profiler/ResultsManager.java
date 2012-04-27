@@ -55,15 +55,19 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 import org.openide.windows.WindowManager;
 import java.awt.*;
 import java.io.*;
@@ -71,9 +75,13 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.cookies.OpenCookie;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
@@ -115,7 +123,9 @@ import org.openide.util.Lookup;
     "ResultsManager_CannotOpenSnapshotMsg=<html><b>Cannot open profiler snapshot.</b><br><br>Attempting to open null snapshot.<br>Check the logfile for details.</html>",
     "ResultsManager_CpuSnapshotDisplayName=cpu: {0}",
     "ResultsManager_MemorySnapshotDisplayName=mem: {0}",
-    "ResultsManager_HeapSnapshotDisplayName=heap: {0}"
+    "ResultsManager_HeapSnapshotDisplayName=heap: {0}",
+    "MSG_SavingSnapshots=Saving Snapshots",
+    "MSG_SavingSnapshot=Saving Snapshot"
 })
 public final class ResultsManager {
     final private static Logger LOGGER = Logger.getLogger(ResultsManager.class.getName());
@@ -191,6 +201,18 @@ public final class ResultsManager {
 
     public String getDefaultSnapshotFileName(LoadedSnapshot ls) {
         return "snapshot-" + ls.getSnapshot().getTimeTaken(); // NOI18N
+    }
+    
+    public String getSnapshotDisplayName(LoadedSnapshot ls) {
+        String name = ls.getFile() == null ? null : ls.getFile().getName();
+        if (name == null) {
+            name = getDefaultSnapshotFileName(ls);
+        } else {
+            int dotIndex = name.lastIndexOf('.'); // NOI18N
+            if (dotIndex > 0 && dotIndex <= name.length() - 2)
+                name = name.substring(0, dotIndex);
+        }
+        return getSnapshotDisplayName(name, ls.getType());
     }
         
     public String getSnapshotDisplayName(String fileName, int snapshotType) {
@@ -277,15 +299,19 @@ public final class ResultsManager {
         return type.intValue();
     }
 
-    public void cctEstablished(RuntimeCCTNode runtimeCCTNode) {
-        if (NetBeansProfiler.getDefaultNB().getProfilingState() == Profiler.PROFILING_INACTIVE) return; // Calibration, ignore
-        resultsAvailable = true;
-        fireResultsAvailable();
-    }
+    @ServiceProviders({@ServiceProvider(service=CPUCCTProvider.Listener.class), @ServiceProvider(service=MemoryCCTProvider.Listener.class)})
+    public static final class ResultsMonitor implements CPUCCTProvider.Listener, MemoryCCTProvider.Listener {
+        //~ Methods --------------------------------------------------------------------------------------------------------------
 
-    public void cctReset() {
-        resultsAvailable = false;
-        fireResultsReset();
+        public void cctEstablished(RuntimeCCTNode runtimeCCTNode, boolean empty) {
+            if (!empty) {
+                getDefault().resultsBecameAvailable();
+            }
+        }
+
+        public void cctReset() {
+            getDefault().resultsReset();
+        }
     }
 
     public void closeSnapshot(LoadedSnapshot ls) {
@@ -369,12 +395,16 @@ public final class ResultsManager {
         assert (selectedSnapshots != null);
         assert (selectedSnapshots.length > 0);
 
+        final String[] fileName = new String[1], fileExt = new String[1];
+        final FileObject[] dir = new FileObject[1];
         if (selectedSnapshots.length == 1) {
             SelectedFile sf = selectSnapshotTargetFile(selectedSnapshots[0].getName(),
-                                                       selectedSnapshots[0].getExt().equals(HEAPDUMP_EXTENSION));
+                                selectedSnapshots[0].getExt().equals(HEAPDUMP_EXTENSION));
 
             if ((sf != null) && checkFileExists(sf)) {
-                exportSnapshot(selectedSnapshots[0], sf.folder, sf.fileName, sf.fileExt);
+                fileName[0] = sf.fileName;
+                fileExt[0] = sf.fileExt;
+                dir[0] = sf.folder;
             }
         } else {
             JFileChooser chooser = new JFileChooser();
@@ -403,12 +433,24 @@ public final class ResultsManager {
 
                 exportDir = file;
 
-                FileObject dir = FileUtil.toFileObject(FileUtil.normalizeFile(file));
-
-                for (int i = 0; i < selectedSnapshots.length; i++) {
-                    exportSnapshot(selectedSnapshots[i], dir, selectedSnapshots[i].getName(), selectedSnapshots[i].getExt());
-                }
+                dir[0] = FileUtil.toFileObject(FileUtil.normalizeFile(file));
             }
+            
+            final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshots());
+            ph.setInitialDelay(500);
+            ph.start();
+            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        for (int i = 0; i < selectedSnapshots.length; i++) {
+                            exportSnapshot(selectedSnapshots[i], dir[0], fileName[0] != null ? fileName[0] : selectedSnapshots[i].getName(), fileExt[0] != null ? fileExt[0] : selectedSnapshots[i].getExt());
+                        }
+                    } finally {
+                        ph.finish();
+                    }
+                }
+            });
         }
     }
 
@@ -827,6 +869,9 @@ public final class ResultsManager {
     }
 
     protected void fireResultsAvailable() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.log(Level.FINEST, "fireResultsAvailable", new Exception());
+        }
         if (resultsListeners.allClasses().isEmpty()) {
             return;
         }
@@ -841,6 +886,9 @@ public final class ResultsManager {
     }
 
     protected void fireResultsReset() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.log(Level.FINEST, "fireResultsReset", new Exception());
+        }
         if (resultsListeners.allClasses().isEmpty()) {
             return;
         }

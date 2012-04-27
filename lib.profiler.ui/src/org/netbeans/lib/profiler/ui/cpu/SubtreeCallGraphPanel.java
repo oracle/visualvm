@@ -69,6 +69,8 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
@@ -111,6 +113,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private static final String INVOCATIONS_COLUMN_NAME = messages.getString("SubtreeCallGraphPanel_InvocationsColumnName"); // NOI18N
     private static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("SubtreeCallGraphPanel_InvocationsColumnToolTip"); // NOI18N
     private static final String TREETABLE_ACCESS_NAME = messages.getString("SubtreeCallGraphPanel_TreeTableAccessName"); // NOI18N
+    private static final String FILTER_ITEM_NAME = messages.getString("FlatProfilePanel_FilterItemName"); // NOI18N
                                                                                                                          // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -576,32 +579,21 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
         treeTablePanel = new JTreeTablePanel(treeTable);
         treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, cornerButton);
+        treeTablePanel.clearBorders();
         add(treeTablePanel, BorderLayout.CENTER);
         initFilterPanel();
     }
     
     private void initFilterPanel() {
-        filterComponent = new FilterComponent();
-
-        //filterComponent.setEmptyFilterText("[Method Name Filter]");
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
-//                "Starts with", CommonConstants.FILTER_STARTS_WITH);
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS
-//        ), "Contains", CommonConstants.FILTER_CONTAINS);
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
-//                "Ends with", CommonConstants.FILTER_ENDS_WITH);
-//        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP), // NOI18N
-//                                      "Regular expression", CommonConstants.FILTER_REGEXP);
-        //filterComponent.addSeparatorItem();
+        filterComponent = FilterComponent.create(true, true);
         
         FilterSortSupport.Configuration config = snapshot.getFilterSortInfo(
                 (PrestimeCPUCCTNode)treeTableModel.getRoot());
-        filterComponent.setFilterValues(config.getFilterString(), config.getFilterType());
+        filterComponent.setFilter(config.getFilterString(), config.getFilterType());
 
-        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
-                public void filterChanged() {
-                    
-                    String filterString = filterComponent.getFilterString();
+        filterComponent.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    String filterString = filterComponent.getFilterValue();
                     int filterType = filterComponent.getFilterType();
                     snapshot.filterForward(filterString, filterType, (PrestimeCPUCCTNodeBacked)treeTableModel.getRoot());
 //                    SwingUtilities.invokeLater(new Runnable() {
@@ -611,7 +603,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
                 }
             });
 
-        add(filterComponent, BorderLayout.SOUTH);
+        add(filterComponent.getComponent(), BorderLayout.SOUTH);
     }
 
     public void requestFocus() {
@@ -628,7 +620,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
         if (treeTablePanel != null) {
             remove(treeTablePanel);
             treeTablePanel = null;
-            remove(filterComponent);
+            remove(filterComponent.getComponent());
             filterComponent = null;
         }
 
@@ -663,6 +655,20 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
             cornerPopup.add(menuItem);
         }
+        
+        cornerPopup.addSeparator();
+
+        JCheckBoxMenuItem filterMenuItem = new JCheckBoxMenuItem(FILTER_ITEM_NAME);
+        filterMenuItem.setActionCommand("Filter"); // NOI18N
+        addMenuItemListener(filterMenuItem);
+
+        if (filterComponent == null) {
+            filterMenuItem.setState(true);
+        } else {
+            filterMenuItem.setState(filterComponent.getComponent().isVisible());
+        }
+        
+        cornerPopup.add(filterMenuItem);
 
         cornerPopup.pack();
     }
@@ -716,6 +722,12 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private void addMenuItemListener(JCheckBoxMenuItem menuItem) {
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    if (e.getActionCommand().equals("Filter")) { // NOI18N
+                        filterComponent.getComponent().setVisible(!filterComponent.getComponent().isVisible());
+
+                        return;
+                    }
+                    
                     boolean sortResults = false;
                     int column = Integer.parseInt(e.getActionCommand());
                     boolean sortOrder = treeTable.getSortingOrder();

@@ -70,13 +70,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -85,6 +79,9 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDisplayer;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
 import org.openide.windows.WindowManager;
 
 
@@ -114,10 +111,15 @@ import org.openide.windows.WindowManager;
 })
 public final class HeapDumpAction extends ProfilingAwareAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
-    private static class ChooseHeapdumpTargetPanel extends JPanel {
+    final private static class Singleton {
+        final private static HeapDumpAction INSTANCE = new HeapDumpAction();
+    }
+    
+    private static class ChooseHeapdumpTargetPanel extends JPanel implements HelpCtx.Provider {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
+        private static final String HELP_CTX_KEY = "ChooseHeapdumpTargetPanel.HelpCtx";  // NOI18N
+        private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
         public static final int DESTINATION_DEFAULT = 0;
         public static final int DESTINATION_CUSTOM = 1;
 
@@ -138,6 +140,11 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
+        @Override
+        public HelpCtx getHelpCtx() {
+            return HELP_CTX;
+        }
+        
         public String getCustomDirectory() {
             return customLocationField.getText();
         }
@@ -306,11 +313,23 @@ public final class HeapDumpAction extends ProfilingAwareAction {
     private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING };
     private static JFileChooser snapshotDirectoryChooser;
 
+    @ActionID(id = "org.netbeans.modules.profiler.actions.HeapDumpAction", category = "Profile")
+    @ActionRegistration(displayName = "#HeapDumpAction_ActionName", lazy=false)
+    @ActionReference(path = "Menu/Profile", position = 1300)
+    public static HeapDumpAction getInstance() {
+        return Singleton.INSTANCE;
+    }
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ChooseHeapdumpTargetPanel heapdumpTargetSelector;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public HeapDumpAction() {
+        setIcon(Icons.getIcon(ProfilerIcons.SNAPSHOT_HEAP));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.SNAPSHOT_HEAP)); // NOI18N
+    }
 
     public HelpCtx getHelpCtx() {
         return HelpCtx.DEFAULT_HELP;
@@ -335,10 +354,6 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
     protected int[] enabledStates() {
         return ENABLED_STATES;
-    }
-
-    protected String iconResource() {
-        return Icons.getResource(ProfilerIcons.SNAPSHOT_HEAP);
     }
 
     private String getCurrentHeapDumpFilename(String targetFolder) {

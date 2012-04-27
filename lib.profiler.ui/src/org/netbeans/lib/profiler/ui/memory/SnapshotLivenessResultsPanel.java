@@ -130,7 +130,7 @@ public class SnapshotLivenessResultsPanel extends LivenessResultsPanel implement
             }
 
             if (snapshot.containsStacks()) {
-                popup.addSeparator();
+                if (GoToSource.isAvailable()) popup.addSeparator();
                 popupShowStacks = new JMenuItem();
                 popupShowStacks.setText(STACK_TRACES_POPUP_ITEM);
                 popup.add(popupShowStacks);
