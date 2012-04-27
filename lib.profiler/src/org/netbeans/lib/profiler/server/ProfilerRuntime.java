@@ -387,7 +387,7 @@ public class ProfilerRuntime implements CommonConstants {
         ThreadInfo ti = ThreadInfo.getThreadInfo();
         int tid = ti.threadId;
 
-        if (ti.evBuf == null) { // memory profilimg use global event buffer
+        if (ti.evBuf == null || !ti.isInitialized()) { // memory profiling or ThreadInfo is not initialized -> use global event buffer
 
             synchronized (eventBuffer) {
                 int curPos = globalEvBufPos;
