@@ -101,6 +101,7 @@ public class FindDialog extends JPanel implements HelpCtx.Provider{
     
     public static String getFindString() {
         final FindDialog findDialog = getDefault();
+        final String previousText = findDialog.findWhatField.getText();
         findDialog.findWhatField.selectAll();
 
         final DialogDescriptor dd = new DialogDescriptor(findDialog, Bundle.FindDialog_FindInResultsDialogCaption(), true,
@@ -112,6 +113,7 @@ public class FindDialog extends JPanel implements HelpCtx.Provider{
         if (dd.getValue() == findDialog.findButton) {
             return findDialog.findWhatField.getText();
         } else {
+            findDialog.findWhatField.setText(previousText);
             return null;
         }
     }
