@@ -53,7 +53,6 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -65,13 +64,18 @@ import org.openide.windows.WindowManager;
 public final class IdeSnapshotAction implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
-        TracerSupportImpl.getInstance().perform(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                final IdeSnapshot snapshot = snapshot();
-                if (snapshot == null) {
-                    return;
-                }
-                openSnapshot(snapshot);
+                final File file = snapshotFile();
+                if (file == null) return;
+                
+                TracerSupportImpl.getInstance().perform(new Runnable() {
+                    public void run() {
+                        final IdeSnapshot snapshot = snapshot(file);
+                        if (snapshot == null) return;
+                        openSnapshot(snapshot);
+                    }
+                });
             }
         });
     }
@@ -96,9 +100,7 @@ public final class IdeSnapshotAction implements ActionListener {
     }
 
     @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot: {0}")
-    private IdeSnapshot snapshot() {
-        File file = snapshotFile();
-        if (file == null) return null;
+    private IdeSnapshot snapshot(File file) {
         try {
             FileObject primary = FileUtil.toFileObject(file);
             FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
@@ -112,17 +114,8 @@ public final class IdeSnapshotAction implements ActionListener {
 
     private File snapshotFile() {
         JFileChooser chooser = createFileChooser();
-        final Frame[] window = new Frame[1];
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    window[0] = WindowManager.getDefault().getMainWindow();
-                }
-            });
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        if (chooser.showOpenDialog(window[0]) == JFileChooser.APPROVE_OPTION) {
+        Frame mainWindow = WindowManager.getDefault().getMainWindow();
+        if (chooser.showOpenDialog(mainWindow) == JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFile();
         } else {
             return null;
