@@ -102,24 +102,6 @@ made subject to such option by the copyright holder.
                         <attr name="position" intvalue="1100"/>
                     </file>
                 </folder>
-                <folder name="Factories">
-                    <file name="NpsDataLoader.instance">
-                        <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.ui.NpsDataObject"/>
-                        <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png"/>
-                        <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
-                        <attr name="mimeType" stringvalue="x-application/nps"/>
-                    </file>
-                </folder>
-            </folder>
-            <folder name="x-netbeans-profiler-hprof">
-                <folder name="Factories">
-                    <file name="HprofDataLoader.instance">
-                        <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.ui.HprofDataObject"/>
-                        <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png"/>
-                        <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
-                        <attr name="mimeType" stringvalue="x-application/hprof"/>
-                    </file>
-                </folder>
             </folder>
         </folder>
     </folder>
