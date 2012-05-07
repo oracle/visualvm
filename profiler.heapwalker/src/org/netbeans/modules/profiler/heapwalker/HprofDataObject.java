@@ -47,6 +47,7 @@ import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataNode;
+import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
@@ -60,6 +61,11 @@ import org.openide.util.RequestProcessor;
  *
  * @author Tomas Hurka
  */
+@DataObject.Registrations({
+    @DataObject.Registration(iconBase = "org/netbeans/modules/profiler/heapwalk/ui/icons/snapshotDataObject.png", 
+        mimeType = "application/x-netbeans-profiler-hprof",
+        position=10)
+})
 public class HprofDataObject extends MultiDataObject implements OpenCookie {
     
     public HprofDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {

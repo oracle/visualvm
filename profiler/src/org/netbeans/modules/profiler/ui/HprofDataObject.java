@@ -66,7 +66,7 @@ import org.openide.util.Lookup;
     resource="../DummyHprofResolver.xml"
 )
 @Registrations({
-    @Registration(iconBase = "org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png", mimeType = "application/x-netbeans-profiler-hprof")
+    @Registration(iconBase = "org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png", mimeType = "application/x-netbeans-profiler-hprof", position=1000)
 })
 public class HprofDataObject extends MultiDataObject implements OpenCookie {
     
