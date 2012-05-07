@@ -46,8 +46,7 @@ import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.MIMEResolver;
 import org.openide.loaders.DataNode;
-import org.openide.loaders.DataObject.Registration;
-import org.openide.loaders.DataObject.Registrations;
+import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
@@ -61,9 +60,10 @@ import org.openide.util.Lookup;
  * @author Tomas Hurka
  */
 @MIMEResolver.Registration(displayName="#NpssResolver", position=2033, resource="../impl/resources/NpssResolver.xml")
-@Registrations({
-    @Registration(iconBase = "org/netbeans/modules/profiler/snaptracer/impl/icons/snapshotDataObjectCPU.png", mimeType = "application/x-netbeans-profiler-npss")
-})
+@DataObject.Registration(
+    iconBase = "org/netbeans/modules/profiler/snaptracer/impl/icons/snapshotDataObjectCPU.png",
+    mimeType = "application/x-netbeans-profiler-npss"
+)
 public class NpssDataObject extends MultiDataObject implements OpenCookie {
 
     public NpssDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {

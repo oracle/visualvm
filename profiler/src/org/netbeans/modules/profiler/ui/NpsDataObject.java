@@ -48,8 +48,7 @@ import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.MIMEResolver;
 import org.openide.loaders.DataNode;
-import org.openide.loaders.DataObject.Registration;
-import org.openide.loaders.DataObject.Registrations;
+import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
@@ -62,10 +61,10 @@ import org.openide.util.Lookup;
     position=99500,
     resource="../NpsResolver.xml"
 )
-@Registrations(value = {
-    @Registration(iconBase = "org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png",
-    mimeType = "application/x-netbeans-profiler")
-})
+@DataObject.Registration(
+    iconBase = "org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png",
+    mimeType = "application/x-netbeans-profiler"
+)
 public class NpsDataObject extends MultiDataObject implements OpenCookie {
 
     public NpsDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
