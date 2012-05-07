@@ -148,6 +148,10 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         public String getCustomDirectory() {
             return customLocationField.getText();
         }
+        
+        public void setCustomDirectory(String directory) {
+            customLocationField.setText(directory);
+        }
 
         public int getDestinationType() {
             if (defaultLocationRadio.isSelected()) {
@@ -155,6 +159,10 @@ public final class HeapDumpAction extends ProfilingAwareAction {
             } else {
                 return DESTINATION_CUSTOM;
             }
+        }
+        
+        public void setDestinationType(int type) {
+            defaultLocationRadio.setSelected(type == DESTINATION_DEFAULT);
         }
 
         public JButton getOKButton() {
@@ -420,12 +428,17 @@ public final class HeapDumpAction extends ProfilingAwareAction {
                                              ? Bundle.HeapDumpAction_LocationProjectString() : 
                                                Bundle.HeapDumpAction_LocationGlobalString());
 
+        int previousType = targetSelector.getDestinationType();
+        String previousDirectory = targetSelector.getCustomDirectory();
+        
         DialogDescriptor desc = new DialogDescriptor(targetSelector, Bundle.HeapDumpAction_DestinationDialogCaption(), true,
                                                      new Object[] { targetSelector.getOKButton(), DialogDescriptor.CANCEL_OPTION },
                                                      DialogDescriptor.OK_OPTION, 0, null, null);
         Object res = DialogDisplayer.getDefault().notify(desc);
 
         if (!res.equals(targetSelector.getOKButton())) {
+            targetSelector.setDestinationType(previousType);
+            targetSelector.setCustomDirectory(previousDirectory);
             return SELECTING_TARGET_CANCELLED;
         }
 
@@ -433,6 +446,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         int destinationType = targetSelector.getDestinationType();
 
         if (destinationType == ChooseHeapdumpTargetPanel.DESTINATION_DEFAULT) {
+            targetSelector.setCustomDirectory(previousDirectory);
             return getCurrentHeapDumpFilename(null);
         } else if (destinationType == ChooseHeapdumpTargetPanel.DESTINATION_CUSTOM) {
             return getCurrentHeapDumpFilename(targetSelector.getCustomDirectory());
