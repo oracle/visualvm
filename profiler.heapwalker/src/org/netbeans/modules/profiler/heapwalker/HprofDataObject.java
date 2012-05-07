@@ -62,7 +62,7 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  */
 @DataObject.Registration(
-    iconBase = "org/netbeans/modules/profiler/heapwalk/ui/icons/snapshotDataObject.png", 
+    iconBase = "org/netbeans/modules/profiler/heapwalk/ui/icons/impl/snapshotDataObject.png", 
     mimeType = "application/x-netbeans-profiler-hprof",
     position=10
 )
