@@ -227,26 +227,30 @@ public final class LiveResultsWindow extends TopComponent
     public static final class ResultsMonitor implements CPUCCTProvider.Listener, MemoryCCTProvider.Listener {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public void cctEstablished(RuntimeCCTNode runtimeCCTNode, boolean empty) {
-            if (!empty) {
-                getDefault().resultsAvailable = true;
-                if (resultsDumpForced.getAndSet(false) && 
-                    getDefault().autoRefreshRequested.getAndDecrement() > 0) {
-                    CommonUtils.runInEventDispatchThread(new Runnable() {
-                        public void run() {
+        public void cctEstablished(RuntimeCCTNode runtimeCCTNode, final boolean empty) {
+            CommonUtils.runInEventDispatchThread(new Runnable() {
+                public void run() {
+                    if (!empty) {
+                        getDefault().resultsAvailable = true;
+                        if (resultsDumpForced.getAndSet(false) && 
+                            getDefault().autoRefreshRequested.getAndDecrement() > 0) {
                             getDefault().updateResultsDisplay();
+                        } else {
+                            getDefault().autoRefreshRequested.compareAndSet(-1, 0);
                         }
-                    });
-                } else {
-                    getDefault().autoRefreshRequested.compareAndSet(-1, 0);
+                    } else {
+                        resultsDumpForced.set(false); // fix for issue #114638
+                    }
                 }
-            } else {
-                resultsDumpForced.set(false); // fix for issue #114638
-            }
+            });
         }
 
         public void cctReset() {
-            getDefault().resultsAvailable = false;
+            CommonUtils.runInEventDispatchThread(new Runnable() {
+                public void run() {
+                   getDefault().resultsAvailable = false;
+                }
+            });
         }
     }
 
