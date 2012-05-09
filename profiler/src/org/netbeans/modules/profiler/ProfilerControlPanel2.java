@@ -1806,7 +1806,7 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY = "ProfilerControlPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
-    private static final String RENAME_SNAPSHOT_HELP_CTX_KEY = "ProfilerControlPanel.RenameSnapshor.HelpCtx"; // NOI18N
+    private static final String RENAME_SNAPSHOT_HELP_CTX_KEY = "ProfilerControlPanel.RenameSnapshot.HelpCtx"; // NOI18N
     private static final HelpCtx RENAME_SNAPSHOT_HELP_CTX = new HelpCtx(RENAME_SNAPSHOT_HELP_CTX_KEY);
     private static ProfilerControlPanel2 defaultInstance;
     private static final Image windowIcon = Icons.getImage(ProfilerIcons.WINDOW_CONTROL_PANEL);
