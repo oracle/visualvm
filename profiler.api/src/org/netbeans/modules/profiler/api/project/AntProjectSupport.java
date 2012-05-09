@@ -77,19 +77,6 @@ public final class AntProjectSupport {
     
     private final AntProjectSupportProvider provider;
     
-    
-    /**
-     * Returns Ant target to use for profiling.
-     * 
-     * @param buildScript build script
-     * @param type profiling type
-     * @param profiledClassFile profiled file or null for profiling entire project
-     * @return Ant target to use for profiling
-     */
-    public String getProfilerTargetName(FileObject buildScript, int type, FileObject profiledClassFile) {
-        return provider.getProfilerTargetName(buildScript, type, profiledClassFile);
-    }
-    
     /**
      * Returns build script of a project.
      * 
