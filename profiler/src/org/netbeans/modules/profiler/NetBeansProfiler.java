@@ -1680,7 +1680,6 @@ public abstract class NetBeansProfiler extends Profiler {
             volatile private ProgressDisplayer pd;
             @Override
             protected void doInBackground() {
-                setupDispatcher(profilingSettings);
                 if (isCancelled()) return;
                 
                 connectToStartedApp(profilingSettings, sessionSettings);

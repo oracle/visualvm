@@ -22,19 +22,4 @@
             </file>
         </folder>
     </folder>
-    
-    <folder name="Loaders">
-        <folder name="application">
-            <folder name="x-netbeans-profiler-npss">
-                <folder name="Factories">
-                    <file name="NpssDataLoader.instance">
-                        <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/profiler/snaptracer/impl/icons/snapshotDataObjectCPU.png"/>
-                        <attr name="dataObjectClass" stringvalue="org.netbeans.modules.profiler.snaptracer.impl.NpssDataObject"/>
-                        <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
-                        <attr name="mimeType" stringvalue="x-application/npss"/>
-                    </file>
-                </folder>
-            </folder>
-        </folder>
-    </folder>
 </filesystem>
