@@ -55,7 +55,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,10 +62,12 @@ import java.util.Date;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.Mnemonics;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.HelpCtx;
 import org.openide.util.RequestProcessor;
 
 @NbBundle.Messages({
@@ -134,8 +135,62 @@ import org.openide.util.RequestProcessor;
     "SnapshotInfoPanel_NoCommentsString=none"
 })
 public class SnapshotInfoPanel extends JPanel {
+
+    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
+
+    private static class UserCommentsPanel extends JPanel
+    {
+        //~ Instance fields ----------------------------------------------------------------------------------------------------
+
+        private JTextArea textArea;
+
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
+
+        UserCommentsPanel() {
+            initComponents();
+        }
+
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        String getInputText() {
+            return textArea.getText();
+        }
+
+        void setInputText(final String text) {
+            textArea.setText(text);
+            textArea.selectAll();
+        }
+
+        private void initComponents() {
+            setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+            setLayout(new BorderLayout(0, 5));
+
+            JLabel textLabel = new JLabel();
+            Mnemonics.setLocalizedText(textLabel, Bundle.SnapshotInfoPanel_UserCommentsLbl());
+
+            textArea = new JTextArea();
+            textLabel.setLabelFor(textArea);
+
+            textArea.requestFocus();
+
+            JScrollPane textAreaScroll = new JScrollPane(textArea);
+            textAreaScroll.setPreferredSize(new Dimension(350, 150));
+            add(textAreaScroll, BorderLayout.CENTER);
+            add(textLabel, BorderLayout.NORTH);
+
+            getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputPanel") // NOI18N
+                    );
+            textArea.getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputField") // NOI18N
+                    );
+        }
+    };
+
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    private static final HelpCtx HELP_CTX = new HelpCtx("EditUserComments.HelpCtx"); // NOI18N
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HTMLTextArea infoArea;
@@ -151,13 +206,16 @@ public class SnapshotInfoPanel extends JPanel {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         String userComments = loadedSnapshot.getUserComments();
-                        NotifyDescriptor.InputLine nd = createDescriptor(
-                                Bundle.SnapshotInfoPanel_UserCommentsLbl(),
-                                Bundle.SnapshotInfoPanel_UserCommentsCaption());
-                        nd.setInputText(userComments);
-                        Object ret = DialogDisplayer.getDefault().notify(nd);
-                        if (ret == NotifyDescriptor.OK_OPTION) {
-                            setUserComments(nd.getInputText());
+                        UserCommentsPanel panel = new UserCommentsPanel();
+                        DialogDescriptor dd = new DialogDescriptor(panel, Bundle.SnapshotInfoPanel_UserCommentsCaption(),
+                                true, new Object[] { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
+                                    DialogDescriptor.OK_OPTION,
+                                    0, HELP_CTX, null);
+                        panel.setInputText(userComments);
+                        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+                        d.setVisible(true);
+                        if (dd.getValue() == DialogDescriptor.OK_OPTION) {
+                            setUserComments(panel.getInputText());
                         }
                     }
                 });
@@ -188,49 +246,6 @@ public class SnapshotInfoPanel extends JPanel {
 
     public boolean fitsVisibleArea() {
         return !infoAreaScrollPane.getVerticalScrollBar().isVisible();
-    }
-    
-    private NotifyDescriptor.InputLine createDescriptor(String label, String caption) {
-        return new NotifyDescriptor.InputLine(label, caption) {
-            private JTextArea textArea;
-            
-            public String getInputText() {
-                return textArea.getText();
-            }
-
-            public void setInputText(final String text) {
-                textArea.setText(text);
-                textArea.selectAll();
-            }
-            
-            protected Component createDesign(final String text) {
-                JPanel panel = new JPanel(new BorderLayout(5, 5));
-                panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
-                panel.setOpaque(false);
-
-                JLabel textLabel = new JLabel();
-                Mnemonics.setLocalizedText(textLabel, text);
-
-                textArea = new JTextArea();
-                textLabel.setLabelFor(textArea);
-
-                textArea.requestFocus();
-                
-                JScrollPane textAreaScroll = new JScrollPane(textArea);
-                textAreaScroll.setPreferredSize(new Dimension(350, 150));
-                panel.add(textAreaScroll, BorderLayout.CENTER);
-                panel.add(textLabel, BorderLayout.NORTH);
-                
-                panel.getAccessibleContext().setAccessibleDescription(
-                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputPanel") // NOI18N
-                );
-                textArea.getAccessibleContext().setAccessibleDescription(
-                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputField") // NOI18N
-                );
-
-                return panel;
-            }
-        };
     }
     
     public void setUserComments(String userComments) {
