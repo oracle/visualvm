@@ -178,7 +178,7 @@ final public class RuntimeCCTNodeProcessor {
             this.plugins = plugins;
         }
         
-        abstract void process();
+        abstract void process(int maxMethodId);
     }
     
     private static class SimpleItem extends Item<RuntimeCCTNode> {
@@ -189,9 +189,12 @@ final public class RuntimeCCTNodeProcessor {
         }
 
         @Override
-        void process() {
+        void process(int maxMethodId) {
             stack.add(new BackoutItem(instance, plugins));
             for(RuntimeCCTNode n : instance.getChildren()) {
+                if (n instanceof MethodCPUCCTNode) {
+                    if (((MethodCPUCCTNode)n).getMethodId() >= maxMethodId) continue;
+                }
                 stack.add(new SimpleItem(stack, n, plugins));
             }
             for(Plugin p : plugins) {
@@ -208,7 +211,7 @@ final public class RuntimeCCTNodeProcessor {
         }
 
         @Override
-        void process() {
+        void process(int maxMethodId) {
             for(Plugin p : plugins) {
                 if (p != null) {
                     p.onBackout(instance);
@@ -228,7 +231,8 @@ final public class RuntimeCCTNodeProcessor {
             }
         }
         nodeStack.push(new SimpleItem(nodeStack, root, plugins));
-        processStack(nodeStack, plugins);
+        int maxMethodId = (root instanceof SimpleCPUCCTNode) ? ((SimpleCPUCCTNode)root).getMaxMethodId() : Integer.MAX_VALUE;
+        processStack(maxMethodId, nodeStack, plugins);
         for(Plugin p : plugins) {
             if (p != null) {
                 p.onStop();
@@ -236,11 +240,11 @@ final public class RuntimeCCTNodeProcessor {
         }
     }
     
-    private static void processStack(Deque<Item<RuntimeCCTNode>> stack, Plugin ... plugins) {
+    private static void processStack(int maxMethodId, Deque<Item<RuntimeCCTNode>> stack, Plugin ... plugins) {
         while (!stack.isEmpty()) {
             Item<RuntimeCCTNode> item = stack.pollLast();
             if (item != null) {
-                item.process();
+                item.process(maxMethodId);
             }
         }
     }

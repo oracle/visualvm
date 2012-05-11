@@ -57,6 +57,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.openide.DialogDisplayer;
+import org.openide.util.HelpCtx;
 
 
 /**
@@ -70,9 +71,11 @@ import org.openide.DialogDisplayer;
     "FindDialog_FindButtonName=Find",
     "FindDialog_FindWhatFieldAccessDescr=First item starting with this string will be found in results."
 })
-public class FindDialog extends JPanel {
+public class FindDialog extends JPanel implements HelpCtx.Provider{
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    private static final String HELP_CTX_KEY = "ProfilerUiFindDialog.HelpCtx"; // NOI18N
+    private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     private static FindDialog defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -90,8 +93,15 @@ public class FindDialog extends JPanel {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    @Override
+    public HelpCtx getHelpCtx()
+    {
+        return HELP_CTX;
+    }
+    
     public static String getFindString() {
         final FindDialog findDialog = getDefault();
+        final String previousText = findDialog.findWhatField.getText();
         findDialog.findWhatField.selectAll();
 
         final DialogDescriptor dd = new DialogDescriptor(findDialog, Bundle.FindDialog_FindInResultsDialogCaption(), true,
@@ -103,6 +113,7 @@ public class FindDialog extends JPanel {
         if (dd.getValue() == findDialog.findButton) {
             return findDialog.findWhatField.getText();
         } else {
+            findDialog.findWhatField.setText(previousText);
             return null;
         }
     }

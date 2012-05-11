@@ -116,6 +116,12 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         synchronized (containerGuard) {
             container = null;
         }
+        
+        // uncomment the following piece of code when trying to reproduce #205482
+//        try {
+//            Thread.sleep(120);
+//        } catch (InterruptedException interruptedException) {
+//        }
     }
 
     @Override
@@ -176,6 +182,8 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     
     @Override
     public void onNode(MethodCPUCCTNode node) {
+        final int nodeMethodId = node.getMethodId();
+                
         ProfilingSessionStatus status = client.getStatus();
         InstrumentationFilter filter = client.getSettings().getInstrumentationFilter();
 
@@ -184,7 +192,7 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
 
         if (!filteredOut && (client.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED || node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
 
-            String jvmClassName = status.getInstrMethodClasses()[node.getMethodId()].replace('.', '/');
+            String jvmClassName = status.getInstrMethodClasses()[nodeMethodId].replace('.', '/');
 
             if (!filter.passesFilter(jvmClassName)) {
                 filteredOut = true;
@@ -194,39 +202,40 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         if (!filteredOut && (currentFilter != null)) {
             filteredOut = !currentFilter.passesFilter(); // finally use the mark filter
         }
-
+        final int parentMethodId = currentParent != null ? currentParent.getMethodId() : -1;
+        
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.log(Level.FINEST, "Processing runtime node: {0}.{1}; filtered={2}, time={3}, CPU time={4}", // NOI18N
-                       new Object[]{status.getInstrMethodClasses()[node.getMethodId()], status.getInstrMethodNames()[node.getMethodId()], 
+                       new Object[]{status.getInstrMethodClasses()[nodeMethodId], status.getInstrMethodNames()[nodeMethodId], 
                        filteredOut, node.getNetTime0(), node.getNetTime1()});
 
             String parentInfo = (currentParent != null)
-                                ? (status.getInstrMethodClasses()[currentParent.getMethodId()] + "."
-                                + status.getInstrMethodNames()[currentParent.getMethodId()]) : "none"; // NOI18N
+                                ? (status.getInstrMethodClasses()[parentMethodId] + "."
+                                + status.getInstrMethodNames()[parentMethodId]) : "none"; // NOI18N
             LOGGER.log(Level.FINEST, "Currently used parent: {0}", parentInfo); // NOI18N
         }
 
         if (filteredOut) {
             if ((currentParent != null) && !currentParent.isRoot()) {
-                invDiff[currentParent.getMethodId()] += node.getNCalls();
+                invDiff[parentMethodId] += node.getNCalls();
 
-                timePM0[currentParent.getMethodId()] += node.getNetTime0();
+                timePM0[parentMethodId] += node.getNetTime0();
 
                 if (status.collectingTwoTimeStamps()) {
-                    timePM1[currentParent.getMethodId()] += node.getNetTime1();
+                    timePM1[parentMethodId] += node.getNetTime1();
                 }
             }
         } else {
-            timePM0[node.getMethodId()] += node.getNetTime0();
+            timePM0[nodeMethodId] += node.getNetTime0();
 
             if (status.collectingTwoTimeStamps()) {
-                timePM1[node.getMethodId()] += node.getNetTime1();
+                timePM1[nodeMethodId] += node.getNetTime1();
             }
 
-            invPM[node.getMethodId()] += node.getNCalls();
+            invPM[nodeMethodId] += node.getNCalls();
 
             if ((currentParent != null) && !currentParent.isRoot()) {
-                nCalleeInvocations[currentParent.getMethodId()] += node.getNCalls();
+                nCalleeInvocations[parentMethodId] += node.getNCalls();
             }
 
             currentParent = node;
