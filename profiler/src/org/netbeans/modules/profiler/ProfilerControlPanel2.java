@@ -65,7 +65,6 @@ import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.SharedClassObject;
 import org.openide.util.actions.SystemAction;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
@@ -104,8 +103,10 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.filesystems.FileLock;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -1389,13 +1390,16 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
                         String origName = fileObject.getName();
-                        NotifyDescriptor.InputLine nd = new NotifyDescriptor.InputLine(
-                                Bundle.ProfilerControlPanel2_NewFileNameLbl(),
-                                Bundle.ProfilerControlPanel2_RenameSnapshotCaption()); // NOI18N
-                        nd.setInputText(origName);
-                        Object ret = DialogDisplayer.getDefault().notify(nd);
-                        if (ret == NotifyDescriptor.OK_OPTION) {
-                            String newName = nd.getInputText();
+                        RenameSnapshotPanel panel = new RenameSnapshotPanel();
+                        panel.setSnapshotName(origName);
+                        DialogDescriptor dd = new DialogDescriptor(panel, Bundle.ProfilerControlPanel2_RenameSnapshotCaption(),
+                                    true, new Object[] { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
+                                    DialogDescriptor.OK_OPTION,
+                                    0, RENAME_SNAPSHOT_HELP_CTX, null);
+                        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+                        d.setVisible(true);
+                        if (dd.getValue() == DialogDescriptor.OK_OPTION) {
+                            String newName = panel.getSnapshotName();
                             if (!origName.equals(newName)) {
                                 FileLock lock = null;
                                 try {
@@ -1728,9 +1732,82 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
         }
     }
 
+    private static final class RenameSnapshotPanel extends JPanel
+    {
+        //~ Instance fields ----------------------------------------------------------------------------------------------------
+
+        private JTextField textField;
+
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
+
+        RenameSnapshotPanel() {
+            initComponents();
+        }
+
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        String getSnapshotName() {
+            return textField.getText();
+        }
+
+        void setSnapshotName(final String text) {
+            textField.setText(text);
+            textField.selectAll();
+        }
+
+        private void initComponents() {
+            GridBagConstraints gridBagConstraints;
+            
+            JLabel textLabel = new JLabel();
+            Mnemonics.setLocalizedText(textLabel, Bundle.ProfilerControlPanel2_NewFileNameLbl());
+            textLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            textField = new JTextField();
+            textLabel.setLabelFor(textField);
+            textField.setPreferredSize(new Dimension(350, textField.getPreferredSize().height));
+            textField.requestFocus();            
+            textField.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            setLayout(new GridBagLayout());
+            
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(15, 10, 5, 10);
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            add(textLabel, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 15, 10);
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            add(textField, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;            
+            add(new JPanel(), gridBagConstraints);
+            
+            getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputPanel") // NOI18N
+                    );
+            textField.getAccessibleContext().setAccessibleDescription(
+                    NbBundle.getMessage(NotifyDescriptor.class, "ACSD_InputField") // NOI18N
+                    );
+        }
+    };
+
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY = "ProfilerControlPanel.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+    private static final String RENAME_SNAPSHOT_HELP_CTX_KEY = "ProfilerControlPanel.RenameSnapshot.HelpCtx"; // NOI18N
+    private static final HelpCtx RENAME_SNAPSHOT_HELP_CTX = new HelpCtx(RENAME_SNAPSHOT_HELP_CTX_KEY);
     private static ProfilerControlPanel2 defaultInstance;
     private static final Image windowIcon = Icons.getImage(ProfilerIcons.WINDOW_CONTROL_PANEL);
     private static final Icon cpuIcon = Icons.getIcon(ProfilerIcons.CPU);

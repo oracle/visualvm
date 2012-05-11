@@ -56,6 +56,7 @@ import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
 import org.openide.DialogDisplayer;
+import org.openide.util.HelpCtx;
 
 
 /**
@@ -74,6 +75,11 @@ import org.openide.DialogDisplayer;
     "IDEUtils_OkButtonText=OK"
 })
 public final class IDEUtils {
+    
+    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+
+    private static HelpCtx HELP_CTX = new HelpCtx("SelectSettingsConfiguration.HelpCtx"); // NOI18N
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static String getAntProfilerStartArgument15(int port, int architecture) {
@@ -153,7 +159,7 @@ public final class IDEUtils {
 
         final DialogDescriptor dd = new DialogDescriptor(panel, Bundle.IDEUtils_SelectSettingsConfigurationDialogCaption(), true,
                                                          new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton, 0,
-                                                         null, null);
+                                                         HELP_CTX, null);
         final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
 
