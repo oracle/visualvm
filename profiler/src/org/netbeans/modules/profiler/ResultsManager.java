@@ -80,7 +80,6 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.cookies.OpenCookie;
 import org.openide.loaders.DataObject;
@@ -869,6 +868,9 @@ public final class ResultsManager {
     }
 
     protected void fireResultsAvailable() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.log(Level.FINEST, "fireResultsAvailable", new Exception());
+        }
         if (resultsListeners.allClasses().isEmpty()) {
             return;
         }
@@ -883,6 +885,9 @@ public final class ResultsManager {
     }
 
     protected void fireResultsReset() {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.log(Level.FINEST, "fireResultsReset", new Exception());
+        }
         if (resultsListeners.allClasses().isEmpty()) {
             return;
         }
