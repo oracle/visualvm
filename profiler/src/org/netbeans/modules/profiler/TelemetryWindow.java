@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Image;
-import java.awt.KeyboardFocusManager;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -92,7 +91,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "Number_of_Threads=Threads",
     "Loaded_Classes_Count=Loaded Classes"
 })
-public final class TelemetryWindow extends TopComponent {
+public final class TelemetryWindow extends ProfilerTopComponent {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static final class GraphTab implements SaveViewAction.ViewProvider, ExportAction.ExportProvider {
@@ -327,7 +326,6 @@ public final class TelemetryWindow extends TopComponent {
     private final MemoryGraphPanel heapGraph;
     private final SurvivingGenerationsGraphPanel generationsGraph;
     private final ThreadsGraphPanel threadsStatsGraph;
-    private Component lastFocusOwner;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -393,17 +391,9 @@ public final class TelemetryWindow extends TopComponent {
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;
     }
-
-    public void componentActivated() {
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else if (threadsStatsGraph != null) {
-            threadsStatsGraph.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    
+    protected Component defaultFocusOwner() {
+        return threadsStatsGraph;
     }
 
     public void showGC() {

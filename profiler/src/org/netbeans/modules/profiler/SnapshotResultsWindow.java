@@ -55,11 +55,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import javax.swing.*;
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -84,7 +81,7 @@ import org.openide.util.lookup.ServiceProvider;
     "SnapshotResultsWindow_FragmentSnapshotAccessDescr=Profiler snapshot with code fragment results",
     "SnapshotResultsWindow_MemorySnapshotAccessDescr=Profiler snapshot with memory results"
 })
-public final class SnapshotResultsWindow extends TopComponent {
+public final class SnapshotResultsWindow extends ProfilerTopComponent {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
     
     /* 
@@ -176,7 +173,6 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Component lastFocusOwner;
     private LoadedSnapshot snapshot;
     private InstanceContent ic = new InstanceContent();
     private SavePerformer savePerformer = new SavePerformer();
@@ -314,17 +310,9 @@ public final class SnapshotResultsWindow extends TopComponent {
             return false;
         }
     }
-
-    public void componentActivated() {
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else if (displayedPanel != null) {
-            displayedPanel.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    
+    protected Component defaultFocusOwner() {
+        return displayedPanel;
     }
 
     public void displayStacksForClass(int selectedClassId, int sortingColumn, boolean sortingOrder) {
