@@ -73,8 +73,6 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.Presenter;
-import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -119,7 +117,6 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 
