@@ -408,8 +408,6 @@ class HprofHeap implements Heap {
         }
         HeapProgress.progressFinish();
         instancesCountComputed = true;
-
-        return;
     }
 
     List findReferencesFor(long instanceId) {
@@ -565,7 +563,6 @@ class HprofHeap implements Heap {
         idToOffsetMap.flush();
         HeapProgress.progressFinish();        
         referencesComputed = true;
-        return;
     }
     
     synchronized void computeRetainedSize() {
@@ -626,7 +623,6 @@ class HprofHeap implements Heap {
             }
         }
         retainedSizeComputed = true;
-        return;
     }
 
     int readDumpTag(long[] offset) {
