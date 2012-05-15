@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +62,7 @@ class DominatorTree {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     
     private static final int BUFFER_SIZE = (64 * 1024) / 8;
+    private static final int ADDITIONAL_IDS_THRESHOLD = 30;
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     
@@ -68,7 +70,7 @@ class DominatorTree {
     private LongBuffer multipleParents;
     private LongBuffer revertedMultipleParents;
     private LongBuffer currentMultipleParents;
-    private Map map;
+    private Map<Long,Long> map;
     private Set dirtySet = Collections.EMPTY_SET;
     private Map nearestGCRootCache = new NearestGCRootCache(400000);
 
@@ -109,12 +111,19 @@ class DominatorTree {
     private boolean computeOneLevel(boolean ignoreDirty) throws IOException {
         boolean changed = false;
         Set newDirtySet = new HashSet(map.size()/10);
+        List<Long> additionalIds = new ArrayList();
+        int additionalIndex = 0;
 //long processedId = 0;
 //long changedId = 0;
         for (;;) {
             long instanceId = readLong();
             if (instanceId == 0) {  // end of level
-                break;
+                if (additionalIndex >= additionalIds.size()) {
+                    if (additionalIndex>0) {
+                    }
+                    break;
+                }
+                instanceId = additionalIds.get(additionalIndex++).longValue();
             }
             Long instanceIdObj = new Long(instanceId);
             Long oldIdomObj = (Long) map.get(instanceIdObj);
@@ -140,6 +149,9 @@ class DominatorTree {
                     newDirtySet.add(oldIdomObj);
                     newDirtySet.add(newIdomIdObj);
                     map.put(instanceIdObj,newIdomIdObj);
+                    if (dirtySet.size() < ADDITIONAL_IDS_THRESHOLD) {
+                        updateAdditionalIds(instanceId, additionalIds);
+                    }
                     changed = true;
 //changedId++;
                 }
@@ -152,6 +164,25 @@ class DominatorTree {
         return changed;
     }
         
+    private void updateAdditionalIds(final long instanceId, final List<Long> additionalIds) {
+        Instance i = heap.getInstanceByID(instanceId);
+        if (i != null) {
+            for (Object v : i.getFieldValues()) {
+                if (v instanceof ObjectFieldValue) {
+                    Instance val = ((ObjectFieldValue)v).getInstance();
+                    if (val != null) {
+                        long idp = val.getInstanceId();
+                        Long idO = new Long(idp);
+                        Long idomO = map.get(idO);
+                        if (idomO != null && idomO.longValue() != 0) {
+                            additionalIds.add(idO);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     private void deleteBuffers() {
         multipleParents.delete();
         revertedMultipleParents.delete();
