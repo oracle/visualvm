@@ -87,7 +87,7 @@ public class ProfilingPointServerHandler {
     }
 
     /**
-     * Invoked by the JFluid server whan the profiling point hits.
+     * Invoked by the JFluid server when the profiling point hits.
      *
      * @param id unique ID of the profiling point
      */
@@ -97,7 +97,7 @@ public class ProfilingPointServerHandler {
     }
 
     /**
-     * Invoked by the JFluid server whan the profiling point hits.
+     * Invoked by the JFluid server when the profiling point hits.
      *
      * @param id unique ID of the profiling point
      */

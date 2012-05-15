@@ -47,10 +47,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.JFileChooser;
+import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.netbeans.modules.profiler.attach.providers.TargetPlatformEnum;
@@ -152,24 +149,28 @@ public class ManualIntegrationPanelUI extends javax.swing.JPanel implements List
     }// </editor-fold>//GEN-END:initComponents
 
 private void generateRemotePackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateRemotePackActionPerformed
-    RequestProcessor.getDefault().post(new Runnable() {
-
+    SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-            try {
-                final JFileChooser chooser = new JFileChooser();
-                final File tmpDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
-                chooser.setDialogTitle(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/Bundle").getString("ManualIntegrationPanelUI_ChooseRemotePackDestination")); // NOI18N
-                chooser.setAcceptAllFileFilterUsed(false);
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                chooser.setSelectedFile(tmpDir);
-                chooser.setCurrentDirectory(tmpDir);
-                chooser.setMultiSelectionEnabled(false);
-                if ((JFileChooser.CANCEL_OPTION & chooser.showSaveDialog(ManualIntegrationPanelUI.this)) == 0) {
-                    String packPath = model.exportRemotePack(chooser.getSelectedFile().getAbsolutePath());
-                    DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/Bundle").getString("ManualIntegrationPanelUI_RemotePackSavedAs") + packPath, NotifyDescriptor.INFORMATION_MESSAGE)); // NOI18N
-                }
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+            JFileChooser chooser = new JFileChooser();
+            File tmpDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
+            chooser.setDialogTitle(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/Bundle").getString("ManualIntegrationPanelUI_ChooseRemotePackDestination")); // NOI18N
+            chooser.setAcceptAllFileFilterUsed(false);
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.setSelectedFile(tmpDir);
+            chooser.setCurrentDirectory(tmpDir);
+            chooser.setMultiSelectionEnabled(false);
+            if ((JFileChooser.CANCEL_OPTION & chooser.showSaveDialog(ManualIntegrationPanelUI.this)) == 0) {
+                final String selectedFile = chooser.getSelectedFile().getAbsolutePath();
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        try {
+                            String packPath = model.exportRemotePack(selectedFile);
+                            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(java.util.ResourceBundle.getBundle("org/netbeans/modules/profiler/attach/panels/Bundle").getString("ManualIntegrationPanelUI_RemotePackSavedAs") + packPath, NotifyDescriptor.INFORMATION_MESSAGE)); // NOI18N
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    } 
+                });
             }
         }
     });

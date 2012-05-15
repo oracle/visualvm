@@ -59,7 +59,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Set;
 import javax.swing.*;
@@ -71,6 +70,7 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.DialogDisplayer;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -482,6 +482,7 @@ public class CompareSnapshotsHelper {
 
     private static final Icon memoryIcon = Icons.getIcon(ProfilerIcons.HEAP_DUMP);
     private static JFileChooser snapshotFileChooser;
+    private static HelpCtx HELP_CTX = new HelpCtx("SelectSecondSnapshot.HelpCtx"); // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -504,7 +505,7 @@ public class CompareSnapshotsHelper {
         DialogDescriptor desc = new DialogDescriptor(panel, Bundle.CompareSnapshotsHelper_SelectDialogCaption(), true,
                                                      new Object[] {
                                                          panel.getOKButton(), DialogDescriptor.CANCEL_OPTION
-                                                     }, DialogDescriptor.OK_OPTION, 0, null, null);
+                                                     }, DialogDescriptor.OK_OPTION, 0, HELP_CTX, null);
         Object res = DialogDisplayer.getDefault().notify(desc);
 
         File ret = null;
