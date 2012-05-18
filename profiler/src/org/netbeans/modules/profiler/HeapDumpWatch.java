@@ -127,9 +127,7 @@ public class HeapDumpWatch extends SessionListener.Adapter {
     
     @Override
     public void onShutdown() {
-        if (monitoredPath != null) {
-            release(null);
-        }
+        release();
     }
 
     @Override
@@ -184,12 +182,14 @@ public class HeapDumpWatch extends SessionListener.Adapter {
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
-            release(heapDump.getParent());
+            release();
         }
     }
 
-    private void release(FileObject watchedFolder) {
-        watchedFolder.removeFileChangeListener(listener);
-        monitoredPath = null;
+    private void release() {
+        if (monitoredPath != null) {
+            monitoredPath.removeFileChangeListener(listener);
+            monitoredPath = null;
+        }
     }
 }
