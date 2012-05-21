@@ -1901,6 +1901,9 @@ public abstract class NetBeansProfiler extends Profiler {
 
 //            // deconfigure the marking engine
 //            MarkingEngine.getDefault().deconfigure();
+            for(SessionListener sl : Lookup.getDefault().lookupAll(SessionListener.class)) {
+                sl.onShutdown();
+            }
         }
     }
 
