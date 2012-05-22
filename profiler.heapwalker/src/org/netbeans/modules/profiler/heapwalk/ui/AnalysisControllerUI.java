@@ -49,7 +49,6 @@ import org.netbeans.modules.profiler.heapwalk.AnalysisController;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Rule;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -79,6 +78,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.text.html.HTMLDocument;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.DialogDisplayer;
 
@@ -390,7 +390,7 @@ public class AnalysisControllerUI extends JPanel {
 
     // --- Private implementation ------------------------------------------------
     private void initRules() {
-        RequestProcessor.getDefault().post(new Runnable() {
+        BrowserUtils.performTask(new Runnable() {
                 public void run() {
                     final List<Rule> rules = analysisController.getRules();
                     SwingUtilities.invokeLater(new Runnable() {
