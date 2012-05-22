@@ -190,7 +190,7 @@ import org.openide.util.lookup.ServiceProvider;
     "MSG_Loading_Progress=Loading...",
     "LAB_ControlPanelName=Profiler"
 })
-public final class ProfilerControlPanel2 extends TopComponent implements ProfilingStateListener {
+public final class ProfilerControlPanel2 extends ProfilerTopComponent implements ProfilingStateListener {
     final private static Logger LOGGER = Logger.getLogger(ProfilerControlPanel2.class.getName());
     
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -1833,7 +1833,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     private final SnippetPanel spStatus;
     private final SnippetPanel spView;
     private final StatusPanel statusSnippet;
-    private Component lastFocusOwner;
     private boolean initialized = false;
     private Listener listener;
 
@@ -1952,17 +1951,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_ALWAYS;
     }
-
-    public void componentActivated() {
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else if (spControls != null) {
-            spControls.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    
+    protected Component defaultFocusOwner() {
+        return spControls;
     }
 
     public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {
