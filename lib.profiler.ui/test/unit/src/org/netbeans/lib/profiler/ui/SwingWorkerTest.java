@@ -43,6 +43,7 @@ package org.netbeans.lib.profiler.ui;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -97,7 +98,7 @@ public class SwingWorkerTest {
             }
         }, null, null);
         instance.execute();
-        latch.await();
+        latch.await(1, TimeUnit.SECONDS);
         assertTrue(executed[0]);
     }
 
@@ -138,7 +139,7 @@ public class SwingWorkerTest {
         } catch (InterruptedException e) {
         }
         instance.cancel();
-        latch.await();
+        latch.await(5, TimeUnit.SECONDS);
         assertTrue(canceled[0]);
         assertFalse(done[0]);
     }
@@ -174,7 +175,7 @@ public class SwingWorkerTest {
             }
         });
         instance.execute();
-        latch.await();
+        latch.await(4, TimeUnit.SECONDS);
         
         assertTrue(waiting[0]);
     }
@@ -184,7 +185,7 @@ public class SwingWorkerTest {
         System.out.println("sharedSemaphore");
         Semaphore s = new Semaphore(1);
         final AtomicInteger counter = new AtomicInteger(0);
-        final CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(2);
         
         final SwingWorker sw1 = new SwingWorkerImpl(0, true, s, new Runnable() {
 
@@ -197,7 +198,13 @@ public class SwingWorkerTest {
                 }
                 counter.decrementAndGet();
             }
-        }, null, null, null);
+        }, new Runnable() {
+
+            @Override
+            public void run() {
+                latch.countDown();
+            }
+        }, null, null);
         SwingWorker sw2 = new SwingWorkerImpl(0, true, s, new Runnable() {
 
             @Override
@@ -220,7 +227,7 @@ public class SwingWorkerTest {
         
         sw2.execute();
         
-        latch.await();
+        latch.await(3, TimeUnit.SECONDS);
         
         assertEquals(0, counter.get());
     }
