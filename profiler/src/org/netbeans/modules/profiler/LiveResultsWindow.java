@@ -73,13 +73,10 @@ import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.Presenter;
-import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Image;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -119,7 +116,6 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 
@@ -149,7 +145,7 @@ import org.openide.util.lookup.ServiceProvider;
     "History_LoggingStopMsg=This will stop history logging for {0}.\nDo you want to continue?",
     "LAB_ResultsWindowName=Live Profiling Results"
 })
-public final class LiveResultsWindow extends TopComponent
+public final class LiveResultsWindow extends ProfilerTopComponent
                                      implements ProfilingStateListener,
                                                 SaveViewAction.ViewProvider,
                                                 ExportAction.ExportProvider {
@@ -465,7 +461,6 @@ public final class LiveResultsWindow extends TopComponent
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private CPUResUserActionsHandler cpuActionsHandler;
-    private Component lastFocusOwner;
     private EmptyLiveResultsPanel noResultsPanel;
     private JButton runGCButton;
     private JButton updateNowButton;
@@ -674,21 +669,9 @@ public final class LiveResultsWindow extends TopComponent
 
         return currentDisplay.getViewName();
     }
-
-    public void componentActivated() {
-        super.componentActivated();
-
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else if (currentDisplayComponent != null) {
-            currentDisplayComponent.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        super.componentDeactivated();
-
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    
+    protected Component defaultFocusOwner() {
+        return currentDisplayComponent;
     }
 
     public boolean fitsVisibleArea() {
