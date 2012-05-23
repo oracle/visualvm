@@ -814,7 +814,7 @@ public class ClassesListControllerUI extends JTitledPanel {
             public void run() {
                 final AtomicBoolean initInProgress = new AtomicBoolean(false);
                 
-                RequestProcessor.getDefault().post(new Runnable() {
+                BrowserUtils.performTask(new Runnable() {
                     public void run() {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {

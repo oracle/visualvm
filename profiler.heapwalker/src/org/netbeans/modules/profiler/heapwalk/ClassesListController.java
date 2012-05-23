@@ -66,9 +66,9 @@ import javax.swing.AbstractButton;
 import javax.swing.JPanel;
 import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -414,7 +414,7 @@ public class ClassesListController extends AbstractController {
     public void compareAction() {
         if (comparingSnapshot) return;
         comparingSnapshot = true;
-        RequestProcessor.getDefault().post(new Runnable() {
+        BrowserUtils.performTask(new Runnable() {
             public void run() {
                 try {
                     HeapFragmentWalker hfw = classesController.getHeapFragmentWalker();
