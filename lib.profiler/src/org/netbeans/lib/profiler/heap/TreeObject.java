@@ -44,8 +44,10 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -61,6 +63,7 @@ class TreeObject {
     private HprofHeap heap;
     private LongBuffer readBuffer;
     private LongBuffer writeBuffer;
+    private Set<Long> unique;
 //private long nextLevelSize;
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -154,9 +157,8 @@ class TreeObject {
             if (entry.hasOnlyOneReference()) {
                 long gcRootPointer = entry.getNearestGCRootPointer();
                 if (gcRootPointer != 0) {
-                    LongMap.Entry gcRootPointerEntry = heap.idToOffsetMap.get(gcRootPointer);                   
-                    if (gcRootPointerEntry.getRetainedSize() == 0) {
-                        gcRootPointerEntry.setRetainedSize(-1);
+                    if (!unique.contains(gcRootPointer)) {
+                        unique.add(gcRootPointer);
                         writeLong(gcRootPointer);
                     }
                 }
@@ -185,6 +187,7 @@ class TreeObject {
         writeBuffer = b;
         readBuffer.startReading();
         writeBuffer.reset();
+        unique = new HashSet(4000);
     }
     
     private void writeLong(long instanceId) throws IOException {
@@ -202,7 +205,6 @@ class TreeObject {
                 return -1;
             }
             if (!refEntry.isTreeObj()) {
-                writeLong(instanceId);
                 return -1;
             }
             return refEntry.getRetainedSize();
