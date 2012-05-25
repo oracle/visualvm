@@ -393,7 +393,6 @@ public class ClassesListController extends AbstractController {
     }
 
     public void selectClass(JavaClass javaClass) {
-        ((ClassesListControllerUI) getPanel()).ensureWillBeVisible(javaClass);
         ((ClassesListControllerUI) getPanel()).selectClass(javaClass);
     }
 
