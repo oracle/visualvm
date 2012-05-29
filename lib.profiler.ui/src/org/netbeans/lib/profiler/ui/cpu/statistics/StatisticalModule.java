@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.ui.cpu.statistics;
 
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 import javax.swing.JPanel;
+import org.netbeans.lib.profiler.marker.Mark;
 
 
 /**
@@ -55,16 +56,40 @@ public abstract class StatisticalModule extends JPanel {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private int mId = -1;
-
+    private Mark mark = Mark.DEFAULT;
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public void setSelectedMethodId(int methodId) {
-        mId = methodId;
+    final public void setSelectedMethodId(int methodId) {
+        int oldId = this.mId;
+        this.mId = methodId;
+        if (oldId != this.mId) {
+            onMethodSelectionChange(oldId, this.mId);
+        }
     }
-
+        
+    final protected int getSelectedMethodId() {
+        return mId;
+    }
+    
+    final public void setSelectedMark(Mark mark) {
+        Mark oldMark = this.mark;
+        this.mark = mark;
+        
+        if (!oldMark.equals(this.mark)) {
+            onMarkSelectionChange(oldMark, this.mark);
+        }
+    }
+    
+    final protected Mark getSelectedMark() {
+        return this.mark;
+    }
+    
     public abstract void refresh(RuntimeCPUCCTNode appNode);
     
-    protected int getSelectedMethodId() {
-        return mId;
+    protected void onMarkSelectionChange(Mark oldMark, Mark newMark) {
+    }
+    
+    protected void onMethodSelectionChange(int oldMethodId, int newMethodId) {
     }
 }
