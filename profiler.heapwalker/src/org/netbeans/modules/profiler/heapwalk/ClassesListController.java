@@ -64,6 +64,8 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
+import org.netbeans.lib.profiler.ProfilerLogger;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -148,7 +150,8 @@ public class ClassesListController extends AbstractController {
     public long maxDiff;
 
     // --- Internal interface ----------------------------------------------------
-    @NbBundle.Messages("ClassesListController_ResultNotAvailableString=N/A")
+    @NbBundle.Messages({"ClassesListController_ResultNotAvailableString=N/A",
+                        "ClassesListController_CompareFailed=Failed to load the heap dump to compare."})
     public Object[][] getData(String[] filterStrings, int filterType, boolean showZeroInstances, boolean showZeroSize,
                                          int sortingColumn, boolean sortingOrder, int columnCount) {
         boolean diff = isDiff();
@@ -424,10 +427,9 @@ public class ClassesListController extends AbstractController {
                             Heap currentHeap = hfw.getHeapFragment();
                             Heap diffHeap = HeapFactory.createHeap(dumpFile);
                             diffClasses = createDiffClasses(diffHeap, currentHeap);
-                        } catch (FileNotFoundException ex) {
-                            Exceptions.printStackTrace(ex);
-                        } catch (IOException ex) {
-                            Exceptions.printStackTrace(ex);
+                        } catch (Exception e) {
+                            ProfilerDialogs.displayError(Bundle.ClassesListController_CompareFailed());
+                            ProfilerLogger.log(e);
                         } finally {
                             hideDiffProgress();
                         }
