@@ -503,6 +503,9 @@ public class OverviewController extends AbstractController {
         int offset = 0;
         int len;
         
+        if (threadName == null) {
+            return "*null*"; // NOI18N
+        }
         if (threadName instanceof PrimitiveArrayInstance) {
             chars = (PrimitiveArrayInstance)threadName;
             len = chars.getLength();
