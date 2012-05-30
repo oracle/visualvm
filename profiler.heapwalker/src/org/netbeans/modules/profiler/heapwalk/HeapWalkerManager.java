@@ -51,11 +51,11 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import java.io.File;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 
 
 /**
@@ -146,7 +146,7 @@ public class HeapWalkerManager {
         topComponents.remove(tc);
 
         if (dumpsBeingDeleted.remove(file)) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            BrowserUtils.performTask(new Runnable() {
                     public void run() {
                         deleteHeapDumpImpl(file, 15);
                     }

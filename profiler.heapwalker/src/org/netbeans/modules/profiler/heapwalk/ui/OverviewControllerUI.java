@@ -65,6 +65,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 
 /**
  *
@@ -137,7 +138,7 @@ public class OverviewControllerUI extends JTitledPanel {
             dataArea.setText(Bundle.OverviewControllerUI_InProgressMsg());
         }
         
-        RequestProcessor.getDefault().post(new Runnable() {
+        BrowserUtils.performTask(new Runnable() {
             public void run() {
                 String summary = "<nobr>" + overviewController.computeSummary() + "</nobr>"; // NOI18N
                 String environment = "<nobr>" + overviewController.computeEnvironment() + "</nobr>"; // NOI18N

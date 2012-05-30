@@ -206,6 +206,9 @@ final class TimelineView {
         container.add(panel, BorderLayout.CENTER);
 
         support.addSelectionListener( new TimelineSupport.SelectionListener() {
+            public void intervalsSelectionChanged() {
+                updateSelectionToolbar();
+            }
             public void indexSelectionChanged() {
                 updateSelectionToolbar();
             }
