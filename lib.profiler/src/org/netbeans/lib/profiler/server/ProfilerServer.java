@@ -1751,4 +1751,8 @@ public class ProfilerServer extends Thread implements CommonConstants {
             resultsNotified = false;
         }
     }
+
+    boolean isDynamic() {
+        return dynamic;
+    }
 }
