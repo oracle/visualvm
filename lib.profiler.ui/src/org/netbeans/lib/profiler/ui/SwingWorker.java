@@ -140,12 +140,12 @@ public abstract class SwingWorker {
         if (!primed.compareAndSet(true, false)) {
             throw new IllegalStateException("SwingWorker instance may be used only once");
         }
-        try {
-            if (throughputSemaphore != null) {
-                throughputSemaphore.acquire();
-            }
-            postRunnable(new Runnable() {
-                public void run() {
+        postRunnable(new Runnable() {
+            public void run() {
+                try {
+                    if (throughputSemaphore != null) {
+                        throughputSemaphore.acquire();
+                    }
                     if (!isCancelled()) {
                         synchronized (warmupLock) {
                             workerRunning = true;
@@ -170,17 +170,18 @@ public abstract class SwingWorker {
                                 } else {
                                     done();
                                 }
-                                if (throughputSemaphore != null) {
-                                    throughputSemaphore.release();
-                                }
                             }
                         }
                     }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } finally {
+                    if (throughputSemaphore != null) {
+                        throughputSemaphore.release();
+                    }
                 }
-            });
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            }
+        });
     }
     
     /**
