@@ -64,7 +64,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Ian Formanek
  */
 @NbBundle.Messages({
-    "TelemetryOverviewPanel_TelemetryOverviewAccessDescr=Profiler telemetry overview",
+    "TelemetryOverviewPanel_TelemetryOverviewAccessDescr=VM telemetry overview",
     "LAB_TelemetryOverviewPanelName=VM Telemetry Overview"
 })
 public final class TelemetryOverviewPanel extends ProfilerTopComponent {

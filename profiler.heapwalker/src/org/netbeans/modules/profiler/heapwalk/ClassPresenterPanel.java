@@ -50,7 +50,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.net.URL;
-import java.text.MessageFormat;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -60,7 +59,7 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
-import org.openide.util.RequestProcessor;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 
 
 /**
@@ -200,7 +199,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
         actionsRenderer = new HTMLLabel() {
             protected void showURL(URL url) {
                 if (heapFragmentWalker != null) {
-                    RequestProcessor.getDefault().post(new Runnable() {
+                    BrowserUtils.performTask(new Runnable() {
                         public void run() {
                             heapFragmentWalker.computeRetainedSizes(true);
                         }
