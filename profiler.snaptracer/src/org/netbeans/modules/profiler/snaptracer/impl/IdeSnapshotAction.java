@@ -50,6 +50,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -140,7 +141,7 @@ public final class IdeSnapshotAction implements ActionListener {
         return chooser;
     }
 
-    private static class IdeSnapshotComponent extends TopComponent {
+    private static class IdeSnapshotComponent extends ProfilerTopComponent {
 
         IdeSnapshotComponent(String npssFileName) {
             setDisplayName(npssFileName);
