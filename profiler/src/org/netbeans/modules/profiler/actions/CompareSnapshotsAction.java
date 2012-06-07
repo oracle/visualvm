@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.*;
 import org.openide.DialogDescriptor;
 import org.openide.filesystems.FileObject;
@@ -61,7 +60,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -619,10 +617,11 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                                   boolean cellHasFocus) {
                         JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
+                        ResultsManager rm = ResultsManager.getDefault();
                         if (value instanceof LoadedSnapshot) {
                             LoadedSnapshot ls = (LoadedSnapshot) value;
                             c.setFont(c.getFont().deriveFont(Font.BOLD));
-                            c.setText(StringUtils.formatUserDate(new Date(ls.getSnapshot().getTimeTaken())));
+                            c.setText(rm.getSnapshotDisplayName(ls));
 
                             switch (ls.getType()) {
                                 case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
@@ -641,11 +640,11 @@ public class CompareSnapshotsAction extends AbstractAction {
                             }
                         } else if (value instanceof FileObject) {
                             FileObject fo = (FileObject) value;
-                            LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
+                            LoadedSnapshot ls = rm.findLoadedSnapshot(FileUtil.toFile(fo));
 
                             if (ls != null) {
                                 c.setFont(c.getFont().deriveFont(Font.BOLD));
-                                c.setText(StringUtils.formatUserDate(new Date(ls.getSnapshot().getTimeTaken())));
+                                c.setText(rm.getSnapshotDisplayName(ls));
 
                                 switch (ls.getType()) {
                                     case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
@@ -663,25 +662,8 @@ public class CompareSnapshotsAction extends AbstractAction {
                                         break;
                                 }
                             } else {
-                                String fileName = fo.getName();
-
-                                if (fileName.startsWith("snapshot-")) { // NOI18N
-
-                                    String time = fileName.substring("snapshot-".length(), fileName.length()); // NOI18N
-
-                                    try {
-                                        long timeStamp = Long.parseLong(time);
-                                        c.setText(StringUtils.formatUserDate(new Date(timeStamp)));
-                                    } catch (NumberFormatException e) {
-                                        // file name is probably customized
-                                        c.setText(fileName);
-                                    }
-                                } else {
-                                    c.setText(fileName);
-                                }
-
-                                int type = ResultsManager.getDefault().getSnapshotType(fo);
-
+                                int type = rm.getSnapshotType(fo);
+                                c.setText(rm.getSnapshotDisplayName(fo.getName(), type));
                                 switch (type) {
                                     case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
                                         c.setIcon(cpuIcon);
