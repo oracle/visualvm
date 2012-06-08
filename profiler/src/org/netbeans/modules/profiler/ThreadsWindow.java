@@ -84,7 +84,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "ThreadsWindow_ThreadsDetailsTabDescr=List of application threads with detailed status data",
     "ThreadsWindow_ThreadsAccessDescr=Profiler threads timeline and details"
 })
-public final class ThreadsWindow extends TopComponent implements ProfilingStateListener, ActionListener, ChangeListener,
+public final class ThreadsWindow extends ProfilerTopComponent implements ProfilingStateListener, ActionListener, ChangeListener,
                                                                  SaveViewAction.ViewProvider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY = "ThreadsWindow.HelpCtx"; // NOI18N
@@ -98,7 +98,6 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
     private final ResultsView threadsView;
     private final ThreadsPanel threadsPanel;
     private final ThreadsTablePanel threadsTablePanel;
-    private Component lastFocusOwner;
     private JPanel threadsDetailsPanelContainer;
     private ThreadsDetailsPanel threadsDetailsPanel;
 
@@ -235,17 +234,9 @@ public final class ThreadsWindow extends TopComponent implements ProfilingStateL
 
         return null;
     }
-
-    public void componentActivated() {
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else if (threadsPanel != null) {
-            threadsPanel.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    
+    protected Component defaultFocusOwner() {
+        return threadsPanel;
     }
 
     public boolean fitsVisibleArea() {

@@ -77,7 +77,6 @@ import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Image;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -144,9 +143,9 @@ import org.openide.util.lookup.ServiceProvider;
     "History_LoggingConfirmationCaption=Log Class History",
     "History_LoggingResetMsg=This will reset history logging for {0}.\nDo you want to continue?",
     "History_LoggingStopMsg=This will stop history logging for {0}.\nDo you want to continue?",
-    "LAB_ResultsWindowName=Live Profiling Results"
+    "LAB_ResultsWindowName=Live Results"
 })
-public final class LiveResultsWindow extends TopComponent
+public final class LiveResultsWindow extends ProfilerTopComponent
                                      implements ProfilingStateListener,
                                                 SaveViewAction.ViewProvider,
                                                 ExportAction.ExportProvider {
@@ -462,7 +461,6 @@ public final class LiveResultsWindow extends TopComponent
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private CPUResUserActionsHandler cpuActionsHandler;
-    private Component lastFocusOwner;
     private EmptyLiveResultsPanel noResultsPanel;
     private JButton runGCButton;
     private JButton updateNowButton;
@@ -671,21 +669,9 @@ public final class LiveResultsWindow extends TopComponent
 
         return currentDisplay.getViewName();
     }
-
-    public void componentActivated() {
-        super.componentActivated();
-
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else if (currentDisplayComponent != null) {
-            currentDisplayComponent.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        super.componentDeactivated();
-
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    
+    protected Component defaultFocusOwner() {
+        return currentDisplayComponent;
     }
 
     public boolean fitsVisibleArea() {
