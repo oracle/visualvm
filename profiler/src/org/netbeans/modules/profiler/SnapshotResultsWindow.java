@@ -164,7 +164,6 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY_CPU = "CpuSnapshot.HelpCtx"; // NOI18N
     private static final String HELP_CTX_KEY_MEM = "MemorySnapshot.HelpCtx"; // NOI18N
-    private static HelpCtx HELP_CTX = HelpCtx.DEFAULT_HELP;
     
     private static final Image WINDOW_ICON_CPU = Icons.getImage(ProfilerIcons.CPU);
     private static final Image WINDOWS_ICON_FRAGMENT = Icons.getImage(ProfilerIcons.FRAGMENT);
@@ -180,6 +179,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     private String tabName = ""; // NOI18N // default
     private SnapshotListener listener;
     private boolean forcedClose = false;
+    private HelpCtx helpCtx = HelpCtx.DEFAULT_HELP;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -279,7 +279,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
     
     public HelpCtx getHelpCtx() {
-        return HELP_CTX;
+        return helpCtx;
     }
 
     public boolean canClose() {
@@ -361,7 +361,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         updateFind(true, cpuPanel);
         add(cpuPanel, BorderLayout.CENTER);
         setIcon(WINDOW_ICON_CPU);
-        HELP_CTX = new HelpCtx(HELP_CTX_KEY_CPU);
+        helpCtx = new HelpCtx(HELP_CTX_KEY_CPU);
     }
 
     private void displayCodeRegionResults(LoadedSnapshot ls) {
@@ -380,7 +380,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         updateFind(true, memoryPanel);
         add(memoryPanel, BorderLayout.CENTER);
         setIcon(WINDOWS_ICON_MEMORY);
-        HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
+        helpCtx = new HelpCtx(HELP_CTX_KEY_MEM);
     }
 
     private void forcedClose() {
