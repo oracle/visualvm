@@ -42,12 +42,9 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.DataOutputStream;
 import java.io.OutputStream;
 import java.util.logging.Level;
-import javax.swing.Action;
 import org.junit.Test;
 import org.netbeans.junit.Log;
 import org.netbeans.modules.profiler.ui.NpsDataObject;
@@ -56,10 +53,12 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import static org.junit.Assert.*;
+import org.netbeans.modules.sampler.Sampler;
 
 /** Shows how o.n.core uses the SelfSamplerAction to start and stop self profiling.
  *
  * @author Jaroslav Tulach <jtulach@netbeans.org>
+ * @author Tomas Hurka
  */
 public class SelfSamplerActionTest {
 
@@ -68,24 +67,17 @@ public class SelfSamplerActionTest {
 
     @Test
     public void testSelfProfileToStream() throws Exception {
-        FileObject afo = FileUtil.getConfigFile("Actions/Profile/org-netbeans-modules-profiler-actions-SelfSamplerAction.instance");
-        assertNotNull("SelfSamplerAction is in the right fileobject", afo);
-        Action a = (Action)afo.getAttribute("delegate"); // NOI18N
-        Object obj = a.getValue("logger-testprofile");
-        assertTrue("It is runnable", obj instanceof Runnable);
-        assertTrue("It is action listener", obj instanceof ActionListener);
+        Sampler sampler = Sampler.createManualSampler("testprofile");
+        assertTrue("sampler instance", sampler != null);
 
-        Runnable r = (Runnable)obj;
-        ActionListener al = (ActionListener)obj;
-
-        r.run();
+        sampler.start();
         Thread.sleep(1000);
-        assertLoggerThread("logger-testprofile shall be there", true);
+        assertSamplerThread("sampler-testprofile shall be there", true);
 
         FileObject fo = FileUtil.createMemoryFileSystem().getRoot().createData("slow.nps");
         OutputStream os = fo.getOutputStream();
         DataOutputStream dos = new DataOutputStream(os);
-        al.actionPerformed(new ActionEvent(dos, 0, "write")); // NOI18N
+        sampler.stopAndWriteTo(dos);
         dos.close();
 
         if (fo.getSize() < 100) {
@@ -104,39 +96,32 @@ public class SelfSamplerActionTest {
             fail("There shall be no warnings:\n" + log);
         }
 
-        assertLoggerThread("no logger- thread shall be there", false);
+        assertSamplerThread("no sampler- thread shall be there", false);
     }
 
     @Test
     public void testSelfProfileCancel() throws Exception {
-        FileObject afo = FileUtil.getConfigFile("Actions/Profile/org-netbeans-modules-profiler-actions-SelfSamplerAction.instance");
-        assertNotNull("SelfSamplerAction is in the right fileobject", afo);
-        Action a = (Action)afo.getAttribute("delegate"); // NOI18N
-        Object obj = a.getValue("logger-testprofile");
-        assertTrue("It is runnable", obj instanceof Runnable);
-        assertTrue("It is action listener", obj instanceof ActionListener);
+        Sampler sampler = Sampler.createManualSampler("testprofile");
+        assertTrue("sampler instance", sampler != null);
 
-        Runnable r = (Runnable)obj;
-        ActionListener al = (ActionListener)obj;
-
-        r.run();
+        sampler.start();
         Thread.sleep(1000);
-        assertLoggerThread("logger-testprofile shall be there", true);
+        assertSamplerThread("sampler-testprofile shall be there", true);
 
-        al.actionPerformed(new ActionEvent(this, 0, "cancel")); // NOI18N
+        sampler.cancel();
         Thread.sleep(1000);
 
-        assertLoggerThread("no logger- thread shall be there", false);
+        assertSamplerThread("no sampler- thread shall be there", false);
     }
 
-    private void assertLoggerThread(String msg, boolean exist) {
+    private void assertSamplerThread(String msg, boolean exist) {
         for (Thread t : Thread.getAllStackTraces().keySet()) {
-            if (t.getName().startsWith("logger-")) {
+            if (t.getName().startsWith("sampler-")) {
                 assertTrue(msg + " There is " + t.getName() + " thread", exist);
                 return;
             }
         }
-        assertFalse(msg + " There is no logger- thread", exist);
+        assertFalse(msg + " There is no sampler- thread", exist);
     }
 
 
