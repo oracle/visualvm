@@ -111,7 +111,6 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -641,7 +640,6 @@ public class ClassesListControllerUI extends JTitledPanel {
                     return getPreferredSize();
                 }
             };
-            p.setIndeterminate(true);
         }
         
         JPanel indent = new JPanel(null);
@@ -660,6 +658,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 w.setVisible(true);
+                p.setIndeterminate(true);
                 p.setVisible(true);
                 l.setVisible(false);
             }
@@ -671,6 +670,7 @@ public class ClassesListControllerUI extends JTitledPanel {
             public void run() {
                 w.setVisible(false);
                 p.setVisible(false);
+                p.setIndeterminate(false);
                 
                 if (classesListController.isDiff()) {
                     l.setText("<nobr>" + NbBundle.getMessage(ClassesListControllerUI.class, // NOI18N
