@@ -434,23 +434,22 @@ public final class ResultsManager {
 
                 dir[0] = FileUtil.toFileObject(FileUtil.normalizeFile(file));
             }
-            
-            final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshots());
-            ph.setInitialDelay(500);
-            ph.start();
-            ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        for (int i = 0; i < selectedSnapshots.length; i++) {
-                            exportSnapshot(selectedSnapshots[i], dir[0], fileName[0] != null ? fileName[0] : selectedSnapshots[i].getName(), fileExt[0] != null ? fileExt[0] : selectedSnapshots[i].getExt());
-                        }
-                    } finally {
-                        ph.finish();
-                    }
-                }
-            });
         }
+        final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshots());
+        ph.setInitialDelay(500);
+        ph.start();
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for (int i = 0; i < selectedSnapshots.length; i++) {
+                        exportSnapshot(selectedSnapshots[i], dir[0], fileName[0] != null ? fileName[0] : selectedSnapshots[i].getName(), fileExt[0] != null ? fileExt[0] : selectedSnapshots[i].getExt());
+                    }
+                } finally {
+                    ph.finish();
+                }
+            }
+        });
     }
 
     public LoadedSnapshot findLoadedSnapshot(ResultsSnapshot snapshot) {
