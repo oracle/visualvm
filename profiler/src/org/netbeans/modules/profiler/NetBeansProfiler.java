@@ -111,7 +111,11 @@ import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -133,7 +137,9 @@ import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.awt.Mnemonics;
+import org.openide.util.Cancellable;
 
 
 /**
@@ -865,6 +871,19 @@ public abstract class NetBeansProfiler extends Profiler {
      */
     @Override
     public boolean connectToStartedApp(final ProfilingSettings profilingSettings, final SessionSettings sessionSettings) {
+        return connectToStartedApp(profilingSettings, sessionSettings, new AtomicBoolean());
+    }
+    
+    /**
+     * Connects to an application started using the specified sessionSettings, and will start its profiling
+     * with the provided profilingSettings.
+     *
+     * @param profilingSettings Settings to use for profiling
+     * @param sessionSettings   Session settings for profiling
+     * @param cancel shared cancel flag
+     * @return true if connected successfully, false otherwise
+     */
+    public boolean connectToStartedApp(final ProfilingSettings profilingSettings, final SessionSettings sessionSettings, final AtomicBoolean cancel) {
         profilingMode = MODE_PROFILE;
 
         lastProfilingSettings = profilingSettings;
@@ -899,7 +918,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     @Override
                     public void run() {
                         // should propagate the result of the following operation somehow; current workflow doesn't allow it
-                        if (tryInitiateSession()) {
+                        if (tryInitiateSession(cancel)) {
                             connectToApp();
                         }
                     }
@@ -945,8 +964,8 @@ public abstract class NetBeansProfiler extends Profiler {
         return true;
     }
     
-    private boolean tryInitiateSession() {
-        if (!targetAppRunner.initiateSession(0, false) || !targetAppRunner.connectToStartedVMAndStartTA()) {
+    private boolean tryInitiateSession(AtomicBoolean cancel) {
+        if (!targetAppRunner.initiateSession(0, false, cancel) || !targetAppRunner.connectToStartedVMAndStartTA()) {
             changeStateTo(PROFILING_INACTIVE);
 
             return false; // failed, cannot proceed
@@ -1672,7 +1691,7 @@ public abstract class NetBeansProfiler extends Profiler {
     @NbBundle.Messages({
         "MSG_StartingProfilerClient=Starting Profiler Client"
     })
-    public boolean startEx(final ProfilingSettings profilingSettings, final SessionSettings sessionSettings) {
+    public boolean startEx(final ProfilingSettings profilingSettings, final SessionSettings sessionSettings, final AtomicBoolean cancel) {
         final boolean[] rslt = new boolean[1];
         final CountDownLatch latch = new CountDownLatch(1);
         
@@ -1682,7 +1701,7 @@ public abstract class NetBeansProfiler extends Profiler {
             protected void doInBackground() {
                 if (isCancelled()) return;
                 
-                connectToStartedApp(profilingSettings, sessionSettings);
+                connectToStartedApp(profilingSettings, sessionSettings, cancel);
             }
 
             @Override
@@ -1714,6 +1733,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     pd = null;
                 }
                 rslt[0] = false;
+                cancel.set(true);
                 latch.countDown();
             }
 
@@ -1901,6 +1921,9 @@ public abstract class NetBeansProfiler extends Profiler {
 
 //            // deconfigure the marking engine
 //            MarkingEngine.getDefault().deconfigure();
+            for(SessionListener sl : Lookup.getDefault().lookupAll(SessionListener.class)) {
+                sl.onShutdown();
+            }
         }
     }
 
