@@ -188,8 +188,7 @@ final public class FileSelectRootMethodsPanel extends JPanel {
 
             public void run() {
                 List<SelectionTreeBuilder> builders = SelectionTreeBuilderFactory.buildersFor(javaFile);
-                fileTreeView.setContext(Lookups.fixed((Object[])builders.toArray(new SelectionTreeBuilder[builders.size()])));
-                fileTreeView.setSelection(currentSelection);
+                fileTreeView.setSelection(currentSelection, Lookups.fixed((Object[])builders.toArray(new SelectionTreeBuilder[builders.size()])));
 
                 List<SelectionTreeBuilderType> builderTypes = fileTreeView.getBuilderTypes();
                 if (builderTypes.size() > 0) {
