@@ -404,6 +404,8 @@ public final class ResultsManager {
                 fileName[0] = sf.fileName;
                 fileExt[0] = sf.fileExt;
                 dir[0] = sf.folder;
+            } else { // dialog cancelled by the user
+                return;
             }
         } else {
             JFileChooser chooser = new JFileChooser();
@@ -433,6 +435,8 @@ public final class ResultsManager {
                 exportDir = file;
 
                 dir[0] = FileUtil.toFileObject(FileUtil.normalizeFile(file));
+            } else { // dialog cancelled
+                return;
             }
         }
         final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshots());
