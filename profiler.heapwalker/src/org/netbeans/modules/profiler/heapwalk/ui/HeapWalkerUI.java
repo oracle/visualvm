@@ -49,7 +49,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.KeyboardFocusManager;
+import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.HelpCtx;
@@ -59,14 +59,13 @@ import org.openide.util.HelpCtx;
  *
  * @author Jiri Sedlacek
  */
-public class HeapWalkerUI extends TopComponent {
+public class HeapWalkerUI extends ProfilerTopComponent {
     private static final String HELP_CTX_KEY = "HeapWalker.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HeapWalker heapWalker;
-    private Component lastFocusOwner;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -80,16 +79,8 @@ public class HeapWalkerUI extends TopComponent {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
-    public void componentActivated() {
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else {
-            heapWalker.getMainHeapWalker().getPanel().requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    protected Component defaultFocusOwner() {
+        return heapWalker.getMainHeapWalker().getPanel();
     }
 
     // --- TopComponent support --------------------------------------------------

@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.*;
 import org.openide.DialogDescriptor;
 import org.openide.filesystems.FileObject;
@@ -59,7 +58,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.Date;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -331,8 +329,8 @@ public class CompareSnapshotsHelper {
                         if (value instanceof FileObject) {
                             FileObject fo = (FileObject) value;
                             c.setIcon(memoryIcon);
-
-                            String fileName = fo.getName();
+                            c.setText(ResultsManager.getDefault().
+                                    getHeapDumpDisplayName(fo.getName()));
 
                             Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
                             for (TopComponent tc : tcs) {
@@ -341,22 +339,6 @@ public class CompareSnapshotsHelper {
                                     c.setFont(c.getFont().deriveFont(Font.BOLD));
                                     break;
                                 }
-                            }
-
-                            if (fileName.startsWith("heapdump-")) { // NOI18N
-
-                                String time = fileName.substring("heapdump-".length(), fileName.length()); // NOI18N
-
-                                try {
-                                    long timeStamp = Long.parseLong(time);
-                                    c.setText(Bundle.CompareSnapshotsHelper_HeapSnapshotDisplayName(
-                                                StringUtils.formatUserDate(new Date(timeStamp))));
-                                } catch (NumberFormatException e) {
-                                    // file name is probably customized
-                                    c.setText(Bundle.CompareSnapshotsHelper_HeapSnapshotDisplayName(fileName));
-                                }
-                            } else {
-                                c.setText(Bundle.CompareSnapshotsHelper_HeapSnapshotDisplayName(fileName));
                             }
                         }
 
