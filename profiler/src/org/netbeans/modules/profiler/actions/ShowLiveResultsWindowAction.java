@@ -65,7 +65,7 @@ import org.openide.awt.ActionRegistration;
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ShowLiveResultsWindowAction")
 @ActionRegistration(displayName="#LBL_ShowLiveResultsWindowAction", iconBase="org/netbeans/modules/profiler/impl/icons/liveResultsWindow.png")
-@ActionReference(path="Menu/Window/Profile", position=300)
+@ActionReference(path="Menu/Window/Profile", position=200)
 public final class ShowLiveResultsWindowAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
