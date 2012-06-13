@@ -990,7 +990,10 @@ public final class ResultsManager {
                 }
 
                 public String getDescription() {
-                    return Bundle.ResultsManager_ProfilerSnapshotFileFilter(heapdump ? HEAPDUMP_EXTENSION : SNAPSHOT_EXTENSION);
+                    if (heapdump) {
+                        return Bundle.ResultsManager_ProfilerHeapdumpFileFilter(HEAPDUMP_EXTENSION);
+                    }
+                    return Bundle.ResultsManager_ProfilerSnapshotFileFilter(SNAPSHOT_EXTENSION);
                 }
             });
 
