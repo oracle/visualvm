@@ -74,6 +74,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -791,13 +792,15 @@ public class ProfilerClient implements CommonConstants {
     /**
      * This is called in all modes, direct invoke or attachment, to establish connection with the target VM
      * @param attachMode 0 = no attach, 1 = direct attach, 2 = dynamic attach
+     * @param calibrationOnlyRun connection in calibration mode only
+     * @param cancel shared cancel flag
      */
-    public boolean establishConnectionWithServer(int attachMode, boolean calibrationOnlyRun) {
+    public boolean establishConnectionWithServer(int attachMode, boolean calibrationOnlyRun, AtomicBoolean cancel) {
         // Make sure we initialize this field early - it may be changed once we connect to the JVM and find out its
         // real version.
         status.targetJDKVersionString = settings.getTargetJDKVersionString();
 
-        return connectToServer(attachMode, calibrationOnlyRun);
+        return connectToServer(attachMode, calibrationOnlyRun, cancel);
     }
 
     /**
@@ -1594,7 +1597,7 @@ public class ProfilerClient implements CommonConstants {
         }
     }
 
-    private boolean connectToServer(int attachMode, boolean calibrationOnlyRun) {
+    private boolean connectToServer(int attachMode, boolean calibrationOnlyRun, final AtomicBoolean cancel) {
         status.targetAppRunning = false;
         targetVMAlive = false;
         terminateOrDetachCommandIssued = false;
@@ -1611,13 +1614,11 @@ public class ProfilerClient implements CommonConstants {
         final String host = taHost;
         final int port = settings.getPortNo();
         
-        final boolean[] waitForConnection = new boolean[1];
-        waitForConnection[0] = true;
         int noOfCycles = 600; // Timeout is set to 150 sec
         
         Runnable cancelHandler = new Runnable() {
             public void run() {
-                waitForConnection[0] = false;
+                cancel.set(true);
                 serverListener.cancel(); 
             }
         };
@@ -1629,7 +1630,7 @@ public class ProfilerClient implements CommonConstants {
             waitDialog.display();
             serverListener.start();
 
-            while (waitForConnection[0]) {
+            while (!cancel.get()) {
                 try {
                     clientSocket = new Socket(host, port);
                     clientSocket.setSoTimeout(0); // ATTENTION: timeout may be found useful eventually...
@@ -1638,9 +1639,9 @@ public class ProfilerClient implements CommonConstants {
                     socketIn = new ObjectInputStream(clientSocket.getInputStream());
                     wireIO = new WireIO(socketOut, socketIn);
 
-                    waitForConnection[0] = false;
                     targetVMAlive = true; // This is in fact an assumption
                     serverListener.startRunning();
+                    break;
                 } catch (ConnectException ex) {
                     // ex.printStackTrace (System.err);
                     try {
@@ -1650,8 +1651,8 @@ public class ProfilerClient implements CommonConstants {
 
                     if (--noOfCycles == 0) {
                         MiscUtils.printWarningMessage("timed out while trying to connect to the target JVM."); // NOI18N
-                        waitForConnection[0] = false;
                         serverListener.cancel();
+                        break;
                     }
                 }
             }
