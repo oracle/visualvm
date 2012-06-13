@@ -81,7 +81,6 @@ import java.io.ObjectOutput;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -190,7 +189,7 @@ import org.openide.util.lookup.ServiceProvider;
     "MSG_Loading_Progress=Loading...",
     "LAB_ControlPanelName=Profiler"
 })
-public final class ProfilerControlPanel2 extends TopComponent implements ProfilingStateListener {
+public final class ProfilerControlPanel2 extends ProfilerTopComponent implements ProfilingStateListener {
     final private static Logger LOGGER = Logger.getLogger(ProfilerControlPanel2.class.getName());
     
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -1006,6 +1005,14 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
                         return null;
                 }
             }
+
+            public boolean equals(Object o) {
+                return fo.equals(((Snapshot)o).fo);
+            }
+            
+            public int hashCode() {
+                return fo.hashCode();
+            }
         }
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -1424,51 +1431,65 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
             }
         }
 
-        final private Semaphore refreshListSemaphore = new Semaphore(1);
+        private static final RequestProcessor updater = new RequestProcessor("Snapshots Updater"); // NOI18N
+        private static final Object updaterSync = new Object();
+        private boolean updating = false;
+        private boolean dirty = false;
+        
         private void refreshList() {
-            final Object[] sel = list.getSelectedValues();
+            synchronized (updaterSync) {
+                if (updating) {
+                    dirty = true;
+                    return;
+                }
+            }
             
-            org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker(refreshListSemaphore) {
-                private final java.util.List<Snapshot> modelElements = new ArrayList<Snapshot>();
-                
-                @Override
-                protected void doInBackground() {
-                    for(FileObject fo : ResultsManager.getDefault().listSavedSnapshots(displayedProject, null)) {
-                        modelElements.add(new Snapshot(fo));
-                    }
-
-                    for(FileObject fo : ResultsManager.getDefault().listSavedHeapdumps(displayedProject, null)) {
-                        modelElements.add(new Snapshot(fo));
-                    }
-                }
-
-                @Override
-                protected void done() {
-                    DefaultListModel newListModel = new DefaultListModel();
-                    for(Object element : modelElements)
-                        newListModel.addElement(element);
-                    list.setModel(newListModel);
-                    listModel.removeAllElements();
-                    listModel = newListModel;
-                    list.setEnabled(true);
-                    for (Object s : sel) {
-                        int i = listModel.indexOf(s);
-                        if (i != -1) list.addSelectionInterval(i, i);
-                    }
-                }
-
-                @Override
-                protected void nonResponding() {
-                    CommonUtils.runInEventDispatchThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            list.setEnabled(false);
-                            listModel.addElement(Bundle.MSG_Loading_Progress());
+            SwingUtilities.invokeLater(new Runnable() { // Read current selection in EDT
+                public void run() {
+                    final java.util.List selection = Arrays.asList(list.getSelectedValues());
+                    
+                    updater.post(new Runnable() { // Access snapshots on filesystem in worker thread
+                        public void run()  {
+                            synchronized (updaterSync) {
+                                dirty = false;
+                                updating = true;
+                            }
+                            
+                            final java.util.List<Snapshot> snapshots = new ArrayList<Snapshot>();
+                            try {
+                                for (FileObject fo : ResultsManager.getDefault().
+                                        listSavedSnapshots(displayedProject, null))
+                                    snapshots.add(new Snapshot(fo));
+                                for (FileObject fo : ResultsManager.getDefault().
+                                        listSavedHeapdumps(displayedProject, null))
+                                    snapshots.add(new Snapshot(fo));
+                            } catch (Throwable t) {
+                                LOGGER.log(Level.WARNING, null, t);
+                            }
+                            
+                            SwingUtilities.invokeLater(new Runnable() { // Update snapshots in EDT
+                                public void run() {
+                                    listModel.clear();
+                                    for (int i = 0; i < snapshots.size(); i++) {
+                                        Snapshot s = snapshots.get(i);
+                                        listModel.addElement(s);
+                                        if (selection.contains(s))
+                                            list.addSelectionInterval(i, i);
+                                    }
+                                    
+                                    boolean refreshAgain = false;
+                                    synchronized (updaterSync) {
+                                        updating = false;
+                                        if (dirty) refreshAgain = true;
+                                    }
+                                    
+                                    if (refreshAgain) refreshList();
+                                }
+                            });
                         }
                     });
                 }
-            };
-            worker.execute();
+            });
         }
 
         private void updateButtons() {
@@ -1833,7 +1854,6 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     private final SnippetPanel spStatus;
     private final SnippetPanel spView;
     private final StatusPanel statusSnippet;
-    private Component lastFocusOwner;
     private boolean initialized = false;
     private Listener listener;
 
@@ -1952,17 +1972,9 @@ public final class ProfilerControlPanel2 extends TopComponent implements Profili
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_ALWAYS;
     }
-
-    public void componentActivated() {
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else if (spControls != null) {
-            spControls.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    
+    protected Component defaultFocusOwner() {
+        return spControls;
     }
 
     public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {

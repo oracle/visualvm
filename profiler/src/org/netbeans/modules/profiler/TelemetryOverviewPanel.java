@@ -64,10 +64,10 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Ian Formanek
  */
 @NbBundle.Messages({
-    "TelemetryOverviewPanel_TelemetryOverviewAccessDescr=Profiler telemetry overview",
+    "TelemetryOverviewPanel_TelemetryOverviewAccessDescr=VM telemetry overview",
     "LAB_TelemetryOverviewPanelName=VM Telemetry Overview"
 })
-public final class TelemetryOverviewPanel extends TopComponent {
+public final class TelemetryOverviewPanel extends ProfilerTopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final String HELP_CTX_KEY = "TelemetryOverviewPanel.HelpCtx"; // NOI18N
@@ -80,7 +80,6 @@ public final class TelemetryOverviewPanel extends TopComponent {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final MonitoringGraphsPanel graphsPanel;
-    private Component lastFocusOwner;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -141,17 +140,9 @@ public final class TelemetryOverviewPanel extends TopComponent {
     public Dimension getPrefferedSize() {
         return PREFFERED_SIZE;
     }
-
-    public void componentActivated() {
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else if (graphsPanel != null) {
-            graphsPanel.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    
+    protected Component defaultFocusOwner() {
+        return graphsPanel;
     }
 
     public boolean needsDocking() {
