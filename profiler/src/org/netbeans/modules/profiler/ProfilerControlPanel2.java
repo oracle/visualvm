@@ -186,6 +186,7 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_RenameSnapshotCaption=Rename Snapshot",
     "ProfilerControlPanel2_NewFileNameLbl=&New file name:",
     "ProfilerControlPanel2_RenameSnapshotFailedMsg=Failed to rename snapshot to {0}",
+    "ProfilerControlPanel2_EmptyNameMsg=Snapshot name cannot be empty.",
     "MSG_Loading_Progress=Loading...",
     "LAB_ControlPanelName=Profiler"
 })
@@ -1408,21 +1409,26 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
                         if (dd.getValue() == DialogDescriptor.OK_OPTION) {
                             String newName = panel.getSnapshotName();
                             if (!origName.equals(newName)) {
-                                FileLock lock = null;
-                                try {
-                                    lock = fileObject.lock();
-                                    final LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(
-                                            FileUtil.toFile(fileObject));
-                                    fileObject.rename(lock, newName, fileObject.getExt());
-                                    if (ls != null) ls.setFile(FileUtil.toFile(fileObject));
-                                    ProfilerControlPanel2.getDefault().refreshSnapshotsList();
-                                } catch (IOException e) {
-                                    ProfilerLogger.warning("Failed to rename snapshot " // NOI18N
-                                            + fileObject + " to " + newName + ": " + e.getMessage()); // NOI18N
-                                    ProfilerDialogs.displayError(Bundle.ProfilerControlPanel2_RenameSnapshotFailedMsg(newName));
+                                if (newName.length() == 0) {
+                                    ProfilerDialogs.displayError(Bundle.ProfilerControlPanel2_EmptyNameMsg());
                                     renameSelectedSnapshot();
-                                } finally {
-                                    if (lock != null) lock.releaseLock();
+                                } else {
+                                    FileLock lock = null;
+                                    try {
+                                        lock = fileObject.lock();
+                                        final LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(
+                                                FileUtil.toFile(fileObject));
+                                        fileObject.rename(lock, newName, fileObject.getExt());
+                                        if (ls != null) ls.setFile(FileUtil.toFile(fileObject));
+                                        ProfilerControlPanel2.getDefault().refreshSnapshotsList();
+                                    } catch (IOException e) {
+                                        ProfilerLogger.warning("Failed to rename snapshot " // NOI18N
+                                                + fileObject + " to " + newName + ": " + e.getMessage()); // NOI18N
+                                        ProfilerDialogs.displayError(Bundle.ProfilerControlPanel2_RenameSnapshotFailedMsg(newName));
+                                        renameSelectedSnapshot();
+                                    } finally {
+                                        if (lock != null) lock.releaseLock();
+                                    }
                                 }
                             }
                         }
@@ -1768,7 +1774,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         String getSnapshotName() {
-            return textField.getText();
+            return textField.getText().trim();
         }
 
         void setSnapshotName(final String text) {
