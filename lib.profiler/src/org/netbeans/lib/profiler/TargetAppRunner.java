@@ -62,6 +62,7 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -355,14 +356,25 @@ public class TargetAppRunner implements CommonConstants {
      *  Initiates profiling session
      * @param attachMode 0 = no attach; 1 = direct; 2 = dynamic
      * @param calibrationOnlyRun
+     * @param cancel shared cancel flag
      * @return Returns TRUE if the connection to the profiler agent has been successfuly established
      */
-    public boolean initiateSession(int attachMode, boolean calibrationOnlyRun) {
+    public boolean initiateSession(int attachMode, boolean calibrationOnlyRun, AtomicBoolean cancel) {
         if (targetJVMIsAlive()) {
             return true;
         }
 
-        return profilerClient.establishConnectionWithServer(attachMode, calibrationOnlyRun);
+        return profilerClient.establishConnectionWithServer(attachMode, calibrationOnlyRun, cancel);
+    }
+    
+    /**
+     *  Initiates profiling session
+     * @param attachMode 0 = no attach; 1 = direct; 2 = dynamic
+     * @param calibrationOnlyRun
+     * @return Returns TRUE if the connection to the profiler agent has been successfuly established
+     */
+    public boolean initiateSession(int attachMode, boolean calibrationOnlyRun) {
+        return initiateSession(attachMode, calibrationOnlyRun, new AtomicBoolean(false));
     }
 
     /**

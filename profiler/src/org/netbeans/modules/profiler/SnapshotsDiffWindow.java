@@ -73,7 +73,7 @@ import org.openide.util.Lookup;
     "SnapshotDiffWindow_AllocAccessDescr=Comparison of two memory allocations snapshots",
     "SnapshotDiffWindow_LivenessAccessDescr=Comparison of two memory liveness snapshots"
 })
-public final class SnapshotsDiffWindow extends TopComponent {
+public final class SnapshotsDiffWindow extends ProfilerTopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     //private static final String HELP_CTX_KEY_CPU = "CpuDiff.HelpCtx"; // NOI18N
@@ -82,9 +82,6 @@ public final class SnapshotsDiffWindow extends TopComponent {
     
     private static final Image WINDOW_ICON_MEMORY = Icons.getImage(ProfilerIcons.SNAPSHOTS_COMPARE);
 
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private Component lastFocusOwner;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -134,16 +131,6 @@ public final class SnapshotsDiffWindow extends TopComponent {
     
     public HelpCtx getHelpCtx() {
         return HELP_CTX;
-    }
-
-    public void componentActivated() {
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     }
 
     protected String preferredID() {
