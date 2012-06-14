@@ -58,6 +58,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDescriptor;
@@ -220,11 +221,16 @@ public class HeapFragmentWalker {
         if (stateListeners.size() == 0) stateListeners = null;
     }
 
-    private void changeState(int newState, boolean masterChange) {
-        retainedSizesStatus = newState;
-        if (stateListeners == null) return;
-        StateEvent e = new StateEvent(getRetainedSizesStatus(), masterChange);
-        for (StateListener listener : stateListeners) listener.stateChanged(e);
+    private void changeState(final int newState, final boolean masterChange) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                retainedSizesStatus = newState;
+                if (stateListeners == null) return;
+                StateEvent e = new StateEvent(retainedSizesStatus, masterChange);
+                for (StateListener listener : stateListeners)
+                    listener.stateChanged(e);
+            }
+        });
     }
 
 
