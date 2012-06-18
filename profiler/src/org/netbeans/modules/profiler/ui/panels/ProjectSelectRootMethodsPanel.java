@@ -188,8 +188,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpC
 
                 @Override
                 public void run() {
-                    pkgTreeView.setContext(getContext());
-                    pkgTreeView.setSelection(currentSelection);
+                    pkgTreeView.setSelection(currentSelection, getContext());
                 }
             });
 
@@ -425,8 +424,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpC
                         if (methods != null) updateSelector(new Runnable() {
                             @Override
                             public void run() {
-                                pkgTreeView.setContext(getContext());
-                                pkgTreeView.setSelection(methods); // TODO: seems to add methods instead of set methods!!!
+                                pkgTreeView.setSelection(methods, getContext());
                             }
                         });
                     }

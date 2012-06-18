@@ -94,6 +94,7 @@ final class DetailsView {
         panel = new DetailsPanel(timelineSupport);
 
         timelineSupport.addSelectionListener(new TimelineSupport.SelectionListener() {
+            public void intervalsSelectionChanged() {}
             public void indexSelectionChanged() {}
             public void timeSelectionChanged(boolean timestampsSelected, boolean justHovering) {}
         });
