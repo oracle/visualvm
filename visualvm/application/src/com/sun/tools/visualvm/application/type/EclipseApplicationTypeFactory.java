@@ -28,7 +28,6 @@ package com.sun.tools.visualvm.application.type;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
 import java.util.Properties;
-import java.util.Scanner;
 
 /**
  * Factory which recognizes Eclipse application.
@@ -53,7 +52,11 @@ public class EclipseApplicationTypeFactory extends MainClassApplicationTypeFacto
      */
     public ApplicationType createApplicationTypeFor(Application app, Jvm jvm, String mainClass) {
         if (MAIN_CLASS.equals(mainClass)) {
-            return new EclipseApplicationType(app, getName(jvm));
+            String name = getName(jvm);
+            if (name == null) {
+                name = ECLIPSE_NAME;
+            }
+            return new EclipseApplicationType(app, name);
         }
         if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect native Windows launcher
             String args = jvm.getJvmArgs();
