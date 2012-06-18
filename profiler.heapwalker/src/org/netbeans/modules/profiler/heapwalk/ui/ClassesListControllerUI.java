@@ -111,7 +111,6 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -348,22 +347,18 @@ public class ClassesListControllerUI extends JTitledPanel {
         // TODO [ui-persistence]
     }
 
-    public void ensureWillBeVisible(JavaClass javaClass) {
-        // TODO: add showZeroSize and showZeroInstances checking
+    public void selectClass(JavaClass javaClass) {
         if (ClassesListController.matchesFilter(javaClass, FilterComponent.getFilterValues(filterValue), filterType,
                                                     showZeroInstances, showZeroSize)) {
-            return;
+            selectClassImpl(javaClass);
+        } else {
+            filterComponent.setFilterValue(""); // NOI18N
+            filterValue = filterComponent.getFilterValue();
+            initDataImpl(javaClass);
         }
-
-        //    if (ClassesListController.matchesFilter(javaClass, FilterComponent.getFilterStrings(filterValue + " " + javaClass.getName()), filterType, showZeroInstances, showZeroSize)) { // NOI18N
-        //      filterComponent.setFilterString(filterValue + " " + javaClass.getName()); // NOI18N
-        //      return;
-        //    }
-        filterComponent.setFilterValue(""); // NOI18N
     }
-
-    // --- Public interface ------------------------------------------------------
-    public void selectClass(JavaClass javaClass) {
+    
+    private void selectClassImpl(JavaClass javaClass) {
         //    if (isShowing()) {
         if ((displayCache == null) || (displayCache.length == 0)) {
             return;
@@ -384,13 +379,6 @@ public class ClassesListControllerUI extends JTitledPanel {
                 break;
             }
         }
-
-        //      needsSelectInstance = false;
-        //    } else {
-        //      needsSelectFirstInstance = false;
-        //      instanceToSelect = instance;
-        //      needsSelectInstance = true;
-        //    }
     }
 
     public void updateData() {
@@ -652,7 +640,6 @@ public class ClassesListControllerUI extends JTitledPanel {
                     return getPreferredSize();
                 }
             };
-            p.setIndeterminate(true);
         }
         
         JPanel indent = new JPanel(null);
@@ -671,6 +658,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 w.setVisible(true);
+                p.setIndeterminate(true);
                 p.setVisible(true);
                 l.setVisible(false);
             }
@@ -682,6 +670,7 @@ public class ClassesListControllerUI extends JTitledPanel {
             public void run() {
                 w.setVisible(false);
                 p.setVisible(false);
+                p.setIndeterminate(false);
                 
                 if (classesListController.isDiff()) {
                     l.setText("<nobr>" + NbBundle.getMessage(ClassesListControllerUI.class, // NOI18N
@@ -806,15 +795,19 @@ public class ClassesListControllerUI extends JTitledPanel {
                 }
             });
     }
-
+    
     private void initData() {
+        initDataImpl(null);
+    }
+
+    private void initDataImpl(final JavaClass classToSelect) {
         if (displayCache == null) displayCache = new Object[0][columnCount + 1];
 
         CommonUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 final AtomicBoolean initInProgress = new AtomicBoolean(false);
                 
-                RequestProcessor.getDefault().post(new Runnable() {
+                BrowserUtils.performTask(new Runnable() {
                     public void run() {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -825,7 +818,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                     }
                 }, 100);
 
-                saveSelection();
+                if (classToSelect == null) saveSelection();
 
                 BrowserUtils.performTask(new Runnable() {
                     public void run() {
@@ -856,7 +849,8 @@ public class ClassesListControllerUI extends JTitledPanel {
                                 
                                 displayCache = displayCache2;
                                 classesListTableModel.fireTableDataChanged();
-                                restoreSelection();
+                                if (classToSelect == null) restoreSelection();
+                                else selectClassImpl(classToSelect);
                                 if (contents != null) contents.show(contentsPanel, DATA);
                             }
                         });

@@ -131,7 +131,7 @@ public class HintsController extends AbstractController {
         BrowserUtils.performTask(new Runnable() {
             public void run() {
                 int retainedSizesState = getSummaryController().getHeapFragmentWalker().
-                                         computeRetainedSizes(false);
+                                         computeRetainedSizes(true);
 
                 final String result = retainedSizesState == HeapFragmentWalker.
                                       RETAINED_SIZES_COMPUTED ?
