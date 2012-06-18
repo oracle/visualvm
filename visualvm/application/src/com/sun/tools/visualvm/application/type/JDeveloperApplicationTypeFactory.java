@@ -27,11 +27,6 @@ package com.sun.tools.visualvm.application.type;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.util.Set;
 
 /**
  * Factory which recognizes JDeveloper 11g and 10g.

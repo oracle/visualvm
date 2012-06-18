@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.regex.Pattern;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import static com.sun.tools.visualvm.application.type.NetBeansApplicationTypeFactory.NB_CLUSTER;
