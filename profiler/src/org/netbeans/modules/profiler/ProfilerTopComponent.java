@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,6 +24,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,68 +39,62 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalker;
 
-import java.io.IOException;
-import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
-import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.openide.cookies.OpenCookie;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
-import org.openide.loaders.DataNode;
-import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectExistsException;
-import org.openide.loaders.MultiDataObject;
-import org.openide.loaders.MultiFileLoader;
-import org.openide.nodes.Node;
-import org.openide.nodes.Children;
-import org.openide.util.Lookup;
+package org.netbeans.modules.profiler;
+
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import org.openide.windows.TopComponent;
 
 /**
- * HPROF heapdump DataObject
  *
- * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
-@DataObject.Registration(
-    iconBase = "org/netbeans/modules/profiler/heapwalk/ui/icons/impl/snapshotDataObject.png", 
-    mimeType = "application/x-netbeans-profiler-hprof",
-    position=10
-)
-public class HprofDataObject extends MultiDataObject implements OpenCookie {
+public class ProfilerTopComponent extends TopComponent {
     
-    public HprofDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
-        super(pf, loader);
-        
-    }
+    private Component lastFocusOwner;
     
-    @Override
-    protected Node createNodeDelegate() {
-        return new DataNode(this, Children.LEAF, getLookup());
-    }
-    
-    @Override
-    public Lookup getLookup() {
-        return getCookieSet().getLookup();
-    }
-    
-    public void open() {
-        final FileObject heapDumpFo = getPrimaryFile();
-        BrowserUtils.performTask(new Runnable() {
-            public void run() {
-                if (heapDumpFo != null) {
-                    HeapWalkerManager.getDefault().openHeapWalker(FileUtil.toFile(heapDumpFo));
+    private final PropertyChangeListener focusListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            Component c = evt.getNewValue() instanceof Component ?
+                    (Component)evt.getNewValue() : null;
+            processFocusedComponent(c);
+        }
+        private void processFocusedComponent(Component c) {
+            Component cc = c;
+            while (c != null) {
+                if (c == ProfilerTopComponent.this) {
+                    lastFocusOwner = cc;
+                    return;
                 }
+                c = c.getParent();
             }
-        });
+        }
+    };
+    
+    public void componentActivated() {
+        super.componentActivated();
+        if (lastFocusOwner != null) {
+            lastFocusOwner.requestFocus();
+        } else {
+            Component defaultFocusOwner = defaultFocusOwner();
+            if (defaultFocusOwner != null) defaultFocusOwner.requestFocus();
+        }
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().
+                addPropertyChangeListener("focusOwner", focusListener); // NOI18N
     }
 
-    @Override
-    protected void handleDelete() throws IOException {
-        HeapWalkerManager.getDefault().deleteHeapDump(FileUtil.toFile(getPrimaryFile()));
+    public void componentDeactivated() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().
+                removePropertyChangeListener("focusOwner", focusListener); // NOI18N
+        super.componentDeactivated();
     }
+    
+    protected Component defaultFocusOwner() {
+        return null;
+    }
+    
 }

@@ -184,9 +184,9 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
         clazz.setSuperClass(superClass);
 
         if ((superClass != null) && !clazz.isInterface()) {
-            superClass.addSubclass(addedClassInfo);
 
             if (addedClassInfo != null) {
+                superClass.addSubclass(addedClassInfo);
                 findAndMarkOverridingMethodsReachable(superClass, addedClassInfo);
             }
 
@@ -203,9 +203,8 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 clazz.setSuperInterface(superInterface, i);
 
                 if (superInterface != null) {
-                    superInterface.addSubclass(addedClassInfo);
-
                     if (addedClassInfo != null) {
+                        superInterface.addSubclass(addedClassInfo);
                         findAndMarkOverridingMethodsReachable(superInterface, addedClassInfo);
                     }
 
