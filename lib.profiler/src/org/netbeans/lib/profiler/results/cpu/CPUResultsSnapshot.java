@@ -49,14 +49,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
-import javax.swing.JOptionPane;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.FilterSortSupport;
 
