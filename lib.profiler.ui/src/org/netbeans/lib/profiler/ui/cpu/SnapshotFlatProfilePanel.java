@@ -238,6 +238,8 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
         if (snapshot != null) {
             flatProfileContainer = snapshot.getFlatProfile(threadId, currentView);
         }
+        
+        initDataUponResultsFetch();
 
         // If a now-inapplicable setting remained from previous run, reset it
         if ((snapshot == null) || (!collectingTwoTimeStamps && (sortBy == FlatProfileContainer.SORT_BY_SECONDARY_TIME))) {
@@ -251,6 +253,8 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
 
         setResultsAvailable(true);
     }
+    
+    protected void initDataUponResultsFetch() {}
 
     protected void showReverseCallGraph(int threadId, int methodId, int currentView, int sortingColumn, boolean sortingOrder) {
         actionsHandler.showReverseCallGraph(snapshot, threadId, methodId, currentView, sortingColumn, sortingOrder);
