@@ -56,6 +56,7 @@ import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.HelpCtx;
@@ -70,8 +71,10 @@ import org.openide.util.Lookup;
 @NbBundle.Messages({
     "SnapshotDiffWindow_AllocCaption=Allocations Comparison",
     "SnapshotDiffWindow_LivenessCaption=Liveness Comparison",
+    "SnapshotDiffWindow_CpuCaption=CPU Comparison",
     "SnapshotDiffWindow_AllocAccessDescr=Comparison of two memory allocations snapshots",
-    "SnapshotDiffWindow_LivenessAccessDescr=Comparison of two memory liveness snapshots"
+    "SnapshotDiffWindow_LivenessAccessDescr=Comparison of two memory liveness snapshots",
+    "SnapshotDiffWindow_CpuAccessDescr=Comparison of two cpu snapshots"
 })
 public final class SnapshotsDiffWindow extends ProfilerTopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -80,6 +83,7 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
     private static final String HELP_CTX_KEY_MEM = "MemoryDiff.HelpCtx"; // NOI18N
     private static HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
     
+    private static final Image WINDOW_ICON_CPU = Icons.getImage(ProfilerIcons.SNAPSHOTS_COMPARE);
     private static final Image WINDOW_ICON_MEMORY = Icons.getImage(ProfilerIcons.SNAPSHOTS_COMPARE);
 
 
@@ -110,6 +114,9 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
         } else if (ls instanceof LivenessMemoryResultsDiff) {
             getAccessibleContext().setAccessibleDescription(Bundle.SnapshotDiffWindow_LivenessAccessDescr());
             displayMemoryLivenessDiff((LivenessMemoryResultsDiff) ls, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
+        } else if (ls instanceof CPUResultsSnapshot) {
+            getAccessibleContext().setAccessibleDescription(Bundle.SnapshotDiffWindow_CpuAccessDescr());
+            displayCPUDiff((CPUResultsSnapshot)ls, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         }
     }
 
@@ -154,6 +161,16 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
         add(livenessDiffPanel, BorderLayout.CENTER);
         setName(Bundle.SnapshotDiffWindow_LivenessCaption());
         setIcon(WINDOW_ICON_MEMORY);
+    }
+    
+    private void displayCPUDiff(CPUResultsSnapshot diff, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
+                                           int sortingColumn, boolean sortingOrder, Lookup.Provider project) {
+        LoadedSnapshot diffLS = new LoadedSnapshot(diff, snapshot1.getSettings(), null, snapshot1.getProject());
+        CPUDiffPanel cpuDiffPanel = new CPUDiffPanel(getLookup(), diffLS, snapshot1, snapshot2, sortingColumn, sortingOrder);
+        updateFind(true, cpuDiffPanel);
+        add(cpuDiffPanel, BorderLayout.CENTER);
+        setName(Bundle.SnapshotDiffWindow_CpuCaption());
+        setIcon(WINDOW_ICON_CPU);
     }
 
     private void updateFind(boolean enabled, final SnapshotResultsWindow.FindPerformer performer) {
