@@ -227,11 +227,11 @@ public final class CPUDiffPanel extends SnapshotPanel implements ActionListener,
     private CCTDisplay cctPanel;
     private CPUResultsDiff snapshot;
     private JComboBox aggregationCombo;
-    private JComboBox threadsCombo;
+//    private JComboBox threadsCombo;
     private LoadedSnapshot loadedSnapshot;
     private SnapshotFlatProfilePanel flatPanel;
     private SubtreeCallGraphPanel subtreeView;
-    private int[] threadIds;
+//    private int[] threadIds;
     private boolean internalChange = false;
     private int currentAggregationMode;
 
@@ -310,22 +310,22 @@ public final class CPUDiffPanel extends SnapshotPanel implements ActionListener,
                 };
         }
 
-        threadIds = snapshot.getThreadIds();
+//        threadIds = snapshot.getThreadIds();
 
-        threadsCombo = new JComboBox(threadNames) {
-                public Dimension getMinimumSize() {
-                    Dimension d = super.getMinimumSize();
-                    d.width = 1;
-                    return d;
-                }
-                public Dimension getMaximumSize() {
-                    Dimension d = super.getPreferredSize();
-                    d.width += 50;
-                    return d;
-                }
-            };
-        threadsCombo.getAccessibleContext().setAccessibleName(Bundle.CPUSnapshotPanel_ThreadsComboAccessName());
-        threadsCombo.getAccessibleContext().setAccessibleDescription(Bundle.CPUSnapshotPanel_ThreadsComboAccessDescr());
+//        threadsCombo = new JComboBox(threadNames) {
+//                public Dimension getMinimumSize() {
+//                    Dimension d = super.getMinimumSize();
+//                    d.width = 1;
+//                    return d;
+//                }
+//                public Dimension getMaximumSize() {
+//                    Dimension d = super.getPreferredSize();
+//                    d.width += 50;
+//                    return d;
+//                }
+//            };
+//        threadsCombo.getAccessibleContext().setAccessibleName(Bundle.CPUSnapshotPanel_ThreadsComboAccessName());
+//        threadsCombo.getAccessibleContext().setAccessibleDescription(Bundle.CPUSnapshotPanel_ThreadsComboAccessDescr());
 
         aggregationCombo.setRenderer(new DefaultListCellRenderer() {
                 public Component getListCellRendererComponent(final JList list, final Object value, final int index,
@@ -346,23 +346,23 @@ public final class CPUDiffPanel extends SnapshotPanel implements ActionListener,
                     return dlcr;
                 }
             });
-        threadsCombo.setRenderer(new DefaultListCellRenderer() {
-                public Component getListCellRendererComponent(final JList list, final Object value, final int index,
-                                                              final boolean isSelected, final boolean cellHasFocus) {
-                    DefaultListCellRenderer dlcr = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value,
-                                                                                                                index,
-                                                                                                                isSelected,
-                                                                                                                cellHasFocus);
-
-                    if (Bundle.CPUSnapshotPanel_AllThreadsItem().equals(value.toString())) {
-                        dlcr.setIcon(null);
-                    } else {
-                        dlcr.setIcon(THREADS_ICON);
-                    }
-
-                    return dlcr;
-                }
-            });
+//        threadsCombo.setRenderer(new DefaultListCellRenderer() {
+//                public Component getListCellRendererComponent(final JList list, final Object value, final int index,
+//                                                              final boolean isSelected, final boolean cellHasFocus) {
+//                    DefaultListCellRenderer dlcr = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value,
+//                                                                                                                index,
+//                                                                                                                isSelected,
+//                                                                                                                cellHasFocus);
+//
+//                    if (Bundle.CPUSnapshotPanel_AllThreadsItem().equals(value.toString())) {
+//                        dlcr.setIcon(null);
+//                    } else {
+//                        dlcr.setIcon(THREADS_ICON);
+//                    }
+//
+//                    return dlcr;
+//                }
+//            });
 
         JLabel lab = new JLabel(Bundle.CPUSnapshotPanel_ViewLabelString());
         lab.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
@@ -377,8 +377,8 @@ public final class CPUDiffPanel extends SnapshotPanel implements ActionListener,
 
         toolBar.addSpace(6);
 
-        toolBar.add(threadsCombo);
-        threadsCombo.addActionListener(this);
+//        toolBar.add(threadsCombo);
+//        threadsCombo.addActionListener(this);
 
         toolBar.addSeparator();
         
@@ -530,20 +530,20 @@ public final class CPUDiffPanel extends SnapshotPanel implements ActionListener,
             } else if (Bundle.CPUSnapshotPanel_PackagesString().equals(sel)) {
                 changeView(CPUResultsSnapshot.PACKAGE_LEVEL_VIEW);
             }
-        } else if (src == threadsCombo) {
-            // this should only be possible if flatPanel is the currently selected tab
-            assert (getSelectedView() == flatPanel);
-
-            int tid = -1; // all threads;
-
-            if (threadsCombo.getSelectedIndex() > 0) {
-                tid = threadIds[threadsCombo.getSelectedIndex() - 1];
-            }
-
-            if (flatPanel.getCurrentThreadId() != tid) {
-                flatPanel.setDataToDisplay(snapshot, tid, flatPanel.getCurrentView());
-                flatPanel.prepareResults();
-            }
+//        } else if (src == threadsCombo) {
+//            // this should only be possible if flatPanel is the currently selected tab
+//            assert (getSelectedView() == flatPanel);
+//
+//            int tid = -1; // all threads;
+//
+//            if (threadsCombo.getSelectedIndex() > 0) {
+//                tid = threadIds[threadsCombo.getSelectedIndex() - 1];
+//            }
+//
+//            if (flatPanel.getCurrentThreadId() != tid) {
+//                flatPanel.setDataToDisplay(snapshot, tid, flatPanel.getCurrentView());
+//                flatPanel.prepareResults();
+//            }
         }
     }
 
@@ -772,7 +772,7 @@ public final class CPUDiffPanel extends SnapshotPanel implements ActionListener,
         Component selectedView = getSelectedView();
         
         // threads combo is only visible on the Hotspots tab
-        threadsCombo.setVisible(selectedView == flatPanel);
+//        threadsCombo.setVisible(selectedView == flatPanel);
         aggregationCombo.setEnabled(selectedView != subtreeView);
     }
 
