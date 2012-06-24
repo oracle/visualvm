@@ -135,7 +135,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
 
     @Override
     public int getMethodId() {
-        return node1 == null ? node2.getMethodId() : node1.getMethodId();
+        return node1 == null ? (-node2.getMethodId()) : node1.getMethodId();
     }
 
     @Override
