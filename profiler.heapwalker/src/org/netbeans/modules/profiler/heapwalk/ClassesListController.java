@@ -175,7 +175,7 @@ public class ClassesListController extends AbstractController {
 
             data[i][0] = jClass.getName();
             
-            if (isDiff()) { 
+            if (diff) { 
                 minDiff = Math.min(minDiff, instancesCount);
                 maxDiff = Math.max(maxDiff, instancesCount);
                 data[i][1] = new Long(instancesCount);

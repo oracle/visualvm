@@ -705,23 +705,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                 }
 
                 public Object getValueAt(int row, int col) {
-                    switch (col) {
-                        case 0:
-                            return flatProfileContainer.getMethodNameAtRow(row);
-                        case 1:
-                            return new Float(flatProfileContainer.getPercentAtRow(row));
-                        case 2:
-                            return StringUtils.mcsTimeToString(flatProfileContainer.getTimeInMcs0AtRow(row)) + " ms (" // NOI18N
-                                   + percentFormat.format(flatProfileContainer.getPercentAtRow(row) / 100) + ")"; // NOI18N
-                        case 3:
-                            return collectingTwoTimeStamps
-                                   ? (StringUtils.mcsTimeToString(flatProfileContainer.getTimeInMcs1AtRow(row)) + " ms" // NOI18N
-                            ) : intFormat.format(flatProfileContainer.getNInvocationsAtRow(row));
-                        case 4:
-                            return intFormat.format(flatProfileContainer.getNInvocationsAtRow(row));
-                        default:
-                            return null;
-                    }
+                    return computeValueAt(row, col);
                 }
 
                 @Override
@@ -929,6 +913,26 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         jScrollPane.setViewportView(null);
         //    jScrollPane.setViewportView(resTable);
         jScrollPane.getViewport().setBackground(resTable.getBackground());
+    }
+    
+    protected Object computeValueAt(int row, int col) {
+        switch (col) {
+            case 0:
+                return flatProfileContainer.getMethodNameAtRow(row);
+            case 1:
+                return new Float(flatProfileContainer.getPercentAtRow(row));
+            case 2:
+                return StringUtils.mcsTimeToString(flatProfileContainer.getTimeInMcs0AtRow(row)) + " ms (" // NOI18N
+                        + percentFormat.format(flatProfileContainer.getPercentAtRow(row) / 100) + ")"; // NOI18N
+            case 3:
+                return collectingTwoTimeStamps
+                        ? (StringUtils.mcsTimeToString(flatProfileContainer.getTimeInMcs1AtRow(row)) + " ms" // NOI18N
+                ) : intFormat.format(flatProfileContainer.getNInvocationsAtRow(row));
+            case 4:
+                return intFormat.format(flatProfileContainer.getNInvocationsAtRow(row));
+            default:
+                return null;
+        }
     }
 
     private void initFilterPanel() {
