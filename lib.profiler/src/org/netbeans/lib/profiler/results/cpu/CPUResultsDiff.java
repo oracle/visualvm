@@ -64,8 +64,8 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
                snapshot2.collectingTwoTimeStamps;
     }
 
+    // Not used for diff
     public CPUCCTContainer getContainerForThread(int threadId, int view) {
-        // Seems to be used for testing only
         return snapshot1.getContainerForThread(threadId, view);
     }
 
@@ -73,38 +73,41 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
         FlatProfileContainer fpc1 = snapshot1.getFlatProfile(threadId, view);
         FlatProfileContainer fpc2 = snapshot2.getFlatProfile(threadId, view);
         return DiffFlatProfileContainer.create(fpc1, fpc2);
-//        return snapshot1.getFlatProfile(threadId, view);
     }
-
-    // -- Views-related code
+    
+    // Not used for diff
     public String[] getInstrMethodClasses(int view) {
         return snapshot1.getInstrMethodClasses(view);
     }
 
+    // Used by CPUTestCase.logInstrumented
+    // Otherwise not used for diff
     public String[] getInstrMethodNames() {
-        return snapshot1.instrMethodNames;
+        return snapshot1.getInstrMethodNames();
     }
 
+    // Not used for diff
     public String[] getInstrMethodSignatures() {
-        return snapshot1.instrMethodSignatures;
+        return snapshot1.getInstrMethodSignatures();
     }
 
     public String[] getMethodClassNameAndSig(int methodId, int view) {
-        return snapshot1.getMethodClassNameAndSig(methodId, view);
+        return methodId < 0 ? snapshot2.getMethodClassNameAndSig(-methodId, view) :
+                              snapshot1.getMethodClassNameAndSig(methodId, view);
     }
 
+    // Not used for diff
     public int getNInstrMethods() {
-        return snapshot1.nInstrMethods;
+        return snapshot1.getNInstrMethods();
     }
 
+    // Not used
     public int getNThreads() {
-        return snapshot1.threadCCTContainers[METHOD_LEVEL_VIEW].length;
+        return snapshot1.getNThreads();
     }
 
+    // Not used for diff
     public PrestimeCPUCCTNode getReverseCCT(int threadId, int methodId, int view) {
-//        PrestimeCPUCCTNode reverse1 = snapshot1.getReverseCCT(threadId, methodId, view);
-//        PrestimeCPUCCTNode reverse2 = snapshot2.getReverseCCT(threadId, methodId, view);
-//        return new DiffCPUCCTNode(reverse1, reverse2);
         return null;
     }
 
@@ -145,14 +148,17 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
         super.saveSortParams(sortBy, sortOrder, node);
     }
     
+    // TODO: used by CPUDiffPanel, fix!
     public int[] getThreadIds() {
         return snapshot1.getThreadIds();
     }
 
+    // Not used for diff
     public String getThreadNameForId(int threadId) {
         return snapshot1.getThreadNameForId(threadId);
     }
 
+    // TODO: used by CPUDiffPanel, fix!
     public String[] getThreadNames() {
         return snapshot1.getThreadNames();
     }

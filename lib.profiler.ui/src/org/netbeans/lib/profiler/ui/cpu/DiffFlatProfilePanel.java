@@ -57,6 +57,16 @@ public class DiffFlatProfilePanel extends SnapshotFlatProfilePanel {
         super(actionsHandler, sampling);
     }
     
+    
+    protected boolean supportsReverseCallGraph() {
+        return false;
+    }
+
+    protected boolean supportsSubtreeCallGraph() {
+        return false;
+    }
+    
+    
     protected Object computeValueAt(int row, int col) {
         long value;
         switch (col) {
