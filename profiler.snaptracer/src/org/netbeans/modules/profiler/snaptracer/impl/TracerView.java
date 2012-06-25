@@ -207,6 +207,7 @@ final class TracerView {
         final TimelineSupport support = model.getTimelineSupport();
         support.addSelectionListener(
                 new TimelineSupport.SelectionListener() {
+            public void intervalsSelectionChanged() {}
             public void indexSelectionChanged() {
                 final int startIndex = Math.min(support.getStartIndex(), support.getEndIndex());
                 final int endIndex = Math.max(support.getStartIndex(), support.getEndIndex());
@@ -360,14 +361,14 @@ final class TracerView {
                 assert ints.size() % 2 == 0;
                 System.out.println("Intervals " + ints.toString());
                 TimelineSupport support = model.getTimelineSupport();
-                support.resetSelectedTimestamps();
+                support.resetSelectedIntervals();
                 Iterator<Integer> iter = ints.iterator();
                 while (iter.hasNext()) {
                     int start = iter.next();
                     int stop  = iter.next();
-                    for (int i = start; i <= stop; i++)
-                        model.getTimelineSupport().selectTimestamp(i, false);
+                    support.selectInterval(start, stop);
                 }
+                support.selectedIntervalsChanged();
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -380,7 +381,7 @@ final class TracerView {
         }
 
         private boolean isRegular(PrestimeCPUCCTNode n) {
-            return  n.getThreadId() != -1 && n.getMethodId() > 0 && !n.isFilteredNode();
+            return  n.getThreadId() != -1 && n.getMethodId() != 0 && !n.isFilteredNode();
         }
         
         private void enableDisablePopup(PrestimeCPUCCTNode n) {

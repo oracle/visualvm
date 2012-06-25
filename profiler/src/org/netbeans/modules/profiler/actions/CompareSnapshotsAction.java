@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.*;
 import org.openide.DialogDescriptor;
 import org.openide.filesystems.FileObject;
@@ -61,7 +60,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -80,8 +78,8 @@ import org.openide.util.Lookup;
 import org.openide.windows.WindowManager;
 
 @NbBundle.Messages({
-    "CompareSnapshotsAction_ActionName=&Compare Memory Snapshots...",
-    "CompareSnapshotsAction_ActionDescr=Computes the difference between two comparable memory snapshots",
+    "CompareSnapshotsAction_ActionName=&Compare Snapshots...",
+    "CompareSnapshotsAction_ActionDescr=Computes the difference between two comparable snapshots",
     "CompareSnapshotsAction_SelectSnapshotDialogCaption=Select Snapshot to Compare",
     "CompareSnapshotsAction_SelectSnapshotsDialogCaption=Select Snapshots to Compare",
     "CompareSnapshotsAction_OpenChooserCaption=Open Snapshot",
@@ -333,11 +331,11 @@ public class CompareSnapshotsAction extends AbstractAction {
                                     // snapshot types don't match
                                     hintStr = Bundle.CompareSnapshotsAction_DifferentSnapshotsTypeMsg();
                                     enabledOk = false;
-                                } else if ((s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
-                                       && (s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
-                                    // not a memory snapshot
-                                    hintStr = Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg();
-                                    enabledOk = false;
+//                                } else if ((s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
+//                                       && (s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
+//                                    // not a memory snapshot
+//                                    hintStr = Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg();
+//                                    enabledOk = false;
                                 } else if (ResultsManager.getDefault().getSnapshotSettings(s1fo).getAllocTrackEvery() != ResultsManager.getDefault()
                                                                                                                                    .getSnapshotSettings(s2fo)
                                                                                                                                    .getAllocTrackEvery()) {
@@ -619,10 +617,11 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                                   boolean cellHasFocus) {
                         JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
+                        ResultsManager rm = ResultsManager.getDefault();
                         if (value instanceof LoadedSnapshot) {
                             LoadedSnapshot ls = (LoadedSnapshot) value;
                             c.setFont(c.getFont().deriveFont(Font.BOLD));
-                            c.setText(StringUtils.formatUserDate(new Date(ls.getSnapshot().getTimeTaken())));
+                            c.setText(rm.getSnapshotDisplayName(ls));
 
                             switch (ls.getType()) {
                                 case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
@@ -641,11 +640,11 @@ public class CompareSnapshotsAction extends AbstractAction {
                             }
                         } else if (value instanceof FileObject) {
                             FileObject fo = (FileObject) value;
-                            LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
+                            LoadedSnapshot ls = rm.findLoadedSnapshot(FileUtil.toFile(fo));
 
                             if (ls != null) {
                                 c.setFont(c.getFont().deriveFont(Font.BOLD));
-                                c.setText(StringUtils.formatUserDate(new Date(ls.getSnapshot().getTimeTaken())));
+                                c.setText(rm.getSnapshotDisplayName(ls));
 
                                 switch (ls.getType()) {
                                     case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
@@ -663,25 +662,8 @@ public class CompareSnapshotsAction extends AbstractAction {
                                         break;
                                 }
                             } else {
-                                String fileName = fo.getName();
-
-                                if (fileName.startsWith("snapshot-")) { // NOI18N
-
-                                    String time = fileName.substring("snapshot-".length(), fileName.length()); // NOI18N
-
-                                    try {
-                                        long timeStamp = Long.parseLong(time);
-                                        c.setText(StringUtils.formatUserDate(new Date(timeStamp)));
-                                    } catch (NumberFormatException e) {
-                                        // file name is probably customized
-                                        c.setText(fileName);
-                                    }
-                                } else {
-                                    c.setText(fileName);
-                                }
-
-                                int type = ResultsManager.getDefault().getSnapshotType(fo);
-
+                                int type = rm.getSnapshotType(fo);
+                                c.setText(rm.getSnapshotDisplayName(fo.getName(), type));
                                 switch (type) {
                                     case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
                                         c.setIcon(cpuIcon);
@@ -804,14 +786,14 @@ public class CompareSnapshotsAction extends AbstractAction {
                             if (snapshot.getType() != ResultsManager.getDefault().getSnapshotType(snapshot2f)) {
                                 // snapshot types doesn't match
                                 externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentSnapshotsTypeMsg());
-                            } else if ((snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
-                                           && (snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
-                                // TODO: remove after Compare CPU snapshots is implemented
-                                // not a memory snapshot
-                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg());
-                                okButton.setEnabled(false);
-
-                                return;
+//                            } else if ((snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
+//                                           && (snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
+//                                // TODO: remove after Compare CPU snapshots is implemented
+//                                // not a memory snapshot
+//                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg());
+//                                okButton.setEnabled(false);
+//
+//                                return;
                             } else if (snapshot.getSettings().getAllocTrackEvery() != ResultsManager.getDefault()
                                                                                                         .getSnapshotSettings(snapshot2f)
                                                                                                         .getAllocTrackEvery()) {

@@ -47,8 +47,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.JFileChooser;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
 /**
@@ -65,7 +65,7 @@ public final class OpenHeapWalkerAction implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         final File heapDumpFile = getHeapDumpFile();
-        RequestProcessor.getDefault().post(new Runnable() {
+        BrowserUtils.performTask(new Runnable() {
                 public void run() {
                     if (heapDumpFile != null) {
                         HeapWalkerManager.getDefault().openHeapWalker(heapDumpFile);

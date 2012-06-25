@@ -55,11 +55,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import javax.swing.*;
-import org.netbeans.lib.profiler.results.ResultsSnapshot;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -84,7 +81,7 @@ import org.openide.util.lookup.ServiceProvider;
     "SnapshotResultsWindow_FragmentSnapshotAccessDescr=Profiler snapshot with code fragment results",
     "SnapshotResultsWindow_MemorySnapshotAccessDescr=Profiler snapshot with memory results"
 })
-public final class SnapshotResultsWindow extends TopComponent {
+public final class SnapshotResultsWindow extends ProfilerTopComponent {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
     
     /* 
@@ -167,7 +164,6 @@ public final class SnapshotResultsWindow extends TopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY_CPU = "CpuSnapshot.HelpCtx"; // NOI18N
     private static final String HELP_CTX_KEY_MEM = "MemorySnapshot.HelpCtx"; // NOI18N
-    private static HelpCtx HELP_CTX = HelpCtx.DEFAULT_HELP;
     
     private static final Image WINDOW_ICON_CPU = Icons.getImage(ProfilerIcons.CPU);
     private static final Image WINDOWS_ICON_FRAGMENT = Icons.getImage(ProfilerIcons.FRAGMENT);
@@ -176,7 +172,6 @@ public final class SnapshotResultsWindow extends TopComponent {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Component lastFocusOwner;
     private LoadedSnapshot snapshot;
     private InstanceContent ic = new InstanceContent();
     private SavePerformer savePerformer = new SavePerformer();
@@ -184,6 +179,7 @@ public final class SnapshotResultsWindow extends TopComponent {
     private String tabName = ""; // NOI18N // default
     private SnapshotListener listener;
     private boolean forcedClose = false;
+    private HelpCtx helpCtx = HelpCtx.DEFAULT_HELP;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -283,7 +279,7 @@ public final class SnapshotResultsWindow extends TopComponent {
     }
     
     public HelpCtx getHelpCtx() {
-        return HELP_CTX;
+        return helpCtx;
     }
 
     public boolean canClose() {
@@ -314,17 +310,9 @@ public final class SnapshotResultsWindow extends TopComponent {
             return false;
         }
     }
-
-    public void componentActivated() {
-        if (lastFocusOwner != null) {
-            lastFocusOwner.requestFocus();
-        } else if (displayedPanel != null) {
-            displayedPanel.requestFocus();
-        }
-    }
-
-    public void componentDeactivated() {
-        lastFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    
+    protected Component defaultFocusOwner() {
+        return displayedPanel;
     }
 
     public void displayStacksForClass(int selectedClassId, int sortingColumn, boolean sortingOrder) {
@@ -373,7 +361,7 @@ public final class SnapshotResultsWindow extends TopComponent {
         updateFind(true, cpuPanel);
         add(cpuPanel, BorderLayout.CENTER);
         setIcon(WINDOW_ICON_CPU);
-        HELP_CTX = new HelpCtx(HELP_CTX_KEY_CPU);
+        helpCtx = new HelpCtx(HELP_CTX_KEY_CPU);
     }
 
     private void displayCodeRegionResults(LoadedSnapshot ls) {
@@ -392,7 +380,7 @@ public final class SnapshotResultsWindow extends TopComponent {
         updateFind(true, memoryPanel);
         add(memoryPanel, BorderLayout.CENTER);
         setIcon(WINDOWS_ICON_MEMORY);
-        HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
+        helpCtx = new HelpCtx(HELP_CTX_KEY_MEM);
     }
 
     private void forcedClose() {

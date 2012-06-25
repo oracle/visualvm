@@ -54,7 +54,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.spi.SessionListener;
+import org.openide.util.Lookup;
+import org.openide.util.Lookup.Provider;
+import org.openide.util.lookup.ServiceProvider;
 
 
 /**
@@ -65,10 +74,13 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
     "HeapDumpWatch_OOME_PROTECTION_OPEN_HEAPDUMP=Profiled application crashed and generated heap dump.\nDo you wish to open it in heapwalker?",
     "HeapDumpWatch_OOME_PROTECTION_REMOVE_HEAPDUMP=You chose not to open the generated heap dump.\nThe heap dump can take a significant amount of disk space.\nShould it be deleted?"
 })
-public class HeapDumpWatch {
+@ServiceProvider(service=SessionListener.class)
+public class HeapDumpWatch extends SessionListener.Adapter {
+    private static final Logger LOG = Logger.getLogger(HeapDumpWatch.class.getName());
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private class HeapDumpFolderListener extends FileChangeAdapter {
+    private  class HeapDumpFolderListener extends FileChangeAdapter {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void fileDataCreated(FileEvent fileEvent) {
@@ -76,36 +88,60 @@ public class HeapDumpWatch {
         }
     }
 
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    public static final String OOME_PROTECTION_ENABLED_KEY = "profiler.info.oomeprotection"; // NOI18N
-    public static final String OOME_PROTECTION_DUMPPATH_KEY = "profiler.info.oomeprotection.dumppath"; // NOI18N
-    private static HeapDumpWatch instance;
-
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private Collection<FileObject> watchedFolders;
+    private FileObject monitoredPath;
     private HeapDumpFolderListener listener;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of HeapDumpWatch */
-    private HeapDumpWatch() {
-        watchedFolders = new ArrayList<FileObject>();
+    public HeapDumpWatch() {
         listener = new HeapDumpFolderListener();
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public static String getHeapDumpPath(Lookup.Provider project) {
+        ProfilerIDESettings gps = ProfilerIDESettings.getInstance();
+        if (!gps.isOOMDetectionEnabled()) return null;
+        
+        int oomeDetectionMode = gps.getOOMDetectionMode();
 
-    public static synchronized HeapDumpWatch getDefault() {
-        if (instance == null) {
-            instance = new HeapDumpWatch();
+        switch (oomeDetectionMode) {
+            case ProfilerIDESettings.OOME_DETECTION_TEMPDIR:
+                return System.getProperty("java.io.tmpdir"); // NOI18N
+            case ProfilerIDESettings.OOME_DETECTION_PROJECTDIR:
+
+                try {
+                    return FileUtil.toFile(ProjectStorage.getSettingsFolder(project, true)).getAbsolutePath();
+                } catch (IOException e) {
+                    LOG.log(Level.WARNING, "Cannot resolve project settings directory:\n" + e.getMessage(), e);
+                    
+                    return null;
+                }
+            case ProfilerIDESettings.OOME_DETECTION_CUSTOMDIR:
+                return gps.getCustomHeapdumpPath();
         }
 
-        return instance;
+        return null;
+    }
+    
+    @Override
+    public void onShutdown() {
+        release();
     }
 
-    public void monitor(String path) throws IllegalArgumentException {
+    @Override
+    public void onStartup(ProfilingSettings ps, Provider p) {
+        if (ProfilerIDESettings.getInstance().isOOMDetectionEnabled()) {
+            String oomePath = getHeapDumpPath(p);
+            if (oomePath != null) {
+                monitor(oomePath);
+            }
+        }
+    }
+
+    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    private void monitor(String path) throws IllegalArgumentException {
         if ((path == null) || (path.length() == 0)) {
             throw new IllegalArgumentException("The path \"" + path + "\" can't be null."); // NOI18N
         }
@@ -119,18 +155,10 @@ public class HeapDumpWatch {
 
             fo.getChildren();
             fo.addFileChangeListener(listener);
-            watchedFolders.add(fo);
+            monitoredPath = fo;
         }
     }
-
-    public void releaseAll() {
-        for (FileObject fo : watchedFolders) {
-            fo.removeFileChangeListener(listener);
-        }
-
-        watchedFolders.clear();
-    }
-
+    
     private void captureHeapDump(FileObject heapDump) {
         if (!heapDump.getExt().equals(ResultsManager.HEAPDUMP_EXTENSION)) {
             return; // NOI18N
@@ -154,12 +182,14 @@ public class HeapDumpWatch {
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
-            release(heapDump.getParent());
+            release();
         }
     }
 
-    private void release(FileObject watchedFolder) {
-        watchedFolder.removeFileChangeListener(listener);
-        watchedFolders.remove(watchedFolder);
+    private void release() {
+        if (monitoredPath != null) {
+            monitoredPath.removeFileChangeListener(listener);
+            monitoredPath = null;
+        }
     }
 }

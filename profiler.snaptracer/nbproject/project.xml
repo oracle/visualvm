@@ -91,7 +91,7 @@ made subject to such option by the copyright holder.
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>2</release-version>
-                        <specification-version>2.2</specification-version>
+                        <specification-version>2.4</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
