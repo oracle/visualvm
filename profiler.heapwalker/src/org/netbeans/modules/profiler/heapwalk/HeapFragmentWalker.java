@@ -221,10 +221,10 @@ public class HeapFragmentWalker {
         if (stateListeners.size() == 0) stateListeners = null;
     }
 
-    private void changeState(final int newState, final boolean masterChange) {
+    private void changeState(int newState, final boolean masterChange) {
+        retainedSizesStatus = newState;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                retainedSizesStatus = newState;
                 if (stateListeners == null) return;
                 StateEvent e = new StateEvent(retainedSizesStatus, masterChange);
                 for (StateListener listener : stateListeners)
