@@ -58,6 +58,15 @@ public class DiffCCTDisplay extends CCTDisplay {
     }
     
     
+    protected boolean supportsReverseCallGraph() {
+        return false;
+    }
+
+    protected boolean supportsSubtreeCallGraph() {
+        return false;
+    }
+    
+    
     protected Float getNodeTimeRel(long time, float percent) {
         return new Float(time);
     }

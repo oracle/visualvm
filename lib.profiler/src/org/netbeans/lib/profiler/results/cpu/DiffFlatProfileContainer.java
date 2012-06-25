@@ -73,6 +73,7 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
         long[] timesInMcs1 = collectingTwoTimeStamps ? new long[rows1 + rows2] : null;
         int[] nInvocations = new int[rows1 + rows2];
         String[] names = new String[rows1 + rows2];
+        int[] methodIDs = new int[rows1 + rows2];
         
         for (int i = 0; i < rows1; i++) {
             String name = c1.getMethodNameAtRow(i);
@@ -80,6 +81,7 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
             if (collectingTwoTimeStamps) timesInMcs1[pointer] = -c1.timeInMcs1[i];
             nInvocations[pointer] = -c1.nInvocations[i];
             names[pointer] = name;
+            methodIDs[pointer] = c1.methodIds[i];
             
             Integer i2 = names2.get(name);
             if (i2 != null) {
@@ -97,6 +99,7 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
                 if (collectingTwoTimeStamps) timesInMcs1[pointer] = c2.timeInMcs1[i];
                 nInvocations[pointer] = c2.nInvocations[i];
                 names[pointer] = name;
+                methodIDs[pointer] = -c2.methodIds[i];
                 pointer++;
             }
         }
@@ -107,10 +110,10 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
         return new DiffFlatProfileContainer(collectingTwoTimeStamps, Arrays.copyOf(timesInMcs0, pointer),
                 collectingTwoTimeStamps ? Arrays.copyOf(timesInMcs1, pointer) : null,
                 Arrays.copyOf(nInvocations, pointer), Arrays.copyOf(names, pointer),
-                pointer, wholeGraphNetTime0, wholeGraphNetTime1);
+                Arrays.copyOf(methodIDs, pointer), pointer, wholeGraphNetTime0, wholeGraphNetTime1);
     }
     
-    private DiffFlatProfileContainer(boolean collectingTwoTimeStamps, long[] timeInMcs0, long[] timeInMcs1, int[] nInvocations, String[] names, int nMethods, double wholeGraphNetTime0, double wholeGraphNetTime1) {
+    private DiffFlatProfileContainer(boolean collectingTwoTimeStamps, long[] timeInMcs0, long[] timeInMcs1, int[] nInvocations, String[] names, int[] methodIDs, int nMethods, double wholeGraphNetTime0, double wholeGraphNetTime1) {
         super(timeInMcs0, timeInMcs1, nInvocations, null, nMethods);
         this.collectingTwoTimeStamps = collectingTwoTimeStamps;
         this.names = names;
@@ -120,12 +123,11 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
         long minTimeX = Long.MAX_VALUE;
         long maxTimeX = Long.MIN_VALUE;
         nRows = nMethods;
-        methodIds = new int[nRows];
+        this.methodIds = methodIDs;
         for (int i = 0; i < nRows; i++) {
             minTimeX = Math.min(minTimeX, timeInMcs0[i]);
             maxTimeX = Math.max(maxTimeX, timeInMcs0[i]);
             nTotalInvocations += nInvocations[i];
-            methodIds[i] = i;
         }
         
         if (minTimeX > 0 && maxTimeX > 0) minTimeX = 0;
