@@ -66,6 +66,7 @@ import org.netbeans.lib.profiler.ui.components.table.JExtendedTablePanel;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.modules.profiler.heapwalk.ClassesListController;
+import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -142,6 +143,8 @@ import org.openide.util.Lookup;
     "ClassesListControllerUI_InstancesColumnDescr=Number of instances",
     "ClassesListControllerUI_SizeColumnText=Size",
     "ClassesListControllerUI_SizeColumnDescr=Size of all instances",
+    "ClassesListControllerUI_RetainedSizeColumnName=Retained",
+    "ClassesListControllerUI_RetainedSizeColumnDescr=Retained size of all instances of particular class",
     "ClassesListControllerUI_FilteringProgressText=Processing classes, wait please...",
     "ClassesListControllerUI_ClassesTableAccessName=Classes",
     "ClassesListControllerUI_ClassesTableAccessDescr=List of classes allocated on the heap",
@@ -242,7 +245,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         public void mouseClicked(MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
                 int row = classesListTable.rowAtPoint(e.getPoint());
-                if (row != -1) showInstancesForClass((JavaClass) displayCache[row][4]);
+                if (row != -1) showInstancesForClass((JavaClass) displayCache[row][columnCount]);
             }
         }
     }
@@ -253,7 +256,6 @@ public class ClassesListControllerUI extends JTitledPanel {
     // --- UI definition ---------------------------------------------------------
     private static final String DATA = "Data"; // NOI18N
     private static final String NO_DATA = "No data"; // NOI18N
-    private static final int columnCount = 4;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -261,20 +263,22 @@ public class ClassesListControllerUI extends JTitledPanel {
     private int filterType = CommonConstants.FILTER_CONTAINS;
     private CardLayout contents;
     private ClassesListController classesListController;
-    private ClassesListTableModel realClassesListTableModel = new ClassesListTableModel();
-    private ExtendedTableModel classesListTableModel = new ExtendedTableModel(realClassesListTableModel);
+    private ClassesListTableModel realClassesListTableModel;
+    private ExtendedTableModel classesListTableModel;
     private FilterComponent filterComponent;
     private JExtendedTable classesListTable;
     private JPanel contentsPanel;
     private JPopupMenu cornerPopup;
     private JPopupMenu tablePopup;
     private String selectedRowContents;
+    private final int columnCount;
     private String[] columnNames;
     private javax.swing.table.TableCellRenderer[] columnRenderers;
     private String[] columnToolTips;
     private int[] columnWidths;
     private Object[][] displayCache;
     private boolean hasProjectContext;
+    private boolean retainedSizeSupported;
     private boolean internalCornerButtonClick = false; // flag for closing columns popup by pressing cornerButton
 
     // --- Selection utils -------------------------------------------------------
@@ -295,11 +299,30 @@ public class ClassesListControllerUI extends JTitledPanel {
         super(Bundle.ClassesListControllerUI_ViewTitle(), ICON_CLASSES, true);
 
         this.classesListController = classesListController;
-        hasProjectContext = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject() != null;
+        HeapFragmentWalker heap = classesListController.getClassesController().getHeapFragmentWalker();
+        hasProjectContext = heap.getHeapDumpProject() != null;
+        retainedSizeSupported = heap.getRetainedSizesStatus() != HeapFragmentWalker.RETAINED_SIZES_UNSUPPORTED;
+        columnCount = retainedSizeSupported ? 5 : 4;
+        realClassesListTableModel = new ClassesListTableModel();
+        classesListTableModel = new ExtendedTableModel(realClassesListTableModel);
 
         initColumnsData();
         initData();
         initComponents();
+        heap.addStateListener(
+            new HeapFragmentWalker.StateListener() {
+                public void stateChanged(HeapFragmentWalker.StateEvent e) {
+                    if (e.getRetainedSizesStatus() == HeapFragmentWalker.RETAINED_SIZES_COMPUTED && e.isMasterChange()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                initData();
+                                setColumnVisibility(4, true);
+                            }
+                        });
+                    }
+                }
+            }
+        );
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -365,7 +388,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         }
 
         for (int i = 0; i < displayCache.length; i++) {
-            if (displayCache[i][4].equals(javaClass)) {
+            if (displayCache[i][columnCount].equals(javaClass)) {
                 classesListTable.setRowSelectionInterval(i, i);
 
                 final int rowIndex = i;
@@ -452,7 +475,8 @@ public class ClassesListControllerUI extends JTitledPanel {
         }
     }
 
-    private void addMenuItemListener(JCheckBoxMenuItem menuItem) {
+    private void addMenuItemListener(final JCheckBoxMenuItem menuItem) {
+        final boolean[] internalChange = new boolean[1];
         menuItem.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     if (e.getActionCommand().equals("Filter")) { // NOI18N
@@ -460,9 +484,30 @@ public class ClassesListControllerUI extends JTitledPanel {
 
                         return;
                     }
-
-                    int column = Integer.parseInt(e.getActionCommand());
-                    setColumnVisibility(column, !classesListTableModel.isRealColumnVisible(column));
+                    if (internalChange[0]) return;
+                    final int column = Integer.parseInt(e.getActionCommand());
+                    if (column == 4 && !classesListTableModel.isRealColumnVisible(column)) {
+                        BrowserUtils.performTask(new Runnable() {
+                            public void run() {
+                                final int retainedSizesState = classesListController.getClassesController().
+                                        getHeapFragmentWalker().computeRetainedSizes(false);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        if (retainedSizesState != HeapFragmentWalker.RETAINED_SIZES_COMPUTED) {
+                                            internalChange[0] = true;
+                                            menuItem.setSelected(!menuItem.isSelected());
+                                            internalChange[0] = false;
+                                        } else {
+                                            initData();
+                                            setColumnVisibility(4,true);
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        setColumnVisibility(column, !classesListTableModel.isRealColumnVisible(column));
+                    }
                 }
             });
     }
@@ -531,7 +576,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                     int row = classesListTable.getSelectedRow();
 
                     if (row != -1) {
-                        showSubclassesForClass((JavaClass) displayCache[row][4]);
+                        showSubclassesForClass((JavaClass) displayCache[row][columnCount]);
                     }
                 }
             });
@@ -584,6 +629,11 @@ public class ClassesListControllerUI extends JTitledPanel {
         columnNames[3] = Bundle.ClassesListControllerUI_SizeColumnText();
         columnToolTips[3] = Bundle.ClassesListControllerUI_SizeColumnDescr();
 
+        if (retainedSizeSupported) {
+            columnNames[4] = Bundle.ClassesListControllerUI_RetainedSizeColumnName();
+            columnToolTips[4] = Bundle.ClassesListControllerUI_RetainedSizeColumnDescr();
+        }
+
         int maxWidth = getFontMetrics(getFont()).charWidth('W') * 12; // NOI18N // initial width of data columns
 
         ClassNameTableCellRenderer classNameCellRenderer = new ClassNameTableCellRenderer();
@@ -601,6 +651,11 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         columnWidths[3 - 1] = maxWidth;
         columnRenderers[3] = dataCellRenderer;
+
+        if (retainedSizeSupported) {
+            columnWidths[4 - 1] = maxWidth;
+            columnRenderers[4] = dataCellRenderer;
+        }
     }
     
     private HTMLLabel l;
@@ -684,6 +739,10 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     private void initComponents() {
+        if (retainedSizeSupported) {
+            HeapFragmentWalker heap = classesListController.getClassesController().getHeapFragmentWalker();
+            classesListTableModel.setRealColumnVisibility(4, heap.getRetainedSizesStatus() == HeapFragmentWalker.RETAINED_SIZES_COMPUTED);
+        }
         classesListTable = new JExtendedTable(classesListTableModel) {
                 public void doLayout() {
                     int columnsWidthsSum = 0;
@@ -791,7 +850,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                 public void valueChanged(ListSelectionEvent e) {
                     classesListController.classSelected((classesListTable.getSelectedRow() == -1) ? null
                                                                                                   : (JavaClass) displayCache[classesListTable
-                                                                                                                             .getSelectedRow()][4]);
+                                                                                                                             .getSelectedRow()][columnCount]);
                 }
             });
     }
@@ -844,6 +903,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                                             new LabelBracketTableCellRenderer(JLabel.TRAILING);
                                     columnRenderers[2] = dataCellRenderer;
                                     columnRenderers[3] = dataCellRenderer;
+                                    columnRenderers[4] = dataCellRenderer;
                                     setColumnsData(false);
                                 }
                                 
@@ -866,7 +926,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         int row = classesListTable.getSelectedRow();
 
         if (row != -1) {
-            showInstancesForClass((JavaClass) displayCache[row][4]);
+            showInstancesForClass((JavaClass) displayCache[row][columnCount]);
         }
     }
 
