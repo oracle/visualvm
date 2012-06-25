@@ -190,9 +190,13 @@ public class StringUtils {
     /** Represent time (given in microsecond) in milliseconds, with roughly the same number of meaningful digits */
     public static String mcsTimeToString(long t) {
         StringBuilder tmpBuf = new StringBuilder();
+        
+        if (t < 0) tmpBuf.append("-"); // NOI18N
+        t = Math.abs(t);
 
         if (t >= 100000) {
-            return intFormat.format(t / 1000);
+            tmpBuf.append(intFormat.format(t / 1000));
+            return tmpBuf.toString();
         } else if (t >= 10000) {
             long x = t / 1000;
             tmpBuf.append(intFormat.format(x));

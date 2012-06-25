@@ -43,53 +43,48 @@
 
 package org.netbeans.modules.profiler;
 
-import java.util.Collection;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.lib.profiler.ui.components.FilterComponent;
 import org.netbeans.lib.profiler.ui.cpu.*;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.modules.profiler.actions.FindNextAction;
 import org.netbeans.modules.profiler.actions.FindPreviousAction;
 import org.netbeans.modules.profiler.ui.FindDialog;
 import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
 import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.actions.FindAction;
-import org.openide.util.NbBundle;
 import org.openide.util.actions.SystemAction;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
+import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -98,31 +93,31 @@ import org.openide.util.RequestProcessor;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
-@NbBundle.Messages({
-    "CPUSnapshotPanel_MethodsString=Methods",
-    "CPUSnapshotPanel_ClassesString=Classes",
-    "CPUSnapshotPanel_PackagesString=Packages",
-    "CPUSnapshotPanel_CallTreeString=Call Tree",
-    "CPUSnapshotPanel_HotSpotsString=Hot Spots",
-    "CPUSnapshotPanel_FindInStatement=Find in {0}",
-    "CPUSnapshotPanel_CombinedString=Combined",
-    "CPUSnapshotPanel_InfoString=Info",
-    "CPUSnapshotPanel_CallTreeTabDescr=Call Tree View - Execution call tree for application threads",
-    "CPUSnapshotPanel_HotSpotTabDescr=Hot Spots View - List of methods which the application spent most time executing",
-    "CPUSnapshotPanel_CombinedTabDescr=Combined View - Call Tree and Hot Spots",
-    "CPUSnapshotPanel_InfoTabDescr=Snapshot Information",
-    "CPUSnapshotPanel_AllThreadsItem=<All Threads>",
-    "CPUSnapshotPanel_ViewLabelString=View:",
-    "CPUSnapshotPanel_ToggleDownToolTip=When selecting item in Call Tree, automatically select corresponding row in Hot Spots.",
-    "CPUSnapshotPanel_ToggleUpToolTip=When selecting item in Hot Spots, automatically select first occurence in Call Tree. Use Find Previous/Next to see other occurences.",
-    "CPUSnapshotPanel_AggregationComboAccessName=Results aggregation level.",
-    "CPUSnapshotPanel_AggregationComboAccessDescr=Select which aggregation level will be used for showing collected results.",
-    "CPUSnapshotPanel_ThreadsComboAccessName=List of application threads.",
-    "CPUSnapshotPanel_ThreadsComboAccessDescr=Choose application thread to display collected results for the thread.",
-    "CPUSnapshotPanel_StringNotFoundMsg=String not found in results",
-    "CPUSnapshotPanel_FindActionTooltip=Find in Results... (Ctrl+F)"
-})
-public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListener, ChangeListener,
+//@NbBundle.Messages({
+//    "CPUSnapshotPanel_MethodsString=Methods",
+//    "CPUSnapshotPanel_ClassesString=Classes",
+//    "CPUSnapshotPanel_PackagesString=Packages",
+//    "CPUSnapshotPanel_CallTreeString=Call Tree",
+//    "CPUSnapshotPanel_HotSpotsString=Hot Spots",
+//    "CPUSnapshotPanel_FindInStatement=Find in {0}",
+//    "CPUSnapshotPanel_CombinedString=Combined",
+//    "CPUSnapshotPanel_InfoString=Info",
+//    "CPUSnapshotPanel_CallTreeTabDescr=Call Tree View - Execution call tree for application threads",
+//    "CPUSnapshotPanel_HotSpotTabDescr=Hot Spots View - List of methods which the application spent most time executing",
+//    "CPUSnapshotPanel_CombinedTabDescr=Combined View - Call Tree and Hot Spots",
+//    "CPUSnapshotPanel_InfoTabDescr=Snapshot Information",
+//    "CPUSnapshotPanel_AllThreadsItem=<All Threads>",
+//    "CPUSnapshotPanel_ViewLabelString=View:",
+//    "CPUSnapshotPanel_ToggleDownToolTip=When selecting item in Call Tree, automatically select corresponding row in Hot Spots.",
+//    "CPUSnapshotPanel_ToggleUpToolTip=When selecting item in Hot Spots, automatically select first occurence in Call Tree. Use Find Previous/Next to see other occurences.",
+//    "CPUSnapshotPanel_AggregationComboAccessName=Results aggregation level.",
+//    "CPUSnapshotPanel_AggregationComboAccessDescr=Select which aggregation level will be used for showing collected results.",
+//    "CPUSnapshotPanel_ThreadsComboAccessName=List of application threads.",
+//    "CPUSnapshotPanel_ThreadsComboAccessDescr=Choose application thread to display collected results for the thread.",
+//    "CPUSnapshotPanel_StringNotFoundMsg=String not found in results",
+//    "CPUSnapshotPanel_FindActionTooltip=Find in Results... (Ctrl+F)"
+//})
+public final class CPUDiffPanel extends SnapshotPanel implements ActionListener, ChangeListener,
                                                                      SnapshotResultsWindow.FindPerformer,
                                                                      SaveViewAction.ViewProvider, ExportAction.ExportProvider {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -188,32 +183,11 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                 setFindString(findString);
                 selectView(cctPanel);
                 performFindFirst();
-            } else if (source == combinedFlat) {
-                setFindString(findString);
-                //tabs.setSelectedComponent(combined);
-                performFindFirst();
-            } else if (source == combinedCCT) {
-                setFindString(findString);
-                //tabs.setSelectedComponent(combined);
-                combinedFlat.selectMethod(findString);
             }
         }
 
         public void showReverseCallGraph(final CPUResultsSnapshot s, final int threadId, final int methodId, final int view,
-                                         final int sortingColumn, final boolean sortingOrder) {
-            if (backtraceView != null) {
-                removeView(backtraceView);
-            }
-
-            backtraceView = new ReverseCallGraphPanel(this);
-            backtraceView.setDataToDisplay(s, threadId, view);
-            backtraceView.setSelectedMethodId(methodId);
-            backtraceView.setSorting(sortingColumn, sortingOrder);
-            backtraceView.prepareResults();
-            backtraceView.setFindString(cctPanel.getFindString()); // must be after backtraceView.prepareResults()!
-            addView(backtraceView.getShortTitle(), BACK_TRACES_TAB_ICON, backtraceView.getTitle(), backtraceView, null);
-            selectView(backtraceView);
-        }
+                                         final int sortingColumn, final boolean sortingOrder) {}
 
         public void showSourceForMethod(final String className, final String methodName, final String methodSig) {
             GoToSource.openSource(loadedSnapshot.getProject(), className, methodName, methodSig);
@@ -237,115 +211,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             selectView(subtreeView);
         }
     }
-
-    private final class CPUSnapshotSelectionHandler implements CPUSelectionHandler {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private boolean cct;
-
-        //~ Constructors ---------------------------------------------------------------------------------------------------------
-
-        private CPUSnapshotSelectionHandler(boolean cct) {
-            this.cct = cct;
-        }
-
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public void methodSelected(final int threadId, final int methodId, final int view) {
-            if (internalSelChange) {
-                return;
-            }
-
-            if (methodId == -1) {
-                return; // all methods deselected
-            }
-
-            if (cct) {
-                // -1 is reserved for the all threads merged flat profile
-                if ((threadId >= -1) && (combinedFlat.getCurrentThreadId() != threadId)) {
-                    combinedFlat.setDataToDisplay(combinedFlat.getSnapshot(), threadId, view);
-                    combinedFlat.prepareResults();
-                }
-
-                if (slaveModeDown) {
-                    if (combinedCCT.getPopupFindItem() != null) {
-                        combinedCCT.getPopupFindItem().setEnabled(false);
-                    }
-
-                    internalSelChange = true;
-                    combinedFlat.selectMethod(methodId);
-                    internalSelChange = false;
-                } else {
-                    if (combinedCCT.getPopupFindItem() != null) {
-                        combinedCCT.getPopupFindItem().setEnabled(true);
-                    }
-                }
-            } else {
-                if (slaveModeUp) {
-                    if (combinedFlat.getPopupFindItem() != null) {
-                        combinedFlat.getPopupFindItem().setEnabled(false);
-                    }
-
-                    int curView = combinedFlat.getCurrentView();
-                    String[] names = snapshot.getMethodClassNameAndSig(methodId, curView);
-                    //          combinedCCT.setFindString(new MethodNameFormatter(names[0], names[1], names[2]).getFormattedClassAndMethod());
-                    combinedCCT.setFindString(MethodNameFormatterFactory.getDefault().getFormatter()
-                                                                        .formatMethodName(names[0], names[1], names[2])
-                                                                        .toFormatted());
-                    internalSelChange = true;
-                    combinedCCT.silentlyFindFirst();
-                    internalSelChange = false;
-                } else {
-                    if (combinedFlat.getPopupFindItem() != null) {
-                        combinedFlat.getPopupFindItem().setEnabled(true);
-                    }
-                }
-            }
-        }
-    }
-
-    private static class CombinedViewTracker extends FocusAdapter {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private Object lastFocusOwner;
-
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public Object getLastFocusOwner() {
-            return lastFocusOwner;
-        }
-
-        public void focusGained(FocusEvent e) {
-            lastFocusOwner = e.getSource();
-        }
-    }
-    
-    private class CustomCCTDisplay extends CCTDisplay {
-        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, boolean sampling) {
-            super(actionsHandler, sampling);
-        }
-
-        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, boolean sampling) {
-            super(actionsHandler, selectionHandler, sampling);
-        }
-
-        protected JPopupMenu createPopupMenu() {
-            JPopupMenu popup = super.createPopupMenu();
-            enhancePopupMenu(popup,this);
-            return popup;
-        }
-
-        protected void enableDisablePopup(PrestimeCPUCCTNode node) {
-            super.enableDisablePopup(node);
-            CPUSnapshotPanel.this.enableDisablePopup(node);
-        }
-        
-    }
-    
-    public interface CCTPopupEnhancer {
-        public void enhancePopup(JPopupMenu popup, LoadedSnapshot snapshot, CCTDisplay cctDisplay);
-        public void enableDisablePopup(LoadedSnapshot snapshot, PrestimeCPUCCTNode node);
-    }
     
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -355,66 +220,36 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private static final Icon THREADS_ICON = Icons.getIcon(ProfilerIcons.THREAD);
     private static final Icon CALL_TREE_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_CALL_TREE);
     private static final Icon HOTSPOTS_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS);
-    private static final Icon COMBINED_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_COMBINED);
-    private static final Icon INFO_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_INFO);
-    private static final Icon BACK_TRACES_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_BACK_TRACES);
     private static final Icon SUBTREE_TAB_ICON = Icons.getIcon(ProfilerIcons.TAB_SUBTREE);
-    private static final Icon SLAVE_DOWN_ICON = Icons.getIcon(GeneralIcons.SLAVE_DOWN);
-    private static final Icon SLAVE_UP_ICON = Icons.getIcon(GeneralIcons.SLAVE_UP);
-    private static final double SPLIT_HALF = 0.5d;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private CCTDisplay cctPanel;
-    private CCTDisplay combinedCCT;
-    private CPUResultsSnapshot snapshot;
-    private CombinedPanel combined;
-    private CombinedViewTracker combinedViewTracker;
-    private Component findActionPresenter;
-    private Component findNextPresenter;
-    private Component findPreviousPresenter;
+    private CPUResultsDiff snapshot;
     private JComboBox aggregationCombo;
     private JComboBox threadsCombo;
-    private JToggleButton slaveToggleButtonDown;
-    private JToggleButton slaveToggleButtonUp;
     private LoadedSnapshot loadedSnapshot;
-    private ReverseCallGraphPanel backtraceView;
-    private SaveSnapshotAction saveAction;
-    private SaveViewAction saveViewAction;
-    private SnapshotFlatProfilePanel combinedFlat;
     private SnapshotFlatProfilePanel flatPanel;
-    private SnapshotInfoPanel infoPanel;
     private SubtreeCallGraphPanel subtreeView;
     private int[] threadIds;
     private boolean internalChange = false;
-    private boolean internalFilterChange = false;
-    private boolean internalSelChange = false;
-    private boolean slaveModeDown = true;
-    private boolean slaveModeUp = true;
     private int currentAggregationMode;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public CPUSnapshotPanel(Lookup context, final LoadedSnapshot ls, final int sortingColumn, final boolean sortingOrder) {
+    public CPUDiffPanel(Lookup context, final LoadedSnapshot ls, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2, final int sortingColumn, final boolean sortingOrder) {
         this.loadedSnapshot = ls;
-        this.snapshot = (CPUResultsSnapshot) ls.getSnapshot();
+        this.snapshot = (CPUResultsDiff)ls.getSnapshot();
 
         CPUActionsHandler actionsHandler = new CPUActionsHandler();
-        CPUSnapshotSelectionHandler combinedActionsHandlerCCT = new CPUSnapshotSelectionHandler(true);
-        CPUSnapshotSelectionHandler combinedActionsHandlerFlat = new CPUSnapshotSelectionHandler(false);
         
         boolean sampling = ls.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED;
 
-        flatPanel = new SnapshotFlatProfilePanel(actionsHandler, sampling);
-        cctPanel = new CustomCCTDisplay(actionsHandler, sampling);
-        infoPanel = new SnapshotInfoPanel(ls);
-        combinedFlat = new SnapshotFlatProfilePanel(actionsHandler, combinedActionsHandlerFlat, sampling);
-        combinedCCT = new CustomCCTDisplay(actionsHandler, combinedActionsHandlerCCT, sampling);
+        flatPanel = new DiffFlatProfilePanel(actionsHandler, sampling);
+        cctPanel = new DiffCCTDisplay(actionsHandler, sampling);
 
         flatPanel.setSorting(sortingColumn, sortingOrder);
         cctPanel.setSorting(sortingColumn, sortingOrder);
-        combinedFlat.setSorting(sortingColumn, sortingOrder);
-        combinedCCT.setSorting(sortingColumn, sortingOrder);
 
         if (cctPanel.getPopupFindItem() != null) {
             cctPanel.getPopupFindItem().setText(Bundle.CPUSnapshotPanel_FindInStatement(Bundle.CPUSnapshotPanel_HotSpotsString()));
@@ -426,76 +261,21 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             flatPanel.getPopupFindItem().setVisible(true);
         }
 
-        if (combinedFlat.getPopupFindItem() != null) {
-            combinedFlat.getPopupFindItem().setText(Bundle.CPUSnapshotPanel_FindInStatement(Bundle.CPUSnapshotPanel_CallTreeString()));
-            combinedFlat.getPopupFindItem().setVisible(true);
-        }
-
-        if (combinedCCT.getPopupFindItem() != null) {
-            combinedCCT.getPopupFindItem().setText(Bundle.CPUSnapshotPanel_FindInStatement(Bundle.CPUSnapshotPanel_HotSpotsString()));
-            combinedCCT.getPopupFindItem().setVisible(true);
-        }
-
         flatPanel.setDataToDisplay(snapshot, -1, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
         cctPanel.setDataToDisplay(snapshot, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-        combinedFlat.setDataToDisplay(snapshot, -1, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-        combinedCCT.setDataToDisplay(snapshot, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
 
         flatPanel.prepareResults();
         cctPanel.prepareResults();
-        combinedCCT.prepareResults();
-        combinedFlat.prepareResults();
-        infoPanel.updateInfo();
-
-        flatPanel.addFilterListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    if (!internalFilterChange) {
-                        internalFilterChange = true;
-                        combinedFlat.setFilterValues(flatPanel.getFilterValue(), flatPanel.getFilterType());
-                        internalFilterChange = false;
-                    }
-                }
-            });
-
-        combinedFlat.addFilterListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    if (!internalFilterChange) {
-                        internalFilterChange = true;
-                        flatPanel.setFilterValues(combinedFlat.getFilterValue(), combinedFlat.getFilterType());
-                        internalFilterChange = false;
-                    }
-                }
-            });
-
-        combined = new CombinedPanel(JSplitPane.VERTICAL_SPLIT, combinedCCT, combinedFlat) {
-                public void requestFocus() {
-                    if (combinedCCT != null) {
-                        combinedCCT.requestFocus();
-                    }
-                }
-            };
-        // to make the split be even when resized
-        combined.setResizeWeight(SPLIT_HALF);
-        // to avoid border buildup
-        combined.setBorder(BorderFactory.createEmptyBorder());
-        combined.addComponentListener(new ComponentAdapter() { // to set the initial split correctly
-                public void componentShown(final ComponentEvent e) {
-                    combined.setDividerLocation(SPLIT_HALF);
-                }
-            });
         
         addView(Bundle.CPUSnapshotPanel_CallTreeString(), CALL_TREE_TAB_ICON, Bundle.CPUSnapshotPanel_CallTreeTabDescr(), cctPanel, null);
         addView(Bundle.CPUSnapshotPanel_HotSpotsString(), HOTSPOTS_TAB_ICON, Bundle.CPUSnapshotPanel_HotSpotTabDescr(), flatPanel, null);
-        addView(Bundle.CPUSnapshotPanel_CombinedString(), COMBINED_TAB_ICON, Bundle.CPUSnapshotPanel_CombinedTabDescr(), combined, null);
-        addView(Bundle.CPUSnapshotPanel_InfoString(), INFO_TAB_ICON, Bundle.CPUSnapshotPanel_InfoTabDescr(), infoPanel, null);
 
         addChangeListener(this);
 
         ProfilerToolbar toolBar = ProfilerToolbar.create(true);
 
-        toolBar.add(saveAction = new SaveSnapshotAction(loadedSnapshot));
         toolBar.add(new ExportAction(this, loadedSnapshot));
-        toolBar.add(saveViewAction = new SaveViewAction(this));
+        toolBar.add(new SaveViewAction(this));
 
         toolBar.addSeparator();
 
@@ -597,29 +377,15 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
 
         toolBar.addSpace(6);
 
-        slaveToggleButtonDown = new JToggleButton(SLAVE_DOWN_ICON);
-        slaveToggleButtonDown.setSelected(slaveModeDown);
-        slaveToggleButtonDown.addActionListener(this);
-        slaveToggleButtonDown.setToolTipText(Bundle.CPUSnapshotPanel_ToggleDownToolTip());
-        slaveToggleButtonDown.getAccessibleContext().setAccessibleName(Bundle.CPUSnapshotPanel_ToggleDownToolTip());
-        toolBar.add(slaveToggleButtonDown);
-
-        slaveToggleButtonUp = new JToggleButton(SLAVE_UP_ICON);
-        slaveToggleButtonUp.setSelected(slaveModeUp);
-        slaveToggleButtonUp.addActionListener(this);
-        slaveToggleButtonUp.setToolTipText(Bundle.CPUSnapshotPanel_ToggleUpToolTip());
-        slaveToggleButtonUp.getAccessibleContext().setAccessibleName(Bundle.CPUSnapshotPanel_ToggleUpToolTip());
-        toolBar.add(slaveToggleButtonUp);
-
         toolBar.add(threadsCombo);
         threadsCombo.addActionListener(this);
 
         toolBar.addSeparator();
         
         ContextAwareAction a = SystemAction.get(FindAction.class);
-        findActionPresenter = toolBar.add(a.createContextAwareInstance(context));
-        findPreviousPresenter = toolBar.add(new FindPreviousAction(this));
-        findNextPresenter = toolBar.add(new FindNextAction(this));
+        Component findActionPresenter = toolBar.add(a.createContextAwareInstance(context));
+        toolBar.add(new FindPreviousAction(this));
+        toolBar.add(new FindNextAction(this));
         
         if (findActionPresenter instanceof AbstractButton) {
             AbstractButton ab = (AbstractButton)findActionPresenter;
@@ -627,13 +393,76 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             ab.setText(""); // NOI18N
             ab.setToolTipText(Bundle.CPUSnapshotPanel_FindActionTooltip());
         }
-
-        findActionPresenter.setEnabled(false);
-        findPreviousPresenter.setEnabled(false);
-        findNextPresenter.setEnabled(false);
         
-        toolBar.addSeparator();
-        toolBar.add(new CompareSnapshotsAction(ls));
+        // Filler to align rest of the toolbar to the right
+        toolBar.addFiller();
+
+        // Information about source snapshot
+        final WeakReference<LoadedSnapshot>[] loadedSnapshots = new WeakReference[2];
+
+        final String s1File = (snapshot1.getFile() == null) ? null : snapshot1.getFile().getAbsolutePath();
+        final String s2File = (snapshot2.getFile() == null) ? null : snapshot2.getFile().getAbsolutePath();
+
+        if (s1File == null) {
+            loadedSnapshots[0] = new WeakReference(snapshot1);
+        }
+
+        if (s2File == null) {
+            loadedSnapshots[1] = new WeakReference(snapshot2);
+        }
+        
+        final ResultsManager rm = ResultsManager.getDefault();
+
+        final String SNAPSHOT_1_MASK = "file:/1"; //NOI18N
+        final String SNAPSHOT_2_MASK = "file:/2"; //NOI18N
+
+        final String SNAPSHOT_1_LINK = "<a href='" + SNAPSHOT_1_MASK + "'>" //NOI18N
+                                       + rm.getSnapshotDisplayName(snapshot1) + "</a>"; //NOI18N
+        final String SNAPSHOT_2_LINK = "<a href='" + SNAPSHOT_2_MASK + "'>" //NOI18N
+                                       + rm.getSnapshotDisplayName(snapshot2) + "</a>"; //NOI18N
+
+        HTMLLabel descriptionLabel = new HTMLLabel(Bundle.MemoryDiffPanel_SnapshotsComparisonString(
+                                                    SNAPSHOT_1_LINK, 
+                                                    SNAPSHOT_2_LINK)) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+
+            public Dimension getMaximumSize() {
+                return getPreferredSize();
+            }
+
+            protected void showURL(URL url) {
+                LoadedSnapshot ls = null;
+
+                if (SNAPSHOT_1_MASK.equals(url.toString())) {
+                    if (s1File != null) {
+                        File f = new File(s1File);
+                        if (f.exists()) ls = rm.loadSnapshot(FileUtil.toFileObject(f));
+                    } else {
+                        ls = loadedSnapshots[0].get();
+                    }
+                } else if (SNAPSHOT_2_MASK.equals(url.toString())) {
+                    if (s2File != null) {
+                        File f = new File(s2File);
+                        if (f.exists()) ls = rm.loadSnapshot(FileUtil.toFileObject(f));
+                    } else {
+                        ls = loadedSnapshots[1].get();
+                    }
+                }
+
+                if (ls != null) {
+                    SnapshotResultsWindow srw = SnapshotResultsWindow.get(ls);
+                    srw.open();
+                    srw.requestActive();
+                } else {
+                    ProfilerDialogs.displayWarning(Bundle.MemoryDiffPanel_SnapshotNotAvailableMsg());
+                }
+            }
+        };
+
+        descriptionLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
+        toolBar.add(descriptionLabel);
 
         updateToolbar();
         setMainToolbar(toolBar.getComponent());
@@ -715,10 +544,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                 flatPanel.setDataToDisplay(snapshot, tid, flatPanel.getCurrentView());
                 flatPanel.prepareResults();
             }
-        } else if (src == slaveToggleButtonDown) {
-            slaveModeDown = slaveToggleButtonDown.isSelected();
-        } else if (src == slaveToggleButtonUp) {
-            slaveModeUp = slaveToggleButtonUp.isSelected();
         }
     }
 
@@ -742,10 +567,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         flatPanel.changeView(view);
         cctPanel.clearSelection();
         cctPanel.changeView(view);
-        combinedCCT.clearSelection();
-        combinedCCT.changeView(view);
-        combinedFlat.clearSelection();
-        combinedFlat.changeView(view);
         //viewTypeHasChanged();
         viewChanged(view);
     }
@@ -762,31 +583,22 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     // --- Save Current View action support --------------------------------------
     public boolean hasView() {
         Component selectedView = getSelectedView();
-        return ((selectedView != null) && (selectedView instanceof ScreenshotProvider) && (selectedView != infoPanel));
+        return ((selectedView != null) && (selectedView instanceof ScreenshotProvider) /*&& (selectedView != infoPanel)*/);
     }
 
     // TODO use polymorphism instead of "if-else" dispatchig; curreant approach doesn't scale well
     public void performFind() {
-        if (getSelectedView() != infoPanel) {
-            String findString = FindDialog.getFindString();
+        String findString = FindDialog.getFindString();
 
-            if (findString == null) {
-                return; // cancelled
-            }
-
-            setFindString(findString);
-            performFindFirst();
+        if (findString == null) {
+            return; // cancelled
         }
+
+        setFindString(findString);
+        performFindFirst();
     }
 
     public void performFindFirst() {
-        // lazily initialize focus listeners once components are created
-        if (combinedViewTracker == null) {
-            combinedViewTracker = new CombinedViewTracker();
-            combinedFlat.addResultsViewFocusListener(combinedViewTracker);
-            combinedCCT.addResultsViewFocusListener(combinedViewTracker);
-        }
-
         boolean found = false;
 
         Component selectedView = getSelectedView();
@@ -814,45 +626,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = flatPanel.findFirst();
-        } else if (selectedView == combined) {
-            if ((combinedViewTracker.getLastFocusOwner() == null)
-                    || (combinedViewTracker.getLastFocusOwner() == combinedFlat.getResultsViewReference())) {
-                if (!combinedCCT.isFindStringDefined()) {
-                    String findString = FindDialog.getFindString();
-
-                    if (findString == null) {
-                        return; // cancelled
-                    }
-
-                    setFindString(findString);
-                }
-
-                found = combinedCCT.findFirst();
-            } else {
-                if (!combinedFlat.isFindStringDefined()) {
-                    String findString = FindDialog.getFindString();
-
-                    if (findString == null) {
-                        return; // cancelled
-                    }
-
-                    setFindString(findString);
-                }
-
-                found = combinedFlat.findFirst();
-            }
-        } else if (selectedView == backtraceView) {
-            if (!backtraceView.isFindStringDefined()) {
-                String findString = FindDialog.getFindString();
-
-                if (findString == null) {
-                    return; // cancelled
-                }
-
-                setFindString(findString);
-            }
-
-            found = backtraceView.findFirst();
         } else if (selectedView == subtreeView) {
             if (!subtreeView.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
@@ -873,13 +646,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     }
 
     public void performFindNext() {
-        // lazily initialize focus listeners once components are created
-        if (combinedViewTracker == null) {
-            combinedViewTracker = new CombinedViewTracker();
-            combinedFlat.addResultsViewFocusListener(combinedViewTracker);
-            combinedCCT.addResultsViewFocusListener(combinedViewTracker);
-        }
-
         boolean found = false;
 
         Component selectedView = getSelectedView();
@@ -907,45 +673,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = flatPanel.findNext();
-        } else if (selectedView == combined) {
-            if ((combinedViewTracker.getLastFocusOwner() == null)
-                    || (combinedViewTracker.getLastFocusOwner() == combinedCCT.getResultsViewReference())) {
-                if (!combinedCCT.isFindStringDefined()) {
-                    String findString = FindDialog.getFindString();
-
-                    if (findString == null) {
-                        return; // cancelled
-                    }
-
-                    setFindString(findString);
-                }
-
-                found = combinedCCT.findNext();
-            } else {
-                if (!combinedFlat.isFindStringDefined()) {
-                    String findString = FindDialog.getFindString();
-
-                    if (findString == null) {
-                        return; // cancelled
-                    }
-
-                    setFindString(findString);
-                }
-
-                found = combinedFlat.findNext();
-            }
-        } else if (selectedView == backtraceView) {
-            if (!backtraceView.isFindStringDefined()) {
-                String findString = FindDialog.getFindString();
-
-                if (findString == null) {
-                    return; // cancelled
-                }
-
-                setFindString(findString);
-            }
-
-            found = backtraceView.findNext();
         } else if (selectedView == subtreeView) {
             if (!subtreeView.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
@@ -966,13 +693,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     }
 
     public void performFindPrevious() {
-        // lazily initialize focus listeners once components are created
-        if (combinedViewTracker == null) {
-            combinedViewTracker = new CombinedViewTracker();
-            combinedFlat.addResultsViewFocusListener(combinedViewTracker);
-            combinedCCT.addResultsViewFocusListener(combinedViewTracker);
-        }
-
         boolean found = false;
 
         Component selectedView = getSelectedView();
@@ -1000,45 +720,6 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             }
 
             found = flatPanel.findPrevious();
-        } else if (selectedView == combined) {
-            if ((combinedViewTracker.getLastFocusOwner() == null)
-                    || (combinedViewTracker.getLastFocusOwner() == combinedCCT.getResultsViewReference())) {
-                if (!combinedCCT.isFindStringDefined()) {
-                    String findString = FindDialog.getFindString();
-
-                    if (findString == null) {
-                        return; // cancelled
-                    }
-
-                    setFindString(findString);
-                }
-
-                found = combinedCCT.findPrevious();
-            } else {
-                if (!combinedFlat.isFindStringDefined()) {
-                    String findString = FindDialog.getFindString();
-
-                    if (findString == null) {
-                        return; // cancelled
-                    }
-
-                    setFindString(findString);
-                }
-
-                found = combinedFlat.findPrevious();
-            }
-        } else if (selectedView == backtraceView) {
-            if (!backtraceView.isFindStringDefined()) {
-                String findString = FindDialog.getFindString();
-
-                if (findString == null) {
-                    return; // cancelled
-                }
-
-                setFindString(findString);
-            }
-
-            found = backtraceView.findPrevious();
         } else if (selectedView == subtreeView) {
             if (!subtreeView.isFindStringDefined()) {
                 String findString = FindDialog.getFindString();
@@ -1073,10 +754,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         }
     }
 
-    public void updateSavedState() {
-        infoPanel.updateInfo();
-        saveAction.updateState();
-    }
+    public void updateSavedState() {}
 
     private String getDefaultSnapshotFileName(ResultsSnapshot snapshot) {
         return "snapshot-" + snapshot.getTimeTaken(); // NOI18N
@@ -1085,22 +763,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private void setFindString(String findString) {
         cctPanel.setFindString(findString);
         flatPanel.setFindString(findString);
-        combinedFlat.setFindString(findString);
-        combinedCCT.setFindString(findString);
-
-        if (backtraceView != null) {
-            backtraceView.setFindString(findString);
-        }
-
         if (subtreeView != null) {
             subtreeView.setFindString(findString);
-        }
-    }
-
-    private void closeReverseCallsGraphs() {
-        if (backtraceView != null) {
-            removeView(backtraceView);
-            backtraceView = null;
         }
     }
 
@@ -1109,17 +773,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         
         // threads combo is only visible on the Hotspots tab
         threadsCombo.setVisible(selectedView == flatPanel);
-        slaveToggleButtonDown.setVisible(selectedView == combined);
-        slaveToggleButtonUp.setVisible(selectedView == combined);
-        aggregationCombo.setEnabled((selectedView != backtraceView) && (selectedView != infoPanel)
-                                    && (selectedView != subtreeView));
-
-        // update the toolbar if selected tab changed
-        boolean findEnabled = selectedView != infoPanel;
-        saveViewAction.setEnabled(findEnabled);
-        findActionPresenter.setEnabled(findEnabled);
-        findPreviousPresenter.setEnabled(findEnabled);
-        findNextPresenter.setEnabled(findEnabled);
+        aggregationCombo.setEnabled(selectedView != subtreeView);
     }
 
     private void viewChanged(final int viewType) {
@@ -1147,24 +801,8 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private void viewTypeHasChanged() {
         cctPanel.prepareResults();
         flatPanel.prepareResults();
-        combinedCCT.prepareResults();
-        combinedFlat.prepareResults();
         revalidate();
         repaint();
-    }
-
-    private void enhancePopupMenu(JPopupMenu popup, CCTDisplay customCCTDisplay) {
-        Collection<? extends CCTPopupEnhancer> col = Lookup.getDefault().lookupAll(CCTPopupEnhancer.class);
-        for(CCTPopupEnhancer en : col) {
-            en.enhancePopup(popup,loadedSnapshot,customCCTDisplay);
-        }
-    }
-
-    private void enableDisablePopup(PrestimeCPUCCTNode node) {
-        Collection<? extends CCTPopupEnhancer> col = Lookup.getDefault().lookupAll(CCTPopupEnhancer.class);
-        for(CCTPopupEnhancer en : col) {
-            en.enableDisablePopup(loadedSnapshot,node);
-        }
     }
     
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
@@ -1175,19 +813,15 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
             flatPanel.exportData(exportedFileType,eDD,false, Bundle.CPUSnapshotPanel_HotSpotsString());
         } else if (selectedView instanceof SubtreeCallGraphPanel) { //Subtree
             subtreeView.exportData(exportedFileType,eDD, subtreeView.getShortTitle());
-        } else if (selectedView instanceof ReverseCallGraphPanel) { //Back Trace
-            backtraceView.exportData(exportedFileType,eDD, backtraceView.getShortTitle());
-        } else if (selectedView==combined) { // Combined
-            combined.exportData(exportedFileType,eDD, Bundle.CPUSnapshotPanel_CombinedString());
         }
     }
 
     public boolean hasLoadedSnapshot() {
-        return true;
+        return false;
     }
 
     public boolean hasExportableView() {
         Component selectedView = getSelectedView();
-        return ((selectedView != null) && (selectedView!=infoPanel));
+        return (selectedView != null);
     }
 }
