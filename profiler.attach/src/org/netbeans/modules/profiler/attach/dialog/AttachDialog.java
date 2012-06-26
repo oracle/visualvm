@@ -59,6 +59,7 @@ import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -66,6 +67,24 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "AttachDialog_JavaApplication=Java application", // NOI18N
+    "AttachDialog_Caption=Attach Settings", // NOI18N
+    "AttachDialog_NoSteps=No steps available.", // NOI18N
+    "AttachDialog_Target=Target", // NOI18N
+    "AttachDialog_Local=&Local", // NOI18N
+    "AttachDialog_LocalHint=Profile a Java process running on this computer.", // NOI18N
+    "AttachDialog_Remote=&Remote", // NOI18N
+    "AttachDialog_RemoteHint=Connect to a Java process running on a remote system.", // NOI18N
+    "AttachDialog_Dynamic=&Dynamic", // NOI18N
+    "AttachDialog_DynamicHint=Connect to an already running Java 6+ process.", // NOI18N
+    "AttachDialog_Direct=D&irect", // NOI18N
+    "AttachDialog_DirectHint=Start a new Java 5+ process, configured for profiling.", // NOI18N
+    "AttachDialog_Hostname=Host&name:", // NOI18N
+    "AttachDialog_OsJvm=&OS & JVM:", // NOI18N
+    "AttachDialog_Connection=Connection", // NOI18N
+    "AttachDialog_Steps=&Before profiling you must perform the following steps:" // NOI18N
+})
 @ServiceProvider(service = AttachWizard.class)
 public class AttachDialog extends AttachWizard {
     
@@ -82,15 +101,15 @@ public class AttachDialog extends AttachWizard {
         }
         
         // Configure implicit settings
-        settings.setTargetType("Java application");
-        settings.setServerType("Java application");
+        settings.setTargetType(Bundle.AttachDialog_JavaApplication());
+        settings.setServerType(Bundle.AttachDialog_JavaApplication());
                 
         // Workaround for remote OS
         if (settings.isRemote()) settings.setHostOS(null);
         
         Panel panel = new Panel();
         panel.setup(settings);
-        DialogDescriptor dd = new DialogDescriptor(panel, "Attach Settings");
+        DialogDescriptor dd = new DialogDescriptor(panel, Bundle.AttachDialog_Caption());
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
         if (dd.getValue() != DialogDescriptor.OK_OPTION) return null;
@@ -109,11 +128,11 @@ public class AttachDialog extends AttachWizard {
             }
         }
         
-        return "No steps available.";
+        return Bundle.AttachDialog_NoSteps();
     }
     
     
-    private static final String ATTACH_WIZARD_HELPCTX = "JDevAttachWizard.HelpCtx";
+    private static final String ATTACH_WIZARD_HELPCTX = "JDevAttachWizard.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(ATTACH_WIZARD_HELPCTX);
     
     private class Panel extends JPanel implements HelpCtx.Provider {
@@ -143,7 +162,7 @@ public class AttachDialog extends AttachWizard {
                 hostname.setText(as.getHost());
                 os.setSelectedItem(as.getHostOS());
             } else {
-                hostname.setText("");
+                hostname.setText(""); // NOI18N
                 os.setSelectedIndex(0);
             }
         }
@@ -174,7 +193,7 @@ public class AttachDialog extends AttachWizard {
             ButtonGroup bg2 = new ButtonGroup();
             
             JPanel target = new JPanel(new GridBagLayout());
-            target.setBorder(new TitledBorder("Target"));
+            target.setBorder(new TitledBorder(Bundle.AttachDialog_Target()));
             
             c = new GridBagConstraints();
             c.gridx = 0;
@@ -186,11 +205,11 @@ public class AttachDialog extends AttachWizard {
                     super.fireItemStateChanged(event);
                     if (event.getStateChange() != ItemEvent.SELECTED) return;
                     CardLayout layout = (CardLayout)connection.getLayout();
-                    layout.show(connection, "LOCAL");
+                    layout.show(connection, "LOCAL"); // NOI18N
                     updateSteps();
                 }
             };
-            Mnemonics.setLocalizedText(local, "&Local");
+            Mnemonics.setLocalizedText(local, Bundle.AttachDialog_Local());
             
             bg1.add(local);
             target.add(local, c);
@@ -202,7 +221,7 @@ public class AttachDialog extends AttachWizard {
             c.fill = GridBagConstraints.HORIZONTAL;
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(6, 30, 0, 10);
-            JLabel localHint = new JLabel("Profile a Java process running on this computer.");
+            JLabel localHint = new JLabel(Bundle.AttachDialog_LocalHint());
             localHint.setEnabled(false);
             target.add(localHint, c);
             
@@ -216,11 +235,11 @@ public class AttachDialog extends AttachWizard {
                     super.fireItemStateChanged(event);
                     if (event.getStateChange() != ItemEvent.SELECTED) return;
                     CardLayout layout = (CardLayout)connection.getLayout();
-                    layout.show(connection, "REMOTE");
+                    layout.show(connection, "REMOTE"); // NOI18N
                     updateSteps();
                 }
             };
-            Mnemonics.setLocalizedText(remote, "&Remote");
+            Mnemonics.setLocalizedText(remote, Bundle.AttachDialog_Remote());
             bg1.add(remote);
             target.add(remote, c);
             
@@ -231,7 +250,7 @@ public class AttachDialog extends AttachWizard {
             c.fill = GridBagConstraints.HORIZONTAL;
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(6, 30, 10, 10);
-            JLabel remoteHint = new JLabel("Connect to a Java process running on a remote system.");
+            JLabel remoteHint = new JLabel(Bundle.AttachDialog_RemoteHint());
             remoteHint.setEnabled(false);
             target.add(remoteHint, c);
             
@@ -256,7 +275,7 @@ public class AttachDialog extends AttachWizard {
                     updateSteps();
                 }
             };
-            Mnemonics.setLocalizedText(dynamic, "&Dynamic");
+            Mnemonics.setLocalizedText(dynamic, Bundle.AttachDialog_Dynamic());
             bg2.add(dynamic);
             localConn.add(dynamic, c);
             
@@ -267,7 +286,7 @@ public class AttachDialog extends AttachWizard {
             c.fill = GridBagConstraints.HORIZONTAL;
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(6, 30, 0, 10);
-            JLabel dynamicHint = new JLabel("Connect to an already running Java 6+ process.");
+            JLabel dynamicHint = new JLabel(Bundle.AttachDialog_DynamicHint());
             dynamicHint.setEnabled(false);
             localConn.add(dynamicHint, c);
             
@@ -283,7 +302,7 @@ public class AttachDialog extends AttachWizard {
                     updateSteps();
                 }
             };
-            Mnemonics.setLocalizedText(direct, "D&irect");
+            Mnemonics.setLocalizedText(direct, Bundle.AttachDialog_Direct());
             bg2.add(direct);
             localConn.add(direct, c);
             
@@ -294,7 +313,7 @@ public class AttachDialog extends AttachWizard {
             c.fill = GridBagConstraints.HORIZONTAL;
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(6, 30, 10, 10);
-            JLabel directHint = new JLabel("Start a new Java 5+ process, configured for profiling.");
+            JLabel directHint = new JLabel(Bundle.AttachDialog_DirectHint());
             directHint.setEnabled(false);
             localConn.add(directHint, c);
             
@@ -305,7 +324,7 @@ public class AttachDialog extends AttachWizard {
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(6, 10, 0, 0);
             JLabel hostnameLabel = new JLabel();
-            Mnemonics.setLocalizedText(hostnameLabel, "Host&name:");
+            Mnemonics.setLocalizedText(hostnameLabel, Bundle.AttachDialog_Hostname());
             remoteConn.add(hostnameLabel, c);
             
             c = new GridBagConstraints();
@@ -325,7 +344,7 @@ public class AttachDialog extends AttachWizard {
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(6, 10, 10, 0);
             JLabel osLabel = new JLabel();
-            Mnemonics.setLocalizedText(osLabel, "&OS & JVM:");
+            Mnemonics.setLocalizedText(osLabel, Bundle.AttachDialog_OsJvm());
             remoteConn.add(osLabel, c);
             
             c = new GridBagConstraints();
@@ -356,9 +375,9 @@ public class AttachDialog extends AttachWizard {
             remoteConn.add(os, c);
             
             
-            connection.setBorder(new TitledBorder("Connection"));
-            connection.add(localConn, "LOCAL");
-            connection.add(remoteConn, "REMOTE");
+            connection.setBorder(new TitledBorder(Bundle.AttachDialog_Connection()));
+            connection.add(localConn, "LOCAL"); // NOI18N
+            connection.add(remoteConn, "REMOTE"); // NOI18N
             
             
             c = new GridBagConstraints();
@@ -374,7 +393,7 @@ public class AttachDialog extends AttachWizard {
             c.fill = GridBagConstraints.HORIZONTAL;
             c.insets = new Insets(10, 12, 0, 12);
             JLabel hint = new JLabel();
-            Mnemonics.setLocalizedText(hint, "&Before profiling you must perform the following steps:");
+            Mnemonics.setLocalizedText(hint, Bundle.AttachDialog_Steps());
             hint.setIcon(Icons.getIcon(GeneralIcons.INFO));
             add(hint, c);
             

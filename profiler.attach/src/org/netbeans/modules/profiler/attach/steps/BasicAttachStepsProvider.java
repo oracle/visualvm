@@ -52,13 +52,28 @@ import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.attach.providers.RemotePackExporter;
 import org.netbeans.modules.profiler.attach.spi.AttachStepsProvider;
-import org.openide.util.RequestProcessor;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "AttachDialog_CopiedToClipboard=Profiler parameter(s) copied to clipboard", // NOI18N
+    "AttachDialog_RemotePackDialogCaption=Choose Target Folder", // NOI18N
+    "AttachDialog_RemotePackSaved=Remote profiling pack saved to {0}", // NOI18N
+    "AttachDialog_Steps_Step=Step {0}:", // NOI18N
+    "AttachDialog_Steps_CopyToClipboard=copy to clipboard", // NOI18N
+    "AttachDialog_Steps_MakeSureStarted=Make sure the target application has been started by user {0} and is running using Java 6+.", // NOI18N
+    "AttachDialog_Steps_SubmitSelectProcess=Submit this dialog and click the Attach button to select the target application process.", // NOI18N
+    "AttachDialog_Steps_ConfigureToRun6=Make sure the target application is configured to run using Java 6+. Click the Help button for information on how to profile Java 5 applications.", // NOI18N
+    "AttachDialog_Steps_StartApplication=Start the target application. The process will wait for the profiler to connect.", // NOI18N
+    "AttachDialog_Steps_SubmitUnblock=Submit this dialog and click the Attach button to connect to the target application and resume its execution.", // NOI18N
+    "AttachDialog_Steps_AddParameters=Add the following parameter(s) to the application startup script", // NOI18N
+    "AttachDialog_Steps_RunCalibrateScript=If you have not run profiling on the remote system yet, run the {0} script first to calibrate the profiler.", // NOI18N
+    "AttachDialog_Steps_CreateRemotePack=If you have not done it before <a href={0}>create a Remote profiling pack</a> for the selected OS & JVM and upload it to the remote system. Remote profiling pack root directory will be referred to as {1}.", // NOI18N
+})
 @ServiceProvider(service = AttachStepsProvider.class)
 public class BasicAttachStepsProvider extends AttachStepsProvider {
     
@@ -80,89 +95,113 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     
     protected String localDynamicSteps(AttachSettings settings) {
         StringBuilder b = new StringBuilder();
-        b.append("<div>");
-        b.append("<b>Step 1: </b>");
-        b.append("Make sure the target application has been started by user ");
-        b.append(System.getProperty("user.name"));
-        b.append(" and is running using Java 6+.");
-        b.append("</div>");
-        b.append("<br/>");
-        b.append("<div>");
-        b.append("<b>Step 2: </b>");
-        b.append("Submit this dialog and click the Attach button to select the target application process.");
-        b.append("</div>");
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(1));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_MakeSureStarted(System.getProperty("user.name"))); // NOI18N
+        b.append("</div>"); // NOI18N
+        b.append("<br/>"); // NOI18N
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(2));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_SubmitSelectProcess());
+        b.append("</div>"); // NOI18N
         return b.toString();
     }
     
     protected String localDirectSteps(AttachSettings settings) {
         StringBuilder b = new StringBuilder();
-        b.append("<div>");
-        b.append("<b>Step 1: </b>");
-        b.append("Make sure the target application is configured to run using Java 6+. Click the Help button for information on how to profile Java 5 applications.");
-        b.append("</div>");
-        b.append("<br/>");
-        b.append("<div>");
-        b.append("<b>Step 2: </b>");
-        b.append("Add the following parameter(s) to the application startup script (<a href='");
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(1));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_ConfigureToRun6());
+        b.append("</div>"); // NOI18N
+        b.append("<br/>"); // NOI18N
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(2));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_AddParameters());
+        b.append(" (<a href='"); // NOI18N
         b.append(LINK_CLIPBOARD);
-        b.append("'>copy to clipboard</a>):");
-        b.append("</div>");
-        b.append("<pre>");
+        b.append("'>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_CopyToClipboard());
+        b.append("</a>):"); // NOI18N
+        b.append("</div>"); // NOI18N
+        b.append("<pre>"); // NOI18N
         b.append(parameters(settings));
-        b.append("</pre>");
-        b.append("<br/>");
-        b.append("<div>");
-        b.append("<b>Step 3: </b>");
-        b.append("Start the target application. The process will wait for the profiler to connect.");
-        b.append("</div>");
-        b.append("<br/>");
-        b.append("<div>");
-        b.append("<b>Step 4: </b>");
-        b.append("Submit this dialog and click the Attach button to connect to the target application and resume its execution.");
-        b.append("</div>");
+        b.append("</pre>"); // NOI18N
+        b.append("<br/>"); // NOI18N
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(3));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_StartApplication());
+        b.append("</div>"); // NOI18N
+        b.append("<br/>"); // NOI18N
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(4));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_SubmitUnblock());
+        b.append("</div>"); // NOI18N
         return b.toString();
     }
     
     protected String remoteDirectSteps(AttachSettings settings) {
         StringBuilder b = new StringBuilder();
-        b.append("<div>");
-        b.append("<b>Step 1: </b>");
-        b.append("If you have not done it before <a href='");
-        b.append(LINK_REMOTEPACK);
-        b.append("'>create a Remote profiling pack</a> for the selected OS & JVM and upload it to the remote system. Remote profiling pack root directory will be referred to as <code>&lt;remote&gt;</code>.");
-        b.append("</div>");
-        b.append("<br/>");
-        b.append("<div>");
-        b.append("<b>Step 2: </b>");
-        b.append("If you have not run profiling on the remote system yet, run the <code>");
-        b.append(IntegrationUtils.getRemoteCalibrateCommandString(settings.getHostOS(), IntegrationUtils.PLATFORM_JAVA_60));
-        b.append("</code> script first to calibrate the profiler.");
-        b.append("</div>");
-        b.append("<br/>");
-        b.append("<div>");
-        b.append("<b>Step 3: </b>");
-        b.append("Make sure the target application is configured to run using Java 6+. Click the Help button for information on how to profile Java 5 applications.");
-        b.append("</div>");
-        b.append("<br/>");
-        b.append("<div>");
-        b.append("<b>Step 4: </b>");
-        b.append("Add the following parameter(s) to the application startup script (<a href='");
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(1));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_CreateRemotePack("'" + LINK_REMOTEPACK + "'", "<code>&lt;remote&gt;</code>")); // NOI18N
+        b.append("</div>"); // NOI18N
+        b.append("<br/>"); // NOI18N
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(2));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_RunCalibrateScript("<code>" + IntegrationUtils.getRemoteCalibrateCommandString(settings.getHostOS(), IntegrationUtils.PLATFORM_JAVA_60) + "</code>")); // NOI18N
+        b.append("</div>"); // NOI18N
+        b.append("<br/>"); // NOI18N
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(3));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_ConfigureToRun6());
+        b.append("</div>"); // NOI18N
+        b.append("<br/>"); // NOI18N
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(4));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_AddParameters());
+        b.append(" (<a href='"); // NOI18N
         b.append(LINK_CLIPBOARD);
-        b.append("'>copy to clipboard</a>):");
-        b.append("</div>");
-        b.append("<pre>");
+        b.append("'>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_CopyToClipboard());
+        b.append("</a>):"); // NOI18N
+        b.append("</div>"); // NOI18N
+        b.append("<pre>"); // NOI18N
         b.append(parameters(settings));
-        b.append("</pre>");
-        b.append("<br/>");
-        b.append("<div>");
-        b.append("<b>Step 5: </b>");
-        b.append("Start the target application. The process will wait for the profiler to connect.");
-        b.append("</div>");
-        b.append("<br/>");
-        b.append("<div>");
-        b.append("<b>Step 6: </b>");
-        b.append("Submit this dialog and click the Attach button to connect to the target application and resume its execution.");
-        b.append("</div>");
+        b.append("</pre>"); // NOI18N
+        b.append("<br/>"); // NOI18N
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(5));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_StartApplication());
+        b.append("</div>"); // NOI18N
+        b.append("<br/>"); // NOI18N
+        b.append("<div>"); // NOI18N
+        b.append("<b>"); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_Step(6));
+        b.append("</b> "); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_SubmitUnblock());
+        b.append("</div>"); // NOI18N
         return b.toString();
     }
     
@@ -173,17 +212,17 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     
     protected void copyParameters(AttachSettings settings) {
         String parameters = parameters(settings);
-        parameters = parameters.replace("&lt;", "<").replace("&gt;", ">");
+        parameters = parameters.replace("&lt;", "<").replace("&gt;", ">"); // NOI18N
         StringSelection s = new StringSelection(parameters);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(s, s);
-        ProfilerDialogs.displayInfo("Profiler parameter(s) copied to clipboard");
+        ProfilerDialogs.displayInfo(Bundle.AttachDialog_CopiedToClipboard());
     }
     
     protected void createRemotePack(final AttachSettings settings) {
         try {
             final JFileChooser chooser = new JFileChooser();
             final File tmpDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
-            chooser.setDialogTitle("Choose Target Folder");
+            chooser.setDialogTitle(Bundle.AttachDialog_RemotePackDialogCaption());
             chooser.setAcceptAllFileFilterUsed(false);
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             chooser.setSelectedFile(tmpDir);
@@ -191,10 +230,10 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
             chooser.setMultiSelectionEnabled(false);
             if ((JFileChooser.CANCEL_OPTION & chooser.showSaveDialog(chooser)) == 0) {
                 String packPath = exportRemotePack(chooser.getSelectedFile().getAbsolutePath(), settings);
-                ProfilerDialogs.displayInfo("Remote profiling pack saved to " + packPath);
+                ProfilerDialogs.displayInfo(Bundle.AttachDialog_RemotePackSaved(packPath));
             }
         } catch (IOException ex) {
-            System.err.println(">>> Exception creating remote pack: " + ex); // NOI18N
+            System.err.println("Exception creating remote pack: " + ex); // NOI18N
         }
     }
     
