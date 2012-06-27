@@ -44,6 +44,8 @@
 package org.netbeans.lib.profiler.client;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
+import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 
 
 /**
@@ -55,6 +57,8 @@ import org.netbeans.lib.profiler.global.CommonConstants;
  * @author Ian Formanek
  */
 public class ClientUtils implements CommonConstants {
+    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+    private static final MethodNameFormatter classNameFormatter = new DefaultMethodNameFormatter(DefaultMethodNameFormatter.VERBOSITY_CLASS);
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static class SourceCodeSelection implements Cloneable {
@@ -128,6 +132,16 @@ public class ClientUtils implements CommonConstants {
             return startLine;
         }
 
+        /** Return if the selection represents whole default package. */
+        public boolean isDefaultPackage() {
+            return className.isEmpty() && methodName.isEmpty() && methodSignature.isEmpty();
+        }
+        
+        /** Return if the selection represents subset of default package. */
+        public boolean isInDefaultPackage() {
+            return isDefaultPackage() || !className.contains(".");
+        }
+
         public Object clone() throws CloneNotSupportedException {
             SourceCodeSelection clone = (SourceCodeSelection) super.clone();
             clone.className = className;
@@ -143,8 +157,8 @@ public class ClientUtils implements CommonConstants {
                     return (startLine >= anotherSelection.startLine) && (endLine <= anotherSelection.endLine);
                 }
             } else {
-                if (isDefaultPkg(this)) {
-                    return isDefaultPkg(anotherSelection);
+                if (isDefaultPackage()) {
+                    return isInDefaultPackage();
                 } else {
                     String thisFlattened = toFlattened().replace('.', '\\').replace('$', '\\') + "\\"; //NOI18N
                     String anotherFlattened = anotherSelection.toFlattened().replace('.', '\\').replace('$', '\\'); //NOI18N
@@ -270,14 +284,7 @@ public class ClientUtils implements CommonConstants {
 
                 return sb.toString();
             }
-        }
-        
-        private static boolean isDefaultPkg(SourceCodeSelection sel) {
-            return ((".*".equals(sel.className) || ".**".equals(sel.className)) &&
-                     (sel.methodName == null || sel.methodName.isEmpty())) ||
-                   ((sel.className == null || sel.className.isEmpty()) &&
-                     (sel.methodName != null && !sel.methodName.isEmpty()));
-        }
+        }        
     }
 
     public static class TargetAppFailedToStart extends Exception {
@@ -408,5 +415,80 @@ public class ClientUtils implements CommonConstants {
 
             return new ClientUtils.SourceCodeSelection(className, methodName, methodSig);
         }
+    }
+
+    /** Format class name for use in root editor dialogs.
+     *  @param className class name obtained from {@link SourceCodeSelection#getClassName() }
+     *  @return class name formated to human readable form
+     */
+    public static String formatClassName(String className) {
+        return classNameFormatter.formatMethodName(className, "", "").toFormatted();
+    }
+
+    /** Parse user input text to the class name. Inversion of {@link #formatClassName(String)}.
+     *  @param text user input
+     *  @param allowWildcards enable wildcards in the class name
+     *  @return class name for use in {@link SourceCodeSelection} or <code>null</code> in case of malformed input.
+     */
+    public static String parseClassName(String text, boolean allowWildcards) {
+        if(text.isEmpty()) {
+            return null;
+        }
+        //irregularities for default package
+        if(text.equals(".*")) {
+            return allowWildcards ? "" : null;
+        }
+        if(text.equals(".**")) {
+            return null;
+        }
+
+        String[] components = text.split("\\.", -1);//NOI18N
+        int len = components.length;
+        String last = components[len-1];
+        
+        if(len == 1) {
+            //class in default package
+            if(text.startsWith("*")) {
+                //only $** suffix allowed
+                return null;
+            }
+            return checkWildcards(text, allowWildcards, false) ? text: null;
+        }
+        for(int i = 0; i < len; i++) {
+            if(components[i].isEmpty()) {
+                //missing component name
+                return null;
+            }
+            if(i < len-1 && components[i].contains("*")) {//NOI18N
+                //wildcards are allowed only in the last component
+                return null;
+            }
+        }
+        if(checkWildcards(last, allowWildcards, true)) {
+            return text;
+        }
+        return null;
+    }
+
+    /** Check wildcards in the last component of the class name */
+    private static boolean checkWildcards(String last, boolean allowWildcards, boolean allowSubPackages) {
+        int wildcard = last.indexOf('*');//NOI18N
+        if(wildcard == -1) {
+            return true;
+        }
+        if(!allowWildcards) {
+            return false;
+        }
+        if(wildcard == last.length()-1) {
+            return true;
+        }
+        if(!allowSubPackages) {
+            return false;
+        }
+        if(wildcard != last.length()-2 || !last.endsWith("*")) {//NOI18N
+            // ** must be at the end of class name
+            return false;
+        }        
+        return wildcard == 0 || last.charAt(wildcard-1) == '$';//NOI18N
     }
 }

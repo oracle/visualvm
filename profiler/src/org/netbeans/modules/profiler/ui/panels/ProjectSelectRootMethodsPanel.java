@@ -188,8 +188,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpC
 
                 @Override
                 public void run() {
-                    pkgTreeView.setContext(getContext());
-                    pkgTreeView.setSelection(currentSelection);
+                    pkgTreeView.setSelection(currentSelection, getContext());
                 }
             });
 
@@ -420,15 +419,13 @@ final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpC
                     @Override
                     public void run() {
                         final ClientUtils.SourceCodeSelection[] methods =
-                                RootMethodsPanel.getSelectedRootMethods(
-                                pkgTreeView.getSelection(), currentProject);
+                            RootMethodsPanel.getSelectedRootMethods(pkgTreeView.getSelection(), currentProject);
                         if (methods != null) updateSelector(new Runnable() {
                             @Override
                             public void run() {
-                                pkgTreeView.setContext(getContext());
-                                pkgTreeView.setSelection(methods); // TODO: seems to add methods instead of set methods!!!
+                                pkgTreeView.setSelection(methods, getContext());
                             }
-                        });
+                        });              
                     }
                 });
             }
@@ -458,29 +455,25 @@ final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpC
         }
     }
 
-    private void updateSelector(Runnable updater) {
-        final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.SelectRootMethodsPanel_ParsingProjectStructureMessage());
-        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            @Override
-            public void run() {
-                ph.setInitialDelay(500);
-                ph.start();
-            }
-        });
-
+    private void updateSelector(final Runnable updater) {        
         try {
-            treeBuilderList.setEnabled(false);
-            pkgTreeView.setEnabled(false);
-            okButton.setEnabled(false);
+            setUIEnabled(false);
             updater.run();
         } finally {
-            ph.finish();
-            okButton.setEnabled(true);
-            pkgTreeView.setEnabled(true);
-            treeBuilderList.setEnabled(true);
+            setUIEnabled(true);
         }
     }
 
+    private void setUIEnabled(final boolean val) {
+        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() {
+                treeBuilderList.setEnabled(val);
+                pkgTreeView.setEnabled(val);
+                okButton.setEnabled(val);
+            }
+        });
+    }
+    
     private void updateSelectorProjects() {
         updateSelector(new Runnable() {
 

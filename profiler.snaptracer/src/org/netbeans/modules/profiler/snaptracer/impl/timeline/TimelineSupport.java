@@ -46,8 +46,6 @@ package org.netbeans.modules.profiler.snaptracer.impl.timeline;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineChart.Row;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.items.ValueItemDescriptor;
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -108,6 +106,7 @@ public final class TimelineSupport {
     private final Set<ValuesListener> valuesListeners = new HashSet();
 
     private final Set<Integer> selectedTimestamps = new HashSet();
+    private final List<Integer> selectedIntervals = new ArrayList();
     private final Set<SelectionListener> selectionListeners = new HashSet();
 
     private final IdeSnapshot snapshot;
@@ -758,6 +757,23 @@ public final class TimelineSupport {
     public Set<Integer> getSelectedTimestamps() {
         return selectedTimestamps;
     }
+    
+    public void selectInterval(int index1, int index2) {
+        selectedIntervals.add(index1);
+        selectedIntervals.add(index2);
+    }
+    
+    public List<Integer> getSelectedIntervals() {
+        return selectedIntervals;
+    }
+    
+    public void resetSelectedIntervals() {
+        selectedIntervals.clear();
+    }
+    
+    public void selectedIntervalsChanged() {
+        notifyIntervalsSelectionChanged();
+    }
 
     private void highlightTimestamp(int selectedIndex) {
         ChartSelectionModel selectionModel = chart.getSelectionModel();
@@ -863,6 +879,11 @@ public final class TimelineSupport {
     public void removeSelectionListener(SelectionListener listener) {
         selectionListeners.remove(listener);
     }
+    
+    private void notifyIntervalsSelectionChanged() {
+        for (SelectionListener selectionListener : selectionListeners)
+            selectionListener.intervalsSelectionChanged();
+    }
 
     private void notifyIndexSelectionChanged() {
         for (SelectionListener selectionListener : selectionListeners)
@@ -878,6 +899,8 @@ public final class TimelineSupport {
 
 
     public static interface SelectionListener {
+        
+        public void intervalsSelectionChanged();
 
         public void indexSelectionChanged();
 

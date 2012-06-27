@@ -503,6 +503,9 @@ public class OverviewController extends AbstractController {
         int offset = 0;
         int len;
         
+        if (threadName == null) {
+            return "*null*"; // NOI18N
+        }
         if (threadName instanceof PrimitiveArrayInstance) {
             chars = (PrimitiveArrayInstance)threadName;
             len = chars.getLength();
@@ -512,8 +515,16 @@ public class OverviewController extends AbstractController {
 
             chars = (PrimitiveArrayInstance) stringInstance.getValueOfField("value"); // NOI18N
             if (chars != null) {
-                offset = ((Integer) stringInstance.getValueOfField("offset")).intValue(); // NOI18N
-                len = ((Integer) stringInstance.getValueOfField("count")).intValue(); // NOI18N
+                Integer oi = (Integer) stringInstance.getValueOfField("offset");  // NOI18N
+                Integer ci = (Integer) stringInstance.getValueOfField("count");   // NOI18N
+                if (oi != null) {
+                    offset = oi.intValue();
+                }
+                if (ci != null) {
+                    len = ci.intValue();
+                } else {
+                    len = chars.getLength();
+                }
             } else {
                 return "*null*"; // NOI18N
             }

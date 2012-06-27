@@ -81,7 +81,6 @@ import java.io.ObjectOutput;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -187,6 +186,7 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_RenameSnapshotCaption=Rename Snapshot",
     "ProfilerControlPanel2_NewFileNameLbl=&New file name:",
     "ProfilerControlPanel2_RenameSnapshotFailedMsg=Failed to rename snapshot to {0}",
+    "ProfilerControlPanel2_EmptyNameMsg=Snapshot name cannot be empty.",
     "MSG_Loading_Progress=Loading...",
     "LAB_ControlPanelName=Profiler"
 })
@@ -1006,6 +1006,14 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
                         return null;
                 }
             }
+
+            public boolean equals(Object o) {
+                return fo.equals(((Snapshot)o).fo);
+            }
+            
+            public int hashCode() {
+                return fo.hashCode();
+            }
         }
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -1401,21 +1409,26 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
                         if (dd.getValue() == DialogDescriptor.OK_OPTION) {
                             String newName = panel.getSnapshotName();
                             if (!origName.equals(newName)) {
-                                FileLock lock = null;
-                                try {
-                                    lock = fileObject.lock();
-                                    final LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(
-                                            FileUtil.toFile(fileObject));
-                                    fileObject.rename(lock, newName, fileObject.getExt());
-                                    if (ls != null) ls.setFile(FileUtil.toFile(fileObject));
-                                    ProfilerControlPanel2.getDefault().refreshSnapshotsList();
-                                } catch (IOException e) {
-                                    ProfilerLogger.warning("Failed to rename snapshot " // NOI18N
-                                            + fileObject + " to " + newName + ": " + e.getMessage()); // NOI18N
-                                    ProfilerDialogs.displayError(Bundle.ProfilerControlPanel2_RenameSnapshotFailedMsg(newName));
+                                if (newName.length() == 0) {
+                                    ProfilerDialogs.displayError(Bundle.ProfilerControlPanel2_EmptyNameMsg());
                                     renameSelectedSnapshot();
-                                } finally {
-                                    if (lock != null) lock.releaseLock();
+                                } else {
+                                    FileLock lock = null;
+                                    try {
+                                        lock = fileObject.lock();
+                                        final LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(
+                                                FileUtil.toFile(fileObject));
+                                        fileObject.rename(lock, newName, fileObject.getExt());
+                                        if (ls != null) ls.setFile(FileUtil.toFile(fileObject));
+                                        ProfilerControlPanel2.getDefault().refreshSnapshotsList();
+                                    } catch (IOException e) {
+                                        ProfilerLogger.warning("Failed to rename snapshot " // NOI18N
+                                                + fileObject + " to " + newName + ": " + e.getMessage()); // NOI18N
+                                        ProfilerDialogs.displayError(Bundle.ProfilerControlPanel2_RenameSnapshotFailedMsg(newName));
+                                        renameSelectedSnapshot();
+                                    } finally {
+                                        if (lock != null) lock.releaseLock();
+                                    }
                                 }
                             }
                         }
@@ -1424,51 +1437,65 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
             }
         }
 
-        final private Semaphore refreshListSemaphore = new Semaphore(1);
+        private static final RequestProcessor updater = new RequestProcessor("Snapshots Updater"); // NOI18N
+        private static final Object updaterSync = new Object();
+        private boolean updating = false;
+        private boolean dirty = false;
+        
         private void refreshList() {
-            final Object[] sel = list.getSelectedValues();
+            synchronized (updaterSync) {
+                if (updating) {
+                    dirty = true;
+                    return;
+                }
+            }
             
-            org.netbeans.lib.profiler.ui.SwingWorker worker = new org.netbeans.lib.profiler.ui.SwingWorker(refreshListSemaphore) {
-                private final java.util.List<Snapshot> modelElements = new ArrayList<Snapshot>();
-                
-                @Override
-                protected void doInBackground() {
-                    for(FileObject fo : ResultsManager.getDefault().listSavedSnapshots(displayedProject, null)) {
-                        modelElements.add(new Snapshot(fo));
-                    }
-
-                    for(FileObject fo : ResultsManager.getDefault().listSavedHeapdumps(displayedProject, null)) {
-                        modelElements.add(new Snapshot(fo));
-                    }
-                }
-
-                @Override
-                protected void done() {
-                    DefaultListModel newListModel = new DefaultListModel();
-                    for(Object element : modelElements)
-                        newListModel.addElement(element);
-                    list.setModel(newListModel);
-                    listModel.removeAllElements();
-                    listModel = newListModel;
-                    list.setEnabled(true);
-                    for (Object s : sel) {
-                        int i = listModel.indexOf(s);
-                        if (i != -1) list.addSelectionInterval(i, i);
-                    }
-                }
-
-                @Override
-                protected void nonResponding() {
-                    CommonUtils.runInEventDispatchThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            list.setEnabled(false);
-                            listModel.addElement(Bundle.MSG_Loading_Progress());
+            SwingUtilities.invokeLater(new Runnable() { // Read current selection in EDT
+                public void run() {
+                    final java.util.List selection = Arrays.asList(list.getSelectedValues());
+                    
+                    updater.post(new Runnable() { // Access snapshots on filesystem in worker thread
+                        public void run()  {
+                            synchronized (updaterSync) {
+                                dirty = false;
+                                updating = true;
+                            }
+                            
+                            final java.util.List<Snapshot> snapshots = new ArrayList<Snapshot>();
+                            try {
+                                for (FileObject fo : ResultsManager.getDefault().
+                                        listSavedSnapshots(displayedProject, null))
+                                    snapshots.add(new Snapshot(fo));
+                                for (FileObject fo : ResultsManager.getDefault().
+                                        listSavedHeapdumps(displayedProject, null))
+                                    snapshots.add(new Snapshot(fo));
+                            } catch (Throwable t) {
+                                LOGGER.log(Level.WARNING, null, t);
+                            }
+                            
+                            SwingUtilities.invokeLater(new Runnable() { // Update snapshots in EDT
+                                public void run() {
+                                    listModel.clear();
+                                    for (int i = 0; i < snapshots.size(); i++) {
+                                        Snapshot s = snapshots.get(i);
+                                        listModel.addElement(s);
+                                        if (selection.contains(s))
+                                            list.addSelectionInterval(i, i);
+                                    }
+                                    
+                                    boolean refreshAgain = false;
+                                    synchronized (updaterSync) {
+                                        updating = false;
+                                        if (dirty) refreshAgain = true;
+                                    }
+                                    
+                                    if (refreshAgain) refreshList();
+                                }
+                            });
                         }
                     });
                 }
-            };
-            worker.execute();
+            });
         }
 
         private void updateButtons() {
@@ -1747,7 +1774,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         String getSnapshotName() {
-            return textField.getText();
+            return textField.getText().trim();
         }
 
         void setSnapshotName(final String text) {

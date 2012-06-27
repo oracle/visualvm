@@ -88,6 +88,7 @@ import org.netbeans.lib.profiler.ui.components.JTitledPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.OQLController;
 import org.netbeans.modules.profiler.heapwalk.OQLSupport;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.oql.ui.OQLEditor;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
@@ -95,7 +96,6 @@ import org.netbeans.modules.profiler.oql.icons.OQLIcons;
 import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -526,7 +526,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             initComponents();
             refreshQueries();
 
-            RequestProcessor.getDefault().post(new Runnable() {
+            BrowserUtils.performTask(new Runnable() {
                 public void run() {
                     OQLController.SavedController.loadData(treeModel);
                     SwingUtilities.invokeLater(new Runnable() {
@@ -547,7 +547,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                     if (OQLQueryCustomizer.saveQuery(query, treeModel, savedTree)) {
                         setVisible(true);
                         refreshQueries();
-                        RequestProcessor.getDefault().post(new Runnable() {
+                        BrowserUtils.performTask(new Runnable() {
                             public void run() {
                                 OQLController.SavedController.saveData(treeModel);
                             }
@@ -574,7 +574,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                 OQLSupport.OQLNode node = node(selection[0]);
                 if (OQLQueryCustomizer.editNode(node, treeModel, savedTree)) {
                     refreshDescription();
-                    RequestProcessor.getDefault().post(new Runnable() {
+                    BrowserUtils.performTask(new Runnable() {
                         public void run() {
                             OQLController.SavedController.saveData(treeModel);
                         }
@@ -599,7 +599,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
                 savedTree.setSelectionPath(new TreePath(treeModel.getPathToRoot(otherNode)));
                 refreshQueries();
                 savedTree.requestFocus();
-                RequestProcessor.getDefault().post(new Runnable() {
+                BrowserUtils.performTask(new Runnable() {
                     public void run() {
                         OQLController.SavedController.saveData(treeModel);
                     }

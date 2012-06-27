@@ -143,7 +143,7 @@ import org.openide.util.lookup.ServiceProvider;
     "History_LoggingConfirmationCaption=Log Class History",
     "History_LoggingResetMsg=This will reset history logging for {0}.\nDo you want to continue?",
     "History_LoggingStopMsg=This will stop history logging for {0}.\nDo you want to continue?",
-    "LAB_ResultsWindowName=Live Profiling Results"
+    "LAB_ResultsWindowName=Live Results"
 })
 public final class LiveResultsWindow extends ProfilerTopComponent
                                      implements ProfilingStateListener,

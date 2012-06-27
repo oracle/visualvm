@@ -418,8 +418,13 @@ public class Monitors implements CommonConstants {
                 for (int i = 0; i < size; i++) {
                     if (threadNew[i]) {
                         newThreadIds[idx] = threadIds[i];
-                        newThreadNames[idx] = ((Thread) threads[i]).getName();
-                        newThreadClassNames[idx] = ((Thread) threads[i]).getClass().getName();
+                        Thread t = (Thread) threads[i];
+                        newThreadClassNames[idx] = t.getClass().getName();
+                        try {
+                            newThreadNames[idx] = t.getName();
+                        } catch (NullPointerException e) {
+                            newThreadNames[idx] = "*Unknown thread ("+threadIds[i]+")*";  // NOI18N
+                        }
                         idx++;
                     }
                 }

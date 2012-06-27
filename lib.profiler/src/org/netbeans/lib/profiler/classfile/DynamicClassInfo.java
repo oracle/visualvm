@@ -58,7 +58,7 @@ public class DynamicClassInfo extends ClassInfo {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ArrayList subclasses; // Subclasses as DynamicClassInfos
-    private DynamicClassInfo superClass; // Superclass as a DynamicClassInfo (just name is inconvenient when multiple classloaders are used)
+    private DynamicClassInfo superClass; // Superclass as a DynamicClassInfo (just name not is inconvenient when multiple classloaders are used)
     private String classFileLocation; // Directory or .jar file where the .class file is located.
     private int[] baseCPoolCount;
     private int java_lang_ThowableCPIndex; // constant pool index for java.lang.Throwable

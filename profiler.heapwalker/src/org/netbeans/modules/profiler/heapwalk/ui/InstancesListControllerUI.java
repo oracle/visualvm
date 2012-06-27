@@ -96,9 +96,9 @@ import javax.swing.tree.TreePath;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -479,7 +479,7 @@ public class InstancesListControllerUI extends JTitledPanel {
                 if (internalChange[0]) return;
                 final int column = Integer.parseInt(e.getActionCommand());
                 if (column == 3 && !instancesListTableModel.isRealColumnVisible(column)) {
-                    RequestProcessor.getDefault().post(new Runnable() {
+                    BrowserUtils.performTask(new Runnable() {
                         public void run() {
                             final int retainedSizesState = instancesListController.getInstancesController().
                                     getHeapFragmentWalker().computeRetainedSizes(false);

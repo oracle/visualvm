@@ -55,6 +55,7 @@ import java.text.MessageFormat;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.openide.DialogDisplayer;
+import org.openide.util.HelpCtx;
 
 /**
  * A panel that allows to select a process PID from a combo box of all running processes
@@ -81,7 +82,10 @@ import org.openide.DialogDisplayer;
     "PIDSelectPanel_SelectedProcessAccessName=Selected process details",
     "PIDSelectPanel_ButtonAccessDescr=Refreshes list of processes available for Profiler connection."
 })
-public final class PIDSelectPanel extends JPanel implements ActionListener {
+public final class PIDSelectPanel extends JPanel implements ActionListener, HelpCtx.Provider {
+    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+    private static final HelpCtx HELP_CTX = new HelpCtx("PIDSelectPanel.HelpCtx");
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class PIDComboRenderer extends DefaultListCellRenderer {
@@ -168,6 +172,11 @@ public final class PIDSelectPanel extends JPanel implements ActionListener {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
+    }
 
     public int getPID() {
         Object sel = combo.getSelectedItem();

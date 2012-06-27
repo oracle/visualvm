@@ -100,10 +100,13 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private static final String PANEL_TITLE_SHORT = messages.getString("SubtreeCallGraphPanel_PanelTitleShort"); // NOI18N
     private static final String METHOD_COLUMN_NAME = messages.getString("SubtreeCallGraphPanel_MethodColumnName"); // NOI18N
     private static final String METHOD_COLUMN_TOOLTIP = messages.getString("SubtreeCallGraphPanel_MethodColumnToolTip"); // NOI18N
+    private static final String METHOD_FILTER_HINT = messages.getString("FlatProfilePanel_MethodFilterHint"); // NOI18N
     private static final String CLASS_COLUMN_NAME = messages.getString("SubtreeCallGraphPanel_ClassColumnName"); // NOI18N
     private static final String CLASS_COLUMN_TOOLTIP = messages.getString("SubtreeCallGraphPanel_ClassColumnToolTip"); // NOI18N
+    private static final String CLASS_FILTER_HINT = messages.getString("FlatProfilePanel_ClassFilterHint"); // NOI18N
     private static final String PACKAGE_COLUMN_NAME = messages.getString("SubtreeCallGraphPanel_PackageColumnName"); // NOI18N
     private static final String PACKAGE_COLUMN_TOOLTIP = messages.getString("SubtreeCallGraphPanel_PackageColumnToolTip"); // NOI18N
+    private static final String PACKAGE_FILTER_HINT = messages.getString("FlatProfilePanel_PackageFilterHint"); // NOI18N
     private static final String TIME_REL_COLUMN_NAME = messages.getString("SubtreeCallGraphPanel_TimeRelColumnName"); // NOI18N
     private static final String TIME_REL_COLUMN_TOOLTIP = messages.getString("SubtreeCallGraphPanel_TimeRelColumnToolTip"); // NOI18N
     private static final String TIME_COLUMN_NAME = messages.getString("SubtreeCallGraphPanel_TimeColumnName"); // NOI18N
@@ -329,8 +332,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
         initColumnsData();
 
         //    PrestimeCPUCCTNode newRoot = snapshot.getSubtreeCCT(rootNode, currentView);
-        initFirstColumnName();
-
+        
         abstractTreeTableModel = new AbstractTreeTableModel(rootNode, sortingColumn, sortOrder) {
                 public int getColumnCount() {
                     return columnCount;
@@ -582,6 +584,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
         treeTablePanel.clearBorders();
         add(treeTablePanel, BorderLayout.CENTER);
         initFilterPanel();
+        initFirstColumnName();
     }
     
     private void initFilterPanel() {
@@ -767,10 +770,10 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     }
     
     private void enableDisablePopup(PrestimeCPUCCTNode node) {
-        boolean regularNode = node.getThreadId() != -1 && node.getMethodId() > 0 && !node.isFilteredNode();
+        boolean regularNode = node.getThreadId() != -1 && node.getMethodId() != 0 && !node.isFilteredNode();
         if (popupShowSource != null) popupShowSource.setEnabled(regularNode && isShowSourceAvailable());
-        popupShowSubtree.setEnabled(regularNode);
-        popupShowReverse.setEnabled(regularNode);
+        if (popupShowSubtree != null) popupShowSubtree.setEnabled(regularNode);
+        if (popupShowReverse != null) popupShowReverse.setEnabled(regularNode);
         popupAddToRoots.setEnabled(regularNode && isAddToRootsAvailable());
         popupFind.setEnabled(regularNode);
     }
@@ -826,16 +829,19 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
             case CPUResultsSnapshot.METHOD_LEVEL_VIEW:
                 columnNames[0] = METHOD_COLUMN_NAME;
                 columnToolTips[0] = METHOD_COLUMN_TOOLTIP;
+                filterComponent.setHint(METHOD_FILTER_HINT);
 
                 break;
             case CPUResultsSnapshot.CLASS_LEVEL_VIEW:
                 columnNames[0] = CLASS_COLUMN_NAME;
                 columnToolTips[0] = CLASS_COLUMN_TOOLTIP;
+                filterComponent.setHint(CLASS_FILTER_HINT);
 
                 break;
             case CPUResultsSnapshot.PACKAGE_LEVEL_VIEW:
                 columnNames[0] = PACKAGE_COLUMN_NAME;
                 columnToolTips[0] = PACKAGE_COLUMN_TOOLTIP;
+                filterComponent.setHint(PACKAGE_FILTER_HINT);
 
                 break;
         }

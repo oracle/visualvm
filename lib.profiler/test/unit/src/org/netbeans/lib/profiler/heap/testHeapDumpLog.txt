@@ -1,7 +1,7 @@
 Heap Summary
 Time Jun 16, 2006 11:46:11 AM
 Live instances 2208
-Live bytes 132489
+Live bytes 139369
 Total alloc instances -1
 Total alloc bytes -1
 Classes size 443
@@ -1110,7 +1110,7 @@ sun.cpu.isalist
    Field next of instance 0x6462e590
    Path to nearest GC root
     Next object java.lang.Class#224
- Id 0x6813a530 Class java.util.regex.Pattern$Node[] SuperClass java.lang.Object Instance size -1 Instance count 3 All Instances Size 48
+ Id 0x6813a530 Class java.util.regex.Pattern$Node[] SuperClass java.lang.Object Instance size -1 Instance count 3 All Instances Size 72
   Static Field name <classLoader> type object value 0
   Instance Id 0x6462d928 number 1 retained size 348
    References count 1
@@ -2674,7 +2674,7 @@ sun.cpu.isalist
    Field returnType of instance 0x64630d08
    Path to nearest GC root
     Null
- Id 0x6c96bd98 Class java.lang.Class[] SuperClass java.lang.Object Instance size -1 Instance count 8 All Instances Size 80
+ Id 0x6c96bd98 Class java.lang.Class[] SuperClass java.lang.Object Instance size -1 Instance count 8 All Instances Size 144
   Static Field name <classLoader> type object value 0
   Instance Id 0x64614fb0 number 1 retained size 0
    References count 2
@@ -2810,7 +2810,7 @@ sun.cpu.isalist
    References count 0
    Path to nearest GC root
     Null
- Id 0x6c96b578 Class java.lang.Object[] SuperClass java.lang.Object Instance size -1 Instance count 316 All Instances Size 10892
+ Id 0x6c96b578 Class java.lang.Object[] SuperClass java.lang.Object Instance size -1 Instance count 316 All Instances Size 13420
   Static Field name <classLoader> type object value 0
   Instance Id 0x646101a8 number 1 retained size 0
    References count 1
@@ -5417,7 +5417,7 @@ sun.cpu.isalist
    Element 0 of array 0x64610630
    Path to nearest GC root
     Next object java.lang.Thread#1
- Id 0x68131208 Class java.lang.ThreadGroup[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 24
+ Id 0x68131208 Class java.lang.ThreadGroup[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 32
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610630 number 1 retained size 32
    References count 1
@@ -5623,7 +5623,7 @@ sun.cpu.isalist
    References count 1
    Element 3 of array 0x64610a38
    Path to nearest GC root
- Id 0x68131c30 Class java.lang.Thread[] SuperClass java.lang.Object Instance size -1 Instance count 2 All Instances Size 48
+ Id 0x68131c30 Class java.lang.Thread[] SuperClass java.lang.Object Instance size -1 Instance count 2 All Instances Size 64
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610a38 number 1 retained size 32
    References count 1
@@ -9429,7 +9429,7 @@ sun.cpu.isalist
    References count 0
    Path to nearest GC root
     Null
- Id 0x68132170 Class java.lang.String[] SuperClass java.lang.Object Instance size -1 Instance count 49 All Instances Size 1380
+ Id 0x68132170 Class java.lang.String[] SuperClass java.lang.Object Instance size -1 Instance count 49 All Instances Size 1772
   Static Field name <classLoader> type object value 0
   Instance Id 0x64611b30 number 1 retained size 72
    References count 1
@@ -10551,7 +10551,7 @@ sun.cpu.isalist
    Field c of instance 0x64629380
    Path to nearest GC root
     Null
- Id 0x68133ae0 Class java.lang.reflect.Constructor[] SuperClass java.lang.Object Instance size -1 Instance count 4 All Instances Size 48
+ Id 0x68133ae0 Class java.lang.reflect.Constructor[] SuperClass java.lang.Object Instance size -1 Instance count 4 All Instances Size 80
   Static Field name <classLoader> type object value 0
   Instance Id 0x64614fa0 number 1 retained size 0
    References count 1
@@ -11317,7 +11317,7 @@ sun.cpu.isalist
    Element 9 of array 0x646268a0
    Path to nearest GC root
     Null
- Id 0x681338b0 Class java.lang.reflect.Field[] SuperClass java.lang.Object Instance size -1 Instance count 4 All Instances Size 156
+ Id 0x681338b0 Class java.lang.reflect.Field[] SuperClass java.lang.Object Instance size -1 Instance count 4 All Instances Size 188
   Static Field name <classLoader> type object value 0
   Instance Id 0x64614dc8 number 1 retained size 0
    References count 1
@@ -11937,7 +11937,7 @@ sun.cpu.isalist
    Element 3 of array 0x64610188
    Path to nearest GC root
     Null
- Id 0x68130a98 Class java.lang.OutOfMemoryError[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 24
+ Id 0x68130a98 Class java.lang.OutOfMemoryError[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 32
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610188 number 1 retained size 0
    References count 0
@@ -11950,7 +11950,7 @@ sun.cpu.isalist
   Field name fileName type object
   Field name methodName type object
   Field name declaringClass type object
- Id 0x681313c0 Class java.lang.StackTraceElement[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 8
+ Id 0x681313c0 Class java.lang.StackTraceElement[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 16
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610650 number 1 retained size 16
    References count 1
@@ -14541,7 +14541,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object java.io.ObjectStreamField[]#8
     Next object java.lang.Class#407
- Id 0x68130e78 Class java.io.ObjectStreamField[] SuperClass java.lang.Object Instance size -1 Instance count 8 All Instances Size 104
+ Id 0x68130e78 Class java.io.ObjectStreamField[] SuperClass java.lang.Object Instance size -1 Instance count 8 All Instances Size 168
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610588 number 1 retained size 16
    References count 1
@@ -15112,7 +15112,7 @@ sun.cpu.isalist
     Next object java.lang.Thread#1
  Id 0x6c97bc18 Class java.lang.annotation.Annotation SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x68131560 Class java.lang.annotation.Annotation[] SuperClass java.lang.Object Instance size -1 Instance count 4 All Instances Size 32
+ Id 0x68131560 Class java.lang.annotation.Annotation[] SuperClass java.lang.Object Instance size -1 Instance count 4 All Instances Size 64
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610730 number 1 retained size 16
    References count 1
@@ -16054,7 +16054,7 @@ sun.cpu.isalist
     Next object java.util.concurrent.ConcurrentHashMap$Segment[]#1
     Next object java.util.concurrent.ConcurrentHashMap#1
     Next object java.lang.Class#221
- Id 0x6813a0c8 Class java.util.concurrent.ConcurrentHashMap$HashEntry[] SuperClass java.lang.Object Instance size -1 Instance count 32 All Instances Size 472
+ Id 0x6813a0c8 Class java.util.concurrent.ConcurrentHashMap$HashEntry[] SuperClass java.lang.Object Instance size -1 Instance count 32 All Instances Size 728
   Static Field name <classLoader> type object value 0
   Instance Id 0x64626be0 number 1 retained size 24
    References count 1
@@ -16842,7 +16842,7 @@ sun.cpu.isalist
     Next object java.util.concurrent.ConcurrentHashMap$Segment[]#2
     Next object java.util.concurrent.ConcurrentHashMap#2
     Next object java.lang.Class#341
- Id 0x68139c08 Class java.util.concurrent.ConcurrentHashMap$Segment[] SuperClass java.lang.Object Instance size -1 Instance count 2 All Instances Size 144
+ Id 0x68139c08 Class java.util.concurrent.ConcurrentHashMap$Segment[] SuperClass java.lang.Object Instance size -1 Instance count 2 All Instances Size 160
   Static Field name <classLoader> type object value 0
   Instance Id 0x64626508 number 1 retained size 1840
    References count 1
@@ -16954,7 +16954,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#5
     Next object java.util.HashMap#3
     Next object java.lang.Class#222
- Id 0x68139658 Class java.io.File[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 16
+ Id 0x68139658 Class java.io.File[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 24
   Static Field name <classLoader> type object value 0
   Instance Id 0x64625928 number 1 retained size 80
    References count 1
@@ -17257,7 +17257,7 @@ sun.cpu.isalist
   Static Field name serialVersionUID type long value -3585440601605666277
   Static Field name <classLoader> type object value 0
   Field name type type object
- Id 0x6813b150 Class java.security.cert.Certificate[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 8
+ Id 0x6813b150 Class java.security.cert.Certificate[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 16
   Static Field name <classLoader> type object value 0
   Instance Id 0x64630cb8 number 1 retained size 16
    References count 2
@@ -18460,7 +18460,7 @@ sun.cpu.isalist
   Field name name type object
  Id 0x6ca06a98 Class java.security.Principal SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
- Id 0x6813af98 Class java.security.Principal[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 8
+ Id 0x6813af98 Class java.security.Principal[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 16
   Static Field name <classLoader> type object value 0
   Instance Id 0x64630c78 number 1 retained size 16
    References count 1
@@ -21304,7 +21304,7 @@ sun.cpu.isalist
     Next object java.util.Hashtable#5
     Next object sun.misc.Launcher$AppClassLoader#1
     Next object java.lang.Thread#1
- Id 0x68131de8 Class java.util.Hashtable$Entry[] SuperClass java.lang.Object Instance size -1 Instance count 12 All Instances Size 1768
+ Id 0x68131de8 Class java.util.Hashtable$Entry[] SuperClass java.lang.Object Instance size -1 Instance count 12 All Instances Size 1864
   Static Field name <classLoader> type object value 0
   Instance Id 0x64615860 number 1 retained size 8158
    References count 1
@@ -23899,7 +23899,7 @@ sun.cpu.isalist
     Next object java.util.HashSet#2
     Next object sun.misc.Launcher$AppClassLoader#1
     Next object java.lang.Thread#1
- Id 0x681318b8 Class java.util.HashMap$Entry[] SuperClass java.lang.Object Instance size -1 Instance count 26 All Instances Size 3280
+ Id 0x681318b8 Class java.util.HashMap$Entry[] SuperClass java.lang.Object Instance size -1 Instance count 26 All Instances Size 3488
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610740 number 1 retained size 80
    References count 1
@@ -24515,7 +24515,7 @@ sun.cpu.isalist
     Next object java.lang.ThreadLocal$ThreadLocalMap$Entry[]#1
     Next object java.lang.ThreadLocal$ThreadLocalMap#1
     Next object java.lang.Thread#1
- Id 0x681340c0 Class java.lang.ThreadLocal$ThreadLocalMap$Entry[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 72
+ Id 0x681340c0 Class java.lang.ThreadLocal$ThreadLocalMap$Entry[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 80
   Static Field name <classLoader> type object value 0
   Instance Id 0x64615118 number 1 retained size 296
    References count 1
@@ -24536,7 +24536,7 @@ sun.cpu.isalist
    Field nextHashCode of Class java.lang.ThreadLocal
    Path to nearest GC root
     Next object java.lang.Class#353
- Id 0x6c9392a0 Class boolean[] SuperClass java.lang.Object Instance size -1 Instance count 5 All Instances Size 1320
+ Id 0x6c9392a0 Class boolean[] SuperClass java.lang.Object Instance size -1 Instance count 5 All Instances Size 1360
   Static Field name <classLoader> type object value 0
   Instance Id 0x6462d7f0 number 1 retained size 272
    References count 1
@@ -24614,7 +24614,7 @@ sun.cpu.isalist
     Next object java.util.regex.Pattern$Branch#1
     Next object java.util.regex.Pattern#1
     Next object java.lang.Class#394
- Id 0x6c939420 Class byte[] SuperClass java.lang.Object Instance size -1 Instance count 25 All Instances Size 26346
+ Id 0x6c939420 Class byte[] SuperClass java.lang.Object Instance size -1 Instance count 25 All Instances Size 26546
   Static Field name <classLoader> type object value 0
   Instance Id 0x64616908 number 1 retained size 144
    References count 1
@@ -24750,7 +24750,7 @@ sun.cpu.isalist
    References count 0
    Path to nearest GC root
     Null
- Id 0x6c939300 Class char[] SuperClass java.lang.Object Instance size -1 Instance count 305 All Instances Size 47510
+ Id 0x6c939300 Class char[] SuperClass java.lang.Object Instance size -1 Instance count 305 All Instances Size 49950
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610018 number 1 retained size 0
    References count 1
@@ -27300,7 +27300,7 @@ sun.cpu.isalist
    Field value of instance 0x6813ae10
    Path to nearest GC root
     Null
- Id 0x6c9394e0 Class int[] SuperClass java.lang.Object Instance size -1 Instance count 19 All Instances Size 2456
+ Id 0x6c9394e0 Class int[] SuperClass java.lang.Object Instance size -1 Instance count 19 All Instances Size 2608
   Static Field name <classLoader> type object value 0
   Instance Id 0x64614f68 number 1 retained size 56
    References count 1
@@ -27385,7 +27385,7 @@ sun.cpu.isalist
    References count 0
    Path to nearest GC root
     Null
- Id 0x6c939480 Class short[] SuperClass java.lang.Object Instance size -1 Instance count 23 All Instances Size 816
+ Id 0x6c939480 Class short[] SuperClass java.lang.Object Instance size -1 Instance count 23 All Instances Size 1000
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610250 number 1 retained size 0
    References count 1
@@ -27483,7 +27483,7 @@ sun.cpu.isalist
    References count 0
    Path to nearest GC root
     Null
- Id 0x6c939540 Class long[] SuperClass java.lang.Object Instance size -1 Instance count 2 All Instances Size 264
+ Id 0x6c939540 Class long[] SuperClass java.lang.Object Instance size -1 Instance count 2 All Instances Size 280
   Static Field name <classLoader> type object value 0
   Instance Id 0x64626388 number 1 retained size 48
    References count 1
@@ -27496,14 +27496,14 @@ sun.cpu.isalist
    Field long5pow of Class sun.misc.FloatingDecimal
    Path to nearest GC root
     Next object java.lang.Class#394
- Id 0x6c939360 Class float[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 52
+ Id 0x6c939360 Class float[] SuperClass java.lang.Object Instance size -1 Instance count 1 All Instances Size 60
   Static Field name <classLoader> type object value 0
   Instance Id 0x6462d4a0 number 1 retained size 60
    References count 1
    Field singleSmall10pow of Class sun.misc.FloatingDecimal
    Path to nearest GC root
     Next object java.lang.Class#394
- Id 0x6c9393c0 Class double[] SuperClass java.lang.Object Instance size -1 Instance count 3 All Instances Size 288
+ Id 0x6c9393c0 Class double[] SuperClass java.lang.Object Instance size -1 Instance count 3 All Instances Size 312
   Static Field name <classLoader> type object value 0
   Instance Id 0x6462d3d8 number 1 retained size 200
    References count 1

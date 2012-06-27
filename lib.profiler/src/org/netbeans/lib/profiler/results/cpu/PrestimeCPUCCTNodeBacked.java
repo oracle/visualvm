@@ -115,6 +115,8 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
             children[i].parent = this;
         }
     }
+    
+    PrestimeCPUCCTNodeBacked() {}
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     

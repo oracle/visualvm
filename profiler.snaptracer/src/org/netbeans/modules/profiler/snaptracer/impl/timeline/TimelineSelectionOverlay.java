@@ -335,6 +335,8 @@ final class TimelineSelectionOverlay extends ChartOverlay {
     }
 
     private class TimeSelectionListener implements TimelineSupport.SelectionListener {
+        
+        public void intervalsSelectionChanged() {}
 
         public void indexSelectionChanged() {}
 

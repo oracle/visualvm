@@ -263,11 +263,11 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
     }
     
     private void setClassName(String cName) {
-        className.setText(cName.trim());
+        className.setText(ClientUtils.formatClassName(cName.trim()));
     }
 
     private String getClassName() {
-        return className.getText().trim(); //NOI18N
+        return ClientUtils.parseClassName(className.getText().trim(), true);
     }
     
     private void setMethodName(String mName) {
@@ -305,34 +305,30 @@ public final class ManualMethodSelect extends JPanel implements HelpCtx.Provider
     private void updateEnabledState() {
         boolean enabled = true;
         
-        String clssName = className.getText().trim();
-        boolean wildcard = clssName.endsWith(".*") || clssName.endsWith(".**");
+        String fClassName = className.getText().trim();
+        String fMethodName = methodName.getText().trim();
+        String fMethodSignature = methodName.getText().trim();
 
         // package/class name cannot be empty
-        if ("".equals(clssName)) {
-            enabled = false; //NOI18N
-        }
-        
-        // method name cannot be empty
-        else if (!wildcard && "".equals(methodName.getText().trim())) {
-            enabled = false; //NOI18N
-        }
-        // method signature cannot be empty
-        else if (!wildcard && "".equals(methodSignature.getText().trim())) {
-            enabled = false; //NOI18N
-        }
-        // try to format method as a kind of heuristics if provided info is correct
-        // TODO: className, methodName and methodSignature should be validated separately and exactly!
-        else {
-            try {
-                //      new MethodNameFormatter(getClassName(), getMethodName(), getMethodSignature()).getFullFormattedClassAndMethod();
-                methodSignature.setForeground(UIManager.getColor("Label.foreground")); // NOI18N // formatting method could fail only because of incorrect signature
-            } catch (Exception e) {
-                methodSignature.setForeground(Color.red); // formatting method could fail only because of incorrect signature
-                enabled = false;
-            }
+        if (fClassName.isEmpty()) {
+            enabled = false;
         }
 
+        // method-signature is filled or not
+        if(fMethodName.isEmpty() != fMethodSignature.isEmpty()) {
+            enabled = false;
+        }
+
+        // check format of class name
+        String cm = ClientUtils.parseClassName(fClassName, fMethodName.isEmpty() && fMethodSignature.isEmpty());
+        if(cm == null)
+        {
+            enabled = false;
+            className.setForeground(Color.red);
+        } else {
+            className.setForeground(UIManager.getColor("Label.foreground")); // NOI18N
+        }
+        
         okButton.setEnabled(enabled);
     }
 }
