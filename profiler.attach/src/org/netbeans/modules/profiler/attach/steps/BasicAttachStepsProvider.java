@@ -72,7 +72,7 @@ import org.openide.util.lookup.ServiceProvider;
     "AttachDialog_Steps_SubmitUnblock=Submit this dialog and click the Attach button to connect to the target application and resume its execution.", // NOI18N
     "AttachDialog_Steps_AddParameters=Add the following parameter(s) to the application startup script", // NOI18N
     "AttachDialog_Steps_RunCalibrateScript=If you have not run profiling on the remote system yet, run the {0} script first to calibrate the profiler.", // NOI18N
-    "AttachDialog_Steps_CreateRemotePack=If you have not done it before <a href={0}>create a Remote profiling pack</a> for the selected OS & JVM and upload it to the remote system. Remote profiling pack root directory will be referred to as {1}.", // NOI18N
+    "AttachDialog_Steps_CreateRemotePack=If you have not done it before <a href={0}>create a Remote profiling pack</a> for the selected OS & JVM and upload it to the remote system. Remote profiling pack root directory will be referred to as {1}." // NOI18N
 })
 @ServiceProvider(service = AttachStepsProvider.class)
 public class BasicAttachStepsProvider extends AttachStepsProvider {
