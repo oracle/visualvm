@@ -66,6 +66,7 @@ class ClassDump extends HprofObject implements JavaClass {
     final ClassDumpSegment classDumpSegment;
     private int instances;
     private long loadClassOffset;
+    private long retainedSizeByClass;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -123,6 +124,11 @@ class ClassDump extends HprofObject implements JavaClass {
 
         return classDumpSegment.getMinimumInstanceSize()
                + getHprofBuffer().getInt(fileOffset + classDumpSegment.instanceSizeOffset);
+    }
+
+    public long getRetainedSizeByClass() {
+        getHprof().computeRetainedSizeByClass();
+        return retainedSizeByClass;
     }
 
     public List /*<Instance>*/ getInstances() {
@@ -416,6 +422,10 @@ class ClassDump extends HprofObject implements JavaClass {
 
     void incrementInstance() {
         instances++;
+    }
+
+    void addSizeForInstance(Instance i) {
+        retainedSizeByClass+=i.getRetainedSize();
     }
 
     private static Boolean isSubClass(JavaClass jcls, Map subclassesMap) {

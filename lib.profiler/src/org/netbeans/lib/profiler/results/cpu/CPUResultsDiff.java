@@ -70,6 +70,7 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
     }
 
     public DiffFlatProfileContainer getFlatProfile(int threadId, int view) {
+        // NOTE: only works correctly for threadId == -1 (All Threads)
         FlatProfileContainer fpc1 = snapshot1.getFlatProfile(threadId, view);
         FlatProfileContainer fpc2 = snapshot2.getFlatProfile(threadId, view);
         return DiffFlatProfileContainer.create(fpc1, fpc2);
