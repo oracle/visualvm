@@ -102,10 +102,13 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private static final String ADD_ROOT_METHOD_POPUP_ITEM = messages.getString("ReverseCallGraphPanel_AddRootMethodPopupItem"); // NOI18N
     private static final String METHOD_COLUMN_NAME = messages.getString("ReverseCallGraphPanel_MethodColumnName"); // NOI18N
     private static final String METHOD_COLUMN_TOOLTIP = messages.getString("ReverseCallGraphPanel_MethodColumnToolTip"); // NOI18N
+    private static final String METHOD_FILTER_HINT = messages.getString("FlatProfilePanel_MethodFilterHint"); // NOI18N
     private static final String CLASS_COLUMN_NAME = messages.getString("ReverseCallGraphPanel_ClassColumnName"); // NOI18N
     private static final String CLASS_COLUMN_TOOLTIP = messages.getString("ReverseCallGraphPanel_ClassColumnToolTip"); // NOI18N
+    private static final String CLASS_FILTER_HINT = messages.getString("FlatProfilePanel_ClassFilterHint"); // NOI18N
     private static final String PACKAGE_COLUMN_NAME = messages.getString("ReverseCallGraphPanel_PackageColumnName"); // NOI18N
     private static final String PACKAGE_COLUMN_TOOLTIP = messages.getString("ReverseCallGraphPanel_PackageColumnToolTip"); // NOI18N
+    private static final String PACKAGE_FILTER_HINT = messages.getString("FlatProfilePanel_PackageFilterHint"); // NOI18N
     private static final String TIME_REL_COLUMN_NAME = messages.getString("ReverseCallGraphPanel_TimeRelColumnName"); // NOI18N
     private static final String TIME_REL_COLUMN_TOOLTIP = messages.getString("ReverseCallGraphPanel_TimeRelColumnToolTip"); // NOI18N
     private static final String TIME_COLUMN_NAME = messages.getString("ReverseCallGraphPanel_TimeColumnName"); // NOI18N
@@ -329,8 +332,6 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
         initColumnsData();
 
         PrestimeCPUCCTNode rootNode = snapshot.getReverseCCT(threadId, selectedMethodId, currentView);
-
-        initFirstColumnName();
 
         abstractTreeTableModel = new AbstractTreeTableModel(rootNode, sortingColumn, sortOrder) {
                 public int getColumnCount() {
@@ -583,6 +584,7 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
         treeTablePanel.clearBorders();
         add(treeTablePanel, BorderLayout.CENTER);
         initFilterPanel();
+        initFirstColumnName();
     }
     
     private void initFilterPanel() {
@@ -607,7 +609,7 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     }
     
     private void enableDisablePopup(PrestimeCPUCCTNode node) {
-        boolean regularNode = node.getMethodId() > 0 && !node.isFilteredNode();
+        boolean regularNode = node.getMethodId() != 0 && !node.isFilteredNode();
         if (popupShowSource != null) popupShowSource.setEnabled(regularNode && isShowSourceAvailable());
         popupAddToRoots.setEnabled(regularNode && isAddToRootsAvailable());
     }
@@ -818,16 +820,19 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
             case CPUResultsSnapshot.METHOD_LEVEL_VIEW:
                 columnNames[0] = METHOD_COLUMN_NAME;
                 columnToolTips[0] = METHOD_COLUMN_TOOLTIP;
+                filterComponent.setHint(METHOD_FILTER_HINT);
 
                 break;
             case CPUResultsSnapshot.CLASS_LEVEL_VIEW:
                 columnNames[0] = CLASS_COLUMN_NAME;
                 columnToolTips[0] = CLASS_COLUMN_TOOLTIP;
+                filterComponent.setHint(CLASS_FILTER_HINT);
 
                 break;
             case CPUResultsSnapshot.PACKAGE_LEVEL_VIEW:
                 columnNames[0] = PACKAGE_COLUMN_NAME;
                 columnToolTips[0] = PACKAGE_COLUMN_TOOLTIP;
+                filterComponent.setHint(PACKAGE_FILTER_HINT);
 
                 break;
         }

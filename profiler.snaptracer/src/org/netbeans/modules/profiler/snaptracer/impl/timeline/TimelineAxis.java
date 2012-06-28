@@ -90,7 +90,6 @@ import org.netbeans.modules.profiler.snaptracer.impl.swing.TimelineMarksPainter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
-import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -150,6 +149,11 @@ final class TimelineAxis extends JPanel {
         });
 
         support.addSelectionListener(new TimelineSupport.SelectionListener() {
+            
+            public void intervalsSelectionChanged() {
+                marks.refreshMarks();
+                marks.repaint();
+            }
 
             public void indexSelectionChanged() {}
 
@@ -268,6 +272,7 @@ final class TimelineAxis extends JPanel {
         private long hoverTime;
 
         private final List<Integer> selections = new ArrayList();
+        private final List<Integer> intervals = new ArrayList();
         private final int markExtent = 2;
 
 
@@ -301,15 +306,37 @@ final class TimelineAxis extends JPanel {
 
         void refreshMarks() {
             Set<Integer> selectedIndexes = support.getSelectedTimestamps();
-            if (selectedIndexes.size() == 0 && selections.isEmpty()) return;
+            if (!selectedIndexes.isEmpty() || !selections.isEmpty()) {
+                selections.clear();
 
-            selections.clear();
-
-            for (int selectedIndex : selectedIndexes) {
-                long time = timeline.getTimestamp(selectedIndex);
-                int x = Utils.checkedInt(context.getViewX(time));
-                if (x > -markExtent && x < getWidth() + markExtent)
-                    selections.add(x + 1);
+                for (int selectedIndex : selectedIndexes) {
+                    long time = timeline.getTimestamp(selectedIndex);
+                    int x = Utils.checkedInt(context.getViewX(time));
+                    if (x > -markExtent && x < getWidth() + markExtent)
+                        selections.add(x + 1);
+                }
+            }
+         
+            
+            List<Integer> selectedIntervals = support.getSelectedIntervals();
+            if (!selectedIntervals.isEmpty() || !intervals.isEmpty()) {
+                intervals.clear();
+                
+                Iterator<Integer> iter = selectedIntervals.iterator();
+                while (iter.hasNext()) {
+                    int start = iter.next();
+                    long time = timeline.getTimestamp(start);
+                    int startX = Utils.checkedInt(context.getViewX(time)) + 1;
+                    
+                    int stop  = iter.hasNext() ? iter.next() : getWidth();
+                    time = timeline.getTimestamp(stop);
+                    int stopX = Utils.checkedInt(context.getViewX(time)) + 1;
+                    
+                    if (startX < getWidth() && stopX > 0) {
+                        intervals.add(startX);
+                        intervals.add(stopX);
+                    }
+                }
             }
         }
 
@@ -359,33 +386,51 @@ final class TimelineAxis extends JPanel {
             support.setTimestampHovering(hoverIndex != -1, wasSelected);
         }
 
+        private final Color systemSelection = Utils.getSystemSelection();
+        private final Color selection = new Color(systemSelection.getRed(),
+                               systemSelection.getGreen(),
+                               systemSelection.getBlue(), 150);
 
         public void paint(Graphics g) {
-            int top = getHeight() / 2 - 1;
+            int height = getHeight();
+            int width = getWidth();
+            int top = height / 2 - 1;
             int bottom = top + 2;
-
+            
+            g.setColor(selection);
+            if (intervals != null && !intervals.isEmpty()) {
+                Iterator<Integer> iter = intervals.iterator();
+                while (iter.hasNext()) {
+                    int start = iter.next();
+                    int wdth = iter.next() - start + 1;
+                    g.fillRect(start, height - 6, Math.min(wdth, width - start - 3), 3);
+                }
+            }
+            
+            g.setColor(getForeground());
             if (ticks != null)
                 for (int i = 0; i < ticks.length; i++)
                     g.drawLine(ticks[i], top, ticks[i], bottom);
 
-            if (selections == null || selections.isEmpty()) return;
+            if (selections != null && !selections.isEmpty()) {
+                int y = height - 5 - MARK_HEIGHT;
+                for (int x : selections)
+                    g.drawImage((x == hoverX && wasSelected) ? MARK_HIGHL :
+                                MARK, x - MARK_EXTENT + 1, y, null);
 
-            int y = getHeight() - 5 - MARK_HEIGHT;
-            for (int x : selections)
-                g.drawImage((x == hoverX && wasSelected) ? MARK_HIGHL :
-                            MARK, x - MARK_EXTENT + 1, y, null);
-
-            if (hoverIndex != -1) {
-                timeRenderer.setText(timeFormat.format(hoverTime));
-                Dimension timeSize = timeRenderer.getPreferredSize();
-                int timeWidth = timeSize.width;
-                int extraWidth = MARK_EXTENT + TimelineTooltipOverlay.TOOLTIP_OFFSET;
-                int timeX = hoverX + extraWidth;
-                if (timeX > getWidth() - timeWidth - TimelineTooltipOverlay.TOOLTIP_MARGIN)
-                    timeX = hoverX - timeWidth - extraWidth;
-                timeRenderer.setLocation(timeX, top - timeSize.height / 2);
-                timeRenderer.paint(g);
+                if (hoverIndex != -1) {
+                    timeRenderer.setText(timeFormat.format(hoverTime));
+                    Dimension timeSize = timeRenderer.getPreferredSize();
+                    int timeWidth = timeSize.width;
+                    int extraWidth = MARK_EXTENT + TimelineTooltipOverlay.TOOLTIP_OFFSET;
+                    int timeX = hoverX + extraWidth;
+                    if (timeX > width - timeWidth - TimelineTooltipOverlay.TOOLTIP_MARGIN)
+                        timeX = hoverX - timeWidth - extraWidth;
+                    timeRenderer.setLocation(timeX, top - timeSize.height / 2);
+                    timeRenderer.paint(g);
+                }
             }
+            
         }
 
     }

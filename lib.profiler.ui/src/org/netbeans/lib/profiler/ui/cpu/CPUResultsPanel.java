@@ -247,7 +247,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
 
     protected void showSourceForMethod(TreePath popupPath) {
         PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)popupPath.getLastPathComponent();
-        if (node.getMethodId() <= 0 || node.isFilteredNode()) return;
+        if (node.getMethodId() == 0 || node.isFilteredNode()) return;
         
         if (currentView != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW) {
             boolean methodLevelView = (currentView == CPUResultsSnapshot.METHOD_LEVEL_VIEW);

@@ -102,7 +102,6 @@ import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -426,7 +425,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                 if (internalChange[0]) return;
                 final int column = Integer.parseInt(e.getActionCommand());
                 if (column == 5 && !fieldsListTableModel.isRealColumnVisible(column)) {
-                    RequestProcessor.getDefault().post(new Runnable() {
+                    BrowserUtils.performTask(new Runnable() {
                         public void run() {
                             final int retainedSizesState = fieldsBrowserController.getInstancesControllerHandler().
                                     getHeapFragmentWalker().computeRetainedSizes(false);

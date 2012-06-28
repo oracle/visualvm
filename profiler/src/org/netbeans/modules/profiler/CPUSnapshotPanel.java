@@ -78,6 +78,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -630,6 +631,9 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         findActionPresenter.setEnabled(false);
         findPreviousPresenter.setEnabled(false);
         findNextPresenter.setEnabled(false);
+        
+        toolBar.addSeparator();
+        toolBar.add(new CompareSnapshotsAction(ls));
 
         updateToolbar();
         setMainToolbar(toolBar.getComponent());

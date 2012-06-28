@@ -62,7 +62,6 @@ import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerFieldNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerInstanceNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.InstanceNode;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -79,7 +78,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
@@ -109,7 +107,6 @@ import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.netbeans.modules.profiler.heapwalk.model.*;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -460,7 +457,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                 if (internalChange[0]) return;
                 final int column = Integer.parseInt(e.getActionCommand());
                 if (column == 5 && !fieldsListTableModel.isRealColumnVisible(column)) {
-                    RequestProcessor.getDefault().post(new Runnable() {
+                    BrowserUtils.performTask(new Runnable() {
                         public void run() {
                             final int retainedSizesState = referencesBrowserController.getReferencesControllerHandler().
                                     getHeapFragmentWalker().computeRetainedSizes(false);

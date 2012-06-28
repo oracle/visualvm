@@ -270,8 +270,8 @@ made subject to such option by the copyright holder.
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.core.ui</code-name-base>
-                        <recursive/>
+                        <code-name-base>org.netbeans.modules.sampler</code-name-base>
+                        <compile-dependency/>
                     </test-dependency>
                 </test-type>
             </test-dependencies>

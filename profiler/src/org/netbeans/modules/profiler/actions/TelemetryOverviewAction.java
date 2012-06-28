@@ -60,8 +60,8 @@ import org.openide.awt.ActionRegistration;
  * @author Ian Formanek
  */
 @NbBundle.Messages({
-    "LBL_TelemetryOverviewAction=Telemetry &Overview",
-    "HINT_TelemetryOverviewAction=Telemetry Overview"
+    "LBL_TelemetryOverviewAction=VM Telemetry &Overview",
+    "HINT_TelemetryOverviewAction=VM Telemetry Overview"
 })
 
 public final class TelemetryOverviewAction extends AbstractAction {
@@ -71,7 +71,7 @@ public final class TelemetryOverviewAction extends AbstractAction {
     
     @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.TelemetryOverviewAction")
     @ActionRegistration(displayName="#LBL_TelemetryOverviewAction", iconBase="org/netbeans/modules/profiler/impl/icons/telemetryOverviewWindow.png")
-    @ActionReference(path="Menu/Window/Profile", position=200)
+    @ActionReference(path="Menu/Window/Profile", position=500)
     public static TelemetryOverviewAction getInstance() {
         return Singleton.INSTANCE;
     }

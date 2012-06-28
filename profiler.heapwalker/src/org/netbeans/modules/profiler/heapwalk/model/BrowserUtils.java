@@ -263,7 +263,7 @@ public class BrowserUtils {
     }
     
     public static void copyPathFromRoot(final TreePath path) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        performTask(new Runnable() {
             public void run() {
                 StringSelection s = new StringSelection(pathFromRoot(path));
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(s, s);
@@ -338,6 +338,10 @@ public class BrowserUtils {
 
     public static void performTask(Runnable task) {
         requestProcessor.post(task);
+    }
+    
+    public static void performTask(Runnable task, int timeToWait) {
+        requestProcessor.post(task, timeToWait);
     }
 
     private static String getNodeName(HeapWalkerNode node) {

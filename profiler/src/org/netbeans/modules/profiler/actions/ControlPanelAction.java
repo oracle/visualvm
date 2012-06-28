@@ -60,7 +60,7 @@ import org.openide.awt.ActionRegistration;
  * @author Ian Formanek
  */
 @NbBundle.Messages({
-    "LBL_ControlPanelAction=Profiler &Control Panel",
+    "LBL_ControlPanelAction=P&rofiler",
     "HINT_ControlPanelAction=Show Profiler Control Panel"
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiles.actions.ControlPanelAction")

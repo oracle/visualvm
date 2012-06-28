@@ -404,13 +404,13 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
                         case 0:
                             return pNode;
                         case 1:
-                            return getNodeTimeRel(pNode);
+                            return getNodeTimeRel(pNode.getTotalTime0(), pNode.getTotalTime0InPerCent());
                         case 2:
-                            return getNodeTime(pNode);
+                            return getNodeTime(pNode.getTotalTime0(), pNode.getTotalTime0InPerCent());
                         case 3:
-                            return getNodeSecondaryTime(pNode);
+                            return getNodeSecondaryTime(pNode.getTotalTime1());
                         case 4:
-                            return getNodeInvocations(pNode);
+                            return getNodeInvocations(pNode.getNCalls());
                         case 5:
                             return getNodeMethodId(pNode);
                     }
@@ -422,30 +422,30 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
                     return columnToolTips[col];
                 }
 
-                private Float getNodeTimeRel(PrestimeCPUCCTNode pNode) {
-                    return new Float(pNode.getTotalTime0InPerCent());
-                }
-
-                private String getNodeTime(PrestimeCPUCCTNode pNode) {
-                    return StringUtils.mcsTimeToString(pNode.getTotalTime0()) + " ms (" // NOI18N
-                           + percentFormat.format(pNode.getTotalTime0InPerCent() / 100) + ")"; // NOI18N
-                }
-
-                private String getNodeWaitTime(PrestimeCPUCCTNode pNode) {
-                    return StringUtils.mcsTimeToString(pNode.getWaitTime0()) + " ms"; // NOI18N
-                }
-
-                private String getNodeSleepTime(PrestimeCPUCCTNode pNode) {
-                    return StringUtils.mcsTimeToString(pNode.getSleepTime0()) + " ms"; // NOI18N
-                }
-
-                private String getNodeSecondaryTime(PrestimeCPUCCTNode pNode) {
-                    return StringUtils.mcsTimeToString(pNode.getTotalTime1()) + " ms"; // NOI18N
-                }
-
-                private Integer getNodeInvocations(PrestimeCPUCCTNode pNode) {
-                    return Integer.valueOf(pNode.getNCalls());
-                }
+//                private Float getNodeTimeRel(PrestimeCPUCCTNode pNode) {
+//                    return new Float(pNode.getTotalTime0InPerCent());
+//                }
+//
+//                private String getNodeTime(PrestimeCPUCCTNode pNode) {
+//                    return StringUtils.mcsTimeToString(pNode.getTotalTime0()) + " ms (" // NOI18N
+//                           + percentFormat.format(pNode.getTotalTime0InPerCent() / 100) + ")"; // NOI18N
+//                }
+//
+//                private String getNodeWaitTime(PrestimeCPUCCTNode pNode) {
+//                    return StringUtils.mcsTimeToString(pNode.getWaitTime0()) + " ms"; // NOI18N
+//                }
+//
+//                private String getNodeSleepTime(PrestimeCPUCCTNode pNode) {
+//                    return StringUtils.mcsTimeToString(pNode.getSleepTime0()) + " ms"; // NOI18N
+//                }
+//
+//                private String getNodeSecondaryTime(PrestimeCPUCCTNode pNode) {
+//                    return StringUtils.mcsTimeToString(pNode.getTotalTime1()) + " ms"; // NOI18N
+//                }
+//
+//                private Integer getNodeInvocations(PrestimeCPUCCTNode pNode) {
+//                    return Integer.valueOf(pNode.getNCalls());
+//                }
 
                 private Integer getNodeMethodId(PrestimeCPUCCTNode pNode) {
                     return Integer.valueOf(pNode.getMethodId());
@@ -642,6 +642,31 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         initFilterPanel();
     }
     
+    protected Float getNodeTimeRel(long time, float percent) {
+        return new Float(percent);
+    }
+
+    protected String getNodeTime(long time, float percent) {
+        return StringUtils.mcsTimeToString(time) + " ms (" // NOI18N
+                + percentFormat.format(percent / 100) + ")"; // NOI18N
+    }
+
+//    protected String getNodeWaitTime(PrestimeCPUCCTNode pNode) {
+//        return StringUtils.mcsTimeToString(pNode.getWaitTime0()) + " ms"; // NOI18N
+//    }
+//
+//    protected String getNodeSleepTime(PrestimeCPUCCTNode pNode) {
+//        return StringUtils.mcsTimeToString(pNode.getSleepTime0()) + " ms"; // NOI18N
+//    }
+
+    protected String getNodeSecondaryTime(long time) {
+        return StringUtils.mcsTimeToString(time) + " ms"; // NOI18N
+    }
+
+    protected String getNodeInvocations(int nCalls) {
+        return Integer.valueOf(nCalls).toString();
+    }
+    
     private void initFilterPanel() {        
         FilterSortSupport.Configuration config = snapshot.getFilterSortInfo(
                 (PrestimeCPUCCTNode)treeTableModel.getRoot());
@@ -821,17 +846,17 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     }
 
     protected void enableDisablePopup(PrestimeCPUCCTNode node) {
-        boolean regularNode = node.getThreadId() != -1 && node.getMethodId() > 0 && !node.isFilteredNode();
+        boolean regularNode = node.getThreadId() != -1 && node.getMethodId() != 0 && !node.isFilteredNode();
         if (popupShowSource != null) popupShowSource.setEnabled(regularNode && isShowSourceAvailable());
-        popupShowSubtree.setEnabled(regularNode);
-        popupShowReverse.setEnabled(regularNode);
+        if (popupShowSubtree != null) popupShowSubtree.setEnabled(regularNode);
+        if (popupShowReverse != null) popupShowReverse.setEnabled(regularNode);
         popupAddToRoots.setEnabled(regularNode && isAddToRootsAvailable());
         popupFind.setEnabled(regularNode);
         // Allow the selection handler to change state of popupFind
         if (selectionHandler != null) selectionHandler.methodSelected(node.getThreadId(), node.getMethodId(), currentView);
     }
 
-    private void initColumnsData() {
+    protected void initColumnsData() {
         columnCount = snapshot.isCollectingTwoTimeStamps() ? 5 : 4;
 
         if (DEBUG) {

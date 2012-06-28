@@ -188,8 +188,7 @@ final public class FileSelectRootMethodsPanel extends JPanel {
 
             public void run() {
                 List<SelectionTreeBuilder> builders = SelectionTreeBuilderFactory.buildersFor(javaFile);
-                fileTreeView.setContext(Lookups.fixed((Object[])builders.toArray(new SelectionTreeBuilder[builders.size()])));
-                fileTreeView.setSelection(currentSelection);
+                fileTreeView.setSelection(currentSelection, Lookups.fixed((Object[])builders.toArray(new SelectionTreeBuilder[builders.size()])));
 
                 List<SelectionTreeBuilderType> builderTypes = fileTreeView.getBuilderTypes();
                 if (builderTypes.size() > 0) {
@@ -233,23 +232,21 @@ final public class FileSelectRootMethodsPanel extends JPanel {
         return null;
     }
 
-    private void updateSelector(Runnable updater) {
-        final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.SelectRootMethodsPanel_ParsingProjectStructureMessage());
-        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            public void run() {
-                ph.setInitialDelay(500);
-                ph.start();
-            }
-        });
-
+    private void updateSelector(final Runnable updater) {        
         try {
-            fileTreeView.setEnabled(false);
-            okButton.setEnabled(false);
+            setUIEnabled(false);
             updater.run();
         } finally {
-            ph.finish();
-            okButton.setEnabled(true);
-            fileTreeView.setEnabled(true);
+            setUIEnabled(true);
         }
+    }
+
+    private void setUIEnabled(final boolean val) {
+        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
+            public void run() {
+                okButton.setEnabled(val);
+                fileTreeView.setEnabled(val);
+            }
+        });
     }
 }

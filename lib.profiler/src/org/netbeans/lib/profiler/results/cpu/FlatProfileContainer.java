@@ -80,7 +80,7 @@ public abstract class FlatProfileContainer {
     protected long[] timeInMcs1;
     protected boolean collectingTwoTimeStamps;
     protected long nTotalInvocations;
-    private int nRows; // Number of methods currently displayed
+    protected int nRows; // Number of methods currently displayed
                        // nRows may be < totalMethods due to user setting up a filter for flat profile data
     private int totalMethods; // Number of methods with non-zero number of invocations
 
@@ -154,6 +154,8 @@ public abstract class FlatProfileContainer {
                 }
 
                 // Swap the current element and the one at (nRows - 1) index
+                swap(i, endIdx);
+                
                 int tmp = methodIds[i];
                 methodIds[i] = methodIds[endIdx];
                 methodIds[endIdx] = tmp;
@@ -327,6 +329,7 @@ public abstract class FlatProfileContainer {
         (new IntSorter(nInvocations, 0, nRows) {
                 protected void swap(int a, int b) {
                     super.swap(a, b);
+                    FlatProfileContainer.this.swap(a, b);
 
                     long tmp;
                     tmp = timeInMcs0[a];
@@ -366,6 +369,7 @@ public abstract class FlatProfileContainer {
         (new StringSorter(fullMethodNames, 0, nRows) {
                 protected void swap(int a, int b) {
                     super.swap(a, b);
+                    FlatProfileContainer.this.swap(a, b);
 
                     long tmp;
                     tmp = timeInMcs0[a];
@@ -420,6 +424,7 @@ public abstract class FlatProfileContainer {
         (new LongSorter(tpmA, 0, nRows) {
                 protected void swap(int a, int b) {
                     super.swap(a, b);
+                    FlatProfileContainer.this.swap(a, b);
 
                     long tmp;
 
@@ -455,6 +460,7 @@ public abstract class FlatProfileContainer {
             (new IntSorter(nInvocations, len + 1, nRows - len - 1) {
                     protected void swap(int a, int b) {
                         super.swap(a, b);
+                        FlatProfileContainer.this.swap(a, b);
 
                         long tmp;
 
@@ -471,4 +477,7 @@ public abstract class FlatProfileContainer {
                 }).sort(sortOrder);
         }
     }
+    
+    protected void swap(int a, int b) {}
+    
 }

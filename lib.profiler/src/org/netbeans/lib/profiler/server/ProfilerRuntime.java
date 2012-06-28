@@ -415,9 +415,16 @@ public class ProfilerRuntime implements CommonConstants {
     }
 
     protected static void writeThreadCreationEvent(Thread thread, int threadId) {
-        String threadName = thread.getName();
+        String threadName;
         String threadClassName = thread.getClass().getName();
-        int fullInfoLen = ((threadName.length() + threadClassName.length()) * 2) + 7;
+        int fullInfoLen;
+        
+        try {
+            threadName = thread.getName();
+        } catch (NullPointerException e) {
+            threadName = "*Unknown thread ("+threadId+")*";  // NOI18N
+        }
+        fullInfoLen = ((threadName.length() + threadClassName.length()) * 2) + 7;
         synchronized (eventBuffer) {
             if ((globalEvBufPos + fullInfoLen) > globalEvBufPosThreshold) {
                 sendingBuffer = true;

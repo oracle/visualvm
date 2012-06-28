@@ -740,6 +740,7 @@ public class ProfilerInterface implements CommonConstants {
             int nonSystemIndex = 0;
             int MAX_CLASSES = 1000;
             Class[] nonSystemClasses = new Class[MAX_CLASSES+1]; // classes loaded by classloaders other that bootstrap and system
+            boolean dynamic = profilerServer.isDynamic();
 
             loadedClassesArray = Classes.getAllLoadedClasses();
             loadedClassesLoaders = new int[loadedClassesArray.length];
@@ -748,12 +749,14 @@ public class ProfilerInterface implements CommonConstants {
                 Class clazz = loadedClassesArray[i];
                 loadedClassesLoaders[i] = ClassLoaderManager.registerLoader(clazz);
 
-                if (loadedClassesLoaders[i] > 0) { // bootstrap classloader has index -1 and system classloader has index 0
-                    nonSystemClasses[nonSystemIndex++] = clazz;
-                }
-                if (nonSystemIndex == MAX_CLASSES) {
-                    cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
-                    nonSystemIndex = 0;
+                if (dynamic) {
+                    if (loadedClassesLoaders[i] > 0) { // bootstrap classloader has index -1 and system classloader has index 0
+                        nonSystemClasses[nonSystemIndex++] = clazz;
+                    }
+                    if (nonSystemIndex == MAX_CLASSES) {
+                        cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+                        nonSystemIndex = 0;
+                    }
                 }
             }
 

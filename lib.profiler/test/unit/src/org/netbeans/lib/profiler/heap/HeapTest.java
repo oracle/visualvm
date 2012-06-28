@@ -183,7 +183,7 @@ public class HeapTest {
     public void testGetSummary() {
         System.out.println("getSummary");
         HeapSummary result = heap.getSummary();
-        assertEquals(132489,result.getTotalLiveBytes());
+        assertEquals(139369,result.getTotalLiveBytes());
         assertEquals(2208,result.getTotalLiveInstances());
     }
 
