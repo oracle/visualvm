@@ -108,6 +108,7 @@
                 <package>org.netbeans.modules.profiler.attach.providers</package>
                 <package>org.netbeans.modules.profiler.attach.providers.scripted</package>
                 <package>org.netbeans.modules.profiler.attach.spi</package>
+                <package>org.netbeans.modules.profiler.attach.steps</package>
                 <package>org.netbeans.modules.profiler.attach.wizard</package>
                 <package>org.netbeans.modules.profiler.attach.wizard.functors</package>
                 <package>org.netbeans.modules.profiler.attach.wizard.screen</package>
