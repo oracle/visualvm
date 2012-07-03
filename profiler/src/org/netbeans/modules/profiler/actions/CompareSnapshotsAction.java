@@ -78,8 +78,8 @@ import org.openide.util.Lookup;
 import org.openide.windows.WindowManager;
 
 @NbBundle.Messages({
-    "CompareSnapshotsAction_ActionName=&Compare Memory Snapshots...",
-    "CompareSnapshotsAction_ActionDescr=Computes the difference between two comparable memory snapshots",
+    "CompareSnapshotsAction_ActionName=&Compare Snapshots...",
+    "CompareSnapshotsAction_ActionDescr=Computes the difference between two comparable snapshots",
     "CompareSnapshotsAction_SelectSnapshotDialogCaption=Select Snapshot to Compare",
     "CompareSnapshotsAction_SelectSnapshotsDialogCaption=Select Snapshots to Compare",
     "CompareSnapshotsAction_OpenChooserCaption=Open Snapshot",
@@ -331,11 +331,11 @@ public class CompareSnapshotsAction extends AbstractAction {
                                     // snapshot types don't match
                                     hintStr = Bundle.CompareSnapshotsAction_DifferentSnapshotsTypeMsg();
                                     enabledOk = false;
-                                } else if ((s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
-                                       && (s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
-                                    // not a memory snapshot
-                                    hintStr = Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg();
-                                    enabledOk = false;
+//                                } else if ((s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
+//                                       && (s1t != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
+//                                    // not a memory snapshot
+//                                    hintStr = Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg();
+//                                    enabledOk = false;
                                 } else if (ResultsManager.getDefault().getSnapshotSettings(s1fo).getAllocTrackEvery() != ResultsManager.getDefault()
                                                                                                                                    .getSnapshotSettings(s2fo)
                                                                                                                                    .getAllocTrackEvery()) {
@@ -786,14 +786,14 @@ public class CompareSnapshotsAction extends AbstractAction {
                             if (snapshot.getType() != ResultsManager.getDefault().getSnapshotType(snapshot2f)) {
                                 // snapshot types doesn't match
                                 externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_DifferentSnapshotsTypeMsg());
-                            } else if ((snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
-                                           && (snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
-                                // TODO: remove after Compare CPU snapshots is implemented
-                                // not a memory snapshot
-                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg());
-                                okButton.setEnabled(false);
-
-                                return;
+//                            } else if ((snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
+//                                           && (snapshot.getType() != LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS)) {
+//                                // TODO: remove after Compare CPU snapshots is implemented
+//                                // not a memory snapshot
+//                                externalFileHintLabel.setText(Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg());
+//                                okButton.setEnabled(false);
+//
+//                                return;
                             } else if (snapshot.getSettings().getAllocTrackEvery() != ResultsManager.getDefault()
                                                                                                         .getSnapshotSettings(snapshot2f)
                                                                                                         .getAllocTrackEvery()) {

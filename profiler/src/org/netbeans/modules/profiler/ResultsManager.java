@@ -77,6 +77,7 @@ import java.util.logging.Logger;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
@@ -350,16 +351,20 @@ public final class ResultsManager {
     }
 
     public void compareSnapshots(LoadedSnapshot s1, LoadedSnapshot s2) {
+        ResultsSnapshot snap1 = s1.getSnapshot();
+        ResultsSnapshot snap2 = s2.getSnapshot();
         ResultsSnapshot diff = null;
 
-        if (s1.getSnapshot() instanceof AllocMemoryResultsSnapshot && s2.getSnapshot() instanceof AllocMemoryResultsSnapshot) {
-            diff = new AllocMemoryResultsDiff((AllocMemoryResultsSnapshot) s1.getSnapshot(),
-                                              (AllocMemoryResultsSnapshot) s2.getSnapshot());
+        if (snap1 instanceof AllocMemoryResultsSnapshot && snap2 instanceof AllocMemoryResultsSnapshot) {
+            diff = new AllocMemoryResultsDiff((AllocMemoryResultsSnapshot)snap1,
+                                              (AllocMemoryResultsSnapshot)snap2);
         }
-        else if (s1.getSnapshot() instanceof LivenessMemoryResultsSnapshot
-                     && s2.getSnapshot() instanceof LivenessMemoryResultsSnapshot) {
-            diff = new LivenessMemoryResultsDiff((LivenessMemoryResultsSnapshot) s1.getSnapshot(),
-                                                 (LivenessMemoryResultsSnapshot) s2.getSnapshot());
+        else if (snap1 instanceof LivenessMemoryResultsSnapshot && snap2 instanceof LivenessMemoryResultsSnapshot) {
+            diff = new LivenessMemoryResultsDiff((LivenessMemoryResultsSnapshot)snap1,
+                                                 (LivenessMemoryResultsSnapshot)snap2);
+        }
+        else if (snap1 instanceof CPUResultsSnapshot && snap2 instanceof CPUResultsSnapshot) {
+            diff = new CPUResultsDiff((CPUResultsSnapshot)snap1, (CPUResultsSnapshot)snap2);
         }
 
         if (diff != null) {

@@ -217,7 +217,7 @@ class ClassDumpSegment extends TagBounds {
                 elSize = idSize;
             }
 
-            size += (getMinimumInstanceSize() + (((long)elements) * elSize));
+            size += (getMinimumInstanceSize() + ArrayDump.HPROF_ARRAY_OVERHEAD + (((long)elements) * elSize));
             arrayMap.put(cls, Long.valueOf(size));
         }
     }

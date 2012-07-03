@@ -107,6 +107,8 @@ public class ClassesListController extends AbstractController {
                     return Integer.valueOf(jClass1.getInstancesCount()).compareTo(Integer.valueOf(jClass2.getInstancesCount()));
                 case 3:
                     return Long.valueOf(jClass1.getAllInstancesSize()).compareTo(jClass2.getAllInstancesSize());
+                case 4:
+                    return Long.valueOf(jClass1.getRetainedSizeByClass()).compareTo(jClass2.getRetainedSizeByClass());
                 default:
                     throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N
             }
@@ -155,6 +157,7 @@ public class ClassesListController extends AbstractController {
     public Object[][] getData(String[] filterStrings, int filterType, boolean showZeroInstances, boolean showZeroSize,
                                          int sortingColumn, boolean sortingOrder, int columnCount) {
         boolean diff = isDiff();
+        boolean retained = classesController.getHeapFragmentWalker().getRetainedSizesStatus() == HeapFragmentWalker.RETAINED_SIZES_COMPUTED;
         
         long totalLiveInstances = classesController.getHeapFragmentWalker().getTotalLiveInstances();
         long totalLiveBytes = classesController.getHeapFragmentWalker().getTotalLiveBytes();
@@ -172,15 +175,21 @@ public class ClassesListController extends AbstractController {
             int instancesCount = jClass.getInstancesCount();
 //                            int instanceSize = jClass.getInstanceSize();
             long allInstancesSize = jClass.getAllInstancesSize();
+            long retainedSizeByClass = -1;
 
+            if (retained) {
+                retainedSizeByClass = jClass.getRetainedSizeByClass();
+            }
             data[i][0] = jClass.getName();
             
-            if (isDiff()) { 
+            if (diff) { 
                 minDiff = Math.min(minDiff, instancesCount);
                 maxDiff = Math.max(maxDiff, instancesCount);
                 data[i][1] = new Long(instancesCount);
                 data[i][2] = (instancesCount > 0 ? "+" : "") + numberFormat.format(instancesCount); // NOI18N
                 data[i][3] = (allInstancesSize > 0 ? "+" : "") + numberFormat.format(allInstancesSize); // NOI18N
+                if (retained)
+                    data[i][4] = (retainedSizeByClass > 0 ? "+" : "") + numberFormat.format(retainedSizeByClass); // NOI18N
             } else {
                 data[i][1] = new Double((double) instancesCount /
                                      (double) totalLiveInstances * 100);
@@ -191,9 +200,15 @@ public class ClassesListController extends AbstractController {
                                       : (numberFormat.format(allInstancesSize) + " (" // NOI18N
                                       + percentFormat.format((double) allInstancesSize /
                                       (double) totalLiveBytes) + ")"); // NOI18N
+                if (retained) {
+                    data[i][4] = (retainedSizeByClass < 0) ? Bundle.ClassesListController_ResultNotAvailableString()
+                                      : (numberFormat.format(retainedSizeByClass) + " (" // NOI18N
+                                      + percentFormat.format((double) retainedSizeByClass /
+                                      (double) totalLiveBytes) + ")"); // NOI18N
+                }
             }
             
-            data[i][4] = diff ? ((DiffJavaClass)jClass).getJavaClass() : jClass;
+            data[i][columnCount] = diff ? ((DiffJavaClass)jClass).getJavaClass() : jClass;
         }
         
         if ((minDiff > 0) && (maxDiff > 0)) {
@@ -212,6 +227,7 @@ public class ClassesListController extends AbstractController {
         private long allInstancesSize;
         private int instanceSize;
         private int instancesCount;
+        private long retainedSizeByClass;
         private JavaClass real;
         
         static DiffJavaClass createExternal(JavaClass jc) {
@@ -229,11 +245,13 @@ public class ClassesListController extends AbstractController {
                 instancesCount = jc.getInstancesCount();
                 instanceSize = jc.getInstanceSize();
                 allInstancesSize = jc.getAllInstancesSize();
+                retainedSizeByClass = jc.getRetainedSizeByClass();
                 real = jc;
             } else {
                 instancesCount = -jc.getInstancesCount();
                 instanceSize = -jc.getInstanceSize();
                 allInstancesSize = -jc.getAllInstancesSize();
+                retainedSizeByClass = -jc.getRetainedSizeByClass();
                 real = null;
             }
         }
@@ -268,6 +286,7 @@ public class ClassesListController extends AbstractController {
             instancesCount += djc.instancesCount;
             instanceSize += djc.instanceSize;
             allInstancesSize += djc.allInstancesSize;
+            retainedSizeByClass += djc.retainedSizeByClass;
             real = djc.real;
         }
         
@@ -340,6 +359,10 @@ public class ClassesListController extends AbstractController {
         public JavaClass getSuperClass() {
             // Not implemented
             return null;
+        }
+
+        public long getRetainedSizeByClass() {
+            return retainedSizeByClass;
         }
         
     }

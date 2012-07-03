@@ -381,7 +381,7 @@ final class TracerView {
         }
 
         private boolean isRegular(PrestimeCPUCCTNode n) {
-            return  n.getThreadId() != -1 && n.getMethodId() > 0 && !n.isFilteredNode();
+            return  n.getThreadId() != -1 && n.getMethodId() != 0 && !n.isFilteredNode();
         }
         
         private void enableDisablePopup(PrestimeCPUCCTNode n) {

@@ -120,6 +120,7 @@ class HprofHeap implements Heap {
     private boolean instancesCountComputed;
     private boolean referencesComputed;
     private boolean retainedSizeComputed;
+    private boolean retainedSizeByClassComputed;
     private int idMapSize;
     private int segment;
 
@@ -623,6 +624,35 @@ class HprofHeap implements Heap {
             }
         }
         retainedSizeComputed = true;
+    }
+
+    synchronized void computeRetainedSizeByClass() {
+        if (retainedSizeByClassComputed) {
+            return;
+        }
+        computeRetainedSize();
+        long[] offset = new long[] { allInstanceDumpBounds.startOffset };
+
+        while (offset[0] < allInstanceDumpBounds.endOffset) {
+            int instanceIdOffset = 0;
+            long start = offset[0];
+            int tag = readDumpTag(offset);
+
+            if (tag == INSTANCE_DUMP) {
+                instanceIdOffset = 1;
+            } else if (tag == OBJECT_ARRAY_DUMP) {
+                instanceIdOffset = 1;
+            } else if (tag == PRIMITIVE_ARRAY_DUMP) {
+                instanceIdOffset = 1;
+            } else {
+                continue;
+            }
+            long instanceId = dumpBuffer.getID(start + instanceIdOffset);
+            Instance i = getInstanceByID(instanceId);
+            ClassDump javaClass = (ClassDump) i.getJavaClass();
+            javaClass.addSizeForInstance(i);
+        }
+        retainedSizeByClassComputed = true;
     }
 
     int readDumpTag(long[] offset) {
