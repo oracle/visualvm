@@ -452,7 +452,7 @@ public class IntegrationUtils {
 
         return "-agentpath:" + "\"" + getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)
                + getDirectorySeparator(targetPlatform) + getProfilerAgentLibraryFile(targetPlatform) + "=" //NOI18N
-               + "\\\"" + getLibsDir(targetPlatform, isRemote) + "\\\"\"" + "," + portNumber; //NOI18N
+               + getLibsDir(targetPlatform, isRemote) + "\"" + "," + portNumber; //NOI18N
     }
 
     public static String fixLibsDirPath(final String libsDirPath, final String args) {
