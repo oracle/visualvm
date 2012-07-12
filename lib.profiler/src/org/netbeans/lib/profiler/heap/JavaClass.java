@@ -129,6 +129,14 @@ public interface JavaClass extends Type {
     int getInstancesCount();
 
     /**
+     * gets sum of retained sizes of all class instances.
+     * <br>
+     * Speed: first invocation is slow, all subsequent invocations are fast
+     * @return sum of retained sizes of all class instances
+     */
+    long getRetainedSizeByClass();
+
+    /**
      * gets unique (in whole heap) ID of this {@link JavaClass}.
      * <br>
      * Speed: fast

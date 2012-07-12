@@ -360,6 +360,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
             result = new StringBuffer("<tr><td>"+replaceHTMLCharacters(flatProfileContainer.getMethodNameAtRow(i))+"</td>"); //NOI18N
             result.append("<td align=\"right\">").append(percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)).append((flatProfileContainer.getTimeInMcs0AtRow(i)%10==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%100==0)?((flatProfileContainer.getTimeInMcs0AtRow(i)%1000==0)?("    "):("  ")):(" ")):("")).append("</td>"); //NOI18N
             result.append("<td align=right>").append((double) flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms</td>"); //NOI18N
+            result.append("<td align=right>").append((double) flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms</td>"); //NOI18N
             result.append("<td align=\"right\">").append(flatProfileContainer.getNInvocationsAtRow(i)).append("</td></tr>"); //NOI18N
             eDD.dumpData(result);
         }
@@ -380,6 +381,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
             result = new StringBuffer("   <TableRow>"+newline+"    <TableColumn><![CDATA["+flatProfileContainer.getMethodNameAtRow(i)+"]]></TableColumn>"+newline); //NOI18N
             result.append("    <TableColumn><![CDATA[").append(percentFormat.format(flatProfileContainer.getPercentAtRow(i)/100)).append("]]></TableColumn>").append(newline); //NOI18N
             result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline); //NOI18N
+            result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs1AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline); //NOI18N
             result.append("    <TableColumn><![CDATA[").append(flatProfileContainer.getNInvocationsAtRow(i)).append("]]></TableColumn>").append(newline).append("  </TableRow>").append(newline); //NOI18N
             eDD.dumpData(result);
         }
@@ -405,6 +407,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
             result.append(quote).append(flatProfileContainer.getMethodNameAtRow(i)).append(quote).append(separator);
             result.append(quote).append(flatProfileContainer.getPercentAtRow(i)).append(quote).append(separator);
             result.append(quote).append((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            result.append(quote).append((double)flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms").append(quote).append(separator);
             result.append(quote).append(flatProfileContainer.getNInvocationsAtRow(i)).append(quote).append(newLine);
             eDD.dumpData(result);
         }
