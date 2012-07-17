@@ -366,7 +366,6 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         scrollPanel.setLayout(new BorderLayout());
         scrollPanel.setBackground(Color.WHITE);
 
-        buttonsToolBar.addSeparator();
         buttonsToolBar.add(zoomInButton);
         buttonsToolBar.add(zoomOutButton);
         buttonsToolBar.add(scaleToFitButton);
@@ -670,6 +669,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         Component actionButton = buttonsToolBar.add(saveViewAction);
         buttonsToolBar.remove(actionButton);
         buttonsToolBar.add(actionButton, 0);
+        buttonsToolBar.add(new JToolBar.Separator(), 1);
     }
 
     // ---------------------------------------------------------------------------------------

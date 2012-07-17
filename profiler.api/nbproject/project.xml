@@ -120,6 +120,7 @@ made subject to such option by the copyright holder.
             </module-dependencies>
             <friend-packages>
                 <friend>com.sun.tools.visualvm.core</friend>
+                <friend>com.sun.tools.visualvm.modules.appui</friend>
                 <friend>com.sun.tools.visualvm.profiler</friend>
                 <friend>com.sun.tools.visualvm.profiling</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
