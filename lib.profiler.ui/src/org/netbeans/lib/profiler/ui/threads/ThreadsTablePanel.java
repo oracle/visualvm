@@ -333,6 +333,7 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
         Component actionButton = buttonsToolBar.add(saveViewAction);
         buttonsToolBar.remove(actionButton);
         buttonsToolBar.add(actionButton, 0);
+        buttonsToolBar.add(new JToolBar.Separator(), 1);
     }
     
     public boolean fitsVisibleArea() {
@@ -586,7 +587,6 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
 
         buttonsToolBar = ProfilerToolbar.create(true);
         
-        buttonsToolBar.addSeparator();
         buttonsToolBar.add(showLabel);
         buttonsToolBar.add(threadsSelectionCombo);
         
