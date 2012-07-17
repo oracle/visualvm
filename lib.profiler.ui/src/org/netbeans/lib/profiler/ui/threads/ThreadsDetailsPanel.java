@@ -228,7 +228,6 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
            });*/
 
         contentPanel.add(content, BorderLayout.NORTH);
-        buttonsToolBar.addSeparator();
         buttonsToolBar.add(showLabel);
         buttonsToolBar.add(threadsSelectionCombo);
         add(scrollPane, BorderLayout.CENTER);
@@ -365,6 +364,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         Component actionButton = buttonsToolBar.add(saveViewAction);
         buttonsToolBar.remove(actionButton);
         buttonsToolBar.add(actionButton, 0);
+        buttonsToolBar.add(new JToolBar.Separator() ,1);
     }
 
     /** Called when data in manager change */
