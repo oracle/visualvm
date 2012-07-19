@@ -58,6 +58,8 @@ import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -72,8 +74,6 @@ import org.netbeans.lib.profiler.ui.components.table.JExtendedTablePanel;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -221,7 +221,7 @@ final class ThreadsMemoryView extends JPanel {
     private void filterData() {
         filteredSortedIndexes.clear();
         
-        String[] filterStrings = filterComponent.getFilterStrings();
+        String[] filterStrings = FilterComponent.getFilterValues(filterString);
         if (filterType == CommonConstants.FILTER_NONE ||
                 filterStrings == null || filterStrings[0].equals("")) { // NOI18N
             for (int i = 0; i < threads.size(); i++) filteredSortedIndexes.add(i);
@@ -619,30 +619,22 @@ final class ThreadsMemoryView extends JPanel {
     }
     
     private void initFilterPanel() {
-        filterComponent = new FilterComponent();
+        filterComponent = FilterComponent.create(true, true);
+                
+        filterComponent.setFilter(filterString, filterType);
         
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_STARTS_WITH),
-                NbBundle.getMessage(MemoryView.class, "LBL_Starts_with"), CommonConstants.FILTER_STARTS_WITH); // NOI18N
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_CONTAINS),
-                NbBundle.getMessage(MemoryView.class, "LBL_Contains"), CommonConstants.FILTER_CONTAINS); // NOI18N
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_ENDS_WITH),
-                NbBundle.getMessage(MemoryView.class, "LBL_Ends_with"), CommonConstants.FILTER_ENDS_WITH); // NOI18N
-        filterComponent.addFilterItem(Icons.getImageIcon(GeneralIcons.FILTER_REG_EXP),
-                NbBundle.getMessage(MemoryView.class, "LBL_Regexp"), CommonConstants.FILTER_REGEXP); // NOI18N
+        filterComponent.setHint(NbBundle.getMessage(MemoryView.class, "LBL_Thread_filter")); // NOI18N
         
-        filterComponent.setFilterValues(filterString, filterType);
-        
-        filterComponent.setEmptyFilterText(NbBundle.getMessage(MemoryView.class, "LBL_Thread_filter")); // NOI18N
-        
-        filterComponent.addFilterListener(new FilterComponent.FilterListener() {
-            public void filterChanged() {
-                filterString = filterComponent.getFilterString();
+        filterComponent.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                filterString = filterComponent.getFilterValue();
                 filterType = filterComponent.getFilterType();
                 updateData(false);
             }
         });
         
-        add(filterComponent, BorderLayout.SOUTH);
+        add(filterComponent.getComponent(), BorderLayout.SOUTH);
     }
     
     private void refreshUI() {

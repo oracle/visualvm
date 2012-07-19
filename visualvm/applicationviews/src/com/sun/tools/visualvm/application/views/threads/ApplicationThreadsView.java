@@ -334,6 +334,9 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             ThreadsPanel threadsPanel = new ThreadsPanel(threadsManager, callback, true);
             threadsPanel.threadsMonitoringEnabled();
 
+            JComponent toolbar = (JComponent)threadsPanel.getToolbar();
+
+            add(toolbar, BorderLayout.NORTH);
             add(threadsPanel, BorderLayout.CENTER);
         }
     }
@@ -357,13 +360,9 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             ThreadsTablePanel threadsPanel = new ThreadsTablePanel(threadsManager, callback, true);
             threadsPanel.setOpaque(false);
 
-            JComponent toolbar = (JComponent)threadsPanel.getComponent(0);
-            toolbar.setOpaque(false);
-            toolbar.setBorder(BorderFactory.createEmptyBorder(9, 5, 5, 5));
+            JComponent toolbar = (JComponent)threadsPanel.getToolbar();
             
-            JComponent tablePanel = (JComponent)threadsPanel.getComponent(1);
-            tablePanel.setOpaque(false);
-
+            add(toolbar, BorderLayout.NORTH);
             add(threadsPanel, BorderLayout.CENTER);
         }
     }
@@ -391,6 +390,9 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             setOpaque(false);
             
             threadsDetailsPanel = new ThreadsDetailsPanel(threadsManager, true);
+            JComponent toolbar = (JComponent)threadsDetailsPanel.getToolbar();
+
+            add(toolbar, BorderLayout.NORTH);
             add(threadsDetailsPanel, BorderLayout.CENTER);
         }
     }
