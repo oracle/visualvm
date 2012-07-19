@@ -138,7 +138,7 @@ class CoreDumpOverviewView extends DataSourceView {
             Properties props = saAgent.getSystemProperties();
             if (props != null) {
                 String javaVersion = props.getProperty("java.version"); // NOI18N
-                 String javaVendor = props.getProperty("java.vendor"); // NOI18N
+                String javaVendor = props.getProperty("java.vendor"); // NOI18N
                 if (javaVersion != null || javaVendor != null) {
                     data.append("<b>"+jLbl+":</b>");
                     if (javaVersion != null) {
