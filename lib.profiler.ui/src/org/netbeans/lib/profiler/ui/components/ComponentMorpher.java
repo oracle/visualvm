@@ -49,8 +49,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 
@@ -88,7 +88,6 @@ public class ComponentMorpher extends JComponent implements ComponentListener, A
 
     // --- Morphing stuff --------------------------------------------------------
     private JComponent startComponent;
-    private JPanel accessibleDelegate;
     private boolean isMorphing = false;
     private float heightDelta;
     private int morphingDelay;
@@ -117,13 +116,11 @@ public class ComponentMorpher extends JComponent implements ComponentListener, A
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public AccessibleContext getAccessibleContext() {
-        if (accessibleDelegate == null) {
-            accessibleDelegate = new JPanel();
-        }
-
-        return accessibleDelegate.getAccessibleContext();
+        if (accessibleContext == null)
+            accessibleContext = new AccessibleComponentMorpher();
+        return accessibleContext;
     }
-
+    
     public void setBorder(Border border) {
         super.setBorder(border);
         setClientPreferredSize(currentComponent.getPreferredSize());
@@ -289,5 +286,14 @@ public class ComponentMorpher extends JComponent implements ComponentListener, A
         }
 
         return component;
+    }
+    
+    
+    protected class AccessibleComponentMorpher extends AccessibleJComponent {
+        
+        public AccessibleRole getAccessibleRole() {
+            return AccessibleRole.PUSH_BUTTON;
+        }
+        
     }
 }
