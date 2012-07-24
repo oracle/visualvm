@@ -43,12 +43,9 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
+import java.awt.*;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.openide.util.NbBundle;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -76,26 +73,45 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    private static class HeaderRenderer extends JLabel {
+    private static class HeaderRenderer extends JPanel {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public Dimension getMinimumSize() {
-            return new Dimension(0, super.getMinimumSize().height);
+        private JLabel classIcon;
+        private JLabel packageName;
+        private JLabel className;
+        
+        
+        HeaderRenderer() {
+            setLayout(new BorderLayout());
+            
+            classIcon = new JLabel();
+            classIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, classIcon.getIconTextGap()));
+            packageName = new JLabel();
+            packageName.setFont(packageName.getFont().deriveFont(Font.PLAIN));
+            packageName.setBorder(BorderFactory.createEmptyBorder());
+            className = new JLabel();
+            className.setFont(packageName.getFont().deriveFont(Font.BOLD));
+            className.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+            
+            add(classIcon, BorderLayout.WEST);
+            add(packageName, BorderLayout.CENTER);
+            add(className, BorderLayout.EAST);
+        }
+        
+        public void setIcon(Icon icon) {
+            classIcon.setIcon(icon);
         }
 
         public void setText(String text) {
             int classNameIndex = text.lastIndexOf('.'); // NOI18N
 
             if (classNameIndex == -1) {
-                super.setText(text);
+                packageName.setText(""); // NOI18N
+                className.setText(text);
             } else {
                 classNameIndex++;
-
-                String htmlText = "<html>" // NOI18N
-                                  + text.substring(0, classNameIndex) + "<b>" // NOI18N
-                                  + text.substring(classNameIndex) + "</b>" // NOI18N
-                                  + "</html>"; // NOI18N
-                super.setText(htmlText);
+                packageName.setText(text.substring(0, classNameIndex));
+                className.setText(text.substring(classNameIndex));
             }
         }
     }
@@ -176,7 +192,6 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
 
 
     private void initComponents() {
-        setLayout(new BorderLayout());
         Color borderColor = UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
             UIManager.getColor("Button.darkShadow") : UIManager.getColor("Button.shadow"); // NOI18N
         setBorder(BorderFactory.createCompoundBorder(
@@ -206,6 +221,9 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
                     });
                 }
             }
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
         };
         actionsRenderer.setBorder(BorderFactory.createEmptyBorder());
         actionsRenderer.setForeground(UIManager.getColor("ToolTip.foreground")); // NOI18N
@@ -218,8 +236,23 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
         detailsContainer.setOpaque(false);
         detailsContainer.add(detailsRenderer);
         detailsContainer.add(actionsRenderer);
-
-        add(headerRenderer, BorderLayout.WEST);
-        add(detailsContainer, BorderLayout.EAST);
+        
+        setLayout(new GridBagLayout());
+        
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        add(headerRenderer, c);
+        
+        JPanel filler = new JPanel(null);
+        filler.setOpaque(false);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        add(filler, c);
+        
+        c = new GridBagConstraints();
+        c.gridx = 2;
+        add(detailsContainer, c);
     }
 }
