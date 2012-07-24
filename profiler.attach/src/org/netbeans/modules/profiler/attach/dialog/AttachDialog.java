@@ -93,6 +93,9 @@ public class AttachDialog extends AttachWizard {
 
     @Override
     public AttachSettings configure(AttachSettings settings) {
+        if (settings == null)
+            settings = new AttachSettings();
+        
         // Configure default settings
         if (settings.getTargetType().isEmpty()) {
             settings.setDirect(false);
@@ -132,7 +135,7 @@ public class AttachDialog extends AttachWizard {
     }
     
     
-    private static final String ATTACH_WIZARD_HELPCTX = "JDevAttachWizard.HelpCtx"; // NOI18N
+    private static final String ATTACH_WIZARD_HELPCTX = "AttachDialog.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(ATTACH_WIZARD_HELPCTX);
     
     private class Panel extends JPanel implements HelpCtx.Provider {
