@@ -672,7 +672,12 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         threadInfos.beginTrans(false);
 
         try {
-            appNode = new SimpleCPUCCTNode(((ProfilerClient)clientRef.get()).getStatus().getNInstrMethods());
+            ProfilerClient client = getClient();
+            if (client != null) {
+                appNode = new SimpleCPUCCTNode(client.getStatus().getNInstrMethods());                
+            } else {
+                appNode = new SimpleCPUCCTNode(true);
+            }
 
             int len = (threadInfos.getThreadNames() != null) ? threadInfos.getThreadNames().length : 0;
 
