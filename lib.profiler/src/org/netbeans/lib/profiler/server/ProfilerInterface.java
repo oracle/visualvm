@@ -201,22 +201,24 @@ public class ProfilerInterface implements CommonConstants {
 
                 boolean loadedRootClassesExist = false;
 
-                switch (instrType) {
-                    case INSTR_RECURSIVE_FULL:
-                    case INSTR_RECURSIVE_SAMPLED:
-                        // This will look into loadedClassesArray to check if there are any root classes already loaded
-                        loadedRootClassesExist = instrSpawnedThreads ? true : checkForLoadedRootClasses();
+                if (!detachStarted) {
+                    switch (instrType) {
+                        case INSTR_RECURSIVE_FULL:
+                        case INSTR_RECURSIVE_SAMPLED:
+                            // This will look into loadedClassesArray to check if there are any root classes already loaded
+                            loadedRootClassesExist = instrSpawnedThreads ? true : checkForLoadedRootClasses();
 
-                        break;
-                    case INSTR_CODE_REGION:
-                        loadedRootClassesExist = checkForLoadedRootClasses();
+                            break;
+                        case INSTR_CODE_REGION:
+                            loadedRootClassesExist = checkForLoadedRootClasses();
 
-                        break;
-                    case INSTR_OBJECT_ALLOCATIONS:
-                    case INSTR_OBJECT_LIVENESS:
-                        loadedRootClassesExist = true;
+                            break;
+                        case INSTR_OBJECT_ALLOCATIONS:
+                        case INSTR_OBJECT_LIVENESS:
+                            loadedRootClassesExist = true;
 
-                        break;
+                            break;
+                    }
                 }
 
                 if (loadedRootClassesExist) { // Root class(es) has been loaded or none is needed - start
@@ -327,6 +329,8 @@ public class ProfilerInterface implements CommonConstants {
     // of classLoadHook() or methodInvokedFirstTime(). To avoid all these problems we use this simple way to avoid
     // unnecessary classLoadHook() invocations.
     private static volatile Thread instrumentMethodGroupCallThread;
+
+    private static volatile boolean detachStarted;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -646,6 +650,14 @@ public class ProfilerInterface implements CommonConstants {
         }
         return "";
     }
+
+    static void setDetachStarted(boolean detachStarted) {
+        ProfilerInterface.detachStarted = detachStarted;
+    }
+
+    static boolean isDetachStarted() {
+        return detachStarted;
+    }
     
     private static boolean getAndInstrumentClasses(boolean rootClassInstrumentation) {
         Response r = profilerServer.getLastResponse();
@@ -746,6 +758,9 @@ public class ProfilerInterface implements CommonConstants {
             loadedClassesLoaders = new int[loadedClassesArray.length];
            
             for (int i = 0; i < loadedClassesArray.length; i++) {
+                if(detachStarted) {
+                    return;
+                }
                 Class clazz = loadedClassesArray[i];
                 loadedClassesLoaders[i] = ClassLoaderManager.registerLoader(clazz);
 

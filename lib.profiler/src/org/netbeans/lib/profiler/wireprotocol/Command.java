@@ -102,6 +102,7 @@ public class Command {
     public static final int TAKE_HEAP_DUMP = 41;
     public static final int GET_CLASSID = 42;
     public static final int STILL_ALIVE = 43;
+    public static final int PREPARE_DETACH = 44;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -211,6 +212,8 @@ public class Command {
                 return "GET_CLASSID"; // NOI18N
             case STILL_ALIVE:
                 return "STILL_ALIVE"; // NOI18N
+            case PREPARE_DETACH:
+                return "PREPARE_DETACH"; // NOI18N
         }
 
         return "Unknown command"; // NOI18N
