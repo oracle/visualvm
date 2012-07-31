@@ -188,7 +188,9 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_RenameSnapshotFailedMsg=Failed to rename snapshot to {0}",
     "ProfilerControlPanel2_EmptyNameMsg=Snapshot name cannot be empty.",
     "MSG_Loading_Progress=Loading...",
-    "LAB_ControlPanelName=Profiler"
+    "LAB_ControlPanelName=Profiler",
+    "#NOI18N",
+    "ProfilerControlPanel2_WindowMode=explorer"
 })
 public final class ProfilerControlPanel2 extends ProfilerTopComponent implements ProfilingStateListener {
     final private static Logger LOGGER = Logger.getLogger(ProfilerControlPanel2.class.getName());
@@ -1994,7 +1996,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
     public void open() {
         if (needsDocking()) { // needs docking
 
-            Mode mode = WindowManager.getDefault().findMode("explorer"); // NOI18N
+            Mode mode = WindowManager.getDefault().findMode(Bundle.ProfilerControlPanel2_WindowMode());
 
             if (mode != null) {
                 mode.dockInto(this);
