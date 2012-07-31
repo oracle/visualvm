@@ -65,7 +65,9 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  */
 @NbBundle.Messages({
     "TelemetryOverviewPanel_TelemetryOverviewAccessDescr=VM telemetry overview",
-    "LAB_TelemetryOverviewPanelName=VM Telemetry Overview"
+    "LAB_TelemetryOverviewPanelName=VM Telemetry Overview",
+    "#NOI18N",
+    "TelemetryOverviewPanel_WindowMode=output"
 })
 public final class TelemetryOverviewPanel extends ProfilerTopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -152,7 +154,7 @@ public final class TelemetryOverviewPanel extends ProfilerTopComponent {
     public void open() {
         if (needsDocking()) { // needs docking
 
-            Mode mode = WindowManager.getDefault().findMode("output"); // NOI18N
+            Mode mode = WindowManager.getDefault().findMode(Bundle.TelemetryOverviewPanel_WindowMode());
 
             if (mode != null) {
                 mode.dockInto(this);
