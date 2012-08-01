@@ -482,7 +482,7 @@ public class IntegrationUtils {
         StringBuilder args = new StringBuilder();
         
         if ((targetJVM.equals(PLATFORM_JAVA_60) || targetJVM.equals(PLATFORM_JAVA_70) || targetJVM.equals(PLATFORM_JAVA_80)) && 
-            (targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS))) {
+            isLinuxPlatform(targetPlatform)) {
             args.append(" -XX:+UseLinuxPosixThreadCPUClocks "); // NOI18N
         }
         args.append("-agentpath:").append(getNativeLibrariesPath(targetPlatform, targetJVM, isRemote)). // NOI18N
@@ -496,7 +496,7 @@ public class IntegrationUtils {
         StringBuilder args = new StringBuilder();
         
         if ((targetJVM.equals(PLATFORM_JAVA_60) || targetJVM.equals(PLATFORM_JAVA_70) || targetJVM.equals(PLATFORM_JAVA_80)) && 
-            (targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS))) {
+            isLinuxPlatform(targetPlatform)) {
             args.append(" -XX:+UseLinuxPosixThreadCPUClocks "); // NOI18N
         }
         String natLibs = getNativeLibrariesPath(targetPlatform, targetJVM, isRemote).replace(" ", pathSpaceChar != null ? pathSpaceChar : " ");

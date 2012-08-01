@@ -995,6 +995,8 @@ public abstract class NetBeansProfiler extends Profiler {
     public void detachFromApp() {
         setTransitionState();
 
+        getTargetAppRunner().prepareDetachFromTargetJVM();
+
         if (getTargetAppRunner().getProfilingSessionStatus().currentInstrType != CommonConstants.INSTR_NONE) {
             //      if (LiveResultsWindow.hasDefault()) LiveResultsWindow.getDefault().reset(); // see issue http://www.netbeans.org/issues/show_bug.cgi?id=68213
             try {
