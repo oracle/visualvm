@@ -362,6 +362,7 @@ public class AttachDialog extends AttachWizard {
                 IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS,
                 IntegrationUtils.PLATFORM_LINUX_OS,
                 IntegrationUtils.PLATFORM_LINUX_AMD64_OS,
+                IntegrationUtils.PLATFORM_LINUX_ARM_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS,
