@@ -150,6 +150,8 @@ public class AttachDialog extends AttachWizard {
         
         private AttachSettings as;
         
+        private boolean updatingUI = false;
+        
         
         Panel() {
             initComponents();
@@ -157,6 +159,7 @@ public class AttachDialog extends AttachWizard {
         
         void setup(AttachSettings as) {
             this.as = as;
+            updatingUI = true;
             local.setSelected(!as.isRemote());
             remote.setSelected(as.isRemote());
             dynamic.setSelected(!as.isDirect());
@@ -168,6 +171,8 @@ public class AttachDialog extends AttachWizard {
                 hostname.setText(""); // NOI18N
                 os.setSelectedIndex(0);
             }
+            updatingUI = false;
+            updateSteps();
         }
         
         AttachSettings getSettings() {
@@ -430,6 +435,7 @@ public class AttachDialog extends AttachWizard {
         }
         
         private void updateSteps() {
+            if (updatingUI) return;
             steps.setText(steps(getSettings()));
             steps.setCaretPosition(0);
         }
