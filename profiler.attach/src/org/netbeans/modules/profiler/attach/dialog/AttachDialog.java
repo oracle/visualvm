@@ -366,9 +366,11 @@ public class AttachDialog extends AttachWizard {
             os = new JComboBox(new Object[] {
                 IntegrationUtils.PLATFORM_WINDOWS_OS,
                 IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS,
+                IntegrationUtils.PLATFORM_WINDOWS_CVM,
                 IntegrationUtils.PLATFORM_LINUX_OS,
                 IntegrationUtils.PLATFORM_LINUX_AMD64_OS,
                 IntegrationUtils.PLATFORM_LINUX_ARM_OS,
+                IntegrationUtils.PLATFORM_LINUX_CVM,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS,
@@ -449,5 +451,3 @@ public class AttachDialog extends AttachWizard {
     }
     
 }
-
-
