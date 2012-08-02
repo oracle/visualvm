@@ -185,6 +185,7 @@ public class AttachDialog extends AttachWizard {
             } else {
                 as.setDirect(direct.isSelected());
                 as.setDynamic16(dynamic.isSelected());
+                as.setHostOS(IntegrationUtils.getLocalPlatform(-1));
             }
             return as;
         }
