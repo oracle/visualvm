@@ -240,7 +240,7 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     }
     
     private static final AtomicBoolean exportRunning = new AtomicBoolean(false);
-    private static String exportRemotePack(String path, AttachSettings settings) throws IOException {
+    protected static String exportRemotePack(String path, AttachSettings settings) throws IOException {
         if (exportRunning.compareAndSet(false, true)) {
             try {
                 return RemotePackExporter.getInstance().export(
@@ -253,7 +253,7 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
         }
     }
     
-    private static String getOS(AttachSettings settings) {
+    protected static String getOS(AttachSettings settings) {
         if (!settings.isRemote()) return settings.getHostOS();
         String hostOS = settings.getHostOS();
         if (IntegrationUtils.PLATFORM_WINDOWS_CVM.equals(hostOS))
@@ -263,13 +263,13 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
         else return settings.getHostOS();
     }
     
-    private static String getPlatform(AttachSettings settings) {
+    protected static String getPlatform(AttachSettings settings) {
         if (settings.isRemote() && isCVMJVM(settings))
             return IntegrationUtils.PLATFORM_JAVA_CVM;
         else return IntegrationUtils.PLATFORM_JAVA_60;
     }
     
-    private static boolean isCVMJVM(AttachSettings settings) {
+    protected static boolean isCVMJVM(AttachSettings settings) {
         String hostOS = settings.getHostOS();
         return IntegrationUtils.PLATFORM_WINDOWS_CVM.equals(hostOS) ||
                IntegrationUtils.PLATFORM_LINUX_CVM.equals(hostOS);
