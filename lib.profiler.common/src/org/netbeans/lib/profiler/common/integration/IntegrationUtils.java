@@ -74,8 +74,11 @@ public class IntegrationUtils {
     public static final String PLATFORM_JAVA_CVM = messages.getString("IntegrationUtils_PlatformJavaCvm"); // NOI18N
     public static final String PLATFORM_WINDOWS_OS = messages.getString("IntegrationUtils_PlatformWindowsOs"); // NOI18N
     public static final String PLATFORM_WINDOWS_AMD64_OS = messages.getString("IntegrationUtils_PlatformWindowsAmd64Os"); // NOI18N
+    public static final String PLATFORM_WINDOWS_CVM = messages.getString("IntegrationUtils_PlatformWindowsCvm"); // NOI18N
     public static final String PLATFORM_LINUX_OS = messages.getString("IntegrationUtils_PlatformLinuxOs"); // NOI18N
     public static final String PLATFORM_LINUX_AMD64_OS = messages.getString("IntegrationUtils_PlatformLinuxAmd64Os"); // NOI18N
+    public static final String PLATFORM_LINUX_ARM_OS = messages.getString("IntegrationUtils_PlatformLinuxArmOs"); // NOI18N
+    public static final String PLATFORM_LINUX_CVM = messages.getString("IntegrationUtils_PlatformLinuxCvm"); // NOI18N
     public static final String PLATFORM_SOLARIS_INTEL_OS = messages.getString("IntegrationUtils_PlatformSolarisIntelOs"); // NOI18N
     public static final String PLATFORM_SOLARIS_AMD64_OS = messages.getString("IntegrationUtils_PlatformSolarisAmd64Os"); // NOI18N
     public static final String PLATFORM_SOLARIS_SPARC_OS = messages.getString("IntegrationUtils_PlatformSolarisSparcOs"); // NOI18N
@@ -406,6 +409,8 @@ public class IntegrationUtils {
             return "linux"; //NOI18N
         } else if (targetPlatform.equals(PLATFORM_LINUX_AMD64_OS)) {
             return "linux-amd64"; //NOI18N
+        } else if (targetPlatform.equals(PLATFORM_LINUX_ARM_OS)) {
+            return "linux-arm"; //NOI18N
         } else if (targetPlatform.equals(PLATFORM_SOLARIS_INTEL_OS)) {
             return "solaris-i386"; //NOI18N
         } else if (targetPlatform.equals(PLATFORM_SOLARIS_AMD64_OS)) {
@@ -569,11 +574,11 @@ public class IntegrationUtils {
     }
 
     public static boolean isWindowsPlatform(String targetPlatform) {
-        return targetPlatform.equals(PLATFORM_WINDOWS_OS) || targetPlatform.equals(PLATFORM_WINDOWS_AMD64_OS);
+        return targetPlatform.equals(PLATFORM_WINDOWS_OS) || targetPlatform.equals(PLATFORM_WINDOWS_AMD64_OS) || targetPlatform.equals(PLATFORM_WINDOWS_CVM);
     }
 
     public static boolean isLinuxPlatform(String targetPlatform) {
-        return targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS);
+        return targetPlatform.equals(PLATFORM_LINUX_OS) || targetPlatform.equals(PLATFORM_LINUX_AMD64_OS) || targetPlatform.equals(PLATFORM_LINUX_ARM_OS) || targetPlatform.equals(PLATFORM_LINUX_CVM);
     }
 
     public static String getXMLCommendEndSign() {
