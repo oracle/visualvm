@@ -238,6 +238,8 @@ public class Platform implements CommonConstants {
                     procArch = "sparc"; // NOI18N
                 } else if (isHpux()) {
                     procArch = "pa_risc2.0"; // NOI18N
+                } else if (isLinuxArm()) {
+                    procArch = "arm"; // NOI18N
                 }
             }
 
@@ -510,6 +512,15 @@ public class Platform implements CommonConstants {
         return isSolaris() && procArch.startsWith("sparc"); // NOI18N
     }
 
+    /**
+     * Test whether we are running on Linux on ARM processor
+     */
+    public static boolean isLinuxArm() {
+        String procArch = System.getProperty("os.arch"); // NOI18N
+        
+        return isLinux() && procArch.startsWith("arm"); // NOI18N
+    }
+    
     /**
      * Returns system architecture: 32/64bit
      */

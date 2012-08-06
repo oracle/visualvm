@@ -150,6 +150,8 @@ public class AttachDialog extends AttachWizard {
         
         private AttachSettings as;
         
+        private boolean updatingUI = false;
+        
         
         Panel() {
             initComponents();
@@ -157,6 +159,7 @@ public class AttachDialog extends AttachWizard {
         
         void setup(AttachSettings as) {
             this.as = as;
+            updatingUI = true;
             local.setSelected(!as.isRemote());
             remote.setSelected(as.isRemote());
             dynamic.setSelected(!as.isDirect());
@@ -168,6 +171,8 @@ public class AttachDialog extends AttachWizard {
                 hostname.setText(""); // NOI18N
                 os.setSelectedIndex(0);
             }
+            updatingUI = false;
+            updateSteps();
         }
         
         AttachSettings getSettings() {
@@ -180,6 +185,7 @@ public class AttachDialog extends AttachWizard {
             } else {
                 as.setDirect(direct.isSelected());
                 as.setDynamic16(dynamic.isSelected());
+                as.setHostOS(IntegrationUtils.getLocalPlatform(-1));
             }
             return as;
         }
@@ -360,8 +366,11 @@ public class AttachDialog extends AttachWizard {
             os = new JComboBox(new Object[] {
                 IntegrationUtils.PLATFORM_WINDOWS_OS,
                 IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS,
+                IntegrationUtils.PLATFORM_WINDOWS_CVM,
                 IntegrationUtils.PLATFORM_LINUX_OS,
                 IntegrationUtils.PLATFORM_LINUX_AMD64_OS,
+                IntegrationUtils.PLATFORM_LINUX_ARM_OS,
+                IntegrationUtils.PLATFORM_LINUX_CVM,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS,
@@ -429,6 +438,7 @@ public class AttachDialog extends AttachWizard {
         }
         
         private void updateSteps() {
+            if (updatingUI) return;
             steps.setText(steps(getSettings()));
             steps.setCaretPosition(0);
         }
@@ -441,5 +451,3 @@ public class AttachDialog extends AttachWizard {
     }
     
 }
-
-
