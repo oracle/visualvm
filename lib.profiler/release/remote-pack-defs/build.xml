@@ -2,7 +2,7 @@
 <!--
 DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+Copyright 1997-2012 Oracle and/or its affiliates. All rights reserved.
 
 Oracle and Java are registered trademarks of Oracle and/or its affiliates.
 Other names may be trademarks of their respective owners.
@@ -131,6 +131,22 @@ made subject to such option by the copyright holder.
     <antcall target="profiler-server-15">
       <param name="os-version" value="linuxamd64"/>
       <param name="os-long-version" value="linux-amd64"/>
+    </antcall>
+  </target>
+
+  <target name="profiler-server-linuxarm-15">
+    <property name="os-version" value="linuxarm"/>
+    <antcall target="profiler-server-common-unix">
+      <param name="calibrate-suffix" value="-16"/>
+    </antcall>
+    <copy todir="${build.dir}/lib">
+       <fileset file="${lib.dir}/jfluid-server-15.jar" />
+    </copy>     
+    <antcall target="profiler-server-jdkspecific-unix">
+      <param name="jdk-version" value="16"/>
+      <param name="os-long-version" value="linux-arm"/>
+    </antcall>
+    <antcall target="profiler-server-zip-unix">
     </antcall>
   </target>
 
@@ -281,7 +297,7 @@ made subject to such option by the copyright holder.
   </target>
 
   <!-- creates the remote packs as a profiler-server for all platforms -->
-  <target name="profiler-server-all" depends="profiler-server-win-15, profiler-server-winamd64-15, profiler-server-win-cvm, profiler-server-mac-15, profiler-server-linux-15, profiler-server-linuxamd64-15, profiler-server-linux-cvm, profiler-server-solx86-15, profiler-server-solamd64-15, profiler-server-solsparc-15, profiler-server-solsparcv9-15" />
+  <target name="profiler-server-all" depends="profiler-server-win-15, profiler-server-winamd64-15, profiler-server-win-cvm, profiler-server-mac-15, profiler-server-linux-15, profiler-server-linuxamd64-15, profiler-server-linuxarm-15, profiler-server-linux-cvm, profiler-server-solx86-15, profiler-server-solamd64-15, profiler-server-solsparc-15, profiler-server-solsparcv9-15" />
 
 </project>
 
