@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -41,49 +41,16 @@
  */
 package org.netbeans.modules.profiler.attach.spi;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
-import org.netbeans.modules.profiler.attach.providers.TargetPlatformEnum;
+import org.netbeans.lib.profiler.common.AttachSettings;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-abstract public class AbstractRemotePackExporter {
-    private static final Map<String, String> scriptMapper = new HashMap<String, String>() {
-        {
-            put(IntegrationUtils.PLATFORM_LINUX_AMD64_OS, "linuxamd64"); //NOI18N
-            put(IntegrationUtils.PLATFORM_LINUX_OS, "linux"); //NOI18N
-            put(IntegrationUtils.PLATFORM_LINUX_ARM_OS, "linuxarm"); //NOI18N
-            put(IntegrationUtils.PLATFORM_MAC_OS, "mac"); //NOI18N
-            put(IntegrationUtils.PLATFORM_SOLARIS_AMD64_OS, "solamd64"); //NOI18N
-            put(IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS, "solx86"); //NOI18N
-            put(IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS, "solsparc"); //NOI18N
-            put(IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS, "solsparcv9"); //NOI18N
-            put(IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS, "winamd64"); //NOI18N
-            put(IntegrationUtils.PLATFORM_WINDOWS_OS, "win"); //NOI18N
-        }
-    };
-    private static final Map<String, String> jdkMapper = new HashMap<String, String>() {
-        {
-            put(TargetPlatformEnum.JDK5.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK6.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK7.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK8.toString(), "15"); //NOI18N
-            put(TargetPlatformEnum.JDK_CVM.toString(), "cvm"); //NOI18N
-        }
-    };
+public abstract class AttachStepsProvider {
     
-    final protected String getPlatformShort(String hostOS) {
-        return scriptMapper.get(hostOS);
-    }
+    public String getSteps(AttachSettings settings) { return null; }
     
-    final protected String getJVMShort(String jvm) {
-        return jdkMapper.get(jvm);
-    }
+    public void handleAction(String action, AttachSettings settings) {}
     
-    abstract public String export(String exportPath, String hostOS, String jvm) throws IOException;
-    abstract public String getRemotePackPath(String exportPath, String hostOS);
 }

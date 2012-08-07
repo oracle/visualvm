@@ -596,7 +596,7 @@ public final class LiveResultsWindow extends ProfilerTopComponent
         if (hasDefault()) {
             CommonUtils.runInEventDispatchThread(new Runnable() {
                     public void run() {
-                        if (defaultLiveInstance.isOpened()) {
+                        if (defaultLiveInstance.isShowing()) {
                             defaultLiveInstance.close();
                         }
                     }

@@ -20,7 +20,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.0</specification-version>
+                        <specification-version>1.20</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -108,6 +108,7 @@
                 <package>org.netbeans.modules.profiler.attach.providers</package>
                 <package>org.netbeans.modules.profiler.attach.providers.scripted</package>
                 <package>org.netbeans.modules.profiler.attach.spi</package>
+                <package>org.netbeans.modules.profiler.attach.steps</package>
                 <package>org.netbeans.modules.profiler.attach.wizard</package>
                 <package>org.netbeans.modules.profiler.attach.wizard.functors</package>
                 <package>org.netbeans.modules.profiler.attach.wizard.screen</package>
