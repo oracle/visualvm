@@ -41,6 +41,7 @@
  */
 package org.netbeans.modules.profiler.attach.spi;
 
+import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.AttachSettings;
 
 /**
@@ -52,5 +53,9 @@ public abstract class AttachStepsProvider {
     public String getSteps(AttachSettings settings) { return null; }
     
     public void handleAction(String action, AttachSettings settings) {}
+    
+    public void addChangeListener(ChangeListener listener) {}
+    
+    public void removeChangeListener(ChangeListener listener) {}
     
 }
