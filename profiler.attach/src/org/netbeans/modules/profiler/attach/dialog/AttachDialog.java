@@ -47,6 +47,8 @@ import java.net.URL;
 import java.util.Collection;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -89,6 +91,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class AttachDialog extends AttachWizard {
     
     private AttachStepsProvider currentProvider;
+    private Panel panel;
     
 
     @Override
@@ -110,26 +113,35 @@ public class AttachDialog extends AttachWizard {
         // Workaround for remote OS
         if (settings.isRemote()) settings.setHostOS(null);
         
-        Panel panel = new Panel();
+        panel = new Panel();
         panel.setup(settings);
         DialogDescriptor dd = new DialogDescriptor(panel, Bundle.AttachDialog_Caption());
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
-        if (dd.getValue() != DialogDescriptor.OK_OPTION) return null;
-        else return panel.getSettings();
+        AttachSettings result = dd.getValue() == DialogDescriptor.OK_OPTION ?
+                panel.getSettings() : null;
+        if (currentProvider != null) currentProvider.removeChangeListener(panel);
+        currentProvider = null;
+        panel = null;
+        return result;
     }
     
     private String steps(AttachSettings settings) {
         Collection<? extends AttachStepsProvider> providers =
                 Lookup.getDefault().lookupAll(AttachStepsProvider.class);
         
+        if (currentProvider != null) currentProvider.removeChangeListener(panel);
+        
         for (AttachStepsProvider provider : providers) {
             String steps = provider.getSteps(settings);
             if (steps != null) {
                 currentProvider = provider;
+                currentProvider.addChangeListener(panel);
                 return steps;
             }
         }
+        
+        currentProvider = null;
         
         return Bundle.AttachDialog_NoSteps();
     }
@@ -138,7 +150,7 @@ public class AttachDialog extends AttachWizard {
     private static final String ATTACH_WIZARD_HELPCTX = "AttachDialog.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(ATTACH_WIZARD_HELPCTX);
     
-    private class Panel extends JPanel implements HelpCtx.Provider {
+    private class Panel extends JPanel implements HelpCtx.Provider, ChangeListener {
         
         private JRadioButton local;
         private JRadioButton remote;
@@ -150,6 +162,8 @@ public class AttachDialog extends AttachWizard {
         
         private AttachSettings as;
         
+        private boolean updatingUI = false;
+        
         
         Panel() {
             initComponents();
@@ -157,6 +171,7 @@ public class AttachDialog extends AttachWizard {
         
         void setup(AttachSettings as) {
             this.as = as;
+            updatingUI = true;
             local.setSelected(!as.isRemote());
             remote.setSelected(as.isRemote());
             dynamic.setSelected(!as.isDirect());
@@ -168,6 +183,8 @@ public class AttachDialog extends AttachWizard {
                 hostname.setText(""); // NOI18N
                 os.setSelectedIndex(0);
             }
+            updatingUI = false;
+            updateSteps();
         }
         
         AttachSettings getSettings() {
@@ -180,6 +197,7 @@ public class AttachDialog extends AttachWizard {
             } else {
                 as.setDirect(direct.isSelected());
                 as.setDynamic16(dynamic.isSelected());
+                as.setHostOS(IntegrationUtils.getLocalPlatform(-1));
             }
             return as;
         }
@@ -360,8 +378,11 @@ public class AttachDialog extends AttachWizard {
             os = new JComboBox(new Object[] {
                 IntegrationUtils.PLATFORM_WINDOWS_OS,
                 IntegrationUtils.PLATFORM_WINDOWS_AMD64_OS,
+                IntegrationUtils.PLATFORM_WINDOWS_CVM,
                 IntegrationUtils.PLATFORM_LINUX_OS,
                 IntegrationUtils.PLATFORM_LINUX_AMD64_OS,
+                IntegrationUtils.PLATFORM_LINUX_ARM_OS,
+                IntegrationUtils.PLATFORM_LINUX_CVM,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS,
@@ -429,6 +450,7 @@ public class AttachDialog extends AttachWizard {
         }
         
         private void updateSteps() {
+            if (updatingUI) return;
             steps.setText(steps(getSettings()));
             steps.setCaretPosition(0);
         }
@@ -437,9 +459,14 @@ public class AttachDialog extends AttachWizard {
         public HelpCtx getHelpCtx() {
             return HELP_CTX;
         }
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { updateSteps(); }
+            });
+        }
         
     }
     
 }
-
-

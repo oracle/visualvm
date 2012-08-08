@@ -311,6 +311,14 @@ public class TargetAppRunner implements CommonConstants {
         return connectToStartedVMAndStartTA(false);
     }
 
+    public void prepareDetachFromTargetJVM() {
+        try {
+            profilerClient.prepareDetachFromTargetJVM();
+        } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+            /* No need to say anything if it's already terminated */
+        }
+    }
+
     public void detachFromTargetJVM() {
         if (targetAppIsSuspended) {
             try {
