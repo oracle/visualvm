@@ -199,8 +199,8 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
 
     @Override
     public void sortChildren(int sortBy, boolean sortOrder) {
-        node1.sortChildren(sortBy, sortOrder);
-        node2.sortChildren(sortBy, sortOrder);
+        if (node1 != null) node1.sortChildren(sortBy, sortOrder);
+        if (node2 != null) node2.sortChildren(sortBy, sortOrder);
         super.sortChildren(sortBy, sortOrder);
     }    
     
