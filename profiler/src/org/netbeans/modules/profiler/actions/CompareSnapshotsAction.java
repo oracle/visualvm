@@ -958,7 +958,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                     }
 
                     public String getDescription() {
-                        return MessageFormat.format(Bundle.CompareSnapshotsAction_OpenChooserCaption(), new Object[] { "nps" }); // NOI18N
+                        return Bundle.CompareSnapshotsAction_OpenChooserFilter("nps"); // NOI18N
                     }
                 });
         }
