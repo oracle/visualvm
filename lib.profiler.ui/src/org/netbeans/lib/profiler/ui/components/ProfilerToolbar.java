@@ -132,6 +132,13 @@ public abstract class ProfilerToolbar {
                     dim.height = Math.max(dim.height, preferredHeight);
                     return dim;
                 }
+                public void doLayout() {
+                    // #216443 - disabled/invisible/JLabel toolbar components
+                    //           break left/right arrow focus traversal
+                    for (Component component : getComponents())
+                        component.setFocusable(isFocusableComponent(component));
+                    super.doLayout();
+                }
             };
             toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
             toolbar.setBorderPainted(false);
@@ -147,6 +154,15 @@ public abstract class ProfilerToolbar {
             } else {
                 component = toolbar;
             }
+        }
+        
+        protected boolean isFocusableComponent(Component component) {
+            if (!component.isVisible()) return false;
+//            if (!component.isEnabled()) return false;
+            if (component instanceof JLabel) return false;
+            if (component instanceof JPanel) return false;
+            if (component instanceof JSeparator) return false;
+            return true;
         }
         
         @Override
