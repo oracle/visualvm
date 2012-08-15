@@ -57,6 +57,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.openide.DialogDisplayer;
+import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
 
 
@@ -67,9 +68,9 @@ import org.openide.util.HelpCtx;
  */
 @NbBundle.Messages({
     "FindDialog_FindInResultsDialogCaption=Find in Results",
-    "FindDialog_FindWhatLabelString=Find What:",
-    "FindDialog_FindButtonName=Find",
-    "FindDialog_FindWhatFieldAccessDescr=First item starting with this string will be found in results."
+    "FindDialog_FindWhatLabelString=Containing &Text:",
+    "FindDialog_FindButtonName=&Find",
+    "FindDialog_FindWhatFieldAccessDescr=First item containing this string will be found in results."
 })
 public class FindDialog extends JPanel implements HelpCtx.Provider{
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -136,8 +137,8 @@ public class FindDialog extends JPanel implements HelpCtx.Provider{
         setLayout(new GridBagLayout());
 
         // findWhatLabel
-        findWhatLabel.setText(Bundle.FindDialog_FindWhatLabelString());
         findWhatLabel.setLabelFor(findWhatField);
+        Mnemonics.setLocalizedText(findWhatLabel, Bundle.FindDialog_FindWhatLabelString());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -169,7 +170,7 @@ public class FindDialog extends JPanel implements HelpCtx.Provider{
         });
 
         // findButton
-        findButton.setText(Bundle.FindDialog_FindButtonName());
+        Mnemonics.setLocalizedText(findButton, Bundle.FindDialog_FindButtonName());
         updateFindButton();
 
         // panel filling bottom space
