@@ -244,7 +244,8 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         children = null;
         int ofs = selfCompactDataOfs;
         totalTime0 = container.getSelfTime0ForNodeOfs(ofs);
-        totalTime1 = container.getSelfTime1ForNodeOfs(ofs);
+        if (container.collectingTwoTimeStamps)
+            totalTime1 = container.getSelfTime1ForNodeOfs(ofs);
     }
 
     public int getMethodId() {
