@@ -95,16 +95,16 @@ public class DiffFlatProfilePanel extends SnapshotFlatProfilePanel {
     
     protected void initColumnsData() {
         super.initColumnsData();
+        columnRenderers[1] = new DiffBarCellRenderer(0, 0);
         columnRenderers[2] = new LabelTableCellRenderer(JLabel.TRAILING);
     }
     
     protected void obtainResults() {
         super.obtainResults();
         DiffFlatProfileContainer container = (DiffFlatProfileContainer)flatProfileContainer;
-        long min = container.getMinTime();
-        long max = container.getMaxTime();
-        columnRenderers[1] = new DiffBarCellRenderer(min, max);
-        resTable.getColumnModel().getColumn(1).setCellRenderer(columnRenderers[1]);
+        DiffBarCellRenderer renderer = (DiffBarCellRenderer)columnRenderers[1];
+        renderer.setMinimum(container.getMinTime());
+        renderer.setMaximum(container.getMaxTime());
     }
     
 }
