@@ -147,7 +147,7 @@ public class AttachModelImpl extends AttachModel {
     }
 
     protected void finalize() throws Throwable {
-        vm.detach();
+        if (vm != null) vm.detach();
         super.finalize();
     }
     
