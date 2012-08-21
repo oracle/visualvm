@@ -85,9 +85,6 @@ final class ApplicationSupport {
     class CurrentApplication extends Application {
 
         private int selfPid;
-        // since getting JVM for the first time can take a long time
-        // hard reference jvm from application so we are sure that it is not garbage collected
-        Jvm jvm;
         
         private CurrentApplication(int selfPid, Host host, String id) {
             super(host, id);
