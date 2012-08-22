@@ -1526,7 +1526,8 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         "ProfilerControlPanel2_AttachLabelString=Attach",
         "ProfilerControlPanel2_ProfileLabelString=Profile",
         "ProfilerControlPanel2_CodeFragmentLabelString=Code Fragment",
-        "ProfilerControlPanel2_CpuLabelString=CPU",       
+        "ProfilerControlPanel2_CpuSamplingLabelString=CPU sampling",
+        "ProfilerControlPanel2_CpuLabelString=CPU instrumentation",       
         "ProfilerControlPanel2_MemoryLabelString=Memory",
         "ProfilerControlPanel2_MonitorLabelString=Monitor",
         "ProfilerControlPanel2_RunningLabelString=Running",
@@ -1544,7 +1545,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         private final JLabel profileValueLabel;
         private final JLabel statusValueLabel;
         private final JLabel typeValueLabel;
-        private String configuration = null;
+        private int profilingType;
         private String host = null;
         private int count = 0;
         private int mode = -1;
@@ -1616,12 +1617,17 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
 
             final ProfilingSettings ps = Profiler.getDefault().getLastProfilingSettings();
 
-            if ((ps != null) && ((configuration == null) || !configuration.equals(ps.getSettingsName()))) {
+            if ((ps != null) && (profilingType != ps.getProfilingType())) {
                 switch (ps.getProfilingType()) {
                     case ProfilingSettings.PROFILE_CPU_STOPWATCH:
                         typeValueLabel.setText(Bundle.ProfilerControlPanel2_CodeFragmentLabelString());
 
                         break;
+                    case ProfilingSettings.PROFILE_CPU_SAMPLING:
+                        typeValueLabel.setText(Bundle.ProfilerControlPanel2_CpuSamplingLabelString());
+
+                        break;
+                        
                     case ProfilingSettings.PROFILE_CPU_ENTIRE:
                     case ProfilingSettings.PROFILE_CPU_PART:
                         typeValueLabel.setText(Bundle.ProfilerControlPanel2_CpuLabelString());
@@ -1638,8 +1644,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
                         break;
                 }
 
-                configuration = ps.getSettingsName();
-                profileValueLabel.setText(configuration);
+                profileValueLabel.setText(ps.getSettingsName());
             }
 
             String newHost = Profiler.getDefault().getTargetAppRunner().getProfilerEngineSettings().getRemoteHost();
