@@ -124,25 +124,10 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_SnapshotsSnippetName=Saved Snapshots",
     "ProfilerControlPanel2_ViewSnippetName=View",
     "ProfilerControlPanel2_TelemetrySnippetName=Basic Telemetry",
-    "ProfilerControlPanel2_ModeLabelString=Mode:",
     "ProfilerControlPanel2_TypeLabelString=Type:",
-    "ProfilerControlPanel2_ConfigLabelString=Configuration:",
-    "ProfilerControlPanel2_OnLabelString=On:",
-    "ProfilerControlPanel2_StatusLabelString=Status:",
-    "ProfilerControlPanel2_ProfileLabelString=Profile",
-    "ProfilerControlPanel2_CpuLabelString=CPU",
     "ProfilerControlPanel2_EntireAppLabelString=Entire Application",
     "ProfilerControlPanel2_ThisCompLabelString=This Computer",
-    "ProfilerControlPanel2_RunningLabelString=Running",
-    "ProfilerControlPanel2_AttachLabelString=Attach",
-    "ProfilerControlPanel2_CodeFragmentLabelString=Code Fragment",
-    "ProfilerControlPanel2_MemoryLabelString=Memory",
-    "ProfilerControlPanel2_MonitorLabelString=Monitor",
     "ProfilerControlPanel2_InactiveLabelString=Inactive",
-    "ProfilerControlPanel2_StartedLabelString=Started",
-    "ProfilerControlPanel2_PausedLabelString=Paused",
-    "ProfilerControlPanel2_StoppedLabelString=Stopped",
-    "ProfilerControlPanel2_StartingLabelString=Starting",
     "ProfilerControlPanel2_TelemetryButtonName=VM Telemetry",
     "ProfilerControlPanel2_TelemetryButtonToolTip=Show VM Telemetry graphs",
     "ProfilerControlPanel2_ThreadsButtonName=Threads",
@@ -180,7 +165,6 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_DeleteButtonAccessDescr=Delete selected snapshots.",
     "ProfilerControlPanel2_ExportButtonAccessDescr=Save selected snapshots as standalone files.",
     "ProfilerControlPanel2_RenameButtonAccessDescr=Renames currently selected snapshot file.",
-    "ProfilerControlPanel2_NoConfigurationString=None",
     "ProfilerControlPanel2_ControlPanelAcessDescr=Profiler control panel",
     "ProfilerControlPanel2_SnapshotsNotDeletedMsg=<html><b>Problem deleting snapshot(s).</b><br><br>The snapshot(s) might not have been deleted<br>or have already been deleted outside of the IDE.</html>",
     "ProfilerControlPanel2_RenameSnapshotCaption=Rename Snapshot",
@@ -1533,6 +1517,24 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         }
     }
 
+    @NbBundle.Messages({
+        "ProfilerControlPanel2_ModeLabelString=Mode:",
+        "ProfilerControlPanel2_ConfigLabelString=Configuration:",
+        "ProfilerControlPanel2_OnLabelString=On:",
+        "ProfilerControlPanel2_StatusLabelString=Status:",
+        "ProfilerControlPanel2_NoConfigurationString=None",
+        "ProfilerControlPanel2_AttachLabelString=Attach",
+        "ProfilerControlPanel2_ProfileLabelString=Profile",
+        "ProfilerControlPanel2_CodeFragmentLabelString=Code Fragment",
+        "ProfilerControlPanel2_CpuLabelString=CPU",       
+        "ProfilerControlPanel2_MemoryLabelString=Memory",
+        "ProfilerControlPanel2_MonitorLabelString=Monitor",
+        "ProfilerControlPanel2_RunningLabelString=Running",
+        "ProfilerControlPanel2_StartedLabelString=Started",
+        "ProfilerControlPanel2_PausedLabelString=Paused",
+        "ProfilerControlPanel2_StoppedLabelString=Stopped",
+        "ProfilerControlPanel2_StartingLabelString=Starting"
+    })
     private static final class StatusPanel extends CPPanel {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
