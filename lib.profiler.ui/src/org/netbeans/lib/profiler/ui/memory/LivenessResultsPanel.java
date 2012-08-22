@@ -167,7 +167,8 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
     }
 
     protected CustomBarCellRenderer getBarCellRenderer() {
-        return new CustomBarCellRenderer(0, maxValue);
+//        return new CustomBarCellRenderer(0, maxValue);
+        return new CustomBarCellRenderer(0, 100);
     }
 
     protected void getResultsSortedByAllocObj() {
@@ -470,7 +471,8 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
             case 0:
                 return sortedClassNames[index];
             case 1:
-                return new Long(trackedLiveObjectsSize[index]);
+//                return new Long(trackedLiveObjectsSize[index]);
+                return (nTotalTrackedBytes == 0) ? 0 : (double)trackedLiveObjectsSize[index] / (double)nTotalTrackedBytes * 100;
             case 2:
                 return intFormat.format(trackedLiveObjectsSize[index]) + " B (" // NOI18N
                        + ((nTotalTrackedBytes == 0) ? "-%" //NOI18N
@@ -566,7 +568,7 @@ public abstract class LivenessResultsPanel extends MemoryResultsPanel {
                               classNameTableCellRenderer, null, labelBracketTableCellRenderer, labelBracketTableCellRenderer,
                               labelTableCellRenderer, labelTableCellRenderer, labelTableCellRenderer, labelTableCellRenderer
                           };
-        columnWidths = new int[] { maxWidth, maxWidth, maxWidth, maxWidth, maxWidth, maxWidth, maxWidth, maxWidth };
+        columnWidths = new int[] { maxWidth + 15, maxWidth, maxWidth, maxWidth, maxWidth, maxWidth, maxWidth, maxWidth };
     }
 
     protected boolean passesValueFilter(int i) {
