@@ -886,28 +886,6 @@ public final class LiveResultsWindow extends ProfilerTopComponent
         return runner.getProfilerClient().getCurrentInstrType() != ProfilerEngineSettings.INSTR_NONE;
     }
 
-    private static boolean checkIfResultsExist(final ProfilerClient client, final int currentInstrType) {
-        switch (currentInstrType) {
-            case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
-            case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED:
-            case ProfilerEngineSettings.INSTR_NONE_SAMPLING:
-
-            //        return client.getCPUCallGraphBuilder().resultsExist(); // TODO
-            case ProfilerEngineSettings.INSTR_OBJECT_ALLOCATIONS:
-            case ProfilerEngineSettings.INSTR_OBJECT_LIVENESS:
-                return getDefault().resultsAvailable;
-            case CommonConstants.INSTR_CODE_REGION:
-
-                try {
-                    return client.cpuResultsExist();
-                } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
-                    return false;
-                }
-        }
-
-        return false;
-    }
-
     private ProfilerToolbar createToolBar() {
         ProfilerToolbar tb = ProfilerToolbar.create(true);
 
