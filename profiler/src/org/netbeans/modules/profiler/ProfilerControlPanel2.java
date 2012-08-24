@@ -51,8 +51,6 @@ import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.MonitoredData;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.EqualFlowLayout;
@@ -95,6 +93,7 @@ import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.modules.profiler.ProfilerControlPanel2.WhiteFilter;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -176,7 +175,7 @@ import org.openide.util.lookup.ServiceProvider;
     "#NOI18N",
     "ProfilerControlPanel2_WindowMode=explorer"
 })
-public final class ProfilerControlPanel2 extends ProfilerTopComponent implements ProfilingStateListener {
+public final class ProfilerControlPanel2 extends ProfilerTopComponent {
     final private static Logger LOGGER = Logger.getLogger(ProfilerControlPanel2.class.getName());
     
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -1917,7 +1916,14 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         scrollPane.getHorizontalScrollBar().setUnitIncrement(50);
         add(scrollPane, BorderLayout.CENTER);
         
-        Profiler.getDefault().addProfilingStateListener(this);
+        Profiler.getDefault().addProfilingStateListener(new SimpleProfilingStateAdapter() {
+
+            @Override
+            protected void update() {
+                updateStatus();
+            }
+
+        });
 
         addComponentListener(new ComponentAdapter() {
                 public void componentResized(ComponentEvent e) {
@@ -1992,10 +1998,6 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         return spControls;
     }
 
-    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {
-        updateStatus();
-    }
-
     public boolean needsDocking() {
         return WindowManager.getDefault().findMode(this) == null;
     }
@@ -2022,10 +2024,6 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
             initialized = true;
             scrollPane.getViewport().setViewPosition(new Point(0, 0));
         }
-    }
-
-    public void profilingStateChanged(final ProfilingStateEvent e) {
-        updateStatus();
     }
 
     public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
@@ -2061,10 +2059,6 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         if (snapshotsSnippet != null) {
             snapshotsSnippet.refreshList();
         }
-    }
-
-    public void threadsMonitoringChanged() {
-        updateStatus();
     }
 
     public void updateStatus() {
