@@ -327,9 +327,9 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
     }
 
     protected void initDataUponResultsFetch() {
-        if (barRenderer != null) {
-            barRenderer.setMaximum(maxValue); // updateState the bar renderer if already exists
-        }
+//        if (barRenderer != null) {
+//            barRenderer.setMaximum(maxValue); // updateState the bar renderer if already exists
+//        }
 
         doCreateClassNamesFromScratch();
     }
