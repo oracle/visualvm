@@ -91,13 +91,17 @@ public class MonitoredNumbersResponse extends Response {
     private byte[] exactThreadStates;
     private long[] exactTimeStamps;
     private int mode = CommonConstants.MODE_THREADS_NONE;
+    private int serverState = CommonConstants.SERVER_RUNNING;
+    private int serverProgress = CommonConstants.SERVER_PROGRESS_INDETERMINATE;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public MonitoredNumbersResponse(long[] generalNumbers) {
+    public MonitoredNumbersResponse(long[] generalNumbers, int serverState, int serverProgress) {
         super(true, MONITORED_NUMBERS);
         this.generalNumbers = generalNumbers;
         this.nNewThreads = 0;
+        this.serverState = serverState;
+        this.serverProgress = serverProgress;
     }
 
     // Custom serialization support
@@ -198,11 +202,20 @@ public class MonitoredNumbersResponse extends Response {
     public long[] getExactStateTimestamps() {
         return exactTimeStamps;
     }
+    
+    public int getServerState() {
+        return serverState;
+    }
 
+    public int getServerProgress() {
+        return serverProgress;
+    }
 
     // For debugging
     public String toString() {
-        return "MonitoredNumbersResponse, mode "+ mode + " " + super.toString(); // NOI18N
+        return super.toString() + ", mode=" + mode +     // NOI18N
+                ", serverState=" + serverState           // NOI18N
+                 + ", serverProgress=" + serverProgress; // NOI18N
     }
 
     void readObject(ObjectInputStream in) throws IOException {
@@ -280,6 +293,9 @@ public class MonitoredNumbersResponse extends Response {
 
         Arrays.sort(gcStarts);
         Arrays.sort(gcFinishs);
+
+        serverState = in.readInt();
+        serverProgress = in.readInt();
     }
 
     void writeObject(ObjectOutputStream out) throws IOException {
@@ -331,5 +347,8 @@ public class MonitoredNumbersResponse extends Response {
         for (int i = 0; i < gcFinishs.length; i++) {
             out.writeLong(gcFinishs[i]);
         }
+
+        out.writeInt(serverState);
+        out.writeInt(serverProgress);
     }
 }
