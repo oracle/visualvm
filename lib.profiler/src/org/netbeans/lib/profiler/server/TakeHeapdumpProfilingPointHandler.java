@@ -99,7 +99,7 @@ public class TakeHeapdumpProfilingPointHandler extends ProfilingPointServerHandl
         if (!remoteProfiling) { // take heap dump is supported only for local profiling
 
             String heapdumpName = getHeapDumpName(absTimeStamp);
-            String error = HeapDump.takeHeapDump(Platform.getJDKVersionNumber() == Platform.JDK_15, heapdumpName);
+            String error = HeapDump.takeHeapDump(heapdumpName);
 
             if (error != null) {
                 System.err.println("Dump to " + heapdumpName + " failed with " + error); // NOI18N
