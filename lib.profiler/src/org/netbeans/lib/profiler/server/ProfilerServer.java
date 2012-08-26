@@ -1649,7 +1649,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             case Command.TAKE_HEAP_DUMP:
 
                 TakeHeapDumpCommand dumpCmd = (TakeHeapDumpCommand) cmd;
-                String error = HeapDump.takeHeapDump(Platform.getJDKVersionNumber() == Platform.JDK_15, dumpCmd.getOutputFile());
+                String error = HeapDump.takeHeapDump(dumpCmd.getOutputFile());
 
                 sendSimpleResponseToClient(error == null, error);
 
