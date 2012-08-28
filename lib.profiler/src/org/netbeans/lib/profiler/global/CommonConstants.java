@@ -69,6 +69,16 @@ public interface CommonConstants {
     public static final String PROFILER_SERVER_SLASHED_CLASS_PREFIX = "org/netbeans/lib/profiler/server/"; // NOI18N
     public static final String PROFILER_DOTTED_CLASS_PREFIX = "org.netbeans.lib.profiler."; // NOI18N
 
+    // State of the profiler server
+    public static final int SERVER_RUNNING = 0;
+    public static final int SERVER_INITIALIZING = 1;
+    public static final int SERVER_PREPARING = 2;
+    public static final int SERVER_INSTRUMENTING = 3;
+
+    // Server progress constants
+    public static final int SERVER_PROGRESS_INDETERMINATE = -1;
+    public static final int SERVER_PROGRESS_WORKUNITS = 100;
+
     // Agent state
     public static final int AGENT_STATE_NOT_RUNNING = 0;
     public static final int AGENT_STATE_READY_DYNAMIC = 1;

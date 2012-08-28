@@ -94,6 +94,9 @@ public class MonitoredData {
     // threadStates use constants defined in CommonConstants for thread states.
     private int nThreads;
 
+    private int serverState;
+    private int serverProgress;
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     private MonitoredData(MonitoredNumbersResponse mresp) {
@@ -141,9 +144,20 @@ public class MonitoredData {
         convertToTimeInMillis(gcStarts);
         gcFinishs = mresp.getGCFinishs();
         convertToTimeInMillis(gcFinishs);
+
+        serverState = mresp.getServerState();
+        serverProgress = mresp.getServerProgress();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    public int getServerState() {
+        return serverState;
+    }
+
+    public int getServerProgress() {
+        return serverProgress;
+    }
 
     public long getFreeMemory() {
         return generalMNumbers[MonitoredNumbersResponse.FREE_MEMORY_IDX];

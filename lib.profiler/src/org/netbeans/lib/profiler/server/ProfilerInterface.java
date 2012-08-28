@@ -110,6 +110,7 @@ public class ProfilerInterface implements CommonConstants {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void run() {
+            Monitors.enterServerState(CommonConstants.SERVER_INITIALIZING);
             // We take a serialClientOperationsLock, then turn class load hook on, to prevent possible class loads, that
             // will neither get into loadedClassesArray nor be intercepted properly and reported to client by classLoadHook.
             // In other words, classes that are loaded before this point get into loadedClassesArray; classes loaded
@@ -141,12 +142,14 @@ public class ProfilerInterface implements CommonConstants {
                 initInstrumentationThread = null;
             } finally {
                 serialClientOperationsLock.endTrans();
+                Monitors.exitServerState();
             }
 
             ThreadInfo.removeProfilerServerThread(this);
         }
 
         private void initiateInstrumentation(final int instrType) {
+            Monitors.DeterminateProgress progress = Monitors.enterServerState(CommonConstants.SERVER_INITIALIZING, 2);
             String[] handlers = cmd.getProfilingPointHandlers();
             String[] infos = cmd.getProfilingPointInfos();
             
@@ -221,6 +224,8 @@ public class ProfilerInterface implements CommonConstants {
                     }
                 }
 
+                progress.next();
+
                 if (loadedRootClassesExist) { // Root class(es) has been loaded or none is needed - start
                                               // instrumentation-related operations right away
                     sendRootClassLoadedCommand(false);
@@ -233,6 +238,7 @@ public class ProfilerInterface implements CommonConstants {
                                             // to true after the first instrumentation, not before
                 }
             }
+            Monitors.exitServerState();
         }
 
         private static void computeRootWildcard() {
@@ -256,6 +262,8 @@ public class ProfilerInterface implements CommonConstants {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+
+    private static final int REDEFINE_CHUNK_SIZE = 500;
 
     // -----
     // I18N String constants
@@ -756,27 +764,33 @@ public class ProfilerInterface implements CommonConstants {
 
             loadedClassesArray = Classes.getAllLoadedClasses();
             loadedClassesLoaders = new int[loadedClassesArray.length];
-           
-            for (int i = 0; i < loadedClassesArray.length; i++) {
-                if(detachStarted) {
-                    return;
-                }
-                Class clazz = loadedClassesArray[i];
-                loadedClassesLoaders[i] = ClassLoaderManager.registerLoader(clazz);
 
-                if (dynamic) {
-                    if (loadedClassesLoaders[i] > 0) { // bootstrap classloader has index -1 and system classloader has index 0
-                        nonSystemClasses[nonSystemIndex++] = clazz;
+            Monitors.DeterminateProgress progress = Monitors.enterServerState(CommonConstants.SERVER_PREPARING, loadedClassesArray.length);
+            try {
+                for (int i = 0; i < loadedClassesArray.length; i++) {
+                    progress.next();
+                    if(detachStarted) {
+                        return;
                     }
-                    if (nonSystemIndex == MAX_CLASSES) {
-                        cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
-                        nonSystemIndex = 0;
+                    Class clazz = loadedClassesArray[i];
+                    loadedClassesLoaders[i] = ClassLoaderManager.registerLoader(clazz);
+
+                    if (dynamic) {
+                        if (loadedClassesLoaders[i] > 0) { // bootstrap classloader has index -1 and system classloader has index 0
+                            nonSystemClasses[nonSystemIndex++] = clazz;
+                        }
+                        if (nonSystemIndex == MAX_CLASSES) {
+                            cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+                            nonSystemIndex = 0;
+                        }
                     }
                 }
-            }
 
-            if (nonSystemIndex > 0) {
-                cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+                if (nonSystemIndex > 0) {
+                    cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+                }
+            } finally {
+                Monitors.exitServerState();
             }
         }
     }
@@ -1121,6 +1135,8 @@ public class ProfilerInterface implements CommonConstants {
 
     private static void instrumentMethodGroupNow(InstrumentMethodGroupData imgb)
                                           throws Exception {
+        //divided into 2 parts: cass loading and class instrumenting
+        Monitors.DeterminateProgress wholeProgress = Monitors.enterServerState(CommonConstants.SERVER_INITIALIZING, 2);
         try {
             instrumentMethodGroupCallThread = Thread.currentThread();
 
@@ -1137,37 +1153,46 @@ public class ProfilerInterface implements CommonConstants {
             byte[][] b = imgb.getReplacementClassFileBytes();
             int k = 0;
 
-            for (int i = 0; i < nClasses; i++) {
-                clazzes[k] = ClassLoaderManager.getLoadedClass(instrClassNames[i], instrClassLoaders[i]);
+            Monitors.DeterminateProgress progress = Monitors.enterServerState(CommonConstants.SERVER_PREPARING, nClasses);
+            try {
+                for (int i = 0; i < nClasses; i++) {
+                    progress.next();
+                    clazzes[k] = ClassLoaderManager.getLoadedClass(instrClassNames[i], instrClassLoaders[i]);
 
-                if (clazzes[k] != null) {
-                    if (b[k] == null) {
-                        // An optimization to avoid overhead of creating and sending original class file bytes from client
-                        // to server
-                        if (instrClassLoaders[i] == 0) {
-                            b[k] = ClassBytesLoader.getClassFileBytes(instrClassNames[i]);
-                        } else {
-                            b[k] = getCachedClassFileBytes(clazzes[k]);
+                    if (clazzes[k] != null) {
+                        if (b[k] == null) {
+                            // An optimization to avoid overhead of creating and sending original class file bytes from client
+                            // to server
+                            if (instrClassLoaders[i] == 0) {
+                                b[k] = ClassBytesLoader.getClassFileBytes(instrClassNames[i]);
+                            } else {
+                                b[k] = getCachedClassFileBytes(clazzes[k]);
+                            }
                         }
+
+                        k++;
+                    } else {
+                        reportUnloadedClass(instrClassNames[i]);
+
+                        int classesToMove = nClasses - k - 1;
+                        System.arraycopy(clazzes, k + 1, clazzes, k, classesToMove);
+                        System.arraycopy(b, k + 1, b, k, classesToMove);
                     }
-
-                    k++;
-                } else {
-                    reportUnloadedClass(instrClassNames[i]);
-
-                    int classesToMove = nClasses - k - 1;
-                    System.arraycopy(clazzes, k + 1, clazzes, k, classesToMove);
-                    System.arraycopy(b, k + 1, b, k, classesToMove);
                 }
-            }
 
-            if (k < nClasses) {
-                Class[] oldClazzes = clazzes;
-                clazzes = new Class[k];
-                System.arraycopy(oldClazzes, 0, clazzes, 0, k);
+                if (k < nClasses) {
+                    Class[] oldClazzes = clazzes;
+                    clazzes = new Class[k];
+                    System.arraycopy(oldClazzes, 0, clazzes, 0, k);
+                }
+            } finally {
+                progress = null;
+                Monitors.exitServerState();                
             }
+            
+            wholeProgress.next();
 
-            Classes.redefineClasses(clazzes, imgb.getReplacementClassFileBytes());
+            redefineClasses(clazzes, imgb.getReplacementClassFileBytes());
 
             time = Timers.getCurrentTimeInCounts() - time;
             totalHotswappingTime += time;
@@ -1215,7 +1240,32 @@ public class ProfilerInterface implements CommonConstants {
                 throw new Exception(MessageFormat.format(UNEXPECTED_EXCEPTION_MSG, new Object[] { t, sw.toString() }));
             }
         } finally {
-            instrumentMethodGroupCallThread = null;
+            instrumentMethodGroupCallThread = null;            
+            Monitors.exitServerState();
+        }
+    }
+
+    private static void redefineClasses(Class[] classes, byte[][] bytecode) throws Classes.RedefineException {
+        Monitors.DeterminateProgress progress = Monitors.enterServerState(CommonConstants.SERVER_INSTRUMENTING, 
+                                                        (classes.length+REDEFINE_CHUNK_SIZE-1)/REDEFINE_CHUNK_SIZE);
+        try {
+            int index = 0;
+            Class[] chunkClasses = null;
+            byte[][] chunkBytecode = null;
+            while(index < classes.length) {
+                int size = Math.min(classes.length - index, REDEFINE_CHUNK_SIZE);
+                if(chunkClasses == null || chunkClasses.length != size ) {
+                    chunkClasses = new Class[size];
+                    chunkBytecode = new byte[size][];
+                }
+                System.arraycopy(classes, index, chunkClasses, 0, size);
+                System.arraycopy(bytecode, index, chunkBytecode, 0, size);
+                Classes.redefineClasses(chunkClasses, chunkBytecode);
+                progress.next();
+                index += size;
+            }            
+        } finally {
+            Monitors.exitServerState();
         }
     }
 
