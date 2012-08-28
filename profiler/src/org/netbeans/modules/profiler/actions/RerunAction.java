@@ -47,7 +47,6 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import javax.swing.Action;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -86,8 +85,9 @@ public final class RerunAction extends ProfilingAwareAction {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public boolean isEnabled() {
-        return super.isEnabled() && Profiler.getDefault().rerunAvailable();
+    @Override
+    protected boolean shouldBeEnabled(Profiler profiler) {
+        return super.shouldBeEnabled(profiler) && profiler.rerunAvailable();
     }
     
     @Override

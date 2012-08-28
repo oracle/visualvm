@@ -95,6 +95,7 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            if (projectList.getModel().getSize() == 0) return; // #217389
             Object[] vals = projectList.getSelectedValues();
             Lookup.Provider[] projs = new Lookup.Provider[vals.length];
             System.arraycopy(vals, 0, projs, 0, vals.length);
@@ -106,6 +107,7 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            if (selectionList.getModel().getSize() == 0) return; // #217389
             Object[] vals = selectionList.getSelectedValues();
             Lookup.Provider[] projs = new Lookup.Provider[vals.length];
             System.arraycopy(vals, 0, projs, 0, vals.length);
