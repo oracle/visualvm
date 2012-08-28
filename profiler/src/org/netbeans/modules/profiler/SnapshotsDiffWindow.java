@@ -79,12 +79,13 @@ import org.openide.util.Lookup;
 public final class SnapshotsDiffWindow extends ProfilerTopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    //private static final String HELP_CTX_KEY_CPU = "CpuDiff.HelpCtx"; // NOI18N
+    private static final String HELP_CTX_KEY_CPU = "CpuDiff.HelpCtx"; // NOI18N
     private static final String HELP_CTX_KEY_MEM = "MemoryDiff.HelpCtx"; // NOI18N
-    private static HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
     
     private static final Image WINDOW_ICON_CPU = Icons.getImage(ProfilerIcons.SNAPSHOTS_COMPARE);
     private static final Image WINDOW_ICON_MEMORY = Icons.getImage(ProfilerIcons.SNAPSHOTS_COMPARE);
+    
+    private HelpCtx helpCtx;
 
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -137,7 +138,7 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
     }
     
     public HelpCtx getHelpCtx() {
-        return HELP_CTX;
+        return helpCtx;
     }
 
     protected String preferredID() {
@@ -152,6 +153,7 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
         add(allocDiffPanel, BorderLayout.CENTER);
         setName(Bundle.SnapshotDiffWindow_AllocCaption());
         setIcon(WINDOW_ICON_MEMORY);
+        helpCtx = new HelpCtx(HELP_CTX_KEY_MEM);
     }
 
     private void displayMemoryLivenessDiff(MemoryResultsSnapshot diff, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
@@ -161,6 +163,7 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
         add(livenessDiffPanel, BorderLayout.CENTER);
         setName(Bundle.SnapshotDiffWindow_LivenessCaption());
         setIcon(WINDOW_ICON_MEMORY);
+        helpCtx = new HelpCtx(HELP_CTX_KEY_MEM);
     }
     
     private void displayCPUDiff(CPUResultsSnapshot diff, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
@@ -171,6 +174,7 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
         add(cpuDiffPanel, BorderLayout.CENTER);
         setName(Bundle.SnapshotDiffWindow_CpuCaption());
         setIcon(WINDOW_ICON_CPU);
+        helpCtx = new HelpCtx(HELP_CTX_KEY_CPU);
     }
 
     private void updateFind(boolean enabled, final SnapshotResultsWindow.FindPerformer performer) {

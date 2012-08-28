@@ -97,4 +97,13 @@ public class RunningVM {
     public String toString() {
         return getPid() + "  " + getVMFlags() + "  " + getVMArgs() + "  " + getMainClass() + "  " + getMainArgs(); // NOI18N
     }
+    
+    public int hashCode() {
+        return toString().hashCode();
+    }
+    
+    public boolean equals(Object o) {
+        if (!(o instanceof RunningVM)) return false;
+        return toString().equals(o.toString());
+    }
 }
