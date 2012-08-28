@@ -161,6 +161,10 @@ public abstract class Profiler {
 
     public abstract int getProfilingState();
 
+    public abstract int getServerState();
+
+    public abstract int getServerProgress();
+
     public abstract TargetAppRunner getTargetAppRunner();
 
     public abstract ThreadsDataManager getThreadsManager();
@@ -380,6 +384,33 @@ public abstract class Profiler {
             public void run() {
                 while (iterator.hasNext()) {
                     ((ProfilingStateListener) iterator.next()).threadsMonitoringChanged();
+                }
+            }
+        };
+
+        if (EventQueue.isDispatchThread()) {
+            r.run();
+        } else {
+            EventQueue.invokeLater(r);
+        }
+    }
+
+    protected final void fireServerStateChanged(final int serverState, final int serverProgress) {
+        if (profilingStateListeners == null) {
+            return;
+        }
+
+        final Vector toNotify;
+
+        synchronized (this) {
+            toNotify = (Vector) profilingStateListeners.clone();
+        }
+
+        final Iterator iterator = toNotify.iterator();
+        final Runnable r = new Runnable() {
+            public void run() {
+                while (iterator.hasNext()) {
+                    ((ProfilingStateListener) iterator.next()).serverStateChanged(serverState, serverProgress);
                 }
             }
         };

@@ -46,10 +46,10 @@ package org.netbeans.modules.profiler.actions;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.openide.util.NbBundle;
 import javax.swing.*;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -173,6 +173,12 @@ public final class StopAction extends ProfilingAwareAction {
         }
         
         firePropertyChange(SMALL_ICON, null, null);
+    }
+
+    @Override
+    protected boolean shouldBeEnabled(Profiler profiler) {
+        return super.shouldBeEnabled(profiler) && (profiler.getProfilingState() == Profiler.PROFILING_INACTIVE
+                || profiler.getServerState() == CommonConstants.SERVER_RUNNING);
     }
     
     private void setToDetach() {

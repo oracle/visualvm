@@ -221,6 +221,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener, Help
     }
 
     private void refreshCombo() {
+        final Object selection = combo.getSelectedItem();
         okButton.setEnabled(false);
         combo.setEnabled(false);
         combo.setModel(new DefaultComboBoxModel(new Object[] { Bundle.PIDSelectPanel_ProcessesListItemText() }));
@@ -244,6 +245,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener, Help
                 try {
                     combo.setEnabled(true);
                     combo.setModel(new DefaultComboBoxModel(get()));
+                    if (selection != null) combo.setSelectedItem(selection);
                     updateInfo();
                 } catch (Exception ex) {
                     Exceptions.printStackTrace(ex);
