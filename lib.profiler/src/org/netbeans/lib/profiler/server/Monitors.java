@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.server;
 
+import java.util.Stack;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.server.system.Classes;
@@ -662,6 +663,78 @@ public class Monitors implements CommonConstants {
 
     }
 
+    interface DeterminateProgress {
+        public void next();        
+    }
+
+    private static class ActiveServerState implements DeterminateProgress{
+        //~ Instance fields ----------------------------------------------------------------------------------------------------------
+        private final ActiveServerState parent;
+        private final int serverState;
+        private final int stepCount;
+        private final double stepSize;
+        private final boolean indeterminate;
+        private int step;
+
+        private final int id;
+        private static int counter = 0;
+
+        //~ Constructors -------------------------------------------------------------------------------------------------------------
+        ActiveServerState(int serverState) {
+            this(null, serverState, 0);
+        }
+
+        ActiveServerState(ActiveServerState parent, int serverState, int stepCount) {
+            this.parent = parent;
+            this.serverState = serverState;
+            this.stepCount = stepCount;
+            if (stepCount == 0) {
+                this.stepSize = parent == null ? 1.0 : parent.stepSize;
+                this.indeterminate = parent == null ? true : parent.indeterminate;
+            } else {
+                this.stepSize = parent == null ? 1.0/stepCount : parent.stepSize/stepCount;
+                this.indeterminate = false;
+            }
+            this.step = 0;
+            this.id = counter ++;
+            //System.out.println("ActiveServerState #"+String.valueOf(id)+": init(serverState="+String.valueOf(serverState)+", stepCount="+String.valueOf(stepCount)+", stepSize="+String.valueOf(stepSize)+")");
+        }
+        
+        //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+        private int getServerState() {
+            return serverState;
+        }
+
+        private int getProgress() {
+            if(indeterminate) {
+               return CommonConstants.SERVER_PROGRESS_INDETERMINATE; 
+            }
+            return (int)(getRealProgress()*CommonConstants.SERVER_PROGRESS_WORKUNITS);
+        }
+
+        private synchronized double getRealProgress() {
+            double result;
+            if(indeterminate) {
+                result = 0.0;
+            } else if(parent == null) {
+                assert stepCount == 0: "called for indeterminate state";
+                result = 1.0*step/stepCount;
+            } else {
+                result = parent.getRealProgress() + parent.stepSize*step/stepCount;
+            }
+            return result;
+        }
+          
+        public synchronized void next() {
+            assert stepCount > 0: "called for indeterminate progress state";
+            step ++;
+            if(step >= stepCount) {
+                step = stepCount - 1;
+            }
+        }        
+    }
+
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final boolean DEBUG = Boolean.getBoolean("org.netbeans.lib.profiler.server.Monitors");
@@ -677,6 +750,8 @@ public class Monitors implements CommonConstants {
 
     protected static long time; // Used just for estimating the overhead
 
+    private static ActiveServerState activeServerState = new ActiveServerState(CommonConstants.SERVER_RUNNING);
+    private static final Object activeServerStateLock = new Object();
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static MonitoredNumbersResponse getMonitoredNumbers() {
@@ -719,7 +794,13 @@ public class Monitors implements CommonConstants {
         generalMNums[MonitoredNumbersResponse.LOADED_CLASSES_IDX] = Classes.getLoadedClassCount();
         generalMNums[MonitoredNumbersResponse.TIMESTAMP_IDX] = System.currentTimeMillis();
 
-        MonitoredNumbersResponse resp = new MonitoredNumbersResponse(generalMNums);
+        int serverState;
+        int serverProgress;
+        synchronized(activeServerStateLock) {
+            serverState = activeServerState.getServerState();
+            serverProgress = activeServerState.getProgress();
+        }
+        MonitoredNumbersResponse resp = new MonitoredNumbersResponse(generalMNums, serverState, serverProgress);
         stMonitor.getThreadsData(resp);
         stMonitor.getGCStartFinishData(resp);
 
@@ -743,6 +824,26 @@ public class Monitors implements CommonConstants {
 
     static void setThreadsSamplingEnabled(boolean b) {
         threadsSamplingEnabled = b;
+    }
+
+    static DeterminateProgress enterServerState(int serverState, int stepCount) {
+        synchronized(activeServerStateLock) {
+            activeServerState = new ActiveServerState(activeServerState, serverState, stepCount);
+            return activeServerState;
+        }
+    }
+
+    static void enterServerState(int serverState) {
+        synchronized(activeServerStateLock) {
+            activeServerState = new ActiveServerState(activeServerState, serverState, 0);
+        }
+    }
+
+    static void exitServerState() {
+        synchronized(activeServerStateLock) {
+            assert activeServerState != null;
+            activeServerState = activeServerState.parent;
+        }
     }
 
     static void recordThreadStateChange(Thread thread, byte state, long timeStamp, Object monitor) {

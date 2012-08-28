@@ -43,11 +43,15 @@
 
 package org.netbeans.modules.profiler;
 
+import java.awt.EventQueue;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.MonitoredData;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import javax.swing.*;
@@ -64,7 +68,7 @@ import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 public final class ProfilingMonitor {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
-    static final class UpdateThread extends Thread {
+    final class UpdateThread extends Thread {
         //~ Static fields/initializers -------------------------------------------------------------------------------------------
 
         private static final int UPDATE_INTERVAL = 1200;
@@ -110,6 +114,8 @@ public final class ProfilingMonitor {
                                         try {
                                             threadsDataManager.processData(md);
                                             vmTelemetryManager.processData(md);
+                                            setServerState(md.getServerState());
+                                            setServerProgress(md.getServerProgress());
 
                                             // ---------------------------------------------------------
                                             // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
@@ -174,10 +180,17 @@ public final class ProfilingMonitor {
         }
     }
 
+    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+    static final String PROPERTY_SERVER_STATE = "serverState";
+    static final String PROPERTY_SERVER_PROGRESS = "serverProgress";
+
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private UpdateThread monitorThread;
     private boolean updateThreadStarted = false;
+    private int serverState = CommonConstants.SERVER_RUNNING;
+    private int serverProgress = CommonConstants.SERVER_PROGRESS_INDETERMINATE;
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -191,6 +204,9 @@ public final class ProfilingMonitor {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void monitorVM(final TargetAppRunner runner) {
+        //set server state before first MONITORED_NUMBERS response arrives
+        setServerState(CommonConstants.SERVER_INITIALIZING);
+        setServerProgress(CommonConstants.SERVER_PROGRESS_INDETERMINATE);
         if (!updateThreadStarted) {
             updateThreadStarted = true;
             monitorThread.start();
@@ -210,5 +226,38 @@ public final class ProfilingMonitor {
             monitorThread.stopThread();
             monitorThread = null;
         }
+    }
+
+    private void setServerState(int serverState) {
+        if(this.serverState != serverState) {
+            int oldValue = this.serverState;
+            this.serverState = serverState;
+            propertyChangeSupport.firePropertyChange(PROPERTY_SERVER_STATE, oldValue, serverState);
+        }
+    }
+
+    int getServerState() {
+        return serverState;
+    }
+
+    private void setServerProgress(int serverProgress) {
+        if(this.serverProgress != serverProgress)
+        {
+            int oldValue = this.serverProgress;
+            this.serverProgress = serverProgress;
+            propertyChangeSupport.firePropertyChange(PROPERTY_SERVER_PROGRESS, oldValue, serverProgress);
+        }
+    }
+
+    int getServerProgress() {
+        return serverProgress;
+    }
+
+    void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
     }
 }

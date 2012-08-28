@@ -51,7 +51,6 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
@@ -98,6 +97,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
@@ -146,8 +146,7 @@ import org.openide.util.lookup.ServiceProvider;
     "LAB_ResultsWindowName=Live Results"
 })
 public final class LiveResultsWindow extends ProfilerTopComponent
-                                     implements ProfilingStateListener,
-                                                SaveViewAction.ViewProvider,
+                                     implements SaveViewAction.ViewProvider,
                                                 ExportAction.ExportProvider {
 
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -575,7 +574,28 @@ public final class LiveResultsWindow extends ProfilerTopComponent
         setFocusable(true);
         setRequestFocusEnabled(true);
 
-        Profiler.getDefault().addProfilingStateListener(this);
+        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter() {
+            @Override
+            public void instrumentationChanged(int oldInstrType, int currentInstrType) {
+                requestProfilingDataUpdate(false);
+            }
+
+            @Override
+            public void profilingStateChanged(ProfilingStateEvent e) {
+                updateActions(e.getNewState());
+
+                switch (e.getNewState()) {
+                    case Profiler.PROFILING_INACTIVE:
+                        handleShutdown();
+
+                        break;
+                    case Profiler.PROFILING_RUNNING:
+                        handleStartup();
+
+                        break;
+                }
+            }
+        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -721,26 +741,7 @@ public final class LiveResultsWindow extends ProfilerTopComponent
     public void ideClosing() {
         hideContributors();
     }
-
-    public void instrumentationChanged(int oldInstrType, int currentInstrType) {
-        requestProfilingDataUpdate(false);
-    }
-
-    public void profilingStateChanged(ProfilingStateEvent e) {
-        updateActions(e.getNewState());
-
-        switch (e.getNewState()) {
-            case Profiler.PROFILING_INACTIVE:
-                handleShutdown();
-
-                break;
-            case Profiler.PROFILING_RUNNING:
-                handleStartup();
-
-                break;
-        }
-    }
-
+    
     /**
      * This method is called periodically every 2400 ms, from the ProfilerMonitor monitor thread, giving the
      * ResultsManager a chance to update live results.
@@ -766,10 +767,6 @@ public final class LiveResultsWindow extends ProfilerTopComponent
             // -----------------------------------------------------------------------
             return false;
         }
-    }
-
-    public void threadsMonitoringChanged() {
-        // ignore
     }
 
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
@@ -884,28 +881,6 @@ public final class LiveResultsWindow extends ProfilerTopComponent
 
     private boolean isProfiling() {
         return runner.getProfilerClient().getCurrentInstrType() != ProfilerEngineSettings.INSTR_NONE;
-    }
-
-    private static boolean checkIfResultsExist(final ProfilerClient client, final int currentInstrType) {
-        switch (currentInstrType) {
-            case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
-            case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED:
-            case ProfilerEngineSettings.INSTR_NONE_SAMPLING:
-
-            //        return client.getCPUCallGraphBuilder().resultsExist(); // TODO
-            case ProfilerEngineSettings.INSTR_OBJECT_ALLOCATIONS:
-            case ProfilerEngineSettings.INSTR_OBJECT_LIVENESS:
-                return getDefault().resultsAvailable;
-            case CommonConstants.INSTR_CODE_REGION:
-
-                try {
-                    return client.cpuResultsExist();
-                } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
-                    return false;
-                }
-        }
-
-        return false;
     }
 
     private ProfilerToolbar createToolBar() {
