@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import java.awt.event.ActionEvent;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
@@ -125,8 +124,9 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public boolean isEnabled() {
-        return super.isEnabled() && ResultsManager.getDefault().resultsAvailable();
+    @Override
+    protected boolean shouldBeEnabled(Profiler profiler) {
+        return super.shouldBeEnabled(profiler) && ResultsManager.getDefault().resultsAvailable();
     }
 
     public HelpCtx getHelpCtx() {

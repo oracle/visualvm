@@ -238,7 +238,7 @@ public class BasicTest extends CommonWireIOTestCase {
             log("send response " + resp);
             wireIO.sendComplexResponse(resp);
 
-            MonitoredNumbersResponse r = new MonitoredNumbersResponse(new long[] { 20L });
+            MonitoredNumbersResponse r = new MonitoredNumbersResponse(new long[] { 20L }, 0, 0);
             log("send response " + r);
             // to prevent NPE due to null fields gcStarts, gcFinishes
             r.setGCstartFinishData(new long[] { 0L }, new long[] { 20L });

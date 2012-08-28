@@ -44,37 +44,66 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
+import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.actions.CallableSystemAction;
 
 
 /**
  * @author Ian Formanek
  */
-public abstract class ProfilingAwareAction extends CallableSystemAction implements ProfilingStateListener {
+public abstract class ProfilingAwareAction extends CallableSystemAction {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private int lastInstrumentation = CommonConstants.INSTR_NONE;
-    private int lastProfilingState = Profiler.PROFILING_INACTIVE;
+    boolean enabledSet = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     protected ProfilingAwareAction() {
-        Profiler.getDefault().addProfilingStateListener(this);
+        Profiler.getDefault().addProfilingStateListener(new SimpleProfilingStateAdapter() {
+
+            @Override
+            protected void update() {
+                updateAction();
+            }
+        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     @Override
-    public boolean isEnabled() {
+    public final boolean isEnabled() {
+        if(enabledSet) {
+            return super.isEnabled();
+        } else {
+            return shouldBeEnabled(Profiler.getDefault());
+        }
+    }
+
+    @Override
+    public final void setEnabled(boolean value) {
+        enabledSet = true;
+        super.setEnabled(value);
+    }
+
+    /** Called whenever state of the Profiler has changed.
+     *  By default this method use {@link #shouldBeEnabled(org.netbeans.lib.profiler.common.Profiler)} to update the
+     *  enabled property of the action.
+     */
+    protected void updateAction()
+    {
+        setEnabled(shouldBeEnabled(Profiler.getDefault()));
+    }
+
+    /** Compute if the action is enabled based on the state of the Profiler.
+     *  Default implementation uses array returned by the {@link #enabledStates() } to determine the state.
+     */
+    protected boolean shouldBeEnabled(Profiler profiler) {
         boolean shouldBeEnabled = false;
-        lastProfilingState = Profiler.getDefault().getProfilingState();
-        lastInstrumentation = lastProfilingState != Profiler.PROFILING_INACTIVE ? 
-                                Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType() :
-                                CommonConstants.INSTR_NONE;
+        int lastProfilingState = profiler.getProfilingState();
+        int lastInstrumentation = lastProfilingState != Profiler.PROFILING_INACTIVE ?
+                                profiler.getTargetAppRunner().getProfilerClient().getCurrentInstrType() :
+                                 CommonConstants.INSTR_NONE;
 
         final int[] enabledStates = enabledStates();
 
@@ -91,22 +120,13 @@ public abstract class ProfilingAwareAction extends CallableSystemAction implemen
         }
 
         return shouldBeEnabled;
-    }
+    }    
 
-    public final void instrumentationChanged(final int oldInstrType, final int currentInstrType) {
-        updateAction();
-    }
-
-    public final void profilingStateChanged(final ProfilingStateEvent e) {
-        updateAction();
-    }
-
-    public final void threadsMonitoringChanged() {
-        updateAction();
-    }
-
+    /** Used by the default implementation of the {@link #shouldBeEnabled(Profiler) } to determine the enabled
+     *  state of the action. */
     protected abstract int[] enabledStates();
 
+    @Override
     protected final boolean asynchronous() {
         return false;
     }
@@ -114,15 +134,5 @@ public abstract class ProfilingAwareAction extends CallableSystemAction implemen
     protected boolean requiresInstrumentation() {
         return false;
     }
-
-    protected void updateAction() {
-        if (lastProfilingState != Profiler.getDefault().getProfilingState()) {
-            boolean shouldBeEnabled = isEnabled();
-            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
-        } else if (lastProfilingState != Profiler.PROFILING_INACTIVE && lastInstrumentation != Profiler.getDefault().getTargetAppRunner().getProfilerClient().getCurrentInstrType()) { // for actions that require instrumentation we need to check if it has not changed
-
-            boolean shouldBeEnabled = isEnabled();
-            firePropertyChange(PROP_ENABLED, !shouldBeEnabled, shouldBeEnabled);
-        }
-    }
+    
 }
