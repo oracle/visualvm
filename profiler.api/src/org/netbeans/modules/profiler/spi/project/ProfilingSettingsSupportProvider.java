@@ -114,14 +114,18 @@ public abstract class ProfilingSettingsSupportProvider {
                     o += 0.5f; // profile all classes
                 }
             } else if (ProfilingSettings.isMemorySettings(settings)) {
-                if (profilingType == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
-                    o += 0.5f; // object allocations
-                } else if (profilingType == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
-                    o += 0.7f; // object liveness
-                }
+                if (profilingType == ProfilingSettings.PROFILE_MEMORY_SAMPLING) {
+                    o += 0.05f; // sample app
+                } else {
+                    if (profilingType == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) {
+                        o += 0.5f; // object allocations
+                    } else if (profilingType == ProfilingSettings.PROFILE_MEMORY_LIVENESS) {
+                        o += 0.7f; // object liveness
+                    }
 
-                if (settings.getAllocStackTraceLimit() != 0) {
-                    o += 0.3f; // record allocation stack traces
+                    if (settings.getAllocStackTraceLimit() != 0) {
+                        o += 0.3f; // record allocation stack traces
+                    }
                 }
             }
 
