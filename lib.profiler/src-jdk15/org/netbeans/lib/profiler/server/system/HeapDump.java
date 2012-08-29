@@ -66,6 +66,7 @@ public class HeapDump {
     private static Object hotspotDiag;
     private static Method dumpHeapMethod;
     private static boolean initialized;
+    private static boolean runningOnJdk15;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -75,15 +76,16 @@ public class HeapDump {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static void initialize(boolean jdk15) {
-        if (jdk15) {
+        runningOnJdk15 = jdk15;
+        if (runningOnJdk15) {
             initialize15();
         } else {
             initialize16();
         }
     }
 
-    public static String takeHeapDump(boolean jdk15, String outputFile) {
-        if (jdk15) {
+    public static String takeHeapDump(String outputFile) {
+        if (runningOnJdk15) {
             return takeHeapDump15(outputFile);
         }
 

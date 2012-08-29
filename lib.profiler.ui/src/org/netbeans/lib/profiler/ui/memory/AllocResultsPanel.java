@@ -148,7 +148,8 @@ public abstract class AllocResultsPanel extends MemoryResultsPanel {
     protected abstract JPopupMenu getPopupMenu();
 
     protected CustomBarCellRenderer getBarCellRenderer() {
-        return new CustomBarCellRenderer(0, maxValue);
+//        return new CustomBarCellRenderer(0, maxValue);
+        return new CustomBarCellRenderer(0, 100);
     }
 
     protected void getResultsSortedByAllocObjNumber() {
@@ -325,7 +326,8 @@ public abstract class AllocResultsPanel extends MemoryResultsPanel {
             case 0:
                 return sortedClassNames[index];
             case 1:
-                return new Long(totalAllocObjectsSize[index]);
+//                return new Long(totalAllocObjectsSize[index]);
+                return (nTotalBytes == 0) ? 0 : (double)totalAllocObjectsSize[index] / (double)nTotalBytes * 100;
             case 2:
                 return intFormat.format(totalAllocObjectsSize[index]) + " B (" // NOI18N
                        + ((nTotalBytes == 0) ? "-%"
@@ -393,7 +395,7 @@ public abstract class AllocResultsPanel extends MemoryResultsPanel {
         columnRenderers = new TableCellRenderer[] {
                               classNameTableCellRenderer, null, labelBracketTableCellRenderer, labelBracketTableCellRenderer
                           };
-        columnWidths = new int[] { maxWidth, maxWidth, maxWidth };
+        columnWidths = new int[] { maxWidth + 15, maxWidth, maxWidth };
     }
 
     protected boolean passesValueFilter(int i) {
