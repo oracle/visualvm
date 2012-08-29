@@ -45,7 +45,7 @@ package org.netbeans.lib.profiler.heap;
 
 
 /**
- * represents primitive type or object. Heap does not distinuish different
+ * represents primitive type or object. Heap does not distinguish different
  * type of objects. All sub classes of java.lang.Object has type "object"
  * @author Tomas Hurka
  */
