@@ -245,8 +245,10 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
                     Bundle.AttachDialog_Steps_JavaCvm()));
         } else {
             b.append(LINK_JDK6UP.equals(currentJDK) ?
-                    Bundle.AttachDialog_Steps_EnsureJava6Up() :
-                    Bundle.AttachDialog_Steps_EnsureJava5());
+                    Bundle.AttachDialog_Steps_EnsureCorrectJava(
+                    Bundle.AttachDialog_Steps_Java6()) :
+                    Bundle.AttachDialog_Steps_EnsureCorrectJava(
+                    Bundle.AttachDialog_Steps_Java5()));
             String linkStart = " <a href='"; // NOI18N
             linkStart += LINK_JDK6UP.equals(currentJDK) ? LINK_JDK5 : LINK_JDK6UP;
             linkStart += "'>"; // NOI18N
