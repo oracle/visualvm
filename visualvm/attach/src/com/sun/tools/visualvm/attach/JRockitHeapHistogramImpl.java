@@ -65,7 +65,6 @@ public class JRockitHeapHistogramImpl extends HeapHistogramImpl {
         
         JRockitClassInfoImpl(Scanner sc) {
             String jvmName;
-            String multi;
             
             sc.next();  // skip unused 99.9%
             bytes = computeBytes(sc.next());
