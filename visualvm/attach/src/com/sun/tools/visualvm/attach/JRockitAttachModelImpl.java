@@ -26,9 +26,6 @@
 package com.sun.tools.visualvm.attach;
 
 import com.sun.tools.visualvm.application.Application;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.Level;
 
 /**
  *
