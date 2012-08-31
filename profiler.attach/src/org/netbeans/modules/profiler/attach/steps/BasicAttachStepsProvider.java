@@ -79,6 +79,7 @@ import org.openide.util.lookup.ServiceProvider;
     "AttachDialog_Steps_Java5_32b=Java 5, 32bit", // NOI18N
     "AttachDialog_Steps_Java5_64b=Java 5, 64bit", // NOI18N
     "AttachDialog_Steps_JavaCvm=CVM", // NOI18N
+    "AttachDialog_Steps_JavaSeEmbedded=Java SE Embedded", // NOI18N
     "#{0}, {1} provide begin/end of HTML link",
     "AttachDialog_Steps_SwitchToJava6Up={0}Click{1} to update steps for profiling JDK 6+ applications.", // NOI18N
     "#{0}, {1} provide begin/end of HTML link",
@@ -243,6 +244,9 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
         if (isCVMJVM(settings)) {
             b.append(Bundle.AttachDialog_Steps_EnsureCorrectJava(
                     Bundle.AttachDialog_Steps_JavaCvm()));
+        } else if (isARMJVM(settings)) {
+            b.append(Bundle.AttachDialog_Steps_EnsureCorrectJava(
+                    Bundle.AttachDialog_Steps_JavaSeEmbedded()));
         } else {
             b.append(LINK_JDK6UP.equals(currentJDK) ?
                     Bundle.AttachDialog_Steps_EnsureCorrectJava(
@@ -377,6 +381,11 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
         String hostOS = settings.getHostOS();
         return IntegrationUtils.PLATFORM_WINDOWS_CVM.equals(hostOS) ||
                IntegrationUtils.PLATFORM_LINUX_CVM.equals(hostOS);
+    }
+    
+    protected static boolean isARMJVM(AttachSettings settings) {
+        String hostOS = settings.getHostOS();
+        return IntegrationUtils.PLATFORM_LINUX_ARM_OS.equals(hostOS);
     }
     
     protected static String getCorrectJavaMsg(String currentJDK, String currentARCH) {
