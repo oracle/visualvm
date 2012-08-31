@@ -41,10 +41,14 @@
  */
 package org.netbeans.lib.profiler.server.system;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 /**
  *
@@ -64,10 +68,20 @@ public class Histogram {
     
     public static boolean initialize() {
         try {
-            Class vmClass = Class.forName(VIRTUAL_MACHINE_CLASS);
-            Class hsVmClass = Class.forName(HS_VIRTUAL_MACHINE_CLASS);
+            Class vmClass;
+            ClassLoader toolsJar = null;
+            try {
+                vmClass = Class.forName(VIRTUAL_MACHINE_CLASS);
+            } catch (ClassNotFoundException ex) {
+                toolsJar = getToolsJar();
+                if (toolsJar == null) {
+                    return false;
+                }
+                vmClass = Class.forName(VIRTUAL_MACHINE_CLASS, true, toolsJar);
+            }
+            Class hsVmClass = toolsJar == null ? Class.forName(HS_VIRTUAL_MACHINE_CLASS) : Class.forName(HS_VIRTUAL_MACHINE_CLASS, true, toolsJar);
             vmAttach = vmClass.getMethod(VIRTUAL_MACHINE_ATTACH_METHOD, String.class);
-            vmHisto = hsVmClass.getMethod(VIRTUAL_MACHINE_HEAPHISTO_METHOD, new Object[0].getClass());
+            vmHisto = hsVmClass.getMethod(VIRTUAL_MACHINE_HEAPHISTO_METHOD, Object[].class);
         } catch (NoSuchMethodException ex) {
             return false;
         } catch (SecurityException ex) {
@@ -76,7 +90,7 @@ public class Histogram {
             return false;
         }
         String selfName = ManagementFactory.getRuntimeMXBean().getName();
-        selfPid = selfName.substring(0, selfName.indexOf('@'));
+        selfPid = selfName.substring(0, selfName.indexOf('@')); // NOI18N
         return true;
     }
     
@@ -97,5 +111,26 @@ public class Histogram {
             return null;
         }
         return null;
+    }
+
+    private static ClassLoader getToolsJar() {
+        File home = getJavaHome();
+        File toolsJar = new File(home,"lib/tools.jar"); // NOI18N
+        if (toolsJar.exists() && toolsJar.isFile()) {
+            try {
+                return new URLClassLoader(new URL[] {toolsJar.toURI().toURL()});
+            } catch (MalformedURLException ex) {
+                return null;
+            }
+        }
+        return null;
+    }
+    
+    private static File getJavaHome() {
+        File jdkHome = new File(System.getProperty("java.home")); // NOI18N
+        if ("jre".equals(jdkHome.getName())) {  // NOI18N
+           jdkHome = jdkHome.getParentFile(); 
+        }
+        return jdkHome;
     }
 }
