@@ -103,6 +103,7 @@ public class Command {
     public static final int GET_CLASSID = 42;
     public static final int STILL_ALIVE = 43;
     public static final int PREPARE_DETACH = 44;
+    public static final int GET_HEAP_HISTOGRAM = 45;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
