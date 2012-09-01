@@ -62,6 +62,8 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -234,6 +236,7 @@ public final class ResultsManager {
                 return Bundle.ResultsManager_CpuSnapshotDisplayName(displayName);
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
                 return Bundle.ResultsManager_MemorySnapshotDisplayName(displayName);
             default:
                 return displayName;
@@ -355,7 +358,10 @@ public final class ResultsManager {
         ResultsSnapshot snap2 = s2.getSnapshot();
         ResultsSnapshot diff = null;
 
-        if (snap1 instanceof AllocMemoryResultsSnapshot && snap2 instanceof AllocMemoryResultsSnapshot) {
+        if (snap1 instanceof SampledMemoryResultsSnapshot && snap2 instanceof SampledMemoryResultsSnapshot) {
+            diff = new SampledMemoryResultsDiff((SampledMemoryResultsSnapshot)snap1,
+                                              (SampledMemoryResultsSnapshot)snap2);
+        } else if (snap1 instanceof AllocMemoryResultsSnapshot && snap2 instanceof AllocMemoryResultsSnapshot) {
             diff = new AllocMemoryResultsDiff((AllocMemoryResultsSnapshot)snap1,
                                               (AllocMemoryResultsSnapshot)snap2);
         }
@@ -711,6 +717,7 @@ public final class ResultsManager {
                 switch (currentInstrType) {
                     case ProfilerEngineSettings.INSTR_OBJECT_ALLOCATIONS:
                     case ProfilerEngineSettings.INSTR_OBJECT_LIVENESS:
+                    case ProfilerEngineSettings.INSTR_NONE_MEMORY_SAMPLING:
                         snapshot = client.getMemoryProfilingResultsSnapshot(reqeustData);
 
                         break;

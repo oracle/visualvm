@@ -66,6 +66,7 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import javax.swing.*;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -126,7 +127,13 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
 
         MemoryResUserActionsHandler memoryActionsHandler = new DiffActionsHandler();
 
-        if (snapshot instanceof AllocMemoryResultsDiff) {
+        if (snapshot instanceof SampledMemoryResultsDiff) {
+            memoryPanel = new DiffSampledResultsPanel((SampledMemoryResultsDiff) snapshot, memoryActionsHandler);
+
+            DiffSampledResultsPanel amemoryPanel = (DiffSampledResultsPanel) memoryPanel;
+            amemoryPanel.setSorting(sortingColumn, sortingOrder);
+            amemoryPanel.prepareResults();
+        } else if (snapshot instanceof AllocMemoryResultsDiff) {
             memoryPanel = new DiffAllocResultsPanel((AllocMemoryResultsDiff) snapshot, memoryActionsHandler);
 
             DiffAllocResultsPanel amemoryPanel = (DiffAllocResultsPanel) memoryPanel;
@@ -330,7 +337,9 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
     }
 
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
-        if (memoryPanel instanceof DiffAllocResultsPanel) {
+        if (memoryPanel instanceof DiffSampledResultsPanel) {
+            ((DiffSampledResultsPanel) memoryPanel).exportData(exportedFileType, eDD, Bundle.MemoryDiffPanel_PanelTitle());
+        } else if (memoryPanel instanceof DiffAllocResultsPanel) {
             ((DiffAllocResultsPanel) memoryPanel).exportData(exportedFileType, eDD, Bundle.MemoryDiffPanel_PanelTitle());
         } else {
             ((DiffLivenessResultsPanel) memoryPanel).exportData(exportedFileType, eDD, Bundle.MemoryDiffPanel_PanelTitle());
