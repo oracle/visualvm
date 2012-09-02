@@ -221,6 +221,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 break;
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
                 getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_MemorySnapshotAccessDescr());
                 displayMemoryResults(ls, sortingColumn, sortingOrder);
 

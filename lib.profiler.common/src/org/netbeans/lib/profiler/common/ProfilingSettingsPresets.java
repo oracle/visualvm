@@ -125,7 +125,7 @@ public class ProfilingSettingsPresets {
     }
 
     public static ProfilingSettings createMemoryPreset() {
-        return createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
+        return createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_SAMPLING);
     }
 
     public static ProfilingSettings createMemoryPreset(int type) {
