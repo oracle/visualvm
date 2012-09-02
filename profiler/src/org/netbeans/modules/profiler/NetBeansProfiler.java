@@ -97,6 +97,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -111,10 +113,7 @@ import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -137,9 +136,7 @@ import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.awt.Mnemonics;
-import org.openide.util.Cancellable;
 
 
 /**
@@ -462,6 +459,8 @@ public abstract class NetBeansProfiler extends Profiler {
         if (!initFailed) {
             initialized = true;
         }
+
+        new ServerStateMonitor(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -571,6 +570,21 @@ public abstract class NetBeansProfiler extends Profiler {
     }
 
     @Override
+    public int getServerState() {
+        if (monitor != null) {
+            return monitor.getServerState();
+        }
+        return CommonConstants.SERVER_RUNNING;
+    }
+    
+    @Override
+    public int getServerProgress() {
+        if (monitor != null) {
+            return monitor.getServerProgress();
+        }
+        return CommonConstants.SERVER_PROGRESS_INDETERMINATE;
+    }
+
     public synchronized TargetAppRunner getTargetAppRunner() {
         if (initialized) {
             if (targetAppRunner == null) {
@@ -995,6 +1009,8 @@ public abstract class NetBeansProfiler extends Profiler {
     public void detachFromApp() {
         setTransitionState();
 
+        getTargetAppRunner().prepareDetachFromTargetJVM();
+
         if (getTargetAppRunner().getProfilingSessionStatus().currentInstrType != CommonConstants.INSTR_NONE) {
             //      if (LiveResultsWindow.hasDefault()) LiveResultsWindow.getDefault().reset(); // see issue http://www.netbeans.org/issues/show_bug.cgi?id=68213
             try {
@@ -1351,6 +1367,16 @@ public abstract class NetBeansProfiler extends Profiler {
     private synchronized ProfilingMonitor getMonitor() {
         if (monitor == null) {
             monitor = new ProfilingMonitor();
+            monitor.addPropertyChangeListener(new PropertyChangeListener() {
+                        @Override
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            if (evt.getPropertyName().equals(ProfilingMonitor.PROPERTY_SERVER_STATE)
+                                || evt.getPropertyName().equals(ProfilingMonitor.PROPERTY_SERVER_PROGRESS)) {
+                                fireServerStateChanged(((ProfilingMonitor)evt.getSource()).getServerState(),
+                                                       ((ProfilingMonitor)evt.getSource()).getServerProgress());
+                            }
+                        }
+                    });            
         }
         return monitor;
     }

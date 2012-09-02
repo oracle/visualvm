@@ -59,7 +59,7 @@ public class HeapDump {
     public static void initialize(boolean jdk15) {
     }
 
-    public static String takeHeapDump(boolean jdk15, String outputFile) {
+    public static String takeHeapDump(String outputFile) {
         return takeHeapDumpCVM(outputFile);
     }
 

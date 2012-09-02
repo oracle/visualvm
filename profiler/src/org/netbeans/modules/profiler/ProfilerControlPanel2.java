@@ -51,8 +51,6 @@ import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.MonitoredData;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.EqualFlowLayout;
@@ -95,6 +93,7 @@ import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.modules.profiler.ProfilerControlPanel2.WhiteFilter;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -124,25 +123,10 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_SnapshotsSnippetName=Saved Snapshots",
     "ProfilerControlPanel2_ViewSnippetName=View",
     "ProfilerControlPanel2_TelemetrySnippetName=Basic Telemetry",
-    "ProfilerControlPanel2_ModeLabelString=Mode:",
     "ProfilerControlPanel2_TypeLabelString=Type:",
-    "ProfilerControlPanel2_ConfigLabelString=Configuration:",
-    "ProfilerControlPanel2_OnLabelString=On:",
-    "ProfilerControlPanel2_StatusLabelString=Status:",
-    "ProfilerControlPanel2_ProfileLabelString=Profile",
-    "ProfilerControlPanel2_CpuLabelString=CPU",
     "ProfilerControlPanel2_EntireAppLabelString=Entire Application",
     "ProfilerControlPanel2_ThisCompLabelString=This Computer",
-    "ProfilerControlPanel2_RunningLabelString=Running",
-    "ProfilerControlPanel2_AttachLabelString=Attach",
-    "ProfilerControlPanel2_CodeFragmentLabelString=Code Fragment",
-    "ProfilerControlPanel2_MemoryLabelString=Memory",
-    "ProfilerControlPanel2_MonitorLabelString=Monitor",
     "ProfilerControlPanel2_InactiveLabelString=Inactive",
-    "ProfilerControlPanel2_StartedLabelString=Started",
-    "ProfilerControlPanel2_PausedLabelString=Paused",
-    "ProfilerControlPanel2_StoppedLabelString=Stopped",
-    "ProfilerControlPanel2_StartingLabelString=Starting",
     "ProfilerControlPanel2_TelemetryButtonName=VM Telemetry",
     "ProfilerControlPanel2_TelemetryButtonToolTip=Show VM Telemetry graphs",
     "ProfilerControlPanel2_ThreadsButtonName=Threads",
@@ -180,7 +164,6 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_DeleteButtonAccessDescr=Delete selected snapshots.",
     "ProfilerControlPanel2_ExportButtonAccessDescr=Save selected snapshots as standalone files.",
     "ProfilerControlPanel2_RenameButtonAccessDescr=Renames currently selected snapshot file.",
-    "ProfilerControlPanel2_NoConfigurationString=None",
     "ProfilerControlPanel2_ControlPanelAcessDescr=Profiler control panel",
     "ProfilerControlPanel2_SnapshotsNotDeletedMsg=<html><b>Problem deleting snapshot(s).</b><br><br>The snapshot(s) might not have been deleted<br>or have already been deleted outside of the IDE.</html>",
     "ProfilerControlPanel2_RenameSnapshotCaption=Rename Snapshot",
@@ -188,9 +171,11 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_RenameSnapshotFailedMsg=Failed to rename snapshot to {0}",
     "ProfilerControlPanel2_EmptyNameMsg=Snapshot name cannot be empty.",
     "MSG_Loading_Progress=Loading...",
-    "LAB_ControlPanelName=Profiler"
+    "LAB_ControlPanelName=Profiler",
+    "#NOI18N",
+    "ProfilerControlPanel2_WindowMode=explorer"
 })
-public final class ProfilerControlPanel2 extends ProfilerTopComponent implements ProfilingStateListener {
+public final class ProfilerControlPanel2 extends ProfilerTopComponent {
     final private static Logger LOGGER = Logger.getLogger(ProfilerControlPanel2.class.getName());
     
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -1531,6 +1516,25 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         }
     }
 
+    @NbBundle.Messages({
+        "ProfilerControlPanel2_ModeLabelString=Mode:",
+        "ProfilerControlPanel2_ConfigLabelString=Configuration:",
+        "ProfilerControlPanel2_OnLabelString=On:",
+        "ProfilerControlPanel2_StatusLabelString=Status:",
+        "ProfilerControlPanel2_NoConfigurationString=None",
+        "ProfilerControlPanel2_AttachLabelString=Attach",
+        "ProfilerControlPanel2_ProfileLabelString=Profile",
+        "ProfilerControlPanel2_CodeFragmentLabelString=Code Fragment",
+        "ProfilerControlPanel2_CpuSamplingLabelString=CPU sampling",
+        "ProfilerControlPanel2_CpuLabelString=CPU instrumentation",       
+        "ProfilerControlPanel2_MemoryLabelString=Memory",
+        "ProfilerControlPanel2_MonitorLabelString=Monitor",
+        "ProfilerControlPanel2_RunningLabelString=Running",
+        "ProfilerControlPanel2_StartedLabelString=Started",
+        "ProfilerControlPanel2_PausedLabelString=Paused",
+        "ProfilerControlPanel2_StoppedLabelString=Stopped",
+        "ProfilerControlPanel2_StartingLabelString=Starting"
+    })
     private static final class StatusPanel extends CPPanel {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -1540,7 +1544,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         private final JLabel profileValueLabel;
         private final JLabel statusValueLabel;
         private final JLabel typeValueLabel;
-        private String configuration = null;
+        private int profilingType;
         private String host = null;
         private int count = 0;
         private int mode = -1;
@@ -1612,12 +1616,17 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
 
             final ProfilingSettings ps = Profiler.getDefault().getLastProfilingSettings();
 
-            if ((ps != null) && ((configuration == null) || !configuration.equals(ps.getSettingsName()))) {
+            if ((ps != null) && (profilingType != ps.getProfilingType())) {
                 switch (ps.getProfilingType()) {
                     case ProfilingSettings.PROFILE_CPU_STOPWATCH:
                         typeValueLabel.setText(Bundle.ProfilerControlPanel2_CodeFragmentLabelString());
 
                         break;
+                    case ProfilingSettings.PROFILE_CPU_SAMPLING:
+                        typeValueLabel.setText(Bundle.ProfilerControlPanel2_CpuSamplingLabelString());
+
+                        break;
+                        
                     case ProfilingSettings.PROFILE_CPU_ENTIRE:
                     case ProfilingSettings.PROFILE_CPU_PART:
                         typeValueLabel.setText(Bundle.ProfilerControlPanel2_CpuLabelString());
@@ -1634,8 +1643,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
                         break;
                 }
 
-                configuration = ps.getSettingsName();
-                profileValueLabel.setText(configuration);
+                profileValueLabel.setText(ps.getSettingsName());
             }
 
             String newHost = Profiler.getDefault().getTargetAppRunner().getProfilerEngineSettings().getRemoteHost();
@@ -1908,7 +1916,14 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         scrollPane.getHorizontalScrollBar().setUnitIncrement(50);
         add(scrollPane, BorderLayout.CENTER);
         
-        Profiler.getDefault().addProfilingStateListener(this);
+        Profiler.getDefault().addProfilingStateListener(new SimpleProfilingStateAdapter() {
+
+            @Override
+            protected void update() {
+                updateStatus();
+            }
+
+        });
 
         addComponentListener(new ComponentAdapter() {
                 public void componentResized(ComponentEvent e) {
@@ -1983,10 +1998,6 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         return spControls;
     }
 
-    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {
-        updateStatus();
-    }
-
     public boolean needsDocking() {
         return WindowManager.getDefault().findMode(this) == null;
     }
@@ -1994,7 +2005,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
     public void open() {
         if (needsDocking()) { // needs docking
 
-            Mode mode = WindowManager.getDefault().findMode("explorer"); // NOI18N
+            Mode mode = WindowManager.getDefault().findMode(Bundle.ProfilerControlPanel2_WindowMode());
 
             if (mode != null) {
                 mode.dockInto(this);
@@ -2013,10 +2024,6 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
             initialized = true;
             scrollPane.getViewport().setViewPosition(new Point(0, 0));
         }
-    }
-
-    public void profilingStateChanged(final ProfilingStateEvent e) {
-        updateStatus();
     }
 
     public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
@@ -2052,10 +2059,6 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent implements
         if (snapshotsSnippet != null) {
             snapshotsSnippet.refreshList();
         }
-    }
-
-    public void threadsMonitoringChanged() {
-        updateStatus();
     }
 
     public void updateStatus() {

@@ -1624,7 +1624,16 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 sendComplexResponseToClient(ProfilerCalibrator.getInternalStats());
 
                 break;
+            case Command.PREPARE_DETACH:
+                ProfilerInterface.setDetachStarted(true); //inform other threads they should stop ongoing instrumentation
+                boolean success = ProfilerInterface.serialClientOperationsLock.beginTrans(true, true);
+                sendSimpleResponseToClient(success, null);                
+                break;
             case Command.DETACH:
+                if(ProfilerInterface.isDetachStarted()) {
+                    ProfilerInterface.serialClientOperationsLock.endTrans();
+                }
+
                 // Just in case, normally should be deactivated and cleaned up by client
                 ProfilerInterface.deactivateInjectedCode();
                 ProfilerInterface.disableProfilerHooks();
@@ -1640,7 +1649,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             case Command.TAKE_HEAP_DUMP:
 
                 TakeHeapDumpCommand dumpCmd = (TakeHeapDumpCommand) cmd;
-                String error = HeapDump.takeHeapDump(Platform.getJDKVersionNumber() == Platform.JDK_15, dumpCmd.getOutputFile());
+                String error = HeapDump.takeHeapDump(dumpCmd.getOutputFile());
 
                 sendSimpleResponseToClient(error == null, error);
 

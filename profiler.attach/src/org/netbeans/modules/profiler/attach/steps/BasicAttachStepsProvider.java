@@ -45,8 +45,12 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JFileChooser;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -67,7 +71,13 @@ import org.openide.util.lookup.ServiceProvider;
     "AttachDialog_Steps_CopyToClipboard=copy to clipboard", // NOI18N
     "AttachDialog_Steps_MakeSureStarted=Make sure the target application has been started by user {0} and is running using Java 6+.", // NOI18N
     "AttachDialog_Steps_SubmitSelectProcess=Submit this dialog and click the Attach button to select the target application process.", // NOI18N
-    "AttachDialog_Steps_ConfigureToRun6=Make sure the target application is configured to run using Java 6+. Click the Help button for information on how to profile Java 5 applications.", // NOI18N
+    "AttachDialog_Steps_EnsureJava6Up=Make sure the target application is configured to run using Java 6+.", // NOI18N
+    "AttachDialog_Steps_EnsureJava5=Make sure the target application is configured to run using Java 5.", // NOI18N
+    "#{0}, {1} provide begin/end of HTML link",
+    "AttachDialog_Steps_SwitchToJava6Up={0}Click{1} to show steps for profiling JDK 6+ applications.", // NOI18N
+    "#{0}, {1} provide begin/end of HTML link",
+    "AttachDialog_Steps_SwitchToJava5={0}Click{1} to show steps for profiling JDK 5 applications.", // NOI18N
+    "AttachDialog_Steps_ConfigureToRunCvm=Make sure the target application is configured to run using CVM.", // NOI18N
     "AttachDialog_Steps_StartApplication=Start the target application. The process will wait for the profiler to connect.", // NOI18N
     "AttachDialog_Steps_SubmitUnblock=Submit this dialog and click the Attach button to connect to the target application and resume its execution.", // NOI18N
     "AttachDialog_Steps_AddParameters=Add the following parameter(s) to the application startup script", // NOI18N
@@ -79,6 +89,26 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     
     protected static final String LINK_CLIPBOARD = "file:/clipboard"; // NOI18N
     protected static final String LINK_REMOTEPACK = "file:/remotepack"; // NOI18N
+    protected static final String LINK_JDK5 = "file:/jdk5"; // NOI18N
+    protected static final String LINK_JDK6UP = "file:/jdk6up"; // NOI18N
+    
+    protected String currentJDK = LINK_JDK6UP;
+    
+    
+    private final Set<ChangeListener> listeners = new HashSet();
+    
+    public synchronized final void addChangeListener(ChangeListener listener) {
+        listeners.add(listener);
+    }
+    
+    public synchronized final void removeChangeListener(ChangeListener listener) {
+        listeners.remove(listener);
+    }
+    
+    protected synchronized final void fireChange(ChangeEvent e) {
+        if (e == null) e = new ChangeEvent(this);
+        for (ChangeListener listener : listeners) listener.stateChanged(e);
+    }
     
     
     public String getSteps(AttachSettings settings) {
@@ -90,6 +120,19 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     public void handleAction(String action, AttachSettings settings) {
         if (LINK_CLIPBOARD.equals(action)) copyParameters(settings);
         else if (LINK_REMOTEPACK.equals(action)) createRemotePack(settings);
+        else if (LINK_JDK5.equals(action)) switchToJDK5();
+        else if (LINK_JDK6UP.equals(action)) switchToJDK6Up();
+    }
+    
+    
+    protected void switchToJDK5() {
+        currentJDK = LINK_JDK5;
+        fireChange(null);
+    }
+    
+    protected void switchToJDK6Up() {
+        currentJDK = LINK_JDK6UP;
+        fireChange(null);
     }
     
     
@@ -117,7 +160,16 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
         b.append("<b>"); // NOI18N
         b.append(Bundle.AttachDialog_Steps_Step(1));
         b.append("</b> "); // NOI18N
-        b.append(Bundle.AttachDialog_Steps_ConfigureToRun6());
+        b.append(LINK_JDK6UP.equals(currentJDK) ?
+                Bundle.AttachDialog_Steps_EnsureJava6Up() :
+                Bundle.AttachDialog_Steps_EnsureJava5());
+        String linkStart = " <a href='"; // NOI18N
+        linkStart += LINK_JDK6UP.equals(currentJDK) ? LINK_JDK5 : LINK_JDK6UP;
+        linkStart += "'>"; // NOI18N
+        String linkEnd = "</a> "; // NOI18N
+        b.append(LINK_JDK6UP.equals(currentJDK) ?
+                Bundle.AttachDialog_Steps_SwitchToJava5(linkStart, linkEnd) :
+                Bundle.AttachDialog_Steps_SwitchToJava6Up(linkStart, linkEnd));
         b.append("</div>"); // NOI18N
         b.append("<br/>"); // NOI18N
         b.append("<div>"); // NOI18N
@@ -157,21 +209,34 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
         b.append("<b>"); // NOI18N
         b.append(Bundle.AttachDialog_Steps_Step(1));
         b.append("</b> "); // NOI18N
-        b.append(Bundle.AttachDialog_Steps_CreateRemotePack("'" + LINK_REMOTEPACK + "'", "<code>&lt;remote&gt;</code>")); // NOI18N
+        if (isCVMJVM(settings)) {
+            b.append(Bundle.AttachDialog_Steps_ConfigureToRunCvm());
+        } else {
+            b.append(LINK_JDK6UP.equals(currentJDK) ?
+                    Bundle.AttachDialog_Steps_EnsureJava6Up() :
+                    Bundle.AttachDialog_Steps_EnsureJava5());
+            String linkStart = " <a href='"; // NOI18N
+            linkStart += LINK_JDK6UP.equals(currentJDK) ? LINK_JDK5 : LINK_JDK6UP;
+            linkStart += "'>"; // NOI18N
+            String linkEnd = "</a> "; // NOI18N
+            b.append(LINK_JDK6UP.equals(currentJDK) ?
+                    Bundle.AttachDialog_Steps_SwitchToJava5(linkStart, linkEnd) :
+                    Bundle.AttachDialog_Steps_SwitchToJava6Up(linkStart, linkEnd));
+        }
         b.append("</div>"); // NOI18N
         b.append("<br/>"); // NOI18N
         b.append("<div>"); // NOI18N
         b.append("<b>"); // NOI18N
         b.append(Bundle.AttachDialog_Steps_Step(2));
         b.append("</b> "); // NOI18N
-        b.append(Bundle.AttachDialog_Steps_RunCalibrateScript("<code>" + IntegrationUtils.getRemoteCalibrateCommandString(settings.getHostOS(), IntegrationUtils.PLATFORM_JAVA_60) + "</code>")); // NOI18N
+        b.append(Bundle.AttachDialog_Steps_CreateRemotePack("'" + LINK_REMOTEPACK + "'", "<code>&lt;remote&gt;</code>")); // NOI18N
         b.append("</div>"); // NOI18N
         b.append("<br/>"); // NOI18N
         b.append("<div>"); // NOI18N
         b.append("<b>"); // NOI18N
         b.append(Bundle.AttachDialog_Steps_Step(3));
         b.append("</b> "); // NOI18N
-        b.append(Bundle.AttachDialog_Steps_ConfigureToRun6());
+        b.append(Bundle.AttachDialog_Steps_RunCalibrateScript("<code>" + IntegrationUtils.getRemoteCalibrateCommandString(settings.getHostOS(), getPlatform(settings, currentJDK)) + "</code>")); // NOI18N
         b.append("</div>"); // NOI18N
         b.append("<br/>"); // NOI18N
         b.append("<div>"); // NOI18N
@@ -206,8 +271,8 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     }
     
     protected String parameters(AttachSettings settings) {
-        return IntegrationUtils.getProfilerAgentCommandLineArgs(settings.getHostOS(),
-                IntegrationUtils.PLATFORM_JAVA_60, settings.isRemote(), settings.getPort());
+        return IntegrationUtils.getProfilerAgentCommandLineArgs(getOS(settings),
+                getPlatform(settings, currentJDK), settings.isRemote(), settings.getPort());
     }
     
     protected void copyParameters(AttachSettings settings) {
@@ -229,7 +294,7 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
             chooser.setCurrentDirectory(tmpDir);
             chooser.setMultiSelectionEnabled(false);
             if ((JFileChooser.CANCEL_OPTION & chooser.showSaveDialog(chooser)) == 0) {
-                String packPath = exportRemotePack(chooser.getSelectedFile().getAbsolutePath(), settings);
+                String packPath = exportRemotePack(chooser.getSelectedFile().getAbsolutePath(), settings, currentJDK);
                 ProfilerDialogs.displayInfo(Bundle.AttachDialog_RemotePackSaved(packPath));
             }
         } catch (IOException ex) {
@@ -238,17 +303,42 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     }
     
     private static final AtomicBoolean exportRunning = new AtomicBoolean(false);
-    private static String exportRemotePack(String path, AttachSettings settings) throws IOException {
+    protected static String exportRemotePack(String path, AttachSettings settings, String jdk) throws IOException {
         if (exportRunning.compareAndSet(false, true)) {
             try {
                 return RemotePackExporter.getInstance().export(
-                        path, settings.getHostOS(), IntegrationUtils.PLATFORM_JAVA_60);
+                        path, getOS(settings), getPlatform(settings, jdk));
             } finally {
                 exportRunning.compareAndSet(true, false);
             }
         } else {
             throw new IOException();
         }
+    }
+    
+    protected static String getOS(AttachSettings settings) {
+        if (!settings.isRemote()) return settings.getHostOS();
+        String hostOS = settings.getHostOS();
+        if (IntegrationUtils.PLATFORM_WINDOWS_CVM.equals(hostOS))
+            return IntegrationUtils.PLATFORM_WINDOWS_OS;
+        if (IntegrationUtils.PLATFORM_LINUX_CVM.equals(hostOS))
+            return IntegrationUtils.PLATFORM_LINUX_OS;
+        else return settings.getHostOS();
+    }
+    
+    protected static String getPlatform(AttachSettings settings, String jdk) {
+        if (settings.isRemote() && isCVMJVM(settings))
+            return IntegrationUtils.PLATFORM_JAVA_CVM;
+        else if (LINK_JDK5.equals(jdk))
+            return IntegrationUtils.PLATFORM_JAVA_50;
+        else
+            return IntegrationUtils.PLATFORM_JAVA_60;
+    }
+    
+    protected static boolean isCVMJVM(AttachSettings settings) {
+        String hostOS = settings.getHostOS();
+        return IntegrationUtils.PLATFORM_WINDOWS_CVM.equals(hostOS) ||
+               IntegrationUtils.PLATFORM_LINUX_CVM.equals(hostOS);
     }
     
 }
