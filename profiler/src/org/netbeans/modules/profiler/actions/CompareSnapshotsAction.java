@@ -99,8 +99,8 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsAction_OnlyComparableListedString=Note: only comparable snapshots are listed",
     "CompareSnapshotsAction_FromFileRadioText=From &file:",
     "CompareSnapshotsAction_FromCurrentLocationRadioText=From &current location:",
-    "CompareSnapshotsAction_BrowseButtonText=&Browse",
-    "CompareSnapshotsAction_Browse2ButtonText=B&rowse",
+    "CompareSnapshotsAction_BrowseButtonText=&Browse...",
+    "CompareSnapshotsAction_Browse2ButtonText=B&rowse...",
     "CompareSnapshotsAction_BrowseButtonAccessDescr=Select snapshot file",
     "CompareSnapshotsAction_Snapshot1String=Snapshot &1:",
     "CompareSnapshotsAction_Snapshot2String=Snapshot &2:",
@@ -111,12 +111,13 @@ import org.openide.windows.WindowManager;
 @ActionRegistration(iconInMenu = true, displayName = "#CompareSnapshotsAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/compareSnapshots.png")
 @ActionReference(path = "Menu/Profile", position = 1600, separatorAfter=1700)
 public class CompareSnapshotsAction extends AbstractAction {
+    //~ Static fields/initializers -------------------------------------------------------------------------------------------
+        private static final HelpCtx EXTERNAL_SNAPSHOT_HELP_CTX = new HelpCtx("SelectExternalSnapshotsPanel.HelpCtx"); // NOI18N
+        private static final HelpCtx SECOND_SNAPSHOT_HELP_CTX = new HelpCtx("SelectSecondSnapshotPanel.HelpCtx"); // NOI18N
+
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class SelectExternalSnapshotsPanel extends JPanel implements HelpCtx.Provider {
-        //~ Static fields/initializers -------------------------------------------------------------------------------------------
-        private static final String HELP_CTX_KEY = "SelectExternalSnapshotsPanel.HelpCtx";
-        private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
             
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
@@ -139,7 +140,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
         @Override
         public HelpCtx getHelpCtx() {
-            return HELP_CTX;
+            return EXTERNAL_SNAPSHOT_HELP_CTX;
         }        
         
         public JButton getOKButton() {
@@ -369,7 +370,7 @@ public class CompareSnapshotsAction extends AbstractAction {
         }
     }
 
-    private class SelectSecondSnapshotPanel extends JPanel {
+    private class SelectSecondSnapshotPanel extends JPanel implements HelpCtx.Provider {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private JButton externalFileButton;
@@ -389,6 +390,11 @@ public class CompareSnapshotsAction extends AbstractAction {
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        @Override
+        public HelpCtx getHelpCtx() {
+            return SECOND_SNAPSHOT_HELP_CTX;
+        }        
 
         public JButton getOKButton() {
             return okButton;
@@ -958,7 +964,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                     }
 
                     public String getDescription() {
-                        return MessageFormat.format(Bundle.CompareSnapshotsAction_OpenChooserCaption(), new Object[] { "nps" }); // NOI18N
+                        return Bundle.CompareSnapshotsAction_OpenChooserFilter("nps"); // NOI18N
                     }
                 });
         }

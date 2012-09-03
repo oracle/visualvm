@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler;
 
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
@@ -60,6 +59,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
 import org.netbeans.lib.profiler.ui.ResultsView;
 import org.netbeans.lib.profiler.ui.threads.ThreadsTablePanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -84,7 +84,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "ThreadsWindow_ThreadsDetailsTabDescr=List of application threads with detailed status data",
     "ThreadsWindow_ThreadsAccessDescr=Profiler threads timeline and details"
 })
-public final class ThreadsWindow extends ProfilerTopComponent implements ProfilingStateListener, ActionListener, ChangeListener,
+public final class ThreadsWindow extends ProfilerTopComponent implements ActionListener, ChangeListener,
                                                                  SaveViewAction.ViewProvider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY = "ThreadsWindow.HelpCtx"; // NOI18N
@@ -166,13 +166,23 @@ public final class ThreadsWindow extends ProfilerTopComponent implements Profili
                 Bundle.ThreadsWindow_ThreadsDetailsTabDescr(), threadsDetailsPanelContainer, threadsDetailsPanel.getToolbar());
 
         profilingStateChanged(Profiler.getDefault().getProfilingState());
-        threadsMonitoringChanged();
+        updateThreadsView();
 
         setFocusable(true);
         setRequestFocusEnabled(true);
 
         threadsView.addChangeListener(this);
-        Profiler.getDefault().addProfilingStateListener(this);
+        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter(){
+            @Override
+            public void profilingStateChanged(final ProfilingStateEvent e) {
+                ThreadsWindow.this.profilingStateChanged(e.getNewState());
+            }
+
+            @Override
+            public void threadsMonitoringChanged() {
+                updateThreadsView();
+            }
+        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -265,15 +275,7 @@ public final class ThreadsWindow extends ProfilerTopComponent implements Profili
 
         return false;
     }
-
-    public void instrumentationChanged(final int oldInstrType, final int currentInstrType) {
-        // ignore
-    }
-
-    public void profilingStateChanged(final ProfilingStateEvent e) {
-        profilingStateChanged(e.getNewState());
-    }
-
+    
     public void showThreads() {
         threadsView.selectView(threadsTimelinePanelContainer);
         open();
@@ -291,7 +293,7 @@ public final class ThreadsWindow extends ProfilerTopComponent implements Profili
             });
     }
 
-    public void threadsMonitoringChanged() {
+    private void updateThreadsView() {
         if (Profiler.getDefault().getThreadsMonitoringEnabled()) {
             threadsPanel.threadsMonitoringEnabled();
             threadsView.setViewEnabled(threadsTablePanel, true);

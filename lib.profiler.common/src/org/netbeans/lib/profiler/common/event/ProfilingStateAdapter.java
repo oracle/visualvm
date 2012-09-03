@@ -37,25 +37,31 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2011 Sun Microsystems, Inc.
+ * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.attach.spi;
 
-import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.common.AttachSettings;
+package org.netbeans.lib.profiler.common.event;
 
-/**
+/** Empty implementation of ProfilingStateListener.
  *
- * @author Jiri Sedlacek
+ * @author jan.taus@oracle.com
  */
-public abstract class AttachStepsProvider {
-    
-    public String getSteps(AttachSettings settings) { return null; }
-    
-    public void handleAction(String action, AttachSettings settings) {}
-    
-    public void addChangeListener(ChangeListener listener) {}
-    
-    public void removeChangeListener(ChangeListener listener) {}
-    
+public class ProfilingStateAdapter implements ProfilingStateListener {
+
+    public void instrumentationChanged(int oldInstrType, int currentInstrType) {
+        //ignore
+    }
+
+    public void profilingStateChanged(ProfilingStateEvent e) {
+        //ignore
+    }
+
+    public void threadsMonitoringChanged() {
+        //ignore
+    }
+
+    public void serverStateChanged(int serverState, int serverProgress) {
+        //ignore
+    }
+
 }

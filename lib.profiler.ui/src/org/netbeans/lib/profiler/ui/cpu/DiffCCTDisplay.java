@@ -85,14 +85,16 @@ public class DiffCCTDisplay extends CCTDisplay {
     
     protected void initColumnsData() {
         super.initColumnsData();
+        columnRenderers[1] = new DiffBarCellRenderer(0, 0);
         columnRenderers[2] = new LabelTableCellRenderer(JLabel.TRAILING);
     }
     
     public void prepareResults() {
         super.prepareResults();
+        DiffBarCellRenderer renderer = (DiffBarCellRenderer)columnRenderers[1];
         long bound = ((CPUResultsDiff)snapshot).getBound(currentView);
-        columnRenderers[1] = new DiffBarCellRenderer(-bound, bound);
-        treeTable.getColumnModel().getColumn(1).setCellRenderer(columnRenderers[1]);
+        renderer.setMinimum(-bound);
+        renderer.setMaximum(bound);
     }
     
 }
