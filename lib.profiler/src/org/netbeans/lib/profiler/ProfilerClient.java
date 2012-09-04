@@ -398,6 +398,7 @@ public class ProfilerClient implements CommonConstants {
     private volatile Response lastResponse;
     private SeparateCmdExecutionThread separateCmdExecThread;
     private ServerListener serverListener;
+    private HeapHistogramManager histogramManager;
 
     //--------------------- Connection management --------------------
     private Socket clientSocket;
@@ -435,6 +436,7 @@ public class ProfilerClient implements CommonConstants {
         appStatusHandler = ash;
         serverCommandHandler = sch;
         instrumentor = new Instrumentor(status, settings);
+        histogramManager = new HeapHistogramManager();
         EventBufferProcessor.initialize(this);
         EventBufferResultsProvider.getDefault().addDispatcher(ProfilingResultsDispatcher.getDefault());
     }
@@ -627,7 +629,14 @@ public class ProfilerClient implements CommonConstants {
     public MemoryResultsSnapshot getMemoryProfilingResultsSnapshot(boolean dump)
         throws ClientUtils.TargetAppOrVMTerminated {
         checkForTargetVMAlive();
-
+        int instrType = getCurrentInstrType();
+        
+        if (instrType == INSTR_NONE_MEMORY_SAMPLING) {
+            if (settings.getRunGCOnGetResultsInMemoryProfiling()) {
+                runGC();
+            }
+            return new SampledMemoryResultsSnapshot(resultsStart, System.currentTimeMillis(), this);
+        }
         if (dump) {
             if (!forceObtainedResultsDump(false, 5)) {
                 return null;
@@ -639,7 +648,7 @@ public class ProfilerClient implements CommonConstants {
         try {
             memCctProvider.updateInternals();
 
-            if (getCurrentInstrType() == INSTR_OBJECT_ALLOCATIONS) {
+            if (instrType == INSTR_OBJECT_ALLOCATIONS) {
                 return new AllocMemoryResultsSnapshot(resultsStart, System.currentTimeMillis(), memCctProvider, this);
             } else {
                 return new LivenessMemoryResultsSnapshot(resultsStart, System.currentTimeMillis(), memCctProvider, this);
@@ -676,6 +685,15 @@ public class ProfilerClient implements CommonConstants {
         return StringUtils.convertPackedStringsIntoStringArrays(resp.getPackedData(), resp.getPackedArrayOffsets(), 3);
     }
 
+    public synchronized HeapHistogram getHeapHistogram() throws ClientUtils.TargetAppOrVMTerminated {
+        HeapHistogramResponse resp;
+        
+        checkForTargetVMAlive();
+        sendSimpleCmdToServer(Command.GET_HEAP_HISTOGRAM);
+        resp = (HeapHistogramResponse) getAndCheckLastResponse("Unknown problem when trying to get heap histogram"); // NOI18N
+        return histogramManager.getHistogram(resp);
+    }
+    
     public synchronized MonitoredData getMonitoredData() {
         try {
             checkForTargetVMAlive();
@@ -966,29 +984,31 @@ public class ProfilerClient implements CommonConstants {
         synchronized (instrumentationLock) {
             removeAllInstrumentation();
 
-            // Set this root class name irrespective of whether the target app has been started or not.
-            // If it's not yet started, then indeed instrumentation should be triggered by main class load event - otherwise
-            // the first loaded class that we register in the server is some reflection class loaded in process of main()
-            // invocation. It causes recursive invocations of classLoadHook() (because it also uses some reflection), thus
-            // screwing up the instrumentation procedure.
-            // If the target app is already running, then instrumentation starts immediately and isn't triggered by a class
-            // load event. However, if the same cmd that we build here is then re-used as commandOnStartup, it should again
-            // contain rootClassName.
-            String[] rootClassNames = new String[]{settings.getMainClassName()};
-            InitiateProfilingCommand cmd = createInitiateInstrumnetation(instrType, rootClassNames, false,
-                                                                                    status.startProfilingPointsActive);
-            commandOnStartup = cmd;
+            if (instrType == INSTR_NONE_MEMORY_SAMPLING) {
+                commandOnStartup = new InitiateProfilingCommand(INSTR_NONE_MEMORY_SAMPLING);
+            } else {
+                // Set this root class name irrespective of whether the target app has been started or not.
+                // If it's not yet started, then indeed instrumentation should be triggered by main class load event - otherwise
+                // the first loaded class that we register in the server is some reflection class loaded in process of main()
+                // invocation. It causes recursive invocations of classLoadHook() (because it also uses some reflection), thus
+                // screwing up the instrumentation procedure.
+                // If the target app is already running, then instrumentation starts immediately and isn't triggered by a class
+                // load event. However, if the same cmd that we build here is then re-used as commandOnStartup, it should again
+                // contain rootClassName.
+                String[] rootClassNames = new String[]{settings.getMainClassName()};
+                commandOnStartup = createInitiateInstrumnetation(instrType, rootClassNames, false, status.startProfilingPointsActive);
 
-            //      switch (instrType) {
-            //        case INSTR_OBJECT_ALLOCATIONS:
-            //          mcgb = new ObjAllocCallGraphBuilder(this);
-            //          break;
-            //        case INSTR_OBJECT_LIVENESS:
-            //          mcgb = new ObjLivenessCallGraphBuilder(this);
-            //          break;
-            //      }
+                //      switch (instrType) {
+                //        case INSTR_OBJECT_ALLOCATIONS:
+                //          mcgb = new ObjAllocCallGraphBuilder(this);
+                //          break;
+                //        case INSTR_OBJECT_LIVENESS:
+                //          mcgb = new ObjLivenessCallGraphBuilder(this);
+                //          break;
+                //      }
 
-            // See initiateRecursiveCPUProfInstrumentation for why it's important to setCurrentInstrType() early
+                // See initiateRecursiveCPUProfInstrumentation for why it's important to setCurrentInstrType() early
+            }
             setCurrentInstrType(instrType);
 
             if (status.targetAppRunning) {
