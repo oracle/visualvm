@@ -31,9 +31,9 @@ import java.util.Properties;
 
 /**
  * This class uses <a href=http://download.oracle.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a> 
- * to obtatin various information from JVM. Note that
+ * to obtain various information from JVM. Note that
  * Attach API is available in JDK 6 and up and only for local processes running as the
- * same user. See Attach API documentaion for mode details.
+ * same user. See Attach API documentation for mode details.
  * 
  * @author Tomas Hurka
  */
@@ -79,7 +79,7 @@ public abstract class AttachModel extends Model {
      * print VM option.
      * Note that VM option is the one which starts with
      * <CODE>-XX:</CODE>
-     * @param name name of VM option. For examle <CODE>HeapDumpOnOutOfMemoryError</CODE>
+     * @param name name of VM option. For example <CODE>HeapDumpOnOutOfMemoryError</CODE>
      * @return Full text of VM option. For example <CODE>-XX:+HeapDumpOnOutOfMemoryError</CODE>
      */
     public abstract String printFlag(String name);
