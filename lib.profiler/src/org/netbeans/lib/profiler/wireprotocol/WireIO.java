@@ -257,6 +257,10 @@ public class WireIO {
                         resp = new GetClassIdResponse();
 
                         break;
+                    case Response.HEAP_HISTOGRAM:
+                        resp = new HeapHistogramResponse();
+                        
+                        break;
                     default:
                         throw new IOException("JFluid wire protocol error: received unknown response type. Value: " + respType); // NOI18N
                 }
