@@ -1703,7 +1703,8 @@ public abstract class NetBeansProfiler extends Profiler {
                 || (ideSettings.getDisplayLiveResultsFragment() && (type == ProfilingSettings.PROFILE_CPU_STOPWATCH))
                 || (ideSettings.getDisplayLiveResultsMemory()
                        && ((type == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS)
-                              || (type == ProfilingSettings.PROFILE_MEMORY_LIVENESS)))) {
+                           || (type == ProfilingSettings.PROFILE_MEMORY_LIVENESS)
+                           || (type == ProfilingSettings.PROFILE_MEMORY_SAMPLING)))) {
             LiveResultsWindow.getDefault().open();
             LiveResultsWindow.getDefault().requestVisible();
         }
