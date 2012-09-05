@@ -105,6 +105,7 @@ import org.netbeans.lib.profiler.ui.graphs.AllocationsHistoryGraphPanel;
 import org.netbeans.lib.profiler.ui.graphs.LivenessHistoryGraphPanel;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryActionsHandler;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
+import org.netbeans.lib.profiler.ui.memory.LiveSampledResultsPanel;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -163,7 +164,12 @@ public final class LiveResultsWindow extends ProfilerTopComponent
 
         @Override
         public void resultsAvailable() {
-            getDefault().resultsAvailableinTA = true;
+            LiveResultsWindow win = getDelegate();
+            win.resultsAvailableinTA = true;
+            int instrType = win.runner.getProfilerClient().getCurrentInstrType();
+            if (instrType == ProfilerEngineSettings.INSTR_NONE_MEMORY_SAMPLING) {
+                win.resultsAvailable();
+            }
         }
 
         @Override
@@ -226,13 +232,7 @@ public final class LiveResultsWindow extends ProfilerTopComponent
             CommonUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     if (!empty) {
-                        getDefault().resultsAvailable = true;
-                        if (resultsDumpForced.getAndSet(false) && 
-                            getDefault().autoRefreshRequested.getAndDecrement() > 0) {
-                            getDefault().updateResultsDisplay();
-                        } else {
-                            getDefault().autoRefreshRequested.compareAndSet(-1, 0);
-                        }
+                        getDefault().resultsAvailable();
                     } else {
                         resultsDumpForced.set(false); // fix for issue #114638
                     }
@@ -772,7 +772,9 @@ public final class LiveResultsWindow extends ProfilerTopComponent
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         Component selectedView = resultsView.getSelectedView();
         if (currentDisplayComponent == memoryTabPanel) {
-            if (selectedView instanceof LiveAllocResultsPanel) {
+            if (selectedView instanceof LiveSampledResultsPanel) {
+                ((LiveSampledResultsPanel) currentDisplay).exportData(exportedFileType, eDD, Bundle.LAB_ResultsWindowName());
+            } else if (selectedView instanceof LiveAllocResultsPanel) {
                 ((LiveAllocResultsPanel) currentDisplay).exportData(exportedFileType, eDD, Bundle.LAB_ResultsWindowName());
             } else if (selectedView instanceof LiveLivenessResultsPanel) {
                 ((LiveLivenessResultsPanel) currentDisplay).exportData(exportedFileType, eDD, Bundle.LAB_ResultsWindowName());
@@ -825,7 +827,13 @@ public final class LiveResultsWindow extends ProfilerTopComponent
 
     protected void componentShowing() {
         super.componentShowing();
-        updateResultsDisplay();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                updateResultsDisplay();
+            }
+        });
     }
 
     /**
@@ -869,7 +877,9 @@ public final class LiveResultsWindow extends ProfilerTopComponent
         }
 
         try {
-            if (instrType != ProfilerEngineSettings.INSTR_CODE_REGION) {
+            if (instrType == ProfilerEngineSettings.INSTR_NONE_MEMORY_SAMPLING) {
+                resultsAvailable();
+            } else if (instrType != ProfilerEngineSettings.INSTR_CODE_REGION) {
                 client.forceObtainedResultsDump(true);
             }
 
@@ -940,6 +950,21 @@ public final class LiveResultsWindow extends ProfilerTopComponent
         LiveResultsPanel aPanel = null;
         
         switch (instrumentationType) {
+            case ProfilerEngineSettings.INSTR_NONE_MEMORY_SAMPLING: {
+                LiveSampledResultsPanel samplingPanel = new LiveSampledResultsPanel(runner,
+                                                    memoryActionsHandler);
+                currentDisplayComponent = memoryTabPanel;
+
+                if (resultsView.getViewsCount() > 0) {
+                    resultsView.removeViews();
+                }
+
+                resultsView.addView(Bundle.LiveResultsWindow_LiveResultsTabName(), null, null, samplingPanel, null);
+                aPanel = samplingPanel;
+                HELP_CTX = new HelpCtx(HELP_CTX_KEY_MEM);
+
+                break;
+            }
             case ProfilerEngineSettings.INSTR_OBJECT_ALLOCATIONS: {
                 LiveAllocResultsPanel allocPanel = new LiveAllocResultsPanel(runner,
                                                     memoryActionsHandler,
@@ -1032,7 +1057,23 @@ public final class LiveResultsWindow extends ProfilerTopComponent
                 }
             });
     }
+    
+    private void resultsAvailable() {
+        CommonUtils.runInEventDispatchThread(new Runnable() {
 
+            @Override
+            public void run() {
+                resultsAvailable = true;
+                if (resultsDumpForced.getAndSet(false) && 
+                    autoRefreshRequested.getAndDecrement() > 0) {
+                    updateResultsDisplay();
+                } else {
+                    autoRefreshRequested.compareAndSet(-1, 0);
+                }
+            }
+        });
+    }
+        
     private void resetResultsDisplay() {
         if ((currentDisplayComponent != null) && (currentDisplayComponent != noResultsPanel)) {
             remove(currentDisplayComponent);

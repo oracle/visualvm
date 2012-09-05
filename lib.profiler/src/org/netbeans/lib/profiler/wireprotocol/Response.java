@@ -72,6 +72,7 @@ public class Response {
     public static final int DEFINING_LOADER = 10;
     public static final int CALIBRATION_DATA = 11;
     public static final int CLASSID_RESPONSE = 12;
+    public static final int HEAP_HISTOGRAM = 13;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -172,6 +173,8 @@ public class Response {
                     return "CALIBRATION_DATA"; // NOI18N
                 case CLASSID_RESPONSE:
                     return "CLASSID_RESPONSE"; // NOI18N
+                case HEAP_HISTOGRAM:
+                    return "HEAP_HISTOGRAM"; // NOI18N
                 default:
                     return "Unknown response"; // NOI18N
             }
