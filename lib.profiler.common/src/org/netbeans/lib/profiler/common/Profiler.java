@@ -244,6 +244,10 @@ public abstract class Profiler {
                 client.initiateMonitoring();
 
                 break;
+            case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
+                client.initiateMemoryProfInstrumentation(CommonConstants.INSTR_NONE_MEMORY_SAMPLING);
+
+                break;
             case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
                 client.initiateMemoryProfInstrumentation(CommonConstants.INSTR_OBJECT_ALLOCATIONS);
 
