@@ -59,18 +59,18 @@ public class HeapHistogramImpl extends HeapHistogram {
     private static final char OBJECT_CODE = 'L'; // NOI18N
     private static final Map<String,String> permGenNames = new HashMap();
     static {
-        permGenNames.put("<methodKlass>","Read-Write Method Metadata");
-        permGenNames.put("<constMethodKlass>","Read-Only Method Metadata");
-        permGenNames.put("<methodDataKlass>","Method Profiling Information");
-        permGenNames.put("<constantPoolKlass>","Constant Pool Metadata");
-        permGenNames.put("<constantPoolCacheKlass>","Class Resolution Optimization Metadata");
-        permGenNames.put("<symbolKlass>","VM Symbol Metadata");
-        permGenNames.put("<compiledICHolderKlass>","Inline Cache Metadata");
-        permGenNames.put("<instanceKlassKlass>","Instance Class Metadata");
-        permGenNames.put("<objArrayKlassKlass>","Object Array Class Metadata");
-        permGenNames.put("<typeArrayKlassKlass>","Scalar Array Class Metadata");
-        permGenNames.put("<klassKlass>","Base Class Metadata");
-        permGenNames.put("<arrayKlassKlass>","Base Array Class Metadata");
+        permGenNames.put("<methodKlass>","Read-Write Method Metadata");      // NOI18N
+        permGenNames.put("<constMethodKlass>","Read-Only Method Metadata");     // NOI18N
+        permGenNames.put("<methodDataKlass>","Method Profiling Information");     // NOI18N
+        permGenNames.put("<constantPoolKlass>","Constant Pool Metadata");     // NOI18N
+        permGenNames.put("<constantPoolCacheKlass>","Class Resolution Optimization Metadata");     // NOI18N
+        permGenNames.put("<symbolKlass>","VM Symbol Metadata");     // NOI18N
+        permGenNames.put("<compiledICHolderKlass>","Inline Cache Metadata");     // NOI18N
+        permGenNames.put("<instanceKlassKlass>","Instance Class Metadata");     // NOI18N
+        permGenNames.put("<objArrayKlassKlass>","Object Array Class Metadata");     // NOI18N
+        permGenNames.put("<typeArrayKlassKlass>","Scalar Array Class Metadata");     // NOI18N
+        permGenNames.put("<klassKlass>","Base Class Metadata");     // NOI18N
+        permGenNames.put("<arrayKlassKlass>","Base Array Class Metadata");     // NOI18N
     }
     Set<ClassInfo> classes;
     Set<ClassInfo> permGenClasses;
@@ -178,7 +178,7 @@ public class HeapHistogramImpl extends HeapHistogram {
             instances = sc.nextLong();
             bytes = sc.nextLong();
             jvmName = sc.next();
-            permGen = jvmName.charAt(0) == '<';
+            permGen = jvmName.charAt(0) == '<';     // NOI18N
             name = convertJVMName(jvmName);
         }
         
@@ -213,7 +213,7 @@ public class HeapHistogramImpl extends HeapHistogram {
         
         String convertJVMName(String jvmName) {
             String name = null;
-            int index = jvmName.lastIndexOf('[');
+            int index = jvmName.lastIndexOf('[');     // NOI18N
             
             if (index != -1) {
                 switch(jvmName.charAt(index+1)) {
@@ -245,7 +245,7 @@ public class HeapHistogramImpl extends HeapHistogram {
                         name=jvmName.substring(index+2,jvmName.length()-1);
                         break;
                     default:
-                        System.err.println("Uknown name "+jvmName);
+                        System.err.println("Uknown name "+jvmName);     // NOI18N
                         name = jvmName;
                 }
                 for (int i=0;i<=index;i++) {

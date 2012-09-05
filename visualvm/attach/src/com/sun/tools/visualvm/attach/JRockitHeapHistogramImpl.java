@@ -71,7 +71,7 @@ public class JRockitHeapHistogramImpl extends HeapHistogramImpl {
             instances = sc.nextLong();
             sc.next(); // diff unused
             jvmName = sc.next();
-            name = convertJVMName(jvmName.replace('/','.'));
+            name = convertJVMName(jvmName.replace('/','.'));     // NOI18N
         }
 
         private long computeBytes(String size) {
