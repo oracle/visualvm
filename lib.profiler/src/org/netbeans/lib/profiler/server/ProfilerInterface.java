@@ -138,7 +138,9 @@ public class ProfilerInterface implements CommonConstants {
                         initiateInstrumentation(instrType);
                         break;
                     case INSTR_NONE_MEMORY_SAMPLING:
-                        profilerServer.notifyClientOnResultsAvailability();
+                        if (Histogram.initialize()) {
+                            profilerServer.notifyClientOnResultsAvailability();
+                        }
                         break;
                     default:
                         throw new IllegalArgumentException("Instr. type: "+instrType);
@@ -517,7 +519,6 @@ public class ProfilerInterface implements CommonConstants {
         Stacks.initialize();
         Threads.initialize();
         HeapDump.initialize(Platform.getJDKVersionNumber() == Platform.JDK_15);
-        Histogram.initialize();
         ClassLoaderManager.initialize(profilerServer);
         scl = ClassLoader.getSystemClassLoader();
         ClassLoaderManager.addLoader(scl);
