@@ -48,6 +48,7 @@ import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
 import org.openide.actions.FindAction;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CallbackSystemAction;
@@ -69,9 +70,11 @@ import org.openide.util.Lookup;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
+    "SnapshotDiffWindow_SampledCaption=Sampling Comparison",
     "SnapshotDiffWindow_AllocCaption=Allocations Comparison",
     "SnapshotDiffWindow_LivenessCaption=Liveness Comparison",
     "SnapshotDiffWindow_CpuCaption=CPU Comparison",
+    "SnapshotDiffWindow_SampledAccessDescr=Comparison of two memory sampling snapshots",
     "SnapshotDiffWindow_AllocAccessDescr=Comparison of two memory allocations snapshots",
     "SnapshotDiffWindow_LivenessAccessDescr=Comparison of two memory liveness snapshots",
     "SnapshotDiffWindow_CpuAccessDescr=Comparison of two cpu snapshots"
@@ -109,7 +112,10 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
         setFocusable(true);
         setRequestFocusEnabled(true);
 
-        if (ls instanceof AllocMemoryResultsDiff) {
+        if (ls instanceof SampledMemoryResultsDiff) {
+            getAccessibleContext().setAccessibleDescription(Bundle.SnapshotDiffWindow_SampledAccessDescr());
+            displayMemorySampledDiff((SampledMemoryResultsDiff) ls, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
+        } else if (ls instanceof AllocMemoryResultsDiff) {
             getAccessibleContext().setAccessibleDescription(Bundle.SnapshotDiffWindow_AllocAccessDescr());
             displayMemoryAllocDiff((AllocMemoryResultsDiff) ls, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
         } else if (ls instanceof LivenessMemoryResultsDiff) {
@@ -146,6 +152,16 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
     }
 
     // -- Private methods --------------------------------------------------------------------------------------------------
+    private void displayMemorySampledDiff(MemoryResultsSnapshot diff, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
+                                        int sortingColumn, boolean sortingOrder, Lookup.Provider project) {
+        MemoryDiffPanel sampledDiffPanel = new MemoryDiffPanel(getLookup(), diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);
+        updateFind(true, sampledDiffPanel);
+        add(sampledDiffPanel, BorderLayout.CENTER);
+        setName(Bundle.SnapshotDiffWindow_SampledCaption());
+        setIcon(WINDOW_ICON_MEMORY);
+        helpCtx = new HelpCtx(HELP_CTX_KEY_MEM);
+    }
+
     private void displayMemoryAllocDiff(MemoryResultsSnapshot diff, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2,
                                         int sortingColumn, boolean sortingOrder, Lookup.Provider project) {
         MemoryDiffPanel allocDiffPanel = new MemoryDiffPanel(getLookup(), diff, snapshot1, snapshot2, sortingColumn, sortingOrder, project);

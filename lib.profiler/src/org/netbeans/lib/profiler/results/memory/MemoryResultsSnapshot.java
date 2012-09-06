@@ -91,16 +91,17 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
     ***************************************************************************/
 
     private JMethodIdTable table;
-    private String[] classNames;
+    /** [0-nProfiledClasses] class names */
+    String[] classNames;
 
     /** [0-nProfiledClasses] total size in bytes for tracked instances of this class */
-    private long[] objectsSizePerClass;
+    long[] objectsSizePerClass;
 
     /** [0-nProfiledClasses] class Id -> root of its allocation traces tree */
     private RuntimeMemoryCCTNode[] stacksForClasses;
 
     /** total number of profiled classes */
-    private int nProfiledClasses;
+    int nProfiledClasses;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -116,40 +117,7 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
         status.beginTrans(false);
 
         try {
-            performInit(client, provider);
-            
-            nProfiledClasses = provider.getNProfiledClasses();
-
-            int len = 0;
-
-            if (provider.getObjectsSizePerClass() != null) {
-                //System.err.println("mcgb.objectsSizePerClass len is: "+mcgb.objectsSizePerClass.length);
-                len = provider.getObjectsSizePerClass().length;
-                objectsSizePerClass = new long[len];
-                System.arraycopy(provider.getObjectsSizePerClass(), 0, objectsSizePerClass, 0, len);
-            } /*else {
-               System.err.println("mcgb.objectsSizePerClass is NULL");
-               }   */
-            String[] s_classNames = status.getClassNames();
-            //      len = s_classNames.length;
-            len = nProfiledClasses;
-            //System.err.println("status.classNames.length is: "+len );
-            classNames = new String[len];
-            System.arraycopy(s_classNames, 0, classNames, 0, len);
-
-            //      System.out.println("Created snapshot [" + timeTaken + "] with " + classNames.length + " classes; nProfiledClasses = " + nProfiledClasses);
-            RuntimeMemoryCCTNode[] stacks = provider.getStacksForClasses();
-            if ((stacks != null) && checkContainsStacks(stacks)) {
-                stacksForClasses = new RuntimeMemoryCCTNode[stacks.length];
-
-                for (int i = 0; i < stacksForClasses.length; i++) {
-                    if (stacks[i] != null) {
-                        stacksForClasses[i] = (RuntimeMemoryCCTNode) stacks[i].clone();
-                    }
-                }
-
-                table = new JMethodIdTable(JMethodIdTable.getDefault());
-            }
+            performInit(client, provider);           
         } finally {
             status.endTrans();
 
@@ -352,8 +320,41 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
     protected abstract PresoObjAllocCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
                                                                   boolean dontShowZeroLiveObjAllocPaths);
 
-    protected abstract void performInit(ProfilerClient client, MemoryCCTProvider provider)
-                                 throws ClientUtils.TargetAppOrVMTerminated;
+    protected void performInit(ProfilerClient client, MemoryCCTProvider provider)
+                                 throws ClientUtils.TargetAppOrVMTerminated {
+        nProfiledClasses = provider.getNProfiledClasses();
+
+        int len = 0;
+
+        if (provider.getObjectsSizePerClass() != null) {
+            //System.err.println("mcgb.objectsSizePerClass len is: "+mcgb.objectsSizePerClass.length);
+            len = provider.getObjectsSizePerClass().length;
+            objectsSizePerClass = new long[len];
+            System.arraycopy(provider.getObjectsSizePerClass(), 0, objectsSizePerClass, 0, len);
+        } /*else {
+           System.err.println("mcgb.objectsSizePerClass is NULL");
+           }   */
+        String[] s_classNames = client.getStatus().getClassNames();
+        //      len = s_classNames.length;
+        len = nProfiledClasses;
+        //System.err.println("status.classNames.length is: "+len );
+        classNames = new String[len];
+        System.arraycopy(s_classNames, 0, classNames, 0, len);
+
+        //      System.out.println("Created snapshot [" + timeTaken + "] with " + classNames.length + " classes; nProfiledClasses = " + nProfiledClasses);
+        RuntimeMemoryCCTNode[] stacks = provider.getStacksForClasses();
+        if ((stacks != null) && checkContainsStacks(stacks)) {
+            stacksForClasses = new RuntimeMemoryCCTNode[stacks.length];
+
+            for (int i = 0; i < stacksForClasses.length; i++) {
+                if (stacks[i] != null) {
+                    stacksForClasses[i] = (RuntimeMemoryCCTNode) stacks[i].clone();
+                }
+            }
+
+            table = new JMethodIdTable(JMethodIdTable.getDefault());
+        }        
+    }
 
     private boolean checkContainsStacks(RuntimeMemoryCCTNode[] stacksForClasses) {
         for (int i = 0; i < stacksForClasses.length; i++) {
