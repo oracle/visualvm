@@ -92,7 +92,7 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
 
     private File getJdkHome(final JvmJvmstatModel jvmstat) {
         File jdkHome = new File(jvmstat.getJavaHome());
-        if ("jre".equals(jdkHome.getName())) {
+        if ("jre".equals(jdkHome.getName())) {  // NOI18N
            jdkHome = jdkHome.getParentFile(); 
         }
         return jdkHome;
