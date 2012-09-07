@@ -39,7 +39,7 @@ class ApplicationSnapshotCategory extends SnapshotCategory<ApplicationSnapshot> 
     private static final String PREFIX = "application"; // NOI18N
     static final String SUFFIX = ".apps";   // NOI18N
     
-    public ApplicationSnapshotCategory() {
+    ApplicationSnapshotCategory() {
         super(NAME, ApplicationSnapshot.class, PREFIX, SUFFIX, POSITION_NONE);
     }
 

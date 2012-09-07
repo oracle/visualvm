@@ -35,7 +35,7 @@ import com.sun.tools.visualvm.core.model.AbstractModelProvider;
  */
 final class ProfilerSnapshotDescriptorProvider extends AbstractModelProvider<DataSourceDescriptor,DataSource> {
     
-    public ProfilerSnapshotDescriptorProvider() {
+    ProfilerSnapshotDescriptorProvider() {
     }
     
     public DataSourceDescriptor createModelFor(DataSource ds) {

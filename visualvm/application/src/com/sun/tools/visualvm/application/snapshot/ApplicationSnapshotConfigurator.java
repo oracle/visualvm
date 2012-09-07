@@ -56,7 +56,7 @@ import org.openide.windows.WindowManager;
  */
 class ApplicationSnapshotConfigurator extends JPanel {
 
-  public static ApplicationSnapshotConfigurator defineSnapshot() {
+  static ApplicationSnapshotConfigurator defineSnapshot() {
     ApplicationSnapshotConfigurator hc = getDefault();
     hc.setupDefineCoreDump();
     
@@ -70,11 +70,11 @@ class ApplicationSnapshotConfigurator extends JPanel {
     else return null;
   }
   
-  public File getSnapshotFile() {
+  File getSnapshotFile() {
     return new File(snapshotFileField.getText().trim());
   }
   
-  public boolean deleteSourceFile() {
+  boolean deleteSourceFile() {
       return deleteSourceCheckbox.isSelected();
   }
   

@@ -51,7 +51,7 @@ class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsConta
     private static AddApplicationSnapshotAction selectionAware;
     
     
-    public static synchronized AddApplicationSnapshotAction alwaysEnabled() {
+    static synchronized AddApplicationSnapshotAction alwaysEnabled() {
         if (alwaysEnabled == null) {
             alwaysEnabled = new AddApplicationSnapshotAction();
             alwaysEnabled.putValue(SMALL_ICON, new ImageIcon(ICON));
@@ -60,7 +60,7 @@ class AddApplicationSnapshotAction extends SingleDataSourceAction<SnapshotsConta
         return alwaysEnabled;
     }
     
-    public static synchronized AddApplicationSnapshotAction selectionAware() {
+    static synchronized AddApplicationSnapshotAction selectionAware() {
         if (selectionAware == null) {
             selectionAware = new AddApplicationSnapshotAction();
             selectionAware.tracksSelection = true;

@@ -67,7 +67,7 @@ class ApplicationSnapshotProvider {
     
     private static ApplicationSnapshotProvider sharedInstance;
     
-    public synchronized static ApplicationSnapshotProvider sharedInstance() {
+    synchronized static ApplicationSnapshotProvider sharedInstance() {
         if (sharedInstance == null) sharedInstance = new ApplicationSnapshotProvider();
         return sharedInstance;
     }
