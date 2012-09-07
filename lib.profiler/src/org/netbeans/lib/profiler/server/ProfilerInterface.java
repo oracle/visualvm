@@ -53,6 +53,7 @@ import org.netbeans.lib.profiler.wireprotocol.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
@@ -135,6 +136,11 @@ public class ProfilerInterface implements CommonConstants {
                     case INSTR_OBJECT_ALLOCATIONS:
                     case INSTR_OBJECT_LIVENESS:
                         initiateInstrumentation(instrType);
+                        break;
+                    case INSTR_NONE_MEMORY_SAMPLING:
+                        if (Histogram.initialize()) {
+                            profilerServer.notifyClientOnResultsAvailability();
+                        }
                         break;
                     default:
                         throw new IllegalArgumentException("Instr. type: "+instrType);
@@ -339,6 +345,8 @@ public class ProfilerInterface implements CommonConstants {
     private static volatile Thread instrumentMethodGroupCallThread;
 
     private static volatile boolean detachStarted;
+    
+    private static HeapHistogramManager heapHistgramManager;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -517,6 +525,7 @@ public class ProfilerInterface implements CommonConstants {
         reflectMethods = new WeakHashMap();
 
         evBufManager = new EventBufferManager(profilerServer);
+        heapHistgramManager = new HeapHistogramManager();
         ProfilerInterface.status = status;
 
         // Check that all profiler's own threads are running, and then record them internally, so that target app threads
@@ -578,6 +587,7 @@ public class ProfilerInterface implements CommonConstants {
 
         switch (instrType) {
             case INSTR_NONE:
+            case INSTR_NONE_MEMORY_SAMPLING:
                 // do nothing
                 break;
             case INSTR_RECURSIVE_FULL:
@@ -666,7 +676,11 @@ public class ProfilerInterface implements CommonConstants {
     static boolean isDetachStarted() {
         return detachStarted;
     }
-    
+        
+    static HeapHistogramResponse computeHistogram() {
+        return heapHistgramManager.computeHistogram(Histogram.getRawHistogram());
+    }
+
     private static boolean getAndInstrumentClasses(boolean rootClassInstrumentation) {
         Response r = profilerServer.getLastResponse();
 
@@ -1284,7 +1298,7 @@ public class ProfilerInterface implements CommonConstants {
         );
     }
 
-    private static boolean serverInternalClassName(String name) {
+    static boolean serverInternalClassName(String name) {
         if (INSTRUMENT_JFLUID_CLASSES) {
             return name.startsWith("org.netbeans.lib.profiler.server") || // NOI18N
                    name.startsWith("org.netbeans.lib.profiler.global") || // NOI18N

@@ -59,7 +59,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.text.MessageFormat;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -640,6 +639,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                     break;
                                 case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
                                 case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                                case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
                                     c.setIcon(memoryIcon);
 
                                     break;
@@ -663,6 +663,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                         break;
                                     case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
                                     case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
                                         c.setIcon(memoryIcon);
 
                                         break;
@@ -681,6 +682,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                         break;
                                     case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
                                     case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
                                         c.setIcon(memoryIcon);
 
                                         break;

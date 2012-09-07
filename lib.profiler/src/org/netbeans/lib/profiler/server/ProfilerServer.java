@@ -1654,6 +1654,11 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 sendSimpleResponseToClient(error == null, error);
 
                 break;
+            case Command.GET_HEAP_HISTOGRAM:
+                HeapHistogramResponse resp = ProfilerInterface.computeHistogram();
+                sendComplexResponseToClient(resp);
+                
+                break;
         }
     }
 
