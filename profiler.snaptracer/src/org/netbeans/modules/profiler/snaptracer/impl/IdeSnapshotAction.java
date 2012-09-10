@@ -169,7 +169,7 @@ public final class IdeSnapshotAction implements ActionListener {
                     return ext;
                 }
                 public String getDescription() {
-                    return descr + " (*" + ext + ")";
+                    return descr + " (*" + ext + ")";  // NOI18N
                 }
             };
         }
