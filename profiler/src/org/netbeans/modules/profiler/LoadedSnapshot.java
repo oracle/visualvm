@@ -534,7 +534,7 @@ public class LoadedSnapshot {
     }
 
     static class SamplesInputStream {
-        static final String ID = "NPSS"; // NetBeans Profiler samples stream, it must match org.netbeans.core.ui.sampler.SamplesOutputStream.ID
+        static final String ID = "NPSS"; // NetBeans Profiler samples stream, it must match org.netbeans.modules.sampler.SamplesOutputStream.ID
         static final int MAX_SUPPORTED_VERSION = 2;
 
         int version;

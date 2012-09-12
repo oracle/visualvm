@@ -95,7 +95,7 @@ public class NpssDataObject extends MultiDataObject implements OpenCookie {
     private void openImpl() {
         IdeSnapshot snapshot;
         FileObject primary = getPrimaryFile();
-        FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log");
+        FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
         
         try {
             snapshot = new IdeSnapshot(primary, uigestureFO);
