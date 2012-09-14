@@ -88,6 +88,7 @@ import org.openide.util.RequestProcessor;
     "SnapshotInfoPanel_CpuSamplingString=CPU Profiling (Sampling Application)",
     "SnapshotInfoPanel_CpuEntireString=CPU Profiling (Entire Application)",
     "SnapshotInfoPanel_CpuPartString=CPU Profiling (Part of Application)",
+    "SnapshotInfoPanel_MemorySamplingString=Memory (Sampling)",
     "SnapshotInfoPanel_MemoryAllocString=Memory (Allocations Only)",
     "SnapshotInfoPanel_MemoryLivenessString=Memory (Liveness)",
     "SnapshotInfoPanel_TrackingAllInstancesString=Tracking All Instances",
@@ -386,6 +387,13 @@ public class SnapshotInfoPanel extends JPanel {
                 appendCPUText(htmlText, ps);
 
                 break;
+            case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
+                htmlText.append(Bundle.SnapshotInfoPanel_MemorySamplingString());
+                htmlText.append("<br>"); // NOI18N
+                htmlText.append("<br>"); // NOI18N
+                appendMemoryText(htmlText, ps);
+
+                break;
             case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
                 htmlText.append(Bundle.SnapshotInfoPanel_MemoryAllocString());
                 htmlText.append("<br>"); // NOI18N
@@ -525,38 +533,39 @@ public class SnapshotInfoPanel extends JPanel {
     }
 
     private void appendMemoryText(StringBuffer htmlText, ProfilingSettings ps) {
-        // Done
-        if (ps.getAllocTrackEvery() == 1) {
-            htmlText.append("<strong>"); // NOI18N
-            htmlText.append(Bundle.SnapshotInfoPanel_TrackingAllInstancesString()).append(" "); // NOI18N
-            htmlText.append("</strong>"); // NOI18N
-        } else {
-            htmlText.append("<strong>"); // NOI18N
-            htmlText.append(Bundle.SnapshotInfoPanel_TrackEveryString()).append(" "); // NOI18N
-            htmlText.append("</strong>"); // NOI18N
-            htmlText.append(Bundle.SnapshotInfoPanel_InstancesCountString("" + ps.getAllocTrackEvery())); // NOI18N
-        }
-
-        htmlText.append("<br>"); // NOI18N
-
-        htmlText.append("<strong>"); // NOI18N
-        htmlText.append(Bundle.SnapshotInfoPanel_RecordStackTracesString()).append(" "); // NOI18N
-        htmlText.append("</strong>"); // NOI18N
-        htmlText.append(getYesNo(ps.getAllocStackTraceLimit() != 0));
-        htmlText.append("<br>"); // NOI18N
-
-        if (ps.getAllocStackTraceLimit() != 0) {
-            htmlText.append("<strong>"); // NOI18N
-            htmlText.append(Bundle.SnapshotInfoPanel_LimitStackDepthString()).append(" "); // NOI18N
-            htmlText.append("</strong>"); // NOI18N
-
-            if (ps.getAllocStackTraceLimit() < 0) {
-                htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
+        if (ps.getProfilingType() != ProfilingSettings.PROFILE_MEMORY_SAMPLING) {
+            if (ps.getAllocTrackEvery() == 1) {
+                htmlText.append("<strong>"); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_TrackingAllInstancesString()).append(" "); // NOI18N
+                htmlText.append("</strong>"); // NOI18N
             } else {
-                htmlText.append(ps.getAllocStackTraceLimit());
+                htmlText.append("<strong>"); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_TrackEveryString()).append(" "); // NOI18N
+                htmlText.append("</strong>"); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_InstancesCountString("" + ps.getAllocTrackEvery())); // NOI18N
             }
 
             htmlText.append("<br>"); // NOI18N
+
+            htmlText.append("<strong>"); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_RecordStackTracesString()).append(" "); // NOI18N
+            htmlText.append("</strong>"); // NOI18N
+            htmlText.append(getYesNo(ps.getAllocStackTraceLimit() != 0));
+            htmlText.append("<br>"); // NOI18N
+
+            if (ps.getAllocStackTraceLimit() != 0) {
+                htmlText.append("<strong>"); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_LimitStackDepthString()).append(" "); // NOI18N
+                htmlText.append("</strong>"); // NOI18N
+
+                if (ps.getAllocStackTraceLimit() < 0) {
+                    htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
+                } else {
+                    htmlText.append(ps.getAllocStackTraceLimit());
+                }
+
+                htmlText.append("<br>"); // NOI18N
+            }
         }
 
         htmlText.append("<strong>"); // NOI18N
