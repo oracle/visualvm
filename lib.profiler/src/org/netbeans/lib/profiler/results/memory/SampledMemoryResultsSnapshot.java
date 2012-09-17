@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,8 +34,11 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2012 Sun Microsystems, Inc.
  */
-
 package org.netbeans.lib.profiler.results.memory;
 
 import java.io.DataInputStream;
@@ -48,54 +46,61 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 
 
 /**
- * Results snapshot for Allocations Memory Profiling.
+ * Results snapshot for Sampled Memory Profiling.
  *
  * @author Ian Formanek
+ * @author Tomas Hurka
  */
-public class AllocMemoryResultsSnapshot extends MemoryResultsSnapshot {
+public class SampledMemoryResultsSnapshot extends MemoryResultsSnapshot {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
     // I18N String constants
-    private static final String MEMORY_ALLOC_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle").getString("AllocMemoryResultsSnapshot_MemoryAllocMsg"); // NOI18N
+    private static final String MEMORY_SAMPLED_MSG = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle").getString("SampledMemoryResultsSnapshot_MemorySamledMsg"); // NOI18N
                                                                                                                     // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private int[] objectsCounts;
+    private int[] liveObjectsCounts;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public AllocMemoryResultsSnapshot() {
+    public SampledMemoryResultsSnapshot() {
     } // No-arg constructor needed for above serialization methods to work
 
-    public AllocMemoryResultsSnapshot(long beginTime, long timeTaken, MemoryCCTProvider provider, ProfilerClient client)
+    public SampledMemoryResultsSnapshot(long beginTime, long timeTaken, ProfilerClient client)
                                throws ClientUtils.TargetAppOrVMTerminated {
-        super(beginTime, timeTaken, provider, client);
+        super(beginTime, timeTaken, null, client);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public int[] getObjectsCounts() {
-        return objectsCounts;
+        return liveObjectsCounts;
     }
 
     public void performInit(ProfilerClient client, MemoryCCTProvider provider)
                      throws ClientUtils.TargetAppOrVMTerminated {
-        super.performInit(client, provider);
+        HeapHistogram histo = client.getHeapHistogram();
+        Set<HeapHistogram.ClassInfo> info = histo.getHeapHistogram();
         
-        int[] cnts = client.getAllocatedObjectsCountResults();
-        objectsCounts = new int[cnts.length];
-        System.arraycopy(cnts, 0, objectsCounts, 0, cnts.length);
-
-        if (LOGGER.isLoggable(Level.FINEST)) {
-            debugValues();
+        nProfiledClasses = info.size();
+        classNames = new String[nProfiledClasses];
+        objectsSizePerClass = new long[nProfiledClasses];
+        liveObjectsCounts = new int[nProfiledClasses];
+        int i = 0;
+        for (HeapHistogram.ClassInfo ci : info) {
+            classNames[i] = ci.getName();
+            objectsSizePerClass[i] = ci.getBytes();
+            liveObjectsCounts[i] = (int)ci.getInstancesCount();
+            i++;
         }
     }
 
@@ -103,10 +108,10 @@ public class AllocMemoryResultsSnapshot extends MemoryResultsSnapshot {
         super.readFromStream(in);
 
         int len = in.readInt();
-        objectsCounts = new int[len];
+        liveObjectsCounts = new int[len];
 
         for (int i = 0; i < len; i++) {
-            objectsCounts[i] = in.readInt();
+            liveObjectsCounts[i] = in.readInt();
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
@@ -115,17 +120,17 @@ public class AllocMemoryResultsSnapshot extends MemoryResultsSnapshot {
     }
 
     public String toString() {
-        return MessageFormat.format(MEMORY_ALLOC_MSG, new Object[] { super.toString() });
+        return MessageFormat.format(MEMORY_SAMPLED_MSG, new Object[] { super.toString() });
     }
 
     //---- Serialization support
     public void writeToStream(DataOutputStream out) throws IOException {
         super.writeToStream(out);
 
-        out.writeInt(objectsCounts.length);
+        out.writeInt(liveObjectsCounts.length);
 
-        for (int i = 0; i < objectsCounts.length; i++) {
-            out.writeInt(objectsCounts[i]);
+        for (int i = 0; i < liveObjectsCounts.length; i++) {
+            out.writeInt(liveObjectsCounts[i]);
         }
     }
 
@@ -136,6 +141,6 @@ public class AllocMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
     void debugValues() {
         super.debugValues();
-        LOGGER.finest("objectsCounts.length: " + debugLength(objectsCounts)); // NOI18N
+        LOGGER.finest("objectsCounts.length: " + debugLength(liveObjectsCounts)); // NOI18N
     }
 }

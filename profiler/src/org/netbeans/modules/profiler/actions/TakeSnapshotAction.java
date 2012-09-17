@@ -91,12 +91,12 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
 
         @Override
         public void resultsAvailable() {
-            if (getDelegate() != null) getDelegate().firePropertyChange(PROP_ENABLED, null, null);
+            if (getDelegate() != null) getDelegate().updateAction();
         }
 
         @Override
         public void resultsReset() {
-            if (getDelegate() != null) getDelegate().firePropertyChange(PROP_ENABLED, null, null);
+            if (getDelegate() != null) getDelegate().updateAction();
         }
         
     }
