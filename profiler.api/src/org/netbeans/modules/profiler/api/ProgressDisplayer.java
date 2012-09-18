@@ -59,8 +59,6 @@ public interface ProgressDisplayer {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public boolean isOpened();
-
     public void close();
 
     public ProgressDisplayer showProgress(String message);
@@ -88,10 +86,6 @@ public interface ProgressDisplayer {
             ph = ProgressHandleFactory.createHandle(message, controller);
             ph.start();
             return DEFAULT;
-        }
-
-        public synchronized boolean isOpened() {
-            return ph != null;
         }
 
         public synchronized void close() {
