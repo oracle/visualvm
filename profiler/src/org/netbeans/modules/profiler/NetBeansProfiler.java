@@ -1733,7 +1733,7 @@ public abstract class NetBeansProfiler extends Profiler {
 
             @Override
             protected void done() {
-                if (pd != null && pd.isOpened()) {
+                if (pd != null) {
                     pd.close();
                     pd = null;
                 }
@@ -1755,7 +1755,7 @@ public abstract class NetBeansProfiler extends Profiler {
 
             @Override
             protected void cancelled() {
-                if (pd != null && pd.isOpened()) {
+                if (pd != null) {
                     pd.close();
                     pd = null;
                 }
