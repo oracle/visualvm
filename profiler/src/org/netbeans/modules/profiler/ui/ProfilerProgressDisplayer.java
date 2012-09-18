@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.ui;
 
 import org.openide.DialogDescriptor;
-import org.openide.util.Cancellable;
 import org.openide.util.NbBundle;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -60,7 +59,6 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.openide.DialogDisplayer;
@@ -82,7 +80,6 @@ public class ProfilerProgressDisplayer extends JPanel implements ProgressDisplay
     protected static final String PROGRESS_STRING = Bundle.ProgressDisplayer_ProgressString();
     protected static final String CANCEL_BUTTON_TEXT = Bundle.ProgressDisplayer_CancelButtonText();
     // -----
-    private static final Object displayerLock = new Object();
 
     // --- Private implementation ------------------------------------------------
     private static ProfilerProgressDisplayer defaultInstance;
@@ -98,13 +95,10 @@ public class ProfilerProgressDisplayer extends JPanel implements ProgressDisplay
 
     // --- Instance variables declaration ----------------------------------------
     private ProgressController controller;
-    private boolean isOpened;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    private ProfilerProgressDisplayer() {
-        initComponents();
-    }
+    private ProfilerProgressDisplayer() {}
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -122,40 +116,37 @@ public class ProfilerProgressDisplayer extends JPanel implements ProgressDisplay
     
     
     @Override
-    public ProgressDisplayer showProgress(String caption, String message, ProgressController controller) {
-        synchronized (displayerLock) {
-            final DialogDescriptor dd = createDialogDescriptor(caption, message, controller);
-            final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
-            d.pack();
+    public ProgressDisplayer showProgress(final String caption, final String message, final ProgressController controller) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (progressLabel == null) initComponents();
+                
+                DialogDescriptor dd = createDialogDescriptor(caption, message, controller);
+                Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+                d.pack();
 
-            setOwner(d);
-
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        setOpened(true);
-                        d.setVisible(true);
-                    }
-                });
-
-            return this;
-        }
-    }
-
-    public boolean isOpened() {
-        synchronized (displayerLock) {
-            return isOpened;
-        }
+                owner = d;
+                if (owner instanceof JDialog) {
+                    ((JDialog)owner).setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+                }
+                
+                d.setVisible(true);
+            }
+        });
+        return this;
     }
 
     public void close() {
-        synchronized (displayerLock) {
-            if (owner != null) {
-                owner.setVisible(false);
-                owner.dispose();
-            }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (owner != null) {
+                    owner.setVisible(false);
+                    owner.dispose();
+                }
 
-            cleanup();
-        }
+                cleanup();
+            }
+        });
     }
 
     public static ProfilerProgressDisplayer getDefault() {
@@ -166,24 +157,11 @@ public class ProfilerProgressDisplayer extends JPanel implements ProgressDisplay
         return defaultInstance;
     }
 
-    private void setOpened(boolean isOpened) {
-        this.isOpened = isOpened;
-    }
-
-    private void setOwner(Dialog owner) {
-        this.owner = owner;
-
-        if (owner instanceof JDialog) {
-            ((JDialog) owner).setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        }
-    }
-
     private void cleanup() {
         if (progressBar != null) {
             progressBar.setIndeterminate(false);
         }
 
-        isOpened = false;
         controller = null;
         owner = null;
     }
@@ -194,16 +172,11 @@ public class ProfilerProgressDisplayer extends JPanel implements ProgressDisplay
         progressLabel.setText(message);
         progressBar.setIndeterminate(true);
 
-        DialogDescriptor dd = null;
-
-        if (controller == null) {
-            dd = new DialogDescriptor(this, caption, true, new Object[0], null, 0, null, null);
-        } else {
-            dd = new DialogDescriptor(this, caption, true, new Object[] { cancelButton }, null, 0, null, null);
-        }
+        DialogDescriptor dd = controller == null ?
+            new DialogDescriptor(this, caption, true, new Object[0], null, 0, null, null) :
+            new DialogDescriptor(this, caption, true, new Object[] { cancelButton }, null, 0, null, null);
 
         dd.setClosingOptions(new Object[0]);
-
         return dd;
     }
 
