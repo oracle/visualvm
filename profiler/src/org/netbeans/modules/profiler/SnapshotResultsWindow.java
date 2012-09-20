@@ -146,6 +146,9 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 
         @Override
         protected void handleSave() {
+            LoadedSnapshot toSave = snapshot;
+            if (toSave == null) return; // #218565 snapshot already closed
+            
             ResultsManager.getDefault().saveSnapshot(snapshot);
             ic.remove(this);
         }
