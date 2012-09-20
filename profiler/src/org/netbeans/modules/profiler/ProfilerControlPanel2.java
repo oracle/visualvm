@@ -1654,7 +1654,8 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
                 profileValueLabel.setText(ps.getSettingsName());
             }
 
-            String newHost = Profiler.getDefault().getTargetAppRunner().getProfilerEngineSettings().getRemoteHost();
+            TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
+            String newHost = runner == null ? null : runner.getProfilerEngineSettings().getRemoteHost();
 
             if (newHost == null) {
                 newHost = ""; // NOI18N
