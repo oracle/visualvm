@@ -165,7 +165,7 @@ public class ClassesListControllerUI extends JTitledPanel {
 
                 if (selectedRow != -1) {
                     Rectangle rowBounds = classesListTable.getCellRect(selectedRow, 0, true);
-                    tablePopup.show(classesListTable, rowBounds.x + (rowBounds.width / 2), rowBounds.y + (rowBounds.height / 2));
+                    showPopupMenu(selectedRow, rowBounds.x + (rowBounds.width / 2), rowBounds.y + (rowBounds.height / 2));
                 }
             }
         }
@@ -233,13 +233,13 @@ public class ClassesListControllerUI extends JTitledPanel {
         public void mousePressed(final MouseEvent e) {
             final int row = classesListTable.rowAtPoint(e.getPoint());
             updateSelection(row);
-            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+            if (e.isPopupTrigger()) showPopupMenu(row, e.getX(), e.getY());
         }
 
         public void mouseReleased(MouseEvent e) {
             int row = classesListTable.rowAtPoint(e.getPoint());
             updateSelection(row);
-            if (e.isPopupTrigger()) tablePopup.show(e.getComponent(), e.getX(), e.getY());
+            if (e.isPopupTrigger()) showPopupMenu(row, e.getX(), e.getY());
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -267,6 +267,7 @@ public class ClassesListControllerUI extends JTitledPanel {
     private ExtendedTableModel classesListTableModel;
     private FilterComponent filterComponent;
     private JExtendedTable classesListTable;
+    private JMenuItem showSourceItem;
     private JPanel contentsPanel;
     private JPopupMenu cornerPopup;
     private JPopupMenu tablePopup;
@@ -581,7 +582,6 @@ public class ClassesListControllerUI extends JTitledPanel {
                 }
             });
 
-        JMenuItem showSourceItem = null;
         if (GoToSource.isAvailable()) {
             showSourceItem = new JMenuItem(Bundle.ClassesListControllerUI_GoToSourceString());
             showSourceItem.addActionListener(new ActionListener() {
@@ -589,11 +589,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                         int row = classesListTable.getSelectedRow();
 
                         if (row != -1) {
-                            String className = (String) displayCache[row][0];
-
-                            while (className.endsWith("[]")) { // NOI18N
-                                className = className.substring(0, className.length() - 2);
-                            }
+                            String className = BrowserUtils.getArrayBaseType((String)displayCache[row][0]);
                             Lookup.Provider p = classesListController.getClassesController().getHeapFragmentWalker().getHeapDumpProject();
                             GoToSource.openSource(p, className, null, null);
                         }
@@ -956,6 +952,14 @@ public class ClassesListControllerUI extends JTitledPanel {
     private void showColumnSelectionPopup(final JPopupMenu headerPopup, final JButton cornerButton) {
         initColumnSelectorItems();
         headerPopup.show(cornerButton, cornerButton.getWidth() - headerPopup.getPreferredSize().width, cornerButton.getHeight());
+    }
+
+    private void showPopupMenu(int row, int x, int y) {
+        if(showSourceItem != null) {
+            String className = BrowserUtils.getArrayBaseType((String)displayCache[row][0]);
+            showSourceItem.setEnabled(!BrowserUtils.isPrimitiveType(className));
+        }
+        tablePopup.show(classesListTable, x, y);
     }
 
     private void showInstancesForClass(JavaClass jClass) {
