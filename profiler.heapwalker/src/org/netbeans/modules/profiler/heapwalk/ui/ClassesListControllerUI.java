@@ -372,20 +372,16 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     public void selectClass(JavaClass javaClass) {
-        if (ClassesListController.matchesFilter(javaClass, FilterComponent.getFilterValues(filterValue), filterType,
-                                                    showZeroInstances, showZeroSize)) {
-            selectClassImpl(javaClass);
-        } else {
+        if (!selectClassImpl(javaClass)) {
             filterComponent.setFilterValue(""); // NOI18N
             filterValue = filterComponent.getFilterValue();
             initDataImpl(javaClass);
         }
     }
     
-    private void selectClassImpl(JavaClass javaClass) {
-        //    if (isShowing()) {
+    private boolean selectClassImpl(JavaClass javaClass) {
         if ((displayCache == null) || (displayCache.length == 0)) {
-            return;
+            return true;
         }
 
         for (int i = 0; i < displayCache.length; i++) {
@@ -400,9 +396,10 @@ public class ClassesListControllerUI extends JTitledPanel {
                         }
                     });
 
-                break;
+                return true;
             }
         }
+        return false;
     }
 
     public void updateData() {
