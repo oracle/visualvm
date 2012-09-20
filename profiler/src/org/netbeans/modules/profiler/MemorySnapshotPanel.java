@@ -65,6 +65,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -145,7 +146,13 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
 
         infoPanel = new SnapshotInfoPanel(ls);
 
-        if (snapshot instanceof LivenessMemoryResultsSnapshot) {
+        if (snapshot instanceof SampledMemoryResultsSnapshot) {
+            memoryPanel = new SnapshotSampledResultsPanel((SampledMemoryResultsSnapshot) snapshot, memoryActionsHandler);
+
+            SnapshotSampledResultsPanel amemoryPanel = (SnapshotSampledResultsPanel) memoryPanel;
+            amemoryPanel.setSorting(sortingColumn, sortingOrder);
+            amemoryPanel.prepareResults();
+        } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {
             memoryPanel = new SnapshotLivenessResultsPanel((LivenessMemoryResultsSnapshot) snapshot, memoryActionsHandler,
                                                            ls.getSettings().getAllocTrackEvery());
 
@@ -439,7 +446,9 @@ public class MemorySnapshotPanel extends SnapshotPanel implements ChangeListener
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         Component selectedView = getSelectedView();
         if (selectedView == memoryPanel) {
-            if (memoryPanel instanceof SnapshotAllocResultsPanel) {
+            if (memoryPanel instanceof SnapshotSampledResultsPanel) {
+                ((SnapshotSampledResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_MemoryResultsTabName());
+            } else if (memoryPanel instanceof SnapshotAllocResultsPanel) {
                 ((SnapshotAllocResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_MemoryResultsTabName());
             } else if (memoryPanel instanceof SnapshotLivenessResultsPanel) {
                 ((SnapshotLivenessResultsPanel)memoryPanel).exportData(exportedFileType, eDD, Bundle.MemorySnapshotPanel_MemoryResultsTabName());

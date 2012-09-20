@@ -841,7 +841,6 @@ public class Monitors implements CommonConstants {
 
     static void exitServerState() {
         synchronized(activeServerStateLock) {
-            assert activeServerState != null;
             activeServerState = activeServerState.parent;
         }
     }
