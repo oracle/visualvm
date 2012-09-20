@@ -451,16 +451,16 @@ public abstract class NetBeansProfiler extends Profiler {
             ProfilerDialogs.displayError(e.getMessage());
             initFailed = true;
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, Bundle.NetBeansProfiler_EngineInitFailedMsg(e.getLocalizedMessage()), e);
+            // #216809 - likely an unsupported system, just silently log the problem
+            LOGGER.log(Level.WARNING, Bundle.NetBeansProfiler_EngineInitFailedMsg(e.getLocalizedMessage()));
             initFailed = true;
         }
 
         
         if (!initFailed) {
             initialized = true;
+            new ServerStateMonitor(this);
         }
-
-        new ServerStateMonitor(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
