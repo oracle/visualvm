@@ -213,11 +213,13 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                 try {
                     newItem = formatterFactory.getFormatter().formatMethodName(scs).toFormatted();
                     if (!selectedRoots.contains(scs)) {
-                        selectedRoots.remove(sel);
-                        selectedRoots.add(scs);
+                        int index = selectedRoots.indexOf(sel);
+                        selectedRoots.remove(index);
+                        selectedRoots.add(index, scs);
 
-                        rootsListModel.addElement(newItem);
-                        rootsList.setSelectedValue(newItem, true);
+                        rootsListModel.remove(index);
+                        rootsListModel.add(index, newItem);
+                        rootsList.setSelectedIndex(index);
                     }
                 } catch (Exception ex) {
                     ProfilerDialogs.displayError(Bundle.RootMethodsPanel_IncorrectManualRootMsg());
