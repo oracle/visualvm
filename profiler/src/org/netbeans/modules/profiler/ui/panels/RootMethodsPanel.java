@@ -138,41 +138,50 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
      */
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource() == addFromJarButton) {
+            addFromJarButton.setEnabled(false);
             RequestProcessor.getDefault().post(new Runnable() {
 
                 public void run() {
-                    FileChooserBuilder b = new FileChooserBuilder(RootMethodsPanel.class);
-                    File jar = b.setFileFilter(new FileFilter() {
+                    try {
+                        FileChooserBuilder b = new FileChooserBuilder(RootMethodsPanel.class);
+                        File jar = b.setFileFilter(new FileFilter() {
 
-                        @Override
-                        public boolean accept(File f) {
-                            if (f.isDirectory()) {
-                                return true;
+                            @Override
+                            public boolean accept(File f) {
+                                if (f.isDirectory()) {
+                                    return true;
+                                }
+                                String ext = null;
+                                String n = f.getName();
+                                int index = n.lastIndexOf(".");
+                                if (index > -1) {
+                                    ext = n.substring(index + 1);
+                                }
+                                return ext != null && ext.equalsIgnoreCase("jar");
                             }
-                            String ext = null;
-                            String n = f.getName();
-                            int index = n.lastIndexOf(".");
-                            if (index > -1) {
-                                ext = n.substring(index + 1);
+
+                            @Override
+                            public String getDescription() {
+                                return "Class folders/JARs";
                             }
-                            return ext != null && ext.equalsIgnoreCase("jar");
+                        }).showOpenDialog();
+
+                        if (jar == null) {
+                            return;
                         }
 
-                        @Override
-                        public String getDescription() {
-                            return "Class folders/JARs";
+                        final ClientUtils.SourceCodeSelection[] sel = FileSelectRootMethodsPanel.getDefault().getRootMethods(FileUtil.toFileObject(jar),
+                                (ClientUtils.SourceCodeSelection[]) selectedRoots.toArray(new ClientUtils.SourceCodeSelection[]{}));
+
+                        if (sel != null) {
+                            addNewRootMethods(sel, true);
                         }
-                    }).showOpenDialog();
-
-                    if (jar == null) {
-                        return;
-                    }
-
-                    final ClientUtils.SourceCodeSelection[] sel = FileSelectRootMethodsPanel.getDefault().getRootMethods(FileUtil.toFileObject(jar),
-                            (ClientUtils.SourceCodeSelection[]) selectedRoots.toArray(new ClientUtils.SourceCodeSelection[]{}));
-
-                    if (sel != null) {
-                        addNewRootMethods(sel, true);
+                    } finally {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                addFromJarButton.setEnabled(true);
+                            }
+                        });
                     }
                 }
             });
