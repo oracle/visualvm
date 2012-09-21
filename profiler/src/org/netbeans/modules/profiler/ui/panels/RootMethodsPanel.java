@@ -87,7 +87,8 @@ import org.openide.util.RequestProcessor;
     "RootMethodsPanel_RemoveButtonAccessDescr=Remove selected profiling roots.",
     "RootMethodsPanel_IncorrectManualRootMsg=<html><b>No method could be resolved based on the provided data.</b><br><br>Please make sure you have entered the method definition correctly.<br>Use <code>javap -s &lt;classname&gt;</code> for exact methods definitions in VM format.",
     "RootMethodsPanel_AddFromJarButtonText=Add &JAR/Folder...",
-    "RootMethodsPanel_AddFromJarButtonAccessDescr=Add new profiling root from an external jar or folder."
+    "RootMethodsPanel_AddFromJarButtonAccessDescr=Add new profiling root from an external jar or folder.",
+    "RootMethodsPanel_FoldersJarsFileFilter=Class folders/JARs"
 })
 public final class RootMethodsPanel extends JPanel implements ActionListener, ListSelectionListener, HelpCtx.Provider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -153,16 +154,16 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
                                 }
                                 String ext = null;
                                 String n = f.getName();
-                                int index = n.lastIndexOf(".");
+                                int index = n.lastIndexOf("."); // NOI18N
                                 if (index > -1) {
                                     ext = n.substring(index + 1);
                                 }
-                                return ext != null && ext.equalsIgnoreCase("jar");
+                                return ext != null && ext.equalsIgnoreCase("jar"); // NOI18N
                             }
 
                             @Override
                             public String getDescription() {
-                                return "Class folders/JARs";
+                                return Bundle.RootMethodsPanel_FoldersJarsFileFilter();
                             }
                         }).showOpenDialog();
 
