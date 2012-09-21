@@ -264,7 +264,7 @@ class NearestGCRoot {
         return readBuffer.readLong();
     }
 
-    private void switchBuffers() {
+    private void switchBuffers() throws IOException {
         LongBuffer b = readBuffer;
         readBuffer = writeBuffer;
         writeBuffer = b;
