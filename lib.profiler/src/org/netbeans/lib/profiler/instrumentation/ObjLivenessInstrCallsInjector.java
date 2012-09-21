@@ -43,11 +43,12 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
+import java.io.IOException;
 import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import java.io.IOException;
+import org.netbeans.lib.profiler.utils.MiscUtils;
 
 
 /**
@@ -102,7 +103,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
             opcNewToInstr = opcNewCount + 1;
             bci = 0;
 
-            while (bci < bytecodesLength) {
+            while (bci < bytecodesLength && bytecodesLength + injectedCodeLen < 65535) {
                 bc = (bytecodes[bci] & 0xFF);
 
                 if ((bc == opc_new) || (bc == opc_anewarray) || (bc == opc_newarray) || (bc == opc_multianewarray)) {
@@ -198,6 +199,11 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                 bci += opcodeLength(bci);
             }
         } while (opcNewToInstr == 0);
+        if (bci < bytecodesLength) {
+            // method was not fully instrumented -> issue warnining
+            String methodFQN = clazz.getName()+"."+clazz.getMethodName(methodIdx)+clazz.getMethodSignature(methodIdx);  // NOI18N
+            MiscUtils.printWarningMessage("Method "+methodFQN+" is too big to be fully instrumented.");  // NOI18N
+        }
 
         if (nInjections == 0) {
             ((DynamicClassInfo) clazz).unsetMethodInstrumented(methodIdx);

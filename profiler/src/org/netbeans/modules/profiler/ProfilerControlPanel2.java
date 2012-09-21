@@ -478,6 +478,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
 
                         break;
                     case CommonConstants.INSTR_NONE_SAMPLING:
+                    case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
                     case CommonConstants.INSTR_NONE:
                         instrStatusText = Bundle.ProfilerControlPanel2_NothingInstrumentedMsg();
 
@@ -847,6 +848,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
                     break;
                 case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
                 case CommonConstants.INSTR_OBJECT_LIVENESS:
+                case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
                     newMode = MEMORY;
 
                     break;
@@ -986,6 +988,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
                         return fragmentIcon;
                     case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
                     case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                    case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
                         return memoryIcon;
                     default:
                         return null;
@@ -1527,7 +1530,8 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
         "ProfilerControlPanel2_CodeFragmentLabelString=Code Fragment",
         "ProfilerControlPanel2_CpuSamplingLabelString=CPU sampling",
         "ProfilerControlPanel2_CpuLabelString=CPU instrumentation",       
-        "ProfilerControlPanel2_MemoryLabelString=Memory",
+        "ProfilerControlPanel2_MemorySamplingLabelString=Memory sampling",
+        "ProfilerControlPanel2_MemoryLabelString=Memory instrumentation",
         "ProfilerControlPanel2_MonitorLabelString=Monitor",
         "ProfilerControlPanel2_RunningLabelString=Running",
         "ProfilerControlPanel2_StartedLabelString=Started",
@@ -1632,6 +1636,10 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
                         typeValueLabel.setText(Bundle.ProfilerControlPanel2_CpuLabelString());
 
                         break;
+                    case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
+                        typeValueLabel.setText(Bundle.ProfilerControlPanel2_MemorySamplingLabelString());
+
+                        break;
                     case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
                     case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
                         typeValueLabel.setText(Bundle.ProfilerControlPanel2_MemoryLabelString());
@@ -1646,7 +1654,8 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
                 profileValueLabel.setText(ps.getSettingsName());
             }
 
-            String newHost = Profiler.getDefault().getTargetAppRunner().getProfilerEngineSettings().getRemoteHost();
+            TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
+            String newHost = runner == null ? null : runner.getProfilerEngineSettings().getRemoteHost();
 
             if (newHost == null) {
                 newHost = ""; // NOI18N

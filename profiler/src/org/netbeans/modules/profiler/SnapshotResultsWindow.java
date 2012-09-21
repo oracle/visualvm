@@ -146,6 +146,9 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 
         @Override
         protected void handleSave() {
+            LoadedSnapshot toSave = snapshot;
+            if (toSave == null) return; // #218565 snapshot already closed
+            
             ResultsManager.getDefault().saveSnapshot(snapshot);
             ic.remove(this);
         }
@@ -221,6 +224,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 break;
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
                 getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_MemorySnapshotAccessDescr());
                 displayMemoryResults(ls, sortingColumn, sortingOrder);
 
