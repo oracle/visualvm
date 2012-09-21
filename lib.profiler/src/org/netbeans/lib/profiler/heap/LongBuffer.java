@@ -103,12 +103,19 @@ class LongBuffer {
         try {
             return readStream.readLong();
         } catch (EOFException ex) {
+            readStream.close();
             return 0L;
         }
     }
 
-    void reset() {
+    void reset() throws IOException {
         bufferSize = 0;
+        if (writeStream != null) {
+            writeStream.close();
+        }
+        if (readStream != null) {
+            readStream.close();
+        }
         writeStream = null;
         readStream = null;
         longs = 0;

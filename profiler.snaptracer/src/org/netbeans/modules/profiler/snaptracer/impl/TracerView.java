@@ -284,6 +284,7 @@ final class TracerView {
         Component oldContents = layout.getLayoutComponent(BorderLayout.CENTER);
         if (oldContents != null) container.remove(oldContents);
         container.add(contents, BorderLayout.CENTER);
+        contents.requestFocusInWindow();
         container.revalidate();
         container.repaint();
     }
