@@ -576,11 +576,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
                         if (row != -1) {
                             HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
-                            String className = node.getType();
-
-                            while (className.endsWith("[]")) { // NOI18N
-                                className = className.substring(0, className.length() - 2);
-                            }
+                            String className = BrowserUtils.getArrayBaseType(node.getType());
                             Lookup.Provider p = fieldsBrowserController.getInstancesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
                             GoToSource.openSource(p, className, null, null);
                         }
@@ -826,10 +822,18 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode && ((HeapWalkerInstanceNode) node).hasInstance());
 
         // Go To Source
-        if (showSourceItem != null)
-            showSourceItem.setEnabled((node instanceof HeapWalkerInstanceNode &&
-                    ((HeapWalkerInstanceNode) node).hasInstance()) ||
-                    node instanceof ClassNode);
+        if (showSourceItem != null) {
+            String className = null;
+            if(node instanceof ClassNode) {
+                className = ((ClassNode)node).getJavaClass().getName();
+            } else if (node instanceof HeapWalkerInstanceNode) {
+                HeapWalkerInstanceNode instanceNode = (HeapWalkerInstanceNode)node;
+                if(instanceNode.hasInstance()) {
+                    className = instanceNode.getInstance().getJavaClass().getName();
+                }
+            }
+            showSourceItem.setEnabled(className != null && !BrowserUtils.isPrimitiveType(BrowserUtils.getArrayBaseType(className)));
+        }
 
         if ((x == -1) || (y == -1)) {
             Rectangle rowBounds = fieldsListTable.getCellRect(row, 0, true);
