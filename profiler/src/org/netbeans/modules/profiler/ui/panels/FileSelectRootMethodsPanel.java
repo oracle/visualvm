@@ -55,9 +55,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -164,9 +161,7 @@ final public class FileSelectRootMethodsPanel extends JPanel {
         container.setLayout(new GridBagLayout());
 
         fileTreeView.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
-
-        JScrollPane advancedLogicalPackageTreeScrollPane = new JScrollPane(fileTreeView);
-        advancedLogicalPackageTreeScrollPane.setPreferredSize(PREFERRED_TOPTREE_DIMENSION);
+        fileTreeView.setPreferredSize(PREFERRED_TOPTREE_DIMENSION);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -177,7 +172,7 @@ final public class FileSelectRootMethodsPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(10, 10, 0, 10);
-        container.add(advancedLogicalPackageTreeScrollPane, gridBagConstraints);
+        container.add(fileTreeView, gridBagConstraints);
     }
 
     public ClientUtils.SourceCodeSelection[] getRootMethods(final FileObject javaFile,
