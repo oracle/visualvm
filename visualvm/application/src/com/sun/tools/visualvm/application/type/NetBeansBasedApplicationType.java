@@ -69,12 +69,12 @@ public class NetBeansBasedApplicationType extends ApplicationType {
         if (fullVersionString != null) {
             int index = fullVersionString.indexOf("(");
             if (index != -1) {
-                return fullVersionString.substring(0,index-1).trim();
+                return fullVersionString.substring(0,index).trim();
             }
             index = fullVersionString.lastIndexOf(" ");
             String buildNo = fullVersionString.substring(index+1);
             if (buildNo.length()>19 && buildNo.charAt(8)=='-') {
-                return fullVersionString.substring(0,index-1);
+                return fullVersionString.substring(0,index);
             }
             return fullVersionString;
         }
