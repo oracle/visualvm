@@ -577,13 +577,7 @@ public class InstancesListControllerUI extends JTitledPanel {
         
         Clipboard clipboard = Lookup.getDefault().lookup(Clipboard.class);
 
-        clipboard.setContents(new StringSelection("0x" + Long.toHexString(instance.getInstanceId())), new ClipboardOwner() {
-
-            @Override
-            public void lostOwnership(Clipboard clipboard, Transferable contents) {
-                // ignore
-            }
-        });
+        clipboard.setContents(new StringSelection("0x" + Long.toHexString(instance.getInstanceId())), null);  // NOI18N
     }
     
     private boolean displaysCollapsedInstances() {
