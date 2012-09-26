@@ -56,7 +56,10 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -316,6 +319,7 @@ public class HeapTest {
             }
         }
         Collection roots = heap.getGCRoots();
+        roots = sortGCRoots(roots);
         out.println("GC roots "+roots.size());
         
         for(Object g : roots) {
@@ -342,5 +346,28 @@ public class HeapTest {
             line = reader.readLine();
         }
         assertEquals("File "+goledFile.getAbsolutePath()+" and "+outFile.getAbsolutePath()+" differs on line "+goldenReader.getLineNumber(), goldenLine, line);
+    }
+
+    private Collection sortGCRoots(Collection roots) {
+        List r = new ArrayList(roots);
+        Collections.sort(r, new Comparator() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+                GCRoot r1 = (GCRoot)o1;
+                GCRoot r2 = (GCRoot)o2;
+                int kind = r1.getKind().compareTo(r2.getKind());
+                
+                if (kind != 0) {
+                    return kind;
+                }
+                
+                long x = r1.getInstance().getInstanceId();
+                long y = r2.getInstance().getInstanceId();                
+                return (x < y) ? -1 : ((x == y) ? 0 : 1);
+            }
+            
+        });
+        return r;
     }
 }
