@@ -110,10 +110,14 @@ public class NetBeansApplicationType extends ApplicationType {
      */
     public String getDescription() {
         if (jvm.isGetSystemPropertiesSupported()) {
-            String versionString = jvm.getSystemProperties().getProperty(PRODUCT_VERSION_PROPERTY);
+            Properties sysProps = jvm.getSystemProperties();
             
-            if (versionString != null) {
-                return versionString;
+            if (sysProps != null) {
+                String versionString = sysProps.getProperty(PRODUCT_VERSION_PROPERTY);
+
+                if (versionString != null) {
+                    return versionString;
+                }
             }
         }
         return NbBundle.getMessage(NetBeansApplicationType.class, "DESCR_NetBeansApplicationType");   // NOI18N
@@ -128,6 +132,7 @@ public class NetBeansApplicationType extends ApplicationType {
     }
 
     private String getVersionFromSysProps(Properties properties) {
+        if (properties == null) return null;
         String versionString = properties.getProperty(PRODUCT_VERSION_PROPERTY);
         
         if (versionString != null) {
