@@ -30,7 +30,6 @@ import com.sun.tools.visualvm.profiling.snapshot.ProfilerSnapshot;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.NbBundle;
 

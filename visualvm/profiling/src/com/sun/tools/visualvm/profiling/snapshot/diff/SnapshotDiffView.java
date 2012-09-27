@@ -42,7 +42,6 @@ import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.MemoryDiffPanel;
 import org.netbeans.modules.profiler.SnapshotsDiffWindow;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
