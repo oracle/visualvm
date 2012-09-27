@@ -256,7 +256,7 @@ final class ApplicationOverviewModel {
     }
 
     private static String formatSystemProperties(Properties properties) {
-        StringBuffer text = new StringBuffer(200);
+        StringBuilder text = new StringBuilder(200);
         List keys = new ArrayList();
         Enumeration en = properties.propertyNames();
         Iterator keyIt;
@@ -282,7 +282,27 @@ final class ApplicationOverviewModel {
             text.append(val);
             text.append("<br>");    // NOI18N
         }
+        return expandInvalidXMLChars(text);
+    }
+    
+    private static String expandInvalidXMLChars(CharSequence chars) {
+        StringBuilder text = new StringBuilder(chars.length());
+        char ch;
+        
+        for (int i = 0; i < chars.length(); i++) {
+            ch = chars.charAt(i);
+            text.append(isValidXMLChar(ch) ? ch :
+                    "&lt;0x" + Integer.toHexString(0x10000 | ch).substring(1).toUpperCase() + "&gt;"); // NOI18N
+        }
+        
         return text.toString();
+    }
+    
+    private static boolean isValidXMLChar(char ch) {
+        return (ch == 0x9 || ch == 0xA || ch == 0xD ||
+              ((ch >= 0x20) && (ch <= 0xD7FF)) ||
+              ((ch >= 0xE000) && (ch <= 0xFFFD)) ||
+              ((ch >= 0x10000) && (ch <= 0x10FFFF)));
     }
     
     private ApplicationOverviewModel() {}
