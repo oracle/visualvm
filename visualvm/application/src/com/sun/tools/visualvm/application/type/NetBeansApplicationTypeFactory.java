@@ -46,6 +46,8 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
     private static final String VISUALVM_ID = "visualvm"; // NOI18N
     private static final String MAIN_CLASS = "org.netbeans.Main"; // NOI18N
     private static final Pattern NBCLUSTER_PATTERN = Pattern.compile("nb[0-9]+\\.[0-9]+");    // NOI18N
+    private static final String BUILD_CLUSTER = "cluster"; // NOI18N
+    private static final String VISUALVM_BUILD_WIN_ID = "\\visualvm\\build\\cluster;"; // NOI18N
     static final String NB_CLUSTER = "nb";    // NOI18N
     static final String PRODUCT_VERSION_PROPERTY="netbeans.productversion";  // NOI18N
     
@@ -131,6 +133,15 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
                 }
                 if (VISUALVM_ID.equals(cluster)) {
                     return new VisualVMApplicationType(app);
+                }
+                if (BUILD_CLUSTER.equals(cluster)) {
+                    // NetBeans platform application was executed 
+                    // directly from IDE or from ant script.
+                    // Check if it is VisualVM on Windows - on other platforms
+                    // VisualVM is recognized via branding
+                    if (jvm.getJvmArgs().contains(VISUALVM_BUILD_WIN_ID)) {
+                        return new VisualVMApplicationType(app);
+                    }
                 }
             }
             if (clusters.isEmpty() && branding == null) {
