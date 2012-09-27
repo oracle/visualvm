@@ -29,7 +29,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import org.netbeans.modules.profiler.LoadedSnapshot;
+import java.io.File;
 
 /**
  *
@@ -49,7 +49,7 @@ public final class ProfilerSnapshotsSupport {
     }
 
 
-    public void createSnapshot(LoadedSnapshot loadedSnapshot, Application application,
+    public void createSnapshot(File loadedSnapshot, Application application,
                                boolean openView) {
         profilerSnapshotsProvider.createSnapshot(loadedSnapshot, application, openView);
     }

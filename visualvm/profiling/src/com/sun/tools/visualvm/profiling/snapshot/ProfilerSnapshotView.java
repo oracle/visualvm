@@ -30,20 +30,8 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import java.awt.Dimension;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
-import org.netbeans.lib.profiler.common.CommonUtils;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.SnapshotResultsWindow;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.NbBundle;
 
 /**
@@ -52,11 +40,8 @@ import org.openide.util.NbBundle;
  * @author Tomas Hurka
  */
 final class ProfilerSnapshotView extends DataSourceView {
-    private static final Logger LOGGER =
-            Logger.getLogger(ProfilerSnapshotView.class.getName());
     
-    private LoadedSnapshot loadedSnapshot = null;
-    private SnapshotResultsWindow srw = null;
+    private ProfilerSnapshot loadedSnapshot = null;
 
     public ProfilerSnapshotView(ProfilerSnapshot snapshot) {
         this(snapshot, DataSourceDescriptorFactory.getDescriptor(snapshot));
@@ -65,46 +50,16 @@ final class ProfilerSnapshotView extends DataSourceView {
     private ProfilerSnapshotView(ProfilerSnapshot snapshot, DataSourceDescriptor descriptor) {
         super(snapshot, descriptor.getName(), descriptor.getIcon(),
               Positionable.POSITION_AT_THE_END, true);
-        loadedSnapshot = snapshot.getLoadedSnapshot();
+        loadedSnapshot = snapshot;
     }
     
         
     protected void removed() {
-        if (srw != null) {
-            CommonUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    try {
-                        Method method = srw.getClass().getDeclaredMethod("componentClosed");   // NOI18N
-                        if (method != null) {
-                            method.setAccessible(true);
-                            method.invoke(srw);
-                        }
-                    } catch (NoSuchMethodException noSuchMethodException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
-                                        "removed", noSuchMethodException);   // NOI18N
-                    } catch (SecurityException securityException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
-                                        "removed", securityException);   // NOI18N
-                    } catch (IllegalAccessException illegalAccessException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
-                                        "removed", illegalAccessException);   // NOI18N
-                    } catch (IllegalArgumentException illegalArgumentException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
-                                        "removed", illegalArgumentException);   // NOI18N
-                    } catch (InvocationTargetException invocationTargetException) {
-                        LOGGER.throwing(ProfilerSnapshotView.class.getName(),
-                                        "removed", invocationTargetException);   // NOI18N
-                    }
-                    srw = null;
-                }
-            });
-        }
+        loadedSnapshot.closeComponent();
         loadedSnapshot = null;
     }
     
     protected DataViewComponent createComponent() {
-        srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.
-                                        SORTING_COLUMN_DEFAULT, false);
         DataViewComponent dvc = new DataViewComponent(
                 new MasterViewSupport().getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(true));
@@ -118,22 +73,7 @@ final class ProfilerSnapshotView extends DataSourceView {
     private class MasterViewSupport extends JPanel  {
         
         public DataViewComponent.MasterView getMasterView() {
-            try {
-                JComponent cpuResPanel = (JComponent)srw.getComponent(0);
-                cpuResPanel.setOpaque(false);
-                JToolBar toolBar = (JToolBar)cpuResPanel.getComponent(1);
-                toolBar.setOpaque(false);
-                int componentsCount = toolBar.getComponentCount();
-                ((JComponent)toolBar.getComponent(0)).setOpaque(false);
-                ((JComponent)toolBar.getComponent(1)).setOpaque(false);
-                ((JComponent)toolBar.getComponent(componentsCount - 3)).setOpaque(false);
-                ((JComponent)toolBar.getComponent(componentsCount - 2)).setOpaque(false);
-                ((JComponent)toolBar.getComponent(componentsCount - 1)).setOpaque(false);
-                JTabbedPane tabbedPane = (JTabbedPane)cpuResPanel.getComponent(0);
-                JComponent infoPanel = (JComponent)tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1);
-                infoPanel.setBorder(BorderFactory.createEmptyBorder());
-            } catch (Exception e) {}
-            srw.setPreferredSize(new Dimension(1, 1));
+            JComponent srw = loadedSnapshot.getUIComponent();
             return new DataViewComponent.MasterView(NbBundle.getMessage(
                     ProfilerSnapshotView.class, "DESCR_Profiler_Snapshot"), null, srw);   // NOI18N
         }

@@ -70,12 +70,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.MemoryMXBean;
-import java.lang.management.ThreadMXBean;
 import java.net.URL;
 import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.management.MBeanServerConnection;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -85,7 +83,6 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
@@ -498,36 +495,19 @@ final class SamplerImpl {
 
                 CPUSamplerSupport.SnapshotDumper snapshotDumper = new CPUSamplerSupport.SnapshotDumper() {
                     public void takeSnapshot(final boolean openView) {
-                        final StackTraceSnapshotBuilder builderF = builder;
                         RequestProcessor.getDefault().post(new Runnable() {
                             public void run() {
                                 LoadedSnapshot ls = null;
-                                DataOutputStream dos = null;
                                 try {
-                                    long time = System.currentTimeMillis();
-                                    CPUResultsSnapshot snapshot = builderF.createSnapshot(time);
-                                    ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
-                                    File file = Utils.getUniqueFile(application.getStorage().getDirectory(),
-                                                                    Long.toString(time),
-                                                                    "." + ResultsManager.SNAPSHOT_EXTENSION); // NOI18N
-                                    dos = new DataOutputStream(new FileOutputStream(file));
-                                    ls.save(dos);
-                                    ls.setFile(file);
-                                    ls.setSaved(true);
+                                    ls = takeNPSSnapshot(application.getStorage().getDirectory());
                                 } catch (CPUResultsSnapshot.NoDataAvailableException e) {
                                     DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(NbBundle.getMessage(
                                             SamplerImpl.class, "MSG_No_save_data_cpu"), NotifyDescriptor.WARNING_MESSAGE)); // NOI18N
                                 } catch (Throwable t) {
                                     LOGGER.log(Level.WARNING, "Failed to save profiler snapshot for " + application, t); // NOI18N
-                                } finally {
-                                    try {
-                                        if (dos != null) dos.close();
-                                    } catch (IOException e) {
-                                        LOGGER.log(Level.WARNING, "Problem closing output stream for  " + dos, e); // NOI18N
-                                    }
                                 }
                                 if (ls != null) {
-                                    ProfilerSnapshot ps = new ProfilerSnapshot(ls, application);
+                                    ProfilerSnapshot ps = ProfilerSnapshot.createSnapshot(ls.getFile(), application);
                                     application.getRepository().addDataSource(ps);
                                     if (openView)
                                         DataSourceWindowManager.sharedInstance().openDataSource(ps);
@@ -721,7 +701,7 @@ final class SamplerImpl {
                                     }
                                 }
                                 if (ls != null) {
-                                    ProfilerSnapshot ps = new ProfilerSnapshot(ls, application);
+                                    ProfilerSnapshot ps = ProfilerSnapshot.createSnapshot(ls.getFile(), application);
                                     application.getRepository().addDataSource(ps);
                                     if (openView)
                                         DataSourceWindowManager.sharedInstance().openDataSource(ps);

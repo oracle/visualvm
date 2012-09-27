@@ -26,48 +26,17 @@
 package com.sun.tools.visualvm.profiling.snapshot;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotDescriptor;
-import java.awt.Image;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-final class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {
-    private static final Logger LOGGER =
-            Logger.getLogger(ProfilerSnapshotDescriptor.class.getName());
-    
-    private static final Image CPU_ICON = Icons.getImage(ProfilerIcons.CPU);
-    private static final Image MEMORY_ICON = Icons.getImage(ProfilerIcons.MEMORY);
-    private static final Image NODE_BADGE = ImageUtilities.loadImage(
-            "com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
-    
+final class ProfilerSnapshotDescriptor extends SnapshotDescriptor<ProfilerSnapshot> {        
 
     public ProfilerSnapshotDescriptor(ProfilerSnapshot snapshot) {
         super(snapshot, NbBundle.getMessage(ProfilerSnapshotDescriptor.class,
-              "DESCR_ProfilerSnapshot"), resolveIcon(snapshot)); // NOI18N
-    }
-
-    
-    private static Image resolveIcon(ProfilerSnapshot snapshot) {
-        try {
-            int snapshotType = snapshot.getLoadedSnapshot().getType();
-            if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_CPU)
-                return ImageUtilities.mergeImages(CPU_ICON, NODE_BADGE, 0, 0);
-            else if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS ||
-                     snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS)
-                return ImageUtilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
-            else return null;
-        } catch (Exception e) {
-            LOGGER.log(Level.FINE, "Failed to determine profiler snapshot type", e);  // NOI18N
-            return null;
-        }
-    }
-        
+              "DESCR_ProfilerSnapshot"), snapshot.resolveIcon()); // NOI18N
+    }    
 }

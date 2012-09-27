@@ -31,20 +31,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.api.actions.Openable;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> {
     private static final Logger LOGGER =
@@ -53,8 +54,8 @@ final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> 
     private static final String NAME = NbBundle.getMessage(
             ProfilerSnapshotCategory.class, "MSG_Profiler_Snapshots");   // NOI18N
     private static final String PREFIX = "snapshot";    // NOI18N
-    private static final String NPS_SUFFIX = ".nps";    // NOI18N
-    private static final String NPSS_SUFFIX = ".npss";    // NOI18N
+    private static final String NPS_SUFFIX = "."+ResultsManager.SNAPSHOT_EXTENSION;    // NOI18N
+    private static final String NPSS_SUFFIX = "."+ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION;    // NOI18N
     
     public ProfilerSnapshotCategory() {
         super(NAME, ProfilerSnapshot.class, PREFIX, NPS_SUFFIX, 30);
@@ -83,13 +84,9 @@ final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> 
                     pHandle.start();
                     try {
                         FileObject fileObject = FileUtil.toFileObject(file);
-                        final LoadedSnapshot loadedSnapshot =
-                                ResultsManager.getDefault().loadSnapshot(fileObject);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                ResultsManager.getDefault().openSnapshot(loadedSnapshot);
-                            }
-                        });
+                        DataObject dobj = DataObject.find(fileObject);
+                        Openable openCookie = dobj.getLookup().lookup(Openable.class);
+                        openCookie.open();
                     } catch (Exception e) {
                         LOGGER.log(Level.INFO, "Error loading profiler snapshot", e); // NOI18N
                         SwingUtilities.invokeLater(new Runnable() {

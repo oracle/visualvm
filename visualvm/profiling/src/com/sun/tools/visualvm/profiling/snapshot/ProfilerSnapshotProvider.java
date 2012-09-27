@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.profiling.snapshot;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.DataSourceRepository;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
@@ -33,23 +34,21 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 final class ProfilerSnapshotProvider {
     
-    public void createSnapshot(LoadedSnapshot loadedSnapshot, Application application, final boolean openView) {
-        final ProfilerSnapshot snapshot = new ProfilerSnapshot(loadedSnapshot, application);
+    void createSnapshot(File snapshotFile, Application application, final boolean openView) {
+        final ProfilerSnapshot snapshot = ProfilerSnapshot.createSnapshot(snapshotFile, application);
         application.getRepository().addDataSource(snapshot);
         if (openView) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -58,7 +57,7 @@ final class ProfilerSnapshotProvider {
         });
     }
     
-    public void initialize() {
+    void initialize() {
         DataSourceRepository.sharedInstance().addDataChangeListener(
                 new SnapshotListener(), Snapshot.class);
         DataSourceRepository.sharedInstance().addDataChangeListener(
@@ -70,11 +69,7 @@ final class ProfilerSnapshotProvider {
         if (snapshot instanceof ProfilerSnapshot) return;
         File snapshotFile = snapshot.getFile();
         if (snapshotFile != null && snapshotFile.isDirectory()) {
-            Set<ProfilerSnapshot> snapshots = new HashSet();
-            LoadedSnapshot[] loadedSnapshots = findSnapshots(snapshotFile);
-            for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
-                if (loadedSnapshot != null)
-                    snapshots.add(new ProfilerSnapshot(loadedSnapshot, snapshot));
+            Set<ProfilerSnapshot> snapshots =findSnapshots(snapshotFile, snapshot);
             snapshot.getRepository().addDataSources(snapshots);
         }
     }
@@ -82,23 +77,20 @@ final class ProfilerSnapshotProvider {
     private void processNewApplication(Application application) {
         Storage storage = application.getStorage();
         if (storage.directoryExists()) {
-            Set<ProfilerSnapshot> snapshots = new HashSet();
-            LoadedSnapshot[] loadedSnapshots = findSnapshots(storage.getDirectory());
-            for (LoadedSnapshot loadedSnapshot : loadedSnapshots)
-                if (loadedSnapshot != null)
-                    snapshots.add(new ProfilerSnapshot(loadedSnapshot, application));
+            Set<ProfilerSnapshot> snapshots = findSnapshots(storage.getDirectory(),application);
             application.getRepository().addDataSources(snapshots);
         }
     }
     
-    private LoadedSnapshot[] findSnapshots(File directory) {
+    private Set<ProfilerSnapshot> findSnapshots(File directory,DataSource app) {
         File[] files = directory.listFiles(
                 ProfilerSnapshotsSupport.getInstance().getCategory().getFilenameFilter());
-        if (files == null) return new LoadedSnapshot[0];
-        FileObject[] fileObjects = new FileObject[files.length];
-        for (int i = 0; i < files.length; i++)
-            fileObjects[i] = FileUtil.toFileObject(FileUtil.normalizeFile(files[i]));
-        return ResultsManager.getDefault().loadSnapshots(fileObjects);
+        if (files == null) return Collections.EMPTY_SET;
+        Set<ProfilerSnapshot> snapshots = new HashSet(files.length);
+        for (File file : files) {
+            snapshots.add(ProfilerSnapshot.createSnapshot(file, app));
+        }
+        return snapshots;
     }
     
     

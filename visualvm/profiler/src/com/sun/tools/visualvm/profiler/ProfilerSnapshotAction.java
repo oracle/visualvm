@@ -1,4 +1,4 @@
-/*
+     /*
  *  Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
@@ -37,7 +37,6 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SnapshotsListener;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.openide.util.NbBundle;
@@ -126,7 +125,7 @@ final class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
                     snapshot.setFile(newSnapshotFile);
                     ProfilerSnapshotsSupport pss = ProfilerSnapshotsSupport.getInstance();
                     ProfilerSnapshotAction psa = ProfilerSnapshotAction.instance();
-                    pss.createSnapshot(snapshot, profiledApplication, psa.openNextSnapshot);
+                    pss.createSnapshot(snapshotFile, profiledApplication, psa.openNextSnapshot);
                     psa.openNextSnapshot = true;
                 }
             } catch (Exception e) {

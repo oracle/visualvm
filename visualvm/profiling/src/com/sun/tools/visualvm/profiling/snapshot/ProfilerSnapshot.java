@@ -28,45 +28,64 @@ package com.sun.tools.visualvm.profiling.snapshot;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.snapshot.SnapshotsSupport;
+import java.awt.Image;
+import java.io.File;
+import javax.swing.JComponent;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public final class ProfilerSnapshot extends Snapshot {
-    
-    private LoadedSnapshot loadedSnapshot;
+public abstract class ProfilerSnapshot extends Snapshot {
 
+    static final Image CPU_ICON = Icons.getImage(ProfilerIcons.CPU);
+    static final Image MEMORY_ICON = Icons.getImage(ProfilerIcons.MEMORY);
+    static final Image NODE_BADGE = ImageUtilities.loadImage(
+            "com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
+   
+    public static ProfilerSnapshot createSnapshot(File file, DataSource master) {
+        if (file.getName().endsWith(ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) {
+            return new ProfilerSnapshotNPSS(file,master);
+        }
+        return new ProfilerSnapshotNPS(file,master);
+    }
 
     public ProfilerSnapshot() {
         super(null, ProfilerSnapshotsSupport.getInstance().getCategory());
     }
     
-    public ProfilerSnapshot(LoadedSnapshot loadedSnapshot, DataSource master) {
-        super(loadedSnapshot.getFile(), ProfilerSnapshotsSupport.getInstance().getCategory(), master);
-        this.loadedSnapshot = loadedSnapshot;
+    public ProfilerSnapshot(File file, DataSource master) {
+        super(file, ProfilerSnapshotsSupport.getInstance().getCategory(), master);
     }
     
-    
-    public LoadedSnapshot getLoadedSnapshot() {
-        return loadedSnapshot;
-    }
-    
+    @Override
     public boolean supportsSaveAs() {
         return true;
     }
     
+    @Override
     protected void remove() {
         super.remove();
-        ResultsManager.getDefault().closeSnapshot(loadedSnapshot);
     }
     
+    @Override
     public void saveAs() {
         SnapshotsSupport.getInstance().saveAs(this, NbBundle.getMessage(
                 ProfilerSnapshot.class, "MSG_Save_Profiler_Snapshot_As"));  // NOI18N
     }
 
+    public abstract LoadedSnapshot getLoadedSnapshot();
+    
+    abstract Image resolveIcon();
+    
+    abstract JComponent getUIComponent();
+    
+    abstract void closeComponent();
 }

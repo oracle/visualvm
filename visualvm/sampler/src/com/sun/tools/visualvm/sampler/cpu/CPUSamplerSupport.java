@@ -25,11 +25,16 @@
 
 package com.sun.tools.visualvm.sampler.cpu;
 
+import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.management.ThreadInfo;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,9 +42,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
+import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.openide.util.NbBundle;
 
 /**
@@ -123,9 +133,8 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         SimpleFilter sf = (SimpleFilter)settings.getSelectedInstrumentationFilter();
         filter.setFilterStrings(sf.getFilterValue());
         filter.setFilterType(convertFilterType(sf.getFilterType()));
-        builder = new StackTraceSnapshotBuilder(1, filter);
-        snapshotDumper.builder = builder;
-        
+        builder = snapshotDumper.getNewBuilder(filter);
+                
         refresher.setRefreshRate(refreshRate);
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -186,6 +195,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         }
         if (cpuView != null) cpuView.terminate();
         if (threadCPUView != null) threadCPUView.terminate();
+        builder = null;  // release data
     }
 
 
@@ -311,7 +321,31 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     }
 
     public static abstract class SnapshotDumper {
-        protected StackTraceSnapshotBuilder builder;
+        private StackTraceSnapshotBuilder builder;
+                
+        StackTraceSnapshotBuilder getNewBuilder(InstrumentationFilter filter) {
+            builder = new StackTraceSnapshotBuilder(1,filter);
+            return builder;
+        }
+        
+        public final LoadedSnapshot takeNPSSnapshot(File directory) throws IOException, NoDataAvailableException {
+            if (builder == null) throw new IllegalStateException("Builder is null"); // NOI18N
+            long time = System.currentTimeMillis();
+            CPUResultsSnapshot snapshot = builder.createSnapshot(time);
+            LoadedSnapshot ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
+            File file = Utils.getUniqueFile(directory,
+                    Long.toString(time),"." + ResultsManager.SNAPSHOT_EXTENSION); // NOI18N
+            DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+            try {
+                ls.save(dos);
+                ls.setFile(file);
+                ls.setSaved(true);
+            } finally {
+                dos.close();
+            }
+            return ls;
+        }
+
         public abstract void takeSnapshot(boolean openView);
     }
 
