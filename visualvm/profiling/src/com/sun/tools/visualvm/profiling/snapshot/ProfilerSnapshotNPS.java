@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.modules.profiler.LoadedSnapshot;
