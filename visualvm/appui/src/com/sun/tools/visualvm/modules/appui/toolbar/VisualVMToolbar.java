@@ -49,7 +49,9 @@ class VisualVMToolbar extends ProfilerToolbar {
 
             public Component add(Component comp) {
                 if (comp instanceof JButton) {
-                    UIUtils.fixButtonUI((JButton) comp);
+                    JButton button = (JButton)comp;
+                    UIUtils.fixButtonUI(button);
+                    button.setOpaque(false);
                 }
                 return super.add(comp);
             }
