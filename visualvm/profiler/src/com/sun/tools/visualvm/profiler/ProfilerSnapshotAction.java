@@ -125,7 +125,7 @@ final class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
                     snapshot.setFile(newSnapshotFile);
                     ProfilerSnapshotsSupport pss = ProfilerSnapshotsSupport.getInstance();
                     ProfilerSnapshotAction psa = ProfilerSnapshotAction.instance();
-                    pss.createSnapshot(snapshotFile, profiledApplication, psa.openNextSnapshot);
+                    pss.createSnapshot(newSnapshotFile, profiledApplication, psa.openNextSnapshot);
                     psa.openNextSnapshot = true;
                 }
             } catch (Exception e) {
