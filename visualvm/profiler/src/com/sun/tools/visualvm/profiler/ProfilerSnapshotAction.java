@@ -55,7 +55,7 @@ final class ProfilerSnapshotAction extends SingleDataSourceAction<Application> {
     private static final String NB_PROFILER_SNAPSHOTS_STORAGE = "config" + File.separator + // NOI18N
             "NBProfiler" + File.separator + "Config" + File.separator + "Settings"; // NOI18N
     
-    private final TakeSnapshotAction originalAction = SystemAction.get(TakeSnapshotAction.class);
+    private final TakeSnapshotAction originalAction = TakeSnapshotAction.getInstance();
     private boolean openNextSnapshot = true;
     
     
