@@ -106,14 +106,6 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
             try {
                 JComponent cpuResPanel = (JComponent) srw.getComponent(0);
                 cpuResPanel.setOpaque(false);
-                JToolBar toolBar = (JToolBar) cpuResPanel.getComponent(1);
-                toolBar.setOpaque(false);
-                int componentsCount = toolBar.getComponentCount();
-                ((JComponent) toolBar.getComponent(0)).setOpaque(false);
-                ((JComponent) toolBar.getComponent(1)).setOpaque(false);
-                ((JComponent) toolBar.getComponent(componentsCount - 3)).setOpaque(false);
-                ((JComponent) toolBar.getComponent(componentsCount - 2)).setOpaque(false);
-                ((JComponent) toolBar.getComponent(componentsCount - 1)).setOpaque(false);
                 JTabbedPane tabbedPane = (JTabbedPane) cpuResPanel.getComponent(0);
                 JComponent infoPanel = (JComponent) tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1);
                 infoPanel.setBorder(BorderFactory.createEmptyBorder());
