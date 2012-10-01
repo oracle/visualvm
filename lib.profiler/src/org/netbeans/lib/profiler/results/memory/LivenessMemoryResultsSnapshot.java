@@ -167,6 +167,8 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
     public void performInit(ProfilerClient client, MemoryCCTProvider provider)
                      throws TargetAppOrVMTerminated {
+        super.performInit(client, provider);
+        
         MemoryCCTProvider.ObjectNumbersContainer onc = provider.getLivenessObjectNumbers();
 
         int len;

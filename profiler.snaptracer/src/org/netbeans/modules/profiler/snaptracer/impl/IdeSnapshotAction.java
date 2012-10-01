@@ -51,6 +51,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -136,7 +137,10 @@ public final class IdeSnapshotAction implements ActionListener {
 
         chooser.setAcceptAllFileFilterUsed(false);
 
-        chooser.addChoosableFileFilter(Filter.create(Bundle.ACTION_IdeSnapshot_filter(), ".npss")); // NOI18N
+        String descr = Bundle.ACTION_IdeSnapshot_filter();
+        String ext = "."+ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION; // NOI18N
+        Filter filter = Filter.create(descr, ext);
+        chooser.addChoosableFileFilter(filter);
 
         return chooser;
     }
@@ -165,7 +169,7 @@ public final class IdeSnapshotAction implements ActionListener {
                     return ext;
                 }
                 public String getDescription() {
-                    return descr + " (*" + ext + ")";
+                    return descr + " (*" + ext + ")";  // NOI18N
                 }
             };
         }

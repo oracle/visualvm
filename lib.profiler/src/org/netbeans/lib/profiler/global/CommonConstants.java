@@ -167,6 +167,7 @@ public interface CommonConstants {
     public static final int INSTR_RECURSIVE_SAMPLED = 4; // instrument for CPU data, sampled data obtained (timestamps at periodic intervals only)
     public static final int INSTR_OBJECT_ALLOCATIONS = 5; // instrument for Memory data, allocations only
     public static final int INSTR_OBJECT_LIVENESS = 6; // instrument for Memory data, complete
+    public static final int INSTR_NONE_MEMORY_SAMPLING = 7; // no instrumentation performed, Memory sampling will be used (live instances at periodic intervals only)
                                                        // These are just helpful constants, not actual instrumentation types
     public static final int INSTR_MEMORY_BASE = 5;
     public static final int INSTR_MAXNUMBER = 7;
