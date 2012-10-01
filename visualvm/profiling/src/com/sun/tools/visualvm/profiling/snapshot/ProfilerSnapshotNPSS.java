@@ -49,7 +49,7 @@ class ProfilerSnapshotNPSS extends ProfilerSnapshot {
 
     private Object loadedSnapshot;
 
-    public ProfilerSnapshotNPSS(File file, DataSource master) {
+    ProfilerSnapshotNPSS(File file, DataSource master) {
         super(file, master);
         try {
             FileObject primary = FileUtil.toFileObject(file);

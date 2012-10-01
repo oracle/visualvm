@@ -57,11 +57,11 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
     private LoadedSnapshot loadedSnapshot;
     private TopComponent srw;
 
-    public ProfilerSnapshotNPS() {
+    ProfilerSnapshotNPS() {
         super();
     }
 
-    public ProfilerSnapshotNPS(File snapshot, DataSource master) {
+    ProfilerSnapshotNPS(File snapshot, DataSource master) {
         super(snapshot, master);
         FileObject fobj = FileUtil.toFileObject(FileUtil.normalizeFile(snapshot));
         loadedSnapshot = ResultsManager.getDefault().loadSnapshot(fobj);
