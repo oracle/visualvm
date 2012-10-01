@@ -779,7 +779,9 @@ public final class ResultsManager {
     public boolean saveSnapshot(LoadedSnapshot snapshot, FileObject profFile) {
         FileLock lock = null;
         DataOutputStream dos = null;
-
+        
+        boolean isSaved = snapshot.isSaved();
+        snapshot.setSaved(true); // Set the file as saved in advance to prevent saving it again
         try {
             lock = profFile.lock();
 
@@ -793,6 +795,7 @@ public final class ResultsManager {
             snapshot.setSaved(true);
             fireSnapshotSaved(snapshot);
         } catch (IOException e) {
+            snapshot.setSaved(isSaved);
             try {
                 if (dos != null) {
                     dos.close();
@@ -805,9 +808,10 @@ public final class ResultsManager {
             }
 
             ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotSaveFailedMsg(e.getMessage()));
-
+            
             return false; // failure => we wont continue with firing the event
         } catch (OutOfMemoryError e) {
+            snapshot.setSaved(isSaved);
             try {
                 if (dos != null) {
                     dos.close();

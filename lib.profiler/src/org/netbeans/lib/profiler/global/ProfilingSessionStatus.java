@@ -371,9 +371,9 @@ public class ProfilingSessionStatus {
         try {
             boolean firstTime = (nInstrMethods == 0);
             int oldSize = firstTime ? 0 : ((classes != null) ? instrMethodNames.length : instrMethodInvoked.length);
-            int newLen = nInstrMethods + nMethods;
             int emptyCell = (firstTime ? 1 : 0);
             int nAddedMethods = nMethods + emptyCell;
+            int newLen = nInstrMethods + nMethods + emptyCell;
 
             if (oldSize < newLen) { // Grow arrays
 

@@ -45,6 +45,9 @@ package org.netbeans.modules.profiler.heapwalk.model;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import org.netbeans.lib.profiler.heap.*;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -99,11 +102,25 @@ public class BrowserUtils {
 
     private static final int MAX_FULLNAME_LENGTH = 100;
 
+    private static final Set<String> PRIMITIVE_TYPES = new HashSet<String>(
+            Arrays.asList("char", "byte", "short", "int", "long", "float", "double", "boolean"));
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
+    /** Get item class of an array. (e.g. <code>byte[]</code> for <code>byte[][]</code>)
+     * @return <code>arrayTypeName</code> without last '[]'
+     * */
     public static String getArrayItemType(String arrayTypeName) {
         int arrayBracketsIdx = arrayTypeName.lastIndexOf('['); // NOI18N
 
+        return ((arrayBracketsIdx == -1) ? arrayTypeName : arrayTypeName.substring(0, arrayBracketsIdx));
+    }
+
+    /** Get base class of an array. (e.g. <code>byte</code> for <code>byte[][]</code>)
+     * @return <code>arrayTypeName</code> without any trailing '[]'
+     * */
+    public static String getArrayBaseType(String arrayTypeName) {
+        int arrayBracketsIdx = arrayTypeName.indexOf('['); // NOI18N
         return ((arrayBracketsIdx == -1) ? arrayTypeName : arrayTypeName.substring(0, arrayBracketsIdx));
     }
 
@@ -354,4 +371,11 @@ public class BrowserUtils {
 
         return name;
     }
+    
+    /** Check if the className is primitive type.
+     */
+    public static boolean isPrimitiveType(String className) {
+        return PRIMITIVE_TYPES.contains(className);
+    }
+
 }
