@@ -101,7 +101,7 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
 
     @Override
     JComponent getUIComponent() {
-        if (srw != null) {
+        if (srw == null) {
             srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
             try {
                 JComponent cpuResPanel = (JComponent) srw.getComponent(0);
