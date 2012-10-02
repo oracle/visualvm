@@ -31,6 +31,7 @@ import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.awt.Component;
 import java.awt.event.*;
+import java.rmi.UnmarshalException;
 import java.util.*;
 
 import java.util.logging.Level;
@@ -183,6 +184,7 @@ class XMBeanOperations extends JPanel implements ActionListener {
                 } catch (Throwable t) {
                     t = Utils.getActualException(t);
                     LOGGER.throwing(XMBeanOperations.class.getName(), "performInvokeRequest", t); // NOI18N
+                    t = checkCNFE(t);
                     
                     new ThreadDialog(
                             button,
@@ -191,6 +193,16 @@ class XMBeanOperations extends JPanel implements ActionListener {
                             Resources.getText("LBL_Error"), // NOI18N
                             JOptionPane.ERROR_MESSAGE).run();
                 }
+            }
+
+            private Throwable checkCNFE(Throwable t) {
+                if (t instanceof UnmarshalException) {
+                    Throwable nt = t.getCause();
+                    if (nt instanceof ClassNotFoundException) {
+                        return new RuntimeException("Cannot instantiate remote class "+nt.getMessage());  // NOI18N
+                    }
+                }
+                return t;
             }
         };
         mbeansTab.getRequestProcessor().post(sw);
