@@ -49,7 +49,7 @@ final class SampleApplicationAction extends SingleDataSourceAction<Application> 
     }
     
     protected boolean isEnabled(Application application) {
-        return true;
+        return SamplerSupport.getInstance().supportsProfiling(application);
     }
         
     private SampleApplicationAction() {

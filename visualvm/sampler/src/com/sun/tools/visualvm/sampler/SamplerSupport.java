@@ -26,6 +26,8 @@
 package com.sun.tools.visualvm.sampler;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 
@@ -43,6 +45,11 @@ public final class SamplerSupport {
     public static synchronized SamplerSupport getInstance() {
         if (instance == null) instance = new SamplerSupport();
         return instance;
+    }
+    
+    boolean supportsProfiling(Application application) {
+        if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+        return JvmFactory.getJVMFor(application).isBasicInfoSupported();
     }
     
     void selectSamplerView(Application application) {

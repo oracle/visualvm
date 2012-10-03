@@ -71,7 +71,7 @@ public abstract class MemorySettingsSupport {
     
     
     public void setEnabled(boolean enabled) {
-        container.setEnabled(enabled);
+        if (container != null) container.setEnabled(enabled);
     }
     
     private JPanel createPanel() {

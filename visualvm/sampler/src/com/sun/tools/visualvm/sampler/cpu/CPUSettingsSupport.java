@@ -72,7 +72,7 @@ public abstract class CPUSettingsSupport {
     
     
     public void setEnabled(boolean enabled) {
-        container.setEnabled(enabled);
+        if (container != null) container.setEnabled(enabled);
     }
     
     private JPanel createPanel() {
