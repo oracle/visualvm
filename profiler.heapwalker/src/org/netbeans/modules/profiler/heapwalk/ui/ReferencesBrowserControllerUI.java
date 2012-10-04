@@ -621,11 +621,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
                         if (row != -1) {
                             HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
-                            String className = node.getType();
-
-                            while (className.endsWith("[]")) {
-                                className = className.substring(0, className.length() - 2); // NOI18N
-                            }
+                            String className = BrowserUtils.getArrayBaseType(node.getType());
                             Lookup.Provider p = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
                             GoToSource.openSource(p, className, null, null);
                         }
@@ -879,7 +875,16 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 //        showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode || node instanceof ClassNode);
         showGcRootItem.setEnabled(node instanceof HeapWalkerInstanceNode && (!node.currentlyHasChildren() ||
                 (node.getNChildren() != 1 || !HeapWalkerNodeFactory.isMessageNode(node.getChild(0))))); // #124306
-        if (showSourceItem != null) showSourceItem.setEnabled(node instanceof HeapWalkerInstanceNode);
+        if (showSourceItem != null) {
+            String className = null;
+            if (node instanceof HeapWalkerInstanceNode) {
+                HeapWalkerInstanceNode instanceNode = (HeapWalkerInstanceNode)node;
+                if(instanceNode.hasInstance()) {
+                    className = instanceNode.getInstance().getJavaClass().getName();
+                }
+            }
+            showSourceItem.setEnabled(className != null && !BrowserUtils.isPrimitiveType(BrowserUtils.getArrayBaseType(className)));
+        }
         showInThreadsItem.setEnabled(false);
         if (node instanceof HeapWalkerInstanceNode) {
             Instance rootInstance = ((HeapWalkerInstanceNode)node).getInstance();
