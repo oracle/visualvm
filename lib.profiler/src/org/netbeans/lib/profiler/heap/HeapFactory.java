@@ -46,6 +46,10 @@ package org.netbeans.lib.profiler.heap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -53,6 +57,8 @@ import java.io.IOException;
  * @author Tomas Hurka
  */
 public class HeapFactory {
+    private static Map heapCache = new HashMap();
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /**
@@ -82,8 +88,44 @@ public class HeapFactory {
      * @throws java.io.FileNotFoundException if heapDump file does not exist
      * @throws java.io.IOException if I/O error occurred while accessing heapDump file
      */
-    public static Heap createHeap(File heapDump, int segment)
+    public static synchronized Heap createHeap(File heapDump, int segment)
                            throws FileNotFoundException, IOException {
-        return new HprofHeap(heapDump, segment);
+        String unique = heapDump.getCanonicalPath();
+        Heap heap = getCachedHeap(unique, segment);
+        if (heap != null) {
+            return heap;
+        }
+        heap = new HprofHeap(heapDump, segment);
+        if (segment == 0) {
+            heapCache.put(unique,new WeakReference(heap));
+        }
+        return heap;
+    }
+    
+    private static Heap getCachedHeap(String key, int segment) throws IOException {
+        cleanCache();
+        if (segment != 0) {
+            return null;
+        }
+        Object heapRef = heapCache.get(key);
+        if (heapRef != null) {
+            Object heap = ((WeakReference) heapRef).get();
+            if (heap != null) {
+                return (Heap)heap;
+            }
+        }
+        return null;
+    }
+    
+    private static void cleanCache() {
+        Map.Entry entry;
+        Iterator it = heapCache.entrySet().iterator();
+        
+        while (it.hasNext()) {
+            entry = (Map.Entry) it.next();
+            if (((WeakReference)entry.getValue()).get() == null) {
+                it.remove();
+            }
+        }
     }
 }
