@@ -26,50 +26,78 @@
 package com.sun.tools.visualvm.modules.killapp;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
+import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
+import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.util.RequestProcessor;
+import org.openide.util.Utilities;
 
 /**
  *
  * @author Tomas Hurka
  */
 public final class KillAction extends SingleDataSourceAction<Application> {
-    
+
     public KillAction() {
         super(Application.class);
         putValue(NAME, NbBundle.getMessage(KillAction.class, "CTL_KillAction"));    // NOI18N
         putValue("noIconInMenu", Boolean.TRUE); // NOI18N
     }
-    
+
     protected void actionPerformed(Application app, ActionEvent event) {
-        final String[] command;
-        
-        if (Utilities.isWindows()) {
-            command = new String[] {"taskkill","/PID",String.valueOf(app.getPid())};    // NOI18N
-        } else if (Utilities.isUnix()) {
-            command = new String[] {"kill",String.valueOf(app.getPid())};   // NOI18N
-        } else {
-            assert false:"strange os";  // NOI18N
+        killApplication(app);
+    }
+
+    private void killApplication(final Application app) {
+        final String pidString = String.valueOf(app.getPid());
+        final String[] command = getCommand(pidString, false);
+
+        if (command == null) {
             return;
         }
-        
+
+        final Progress handle = new Progress(pidString);
+        app.notifyWhenRemoved(handle);
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 try {
                     Runtime.getRuntime().exec(command);
+                    Thread.sleep(5000);
+                    if (app.getState() == Stateful.STATE_AVAILABLE) {
+                        // application is still alive, try to kill it hard way
+                        Runtime.getRuntime().exec(getCommand(pidString, true));
+                        refreshJvms();
+                    }
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
+                } catch (InterruptedException ex) {
+                    Exceptions.printStackTrace(ex);
+                } finally {
+                    handle.finish();
                 }
             }
         });
     }
-    
+
+    private void refreshJvms() throws IOException {
+        String javaSub = Utilities.isWindows() ? "bin\\java.exe" : "bin/java"; // NOI18N
+        File java = new File(System.getProperty("java.home"), javaSub); // NOI18N
+
+        if (java.isFile()) {
+            String command[] = {java.getAbsolutePath(), "-version"};
+            Runtime.getRuntime().exec(command);
+        }
+    }
+
     protected boolean isEnabled(Application application) {
         if (Application.CURRENT_APPLICATION.equals(application)) {
             // don't commit suiside
@@ -81,5 +109,53 @@ public final class KillAction extends SingleDataSourceAction<Application> {
         }
         return true;
     }
-    
+
+    private String[] getCommand(String pidString, boolean force) {
+        if (Utilities.isWindows()) {
+            if (force) {
+                return new String[]{"taskkill", "/F", "/PID", pidString};    // NOI18N                
+            } else {
+                return new String[]{"taskkill", "/PID", pidString};    // NOI18N
+            }
+        } else if (Utilities.isUnix()) {
+            if (force) {
+                return new String[]{"kill", "-9", pidString};   // NOI18N                
+            } else {
+                return new String[]{"kill", pidString};   // NOI18N
+            }
+        } else {
+            assert false : "strange os";  // NOI18N
+            return null;
+        }
+    }
+
+    @NbBundle.Messages({"MSG_Kill=Killing application with PID {0}"})
+    private static class Progress implements DataRemovedListener<Application>{
+
+        ProgressHandle handle;
+        boolean running;
+        
+        private Progress(String pid) {
+            handle = ProgressHandleFactory.createHandle(Bundle.MSG_Kill(pid));
+            handle.setInitialDelay(500);
+            handle.start();
+            running = true;
+        }
+
+        private synchronized void finish() {
+            if (running) {
+                running = false;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        handle.finish();
+                        handle = null;
+                    }
+                });
+            }
+        }
+
+        public void dataRemoved(Application x) {
+            finish();
+        }
+    }
 }
