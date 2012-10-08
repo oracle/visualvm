@@ -184,16 +184,16 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             samplerTask.cancel();
             samplerTask = null;
         }
-        if (threadCPUTimer != null) {
-            threadCPUTimer.stop();
-            threadCPUTimer = null;
-        }
     }
 
     public synchronized void terminate() {
         if (timer != null) {
             timer.cancel();
             timer = null;
+        }
+        if (threadCPUTimer != null) {
+            threadCPUTimer.stop();
+            threadCPUTimer = null;
         }
         if (cpuView != null) cpuView.terminate();
         if (threadCPUView != null) threadCPUView.terminate();
