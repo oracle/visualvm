@@ -99,7 +99,7 @@ final class CPUView extends JPanel {
             remove(noDataLabel);
             resultsPanel.setPreferredSize(new Dimension(1, 1));
             JScrollPane resultsScroll = (JScrollPane)resultsPanel.getComponent(0);
-            resultsScroll.setBorder(BorderFactory.createLoweredBevelBorder());
+            resultsScroll.setBorder(BorderFactory.createEmptyBorder());
             resultsScroll.setViewportBorder(BorderFactory.createEmptyBorder());
             add(resultsPanel, BorderLayout.CENTER);
             resultsPanel.invalidate();
@@ -237,7 +237,7 @@ final class CPUView extends JPanel {
 
         toolBar.setBorder(BorderFactory.createEmptyBorder(4, 4, 3, 4));
 
-        add(toolBar, BorderLayout.NORTH);
+        add(TransparentToolBar.withSeparator(toolBar), BorderLayout.NORTH);
         
         noDataLabel = new JLabel(NbBundle.getMessage(CPUView.class, "LBL_No_data"), // NOI18N
                                  SwingConstants.CENTER);

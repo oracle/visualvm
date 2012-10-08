@@ -546,7 +546,7 @@ final class ThreadsCPUView extends JPanel {
         
         resultsPanel.add(areaPanel, BorderLayout.NORTH);
         
-        add(toolBar, BorderLayout.NORTH);
+        add(TransparentToolBar.withSeparator(toolBar), BorderLayout.NORTH);
         
         resTable = initTable();
         resTable.addComponentListener(new ComponentAdapter() {
@@ -556,10 +556,8 @@ final class ThreadsCPUView extends JPanel {
         });
         
         resTablePanel = new JExtendedTablePanel(resTable);
+        resTablePanel.clearBorders();
         resultsPanel.add(resTablePanel, BorderLayout.CENTER);
-        
-        resultsPanel.setBorder(resTablePanel.getBorder());
-        resTablePanel.setBorder(BorderFactory.createEmptyBorder());
         
         add(resultsPanel, BorderLayout.CENTER);
         

@@ -44,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -147,6 +148,14 @@ public final class TransparentToolBar extends JPanel {
             protected void paintComponent(Graphics g) {}
         };
         addItem(filler);
+    }
+    
+    public static Component withSeparator(TransparentToolBar toolbar) {
+        JPanel panel = new JPanel(new BorderLayout(0, 0));
+        panel.setOpaque(false);
+        panel.add(toolbar, BorderLayout.CENTER);
+        panel.add(UIUtils.createHorizontalLine(toolbar.getBackground()),BorderLayout.SOUTH);
+        return panel;
     }
     
 
