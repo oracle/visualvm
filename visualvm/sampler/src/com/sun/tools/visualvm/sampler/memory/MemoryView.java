@@ -79,8 +79,6 @@ import org.netbeans.lib.profiler.ui.components.table.JExtendedTablePanel;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -131,7 +129,7 @@ final class MemoryView extends JPanel {
 
 
     void initSession() {
-        snapshotButton.setEnabled(false);
+        if (snapshotButton != null) snapshotButton.setEnabled(false);
     }
 
     boolean isPaused() {
@@ -195,7 +193,7 @@ final class MemoryView extends JPanel {
         updateData(false);
         refreshUI();
 
-        snapshotButton.setEnabled(snapshotDumper != null);
+        if (snapshotButton != null) snapshotButton.setEnabled(true);
     }
 
     void terminate() {
@@ -614,19 +612,21 @@ final class MemoryView extends JPanel {
         deltaButton.setOpaque(false);
         toolBar.addItem(deltaButton);
 
-        toolBar.addSeparator();
-
-        snapshotButton = new JButton(NbBundle.getMessage(MemoryView.class,
-                "LBL_Snapshot"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
-                "com/sun/tools/visualvm/sampler/resources/snapshot.png", true))) { // NOI18N
-            protected void fireActionPerformed(ActionEvent event) {
-                snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
-            }
-        };
-        snapshotButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Snapshot")); // NOI18N
-        snapshotButton.setOpaque(false);
-        snapshotButton.setEnabled(false);
-        toolBar.addItem(snapshotButton);
+        if (snapshotDumper != null) {
+            toolBar.addSeparator();
+            
+            snapshotButton = new JButton(NbBundle.getMessage(MemoryView.class,
+                    "LBL_Snapshot"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
+                    "com/sun/tools/visualvm/sampler/resources/snapshot.png", true))) { // NOI18N
+                protected void fireActionPerformed(ActionEvent event) {
+                    snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+                }
+            };
+            snapshotButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Snapshot")); // NOI18N
+            snapshotButton.setOpaque(false);
+            snapshotButton.setEnabled(false);
+            toolBar.addItem(snapshotButton);
+        }
 
         toolBar.addFiller();
 
@@ -660,7 +660,7 @@ final class MemoryView extends JPanel {
 
         int maxHeight = pauseButton.getPreferredSize().height;
         maxHeight = Math.max(maxHeight, refreshButton.getPreferredSize().height);
-        maxHeight = Math.max(maxHeight, snapshotButton.getPreferredSize().height);
+        if (snapshotButton != null) maxHeight = Math.max(maxHeight, snapshotButton.getPreferredSize().height);
         maxHeight = Math.max(maxHeight, deltaButton.getPreferredSize().height);
         maxHeight = Math.max(maxHeight, gcButton.getPreferredSize().height);
         maxHeight = Math.max(maxHeight, heapdumpButton.getPreferredSize().height);
@@ -677,11 +677,13 @@ final class MemoryView extends JPanel {
         refreshButton.setPreferredSize(size);
         refreshButton.setMaximumSize(size);
 
-        width = snapshotButton.getPreferredSize().width;
-        size = new Dimension(width + 5, maxHeight);
-        snapshotButton.setMinimumSize(size);
-        snapshotButton.setPreferredSize(size);
-        snapshotButton.setMaximumSize(size);
+        if (snapshotButton != null) {
+            width = snapshotButton.getPreferredSize().width;
+            size = new Dimension(width + 5, maxHeight);
+            snapshotButton.setMinimumSize(size);
+            snapshotButton.setPreferredSize(size);
+            snapshotButton.setMaximumSize(size);
+        }
 
         width = deltaButton.getPreferredSize().width;
         size = new Dimension(width + 5, maxHeight);
