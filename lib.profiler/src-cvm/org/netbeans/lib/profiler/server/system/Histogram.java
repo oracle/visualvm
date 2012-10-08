@@ -50,7 +50,7 @@ import java.io.InputStream;
  */
 public class Histogram {
 
-    public static boolean initialize() {
+    public static boolean isAvailable() {
         return false;
     }
     

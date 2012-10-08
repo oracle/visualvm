@@ -497,7 +497,7 @@ public class ProfilerRuntime implements CommonConstants {
 
                 break;
             case INSTR_NONE_MEMORY_SAMPLING:
-                if (Histogram.initialize()) {
+                if (Histogram.isAvailable()) {
                     ProfilerServer.notifyClientOnResultsAvailability();
                 }
                 break;
