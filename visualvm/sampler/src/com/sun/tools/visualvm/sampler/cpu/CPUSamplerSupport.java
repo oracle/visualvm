@@ -105,6 +105,26 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                 doRefreshImpl();
             }
         };
+        
+        if (threadsCPU != null) {
+            threadCPURefresher = new Refresher() {
+                public final boolean checkRefresh() {
+                    if (!threadCPUTimer.isRunning()) return false;
+                    return threadCPUView.isShowing();
+                }
+                public final void doRefresh() {
+                    doRefreshImpl(threadCPUTimer, threadCPUView);
+                }
+                public final void setRefreshRate(int refreshRate) {
+                    threadCPUTimer.setDelay(refreshRate);
+                    threadCPUTimer.setInitialDelay(refreshRate);
+                    threadCPUTimer.restart();
+                }
+                public final int getRefreshRate() {
+                    return threadCPUTimer.getDelay();
+                }
+            };
+        }
     }
 
 
@@ -115,7 +135,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             detailsViews[0] = new DataViewComponent.DetailsView(NbBundle.getMessage(
                 CPUSamplerSupport.class, "LBL_Cpu_samples"), null, 10, cpuView, null); // NOI18N
             if (threadsCPU != null) {
-                threadCPUView = new ThreadsCPUView(refresher);
+                threadCPUView = new ThreadsCPUView(threadCPURefresher);
                 detailsViews[1] = new DataViewComponent.DetailsView(NbBundle.getMessage(
                 CPUSamplerSupport.class, "LBL_ThreadAlloc"), null, 20, threadCPUView, null); // NOI18N
                 
@@ -154,24 +174,6 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                     threadCPURefresher.refresh();
                 }
             });
-            threadCPURefresher = new Refresher() {
-                public final boolean checkRefresh() {
-                    if (!threadCPUTimer.isRunning()) return false;
-                    return threadCPUView.isShowing();
-                }
-                public final void doRefresh() {
-                    doRefreshImpl(threadCPUTimer, threadCPUView);
-                }
-                public final void setRefreshRate(int refreshRate) {
-                    threadCPUTimer.setDelay(refreshRate);
-                    threadCPUTimer.setInitialDelay(refreshRate);
-                    threadCPUTimer.restart();
-                }
-                public final int getRefreshRate() {
-                    return threadCPUTimer.getDelay();
-                }
-            };
-
             threadCPURefresher.setRefreshRate(refreshRate);
         }
         return true;
