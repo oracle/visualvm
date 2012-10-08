@@ -65,33 +65,14 @@ public class Histogram {
     private static Method vmAttach;
     private static Method vmHisto;
     private static Object virtualMachine;
-    
-    public static boolean initialize() {
-        try {
-            Class vmClass;
-            ClassLoader toolsJar = null;
-            try {
-                vmClass = Class.forName(VIRTUAL_MACHINE_CLASS);
-            } catch (ClassNotFoundException ex) {
-                toolsJar = getToolsJar();
-                if (toolsJar == null) {
-                    return false;
-                }
-                vmClass = Class.forName(VIRTUAL_MACHINE_CLASS, true, toolsJar);
-            }
-            Class hsVmClass = toolsJar == null ? Class.forName(HS_VIRTUAL_MACHINE_CLASS) : Class.forName(HS_VIRTUAL_MACHINE_CLASS, true, toolsJar);
-            vmAttach = vmClass.getMethod(VIRTUAL_MACHINE_ATTACH_METHOD, String.class);
-            vmHisto = hsVmClass.getMethod(VIRTUAL_MACHINE_HEAPHISTO_METHOD, Object[].class);
-        } catch (NoSuchMethodException ex) {
-            return false;
-        } catch (SecurityException ex) {
-            return false;
-        } catch (ClassNotFoundException ex) {
-            return false;
+    private static Boolean initialized;
+   
+    public static boolean isAvailable() {
+        if (initialized != null) {
+            return initialized.booleanValue();
         }
-        String selfName = ManagementFactory.getRuntimeMXBean().getName();
-        selfPid = selfName.substring(0, selfName.indexOf('@')); // NOI18N
-        return true;
+        initialized = Boolean.valueOf(initialize());
+        return initialized.booleanValue();
     }
     
     public static InputStream getRawHistogram() {
@@ -132,5 +113,33 @@ public class Histogram {
            jdkHome = jdkHome.getParentFile(); 
         }
         return jdkHome;
+    }
+
+    private static boolean initialize() {
+        try {
+            Class vmClass;
+            ClassLoader toolsJar = null;
+            try {
+                vmClass = Class.forName(VIRTUAL_MACHINE_CLASS);
+            } catch (ClassNotFoundException ex) {
+                toolsJar = getToolsJar();
+                if (toolsJar == null) {
+                    return false;
+                }
+                vmClass = Class.forName(VIRTUAL_MACHINE_CLASS, true, toolsJar);
+            }
+            Class hsVmClass = toolsJar == null ? Class.forName(HS_VIRTUAL_MACHINE_CLASS) : Class.forName(HS_VIRTUAL_MACHINE_CLASS, true, toolsJar);
+            vmAttach = vmClass.getMethod(VIRTUAL_MACHINE_ATTACH_METHOD, String.class);
+            vmHisto = hsVmClass.getMethod(VIRTUAL_MACHINE_HEAPHISTO_METHOD, Object[].class);
+        } catch (NoSuchMethodException ex) {
+            return false;
+        } catch (SecurityException ex) {
+            return false;
+        } catch (ClassNotFoundException ex) {
+            return false;
+        }
+        String selfName = ManagementFactory.getRuntimeMXBean().getName();
+        selfPid = selfName.substring(0, selfName.indexOf('@')); // NOI18N
+        return true;
     }
 }
