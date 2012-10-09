@@ -47,13 +47,13 @@ class VisualVMToolbar extends ProfilerToolbar {
     VisualVMToolbar(boolean showSeparator) {
         toolbar = new JToolBar() {
 
-            public Component add(Component comp) {
+            protected void addImpl(Component comp, Object constraints, int index) {
                 if (comp instanceof JButton) {
                     JButton button = (JButton)comp;
                     UIUtils.fixButtonUI(button);
                     button.setOpaque(false);
                 }
-                return super.add(comp);
+                super.addImpl(comp, constraints, index);
             }
 
             public Dimension getPreferredSize() {
