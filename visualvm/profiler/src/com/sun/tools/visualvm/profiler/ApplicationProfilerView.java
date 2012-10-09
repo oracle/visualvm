@@ -238,17 +238,20 @@ final class ApplicationProfilerView extends DataSourceView {
             JComponent view = LiveResultsWindow.getDefault();
 
             Component[] components = view.getComponents();
-            if (components.length > 0 && components[0] instanceof JToolBar) {
-                JToolBar toolbar = (JToolBar)components[0];
-                toolbar.setOpaque(false);
-                components = toolbar.getComponents();
-                for (int i = 0; i < components.length; i++) {
-                    Component component = components[i];
-                    if (component instanceof AbstractButton) {
-                        ((AbstractButton)component).setOpaque(false);
-                        if (i == 5)
-                            ((AbstractButton)component).setText(NbBundle.getMessage(
-                                    ApplicationProfilerView.class, "LBL_Snapshot")); // NOI18N
+            if (components.length > 0 && components[0] instanceof JPanel) {
+                components = ((JPanel)components[0]).getComponents();
+                if (components.length > 0 && components[0] instanceof JToolBar) {
+                    JToolBar toolbar = (JToolBar)components[0];
+                    toolbar.setOpaque(false);
+                    components = toolbar.getComponents();
+                    for (int i = 0; i < components.length; i++) {
+                        Component component = components[i];
+                        if (component instanceof AbstractButton) {
+                            ((AbstractButton)component).setOpaque(false);
+                            if (i == 5)
+                                ((AbstractButton)component).setText(NbBundle.getMessage(
+                                        ApplicationProfilerView.class, "LBL_Snapshot")); // NOI18N
+                        }
                     }
                 }
             }
