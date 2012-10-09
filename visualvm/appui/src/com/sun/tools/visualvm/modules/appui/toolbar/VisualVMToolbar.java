@@ -80,7 +80,7 @@ class VisualVMToolbar extends ProfilerToolbar {
                 return dim;
             }
         };
-        toolbar.setBorder(BorderFactory.createEmptyBorder(9, 5, 5, 5));
+        toolbar.setBorder(BorderFactory.createEmptyBorder(4, 4, 3, 4));
         toolbar.setBorderPainted(false);
         toolbar.setRollover(true);
         toolbar.setFloatable(false);
