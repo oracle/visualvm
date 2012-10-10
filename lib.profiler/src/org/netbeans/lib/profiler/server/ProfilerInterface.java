@@ -527,6 +527,7 @@ public class ProfilerInterface implements CommonConstants {
         evBufManager = new EventBufferManager(profilerServer);
         heapHistgramManager = new HeapHistogramManager();
         ProfilerInterface.status = status;
+        detachStarted = false;
 
         // Check that all profiler's own threads are running, and then record them internally, so that target app threads
         // are accounted for properly.
