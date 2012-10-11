@@ -446,8 +446,8 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
             final TargetAppRunner targetAppRunner = Profiler.getDefault().getTargetAppRunner();
 
             String instrStatusText = ""; // NOI18N
-
-            if (state != Profiler.PROFILING_INACTIVE) {
+            
+            if (state == Profiler.PROFILING_RUNNING) {
                 final int currentInstrType = targetAppRunner.getProfilingSessionStatus().currentInstrType;
 
                 switch (currentInstrType) {
@@ -485,7 +485,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
                         break;
                 }
             }
-
+            
             if ((savedInstrText == null) || !savedInstrText.equals(instrStatusText)) {
                 savedInstrText = instrStatusText;
                 instrValueLabel.setText(savedInstrText);
@@ -494,21 +494,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
             String filterText = ""; // NOI18N
 
             switch (state) {
-                case Profiler.PROFILING_INACTIVE:
-
-                    if (inactive) {
-                        return;
-                    }
-
-                    inactive = true;
-                    threadsValueLabel.setText(""); // NOI18N
-                    totalMemValueLabel.setText(""); // NOI18N
-                    usedMemValueLabel.setText(""); // NOI18N
-                    relTimeValueLabel.setText(""); // NOI18N
-                    typeValueLabel.setText(""); // NOI18N
-
-                    break;
-                default:
+                case Profiler.PROFILING_RUNNING:
                     inactive = false;
 
                     final MonitoredData data = Profiler.getDefault().getVMTelemetryManager().getLastData();
@@ -528,6 +514,20 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
                         relTimeValueLabel.setText(""); // NOI18N
                         typeValueLabel.setText(""); // NOI18N
                     }
+
+                    break;
+                    
+                default:
+                    if (inactive) {
+                        return;
+                    }
+
+                    inactive = true;
+                    threadsValueLabel.setText(""); // NOI18N
+                    totalMemValueLabel.setText(""); // NOI18N
+                    usedMemValueLabel.setText(""); // NOI18N
+                    relTimeValueLabel.setText(""); // NOI18N
+                    typeValueLabel.setText(""); // NOI18N
 
                     break;
             }
