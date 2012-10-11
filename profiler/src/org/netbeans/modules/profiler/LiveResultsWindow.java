@@ -546,6 +546,7 @@ public final class LiveResultsWindow extends ProfilerTopComponent
         graphButtonsSeparator = new JToolBar.Separator();
         toolBar.add(graphButtonsSeparator);
         final int chartButtonsOffset = toolBar.getComponentCount();
+        graphButtonsSeparator.setVisible(false);
 
         resultsView = new ResultsView();
         memoryTabPanel.add(resultsView, BorderLayout.CENTER);

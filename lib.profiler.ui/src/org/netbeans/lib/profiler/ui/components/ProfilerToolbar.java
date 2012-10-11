@@ -104,10 +104,10 @@ public abstract class ProfilerToolbar {
         
         protected Impl(boolean showSeparator) {
             toolbar = new JToolBar() {
-                public Component add(Component comp) {
+                protected void addImpl(Component comp, Object constraints, int index) {
                     if (comp instanceof JButton)
                         UIUtils.fixButtonUI((JButton) comp);
-                    return super.add(comp);
+                    super.addImpl(comp, constraints, index);
                 }
                 public Dimension getPreferredSize() {
                     Dimension dim = super.getPreferredSize();
