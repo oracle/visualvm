@@ -1633,6 +1633,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 if(ProfilerInterface.isDetachStarted()) {
                     ProfilerInterface.serialClientOperationsLock.endTrans();
                 }
+                ProfilerInterface.setDetachStarted(false);
 
                 // Just in case, normally should be deactivated and cleaned up by client
                 ProfilerInterface.deactivateInjectedCode();

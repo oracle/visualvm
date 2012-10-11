@@ -650,7 +650,9 @@ class HprofHeap implements Heap {
             long instanceId = dumpBuffer.getID(start + instanceIdOffset);
             Instance i = getInstanceByID(instanceId);
             ClassDump javaClass = (ClassDump) i.getJavaClass();
-            javaClass.addSizeForInstance(i);
+            if (javaClass != null) {
+                javaClass.addSizeForInstance(i);
+            }
         }
         retainedSizeByClassComputed = true;
     }
