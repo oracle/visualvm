@@ -25,8 +25,9 @@
 
 package com.sun.tools.visualvm.application.type;
 
-import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.Jvm;
+import java.util.regex.Pattern;
 
 /**
  * Factory which recognizes JDeveloper 11g and 10g.
@@ -34,12 +35,19 @@ import com.sun.tools.visualvm.application.Application;
  */
 public class JDeveloperApplicationTypeFactory extends MainClassApplicationTypeFactory {
     
+    private static final String MAIN_CLASS_12 = "oracle.ide.osgi.boot.JDeveloper"; // NOI18N
     private static final String MAIN_CLASS_11 = "oracle.ide.boot.Launcher"; // NOI18N
     private static final String MAIN_CLASS_10 = "oracle.ideimpl.Main"; // NOI18N
+    private static final String IDE_CONF_12 = "\\-Dide.conf=\\S+jdev.conf"; // NOI18N
     private static final String IDE_CONF_11 = "-Dide.config_pathname="; // NOI18N
     private static final String IDE_PRODUCT_10 = "-Dide.product=oracle.jdeveloper"; // NOI18N
+
+    private static final Pattern IDE_CONF_12_PATTERN = Pattern.compile(IDE_CONF_12);
     
     private String getJDeveloperVersion(Jvm jvm, String mainClass) {
+        if (MAIN_CLASS_12.equals(mainClass)) {
+            return "12c";
+        }
         if (MAIN_CLASS_11.equals(mainClass)) {
             return "11g";
         }
@@ -55,6 +63,9 @@ public class JDeveloperApplicationTypeFactory extends MainClassApplicationTypeFa
                 if (args.contains(IDE_PRODUCT_10)) {
                     return "10g";
                 }
+                if (IDE_CONF_12_PATTERN.matcher(args).find()) {
+                    return "12c";
+                }
             }
         }
         return null;
@@ -63,7 +74,7 @@ public class JDeveloperApplicationTypeFactory extends MainClassApplicationTypeFa
     
     /**
      * Detects JDeveloper IDE. It returns
-     * {@link JDeveloperApplicationType} for JDeveloper 11g and 10g.
+     * {@link JDeveloperApplicationType} for JDeveloper 12c, 11g and 10g.
      *
      * @return {@link ApplicationType} subclass or <code>null</code> if
      * this application is not JDeveloper IDE
