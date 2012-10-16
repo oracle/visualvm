@@ -145,7 +145,7 @@ final class ThreadsCPUView extends JPanel {
     }
     
     void refresh(ThreadsCPUInfo info) {
-        if (isPaused()) return;
+        if (!isShowing() || (pauseButton.isSelected() && !forceRefresh)) return;
         forceRefresh = false;
         threads = info.getThreads();
         threadCPUInfo = info.getThreadCPUTime();

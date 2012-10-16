@@ -109,6 +109,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         if (threadsCPU != null) {
             threadCPURefresher = new Refresher() {
                 public final boolean checkRefresh() {
+                    if (threadCPUTimer == null) return false;
                     if (!threadCPUTimer.isRunning()) return false;
                     return threadCPUView.isShowing();
                 }
@@ -184,16 +185,16 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             samplerTask.cancel();
             samplerTask = null;
         }
+        if (threadCPUTimer != null) {
+            threadCPUTimer.stop();
+            threadCPUTimer = null;
+        }
     }
 
     public synchronized void terminate() {
         if (timer != null) {
             timer.cancel();
             timer = null;
-        }
-        if (threadCPUTimer != null) {
-            threadCPUTimer.stop();
-            threadCPUTimer = null;
         }
         if (cpuView != null) cpuView.terminate();
         if (threadCPUView != null) threadCPUView.terminate();
