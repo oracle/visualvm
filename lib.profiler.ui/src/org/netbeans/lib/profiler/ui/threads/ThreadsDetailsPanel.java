@@ -60,6 +60,7 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.components.VerticalLayout;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
@@ -202,30 +203,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
 
         // perform layout
         setLayout(new BorderLayout());
-        content.setLayout(new GridLayout(0, 1)); /*new GridLayout(0, 1) {
-           public void layoutContainer(Container parent) {
-             Component[] list = parent.getComponents();
-             if (list.length == 0) return;
-        
-             Insets insets = parent.getInsets();
-             Dimension parentSize = parent.getSize();
-             int availableW = parentSize.width - (insets.left + insets.right);
-             int availableH = parentSize.height - (insets.top + insets.bottom);
-        
-             int targetHeight = 0;
-             for (int i = 0; i < list.length; i++) targetHeight += list[i].getPreferredSize().height;
-             if (targetHeight >= availableH)
-               super.layoutContainer(parent);
-             else {
-               int ypos = insets.top;
-               for (int i = 0 ; i < list.length; i++) {
-                 int prefHeight = list[i].getPreferredSize().height;
-                 list[i].setBounds(insets.left, ypos, availableW, prefHeight);
-                 ypos += prefHeight;
-               }
-             }
-           }
-           });*/
+        content.setLayout(new VerticalLayout(0, 0));
 
         contentPanel.add(content, BorderLayout.NORTH);
         buttonsToolBar.add(showLabel);
