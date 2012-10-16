@@ -46,25 +46,25 @@ public class JDeveloperApplicationTypeFactory extends MainClassApplicationTypeFa
     
     private String getJDeveloperVersion(Jvm jvm, String mainClass) {
         if (MAIN_CLASS_12.equals(mainClass)) {
-            return "12c";
+            return "12c";  // NOI18N
         }
         if (MAIN_CLASS_11.equals(mainClass)) {
-            return "11g";
+            return "11g";  // NOI18N
         }
         if (MAIN_CLASS_10.equals(mainClass)) {
-            return "10g";
+            return "10g";  // NOI18N
         }
         if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect native Windows launcher
             String args = jvm.getJvmArgs();
             if (args != null) {
                 if (args.contains(IDE_CONF_11)) {
-                    return "11g";
+                    return "11g";  // NOI18N
                 }
                 if (args.contains(IDE_PRODUCT_10)) {
-                    return "10g";
+                    return "10g";  // NOI18N
                 }
                 if (IDE_CONF_12_PATTERN.matcher(args).find()) {
-                    return "12c";
+                    return "12c";  // NOI18N
                 }
             }
         }
