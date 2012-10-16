@@ -35,6 +35,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -88,6 +89,16 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     // VisualVM bugfix #279 - do not override FocusTraversalPolicy
 //    setFocusCycleRoot(true);
 //    setFocusTraversalPolicy(new CBTPPolicy());
+    
+    // Clear default border for fill up the entire DataSourceWindow
+    setOpaque(false);
+    if (UIManager.getLookAndFeel().getID().equals("Aqua")) { // NOI18N
+        setBorder(BorderFactory.createEmptyBorder(0, -11, -13, -10));
+    } else {
+        setBorder(BorderFactory.createEmptyBorder());
+        Insets i = UIManager.getInsets("TabbedPane.contentBorderInsets"); // NOI18N
+        if (i != null) setBorder(BorderFactory.createEmptyBorder(0, -i.left, -i.bottom, -i.right));
+    }
   }
 
 
