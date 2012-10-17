@@ -86,16 +86,16 @@ class VisualVMToolbar extends ProfilerToolbar {
 
     @Override
     public void remove(Component component) {
-        toolbar.remove(component);
+        toolbar.removeItem(component);
     }
 
     @Override
     public void remove(int index) {
-        toolbar.remove(index);
+        toolbar.removeItem(index);
     }
 
     @Override
     public int getComponentCount() {
-        return toolbar.getComponentCount();
+        return toolbar.getItemsCount();
     }
 }

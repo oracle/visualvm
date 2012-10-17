@@ -154,8 +154,8 @@ public final class TransparentToolBar extends JPanel {
                 b.setRolloverEnabled(true);
                 listener.refresh(b);
             }
-            repaint();
         }
+        repaint();
         
         return c;
     }
@@ -170,7 +170,23 @@ public final class TransparentToolBar extends JPanel {
                 c.removeFocusListener(listener);
             }
             remove(c);
-            repaint();
+        }
+        repaint();
+    }
+    
+    public void removeItem(int index) {
+        if (toolbar != null) {
+            toolbar.remove(index);
+        } else {
+            removeItem(getComponent(index));
+        }
+    }
+    
+    public int getItemsCount() {
+	if (toolbar != null) {
+            return toolbar.getComponentCount();
+        } else {
+            return super.getComponentCount();
         }
     }
     
