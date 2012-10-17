@@ -1154,6 +1154,8 @@ public class ThreadDetailsComponent extends JPanel {
                 } else {
                     pieChartModel.setItemValues(new double[] { 0d, 0d, 0d });
                 }
+                
+                timeLine.updateData(threadData, viewManager.getDataStartTime(), viewManager.getDataEndTime());
             }
         } else {
             // When the threadIndex was changed (component displays data of different thread) details textarea is cleared
