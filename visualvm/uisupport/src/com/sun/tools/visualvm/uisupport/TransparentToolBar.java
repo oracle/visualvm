@@ -36,45 +36,56 @@ import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public final class TransparentToolBar extends JPanel {
+    
+    private static Border BORDER = BorderFactory.createEmptyBorder(2, 2, 1, 2);
 
     private static Boolean NEEDS_PANEL;
     private static Boolean CUSTOM_FILLER;
+    
+    private static int preferredHeight = -1;
     
     private final JToolBar toolbar;
     private final ItemListener listener = new ItemListener();
 
     
     public TransparentToolBar() {
-        toolbar = needsPanel() ? null : new JToolBar();
         setOpaque(false);
-        if (toolbar == null) {
+        setBorder(BORDER);
+        
+        if (needsPanel()) {
             // Toolbar is a JPanel (GTK)
+            toolbar = null;
             setLayout(new HorizontalLayout(false));
         } else {
             // Toolbar is a JToolBar (default)
-            toolbar.setBorderPainted(false);
-            toolbar.setFloatable(false);
-            toolbar.setRollover(true);
-            toolbar.setOpaque(false);
+            toolbar = createToolBar();
             toolbar.setBorder(BorderFactory.createEmptyBorder());
             setLayout(new BorderLayout());
             add(toolbar, BorderLayout.CENTER);
         }
+        
         addHierarchyListener(new HierarchyListener() {
             public void hierarchyChanged(HierarchyEvent e) {
                 if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
@@ -90,28 +101,66 @@ public final class TransparentToolBar extends JPanel {
             }
         });
     }
+    
+    public Dimension getPreferredSize() {
+        Dimension dim = super.getPreferredSize();
+        if (preferredHeight == -1) {
+            JToolBar tb = createToolBar();
+            tb.setBorder(BORDER);
+            Icon icon = new Icon() {
+                public int getIconWidth() { return 16; }
+                public int getIconHeight() { return 16; }
+                public void paintIcon(Component c, Graphics g, int x, int y) {}
+            };
+            JButton b = new JButton("Button", icon); // NOI18N
+            tb.add(b);
+            JToggleButton t = new JToggleButton("Button", icon); // NOI18N
+            tb.add(t);
+            JComboBox c = new JComboBox();
+            c.setEditor(new BasicComboBoxEditor());
+            c.setRenderer(new BasicComboBoxRenderer());
+            tb.add(c);
+            tb.addSeparator();
+            preferredHeight = tb.getPreferredSize().height;
+        }
+        dim.height = Math.max(dim.height, preferredHeight);
+        return dim;
+    }
+    
+    public Component addItem(Action action) {
+        return addItem(createActionComponent(action));
+    }
+    
+    public Component addItem(Component c) {
+        return addItem(c, -1);
+    }
 
-    public void addItem(JComponent c) {
-        c.setOpaque(false);
+    public Component addItem(Component c, int index) {
+        if (c instanceof JComponent)
+            ((JComponent)c).setOpaque(false);
 
         if (c instanceof JButton)
             ((JButton)c).setDefaultCapable(false);
 
         if (toolbar != null) {
-            toolbar.add(c);
+            toolbar.add(c, index);
         } else {
-            add(c);
+            add(c, index);
             if (c instanceof AbstractButton) {
                 AbstractButton b = (AbstractButton) c;
                 b.addMouseListener(listener);
                 b.addChangeListener(listener);
                 b.addFocusListener(listener);
                 b.setRolloverEnabled(true);
+                listener.refresh(b);
             }
+            repaint();
         }
+        
+        return c;
     }
 
-    public void removeItem(JComponent c) {
+    public void removeItem(Component c) {
         if (toolbar != null) {
             toolbar.remove(c);
         } else {
@@ -121,11 +170,18 @@ public final class TransparentToolBar extends JPanel {
                 c.removeFocusListener(listener);
             }
             remove(c);
+            repaint();
         }
     }
     
     public void addSeparator() {
         JToolBar.Separator separator = new JToolBar.Separator();
+        separator.setOrientation(JToolBar.Separator.VERTICAL);
+        addItem(separator);
+    }
+    
+    public void addSpace(int width) {
+        JToolBar.Separator separator = new JToolBar.Separator(new Dimension(width, 0));
         separator.setOrientation(JToolBar.Separator.VERTICAL);
         addItem(separator);
     }
@@ -150,12 +206,34 @@ public final class TransparentToolBar extends JPanel {
         addItem(filler);
     }
     
-    public static Component withSeparator(TransparentToolBar toolbar) {
+    public static JComponent withSeparator(TransparentToolBar toolbar) {
         JPanel panel = new JPanel(new BorderLayout(0, 0));
         panel.setOpaque(false);
         panel.add(toolbar, BorderLayout.CENTER);
         panel.add(new JSeparator(),BorderLayout.SOUTH);
         return panel;
+    }
+    
+    
+    private JButton createActionComponent(Action a) {
+        JButton b = new JButton();
+        if (a != null && (a.getValue(Action.SMALL_ICON) != null ||
+                          a.getValue(Action.LARGE_ICON_KEY) != null)) {
+            b.setHideActionText(true);
+        }
+        b.setHorizontalTextPosition(JButton.CENTER);
+        b.setVerticalTextPosition(JButton.BOTTOM);
+        b.setAction(a);
+        return b;
+    }
+    
+    private static JToolBar createToolBar() {
+        JToolBar tb = new JToolBar();
+        tb.setBorderPainted(false);
+        tb.setFloatable(false);
+        tb.setRollover(true);
+        tb.setOpaque(false);
+        return tb;
     }
     
 

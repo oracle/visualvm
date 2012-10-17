@@ -583,8 +583,6 @@ final class ThreadsMemoryView extends JPanel {
         heapdumpButton.setPreferredSize(size);
         heapdumpButton.setMaximumSize(size);
         
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 4, 3, 4));
-        
         JPanel resultsPanel = new JPanel(new BorderLayout());
         resultsPanel.setOpaque(false);
         

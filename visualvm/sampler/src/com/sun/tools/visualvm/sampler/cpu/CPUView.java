@@ -235,8 +235,6 @@ final class CPUView extends JPanel {
         threaddumpButton.setPreferredSize(size);
         threaddumpButton.setMaximumSize(size);
 
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 4, 3, 4));
-
         add(TransparentToolBar.withSeparator(toolBar), BorderLayout.NORTH);
         
         noDataLabel = new JLabel(NbBundle.getMessage(CPUView.class, "LBL_No_data"), // NOI18N

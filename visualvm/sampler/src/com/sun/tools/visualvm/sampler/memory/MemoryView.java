@@ -703,8 +703,6 @@ final class MemoryView extends JPanel {
         heapdumpButton.setPreferredSize(size);
         heapdumpButton.setMaximumSize(size);
 
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 4, 3, 4));
-
 //        controlPanel.add(toolBar, BorderLayout.NORTH);
 //        controlPanel.add(new JSeparator(), BorderLayout.CENTER);
 

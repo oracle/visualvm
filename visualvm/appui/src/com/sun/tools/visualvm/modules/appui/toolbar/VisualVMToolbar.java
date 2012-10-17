@@ -26,12 +26,8 @@ package com.sun.tools.visualvm.modules.appui.toolbar;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicComboBoxEditor;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import com.sun.tools.visualvm.uisupport.TransparentToolBar;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *
@@ -40,57 +36,14 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  */
 class VisualVMToolbar extends ProfilerToolbar {
 
-    static int preferredHeight = -1;
-    final JComponent component;
-    final JToolBar toolbar;
+    private final JComponent component;
+    private final TransparentToolBar toolbar;
 
     VisualVMToolbar(boolean showSeparator) {
-        toolbar = new JToolBar() {
-
-            protected void addImpl(Component comp, Object constraints, int index) {
-                if (comp instanceof JButton) {
-                    JButton button = (JButton)comp;
-                    UIUtils.fixButtonUI(button);
-                    button.setOpaque(false);
-                }
-                super.addImpl(comp, constraints, index);
-            }
-
-            public Dimension getPreferredSize() {
-                Dimension dim = super.getPreferredSize();
-                if (preferredHeight == -1) {
-                    JToolBar tb = new JToolBar();
-                    tb.setBorder(toolbar.getBorder());
-                    tb.setBorderPainted(toolbar.isBorderPainted());
-                    tb.setRollover(toolbar.isRollover());
-                    tb.setFloatable(toolbar.isFloatable());
-                    Icon icon = Icons.getIcon(GeneralIcons.SAVE);
-                    JButton b = new JButton("Button", icon); // NOI18N
-                    tb.add(b);
-                    JToggleButton t = new JToggleButton("Button", icon); // NOI18N
-                    tb.add(t);
-                    JComboBox c = new JComboBox();
-                    c.setEditor(new BasicComboBoxEditor());
-                    c.setRenderer(new BasicComboBoxRenderer());
-                    tb.add(c);
-                    tb.addSeparator();
-                    preferredHeight = tb.getPreferredSize().height;
-                }
-                dim.height = Math.max(dim.height, preferredHeight);
-                return dim;
-            }
-        };
-        toolbar.setBorder(BorderFactory.createEmptyBorder(4, 4, 3, 4));
-        toolbar.setBorderPainted(false);
-        toolbar.setRollover(true);
-        toolbar.setFloatable(false);
-        toolbar.setOpaque(false);
+        toolbar = new TransparentToolBar();
 
         if (showSeparator) {
-            component = new JPanel(new BorderLayout(0, 0));
-            component.setOpaque(false);
-            component.add(toolbar, BorderLayout.CENTER);
-            component.add(UIUtils.createHorizontalLine(toolbar.getBackground()), BorderLayout.SOUTH);
+            component = TransparentToolBar.withSeparator(toolbar);
         } else {
             component = toolbar;
         }
@@ -103,17 +56,17 @@ class VisualVMToolbar extends ProfilerToolbar {
 
     @Override
     public Component add(Action action) {
-        return toolbar.add(action);
+        return toolbar.addItem(action);
     }
 
     @Override
     public Component add(Component component) {
-        return toolbar.add(component);
+        return toolbar.addItem(component);
     }
 
     @Override
     public Component add(Component component, int index) {
-        return toolbar.add(component, index);
+        return toolbar.addItem(component, index);
     }
 
     @Override
@@ -123,26 +76,12 @@ class VisualVMToolbar extends ProfilerToolbar {
 
     @Override
     public void addSpace(int width) {
-        toolbar.addSeparator(new Dimension(width, 0));
+        toolbar.addSpace(width);
     }
 
     @Override
     public void addFiller() {
-        JPanel toolbarFiller = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0)) {
-
-            public Dimension getPreferredSize() {
-                if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
-                    int currentWidth = toolbar.getSize().width;
-                    int minimumWidth = toolbar.getMinimumSize().width;
-                    int extraWidth = currentWidth - minimumWidth;
-                    return new Dimension(Math.max(extraWidth, 0), 0);
-                } else {
-                    return super.getPreferredSize();
-                }
-            }
-        };
-        toolbarFiller.setOpaque(false);
-        toolbar.add(toolbarFiller);
+        toolbar.addFiller();
     }
 
     @Override

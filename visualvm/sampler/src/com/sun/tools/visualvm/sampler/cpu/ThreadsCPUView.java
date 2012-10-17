@@ -530,8 +530,6 @@ final class ThreadsCPUView extends JPanel {
         deltaButton.setMinimumSize(size);
         deltaButton.setPreferredSize(size);
         deltaButton.setMaximumSize(size);
-                
-        toolBar.setBorder(BorderFactory.createEmptyBorder(4, 4, 3, 4));
         
         JPanel resultsPanel = new JPanel(new BorderLayout());
         resultsPanel.setOpaque(false);
