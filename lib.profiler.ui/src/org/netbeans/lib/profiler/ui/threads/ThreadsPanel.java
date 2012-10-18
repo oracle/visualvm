@@ -325,7 +325,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         table.setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
         table.setShowGrid(false);
         table.setRowMargin(0);
-        table.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+        table.setRowHeight(UIUtils.getDefaultRowHeight() + 4);
 
         DefaultTableCellRenderer defaultHeaderRenderer = new DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
