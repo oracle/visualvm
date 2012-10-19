@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.modules.appui.about;
 
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.SeparatorLine;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -43,7 +44,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.openide.awt.Mnemonics;
@@ -177,10 +177,7 @@ public class TextBrowser {
         buttonsContainer.add(closeButton, BorderLayout.EAST);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
-        final JSeparator separator = new JSeparator() {
-            public Dimension getMinimumSize() { return getPreferredSize(); }
-            public Dimension getMaximumSize() { return getPreferredSize(); }
-        };
+        final SeparatorLine separator = new SeparatorLine();
         bottomPanel.add(separator, BorderLayout.NORTH);
         bottomPanel.add(buttonsContainer, BorderLayout.CENTER);
 

@@ -44,7 +44,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.border.Border;
@@ -52,7 +51,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -227,7 +225,7 @@ public final class TransparentToolBar extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(0, 0));
         panel.setOpaque(false);
         panel.add(toolbar, BorderLayout.CENTER);
-        panel.add(new JSeparator(),BorderLayout.SOUTH);
+        panel.add(new SeparatorLine(), BorderLayout.SOUTH);
         return panel;
     }
     
@@ -254,7 +252,7 @@ public final class TransparentToolBar extends JPanel {
     }
     
     private static Border createToolBarBorder() {
-        if (UIUtils.isAquaLookAndFeel()) {
+        if (UISupport.isAquaLookAndFeel()) {
             return BorderFactory.createEmptyBorder(3, 2, 0, 2);
         } else {
             return BorderFactory.createEmptyBorder(2, 2, 2, 2);

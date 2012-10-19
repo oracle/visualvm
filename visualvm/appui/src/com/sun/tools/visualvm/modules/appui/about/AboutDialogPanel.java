@@ -26,9 +26,9 @@ package com.sun.tools.visualvm.modules.appui.about;
 
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.SeparatorLine;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.HierarchyEvent;
@@ -37,7 +37,6 @@ import java.net.URL;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeListener;
@@ -92,10 +91,7 @@ public class AboutDialogPanel extends JPanel {
     private void initComponents() {
         JPanel splashImageContainer = new ImagePanel(AboutDialog.getInstance().getAboutImage());
         
-        JSeparator separator = new JSeparator() {
-            public Dimension getMinimumSize() { return getPreferredSize(); }
-            public Dimension getMaximumSize() { return getPreferredSize(); }
-        };
+        SeparatorLine separator = new SeparatorLine();
 
         licenseArea = new HTMLTextArea() {
             protected void showURL(URL url) {

@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.sampler.memory;
 
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.SeparatorLine;
 import com.sun.tools.visualvm.uisupport.TransparentToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -54,7 +55,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -592,7 +592,7 @@ final class ThreadsMemoryView extends JPanel {
         area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         refreshUI();
         areaPanel.add(area, BorderLayout.NORTH);
-        areaPanel.add(new JSeparator(), BorderLayout.SOUTH);
+        areaPanel.add(new SeparatorLine(), BorderLayout.SOUTH);
         
         resultsPanel.add(areaPanel, BorderLayout.NORTH);
         
