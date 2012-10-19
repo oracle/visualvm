@@ -52,6 +52,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -59,7 +60,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  */
 public final class TransparentToolBar extends JPanel {
     
-    private static Border BORDER = BorderFactory.createEmptyBorder(2, 2, 1, 2);
+    private static Border BORDER = createToolBarBorder();
 
     private static Boolean NEEDS_PANEL;
     private static Boolean CUSTOM_FILLER;
@@ -250,6 +251,14 @@ public final class TransparentToolBar extends JPanel {
         tb.setRollover(true);
         tb.setOpaque(false);
         return tb;
+    }
+    
+    private static Border createToolBarBorder() {
+        if (UIUtils.isAquaLookAndFeel()) {
+            return BorderFactory.createEmptyBorder(3, 2, 0, 2);
+        } else {
+            return BorderFactory.createEmptyBorder(2, 2, 2, 2);
+        }
     }
     
 
