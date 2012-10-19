@@ -201,7 +201,7 @@ public final class AboutAction extends AbstractAction {
     private static String getUserDir() {
         File userdirf = Places.getUserDirectory();
         String userdir = userdirf != null ? userdirf.getAbsolutePath() : null;
-        return userdir != null ? userdir : System.getProperty("netbeans.user", "unknown");   // NOI18N
+        return userdir != null ? userdir : "unknown";   // NOI18N
     }
     
     private static String getIDEInstallValue() {
