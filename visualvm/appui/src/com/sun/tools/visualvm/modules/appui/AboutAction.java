@@ -42,6 +42,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import com.sun.tools.visualvm.modules.appui.about.AboutDialog;
 import java.util.logging.Logger;
+import org.openide.modules.Places;
 import org.openide.util.Enumerations;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
@@ -104,9 +105,8 @@ public final class AboutAction extends AbstractAction {
     }
     
     private String getLogfile() {
-        String sep = File.separator;
-        String logfilePath = System.getProperty("netbeans.user") + sep + "var" + sep + "log" + sep + "messages.log"; // NOI18N
-        File logfile = new File(logfilePath);
+        String logfilePath = "var/log/messages.log"; // NOI18N
+        File logfile = new File(Places.getUserDirectory(), logfilePath);
         if (logfile.exists() && logfile.isFile() && logfile.canRead()) return logfile.getAbsolutePath();
         else return null;
     }
@@ -115,44 +115,49 @@ public final class AboutAction extends AbstractAction {
         if (details == null) {
             StringBuffer sb = new StringBuffer();
             
-            sb.append("<table border=\"0\">");
+            sb.append("<table border=\"0\">"); // NOI18N
             
-            sb.append("<tr>");
-            sb.append("<td valign=\"top\" nowrap>" + "<b>Version: </b>" + "</td>");
-            sb.append("<td valign=\"top\" nowrap>" + versionString + " (Build " + getBuildNumber() + "); platform " + System.getProperty("netbeans.buildnumber") + "</td>");
-            sb.append("</tr>");
+            sb.append("<tr>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + "<b>Version: </b>" + "</td>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + versionString + " (Build " + getBuildNumber() + "); platform " + System.getProperty("netbeans.buildnumber") + "</td>"); // NOI18N
+            sb.append("</tr>"); // NOI18N
             
-            sb.append("<tr>");
-            sb.append("<td valign=\"top\" nowrap>" + "<b>System: </b>" + "</td>");
-            sb.append("<td valign=\"top\" nowrap>" + getOSInfo() + "</td>");
-            sb.append("</tr>");
+            sb.append("<tr>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + "<b>System: </b>" + "</td>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + getOSInfo() + "</td>"); // NOI18N
+            sb.append("</tr>"); // NOI18N
             
-            sb.append("<tr>");
-            sb.append("<td valign=\"top\" nowrap>" + "<b>Java: </b>" + "</td>");
-            sb.append("<td valign=\"top\" nowrap>" + getJavaInfo() + "</td>");
-            sb.append("</tr>");
+            sb.append("<tr>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + "<b>Java: </b>" + "</td>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + getJavaInfo() + "</td>"); // NOI18N
+            sb.append("</tr>"); // NOI18N
 
-            sb.append("<tr>");
-            sb.append("<td valign=\"top\" nowrap>" + "<b>Vendor: </b>" + "</td>");
-            sb.append("<td valign=\"top\" nowrap>" + getJavaVendor() + "</td>");
-            sb.append("</tr>");
+            sb.append("<tr>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + "<b>Vendor: </b>" + "</td>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + getJavaVendor() + "</td>"); // NOI18N
+            sb.append("</tr>"); // NOI18N
             
-            sb.append("<tr>");
-            sb.append("<td valign=\"top\" nowrap>" + "<b>Environment: </b>" + "</td>");
-            sb.append("<td valign=\"top\" nowrap>" + getEnvironment() + "</td>");
-            sb.append("</tr>");
+            sb.append("<tr>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + "<b>Environment: </b>" + "</td>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + getEnvironment() + "</td>"); // NOI18N
+            sb.append("</tr>"); // NOI18N
             
-            sb.append("<tr>");
-            sb.append("<td valign=\"top\" nowrap>" + "<b>Userdir: </b>" + "</td>");
-            sb.append("<td valign=\"top\" nowrap>" + System.getProperty("netbeans.user", "unknown") + "</td>");
-            sb.append("</tr>");
+            sb.append("<tr>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + "<b>User directory: </b>" + "</td>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + getUserDir() + "</td>"); // NOI18N
+            sb.append("</tr>"); // NOI18N
             
-            sb.append("<tr>");
-            sb.append("<td valign=\"top\" nowrap>" + "<b>Clusters: </b>" + "</td>");
-            sb.append("<td valign=\"top\" nowrap>" + getIDEInstallValue() + "</td>");
-            sb.append("</tr>");
+            sb.append("<tr>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + "<b>Cache directory: </b>" + "</td>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + Places.getCacheDirectory().getAbsolutePath() + "</td>"); // NOI18N
+            sb.append("</tr>"); // NOI18N
             
-            sb.append("</table>");
+            sb.append("<tr>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + "<b>Clusters: </b>" + "</td>"); // NOI18N
+            sb.append("<td valign=\"top\" nowrap>" + getIDEInstallValue() + "</td>"); // NOI18N
+            sb.append("</tr>"); // NOI18N
+            
+            sb.append("</table>"); // NOI18N
             
             details = sb.toString();
         }
@@ -191,6 +196,12 @@ public final class AboutAction extends AbstractAction {
         String encoding = System.getProperty("file.encoding", "unknown");   // NOI18N
         String locale = Locale.getDefault().toString() + (branding == null ? "" : (" (" + branding + ")")); // NOI18N
         return encoding + "; " + locale;
+    }
+    
+    private static String getUserDir() {
+        File userdirf = Places.getUserDirectory();
+        String userdir = userdirf != null ? userdirf.getAbsolutePath() : null;
+        return userdir != null ? userdir : System.getProperty("netbeans.user", "unknown");   // NOI18N
     }
     
     private static String getIDEInstallValue() {
