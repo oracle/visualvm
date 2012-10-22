@@ -75,7 +75,6 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
     @Override
     protected void remove() {
         super.remove();
-        srw = null;
         ResultsManager.getDefault().closeSnapshot(loadedSnapshot);
 
     }
