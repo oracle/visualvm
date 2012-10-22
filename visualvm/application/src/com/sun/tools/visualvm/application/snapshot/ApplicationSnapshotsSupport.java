@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.application.snapshot;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Utils;
@@ -61,6 +62,16 @@ public final class ApplicationSnapshotsSupport {
         return instance;
     }
     
+    
+    /**
+     * Takes application snapshot from Application.
+     * 
+     * @param application Application to take the snapshot,
+     * @param openView true if taken application snapshot should be opened, false otherwise.
+     */
+    public void takeApplicationSnapshot(Application application, boolean openView) {
+        snapshotProvider.createSnapshot(application, openView);
+    }
     
     /**
      * Returns SnapshotCategory instance for application snapshots.
