@@ -29,7 +29,6 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
-import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotsSupport;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
@@ -41,16 +40,9 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
-import java.awt.AWTEvent;
 import java.awt.BorderLayout;
-import java.awt.Toolkit;
-import java.awt.event.AWTEventListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.URL;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -157,15 +149,12 @@ class OverviewViewSupport {
     
     // --- Snapshots -----------------------------------------------------------
     
-    static class SnapshotsViewSupport extends JPanel implements DataChangeListener<Snapshot>, AWTEventListener {
-        
-        private static final String LINK_APP_SNAPSHOT = "file:/appsnapshot"; // NOI18N
+    static class SnapshotsViewSupport extends JPanel implements DataChangeListener<Snapshot> {
         
         private DataSource dataSource;
         private HTMLTextArea area;
 
         private boolean standaloneAppSnapshot;
-        private boolean openSnapshot = true;
         
         
         public SnapshotsViewSupport(DataSource dataSource) {
@@ -178,32 +167,7 @@ class OverviewViewSupport {
             if (standaloneAppSnapshot) {
                 dataSource.setVisible(false);
                 DataSource.ROOT.getRepository().addDataSource(dataSource);
-            } else if (dataSource instanceof Application) {
-                addHierarchyListener(new HierarchyListener() {
-                    public void hierarchyChanged(HierarchyEvent e) {
-                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                            if (isShowing()) {
-                                Toolkit.getDefaultToolkit().addAWTEventListener(
-                                        SnapshotsViewSupport.this, AWTEvent.KEY_EVENT_MASK);
-                            } else {
-                                Toolkit.getDefaultToolkit().removeAWTEventListener(
-                                        SnapshotsViewSupport.this);
-                                openSnapshot = true;
-                            }
-                        }
-                    }
-                });
             }
-        }
-        
-        public void eventDispatched(AWTEvent event) {
-            if (!(event instanceof KeyEvent)) return;
-            
-            KeyEvent ke = (KeyEvent)event;
-            if (ke.getID() == KeyEvent.KEY_PRESSED && (ke.getModifiers() &
-                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0)
-                openSnapshot = false;
-            else openSnapshot = true;
         }
         
         public DataViewComponent.DetailsView getDetailsView() {
@@ -214,12 +178,7 @@ class OverviewViewSupport {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            area = new HTMLTextArea() {
-                protected void showURL(URL url) {
-                    ApplicationSnapshotsSupport.getInstance().takeApplicationSnapshot(
-                            (Application)dataSource, openSnapshot);
-                }
-            };
+            area = new HTMLTextArea();
             updateSavedData();
             area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             
@@ -247,15 +206,7 @@ class OverviewViewSupport {
             for (SnapshotCategory category : snapshotCategories)
                 data.append("<b>" + category.getName() + ":</b> " + dataSource.getRepository().getDataSources(category.getType()).size() + "<br>"); // NOI18N
             
-            if (dataSource instanceof Application) {
-                data.append("<br><a href='"); // NOI18N
-                data.append(LINK_APP_SNAPSHOT);
-                data.append("'>"); // NOI18N
-                data.append(NbBundle.getMessage(OverviewViewSupport.class, "LBL_Application_Snapshot")); // NOI18N
-                data.append("</a>"); // NOI18N
-            }
-            
-            area.setText("<nobr>" + data.toString() + "</nobr>"); // NOI18N
+            area.setText("<nobr>" + data.toString() + "</nobr>");   // NOI18N
         }
         
     }

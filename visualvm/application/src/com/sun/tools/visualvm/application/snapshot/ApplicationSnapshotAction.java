@@ -64,7 +64,7 @@ class ApplicationSnapshotAction extends MultiDataSourceAction<Application> {
         
     protected void actionPerformed(Set<Application> applications, ActionEvent actionEvent) {
         for (Application application : applications)
-            ApplicationSnapshotsSupport.getInstance().takeApplicationSnapshot(application,
+            ApplicationSnapshotsSupport.getInstance().getSnapshotProvider().createSnapshot(application,
             (actionEvent.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
     }
     
