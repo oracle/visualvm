@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.profiling.snapshot;
 
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Positionable;
@@ -49,7 +51,7 @@ final class ProfilerSnapshotView extends DataSourceView {
     
     private ProfilerSnapshotView(ProfilerSnapshot snapshot, DataSourceDescriptor descriptor) {
         super(snapshot, descriptor.getName(), descriptor.getIcon(),
-              Positionable.POSITION_AT_THE_END, true);
+              Positionable.POSITION_AT_THE_END, isClosableView(snapshot));
         loadedSnapshot = snapshot;
     }
     
@@ -65,6 +67,29 @@ final class ProfilerSnapshotView extends DataSourceView {
                 new DataViewComponent.MasterViewConfiguration(true));
         
         return dvc;
+    }
+    
+    private static boolean isClosableView(ProfilerSnapshot snapshot) {
+        // ProfilerSnapshot invisible
+        if (!snapshot.isVisible()) return false;
+        
+        // ProfilerSnapshot not in DataSources tree
+        DataSource owner = snapshot.getOwner();
+        if (owner == null) return false;
+        
+        while (owner != null && owner != DataSource.ROOT) {
+            // Application snapshot provides link to open the ProfilerSnapshot
+            if (owner instanceof ApplicationSnapshot) return true;
+            // Subtree containing ProfilerSnapshot invisible
+            if (!owner.isVisible()) return false;
+            owner = owner.getOwner();
+        }
+        
+        // ProfilerSnapshot visible in DataSources tree
+        if (owner == DataSource.ROOT) return true;
+        
+        // ProfilerSnapshot not in DataSources tree
+        return false;
     }
     
     

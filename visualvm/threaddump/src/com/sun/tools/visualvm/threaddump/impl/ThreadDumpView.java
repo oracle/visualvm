@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.threaddump.impl;
 
+import com.sun.tools.visualvm.application.snapshot.ApplicationSnapshot;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
@@ -58,7 +59,6 @@ class ThreadDumpView extends DataSourceView {
     
     public ThreadDumpView(ThreadDump threadDump) {
         this(threadDump, DataSourceDescriptorFactory.getDescriptor(threadDump));
-        
     }
     
     private ThreadDumpView(ThreadDump threadDump, DataSourceDescriptor descriptor) {
@@ -83,6 +83,8 @@ class ThreadDumpView extends DataSourceView {
         if (owner == null) return false;
         
         while (owner != null && owner != DataSource.ROOT) {
+            // Application snapshot provides link to open the ThreadDump
+            if (owner instanceof ApplicationSnapshot) return true;
             // Subtree containing ThreadDump invisible
             if (!owner.isVisible()) return false;
             owner = owner.getOwner();
