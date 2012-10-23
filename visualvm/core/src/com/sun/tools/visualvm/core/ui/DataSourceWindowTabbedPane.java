@@ -212,12 +212,12 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       if (!container.getView().isClosable()) return null;
       
       b = new Rectangle(b);
-      fixGetBoundsAt(b);
-      
-      Dimension tabsz = getSize();
-      if (b.x + b.width >= tabsz.width
-        || b.y + b.height >= tabsz.height)
-        return null;
+//      fixGetBoundsAt(b);
+//      
+//      Dimension tabsz = getSize();
+//      if (b.x + b.width >= tabsz.width
+//        || b.y + b.height >= tabsz.height)
+//        return null;
       // bugfix #110654
       if (b.width == 0 || b.height == 0) {
         return null;
