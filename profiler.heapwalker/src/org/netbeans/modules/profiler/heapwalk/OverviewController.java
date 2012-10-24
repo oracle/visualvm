@@ -212,7 +212,7 @@ public class OverviewController extends AbstractController {
             String threadName = htmlize(getThreadName(thread));
             String threadUrl = "<a href='"+ THREAD_URL_PREFIX + thread.getJavaClass().getName() + "/" + thread.getInstanceId() + "'>" + threadName + "</a>"; // NOI18N
             oomeString = "<br><br>" + LINE_PREFIX // NOI18N
-                + Bundle.OverviewController_OOMELabelString() + "<br>" + LINE_PREFIX
+                + Bundle.OverviewController_OOMELabelString() + "<br>" + LINE_PREFIX // NOI18N
                 + Bundle.OverviewController_OOMEItemString(threadUrl);
         }
         String memoryRes = Icons.getResource(ProfilerIcons.HEAP_DUMP);
@@ -358,7 +358,7 @@ public class OverviewController extends AbstractController {
                 if (stackTrace!=null && stackTrace.length>=1) {
                     StackTraceElement ste = stackTrace[0];
                     
-                    if (OutOfMemoryError.class.getName().equals(ste.getClassName()) && "<init>".equals(ste.getMethodName())) {
+                    if (OutOfMemoryError.class.getName().equals(ste.getClassName()) && "<init>".equals(ste.getMethodName())) {  // NOI18N
                         return threadRoot;
                     }
                 }
@@ -432,7 +432,7 @@ public class OverviewController extends AbstractController {
                         String style="";
 
                         if (threadRoot.equals(oome)) {
-                            style="style=\"color: #FF0000\"";
+                            style="style=\"color: #FF0000\""; // NOI18N
                         }                        
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
                         // sw.append("&nbsp;&nbsp;<span style=\"color: #0033CC\">"); // NOI18N
