@@ -26,22 +26,30 @@
 package com.sun.tools.visualvm.coredump.impl;
 
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
+import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.datasupport.DataChangeEvent;
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
+import com.sun.tools.visualvm.core.datasupport.Positionable;
 import com.sun.tools.visualvm.core.snapshot.RegisteredSnapshotCategories;
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.NotSupportedDisplayer;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -60,6 +68,12 @@ public final class OverviewViewSupport {
     
     static class SnapshotsViewSupport extends JPanel  {
         
+        private static final String LINK_TOGGLE_CATEGORY = "file:/toggle_category"; // NOI18N
+        private static final String LINK_OPEN_SNAPSHOT = "file:/open_snapshot"; // NOI18N
+        
+        private final Map<Integer, Snapshot> snapshotsMap = new HashMap();
+        private final Map<String, Boolean> expansionMap = new HashMap();
+        
         public SnapshotsViewSupport(DataSource ds) {
             initComponents(ds);
         }        
@@ -72,26 +86,81 @@ public final class OverviewViewSupport {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            final HTMLTextArea area = new HTMLTextArea();
+            final HTMLTextArea area = new HTMLTextArea() {
+                protected void showURL(URL url) {
+                    String link = url.toString();
+                    if (link.startsWith(LINK_TOGGLE_CATEGORY)) {
+                        link = link.substring(LINK_TOGGLE_CATEGORY.length());
+                        toggleExpanded(link); 
+                        setText(getSavedData(ds));
+                    } else if (link.startsWith(LINK_OPEN_SNAPSHOT)) {
+                        link = link.substring(LINK_OPEN_SNAPSHOT.length());
+                        Snapshot s = snapshotsMap.get(Integer.parseInt(link));
+                        if (s != null) DataSourceWindowManager.sharedInstance().openDataSource(s);
+                    }
+                }
+            };
             area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             
             ds.getRepository().addDataChangeListener(new DataChangeListener() {
                 public void dataChanged(DataChangeEvent event) {
-                    area.setText("<nobr>" + getSavedData(ds) + "</nobr>");  // NOI18N
+                    area.setText(getSavedData(ds));
                 }                
             }, Snapshot.class);
             
             add(new ScrollableContainer(area), BorderLayout.CENTER);
         }
         
-        private String getSavedData(DataSource ds) {
+        private String getSavedData(DataSource dataSource) {
+            snapshotsMap.clear();
             StringBuilder data = new StringBuilder();
             
             List<SnapshotCategory> snapshotCategories = RegisteredSnapshotCategories.sharedInstance().getVisibleCategories();
-            for (SnapshotCategory category : snapshotCategories)
-                data.append("<b>" + category.getName() + ":</b> " + ds.getRepository().getDataSources(category.getType()).size() + "<br>"); // NOI18N
+            for (SnapshotCategory category : snapshotCategories) {
+                Set<Snapshot> snapshots = dataSource.getRepository().getDataSources(category.getType());
+                if (snapshots.isEmpty()) {
+                    data.append("<b>" + category.getName() + ":</b> " + snapshots.size() + "<br>"); // NOI18N
+                } else {
+                    String categoryName = category.getName();
+                    data.append("<b>" + categoryName + ":</b> <a href='" + (LINK_TOGGLE_CATEGORY + categoryName) + "'>" + snapshots.size() + "</a><br>"); // NOI18N
+                    
+                    if (isExpanded(categoryName)) {
+                        List<DataSourceDescriptor> descriptors = new ArrayList();
+                        Map<DataSourceDescriptor, Snapshot> dataSources = new HashMap();
 
-            return data.toString();
+                        for (Snapshot s : snapshots) {
+                            DataSourceDescriptor dsd = DataSourceDescriptorFactory.getDescriptor(s);
+                            descriptors.add(dsd);
+                            dataSources.put(dsd, s);
+                        }
+                        Collections.sort(descriptors, Positionable.STRONG_COMPARATOR);
+
+                        int size = snapshotsMap.size();
+                        for (int i = 0; i < descriptors.size(); i++) {
+                            DataSourceDescriptor dsd = descriptors.get(i);
+                            Snapshot s = dataSources.get(dsd);
+                            snapshotsMap.put(i + size, s);
+                            data.append("&nbsp;&nbsp;&nbsp;<a href='" + LINK_OPEN_SNAPSHOT + (i + size) + "'>" + dsd.getName() + "</a><br>"); // NOI18N
+                        }
+                        data.append("<br>"); // NOI18N
+                    }
+                }
+            }            
+            
+            return "<nobr>" + data.toString() + "</nobr>";   // NOI18N
+        }
+        
+        private boolean isExpanded(String categoryName) {
+            Boolean expanded = expansionMap.get(categoryName);
+            if (expanded == null) {
+                expanded = false;
+                expansionMap.put(categoryName, expanded);
+            }
+            return expanded.booleanValue();
+        }
+        
+        private void toggleExpanded(String categoryName) {
+            expansionMap.put(categoryName, !isExpanded(categoryName));
         }
         
     }
