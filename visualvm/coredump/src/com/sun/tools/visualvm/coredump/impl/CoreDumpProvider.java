@@ -217,6 +217,7 @@ public class CoreDumpProvider {
                 PROPERTY_JAVA_HOME
             };
             String[] propValues = storage.getCustomProperties(propNames);
+            if (propValues[0] == null || propValues[1] == null) continue;
                 
             CoreDumpImpl persistedCoredump = null;
             try {
