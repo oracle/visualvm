@@ -113,6 +113,7 @@ public class OverviewController extends AbstractController {
     private static final String CLASS_URL_PREFIX = "file://class/"; // NOI18N
     private static final String INSTANCE_URL_PREFIX = "file://instance/";   // NOI18N
     private static final String THREAD_URL_PREFIX = "file://thread/";   // NOI18N
+    private static final String LINE_PREFIX = "&nbsp;&nbsp;&nbsp;&nbsp;"; // NOI18N
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     private HeapFragmentWalker heapFragmentWalker;
@@ -173,36 +174,36 @@ public class OverviewController extends AbstractController {
             }
         }
         
-        String filename = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String filename = LINE_PREFIX
                 + Bundle.OverviewController_FileItemString(
                     file != null && file.exists() ? file.getAbsolutePath() : 
                         Bundle.OverviewController_NotAvailableMsg());
         
-        String filesize = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String filesize = LINE_PREFIX
                 + Bundle.OverviewController_FileSizeItemString(
                     file != null && file.exists() ?
                         numberFormat.format(file.length()/(1024 * 1024.0)) + " MB" : // NOI18N
                         Bundle.OverviewController_NotAvailableMsg());
         
-        String dateTaken = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String dateTaken = LINE_PREFIX
                 + Bundle.OverviewController_DateTakenItemString(new Date(hsummary.getTime()).toString());
         
-        String liveBytes = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String liveBytes = LINE_PREFIX
                 + Bundle.OverviewController_TotalBytesItemString(numberFormat.format(hsummary.getTotalLiveBytes()));
         
-        String liveClasses = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String liveClasses = LINE_PREFIX
                 + Bundle.OverviewController_TotalClassesItemString(numberFormat.format(heap.getAllClasses().size()));
         
-        String liveInstances = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String liveInstances = LINE_PREFIX
                 + Bundle.OverviewController_TotalInstancesItemString(numberFormat.format(hsummary.getTotalLiveInstances()));
         
-        String classloaders = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String classloaders = LINE_PREFIX
                 + Bundle.OverviewController_ClassloadersItemString(numberFormat.format(nclassloaders));
         
-        String gcroots = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String gcroots = LINE_PREFIX
                 + Bundle.OverviewController_GcRootsItemString(numberFormat.format(heap.getGCRoots().size()));
         
-        String finalizersInfo = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String finalizersInfo = LINE_PREFIX
                 + Bundle.OverviewController_FinalizersItemString(numberFormat.format(finalizers));
 
         String oomeString = "";
@@ -210,8 +211,8 @@ public class OverviewController extends AbstractController {
             Instance thread = oome.getInstance();
             String threadName = htmlize(getThreadName(thread));
             String threadUrl = "<a href='"+ THREAD_URL_PREFIX + thread.getJavaClass().getName() + "/" + thread.getInstanceId() + "'>" + threadName + "</a>"; // NOI18N
-            oomeString = "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
-                + Bundle.OverviewController_OOMELabelString() + "<br>&nbsp;&nbsp;&nbsp;&nbsp;"
+            oomeString = "<br><br>" + LINE_PREFIX // NOI18N
+                + Bundle.OverviewController_OOMELabelString() + "<br>" + LINE_PREFIX
                 + Bundle.OverviewController_OOMEItemString(threadUrl);
         }
         String memoryRes = Icons.getResource(ProfilerIcons.HEAP_DUMP);
@@ -227,39 +228,39 @@ public class OverviewController extends AbstractController {
         Properties sysprops = getSystemProperties();
         
         if (sysprops == null) {
-            return header + "&nbsp;&nbsp;&nbsp;&nbsp;" + Bundle.OverviewController_NotAvailableMsg();
+            return header + LINE_PREFIX + Bundle.OverviewController_NotAvailableMsg();
         }
         
         String patchLevel = sysprops.getProperty("sun.os.patch.level", ""); // NOI18N
-        String os = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String os = LINE_PREFIX
                 + Bundle.OverviewController_OsItemString(
                     sysprops.getProperty("os.name", Bundle.OverviewController_NotAvailableMsg()), // NOI18N
                     sysprops.getProperty("os.version", ""), // NOI18N
                     ("unknown".equals(patchLevel) ? "" : patchLevel) // NOI18N
         );
         
-        String arch = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String arch = LINE_PREFIX
                 + Bundle.OverviewController_ArchitectureItemString(
                     sysprops.getProperty("os.arch", Bundle.OverviewController_NotAvailableMsg()), // NOI18N
                     sysprops.getProperty("sun.arch.data.model", "?") + "bit" // NOI18N
         );
         
-        String jdk = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String jdk = LINE_PREFIX
                 + Bundle.OverviewController_JavaHomeItemString(
                     sysprops.getProperty("java.home", Bundle.OverviewController_NotAvailableMsg())); // NOI18N
 
-        String version = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String version = LINE_PREFIX
                 + Bundle.OverviewController_JavaVersionItemString(
                     sysprops.getProperty("java.version", Bundle.OverviewController_NotAvailableMsg())); // NOI18N
         
-        String jvm = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String jvm = LINE_PREFIX
                 + Bundle.OverviewController_JvmItemString(
                     sysprops.getProperty("java.vm.name", Bundle.OverviewController_NotAvailableMsg()), // NOI18N
                     sysprops.getProperty("java.vm.version", ""), // NOI18N
                     sysprops.getProperty("java.vm.info", "") // NOI18N
         );
 
-        String vendor = "&nbsp;&nbsp;&nbsp;&nbsp;" // NOI18N
+        String vendor = LINE_PREFIX
                 + Bundle.OverviewController_JavaVendorItemString(
                     sysprops.getProperty("java.vendor", Bundle.OverviewController_NotAvailableMsg())); // NOI18N
         
@@ -273,12 +274,12 @@ public class OverviewController extends AbstractController {
         Properties sysprops = getSystemProperties();
         
         if (sysprops == null) {
-            return header + "&nbsp;&nbsp;&nbsp;&nbsp;" + Bundle.OverviewController_NotAvailableMsg();
+            return header + LINE_PREFIX + Bundle.OverviewController_NotAvailableMsg();
         }
         
         return header 
                 + (showSystemProperties ? formatSystemProperties(sysprops)
-                : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_SYSPROPS_URL + "'>" + Bundle.OverviewController_ShowSysPropsLinkString() + "</a>")); // NOI18N
+                : (LINE_PREFIX + "<a href='" + SHOW_SYSPROPS_URL + "'>" + Bundle.OverviewController_ShowSysPropsLinkString() + "</a>")); // NOI18N
     }
     
     public String computeThreads(boolean showThreads) {
@@ -286,7 +287,7 @@ public class OverviewController extends AbstractController {
         return "<b><img border='0' align='bottom' src='nbresloc:/" + threadsWindowRes + "'>&nbsp;&nbsp;" // NOI18N
                 + Bundle.OverviewController_ThreadsString() + "</b><br><hr>" // NOI18N
                 + (showThreads ? getStackTrace()
-                : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_THREADS_URL + "'>" + Bundle.OverviewController_ShowThreadsLinkString() + "</a><br>&nbsp;")); // NOI18N
+                : (LINE_PREFIX + "<a href='" + SHOW_THREADS_URL + "'>" + Bundle.OverviewController_ShowThreadsLinkString() + "</a><br>&nbsp;")); // NOI18N
         // NOTE: the above HTML string should be terminated by newline to workaround HTML rendering bug in JDK 5, see Issue 120157
     }
     
@@ -396,7 +397,7 @@ public class OverviewController extends AbstractController {
                 val = val.replace("\r", "\\r"); // NOI18N
             }
             
-            text.append("<nobr>&nbsp;&nbsp;&nbsp;&nbsp;<b>"); // NOI18N
+            text.append("<nobr>"+ LINE_PREFIX +"<b>"); // NOI18N
             text.append(key);
             text.append("</b>="); // NOI18N
             text.append(val);
