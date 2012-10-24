@@ -488,7 +488,7 @@ public class OverviewController extends AbstractController {
                             }
                         }
                     } else {
-                        sb.append("&nbsp;&nbsp;Unknown thread"); // NOI18N
+                        sb.append("&nbsp;&nbsp;Unknown thread<br>"); // NOI18N
                     }
                     sb.append("<br>");  // NOI18N
                 }
