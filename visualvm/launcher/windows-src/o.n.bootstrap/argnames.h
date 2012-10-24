@@ -23,10 +23,25 @@
  * questions.
  */
 
+#ifndef _ARGNAMES_H
+#define	_ARGNAMES_H
 
-#include "visualvmlauncher.h"
+#define ARG_NAME_SEPAR_PROC "--fork-java"
+#define ARG_NAME_CONSOLE    "--console"
+#define ARG_NAME_LAUNCHER_LOG "--trace"
+#define ARG_NAME_LA_START_APP "--la_start_app"
+#define ARG_NAME_LA_START_AU "--la_start_au"
+#define ARG_NAME_LA_PPID "--la_ppid"
+#define ARG_NAME_USER_DIR "--userdir"
+#define ARG_DEFAULT_USER_DIR_ROOT "--default_userdir_root"
+#define ARG_NAME_CACHE_DIR "--cachedir"
+#define ARG_NAME_CLUSTERS "--clusters"
+#define ARG_NAME_BOOTCLASS "--bootclass"
+#define ARG_NAME_JDKHOME "--jdkhome"
+#define ARG_NAME_CP_PREPEND "--cp:p"
+#define ARG_NAME_CP_APPEND "--cp:a"
+#define ARG_NAME_NOSPLASH "--nosplash"
 
-int main(int argc, char *argv[]) {
-    VisualVMLauncher launcher;
-    return launcher.start(argc - 1, argv + 1);
-}
+
+#endif	/* _ARGNAMES_H */
+

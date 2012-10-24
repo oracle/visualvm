@@ -1,58 +1,91 @@
-# -*- Makefile -*-
+#  Main targets can be executed directly, and they are:
+#  
+#     build                    build a specific configuration
+#     clean                    remove built files from a configuration
+#     clobber                  remove all built files
+#     all                      build all configurations
+#     help                     print help mesage
+#  
+#  Targets .build-impl, .clean-impl, .clobber-impl, .all-impl, and
+#  .help-impl are implemented in nbproject/makefile-impl.mk.
 #
-# Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
-# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-#
-# This code is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License version 2 only, as
-# published by the Free Software Foundation.  Oracle designates this
-# particular file as subject to the "Classpath" exception as provided
-# by Oracle in the LICENSE file that accompanied this code.
-#
-# This code is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-# version 2 for more details (a copy is included in the LICENSE file that
-# accompanied this code).
-#
-# You should have received a copy of the GNU General Public License version
-# 2 along with this work; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-# Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
-# or visit www.oracle.com if you need additional information or have any
-# questions.
-#
+# NOCDDL
 
-LIBS =
-#LIBS = advapi32.lib user32.lib
 
-CFLAGS = -s -mno-cygwin
-#!ifdef DEBUG
-#	CFLAGS = $(CFLAGS) -Zi
-#!endif
 
-all : visualvm.exe visualvm_w.exe
+# Environment 
+MKDIR=mkdir
+CP=cp
+CCADMIN=CCadmin
+RANLIB=ranlib
 
-visualvm.exe : visualvm.cpp visualvm.res
-	gcc $(CFLAGS) $(LIBS) -mwindows -DWINMAIN visualvm.cpp -o visualvm.exe visualvm.res
-	mv visualvm.exe ../
 
-visualvm_w.exe : visualvm.cpp
-	gcc $(CFLAGS) $(LIBS) visualvm.cpp -o visualvm_w.exe
-	mv visualvm_w.exe ../
 
-visualvm.res : visualvm.rc version.rc version.h visualvm.exe.manifest
-	windres -o$@ -Ocoff visualvm.rc
+# build
+build: .build-post-$(CONF)
 
-clean :
-	-rm *.res *.obj *.pdb *.ilk *~ 2>NUL
+.build-pre: .build-pre-$(CONF)
+# Add your pre 'build' code here...
 
-distclean : clean
-	-rm *.exe 2>NUL
+.build-pre-visualvm.exe: visualvm.rc
+	windres -ovisualvm.res -Ocoff visualvm.rc
 
-test :
-	../visualvm.exe
+.build-pre-visualvm64.exe: visualvm.rc
+	x86_64-w64-mingw32-windres.exe -ovisualvm64.res -Ocoff visualvm.rc
 
-test_w :
-	../visualvm_w.exe
+.build-post-visualvm.exe: .build-impl
+	cp visualvm.exe ../visualvm.exe
+	strip ../visualvm.exe
+	
+.build-post-visualvm64.exe: .build-impl
+	cp visualvm64.exe ../visualvm64.exe
+	strip ../visualvm.exe
+
+											
+
+# clean
+clean: .clean-post
+
+.clean-pre:
+# Add your pre 'clean' code here...
+
+.clean-post: .clean-impl
+# Add your post 'clean' code here...
+
+
+
+# clobber
+clobber: .clobber-post
+
+.clobber-pre:
+# Add your pre 'clobber' code here...
+
+.clobber-post: .clobber-impl
+# Add your post 'clobber' code here...
+
+
+
+# all
+all: .all-post
+
+.all-pre:
+# Add your pre 'all' code here...
+
+.all-post: .all-impl
+# Add your post 'all' code here...
+
+
+
+# help
+help: .help-post
+
+.help-pre:
+# Add your pre 'help' code here...
+
+.help-post: .help-impl
+# Add your post 'help' code here...
+
+
+
+# include project implementation makefile
+include nbproject/Makefile-impl.mk
