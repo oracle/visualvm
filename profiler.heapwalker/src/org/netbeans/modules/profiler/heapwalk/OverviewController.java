@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.heapwalk;
 
 import java.io.File;
 import java.lang.Thread.State;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -81,7 +80,7 @@ import org.openide.util.NbBundle;
  * @author Tomas Hurka
  */
 @NbBundle.Messages({
-    "OverviewController_NotAvailableMsg=<not available>",
+    "OverviewController_NotAvailableMsg=&lt;not available&gt;",
     "OverviewController_SystemPropertiesString=System properties:",
     "OverviewController_SummaryString=Basic info:",
     "OverviewController_EnvironmentString=Environment:",
@@ -222,10 +221,13 @@ public class OverviewController extends AbstractController {
     }
     
     public String computeEnvironment() {
+        String sysinfoRes = Icons.getResource(HeapWalkerIcons.SYSTEM_INFO);
+        String header =  "<b><img border='0' align='bottom' src='nbresloc:/" + sysinfoRes + "'>&nbsp;&nbsp;" // NOI18N
+                + Bundle.OverviewController_EnvironmentString() + "</b><br><hr>";   // NOI18N
         Properties sysprops = getSystemProperties();
         
         if (sysprops == null) {
-            return Bundle.OverviewController_NotAvailableMsg();
+            return header + "&nbsp;&nbsp;&nbsp;&nbsp;" + Bundle.OverviewController_NotAvailableMsg();
         }
         
         String patchLevel = sysprops.getProperty("sun.os.patch.level", ""); // NOI18N
@@ -261,21 +263,20 @@ public class OverviewController extends AbstractController {
                 + Bundle.OverviewController_JavaVendorItemString(
                     sysprops.getProperty("java.vendor", Bundle.OverviewController_NotAvailableMsg())); // NOI18N
         
-        String sysinfoRes = Icons.getResource(HeapWalkerIcons.SYSTEM_INFO);
-        return "<b><img border='0' align='bottom' src='nbresloc:/" + sysinfoRes + "'>&nbsp;&nbsp;" // NOI18N
-                + Bundle.OverviewController_EnvironmentString() + "</b><br><hr>" + os + "<br>" + arch + "<br>" + jdk + "<br>" + version + "<br>" + jvm + "<br>" + vendor; // NOI18N
+        return header + os + "<br>" + arch + "<br>" + jdk + "<br>" + version + "<br>" + jvm + "<br>" + vendor; // NOI18N
     }
     
     public String computeSystemProperties(boolean showSystemProperties) {
+        String propertiesRes = Icons.getResource(HeapWalkerIcons.PROPERTIES);
+        String header = "<b><img border='0' align='bottom' src='nbresloc:/" + propertiesRes + "'>&nbsp;&nbsp;" // NOI18N
+                + Bundle.OverviewController_SystemPropertiesString() + "</b><br><hr>"; // NOI18N
         Properties sysprops = getSystemProperties();
         
         if (sysprops == null) {
-            return Bundle.OverviewController_NotAvailableMsg();
+            return header + "&nbsp;&nbsp;&nbsp;&nbsp;" + Bundle.OverviewController_NotAvailableMsg();
         }
         
-        String propertiesRes = Icons.getResource(HeapWalkerIcons.PROPERTIES);
-        return "<b><img border='0' align='bottom' src='nbresloc:/" + propertiesRes + "'>&nbsp;&nbsp;" // NOI18N
-                + Bundle.OverviewController_SystemPropertiesString() + "</b><br><hr>" // NOI18N
+        return header 
                 + (showSystemProperties ? formatSystemProperties(sysprops)
                 : ("&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + SHOW_SYSPROPS_URL + "'>" + Bundle.OverviewController_ShowSysPropsLinkString() + "</a>")); // NOI18N
     }
