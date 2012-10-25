@@ -65,6 +65,8 @@ import org.openide.windows.WindowManager;
  */
 public final class IdeSnapshotAction implements ActionListener {
 
+    private File lastDirectory;
+    
     public void actionPerformed(ActionEvent e) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -115,9 +117,10 @@ public final class IdeSnapshotAction implements ActionListener {
     }
 
     private File snapshotFile() {
-        JFileChooser chooser = createFileChooser();
+        JFileChooser chooser = createFileChooser(lastDirectory);
         Frame mainWindow = WindowManager.getDefault().getMainWindow();
         if (chooser.showOpenDialog(mainWindow) == JFileChooser.APPROVE_OPTION) {
+            lastDirectory = chooser.getCurrentDirectory();
             return chooser.getSelectedFile();
         } else {
             return null;
@@ -128,7 +131,7 @@ public final class IdeSnapshotAction implements ActionListener {
         "ACTION_IdeSnapshot_dialog=Load IDE Snapshot",
         "ACTION_IdeSnapshot_filter=IDE Snapshots"
     })
-    private static JFileChooser createFileChooser() {
+    private static JFileChooser createFileChooser(File directory) {
         JFileChooser chooser = new JFileChooser();
 
         chooser.setDialogTitle(Bundle.ACTION_IdeSnapshot_dialog());
@@ -136,7 +139,10 @@ public final class IdeSnapshotAction implements ActionListener {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         chooser.setAcceptAllFileFilterUsed(false);
-
+        if (directory != null) {
+            chooser.setCurrentDirectory(directory);
+        }
+        
         String descr = Bundle.ACTION_IdeSnapshot_filter();
         String ext = "."+ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION; // NOI18N
         Filter filter = Filter.create(descr, ext);
