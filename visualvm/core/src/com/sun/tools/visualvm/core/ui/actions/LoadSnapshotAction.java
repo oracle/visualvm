@@ -59,10 +59,10 @@ class LoadSnapshotAction extends AbstractAction {
         if (instance == null) {
             instance = new LoadSnapshotAction();
 
-            instance.updateEnabled();
+            instance.updateEnabled(true);
             RegisteredSnapshotCategories.sharedInstance().addCategoriesListener(new SnapshotCategoriesListener() {
-                public void categoryRegistered(SnapshotCategory category) { instance.updateEnabled(); }
-                public void categoryUnregistered(SnapshotCategory category) { instance.updateEnabled(); }
+                public void categoryRegistered(SnapshotCategory category) { instance.updateEnabled(false); }
+                public void categoryUnregistered(SnapshotCategory category) { instance.updateEnabled(false); }
         });
     }
         return instance;
@@ -122,12 +122,14 @@ class LoadSnapshotAction extends AbstractAction {
         }
     }
     
-    private void updateEnabled() {
+    private void updateEnabled(boolean lazily) {
         final boolean isEnabled = !RegisteredSnapshotCategories.sharedInstance().getOpenSnapshotCategories().isEmpty();
         
-        UISupport.runInEventDispatchThreadAndWait(new Runnable() {
+        Runnable updater = new Runnable() {
             public void run() { setEnabled(isEnabled); }
-        });
+        };
+        if (lazily) UISupport.runInEventDispatchThread(updater);
+        else UISupport.runInEventDispatchThreadAndWait(updater);
     }
     
     
