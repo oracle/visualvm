@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,8 +26,10 @@
 package com.sun.tools.visualvm.application.views.threads;
 
 import java.lang.management.ThreadMXBean;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Arrays;
 import java.util.logging.Logger;
+import javax.management.ReflectionException;
 
 /**
  *
@@ -66,12 +68,15 @@ class DeadlockDetector {
             deadlockDectionDisabled = true;
             return null;
         } catch (UnsupportedOperationException ex) {
-            if (findDeadlockedThreadsSupported) {
-                findDeadlockedThreadsSupported = false;
-                detectDeadlock();
-            } else {
-                LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "detectDeadlock", ex); // NOI18N
-                deadlockDectionDisabled = true;
+            tryJdk15(ex);
+            return null;
+        } catch (UndeclaredThrowableException ex) {
+            Throwable t = ex.getUndeclaredThrowable();
+            if (t instanceof ReflectionException) {
+                ReflectionException re = (ReflectionException) t;
+                if (re.getTargetException() instanceof NoSuchMethodException) {
+                    tryJdk15(ex);
+                }
             }
             return null;
         }
@@ -80,5 +85,16 @@ class DeadlockDetector {
             // LOGGER.info("Deadlock "+Arrays.toString(threadIds));
         }
         return threadIds;
+    }
+
+    private void tryJdk15(Exception ex) {
+        if (findDeadlockedThreadsSupported) {
+            findDeadlockedThreadsSupported = false;
+            countDown--;
+            detectDeadlock();
+        } else {
+            LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "detectDeadlock", ex); // NOI18N
+            deadlockDectionDisabled = true;
+        }
     }
 }
