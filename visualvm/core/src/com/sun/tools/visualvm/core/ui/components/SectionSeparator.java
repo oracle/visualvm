@@ -101,7 +101,7 @@ public final class SectionSeparator extends JPanel {
         GridBagConstraints c2 = new GridBagConstraints();
         c2.weightx = 1d;
         c2.fill = GridBagConstraints.HORIZONTAL;
-        c2.insets = new Insets(0, 4, 0, 0);
+        c2.insets = new Insets(1, 4, 0, 0);
         add(new SeparatorLine(), c2);
     }
 
