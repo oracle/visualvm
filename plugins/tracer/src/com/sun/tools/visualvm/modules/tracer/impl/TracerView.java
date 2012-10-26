@@ -686,8 +686,16 @@ final class TracerView extends DataSourceView {
         }
 
         private JComponent createComponents() {
-            JPanel view = new JPanel(new HorizontalLayout(true));
-            view.setBorder(BorderFactory.createEmptyBorder(15, 8, 15, 8));
+            final int refHeight = new TransparentToolBar().getPreferredSize().height;
+            JPanel view = new JPanel(new HorizontalLayout(true)) {
+                public Dimension getPreferredSize() {
+                    Dimension dim = super.getPreferredSize();
+                    Insets i = getInsets();
+                    dim.height = Math.max(dim.height, refHeight + i.top + i.bottom + 4);
+                    return dim;
+                }
+            };
+            view.setBorder(BorderFactory.createEmptyBorder(10, 8, 10, 8));
             view.setOpaque(false);
 
             startButton = new JToggleButton("Start", new ImageIcon(ImageUtilities.
