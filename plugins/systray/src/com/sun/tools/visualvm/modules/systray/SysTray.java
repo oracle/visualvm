@@ -51,6 +51,7 @@ import org.openide.LifecycleManager;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
 
@@ -58,6 +59,17 @@ import org.openide.windows.WindowManager;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "SysTray_NotSupportedUninstall=<html><b>VisualVM tray icon not supported.</b><br><br>Your system can't display VisualVM tray icon.<br>Please uninstall the plugin.</html>",
+    "SysTray_Show=Show",
+    "SysTray_Hide=Hide",
+    "SysTray_AlwaysOnTop=Always on top",
+    "SysTray_HideWhenMinimized=Hide when minimized",
+    "SysTray_NoTrayicon=No trayicon when showing",
+    "SysTray_Exit=Exit",
+    "SysTray_Settings=Settings",
+    "SysTray_ModalDialog=<html><b>Modal dialog in the way.</b><br><br>Please close all modal dialogs before hiding VisualVM.</html>"
+})
 class SysTray {
 
     private static SysTray INSTANCE;
@@ -127,8 +139,7 @@ class SysTray {
                     } catch (AWTException e) {
                         trayIcon = null;
                         DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
-                            "<html><b>VisualVM tray icon not supported.</b><br><br>Your system can't display VisualVM tray icon.<br>Please uninstall the plugin.</html>", // NOI18N
-                            NotifyDescriptor.ERROR_MESSAGE));
+                            Bundle.SysTray_NotSupportedUninstall(), NotifyDescriptor.ERROR_MESSAGE));
                         System.err.println("Exception showing tray icon: " + e); // NOI18N
                     } catch (Exception e) {
                         trayIcon = null;
@@ -195,7 +206,7 @@ class SysTray {
     private PopupMenu createTrayPopup() {
 
         // "Show / Hide" menu item
-        showHideItem = new MenuItem(mainWindow.isVisible() ? "Hide" : "Show");
+        showHideItem = new MenuItem(mainWindow.isVisible() ? Bundle.SysTray_Hide() : Bundle.SysTray_Show());
         showHideItem.setFont(UIManager.getFont("MenuItem.font").deriveFont(Font.BOLD)); // NOI18N
         showHideItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -209,7 +220,7 @@ class SysTray {
 
         // "Always on top" menu item
         if (Toolkit.getDefaultToolkit().isAlwaysOnTopSupported() && mainWindow.isAlwaysOnTopSupported()) {
-            onTopItem = new CheckboxMenuItem("Always on top", SysTrayPreferences.getInstance().getAlwaysOnTop());
+            onTopItem = new CheckboxMenuItem(Bundle.SysTray_AlwaysOnTop(), SysTrayPreferences.getInstance().getAlwaysOnTop());
             onTopItem.setFont(UIManager.getFont("MenuItem.font")); // NOI18N
             onTopItem.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent e) {
@@ -224,7 +235,7 @@ class SysTray {
         }
 
         // "Hide when minimized" menu item
-        hideMinimizedItem = new CheckboxMenuItem("Hide when minimized", hideWhenMinimized);
+        hideMinimizedItem = new CheckboxMenuItem(Bundle.SysTray_HideWhenMinimized(), hideWhenMinimized);
         hideMinimizedItem.setFont(UIManager.getFont("MenuItem.font")); // NOI18N
         hideMinimizedItem.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -237,7 +248,7 @@ class SysTray {
         });
 
         // "No trayicon when showing" menu item
-        hideTrayIconItem = new CheckboxMenuItem("No trayicon when showing", hideTrayIcon);
+        hideTrayIconItem = new CheckboxMenuItem(Bundle.SysTray_NoTrayicon(), hideTrayIcon);
         hideTrayIconItem.setFont(UIManager.getFont("MenuItem.font")); // NOI18N
         hideTrayIconItem.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -250,7 +261,7 @@ class SysTray {
         });
 
         // "Exit" menu item
-        exitItem = new MenuItem("Exit");
+        exitItem = new MenuItem(Bundle.SysTray_Exit());
         exitItem.setFont(UIManager.getFont("MenuItem.font")); // NOI18N
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -263,7 +274,7 @@ class SysTray {
         });
 
         // "Settings" submenu
-        PopupMenu settingsItem = new PopupMenu("Settings");
+        PopupMenu settingsItem = new PopupMenu(Bundle.SysTray_Settings());
         settingsItem.setFont(UIManager.getFont("MenuItem.font")); // NOI18N
         if (onTopItem != null) settingsItem.add(onTopItem);
         settingsItem.add(hideMinimizedItem);
@@ -289,7 +300,8 @@ class SysTray {
             if (window.isVisible() && window instanceof Dialog)
                 if (((Dialog)window).isModal()) {
                     trayPopup.setEnabled(false);
-                    DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("<html><b>Modal dialog in the way.</b><br><br>Please close all modal dialogs before hiding VisualVM.</html>", NotifyDescriptor.WARNING_MESSAGE));
+                    DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
+                            Bundle.SysTray_ModalDialog(), NotifyDescriptor.WARNING_MESSAGE));
                     trayPopup.setEnabled(true);
                     return;
                 }
@@ -299,13 +311,13 @@ class SysTray {
         if (!Utilities.isWindows() && (mainWindow.getExtendedState() & Frame.ICONIFIED) != 0) {
             workaround = true;
         }
-        if (showHideItem != null) showHideItem.setLabel("Show");
+        if (showHideItem != null) showHideItem.setLabel(Bundle.SysTray_Show());
     }
 
     private void showWindow() {
         mainWindow.setVisible(true);
         mainWindow.setExtendedState(lastWindowState);
-        showHideItem.setLabel("Hide");
+        showHideItem.setLabel(Bundle.SysTray_Hide());
         mainWindow.toFront();
     }
 
