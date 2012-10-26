@@ -59,7 +59,7 @@ esac
 
 
 if [ -f "$progdir"/../lib/visualvm/etc/visualvm.conf ] ; then
-    jdkhome="$basedir"
+    visualvm_jdkhome="$basedir"
     old=`pwd`
     cd "$progdir/../lib/visualvm/"
     basedir=`pwd`
