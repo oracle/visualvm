@@ -57,8 +57,6 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  * @author Jiri Sedlacek
  */
 public final class TransparentToolBar extends JPanel {
-    
-    private static Border BORDER = createToolBarBorder();
 
     private static Boolean NEEDS_PANEL;
     private static Boolean CUSTOM_FILLER;
@@ -71,7 +69,7 @@ public final class TransparentToolBar extends JPanel {
     
     public TransparentToolBar() {
         setOpaque(false);
-        setBorder(BORDER);
+        setBorder(createToolBarBorder());
         
         if (needsPanel()) {
             // Toolbar is a JPanel (GTK)
@@ -102,28 +100,31 @@ public final class TransparentToolBar extends JPanel {
     }
     
     public Dimension getPreferredSize() {
-        Dimension dim = super.getPreferredSize();
+        Dimension dim = getPreferredSizeSuper();
         if (preferredHeight == -1) {
-            JToolBar tb = createToolBar();
-            tb.setBorder(BORDER);
+            TransparentToolBar tb = new TransparentToolBar();
             Icon icon = new Icon() {
                 public int getIconWidth() { return 16; }
                 public int getIconHeight() { return 16; }
                 public void paintIcon(Component c, Graphics g, int x, int y) {}
             };
             JButton b = new JButton("Button", icon); // NOI18N
-            tb.add(b);
+            tb.addItem(b);
             JToggleButton t = new JToggleButton("Button", icon); // NOI18N
-            tb.add(t);
+            tb.addItem(t);
             JComboBox c = new JComboBox();
             c.setEditor(new BasicComboBoxEditor());
             c.setRenderer(new BasicComboBoxRenderer());
-            tb.add(c);
+            tb.addItem(c);
             tb.addSeparator();
-            preferredHeight = tb.getPreferredSize().height;
+            preferredHeight = tb.getPreferredSizeSuper().height;
         }
         dim.height = Math.max(dim.height, preferredHeight);
         return dim;
+    }
+    
+    private Dimension getPreferredSizeSuper() {
+        return super.getPreferredSize();
     }
     
     public Component addItem(Action action) {
@@ -140,6 +141,9 @@ public final class TransparentToolBar extends JPanel {
 
         if (c instanceof JButton)
             ((JButton)c).setDefaultCapable(false);
+        
+        if (UISupport.isAquaLookAndFeel() && c instanceof AbstractButton)
+            ((AbstractButton)c).putClientProperty("JButton.buttonType", "gradient"); // NOI18N
 
         if (toolbar != null) {
             toolbar.add(c, index);
@@ -225,7 +229,7 @@ public final class TransparentToolBar extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(0, 0));
         panel.setOpaque(false);
         panel.add(toolbar, BorderLayout.CENTER);
-        panel.add(new SeparatorLine(), BorderLayout.SOUTH);
+        panel.add(new SeparatorLine(true), BorderLayout.SOUTH);
         return panel;
     }
     
@@ -253,7 +257,9 @@ public final class TransparentToolBar extends JPanel {
     
     private static Border createToolBarBorder() {
         if (UISupport.isAquaLookAndFeel()) {
-            return BorderFactory.createEmptyBorder(3, 2, 0, 2);
+            return BorderFactory.createEmptyBorder(-1, 2, -1, 2);
+        } else if (UISupport.isNimbusLookAndFeel()) {
+            return BorderFactory.createEmptyBorder(1, 2, 1, 2);
         } else {
             return BorderFactory.createEmptyBorder(2, 2, 2, 2);
         }

@@ -592,7 +592,7 @@ final class ThreadsMemoryView extends JPanel {
         area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         refreshUI();
         areaPanel.add(area, BorderLayout.NORTH);
-        areaPanel.add(new SeparatorLine(), BorderLayout.SOUTH);
+        areaPanel.add(new SeparatorLine(true), BorderLayout.SOUTH);
         
         resultsPanel.add(areaPanel, BorderLayout.NORTH);
         

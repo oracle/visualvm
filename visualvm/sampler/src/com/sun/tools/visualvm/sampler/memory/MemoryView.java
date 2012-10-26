@@ -704,7 +704,7 @@ final class MemoryView extends JPanel {
         heapdumpButton.setMaximumSize(size);
 
 //        controlPanel.add(toolBar, BorderLayout.NORTH);
-//        controlPanel.add(new SeparatorLine(), BorderLayout.CENTER);
+//        controlPanel.add(new SeparatorLine(true), BorderLayout.CENTER);
 
         JPanel resultsPanel = new JPanel(new BorderLayout());
         resultsPanel.setOpaque(false);
@@ -715,7 +715,7 @@ final class MemoryView extends JPanel {
         area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         refreshUI();
         areaPanel.add(area, BorderLayout.NORTH);
-        areaPanel.add(new SeparatorLine(), BorderLayout.SOUTH);
+        areaPanel.add(new SeparatorLine(true), BorderLayout.SOUTH);
 
         resultsPanel.add(areaPanel, BorderLayout.NORTH);
 

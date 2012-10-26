@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.core.ui.components;
 
+import com.sun.tools.visualvm.uisupport.SeparatorLine;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -101,7 +102,7 @@ public final class SectionSeparator extends JPanel {
         c2.weightx = 1d;
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(0, 4, 0, 0);
-        add(new Separator(), c2);
+        add(new SeparatorLine(), c2);
     }
 
     private JLabel label;
