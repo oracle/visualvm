@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.modules.systray;
 
+import java.awt.AWTException;
 import java.awt.CheckboxMenuItem;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -123,6 +124,12 @@ class SysTray {
                 if (trayIcon != null) {
                     try {
                         tray.add(trayIcon);
+                    } catch (AWTException e) {
+                        trayIcon = null;
+                        DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
+                            "<html><b>VisualVM tray icon not supported.</b><br><br>Your system can't display VisualVM tray icon.<br>Please uninstall the plugin.</html>", // NOI18N
+                            NotifyDescriptor.ERROR_MESSAGE));
+                        System.err.println("Exception showing tray icon: " + e); // NOI18N
                     } catch (Exception e) {
                         trayIcon = null;
                         Exceptions.printStackTrace(e);
