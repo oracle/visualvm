@@ -29,6 +29,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.HierarchyEvent;
@@ -61,7 +63,8 @@ public final class TransparentToolBar extends JPanel {
     private static Boolean NEEDS_PANEL;
     private static Boolean CUSTOM_FILLER;
     
-    private static int preferredHeight = -1;
+    private static int PREFERRED_HEIGHT = -1;
+    private static int BUTTON_HEIGHT = -1;
     
     private final JToolBar toolbar;
     private final ItemListener listener = new ItemListener();
@@ -101,7 +104,7 @@ public final class TransparentToolBar extends JPanel {
     
     public Dimension getPreferredSize() {
         Dimension dim = getPreferredSizeSuper();
-        if (preferredHeight == -1) {
+        if (PREFERRED_HEIGHT == -1) {
             TransparentToolBar tb = new TransparentToolBar();
             Icon icon = new Icon() {
                 public int getIconWidth() { return 16; }
@@ -117,9 +120,9 @@ public final class TransparentToolBar extends JPanel {
             c.setRenderer(new BasicComboBoxRenderer());
             tb.addItem(c);
             tb.addSeparator();
-            preferredHeight = tb.getPreferredSizeSuper().height;
+            PREFERRED_HEIGHT = tb.getPreferredSizeSuper().height;
         }
-        dim.height = Math.max(dim.height, preferredHeight);
+        dim.height = Math.max(dim.height, PREFERRED_HEIGHT);
         return dim;
     }
     
@@ -247,7 +250,23 @@ public final class TransparentToolBar extends JPanel {
     }
     
     private static JToolBar createToolBar() {
-        JToolBar tb = new JToolBar();
+        JToolBar tb = new JToolBar() {
+            public void layout() {
+                super.layout();
+                if (BUTTON_HEIGHT == -1)
+                    BUTTON_HEIGHT = getButtonHeight();
+                Insets i = getInsets();
+                int height = getHeight() - i.top - i.bottom;
+                for (Component comp : getComponents()) {
+                    if (comp.isVisible() && (comp instanceof JButton || comp instanceof JToggleButton)) {
+                        Rectangle b = comp.getBounds();
+                        b.height = BUTTON_HEIGHT;
+                        b.y = i.top + (height - b.height) / 2;
+                        comp.setBounds(b);
+                    }
+                }
+            }
+        };
         tb.setBorderPainted(false);
         tb.setFloatable(false);
         tb.setRollover(true);
@@ -263,6 +282,35 @@ public final class TransparentToolBar extends JPanel {
         } else {
             return BorderFactory.createEmptyBorder(2, 2, 2, 2);
         }
+    }
+    
+    private static int getButtonHeight() {
+        Icon icon = new Icon() {
+            public int getIconWidth() { return 16; }
+            public int getIconHeight() { return 16; }
+            public void paintIcon(Component c, Graphics g, int x, int y) {}
+        };
+        
+        JButton b = new JButton("Button", icon); // NOI18N
+        JToolBar tb = new JToolBar();
+        tb.setBorder(BorderFactory.createEmptyBorder());
+        tb.setBorderPainted(false);
+        tb.add(b);
+        int bsize = tb.getPreferredSize().height;
+        
+        JToggleButton t = new JToggleButton("Button", icon); // NOI18N
+        tb = new JToolBar();
+        tb.setBorder(BorderFactory.createEmptyBorder());
+        tb.setBorderPainted(false);
+        tb.add(t);
+        int tbsize = tb.getPreferredSize().height;
+        
+        if (UISupport.isAquaLookAndFeel())
+            return Math.max(bsize, tbsize) + 4;
+        else if (UISupport.isMetalLookAndFeel())
+            return Math.max(bsize, tbsize) - 2;
+        
+        return Math.max(bsize, tbsize);
     }
     
 
