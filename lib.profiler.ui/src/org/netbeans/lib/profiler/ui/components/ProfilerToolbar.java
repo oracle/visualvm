@@ -174,27 +174,35 @@ public abstract class ProfilerToolbar {
 
         @Override
         public Component add(Action action) {
-            return toolbar.add(action);
+            Component c = toolbar.add(action);
+            toolbar.repaint();
+            return c;
         }
 
         @Override
         public Component add(Component component) {
-            return toolbar.add(component);
+            Component c = toolbar.add(component);
+            toolbar.repaint();
+            return c;
         }
         
         @Override
         public Component add(Component component, int index) {
-            return toolbar.add(component, index);
+            Component c = toolbar.add(component, index);
+            toolbar.repaint();
+            return c;
         }
 
         @Override
         public void addSeparator() {
             toolbar.addSeparator();
+            toolbar.repaint();
         }
         
         @Override
         public void addSpace(int width) {
             toolbar.addSeparator(new Dimension(width, 0));
+            toolbar.repaint();
         }
         
         @Override
@@ -202,16 +210,19 @@ public abstract class ProfilerToolbar {
             Dimension minDim = new Dimension(0, 0);
             Dimension maxDim = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
             toolbar.add(new Box.Filler(minDim, minDim, maxDim));
+            toolbar.repaint();
         }
         
         @Override
         public void remove(Component component) {
             toolbar.remove(component);
+            toolbar.repaint();
         }
         
         @Override
         public void remove(int index) {
             toolbar.remove(index);
+            toolbar.repaint();
         }
         
         @Override
