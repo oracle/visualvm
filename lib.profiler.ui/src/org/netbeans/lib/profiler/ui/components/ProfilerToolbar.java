@@ -140,6 +140,8 @@ public abstract class ProfilerToolbar {
                     super.doLayout();
                 }
             };
+            if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
+                toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
             toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
             toolbar.setBorderPainted(false);
             toolbar.setRollover(true);
@@ -197,20 +199,9 @@ public abstract class ProfilerToolbar {
         
         @Override
         public void addFiller() {
-            JPanel toolbarFiller = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0)) {
-                public Dimension getPreferredSize() {
-                    if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
-                        int currentWidth = toolbar.getSize().width;
-                        int minimumWidth = toolbar.getMinimumSize().width;
-                        int extraWidth = currentWidth - minimumWidth;
-                        return new Dimension(Math.max(extraWidth, 0), 0);
-                    } else {
-                        return super.getPreferredSize();
-                    }
-                }
-            };
-            toolbarFiller.setOpaque(false);
-            toolbar.add(toolbarFiller);
+            Dimension minDim = new Dimension(0, 0);
+            Dimension maxDim = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+            toolbar.add(new Box.Filler(minDim, minDim, maxDim));
         }
         
         @Override
