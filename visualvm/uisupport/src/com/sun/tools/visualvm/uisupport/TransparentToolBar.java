@@ -41,6 +41,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -61,7 +62,6 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 public final class TransparentToolBar extends JPanel {
 
     private static Boolean NEEDS_PANEL;
-    private static Boolean CUSTOM_FILLER;
     
     private static int PREFERRED_HEIGHT = -1;
     private static int BUTTON_HEIGHT = -1;
@@ -77,7 +77,7 @@ public final class TransparentToolBar extends JPanel {
         if (needsPanel()) {
             // Toolbar is a JPanel (GTK)
             toolbar = null;
-            setLayout(new HorizontalLayout(false));
+            setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
         } else {
             // Toolbar is a JToolBar (default)
             toolbar = createToolBar();
@@ -211,18 +211,7 @@ public final class TransparentToolBar extends JPanel {
     public void addFiller() {
         Dimension minDim = new Dimension(0, 0);
         Dimension maxDim = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        final boolean customFiller = customFiller();
         Box.Filler filler = new Box.Filler(minDim, minDim, maxDim) {
-            public Dimension getPreferredSize() {
-                if (customFiller) {
-                    int currentWidth = TransparentToolBar.this.getSize().width;
-                    int minimumWidth = TransparentToolBar.this.getMinimumSize().width;
-                    int extraWidth = currentWidth - minimumWidth;
-                    return new Dimension(Math.max(extraWidth, 0), 0);
-                } else {
-                    return super.getPreferredSize();
-                }
-            }
             protected void paintComponent(Graphics g) {}
         };
         addItem(filler);
@@ -267,6 +256,8 @@ public final class TransparentToolBar extends JPanel {
                 }
             }
         };
+        if (UISupport.isNimbusLookAndFeel())
+            tb.setLayout(new BoxLayout(tb, BoxLayout.LINE_AXIS));
         tb.setBorderPainted(false);
         tb.setFloatable(false);
         tb.setRollover(true);
@@ -317,12 +308,6 @@ public final class TransparentToolBar extends JPanel {
     private static boolean needsPanel() {
         if (NEEDS_PANEL == null) NEEDS_PANEL = UISupport.isGTKLookAndFeel();
         return NEEDS_PANEL;
-    }
-    
-    private static boolean customFiller() {
-        if (CUSTOM_FILLER == null) CUSTOM_FILLER = UISupport.isGTKLookAndFeel() ||
-                                                  UISupport.isNimbusLookAndFeel();
-        return CUSTOM_FILLER;
     }
 
             
