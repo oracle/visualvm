@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -95,6 +96,10 @@ public class ProfilerTopComponent extends TopComponent {
     
     protected Component defaultFocusOwner() {
         return null;
+    }
+    
+    public Dimension getMinimumSize() {
+        return new Dimension(0, 0);
     }
     
 }
