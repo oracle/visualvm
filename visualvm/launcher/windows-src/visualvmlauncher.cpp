@@ -23,6 +23,7 @@
  * questions.
  */
 
+#include <io.h>
 #include "visualvmlauncher.h"
 #include "o.n.bootstrap/utilsfuncs.h"
 #include "o.n.bootstrap/argnames.h"
@@ -81,10 +82,8 @@ int VisualVMLauncher::start(int argc, char *argv[]) {
         return -1;
     }
 
-    if (!parseConfigFile((baseDir + "\\etc\\" + getAppName() + ".conf").c_str())) {
-        jdkHome = baseDir;
-        parseConfigFile((baseDir + "\\lib\\visualvm\\etc\\" + getAppName() + ".conf").c_str());
-    }
+    parseConfigFile((baseDir + "\\etc\\" + getAppName() + ".conf").c_str());
+    
     if (!parseArgs(argc, argv)) {
         return -1;
     }
@@ -185,6 +184,16 @@ bool VisualVMLauncher::initBaseNames() {
     *bslash = '\0';
 
     baseDir = path;
+    string config = baseDir + "\\etc\\" + getAppName() + ".conf";
+    // check that the config file exists
+    if( (_access( config.c_str(), 4 )) == -1 ) {
+        config = baseDir + "\\lib\\visualvm\\etc\\" + getAppName() + ".conf";
+        if( (_access( config.c_str(), 4 )) != -1 ) { // JDK installation
+            jdkHome = baseDir;
+            baseDir += "\\lib\\visualvm";
+        }         
+    }
+    
     logMsg("Base dir: %s", baseDir.c_str());
     return true;
 }
