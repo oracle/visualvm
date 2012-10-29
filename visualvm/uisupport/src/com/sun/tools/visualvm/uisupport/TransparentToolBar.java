@@ -77,7 +77,7 @@ public final class TransparentToolBar extends JPanel {
         if (needsPanel()) {
             // Toolbar is a JPanel (GTK)
             toolbar = null;
-            setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
+            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         } else {
             // Toolbar is a JToolBar (default)
             toolbar = createToolBar();
