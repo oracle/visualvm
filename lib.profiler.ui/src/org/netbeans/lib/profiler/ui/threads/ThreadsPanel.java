@@ -390,6 +390,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         monitorLegend.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 8));
+        legendPanel.setOpaque(false);
         legendPanel.add(runningLegend);
         legendPanel.add(sleepingLegend);
 
@@ -402,6 +403,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
 
         //legendPanel.add(unknownLegend);
         JPanel bottomPanel = new JPanel(new BorderLayout());
+        UIUtils.decorateProfilerPanel(bottomPanel);
         bottomPanel.add(UIUtils.createHorizontalLine(bottomPanel.getBackground()), BorderLayout.NORTH);
         bottomPanel.add(legendPanel, BorderLayout.EAST);
 

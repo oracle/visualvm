@@ -220,6 +220,7 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
     }
 
     private static void tweakSplitPaneUI(JSplitPane splitPane) {
+        splitPane.setOpaque(false);
         splitPane.setBorder(null);
         splitPane.setDividerSize(3);
 

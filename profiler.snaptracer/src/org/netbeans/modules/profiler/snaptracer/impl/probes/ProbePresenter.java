@@ -83,7 +83,7 @@ public final class ProbePresenter extends JLabel {
         
         setIconTextGap(7);
         setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 1, 1, 1, Color.LIGHT_GRAY),
+                    BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY),
                     BorderFactory.createEmptyBorder(5, 10, 5, 10)
                 ));
     }

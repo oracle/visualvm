@@ -54,7 +54,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.ItemsModel;
 import org.netbeans.lib.profiler.charts.PaintersModel;
@@ -235,10 +234,12 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
 
         // Legend container
         JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 8));
+        bigLegendPanel.setOpaque(false);
         bigLegendPanel.add(allocObjectsBig);
         bigLegendPanel.add(allocBytesBig);
         
         JPanel legendContainer = new JPanel(new BorderLayout(0, 0));
+        UIUtils.decorateProfilerPanel(legendContainer);
         legendContainer.add(UIUtils.createHorizontalLine(legendContainer.getBackground()), BorderLayout.NORTH);
         legendContainer.add(bigLegendPanel, BorderLayout.CENTER);
 
