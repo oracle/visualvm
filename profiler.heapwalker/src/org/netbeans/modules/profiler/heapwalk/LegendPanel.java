@@ -86,10 +86,12 @@ public class LegendPanel extends JPanel {
     }
 
     private void initComponents() {
+        setOpaque(false);
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 4, 5));
 
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
+        legendPanel.setOpaque(false);
 
         gcRootLegend = new JLabel(Bundle.ClassesListController_GcRootString(), BrowserUtils.ICON_GCROOT, SwingConstants.LEFT);
         gcRootLegendDivider = new JLabel("|"); // NOI18N

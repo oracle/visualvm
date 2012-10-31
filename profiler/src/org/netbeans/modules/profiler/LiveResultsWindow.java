@@ -542,6 +542,7 @@ public final class LiveResultsWindow extends ProfilerTopComponent
 
         //*************
         memoryTabPanel = new JPanel(new BorderLayout());
+        memoryTabPanel.setOpaque(false);
 
         graphButtonsSeparator = new JToolBar.Separator();
         toolBar.add(graphButtonsSeparator);
