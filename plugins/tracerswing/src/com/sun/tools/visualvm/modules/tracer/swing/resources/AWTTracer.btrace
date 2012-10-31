@@ -1,0 +1,170 @@
+package net.java.btrace.visualvm.tracer.swing.resources;
+
+import com.sun.btrace.Profiler;
+import com.sun.btrace.annotations.*;
+import static com.sun.btrace.BTraceUtils.*;
+
+@BTrace(name="AWTStats") public class AWTTracer {
+    private static long lastTimeStamp = -1L;
+    // <fragment name="edt_counts">
+    private static long cntDispatchEvent = 0;
+    private static long cntInvokeWait = 0;
+    private static long cntInvokeLater = 0;
+
+    @Property volatile private static long dispatchEventCount = 0;
+    @Property volatile private static long invokeWaitCount = 0;
+    @Property volatile private static long invokeLaterCount = 0;
+
+    @OnMethod(
+        clazz="java.awt.EventQueue",
+        method="/(dispatchEvent|invokeAndWait|invokeLater)/"
+    )
+    public static void eqCountHandler(@ProbeMethodName String pmn) {
+        if (startsWith(pmn, "dispatchEvent")) {
+            cntDispatchEvent++;
+        } else if (startsWith(pmn, "invokeAndWait")) {
+            cntInvokeWait++;
+        } else if (startsWith(pmn, "invokeLater")) {
+            cntInvokeLater++;
+        }
+    }
+    // </fragment>
+
+    // <fragment name="edt_times">
+    @Property volatile private static int dispatchEventTime = 0;
+    @Property volatile private static int invokeWaitTime = 0;
+
+    private static long tmrDispatchEvent = 0;
+    private static long tmrInvokeWait = 0;
+
+    @OnMethod(
+        clazz="java.awt.EventQueue",
+        method="/(dispatchEvent|invokeAndWait)/",
+        location=@Location(Kind.RETURN)
+    )
+    public static void eqTimerHandler(@Duration long time, @ProbeMethodName String pmn) {
+        if (startsWith(pmn, "dispatchEvent")) {
+            tmrDispatchEvent += time;
+        } else if (startsWith(pmn, "invokeAndWait")) {
+            tmrInvokeWait += time;
+        }
+    }
+    // </fragment>
+
+    // <fragment name="awt_paint">
+    @Property(name="awtPaintProfiler") private static Profiler awtPaintProfiler = Profiling.newProfiler(3);
+
+    @OnMethod(
+        clazz="+java.awt.Component",
+        method="/(paint|update|repaint)/"
+    )
+    public static void componentPaintBefore(@ProbeMethodName String pmn) {
+        Profiling.recordEntry(awtPaintProfiler, pmn);
+    }
+
+    @OnMethod(
+        clazz="+java.awt.Component",
+        method="/(paint|update|repaint)/",
+        location=@Location(Kind.RETURN)
+    )
+    public static void componentPaintAfter(@Duration long time, @ProbeMethodName String pmn) {
+        Profiling.recordExit(awtPaintProfiler, pmn, time);
+    }
+    // </fragment>
+
+    // <fragment name="utilization">
+    private static long timeInEDT = 0;
+    private static long timeInPaint = 0;
+    private static long timeInLayout = 0;
+
+    @Property volatile private static int dispatch = 0;
+    @Property volatile private static int paint = 0;
+    @Property volatile private static int layout = 0;
+
+    @TLS private static int handlerDepth = 0;
+
+    @OnMethod(
+        clazz="java.awt.EventQueue",
+        method="dispatchEvent"
+    )
+    public static void onDispatchEnter() {
+        handlerDepth++;
+    }
+
+    @OnMethod(
+        clazz="java.awt.EventQueue",
+        method="dispatchEvent",
+        location=@Location(value=Kind.RETURN)
+    )
+    public static void onDispatchExit(@Duration long time) {
+        if (--handlerDepth == 0) {
+            timeInEDT += time;
+        }
+    }
+
+    @OnMethod(
+        clazz="javax.swing.RepaintManager",
+        method="paint",
+        location=@Location(value=Kind.RETURN)
+    )
+    public static void onPaint(@Duration long time) {
+        timeInPaint += time;
+    }
+
+    @OnMethod(
+        clazz="+java.awt.LayoutManager",
+        method="layoutContainer",
+        location=@Location(value=Kind.RETURN)
+    )
+    public static void onLayout(@Duration long time) {
+        timeInLayout += time;
+    }
+    // </fragment>
+
+    @OnTimer(value=1000)
+    public static void calcRates() {
+        // <fragment name="utilization">
+        long inLayout = timeInLayout;
+        long inPaint = timeInPaint;
+        long edt = timeInEDT;
+        timeInLayout = 0;
+        timeInPaint = 0;
+        timeInEDT = 0;
+        // </fragment>
+        // <fragment name="edt_times">
+        long tmpDispatchEvent = tmrDispatchEvent;
+        long tmpInvokeWait = tmrInvokeWait;
+        tmrDispatchEvent = 0;
+        tmrInvokeWait = 0;
+
+        // </fragment>
+        // <fragment name="edt_counts">
+        dispatchEventCount = cntDispatchEvent;
+        invokeWaitCount = cntInvokeWait;
+        invokeLaterCount = cntInvokeLater;
+        cntDispatchEvent = 0;
+        cntInvokeLater = 0;
+        cntInvokeWait = 0;
+        // </fragment>
+        // <fragment name="awt_paint">
+        Profiling.snapshotAndReset(awtPaintProfiler);
+        // </fragment>
+
+        long timeStamp = timeMillis();
+        long span = lastTimeStamp > -1 ? timeStamp - lastTimeStamp : 1000;
+        lastTimeStamp = timeStamp;
+
+        long divider = span * 1000L; // nanoseconds in 1 millisecond * 100 (as %)
+
+        // <fragment name="edt_times">
+        dispatchEventTime = (int)(tmpDispatchEvent / divider);
+        invokeWaitTime = (int)(tmpInvokeWait / divider);
+        // </fragment>
+
+        // <fragment name="utilization">
+        dispatch = (int)(edt / divider);
+        paint = (int)(inPaint / divider);
+        layout = (int)(inLayout / divider);
+        // </fragment>
+    }
+}

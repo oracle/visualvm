@@ -1,0 +1,428 @@
+/*
+ * Copyright (c) 2010, 2011, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
+ */
+
+import com.sun.btrace.annotations.*;
+import static com.sun.btrace.BTraceUtils.*;
+import java.util.Map;
+import java.lang.ref.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.Iterator;
+
+// <fragment name="sgNode">
+import com.sun.javafx.runtime.sequence.Sequence;
+// </fragment>
+
+/**
+ * This BTrace script tries to measure aggregate stat like total
+ * FXObject count, total dependent count, total notification count etc.
+ * This script measures histogram of FXObjects as well.
+ *
+ * @author A. Sundararajan
+ * @author J. Bachorik
+ */
+@BTrace(name="FxBtraceTracker", unsafe=true) public class FxBtraceTracker {
+
+    // @Property exposes this field as MBean attribute
+
+    // <fragment name="metrics">
+    @Property private static long invalidationRate = 0;
+    volatile private static long invalidations = 0;
+
+    @Property private static long replacementRate = 0;
+    volatile private static long replacements = 0;
+    // </fragment>
+
+    // <fragment name="objects">
+    volatile private static long fxObjectCountRunning = 0;
+
+    @Property private static long fxObjectCreationRate = 0;
+    @Property private static long fxObjectDeletionRate = 0;
+    // </fragment>
+
+    // <fragment name="fps">
+    @Property private static int allPulses = 0;
+    volatile private static int pulses = 0;
+    @Property private static double averageFPS = 0.0;
+    // </fragment>
+
+    // <fragment name="pulseCount">
+    @Property private static long mousePulses = 0L;
+    @Property private static long keyPulses = 0L;
+
+    volatile private static int mPulses = 0;
+    volatile private static int kPulses = 0;
+    // </fragment>
+
+    // <fragment name="pulseTiming">
+    @Property private static long mousePulsesCumulativeTime = 0L;
+    @Property private static long keyPulsesCumulativeTime = 0L;
+    volatile private static long mCumulativeTime = 0L;
+    volatile private static long mCurrentTime = 0L;
+    
+    volatile private static long kCumulativeTime = 0L;
+    volatile private static long kCurrentTime = 0L;
+    // </fragment>
+
+    // <fragment name="sgCss">
+    //styles
+    @Property private static long getStyleHelperCalls = 0;
+    @Property private static long styleHelperCount = 0;
+    @Property private static long transitionToStateCalls = 0;
+    @Property private static long processCssCount = 0;
+    @Property private static long processCssOnRootCount = 0;
+
+    volatile private static long getStyleHelperCallsLocal = 0;
+    volatile private static long transitionToStateCallsLocal = 0;
+    volatile private static long processCssCountLocal = 0;
+    volatile private static long processCssOnRootCountLocal = 0;
+    // </fragment>
+
+    // <fragment name="sgNode">
+    //unsafe
+    //
+    @Property private static long nodeCount = 0L;
+    @Property private static long needsLayout = 0L;
+    volatile private static long nodeCountInternal = 0L;
+    volatile private static long needsLayoutInternal = 0L;
+    // </fragment>
+
+    // <fragment name="sgTiming">
+    @Property private static long paintCumulativeTime = 0L;
+    @Property private static long dirtyRegionsCumulativeTime = 0L;
+    //paint
+    volatile private static long pCumulativeTime = 0L;
+    volatile private static long pCurrentTime = 0L;
+    //dirty regions
+    volatile private static long dCumulativeTime = 0L;
+    volatile private static long dCurrentTime = 0L;
+    //synchronization
+    @Property private static long synchronizationTime = 0L;
+    volatile private static long syncCumulativeTime = 0L;
+    volatile private static long syncCurrentTime = 0L;
+    // </fragment>
+
+    // <fragment name="synCalls">
+    @Property private static long synchronizationCalls = 0L;
+    @Property private static String clazzName;
+    volatile private static long syncCalls = 0L;
+    // </fragment>
+
+    volatile private static long startTime = 0;
+
+    //just the debug variables
+    @Property private static long xyz = 0L;
+    volatile private static long _xyz = 0L;
+
+    // <fragment name="objects">
+    @OnMethod(
+	clazz="com.sun.javafx.runtime.FXBase",
+        method="<init>"
+    )
+    public static void onNewFXObject(@Self Object obj, boolean dummy) {
+        fxObjectCountRunning++;
+    }
+    // </fragment>
+
+    // <fragment name="metrics">
+    @OnMethod(
+        clazz="+com.sun.javafx.runtime.FXBase",
+        method="/invalidate\\$.+/"
+    )
+    public static void onInvalidate() {
+        invalidations++;
+    }
+
+    @OnMethod(
+        clazz="+com.sun.javafx.runtime.FXBase",
+        method="/onReplace\\$.+/",
+        location=@Location(Kind.RETURN)
+    )
+    public static void onOnReplaceReturn() {
+        replacements++;
+    }
+    // </fragment>
+
+    //here to compute FPS related fields
+    @OnMethod(
+        clazz="javafx.scene.Scene$ScenePulseListener",
+        method="pulse"
+    )
+    public static void onPulse(@Self Object obj){
+        // <fragment name="fps">
+        if (startTime == 0)
+            startTime = timeNanos();
+            pulses++;
+        // </fragment>
+
+        // <fragment name="sgNode">
+        //here the unsafe operations
+//        java.lang.reflect.Field f = field("com.sun.stylesheet.StyleManager", "$defaultContainer");
+//        println(f);
+
+        //$javafx$scene$Scene$ScenePulseListener$scene$
+        javafx.scene.Scene scene = (javafx.scene.Scene)get(field(name(classOf(obj)), "accessOuterField$"), obj);
+        Sequence seq = scene.get$content();//(Sequence)get(field(name(classOf(scene)), "$content"), scene);
+
+        int cnt = 0;
+        int needsLayout = 0;
+        java.util.Deque<java.util.Iterator> queue = newDeque();
+        java.util.Iterator it = seq.iterator();
+        while(it != null && it.hasNext()){
+            Object object = it.next();
+            if (object instanceof javafx.scene.Parent){
+                seq = ((javafx.scene.Parent)object).impl_getChildren();
+                //println("It is sequence " + seq.size());
+                push(queue, it);
+                it = seq.iterator();
+                /* pulse enter point seems to be correct for computing if layouting is needed,
+                   as long as layouting calls are done within this procedure - in this place,
+                   all needsLayout must be set IMO */
+            }
+            if(((javafx.scene.Node)object).get$parent().get$needsLayout()){
+                needsLayoutInternal++;
+            }
+            cnt++;
+
+            if (!it.hasNext()){
+                it = poll(queue);
+            }
+        }
+        nodeCountInternal = cnt;
+        // </fragment>
+    }
+
+    // <fragment name="sgTiming">
+    @OnMethod(
+        clazz="com.sun.scenario.scenegraph.JSGPanel",
+        method="paintComponent",
+        location=@Location(Kind.RETURN)
+    )
+    public static void painComponentExit(@Duration long dur){
+        pCumulativeTime += dur;
+    }
+
+    @OnMethod(
+        clazz="com.sun.scenario.scenegraph.JSGPanel",
+        method="accumulateDirtyRegions",
+        location=@Location(Kind.RETURN)
+    )
+    public static void accumulateDirtyRegionsExit(@Duration long dur){
+        dCumulativeTime += dur;
+    }
+    // </fragment>
+
+    // <fragment name="pulseCount">
+    //mouse
+    @OnMethod(
+        clazz="javafx.scene.Scene",
+        method="impl_processMouseEvent"
+    )
+    public static void onMousePulseEnter(){
+        mPulses++;
+    }
+    //keyboard
+    @OnMethod(
+        clazz="javafx.scene.Scene",
+        method="impl_processKeyEvent"
+    )
+    public static void onKeyPulseEnter(){
+        kPulses++;
+    }
+    // </fragment>
+
+    // <fragment name="pulseTiming">
+    // mouse
+    @OnMethod(
+        clazz="javafx.scene.Scene",
+        method="impl_processMouseEvent",
+        location=@Location(Kind.RETURN)
+    )
+    public static void onMousePulseExit(@Duration long dur){
+        mCumulativeTime += dur;
+    }
+    //keyboard
+    @OnMethod(
+        clazz="javafx.scene.Scene",
+        method="impl_processKeyEvent",
+        location=@Location(Kind.RETURN)
+    )
+    public static void onKeyPulseExit(@Duration long dur){
+        kCumulativeTime += dur;
+    }
+    // </fragment>
+
+    //synchronization
+    // <fragment name="synCalls">
+    @OnMethod(
+        clazz="javafx.scene.Node",
+        method="impl_updatePG"
+//I suspect, we should track the calls on scene, but they do not anything
+//    @OnMethod(
+//        clazz="javafx.scene.Scene",
+//        method="synchronizePGScene"
+    )
+    public static void doSynchronizeStart(@Self Object obj){
+        clazzName = name(classOf(obj));//str(obj);
+        syncCalls++;
+    }
+    // </fragment>
+
+    // <fragment name="sgTiming">
+    @OnMethod(
+        clazz="javafx.scene.Node",
+        method="impl_updatePG",
+//I suspect, we should track the calls on scene, but they do not anything
+//    @OnMethod(
+//        clazz="javafx.scene.Scene",
+//        method="synchronizePGScene",
+        location=@Location(Kind.RETURN)
+    )
+    public static void doSynchronizeEnds(@Duration long dur){
+        syncCumulativeTime += dur;
+    }
+    // </fragment>
+
+    // <fragment name="sgCss">
+    //styles
+    @OnMethod(
+        clazz="com.sun.stylesheet.StyleManager",
+        method="getStyleHelper"
+    )
+    public static void styleHelperRequest(@Self Object obj){
+        getStyleHelperCallsLocal++;
+        println(obj);
+        //# of style helper ==> containerMap + defaultContainer
+        //update amount of StyleHelper here?
+        println(((com.sun.stylesheet.StyleManager)obj).$defaultContainer);
+    }
+
+    @OnMethod(
+        clazz="com.sun.stylesheet.StyleHelper",
+        method="transitionToState"
+    )
+    public static void styleHelperTransition(){
+        transitionToStateCallsLocal++;
+    }
+
+    @OnMethod(
+        clazz="javafx.scene.Node",
+        method="impl_processCSS"
+    )
+    public static void processCss(@Self Object object){
+        //println(name(classOf(object)));
+        processCssCountLocal++;
+        if (compareTo(name(classOf(object)), "javafx.scene.Scene$Root") == 0)
+            processCssOnRootCountLocal++;
+    }
+    // </fragment>
+
+    @OnMethod(
+        clazz="com.sun.embeddedswing.EmbeddedEventQueue",
+        method="dispatchEvent"
+    )
+    public static void onDispatchEvent(@Self Object object){
+        printFields(object);
+    }
+
+    @OnTimer(1000)
+    public static void calculatePerSecondRates() {
+        // <fragment name="metrics">
+        invalidationRate = invalidations;
+        replacementRate = replacements;
+        invalidations = 0;
+        replacements = 0;
+        // </fragment>
+        // <fragment name="objects">
+        fxObjectCreationRate = fxObjectCountRunning;
+        fxObjectCountRunning = 0;
+        // </fragment>
+
+        // <fragment name="fps">
+        //here we compute FPS related variables
+        if (pulses > 0){
+            averageFPS  = ((1000000000.0 * pulses) / (timeNanos() - startTime));
+            allPulses = pulses;
+        }
+        pulses = 0;
+        startTime = 0L;
+        // </fragment>
+
+        // <fragment name="pulseCount">
+        //key/mouse events
+        keyPulses = kPulses;
+        kPulses = 0;
+
+        mousePulses = mPulses;
+        mPulses = 0;
+        // </fragment>
+
+        // <fragment name="pulseTiming">
+        //key/mouse events
+        keyPulsesCumulativeTime = kCumulativeTime/1000000; //in miliSec
+        kCumulativeTime = 0L;
+
+        mousePulsesCumulativeTime = mCumulativeTime/1000000; //in miliSec
+        mCumulativeTime = 0L;
+        // </fragment>
+
+        // <fragment name="sgTiming">
+        //paint
+        paintCumulativeTime = pCumulativeTime/1000000; //in miliSec
+        pCumulativeTime = 0L;
+
+        //dirty regions
+        dirtyRegionsCumulativeTime = dCumulativeTime/1000000; //in miliSec
+        dCumulativeTime = 0L;
+        // </fragment>
+
+        //synchronization
+        // <fragment name="sgTiming">
+        synchronizationTime = syncCumulativeTime/1000000;
+        syncCumulativeTime = 0L;
+        // </fragment>
+
+        // <fragment name="synCall">
+        synchronizationCalls = syncCalls;
+        syncCalls = 0L;
+        // </fragment>
+
+        // <fragment name="sgNode">
+        //unsafe
+        needsLayout = needsLayoutInternal;
+        needsLayoutInternal = 0;
+        nodeCount = nodeCountInternal != 0 ? nodeCountInternal : nodeCount; //do not reset to zero
+        nodeCountInternal = 0;
+        // </fragment>
+
+        // <fragment name="sgCss">
+        getStyleHelperCalls = getStyleHelperCallsLocal;
+        getStyleHelperCallsLocal = 0;
+        transitionToStateCalls = transitionToStateCallsLocal;
+        transitionToStateCallsLocal = 0;
+        processCssCount = processCssCountLocal;
+        processCssCountLocal = 0;
+        processCssOnRootCount = processCssOnRootCountLocal;
+        processCssOnRootCountLocal = 0;
+        // </fragment>
+    }
+}

@@ -1,0 +1,600 @@
+/*
+ * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
+ */
+
+package com.sun.tools.visualvm.sampler.cpu;
+
+import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
+import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.SeparatorLine;
+import com.sun.tools.visualvm.uisupport.TransparentToolBar;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.lang.management.ThreadInfo;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.ui.UIConstants;
+import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.components.FilterComponent;
+import org.netbeans.lib.profiler.ui.components.JExtendedTable;
+import org.netbeans.lib.profiler.ui.components.table.ClassNameTableCellRenderer;
+import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
+import org.netbeans.lib.profiler.ui.components.table.ExtendedTableModel;
+import org.netbeans.lib.profiler.ui.components.table.JExtendedTablePanel;
+import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
+import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
+import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
+import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
+
+/**
+ *
+ * @author Jiri Sedlacek
+ * @author Tomas Hurka
+ */
+final class ThreadsCPUView extends JPanel {
+    private static final double NANOS_MILIS=1000000.0;
+    
+    private final AbstractSamplerSupport.Refresher refresher;
+    private boolean forceRefresh = false;
+    
+    private HTMLTextArea area;
+    private AbstractButton deltaButton;
+    private AbstractButton pauseButton;
+    private AbstractButton refreshButton;
+    private JExtendedTable resTable;
+    private ExtendedTableModel resTableModel;
+    private JExtendedTablePanel resTablePanel;
+    private FilterComponent filterComponent;
+    private CustomBarCellRenderer customBarCellRenderer;
+    private LabelTableCellRenderer labelTableCellRenderer;
+    private LabelBracketTableCellRenderer labelBracketTableCellRenderer;
+    
+    private String filterString = ""; // NOI18N
+    private int filterType = CommonConstants.FILTER_CONTAINS;
+    
+    private List<ThreadInfo> threads;
+    private List<Long> threadCPUInfo;
+    private List<Long> threadCPUInfoPerSec;
+    private ThreadsCPUInfo currentThreadsInfo;
+    private ThreadsCPUInfo baseThreadsInfo;
+    private List<Integer> filteredSortedIndexes = new ArrayList();
+    private int totalThreads = -1;
+    private long totalCPUTime, baseTotalCPUTime = -1;
+    
+    private int sortingColumn = 1;
+    private boolean sortOrder = false; // Defines the sorting order (ascending or descending)
+    private String[] columnNames;
+    private TableCellRenderer[] columnRenderers;
+    private String[] columnToolTips;
+    private Class[] columnTypes;
+    private int[] columnWidths;
+    private int minNamesColumnWidth; // minimal width of classnames columns
+    
+    ThreadsCPUView(AbstractSamplerSupport.Refresher refresher) {    
+        this.refresher = refresher;
+        initColumnsData();
+        initComponents();
+        
+        addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (isShowing()) ThreadsCPUView.this.refresher.refresh();
+                }
+            }
+        });
+    }    
+    
+    void initSession() {
+    }
+    
+    boolean isPaused() {
+        return pauseButton.isSelected() && !forceRefresh;
+    }
+    
+    boolean isEmpty() {
+        return resTableModel.getRowCount() == 0;
+    }
+    
+    void refresh(ThreadsCPUInfo info) {
+        if (!isShowing() || (pauseButton.isSelected() && !forceRefresh)) return;
+        forceRefresh = false;
+        threads = info.getThreads();
+        threadCPUInfo = info.getThreadCPUTime();
+        totalCPUTime = info.getTotalCPUTime();
+        if (currentThreadsInfo != null) {
+            threadCPUInfoPerSec = currentThreadsInfo.getCPUTimePerSecond(info);
+        }
+        currentThreadsInfo = info;
+        if (deltaButton.isSelected()) {
+            if (baseThreadsInfo == null) {
+                baseThreadsInfo = info;
+                baseTotalCPUTime = totalCPUTime;
+                
+                columnRenderers[2] = labelTableCellRenderer;
+                updateColumnRenderers();
+            }
+            totalThreads = threads.size() - baseThreadsInfo.getThreads().size();
+            threadCPUInfo = baseThreadsInfo.getThreadCPUTimeDiff(info);
+            totalCPUTime = baseThreadsInfo.getTotalDiffCPUTime();
+        } else {
+            if (baseThreadsInfo != null) {
+                baseThreadsInfo = null;
+                baseTotalCPUTime = -1;
+                
+                columnRenderers[2] = labelBracketTableCellRenderer;
+                updateColumnRenderers();
+            }
+            threadCPUInfo = info.getThreadCPUTime();
+            totalCPUTime = info.getTotalCPUTime();
+            totalThreads = threads.size();
+            
+        }
+        customBarCellRenderer.setMaximum(totalCPUTime);
+        updateData(false);
+        refreshUI();
+    }
+    
+    void terminate() {
+        pauseButton.setEnabled(false);
+        refreshButton.setEnabled(false);
+        deltaButton.setEnabled(false);
+    }
+    
+    private void updateData(boolean sortOnly) {
+        int selectedRow = resTable.getSelectedRow();
+        String selectedRowContents = null;
+        
+        if (selectedRow != -1)
+            selectedRowContents = (String) resTable.getValueAt(selectedRow, 0);
+        
+        if (!sortOnly) filterData();
+        sortData();
+        
+        resTableModel.fireTableDataChanged();
+        
+        if (selectedRowContents != null)
+            resTable.selectRowByContents(selectedRowContents, 0, false);
+    }
+    
+    
+    private void filterData() {
+        filteredSortedIndexes.clear();
+        
+        String[] filterStrings = FilterComponent.getFilterValues(filterString);
+        if (filterType == CommonConstants.FILTER_NONE ||
+                filterStrings == null || filterStrings[0].equals("")) { // NOI18N
+            for (int i = 0; i < threads.size(); i++) filteredSortedIndexes.add(i);
+        } else {
+            for (int i = 0; i < threads.size(); i++)
+                if (passedFilters(threads.get(i).getThreadName(), filterStrings, filterType))
+                    filteredSortedIndexes.add(i);
+        }
+    }
+    
+    private static boolean passedFilters(String value, String[] filters, int type) {
+        for (int i = 0; i < filters.length; i++)
+            if (passedFilter(value, filters[i], type)) return true;
+        return false;
+    }
+    
+    private static boolean passedFilter(String value, String filter, int type) {
+        // Case insensitive comparison (except regexp):
+        switch (type) {
+            case CommonConstants.FILTER_STARTS_WITH:
+                return value.regionMatches(true, 0, filter, 0, filter.length()); // case insensitive startsWith, optimized
+            case CommonConstants.FILTER_CONTAINS:
+                return value.toLowerCase().indexOf(filter.toLowerCase()) != -1; // case insensitive indexOf, NOT OPTIMIZED
+            case CommonConstants.FILTER_ENDS_WITH:
+                
+                // case insensitive endsWith, optimized
+                return value.regionMatches(true, value.length() - filter.length(), filter, 0, filter.length());
+            case CommonConstants.FILTER_EQUALS:
+                return value.equalsIgnoreCase(filter); // case insensitive equals
+            case CommonConstants.FILTER_REGEXP:
+                return value.matches(filter); // still case sensitive!
+        }
+        
+        return false;
+    }
+    
+    private void sortData() {
+        Collections.sort(filteredSortedIndexes, new Comparator() {
+            
+            public int compare(Object o1, Object o2) {
+                Integer index1 = (Integer)o1;
+                Integer index2 = (Integer)o2;
+                
+                switch (sortingColumn) {
+                    case 0:
+                        ThreadInfo ti1 = threads.get(index1);
+                        ThreadInfo ti2 = threads.get(index2);
+                        return sortOrder ? Long.valueOf(ti1.getThreadId()).compareTo(ti2.getThreadId()) :
+                            Long.valueOf(ti2.getThreadId()).compareTo(ti1.getThreadId());
+                    case 1:
+                    case 2:
+                        Long alloc1 = threadCPUInfo.get(index1);
+                        Long alloc2 = threadCPUInfo.get(index2);
+                        return sortOrder ? alloc1.compareTo(alloc2) : alloc2.compareTo(alloc1);
+                    case 3:
+                        Long allocSec1 = threadCPUInfoPerSec.get(index1);
+                        Long allocSec2 = threadCPUInfoPerSec.get(index2);
+                        return sortOrder ? allocSec1.compareTo(allocSec2) : allocSec2.compareTo(allocSec1);
+                    default:
+                        return 0;
+                }
+            }
+            
+        });
+    }
+    
+    
+    private JExtendedTable initTable() {
+        resTableModel = new ExtendedTableModel(new SortableTableModel() {
+            public String getColumnName(int col) {
+                return columnNames[col];
+            }
+            
+            public int getRowCount() {
+                return filteredSortedIndexes.size();
+            }
+            
+            public int getColumnCount() {
+                return columnNames.length;
+            }
+            
+            public Class getColumnClass(int col) {
+                return columnTypes[col];
+            }
+            
+            public Object getValueAt(int row, int col) {
+                int index = filteredSortedIndexes.get(row);
+                long threadCPUtime = threadCPUInfo.get(index).longValue();
+                double threadCPUtimeInMs = threadCPUtime/NANOS_MILIS;
+                boolean deltas = baseThreadsInfo != null;
+                NumberFormat formatter = NumberFormat.getInstance();
+                formatter.setMaximumFractionDigits(3);
+                
+                switch (col) {
+                    case 0:
+                        ThreadInfo threadInfo = threads.get(index);
+                        return threadInfo.getThreadName() ;
+                    case 1:
+                        return threadCPUtime;
+                    case 2:
+                        if (deltas) {
+                            return threadCPUtimeInMs > 0 ? "+" + formatter.format(threadCPUtimeInMs) : formatter.format(threadCPUtimeInMs); // NOI18N
+                        } else {
+                            return threadCPUtimeInMs == 0 ? "0 (0.0%)" : formatter.format(threadCPUtimeInMs) + " (" + getPercentValue(threadCPUtimeInMs, totalCPUTime) + "%)"; // NOI18N
+                        }
+                    case 3:
+                        if (threadCPUInfoPerSec != null) {
+                            return formatter.format(threadCPUInfoPerSec.get(index).longValue()/NANOS_MILIS);
+                        }
+                        return "0";
+                    default:
+                        return null;
+                }
+            }
+            
+            private String getPercentValue(double value, double basevalue) {
+                int basis = (int) (value / basevalue * 1000f);
+                int percent = basis / 10;
+                int permille = basis % 10;
+                
+                return "" + percent + "." + permille; // NOI18N
+            }
+            
+            public String getColumnToolTipText(int col) {
+                return columnToolTips[col];
+            }
+            
+            public void sortByColumn(int column, boolean order) {
+                sortingColumn = column;
+                sortOrder = order;
+                updateData(true);
+            }
+            
+            /**
+             * @param column The table column index
+             * @return Initial sorting for the specified column - if true, ascending, if false descending
+             */
+            public boolean getInitialSorting(int column) {
+                switch (column) {
+                    case 0:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        
+        resTable = new JExtendedTable(resTableModel) {
+            public void doLayout() {
+                int columnsWidthsSum = 0;
+                int realFirstColumn = -1;
+                
+                int index;
+                
+                for (int i = 0; i < resTableModel.getColumnCount(); i++) {
+                    index = resTableModel.getRealColumn(i);
+                    
+                    if (index == 0) {
+                        realFirstColumn = i;
+                    } else {
+                        columnsWidthsSum += getColumnModel().getColumn(i).getPreferredWidth();
+                    }
+                }
+                
+                if (realFirstColumn != -1) {
+                    getColumnModel().getColumn(realFirstColumn)
+                            .setPreferredWidth(Math.max(getWidth() - columnsWidthsSum, minNamesColumnWidth));
+                }
+                
+                super.doLayout();
+            }
+            ;
+        };
+        
+        resTableModel.setTable(resTable);
+        resTableModel.setInitialSorting(sortingColumn, sortOrder);
+        resTable.setRowSelectionAllowed(true);
+        resTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        resTable.setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
+        resTable.setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
+        resTable.setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
+        resTable.setShowHorizontalLines(UIConstants.SHOW_TABLE_HORIZONTAL_GRID);
+        resTable.setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
+        resTable.setRowMargin(UIConstants.TABLE_ROW_MARGIN);
+        resTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+        
+        resTable.getAccessibleContext().setAccessibleName(""); // NOI18N
+        resTable.getAccessibleContext().setAccessibleDescription(""); // NOI18N
+        
+        // Disable traversing table cells using TAB and Shift+TAB
+        Set keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
+        resTable.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
+        
+        keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
+        resTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
+        
+        setColumnsData();
+        
+        return resTable;
+    }
+    
+    protected void initColumnsData() {
+        int maxWidth = getFontMetrics(getFont()).charWidth('W') * 14; // NOI18N // initial width of data columns
+        minNamesColumnWidth = getFontMetrics(getFont()).charWidth('W') * 30; // NOI18N
+        
+        ClassNameTableCellRenderer classNameTableCellRenderer = new ClassNameTableCellRenderer();
+        customBarCellRenderer = new CustomBarCellRenderer(0, 100);
+        labelTableCellRenderer = new LabelTableCellRenderer(JLabel.TRAILING);
+        labelBracketTableCellRenderer = new LabelBracketTableCellRenderer(JLabel.TRAILING);
+        
+        columnNames = new String[] {
+            NbBundle.getMessage(CPUView.class, "COL_Thread_name"), // NOI18N
+            NbBundle.getMessage(CPUView.class, "COL_ABytes_rel"), // NOI18N
+            NbBundle.getMessage(CPUView.class, "COL_ABytes"), // NOI18N
+            NbBundle.getMessage(CPUView.class, "COL_ABytes_Sec")}; // NOI18N
+        columnToolTips = new String[] {
+            NbBundle.getMessage(CPUView.class, "COL_Thread_name"), // NOI18N
+            NbBundle.getMessage(CPUView.class, "COL_ABytes_rel"), // NOI18N
+            NbBundle.getMessage(CPUView.class, "COL_ABytes"), // NOI18N
+            NbBundle.getMessage(CPUView.class, "COL_ABytes_Sec")}; // NOI18N
+        columnTypes = new Class[] { String.class, Number.class, String.class, String.class};
+        columnRenderers = new TableCellRenderer[] {
+            classNameTableCellRenderer, customBarCellRenderer,
+            labelBracketTableCellRenderer, labelTableCellRenderer };
+        columnWidths = new int[] { maxWidth, maxWidth, maxWidth, maxWidth };
+    }
+    
+    private void setColumnsData() {
+        TableColumnModel colModel = resTable.getColumnModel();
+        colModel.getColumn(0).setPreferredWidth(minNamesColumnWidth);
+        
+        int index;
+        for (int i = 0; i < colModel.getColumnCount(); i++) {
+            index = resTableModel.getRealColumn(i);
+            
+            if (index == 0) {
+                colModel.getColumn(i).setPreferredWidth(minNamesColumnWidth);
+            } else {
+                colModel.getColumn(i).setPreferredWidth(columnWidths[index - 1]);
+            }
+            
+            colModel.getColumn(i).setCellRenderer(columnRenderers[index]);
+        }
+    }
+    
+    private void updateColumnRenderers() {
+        TableColumnModel colModel = resTable.getColumnModel();
+        for (int i = 0; i < colModel.getColumnCount(); i++)
+            colModel.getColumn(i).setCellRenderer(
+                    columnRenderers[resTableModel.getRealColumn(i)]);
+    }
+    
+    private void initComponents() {
+        setLayout(new BorderLayout());
+        setOpaque(false);
+        
+        final TransparentToolBar toolBar = new TransparentToolBar();
+        
+        pauseButton = new JToggleButton() {
+            protected void fireActionPerformed(ActionEvent event) {
+                boolean selected = pauseButton.isSelected();
+                refreshButton.setEnabled(selected);
+                if (!selected) refresher.refresh();
+            }
+        };
+        pauseButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
+                "com/sun/tools/visualvm/sampler/resources/pause.png", true))); // NOI18N
+        pauseButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Pause_results")); // NOI18N
+        pauseButton.setOpaque(false);
+        toolBar.addItem(pauseButton);
+        
+        refreshButton = new JButton() {
+            protected void fireActionPerformed(ActionEvent event) {
+                forceRefresh = true;
+                refresher.refresh();
+            }
+        };
+        refreshButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
+                "com/sun/tools/visualvm/sampler/resources/update.png", true))); // NOI18N
+        refreshButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Update_results")); // NOI18N
+        refreshButton.setEnabled(pauseButton.isSelected());
+        refreshButton.setOpaque(false);
+        toolBar.addItem(refreshButton);
+        
+        toolBar.addSeparator();
+        
+        deltaButton = new JToggleButton(NbBundle.getMessage(CPUView.class, "LBL_Deltas")) { // NOI18N
+            protected void fireActionPerformed(ActionEvent event) {
+                refresher.refresh();
+            }
+        };
+        deltaButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Deltas")); // NOI18N
+        deltaButton.setOpaque(false);
+        toolBar.addItem(deltaButton);
+        
+        toolBar.addFiller();
+                        
+        int maxHeight = pauseButton.getPreferredSize().height;
+        maxHeight = Math.max(maxHeight, refreshButton.getPreferredSize().height);
+        maxHeight = Math.max(maxHeight, deltaButton.getPreferredSize().height);
+        
+        int width = pauseButton.getPreferredSize().width;
+        Dimension size = new Dimension(maxHeight, maxHeight);
+        pauseButton.setMinimumSize(size);
+        pauseButton.setPreferredSize(size);
+        pauseButton.setMaximumSize(size);
+        
+        width = refreshButton.getPreferredSize().width;
+        size = new Dimension(maxHeight, maxHeight);
+        refreshButton.setMinimumSize(size);
+        refreshButton.setPreferredSize(size);
+        refreshButton.setMaximumSize(size);
+        
+        width = deltaButton.getPreferredSize().width;
+        size = new Dimension(width + 5, maxHeight);
+        deltaButton.setMinimumSize(size);
+        deltaButton.setPreferredSize(size);
+        deltaButton.setMaximumSize(size);
+        
+        JPanel resultsPanel = new JPanel(new BorderLayout());
+        resultsPanel.setOpaque(false);
+        
+        JPanel areaPanel = new JPanel(new BorderLayout());
+        areaPanel.setOpaque(false);
+        area = new HTMLTextArea();
+        area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        refreshUI();
+        areaPanel.add(area, BorderLayout.NORTH);
+        areaPanel.add(new SeparatorLine(true), BorderLayout.SOUTH);
+        
+        resultsPanel.add(areaPanel, BorderLayout.NORTH);
+        
+        add(TransparentToolBar.withSeparator(toolBar), BorderLayout.NORTH);
+        
+        resTable = initTable();
+        resTable.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                ThreadsCPUView.this.revalidate();
+            }
+        });
+        
+        resTablePanel = new JExtendedTablePanel(resTable);
+        resTablePanel.clearBorders();
+        resultsPanel.add(resTablePanel, BorderLayout.CENTER);
+        
+        add(resultsPanel, BorderLayout.CENTER);
+        
+        initFilterPanel();
+    }
+    
+    private void initFilterPanel() {
+        filterComponent = FilterComponent.create(true, true);
+                
+        filterComponent.setFilter(filterString, filterType);
+        
+        filterComponent.setHint(NbBundle.getMessage(CPUView.class, "LBL_Thread_filter")); // NOI18N
+        
+        filterComponent.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                filterString = filterComponent.getFilterValue();
+                filterType = filterComponent.getFilterType();
+                updateData(false);
+            }
+        });
+        
+        add(filterComponent.getComponent(), BorderLayout.SOUTH);
+    }
+    
+    private void refreshUI() {
+        int selStart = area.getSelectionStart();
+        int selEnd   = area.getSelectionEnd();
+        area.setText(getBasicTelemetry());
+        area.select(selStart, selEnd);
+    }
+    
+    private String getBasicTelemetry() {
+        boolean deltas = baseThreadsInfo != null;
+        String sThreads = totalThreads == -1 ? "" : (deltas && totalThreads > 0 ? "+" : "") + NumberFormat.getInstance().format(totalThreads); // NOI18N
+        String sCPUTime = totalCPUTime == -1 ? "" : (deltas && totalCPUTime > 0 ? "+" : "") + NumberFormat.getInstance().format(totalCPUTime/1000000); // NOI18N
+        String ssThreads = NbBundle.getMessage(CPUView.class, "LBL_Threads", sThreads); // NOI18N
+        String ssCPUTime = NbBundle.getMessage(CPUView.class, "LBL_CPUTime", sCPUTime); // NOI18N
+        return "<nobr>" + ssThreads + "&nbsp;&nbsp;&nbsp;&nbsp;" + ssCPUTime + "</nobr>"; // NOI18N
+    }
+    
+}

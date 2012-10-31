@@ -1,0 +1,168 @@
+1. Introduction:
+================================================================================
+Dynamic tracer modules enables declaratively specify tracer probes, using JSON
+like syntax. It provides rudimentary support for accessing JMX mbean attributes,
+thus making it really simple to connect a tracer probe mbean backed performance
+data.
+
+2. Creating new tracer probes:
+================================================================================
+In order to create a new tracer probe (or, better said, set of probe packages)
+one needs to create a new NetBeans module which declares requirement of the
+"com.sun.tools.visualvm.modules.tracer.dynamic" token and contains the layer
+definition (layer.xml).
+
+The second step is creating a reference to the defining JS file from inside the
+layer. You need to register the file in folder "VisualVM/Tracer/packages".
+All such registered files will be processed by the dynamic tracer support with
+the context of VisualVM Tracer.
+
+3. Syntax:
+================================================================================
+The defining JS file must contain at least one invocation of the
+"VisualVM.Tracer.addPackages(packages)" method. The "packages" variable passed
+to this method is an array of tracer probe package definitions.
+
+3.1 Probe package definition
+================================================================================
+{
+  name: <package display name>,
+  desc: <package description>,
+  reqs: <string or array of strings which will be appended to the description
+        when the package is disabled (according to validator)>,
+  icon: <icon to be used by the package - either a path or actual instance>,
+  validator: <function() returning true/false indicating package availability>,
+  probes: [<list of probe definitions {3.2} separated by ",">]
+}
+
+"desc", "icon" and "validator" attributes are optional. "name" and "probes"
+attributes are mandatory and without them the package will not be processed.
+The order of attributes is not important.
+
+3.2 Probe definition
+================================================================================
+{
+  name: <probe display name>,
+  desc: <probe description>,
+  reqs: <string or array of strings which will be appended to the description
+        when the probe is disabled (according to validator)>,
+  validator: <function() returning true/false indicating probe availability>,
+  deployment: <deployment definition {3.2.1}>,
+  properties: [list of probe property definitions {3.3} separated by ",">]
+}
+
+"desc", "validator" and "deployment" attributes are optional. "name" and
+"properties" attributes are mandatory and without them the probe will not be
+processed.
+The order of attributes is not important.
+
+3.2.1 Deployment definition
+================================================================================
+Sometimes it is necessary to deploy a certain technology before being able to
+collect performance data (eg. BTrace, DTrace etc.). Deployment definition
+configures this deployment.
+
+{
+  deployer: <"com.sun.tools.visualvm.modules.tracer.dynamic.spi.DeployerImpl"
+             implementor>,
+  /*
+  list of the deployer specific attributes which will be converted to name/value
+  map passed to the deployer
+  */
+}
+
+3.3 Probe property definition
+================================================================================
+{
+  name: <property display name>,
+  desc: <property description>,
+  value: <function(timestamp) returning the property value at the timestamp>,
+  presenter: <presenter definition {3.3.1}>
+}
+
+"desc" and "presenter" attributes are optional. "presenter" attribute defaults
+to an auto-colored line graph representation. "name" and "value" attributes
+are mandatory and the property will not be processed without them.
+
+The order of attributes is not important.
+
+3.3.1 Property presenter definition
+================================================================================
+{
+  type: <"discrete" or "continuous">,
+  format: <either an instance of
+           "com.sun.tools.visualvm.modules.tracer.ItemValueFormatter" or a
+           format definition object {3.3.1.1}>,
+  min: <anticipated property minimum>,
+  max: <anticipated property maximum>,
+  factor: <magnifying factor>,
+  lineColor: <line color, can use "AUTOCOLOR" {4.4.2} to indicate autocoloring>,
+  fillColor: <fill color, can use "AUTOCOLOR" {4.4.2} to indicate autocoloring>,
+  lineWidth: <line width>,
+  fixedWidth: <true/false; applicable only to "discrete" property>,
+  topLine: <true/false; applicable only to "discrete" property>,
+  outline: <true/false; applicable only to "discrete" property>
+}
+
+All attributes are optional.
+
+3.3.1.1 Property presenter format definition
+================================================================================
+{
+  formatValue: <function(value, format) - returns a specifically formatted value
+                - the "format" parameter can be one of the
+                "com.sun.tools.visualvm.modules.tracer.ItemValueFormatter.FORMAT_*"
+                constants>,
+  getUnits: <function(format) - returns the units text used for the given format
+             - the "format" parameter can be one of the
+             "com.sun.tools.visualvm.modules.tracer.ItemValueFormatter.FORMAT_*"
+             constants>
+}
+
+At least one of the attributes must be defined.
+
+4. Helpers
+================================================================================
+4.1 Value retrieving helper functions
+================================================================================
+These functions can be used to define the "value" attribute of a property {3.3}
+They can both be considered to be a value provider.
+
+4.1.1 mbeanAttribute(objectName, attributeName):
+* retrieves an mbean attribute value if it exists and performs safe conversion
+   to long
+* in order to access nested data structures (composite data, maps, tabular data etc.)
+   one can invoke "get(key)" function on the result of invoking "mbeanAttribute".
+   The result of this invocation supports "get(key)" function, too.
+
+4.1.2 delta(valueProvider)
+* computes the delta between the last two known values provided by the valueProvider
+
+4.2 MBean helper functions
+================================================================================
+4.2.1 VisualVM.MBeans.listMBeanNames(objectNamePattern, queryExp)
+* retrieves an array of object names fitting the "objectNamePattern" and "queryExp"
+* see "javax.management.MBeanServerConnection#queryNames" method for parameter
+  details
+
+4.2.2 VisualVM.MBeans.attribute(objectName, attributeName)
+* the same as "mbeanAttribute" {4.1.1}
+
+4.3 L11N and I18N
+================================================================================
+4.3.1 new L11N(bundleBaseName)
+* instantiates a new L11N support from "bundleBaseName"/Bundle.properties file
+
+4.3.1 <L11N instance>.message(key)
+* looks up the message by "key" in the assigned bundle
+
+4.4 Other helpers
+================================================================================
+4.4.1 Color
+* a shortcut to Packages.java.awt.Color
+
+4.4.2 AUTOCOLOR
+* a particular color value used to indicate request to auto-color a property
+
+4.4.3 NULL_VALUE
+* a value provider always returning 0
