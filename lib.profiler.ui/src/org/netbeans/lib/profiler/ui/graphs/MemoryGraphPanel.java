@@ -59,7 +59,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartContext;
@@ -310,10 +309,12 @@ public final class MemoryGraphPanel extends GraphPanel {
 
             // Legend container
             JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 8));
+            bigLegendPanel.setOpaque(false);
             bigLegendPanel.add(heapSizeBig);
             bigLegendPanel.add(usedHeapBig);
             
             JPanel legendContainer = new JPanel(new BorderLayout(0, 0));
+            UIUtils.decorateProfilerPanel(legendContainer);
             legendContainer.add(UIUtils.createHorizontalLine(legendContainer.getBackground()), BorderLayout.NORTH);
             legendContainer.add(bigLegendPanel, BorderLayout.CENTER);
 

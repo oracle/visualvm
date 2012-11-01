@@ -123,6 +123,7 @@ public class MemoryDiffPanel extends JPanel implements SnapshotResultsWindow.Fin
                            boolean sortingOrder, Lookup.Provider project) {
         this.project = project;
 
+        setOpaque(false);
         setLayout(new BorderLayout());
 
         MemoryResUserActionsHandler memoryActionsHandler = new DiffActionsHandler();
