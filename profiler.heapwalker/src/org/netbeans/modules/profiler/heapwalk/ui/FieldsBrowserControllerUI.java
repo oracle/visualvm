@@ -428,7 +428,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                     BrowserUtils.performTask(new Runnable() {
                         public void run() {
                             final int retainedSizesState = fieldsBrowserController.getInstancesControllerHandler().
-                                    getHeapFragmentWalker().computeRetainedSizes(false);
+                                    getHeapFragmentWalker().computeRetainedSizes(false, true);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     if (retainedSizesState != HeapFragmentWalker.RETAINED_SIZES_COMPUTED) {

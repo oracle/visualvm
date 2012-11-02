@@ -89,7 +89,10 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsHelper_FromFileRadioText=From &file:",
     "CompareSnapshotsHelper_BrowseButtonText=&Browse",
     "CompareSnapshotsHelper_BrowseButtonAccessDescr=Select heap dump file",
-    "CompareSnapshotsHelper_SnapshotsListAccessDescr=List of comparable heap dumps in current project"
+    "CompareSnapshotsHelper_SnapshotsListAccessDescr=List of comparable heap dumps in current project",
+    "CompareSnapshotsHelper_CompareRetainedRadio=Compare &retained sizes",
+    "CompareSnapshotsHelper_CompareRetainedRadioAccessDescr=Compute and compare retained sizes by class",
+    "CompareSnapshotsHelper_CompareRetainedHint=Comparing retained sizes can take a significant amount of time!"
 })
 public class CompareSnapshotsHelper {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -106,6 +109,7 @@ public class CompareSnapshotsHelper {
         private JRadioButton fromFileRadio;
         private JRadioButton fromProjectRadio;
         private JTextField externalFileField;
+        private JCheckBox compareRetainedCheckBox;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -143,6 +147,10 @@ public class CompareSnapshotsHelper {
             } else {
                 return null;
             }
+        }
+        
+        public boolean computeRetained() {
+            return compareRetainedCheckBox.isSelected();
         }
 
         public void populateSnapshotsList() {
@@ -320,6 +328,29 @@ public class CompareSnapshotsHelper {
             c.fill = GridBagConstraints.NONE;
             c.insets = new Insets(0, 15 + new JRadioButton("").getPreferredSize().width, 5, 10); // NOI18N
             add(externalFileHintLabel, c);
+            
+            compareRetainedCheckBox = new JCheckBox();
+            org.openide.awt.Mnemonics.setLocalizedText(compareRetainedCheckBox, Bundle.CompareSnapshotsHelper_CompareRetainedRadio());
+            compareRetainedCheckBox.getAccessibleContext().setAccessibleDescription(Bundle.CompareSnapshotsHelper_CompareRetainedRadioAccessDescr());
+            compareRetainedCheckBox.setSelected(compareRetained);
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 7;
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.NONE;
+            c.insets = new Insets(5, 15, 0, 10);
+            add(compareRetainedCheckBox, c);
+            
+            JLabel compareRetainedHintLabel = new JLabel(Bundle.CompareSnapshotsHelper_CompareRetainedHint());
+            compareRetainedHintLabel.setForeground(Color.darkGray);
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 8;
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            c.anchor = GridBagConstraints.WEST;
+            c.insets = new Insets(0, 15 + new JRadioButton("").getPreferredSize().width, 5, 10); // NOI18N
+            add(compareRetainedHintLabel, c);
 
             projectSnapshotsList.setCellRenderer(new DefaultListCellRenderer() {
                     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
@@ -459,6 +490,19 @@ public class CompareSnapshotsHelper {
             }
         }
     }
+    
+    static class Result {
+        private File file;
+        private boolean compareRetained;
+        
+        Result(File file, boolean compareRetained) {
+            this.file = file;
+            this.compareRetained = compareRetained;
+        }
+        
+        File getFile() { return file; }
+        boolean compareRetained() { return compareRetained; }
+    }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -469,18 +513,20 @@ public class CompareSnapshotsHelper {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private HeapFragmentWalker heapWalker;
+    private boolean compareRetained;
     private SelectSecondSnapshotPanel secondSnapshotSelector;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    private CompareSnapshotsHelper(HeapFragmentWalker heapWalker) {
+    private CompareSnapshotsHelper(HeapFragmentWalker heapWalker, boolean compareRetained) {
         this.heapWalker = heapWalker;
+        this.compareRetained = compareRetained;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static File selectSnapshot(HeapFragmentWalker heapWalker) {
-        CompareSnapshotsHelper helper = new CompareSnapshotsHelper(heapWalker);
+    public static Result selectSnapshot(HeapFragmentWalker heapWalker, boolean compareRetained) {
+        CompareSnapshotsHelper helper = new CompareSnapshotsHelper(heapWalker, compareRetained);
         SelectSecondSnapshotPanel panel = helper.getSecondSnapshotSelector();
         panel.populateSnapshotsList();
 
@@ -490,11 +536,8 @@ public class CompareSnapshotsHelper {
                                                      }, DialogDescriptor.OK_OPTION, 0, HELP_CTX, null);
         Object res = DialogDisplayer.getDefault().notify(desc);
 
-        File ret = null;
-        if (res.equals(panel.getOKButton()))
-            ret = panel.getSnapshot();
-        
-        return ret;
+        return !res.equals(panel.getOKButton()) ? null :
+                new Result(panel.getSnapshot(), panel.computeRetained());
     }
 
     private static JFileChooser getSnapshotFileChooser() {

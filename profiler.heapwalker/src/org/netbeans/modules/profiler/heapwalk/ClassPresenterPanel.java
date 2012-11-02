@@ -216,7 +216,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
                 if (heapFragmentWalker != null) {
                     BrowserUtils.performTask(new Runnable() {
                         public void run() {
-                            heapFragmentWalker.computeRetainedSizes(true);
+                            heapFragmentWalker.computeRetainedSizes(true, true);
                         }
                     });
                 }
