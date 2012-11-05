@@ -67,6 +67,7 @@ import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
     "ClassPresenterPanel_InstancesCountString=Instances: {0}",
     "ClassPresenterPanel_InstanceSizeString=Instance size: {0}",
     "ClassPresenterPanel_TotalSizeString=Total size: {0}",
+    "ClassPresenterPanel_RetainedSizeString=Retained size: {0}",
     "ClassPresenterPanel_RetainedSizesString=Compute Retained Sizes"
 })
 public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.StateListener {
@@ -149,6 +150,8 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
                                       : ""; // NOI18N
             String classDetails = javaClass.isArray() ? (instancesCount + allInstancesSize)
                                                       : (instancesCount + instanceSize + allInstancesSize);
+            if (heapFragmentWalker.getRetainedSizesStatus() == HeapFragmentWalker.RETAINED_SIZES_COMPUTED)
+                classDetails += "  |  " + Bundle.ClassPresenterPanel_RetainedSizeString(javaClass.getRetainedSizeByClass()); // NOI18N
             headerRenderer.setText(className);
             detailsRenderer.setText(classDetails);
             actionsRenderer.setPreferredSize(new Dimension(actionsRenderer.getPreferredSize().width,
@@ -167,6 +170,8 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
             updateActions(HeapFragmentWalker.RETAINED_SIZES_UNSUPPORTED);
         }
     }
+    
+    public void refresh() {}
 
     public void stateChanged(StateEvent e) {
         updateActions(e.getRetainedSizesStatus());
@@ -177,6 +182,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
             case HeapFragmentWalker.RETAINED_SIZES_UNSUPPORTED:
             case HeapFragmentWalker.RETAINED_SIZES_COMPUTED:
                 actionsRenderer.setVisible(false);
+                refresh();
                 break;
             case HeapFragmentWalker.RETAINED_SIZES_UNKNOWN:
             case HeapFragmentWalker.RETAINED_SIZES_CANCELLED:
@@ -216,7 +222,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
                 if (heapFragmentWalker != null) {
                     BrowserUtils.performTask(new Runnable() {
                         public void run() {
-                            heapFragmentWalker.computeRetainedSizes(true);
+                            heapFragmentWalker.computeRetainedSizes(true, true);
                         }
                     });
                 }
