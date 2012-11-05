@@ -481,7 +481,7 @@ public class InstancesListControllerUI extends JTitledPanel {
                     BrowserUtils.performTask(new Runnable() {
                         public void run() {
                             final int retainedSizesState = instancesListController.getInstancesController().
-                                    getHeapFragmentWalker().computeRetainedSizes(false);
+                                    getHeapFragmentWalker().computeRetainedSizes(false, true);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     if (retainedSizesState != HeapFragmentWalker.RETAINED_SIZES_COMPUTED) {
