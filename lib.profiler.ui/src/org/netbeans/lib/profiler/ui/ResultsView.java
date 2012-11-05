@@ -196,6 +196,11 @@ public class ResultsView extends JPanel {
         tabs.setSelectedComponent(view);
     }
     
+    public final void selectView(int index) {
+        if (tabs == null) return;
+        tabs.setSelectedIndex(index);
+    }
+    
     public final void selectPreviousView() {
         if (tabs == null) return;
         int index = UIUtils.getPreviousSubTabIndex(tabs, tabs.getSelectedIndex());

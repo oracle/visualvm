@@ -185,6 +185,7 @@ public class InstancesControllerUI extends JPanel {
         legendPanel = new LegendPanel(true);
 
         dataPanel = new JPanel(new BorderLayout());
+        dataPanel.setOpaque(false);
         dataPanel.add(classPresenterPanel, BorderLayout.NORTH);
         dataPanel.add(contentsSplit, BorderLayout.CENTER);
         dataPanel.add(legendPanel, BorderLayout.SOUTH);
@@ -217,6 +218,7 @@ public class InstancesControllerUI extends JPanel {
     }
 
     private void tweakSplitPaneUI(JSplitPane splitPane) {
+        splitPane.setOpaque(false);
         splitPane.setBorder(null);
         splitPane.setDividerSize(3);
 

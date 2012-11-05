@@ -206,6 +206,10 @@ public class ReferencesBrowserController extends AbstractController {
     public void navigateToInstance(Instance instance) {
         referencesControllerHandler.showInstance(instance);
     }
+    
+    public void navigateToRootNearestGCRoot() {
+        ((ReferencesBrowserControllerUI)getPanel()).showRootGCRoot();
+    }
 
     public void navigateToNearestGCRoot(final InstanceNode instanceNode) {
         new NBSwingWorker(true) {

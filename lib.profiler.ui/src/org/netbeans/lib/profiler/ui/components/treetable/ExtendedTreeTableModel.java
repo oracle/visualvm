@@ -222,5 +222,8 @@ public class ExtendedTreeTableModel extends AbstractTreeTableModel {
         for (int i = virtualColumnIndex; i < realColumnsCount; i++) {
             columnsMapping[i] = -1;
         }
+        
+        fireTableStructureChanged();
+        realModel.fireTableStructureChanged();
     }
 }
