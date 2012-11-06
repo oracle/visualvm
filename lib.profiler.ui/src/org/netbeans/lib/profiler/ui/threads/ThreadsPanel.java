@@ -431,6 +431,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         notificationPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 15));
         notificationPanel.setBorder(dataPanel.getBorder());
         notificationPanel.setBackground(table.getBackground());
+        UIUtils.decorateProfilerPanel(notificationPanel);
 
         Border myRolloverBorder = new CompoundBorder(new FlatToolBar.FlatRolloverButtonBorder(Color.GRAY, Color.LIGHT_GRAY),
                                                      new FlatToolBar.FlatMarginBorder());
