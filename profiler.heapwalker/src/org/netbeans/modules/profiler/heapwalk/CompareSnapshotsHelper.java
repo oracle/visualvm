@@ -94,7 +94,7 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsHelper_CompareRetainedRadioAccessDescr=Compute and compare retained sizes by class",
     "CompareSnapshotsHelper_CompareRetainedHint=Comparing retained sizes can take a significant amount of time!"
 })
-public class CompareSnapshotsHelper {
+class CompareSnapshotsHelper {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private class SelectSecondSnapshotPanel extends JPanel {
@@ -113,17 +113,17 @@ public class CompareSnapshotsHelper {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public SelectSecondSnapshotPanel() {
+        SelectSecondSnapshotPanel() {
             initComponents();
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        public JButton getOKButton() {
+        JButton getOKButton() {
             return okButton;
         }
 
-        public File getSnapshot() {
+        File getSnapshot() {
             if (fromProjectRadio.isSelected()) {
                 Object selectedItem = projectSnapshotsList.getSelectedValue();
 
@@ -149,11 +149,11 @@ public class CompareSnapshotsHelper {
             }
         }
         
-        public boolean computeRetained() {
+        boolean computeRetained() {
             return compareRetainedCheckBox.isSelected();
         }
 
-        public void populateSnapshotsList() {
+        void populateSnapshotsList() {
             // Get list model
             DefaultListModel listModel = (DefaultListModel) projectSnapshotsList.getModel();
 
@@ -525,7 +525,7 @@ public class CompareSnapshotsHelper {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static Result selectSnapshot(HeapFragmentWalker heapWalker, boolean compareRetained) {
+    static Result selectSnapshot(HeapFragmentWalker heapWalker, boolean compareRetained) {
         CompareSnapshotsHelper helper = new CompareSnapshotsHelper(heapWalker, compareRetained);
         SelectSecondSnapshotPanel panel = helper.getSecondSnapshotSelector();
         panel.populateSnapshotsList();
