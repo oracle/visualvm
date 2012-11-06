@@ -149,12 +149,14 @@ final class HeapPatterns {
                 }
             }
             if (!classs.equals(c1) || !classs.equals(c2)) {
-                if (LINKED_LIST_CLASSNAME.equals(c1.getName())) {
-                    v3 = v1;
-                    passed = true;
-                } else if (LINKED_LIST_CLASSNAME.equals(c2.getName())) {
-                    v3 = v2;
-                    passed = true;
+                if (e1 != null) {
+                    if (LINKED_LIST_CLASSNAME.equals(c1.getName())) {
+                        v3 = v1;
+                        passed = true;
+                    } else if (LINKED_LIST_CLASSNAME.equals(c2.getName())) {
+                        v3 = v2;
+                        passed = true;
+                    }
                 }
                 break;
             }

@@ -43,9 +43,6 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.NumberFormat;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -69,7 +66,6 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 
@@ -188,8 +184,10 @@ public class ClassesListController extends AbstractController {
                 data[i][1] = new Long(instancesCount);
                 data[i][2] = (instancesCount > 0 ? "+" : "") + numberFormat.format(instancesCount); // NOI18N
                 data[i][3] = (allInstancesSize > 0 ? "+" : "") + numberFormat.format(allInstancesSize); // NOI18N
-                if (retained)
-                    data[i][4] = (retainedSizeByClass > 0 ? "+" : "") + numberFormat.format(retainedSizeByClass); // NOI18N
+                if (retained) {
+                    if (!compareRetained) data[i][4] = Bundle.ClassesListController_ResultNotAvailableString();
+                    else data[i][4] = (retainedSizeByClass > 0 ? "+" : "") + numberFormat.format(retainedSizeByClass); // NOI18N 
+                }
             } else {
                 data[i][1] = new Double((double) instancesCount /
                                      (double) totalLiveInstances * 100);
@@ -230,28 +228,28 @@ public class ClassesListController extends AbstractController {
         private long retainedSizeByClass;
         private JavaClass real;
         
-        static DiffJavaClass createExternal(JavaClass jc) {
-            return new DiffJavaClass(jc, false);
+        static DiffJavaClass createExternal(JavaClass jc, boolean compareRetained) {
+            return new DiffJavaClass(jc, false, compareRetained);
         }
         
-        static DiffJavaClass createReal(JavaClass jc) {
-            return new DiffJavaClass(jc, true);
+        static DiffJavaClass createReal(JavaClass jc, boolean compareRetained) {
+            return new DiffJavaClass(jc, true, compareRetained);
         }
         
-        private DiffJavaClass(JavaClass jc, boolean realClass) {
+        private DiffJavaClass(JavaClass jc, boolean realClass, boolean compareRetained) {
             name = jc.getName();
             
             if (realClass) {
                 instancesCount = jc.getInstancesCount();
                 instanceSize = jc.getInstanceSize();
                 allInstancesSize = jc.getAllInstancesSize();
-                retainedSizeByClass = jc.getRetainedSizeByClass();
+                retainedSizeByClass = compareRetained ? jc.getRetainedSizeByClass() : -1;
                 real = jc;
             } else {
                 instancesCount = -jc.getInstancesCount();
                 instanceSize = -jc.getInstanceSize();
                 allInstancesSize = -jc.getAllInstancesSize();
-                retainedSizeByClass = -jc.getRetainedSizeByClass();
+                retainedSizeByClass = compareRetained ? -jc.getRetainedSizeByClass() : -1;
                 real = null;
             }
         }
@@ -436,6 +434,7 @@ public class ClassesListController extends AbstractController {
     
     private List diffClasses;
     private boolean comparingSnapshot = false;
+    private boolean compareRetained;
     public void compareAction() {
         if (comparingSnapshot) return;
         comparingSnapshot = true;
@@ -443,12 +442,14 @@ public class ClassesListController extends AbstractController {
             public void run() {
                 try {
                     HeapFragmentWalker hfw = classesController.getHeapFragmentWalker();
-                    File dumpFile = CompareSnapshotsHelper.selectSnapshot(hfw);
-                    if (dumpFile != null) {
+                    CompareSnapshotsHelper.Result result = CompareSnapshotsHelper.selectSnapshot(
+                            hfw, ((ClassesListControllerUI)getPanel()).isRetainedVisible());
+                    if (result != null) {
                         try {
                             showDiffProgress();
                             Heap currentHeap = hfw.getHeapFragment();
-                            Heap diffHeap = HeapFactory.createHeap(dumpFile);
+                            Heap diffHeap = HeapFactory.createHeap(result.getFile());
+                            compareRetained = result.compareRetained();
                             diffClasses = createDiffClasses(diffHeap, currentHeap);
                         } catch (Exception e) {
                             ProfilerDialogs.displayError(Bundle.ClassesListController_CompareFailed());
@@ -469,20 +470,27 @@ public class ClassesListController extends AbstractController {
         return diffClasses != null;
     }
     
-    private static List createDiffClasses(Heap h1, Heap h2) {
+    public boolean compareRetained() {
+        return compareRetained;
+    }
+    
+    private List createDiffClasses(Heap h1, Heap h2) {
+        if (compareRetained) classesController.getHeapFragmentWalker().
+                             computeRetainedSizes(false, false);
+        
         Map<String, DiffJavaClass> classes = new HashMap();
         
         List<JavaClass> classes1 = h1.getAllClasses();
         for (JavaClass jc1 : classes1) {
             String id1 = DiffJavaClass.createID(jc1);
-            DiffJavaClass djc1 = DiffJavaClass.createExternal(jc1);
+            DiffJavaClass djc1 = DiffJavaClass.createExternal(jc1, compareRetained);
             classes.put(id1, djc1);
         }
         
         List<JavaClass> classes2 = h2.getAllClasses();
         for (JavaClass jc2 : classes2) {
             String id2 = DiffJavaClass.createID(jc2);
-            DiffJavaClass djc2 = DiffJavaClass.createReal(jc2);
+            DiffJavaClass djc2 = DiffJavaClass.createReal(jc2, compareRetained);
             DiffJavaClass djc1 = classes.get(id2);
             if (djc1 != null) djc1.diff(djc2);
             else classes.put(id2, djc2);
@@ -590,7 +598,7 @@ public class ClassesListController extends AbstractController {
             ArrayList ret = new ArrayList();
             for (Object o : subclasses) {
                 int i = diffClasses.indexOf(
-                        DiffJavaClass.createExternal((JavaClass)o));
+                        DiffJavaClass.createExternal((JavaClass)o, false));
                 if (i != -1) ret.add(diffClasses.get(i));
             }
             return ret;
