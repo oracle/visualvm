@@ -142,6 +142,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         noContentPanel = new JPanel();
         noContentPanel.setLayout(new BorderLayout());
         noContentPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        UIUtils.decorateProfilerPanel(noContentPanel);
 
         JLabel noContentIcon = new JLabel(Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
         noContentIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
@@ -195,6 +196,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
 
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
+        UIUtils.decorateProfilerPanel(contentPanel);
         scrollPane = new JScrollPane(contentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
@@ -204,6 +206,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         // perform layout
         setLayout(new BorderLayout());
         content.setLayout(new VerticalLayout(0, 0));
+        content.setOpaque(false);
 
         contentPanel.add(content, BorderLayout.NORTH);
         buttonsToolBar.add(showLabel);
