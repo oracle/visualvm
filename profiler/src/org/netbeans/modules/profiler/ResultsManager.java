@@ -977,7 +977,7 @@ public final class ResultsManager {
     }
 
     void resultsBecameAvailable() {
-        if (NetBeansProfiler.getDefaultNB().getProfilingState() == Profiler.PROFILING_INACTIVE) return; // Calibration, ignore
+        if (Profiler.getDefault().getProfilingState() == Profiler.PROFILING_INACTIVE) return; // Calibration, ignore
         resultsAvailable = true;
         fireResultsAvailable();
     }
