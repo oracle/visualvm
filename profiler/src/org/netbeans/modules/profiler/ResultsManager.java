@@ -308,12 +308,38 @@ public final class ResultsManager {
 
         public void cctEstablished(RuntimeCCTNode runtimeCCTNode, boolean empty) {
             if (!empty) {
-                getDefault().resultsBecameAvailable();
+                ResultsManager rm = getDefault();
+                if (!rm.resultsAvailable() && !isSomeResultsAvailable()) {
+                    return;
+                }
+                rm.resultsBecameAvailable();
             }
         }
 
         public void cctReset() {
             getDefault().resultsReset();
+        }
+        
+        private boolean isSomeResultsAvailable() {
+            // check that we have data for snapshot, CPU profiling can have non-empty
+            // batch, but this batch can contain only marker methods
+            ProfilerClient client = Profiler.getDefault().getTargetAppRunner().getProfilerClient();
+            int instrType = client.getCurrentInstrType();
+
+            if (instrType == ProfilerEngineSettings.INSTR_RECURSIVE_FULL ||
+                instrType == ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED) {
+                try {
+                    // construct snapshot and check that it has some data
+                    client.getCPUProfilingResultsSnapshot(false);
+                } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
+                    // we don't have data for snapshot
+                    return false;
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    // target VM is down
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
@@ -977,7 +1003,7 @@ public final class ResultsManager {
     }
 
     void resultsBecameAvailable() {
-        if (NetBeansProfiler.getDefaultNB().getProfilingState() == Profiler.PROFILING_INACTIVE) return; // Calibration, ignore
+        if (Profiler.getDefault().getProfilingState() == Profiler.PROFILING_INACTIVE) return; // Calibration, ignore
         resultsAvailable = true;
         fireResultsAvailable();
     }
