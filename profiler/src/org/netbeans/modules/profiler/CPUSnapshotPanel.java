@@ -1227,8 +1227,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     
     public State getState() {
         int selectedTab = getSelectedViewIndex();
-        if (selectedTab > 2 && selectedTab != (getViewsCount() - 1))
-            selectedTab = -1;
+        if (selectedTab > 3) selectedTab = 0; // #221850, only persist the default tabs
         if (selectedTab == -1) return null;
         
         boolean cctPanelFilter = cctPanel.isFilterVisible();
