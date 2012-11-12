@@ -268,20 +268,23 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
                 globalEvBufPos = 0;
                 sendingBuffer = false;
             }
+            
+            // check that we still have valid eventBuffer
+            if (eventBuffer != null) {
+                // Finally copy the local buffer into the global one
+                eventBuffer[globalEvBufPos++] = SET_FOLLOWING_EVENTS_THREAD;
+                eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId >> 8) & 0xFF);
+                eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId) & 0xFF);
+                System.arraycopy(ti.evBuf, evBufDumpLastPos, eventBuffer, globalEvBufPos, curPos - evBufDumpLastPos);
+                globalEvBufPos += (curPos - evBufDumpLastPos);
+                ti.evBufPos = 0;
+                ti.evBufDumpLastPos = 0;
 
-            // Finally copy the local buffer into the global one
-            eventBuffer[globalEvBufPos++] = SET_FOLLOWING_EVENTS_THREAD;
-            eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId >> 8) & 0xFF);
-            eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId) & 0xFF);
-            System.arraycopy(ti.evBuf, evBufDumpLastPos, eventBuffer, globalEvBufPos, curPos - evBufDumpLastPos);
-            globalEvBufPos += (curPos - evBufDumpLastPos);
-            ti.evBufPos = 0;
-            ti.evBufDumpLastPos = 0;
-
-            // Now, if we previously spent time waiting for another thread to dump the global buffer, or doing that
-            // ourselves, write the ADJUST_TIME event into the local buffer
-            if (needToAdjustTime) {
-                writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
+                // Now, if we previously spent time waiting for another thread to dump the global buffer, or doing that
+                // ourselves, write the ADJUST_TIME event into the local buffer
+                if (needToAdjustTime) {
+                    writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
+                }
             }
         }
     }
