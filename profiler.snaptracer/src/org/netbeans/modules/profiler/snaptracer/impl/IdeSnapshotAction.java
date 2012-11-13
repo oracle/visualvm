@@ -72,19 +72,28 @@ public final class IdeSnapshotAction implements ActionListener {
             public void run() {
                 final File file = snapshotFile();
                 if (file == null) return;
-                
-                TracerSupportImpl.getInstance().perform(new Runnable() {
-                    public void run() {
-                        final IdeSnapshot snapshot = snapshot(file);
-                        if (snapshot == null) return;
-                        openSnapshot(snapshot);
-                    }
-                });
+                openSnapshot(FileUtil.toFileObject(file));
+            }
+        });
+    }
+    
+    @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot {0}:\n{1}")
+    static void openSnapshot(final FileObject primary) {
+        TracerSupportImpl.getInstance().perform(new Runnable() {
+            public void run() {
+                try {
+                    FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
+                    IdeSnapshot snapshot = new IdeSnapshot(primary, uigestureFO);
+                    openSnapshotImpl(snapshot);
+                } catch (Throwable t) {
+                    ProfilerDialogs.displayError(Bundle.MSG_SnapshotLoadFailedMsg(
+                                                 primary.getNameExt(), t.getLocalizedMessage()));
+                }
             }
         });
     }
 
-    static void openSnapshot(final IdeSnapshot snapshot) {
+    private static void openSnapshotImpl(final IdeSnapshot snapshot) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 TracerModel model = new TracerModel(snapshot);
@@ -101,19 +110,6 @@ public final class IdeSnapshotAction implements ActionListener {
         TracerView tracer = new TracerView(model, controller);
         tc.add(tracer.createComponent(), BorderLayout.CENTER);
         return tc;
-    }
-
-    @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot: {0}")
-    private IdeSnapshot snapshot(File file) {
-        try {
-            FileObject primary = FileUtil.toFileObject(file);
-            FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
-            
-            return new IdeSnapshot(primary, uigestureFO);
-        } catch (Throwable t) {
-            ProfilerDialogs.displayError(Bundle.MSG_SnapshotLoadFailedMsg(file.getName()));
-            return null;
-        }
     }
 
     private File snapshotFile() {
