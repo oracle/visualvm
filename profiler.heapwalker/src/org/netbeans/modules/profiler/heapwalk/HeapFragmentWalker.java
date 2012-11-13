@@ -114,12 +114,12 @@ public class HeapFragmentWalker {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public synchronized final int computeRetainedSizes(boolean masterAction) {
+    public synchronized final int computeRetainedSizes(boolean masterAction, boolean interactive) {
 
         if (retainedSizesStatus != RETAINED_SIZES_UNSUPPORTED &&
             retainedSizesStatus != RETAINED_SIZES_COMPUTED) {
 
-            if (!ProfilerDialogs.displayConfirmationDNSA(
+            if (interactive && !ProfilerDialogs.displayConfirmationDNSA(
                     Bundle.HeapFragmentWalker_ComputeRetainedMsg(), 
                     Bundle.HeapFragmentWalker_ComputeRetainedCaption(),
                     null, "HeapFragmentWalker.computeRetainedSizes", false)) { //NOI18N
@@ -130,11 +130,11 @@ public class HeapFragmentWalker {
                 for (JavaClass jclass : classes) {
                     List<Instance> instances = jclass.getInstances();
                     if (instances.size() > 0) {
-                        ProgressDisplayer pd = ProfilerProgressDisplayer.getDefault();
-                        pd.showProgress(Bundle.HeapFragmentWalker_ComputingRetainedCaption(),
-                                        Bundle.HeapFragmentWalker_ComputingRetainedMsg(), null);
+                        ProgressDisplayer pd = interactive ? ProfilerProgressDisplayer.getDefault() : null;
+                        if (pd != null) pd.showProgress(Bundle.HeapFragmentWalker_ComputingRetainedCaption(),
+                                                        Bundle.HeapFragmentWalker_ComputingRetainedMsg(), null);
                         instances.get(0).getRetainedSize();
-                        pd.close();
+                        if (pd != null) pd.close();
                         break;
                     }
                 }

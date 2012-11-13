@@ -302,13 +302,22 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
 
     // NOTE: this method only sets sortingColumn, sortOrder and sortBy, it doesn't refresh UI!
     public void setSorting(int sColumn, boolean sOrder) {
-        if (sColumn == CommonConstants.SORTING_COLUMN_DEFAULT) {
+        setSorting(sColumn, sOrder, false);
+    }
+    
+    public void setSorting(int sColumn, boolean sOrder, boolean refreshUI) {
+        if (!refreshUI && sColumn == CommonConstants.SORTING_COLUMN_DEFAULT) {
             setDefaultSorting();
         } else {
             sortingColumn = sColumn;
             sortOrder = sOrder;
 
             //sortBy = getSortBy(sortingColumn);
+        }
+        if (refreshUI) {
+            treeTable.setSortingColumn(treeTableModel.getVirtualColumn(sColumn));
+            treeTable.setSortingOrder(sOrder);
+            treeTableModel.sortByColumn(sColumn, sOrder);
         }
     }
 
@@ -968,6 +977,37 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
 
         columnsVisibility = null;
         columnsVisibility = treeTableModel.getColumnsVisibility();
+    }
+    
+    public void setColumnsVisibility(boolean[] columnsVisibility) {
+        treeTableModel.setColumnsVisibility(columnsVisibility);
+        treeTable.createDefaultColumnsFromModel();
+        treeTable.updateTreeTableHeader();
+        setColumnsData();
+    }
+    
+    public boolean[] getColumnsVisibility() {
+        return treeTableModel.getColumnsVisibility();
+    }
+    
+    public void setFilterVisible(boolean visible) {
+        if (filterComponent != null) filterComponent.getComponent().setVisible(visible);
+    }
+    
+    public boolean isFilterVisible() {
+        return filterComponent == null ? false : filterComponent.getComponent().isVisible();
+    }
+    
+    public int getFilterType() {
+        return filterComponent.getFilterType();
+    }
+
+    public String getFilterValue() {
+        return filterComponent.getFilterValue();
+    }
+
+    public void setFilterValues(String filterValue, int filterType) {
+        filterComponent.setFilter(filterValue, filterType);
     }
 
     /*

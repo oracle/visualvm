@@ -370,6 +370,10 @@ public class ClassesListControllerUI extends JTitledPanel {
 
         // TODO [ui-persistence]
     }
+    
+    public boolean isRetainedVisible() {
+        return classesListTableModel.isRealColumnVisible(4);
+    }
 
     public void selectClass(JavaClass javaClass) {
         if (!selectClassImpl(javaClass)) {
@@ -488,7 +492,7 @@ public class ClassesListControllerUI extends JTitledPanel {
                         BrowserUtils.performTask(new Runnable() {
                             public void run() {
                                 final int retainedSizesState = classesListController.getClassesController().
-                                        getHeapFragmentWalker().computeRetainedSizes(true);
+                                        getHeapFragmentWalker().computeRetainedSizes(true, true);
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
                                         if (retainedSizesState != HeapFragmentWalker.RETAINED_SIZES_COMPUTED) {
@@ -904,6 +908,10 @@ public class ClassesListControllerUI extends JTitledPanel {
                                 classesListTableModel.fireTableDataChanged();
                                 if (classToSelect == null) restoreSelection();
                                 else selectClassImpl(classToSelect);
+                                
+                                if (isDiff && classesListController.compareRetained())
+                                    setColumnVisibility(4, true);
+                                
                                 if (contents != null) contents.show(contentsPanel, DATA);
                             }
                         });

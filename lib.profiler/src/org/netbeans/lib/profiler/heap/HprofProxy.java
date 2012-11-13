@@ -60,30 +60,34 @@ class HprofProxy {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     static Properties getProperties(Instance propertiesInstance) {
-        Instance defaultsObj = (Instance) propertiesInstance.getValueOfField("defaults"); // NOI18N
         ObjectArrayDump entriesObj = (ObjectArrayDump) propertiesInstance.getValueOfField("table"); // NOI18N
-        Iterator enIt = entriesObj.getValues().iterator();
-        Properties props;
+        if (entriesObj != null) {
+            Instance defaultsObj = (Instance) propertiesInstance.getValueOfField("defaults"); // NOI18N
+            Iterator enIt = entriesObj.getValues().iterator();
+            Properties props;
 
-        if (defaultsObj != null) {
-            props = new Properties(getProperties(defaultsObj));
-        } else {
-            props = new Properties();
-        }
-        while (enIt.hasNext()) {
-            Instance entry = (Instance) enIt.next();
+            if (defaultsObj != null) {
+                props = new Properties(getProperties(defaultsObj));
+            } else {
+                props = new Properties();
+            }
+            while (enIt.hasNext()) {
+                Instance entry = (Instance) enIt.next();
 
-            for (; entry != null; entry = (Instance) entry.getValueOfField("next")) { // NOI18N
-                Instance key = (Instance) entry.getValueOfField("key"); // NOI18N
-                Instance val = (Instance) entry.getValueOfField("value"); // NOI18N
+                for (; entry != null; entry = (Instance) entry.getValueOfField("next")) { // NOI18N
+                    Instance key = (Instance) entry.getValueOfField("key"); // NOI18N
+                    Instance val = (Instance) entry.getValueOfField("value"); // NOI18N
 
-                if (key != null) {
-                    props.setProperty(getString(key), getString(val));
+                    if (key != null) {
+                        props.setProperty(getString(key), getString(val));
+                    }
                 }
             }
-        }
 
-        return props;
+            return props;
+        }
+ 
+        return null;
     }
 
     static String getString(Instance stringInstance) {

@@ -257,12 +257,20 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
 
     // NOTE: this method only sets sortingColumn, sortOrder and sortBy, it doesn't refresh UI!
     public void setSorting(int sColumn, boolean sOrder) {
-        if (sColumn == CommonConstants.SORTING_COLUMN_DEFAULT) {
+        setSorting(sColumn, sOrder, false);
+    }
+    
+    public void setSorting(int sColumn, boolean sOrder, boolean refreshUI) {
+        if (!refreshUI && sColumn == CommonConstants.SORTING_COLUMN_DEFAULT) {
             setDefaultSorting();
         } else {
             sortingColumn = sColumn;
             sortOrder = sOrder;
             sortBy = getSortBy(sortingColumn);
+        }
+        if (refreshUI) {
+            resTableModel.setInitialSorting(resTableModel.getVirtualColumn(sColumn), sOrder);
+            resTableModel.sortByColumn(sColumn, sOrder);
         }
     }
 
@@ -992,4 +1000,24 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
             resTable.getTableHeader().repaint();
         }
     }
+    
+    public void setColumnsVisibility(boolean[] columnsVisibility) {
+        resTableModel.setColumnsVisibility(columnsVisibility);
+        resTable.createDefaultColumnsFromModel();
+        resTableModel.setTable(resTable);
+        setColumnsData();
+    }
+    
+    public boolean[] getColumnsVisibility() {
+        return resTableModel.getColumnsVisibility();
+    }
+    
+    public void setFilterVisible(boolean visible) {
+        if (filterComponent != null) filterComponent.getComponent().setVisible(visible);
+    }
+    
+    public boolean isFilterVisible() {
+        return filterComponent == null ? false : filterComponent.getComponent().isVisible();
+    }
+    
 }

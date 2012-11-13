@@ -66,6 +66,7 @@ import org.netbeans.lib.profiler.ui.cpu.CCTDisplay;
 import org.netbeans.modules.profiler.CPUSnapshotPanel;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
+import org.netbeans.modules.profiler.SnapshotPanel;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.openide.util.Exceptions;
@@ -86,6 +87,8 @@ final class TracerView {
     private LoadedSnapshot lsF;
     private TimelineView timelineView;
     private FindMethodAction findMethod;
+    
+    private SnapshotPanel.State lastState;
     
     TracerView(TracerModel model, TracerController controller) {
         this.model = model;
@@ -279,10 +282,16 @@ final class TracerView {
         }
     }
 
-    private static void addContents(JComponent container, JComponent contents) {
+    private void addContents(JComponent container, JComponent contents) {
         BorderLayout layout = (BorderLayout)container.getLayout();
         Component oldContents = layout.getLayoutComponent(BorderLayout.CENTER);
-        if (oldContents != null) container.remove(oldContents);
+        if (oldContents != null) {
+            if (oldContents instanceof SnapshotResultsWindow)
+                lastState = ((SnapshotResultsWindow)oldContents).getState();
+            container.remove(oldContents);
+        }
+        if (contents instanceof SnapshotResultsWindow)
+            ((SnapshotResultsWindow)contents).setState(lastState);
         container.add(contents, BorderLayout.CENTER);
         contents.requestFocusInWindow();
         container.revalidate();

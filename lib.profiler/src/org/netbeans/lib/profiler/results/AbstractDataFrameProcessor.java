@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.results;
 
 import org.netbeans.lib.profiler.ProfilerClient;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;

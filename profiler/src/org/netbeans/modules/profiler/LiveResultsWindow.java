@@ -182,6 +182,10 @@ public final class LiveResultsWindow extends ProfilerTopComponent
     
     public static final class EmptyLiveResultsPanel extends JPanel implements LiveResultsPanel {
         //~ Methods --------------------------------------------------------------------------------------------------------------
+        
+        public EmptyLiveResultsPanel() {
+            setOpaque(false);
+        }
 
         public int getSortingColumn() {
             return -1;
@@ -542,6 +546,7 @@ public final class LiveResultsWindow extends ProfilerTopComponent
 
         //*************
         memoryTabPanel = new JPanel(new BorderLayout());
+        memoryTabPanel.setOpaque(false);
 
         graphButtonsSeparator = new JToolBar.Separator();
         toolBar.add(graphButtonsSeparator);
