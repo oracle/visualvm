@@ -68,4 +68,6 @@ public interface UIConstants {
     /** Color used for painting selected cell foreground in JTables */
     public static final Color TABLE_SELECTION_FOREGROUND_COLOR = Color.BLACK;
     public static final int TABLE_ROW_MARGIN = 0;
+    
+    public static final String PROFILER_PANELS_BACKGROUND = "ProfilerPanels.background"; // NOI18N
 }

@@ -63,6 +63,7 @@ public abstract class AbstractController {
     public JPanel getPanel() {
         if (controllerUI == null) {
             controllerUI = createControllerUI();
+            controllerUI.setOpaque(false);
         }
 
         return controllerUI;

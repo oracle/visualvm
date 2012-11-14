@@ -43,8 +43,6 @@
 
 package org.netbeans.lib.profiler.ui.components.table;
 
-import org.netbeans.lib.profiler.ui.components.*;
-
 
 /**
  * Table model that extends SortableTableModel and allows to hide columns
@@ -181,5 +179,8 @@ public class ExtendedTableModel extends SortableTableModel {
         for (int i = virtualColumnIndex; i < realColumnsCount; i++) {
             columnsMapping[i] = -1;
         }
+        
+        fireTableStructureChanged();
+        realModel.fireTableStructureChanged();
     }
 }

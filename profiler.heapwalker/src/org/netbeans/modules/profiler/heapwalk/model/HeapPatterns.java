@@ -43,10 +43,11 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
@@ -64,15 +65,22 @@ import org.openide.util.NbBundle;
 })
 final class HeapPatterns {
     private static final String LINKED_LIST_CLASSNAME = "java.util.LinkedList"; // NOI18N
-    private static final String LINKED_LIST_ENTRY_CLASSNAME = "java.util.LinkedList$Entry"; // NOI18N
+    private static final Map<String,String> LINKED_LIST_ENTRY_CLASSNAMES;
 
+    static {
+        Map<String,String> entryClass = new HashMap();
+        
+        entryClass.put("java.util.LinkedList$Entry","previous, next");    // NOI18N
+        entryClass.put("java.util.LinkedList$Node","prev, next");     // NOI18N
+        LINKED_LIST_ENTRY_CLASSNAMES = Collections.unmodifiableMap(entryClass);
+    }
 
     static HeapWalkerNode[] processReferencePatterns(InstanceNode parent, List references) {
         Instance instance = parent.getInstance();
         JavaClass classs = instance.getJavaClass();
         String className = classs.getName();
 
-        if (LINKED_LIST_ENTRY_CLASSNAME.equals(className))
+        if (isEntryClass(className))
             return processLinkedListReferencePatterns(parent, instance, classs, references);
 
         return null;
@@ -140,7 +148,18 @@ final class HeapPatterns {
                     break;
                 }
             }
-            if (!classs.equals(c1) || !classs.equals(c2)) break;
+            if (!classs.equals(c1) || !classs.equals(c2)) {
+                if (e1 != null) {
+                    if (LINKED_LIST_CLASSNAME.equals(c1.getName())) {
+                        v3 = v1;
+                        passed = true;
+                    } else if (LINKED_LIST_CLASSNAME.equals(c2.getName())) {
+                        v3 = v2;
+                        passed = true;
+                    }
+                }
+                break;
+            }
 
             if (e1 == null) {
                 e1 = i1;
@@ -174,13 +193,13 @@ final class HeapPatterns {
         List<Instance> instances;
 
         if (e1.equals(e2)) {
-            nodesCount = Bundle.HeapPatterns_InstanceOfString(LINKED_LIST_ENTRY_CLASSNAME);
+            nodesCount = Bundle.HeapPatterns_InstanceOfString(e1.getJavaClass().getName());
             instances = Collections.singletonList(e1);
         } else {
-            nodesCount = Bundle.HeapPatterns_InstancesOfString(2, LINKED_LIST_ENTRY_CLASSNAME);
+            nodesCount = Bundle.HeapPatterns_InstancesOfString(2, e1.getJavaClass().getName());
             instances = Arrays.asList(new Instance[] { e1, e2 });
         }
-        String collapsedNodeName = "previous, next (" + nodesCount + ")"; // NOI18N
+        String collapsedNodeName = getFieldNames(e1.getJavaClass())+" (" + nodesCount + ")"; // NOI18N
 
         HeapWalkerNode[] result;
         if (nested) {
@@ -199,4 +218,11 @@ final class HeapPatterns {
         return result;
     }
 
+    private static boolean isEntryClass(String className) {
+        return LINKED_LIST_ENTRY_CLASSNAMES.containsKey(className);
+    }
+
+    private static String getFieldNames(JavaClass entryClass) {
+        return LINKED_LIST_ENTRY_CLASSNAMES.get(entryClass.getName());
+    }
 }

@@ -460,7 +460,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                     BrowserUtils.performTask(new Runnable() {
                         public void run() {
                             final int retainedSizesState = referencesBrowserController.getReferencesControllerHandler().
-                                    getHeapFragmentWalker().computeRetainedSizes(false);
+                                    getHeapFragmentWalker().computeRetainedSizes(false, true);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     if (retainedSizesState != HeapFragmentWalker.RETAINED_SIZES_COMPUTED) {
@@ -853,6 +853,28 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         initColumnSelectorItems();
         headerPopup.show(cornerButton, cornerButton.getWidth() - headerPopup.getPreferredSize().width, cornerButton.getHeight());
     }
+    
+    public void showRootGCRoot() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                final HeapWalkerNode node = (HeapWalkerNode)fieldsListTable.getTree().getPathForRow(0).getLastPathComponent();
+                if (node != null && isComputed(node) /*&& (node instanceof InstanceNode)*/) {
+                    referencesBrowserController.navigateToNearestGCRoot((InstanceNode)node);
+                } else {
+                    BrowserUtils.performTask(new Runnable() {
+                        public void run() {
+                            showRootGCRoot();
+                        }
+                    }, 100);
+                }
+            }
+        });
+    }
+    
+    private boolean isComputed(HeapWalkerNode node) {
+        return node instanceof HeapWalkerInstanceNode && (!node.currentlyHasChildren() ||
+               node.getNChildren() != 1 || !HeapWalkerNodeFactory.isMessageNode(node.getChild(0)));
+    }
 
     private void showPopupMenu(int row, int x, int y) {
         HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
@@ -873,8 +895,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         }
 
 //        showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode || node instanceof ClassNode);
-        showGcRootItem.setEnabled(node instanceof HeapWalkerInstanceNode && (!node.currentlyHasChildren() ||
-                (node.getNChildren() != 1 || !HeapWalkerNodeFactory.isMessageNode(node.getChild(0))))); // #124306
+        showGcRootItem.setEnabled(isComputed(node)); // #124306
         if (showSourceItem != null) {
             String className = null;
             if (node instanceof HeapWalkerInstanceNode) {

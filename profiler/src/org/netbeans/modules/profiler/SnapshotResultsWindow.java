@@ -235,7 +235,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
+    
     public static synchronized void closeAllWindows() {
         Collection windows = windowsList.values();
 
@@ -356,6 +356,17 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     protected String preferredID() {
         return this.getClass().getName();
     }
+    
+    
+    // --- Support for saving/restoring selected tabs, opened columns etc. -----
+    public void setState(SnapshotPanel.State state) {
+        displayedPanel.setState(state);
+    }
+    
+    public SnapshotPanel.State getState() {
+        return displayedPanel.getState();
+    }
+    // -------------------------------------------------------------------------
 
     // -- Private methods --------------------------------------------------------------------------------------------------
 

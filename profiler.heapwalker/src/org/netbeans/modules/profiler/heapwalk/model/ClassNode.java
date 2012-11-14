@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.heapwalk.model;
 
 
+import java.text.NumberFormat;
 import org.openide.util.NbBundle;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -57,6 +58,9 @@ import org.netbeans.lib.profiler.heap.JavaClass;
  * @author Jiri Sedlacek
  */
 public class ClassNode extends AbstractHeapWalkerNode {
+    
+    private static final NumberFormat numberFormat = NumberFormat.getInstance();
+    
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public abstract static class RootNode extends ClassNode implements org.netbeans.modules.profiler.heapwalk.model.RootNode {
@@ -148,10 +152,10 @@ public class ClassNode extends AbstractHeapWalkerNode {
     }
 
     protected String computeSize() {
-        return "-"; // NOI18N
+        return numberFormat.format(javaClass.getAllInstancesSize());
     }
 
     protected String computeRetainedSize() {
-        return "-"; // NOI18N
+        return numberFormat.format(javaClass.getRetainedSizeByClass());
     }
 }
