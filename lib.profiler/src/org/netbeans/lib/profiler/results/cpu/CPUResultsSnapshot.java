@@ -188,13 +188,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         // Generate individual CCT containers for all threads in CPUCallGraphBuilder.
         CPUCCTContainer[] methodLevelCCTs = cctProvider.createPresentationCCTs(this);
 
-        if (methodLevelCCTs == null) {
-            throw new NoDataAvailableException();
-        }
-
-        int len = methodLevelCCTs.length;
-
-        if (len == 0) {
+        if (methodLevelCCTs == null || methodLevelCCTs.length == 0) {
             throw new NoDataAvailableException();
         }
 
