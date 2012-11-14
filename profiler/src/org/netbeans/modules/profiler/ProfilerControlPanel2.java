@@ -1102,24 +1102,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
 
                         if (value instanceof Snapshot) {
                             Snapshot s = (Snapshot)value;
-                            // FileObject
-                            final FileObject fo = s.getFile();
-
-                            if (s.isHeapDump()) {
-                                Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
-                                for (TopComponent tc : tcs) {
-                                    Object o = tc.getClientProperty("HeapDumpFileName"); // NOI18N
-                                    if (o != null && FileUtil.toFile(fo).equals(new File(o.toString()))) {
-                                        c.setFont(c.getFont().deriveFont(Font.BOLD));
-                                        break;
-                                    }
-                                }
-                            } else {
-                                LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(FileUtil.toFile(fo));
-                                if (ls != null) {
-                                    c.setFont(c.getFont().deriveFont(Font.BOLD));
-                                }
-                            }
+                            if (isOpen(s)) c.setFont(c.getFont().deriveFont(Font.BOLD));
                             c.setText(s.getDisplayName());
                             c.setIcon(s.getIcon());
                         } else {
@@ -1231,6 +1214,22 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
             updateButtons();
             updateCombo();
             setDisplayedProject(ProjectUtilities.getMainProject());
+        }
+        
+        private boolean isOpen(Snapshot s) {
+            File f = FileUtil.toFile(s.getFile());
+
+            if (s.isHeapDump()) {
+                Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
+                for (TopComponent tc : tcs) {
+                    Object o = tc.getClientProperty("HeapDumpFileName"); // NOI18N
+                    if (o != null && f.equals(new File(o.toString()))) return true;
+                }
+            } else {
+                LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(f);
+                if (ls != null) return true;
+            }
+            return false;
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -1498,9 +1497,15 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
         private void updateButtons() {
             int[] selected = list.getSelectedIndices();
             openButton.setEnabled(selected.length > 0);
-            renameButton.setEnabled(selected.length == 1);
             deleteButton.setEnabled(selected.length > 0);
             exportButton.setEnabled(selected.length > 0);
+            if (selected.length != 1) {
+                renameButton.setEnabled(false);
+            } else {
+                Object o = list.getModel().getElementAt(selected[0]);
+                if (!(o instanceof Snapshot)) renameButton.setEnabled(false);
+                else renameButton.setEnabled(!isOpen((Snapshot)o));
+            }
         }
 
         private void updateCombo() {
