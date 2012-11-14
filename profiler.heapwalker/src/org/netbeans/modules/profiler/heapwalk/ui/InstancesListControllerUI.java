@@ -66,7 +66,6 @@ import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -482,7 +481,7 @@ public class InstancesListControllerUI extends JTitledPanel {
                     BrowserUtils.performTask(new Runnable() {
                         public void run() {
                             final int retainedSizesState = instancesListController.getInstancesController().
-                                    getHeapFragmentWalker().computeRetainedSizes(false);
+                                    getHeapFragmentWalker().computeRetainedSizes(false, true);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     if (retainedSizesState != HeapFragmentWalker.RETAINED_SIZES_COMPUTED) {
@@ -552,6 +551,16 @@ public class InstancesListControllerUI extends JTitledPanel {
     private JPopupMenu createTablePopup() {
         JPopupMenu popup = new JPopupMenu();
         
+        JMenuItem showGcRootItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_ShowGcRootItemText());
+        showGcRootItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                instancesListController.getInstancesController().getReferencesBrowserController().navigateToRootNearestGCRoot();
+            }
+        });
+        popup.add(showGcRootItem);
+        
+        popup.addSeparator();
+        
         JMenuItem copyIdItem = new JMenuItem(Bundle.InstancesListControllerUI_CopyIdString());
         copyIdItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -559,7 +568,6 @@ public class InstancesListControllerUI extends JTitledPanel {
             }
         });
         copyIdItem.setAccelerator(COPY_ID_KEYSTROKE);
-//        copyIdItem.setFont(popup.getFont().deriveFont(Font.BOLD));
 
         popup.add(copyIdItem);
 

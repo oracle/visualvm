@@ -263,7 +263,6 @@ public class LiveSampledResultsPanel extends SampledResultsPanel implements Live
                 memoryResPopupMenu.add(popupShowSource);
 
                 popupShowSource.addActionListener(this);
-                memoryResPopupMenu.addSeparator();
             }
 
             memoryResPopupMenu.addPopupMenuListener(new PopupMenuListener() {

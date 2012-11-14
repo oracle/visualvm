@@ -1034,7 +1034,16 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
                 }
             };
 
-            combo = new JComboBox(new DefaultComboBoxModel());
+            combo = new JComboBox(new DefaultComboBoxModel()) {
+                public Dimension getPreferredSize() {
+                    Dimension dim = super.getPreferredSize();
+                    dim.width = 1;
+                    return dim;
+                }
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+            };
             combo.setRenderer(new ProjectNameRenderer());
             combo.getAccessibleContext().setAccessibleName(Bundle.ProfilerControlPanel2_ComboAccessName());
             combo.getAccessibleContext().setAccessibleDescription(Bundle.ProfilerControlPanel2_ComboAccessDescr());
