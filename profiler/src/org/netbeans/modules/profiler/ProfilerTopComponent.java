@@ -43,10 +43,16 @@
 
 package org.netbeans.modules.profiler;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.UIManager;
+import org.netbeans.lib.profiler.ui.UIConstants;
 import org.openide.windows.TopComponent;
 
 /**
@@ -95,6 +101,21 @@ public class ProfilerTopComponent extends TopComponent {
     
     protected Component defaultFocusOwner() {
         return null;
+    }
+    
+    public Dimension getMinimumSize() {
+        return new Dimension(0, 0);
+    }
+    
+    public void paintComponent(Graphics g) {
+        Color background = UIManager.getColor(UIConstants.PROFILER_PANELS_BACKGROUND);
+        if (background != null) {
+            g.setColor(background);
+            Insets i = getInsets();
+            g.fillRect(i.left, i.top, getWidth() - i.left - i.right, getHeight() - i.top - i.bottom);
+        } else {
+            super.paintComponent(g);
+        }
     }
     
 }

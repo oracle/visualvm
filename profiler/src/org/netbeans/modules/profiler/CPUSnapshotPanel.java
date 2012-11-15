@@ -50,7 +50,6 @@ import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.lib.profiler.ui.components.FilterComponent;
 import org.netbeans.lib.profiler.ui.cpu.*;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.modules.profiler.actions.FindNextAction;
@@ -85,11 +84,9 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 
 /**
@@ -1189,5 +1186,148 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     public boolean hasExportableView() {
         Component selectedView = getSelectedView();
         return ((selectedView != null) && (selectedView!=infoPanel));
+    }
+    
+    // --- Support for saving/restoring selected tabs, opened columns etc. -----
+    public void setState(SnapshotPanel.State state) {
+        if (!(state instanceof State)) return;
+        
+        State newState = (State)state;
+        int selectedTab = newState.getSelectedTab();
+        if (selectedTab == -1) return;
+        
+        boolean[] filterVisible = newState.getVisibleFilters();
+        cctPanel.setFilterVisible(filterVisible[0]);
+        combinedCCT.setFilterVisible(filterVisible[1]);
+        flatPanel.setFilterVisible(filterVisible[2]);
+        combinedFlat.setFilterVisible(filterVisible[3]);
+        
+        boolean[][] columnVisibilities = newState.getVisibleColumns();
+        cctPanel.setColumnsVisibility(columnVisibilities[0]);
+        combinedCCT.setColumnsVisibility(columnVisibilities[1]);
+        flatPanel.setColumnsVisibility(columnVisibilities[2]);
+        combinedFlat.setColumnsVisibility(columnVisibilities[3]);
+        
+        int[] sortingColumns = newState.getSortingColumns();
+        boolean[] sortingOrder = newState.getSortingOrders();
+        cctPanel.setSorting(sortingColumns[0], sortingOrder[0], true);
+        combinedCCT.setSorting(sortingColumns[1], sortingOrder[1], true);
+        flatPanel.setSorting(sortingColumns[2], sortingOrder[2], true);
+        combinedFlat.setSorting(sortingColumns[3], sortingOrder[3], true);
+        
+        String[] filterValues = newState.getFilterValues();
+        int[] filterTypes = newState.getFilterTypes();
+        cctPanel.setFilterValues(filterValues[0], filterTypes[0]);
+        combinedCCT.setFilterValues(filterValues[1], filterTypes[1]);
+        flatPanel.setFilterValues(filterValues[2], filterTypes[2]);
+        combinedFlat.setFilterValues(filterValues[3], filterTypes[3]);
+        
+        selectView(selectedTab);
+    }
+    
+    public State getState() {
+        int selectedTab = getSelectedViewIndex();
+        if (selectedTab > 3) selectedTab = 0; // #221850, only persist the default tabs
+        if (selectedTab == -1) return null;
+        
+        boolean cctPanelFilter = cctPanel.isFilterVisible();
+        boolean combinedCCTFilter = combinedCCT.isFilterVisible();
+        boolean flatPanelFilter = flatPanel.isFilterVisible();
+        boolean combinedFlatFilter = combinedFlat.isFilterVisible();
+        
+        boolean[] cctPanelVisibilities = cctPanel.getColumnsVisibility();
+        boolean[] combinedCCTVisibilities = combinedCCT.getColumnsVisibility();
+        boolean[] flatPanelVisibilities = flatPanel.getColumnsVisibility();
+        boolean[] combinedFlatVisibilities = combinedFlat.getColumnsVisibility();
+        
+        // Workaround - cct's share the model (=> one sorting/filtering config)
+        int cctColumn = getSelectedView() == cctPanel ?
+                cctPanel.getSortingColumn() : combinedCCT.getSortingColumn();
+        int cctPanelColumn = cctColumn;
+        int combinedCCTColumn = cctColumn;
+//        int cctPanelColumn = cctPanel.getSortingColumn();
+//        int combinedCCTColumn = combinedCCT.getSortingColumn();
+        int flatPanelColumn = flatPanel.getSortingColumn();
+        int combinedFlatColumn = combinedFlat.getSortingColumn();
+        
+        // Workaround - cct's share the model (=> one sorting/filtering config)
+        boolean cctSorting = getSelectedView() == cctPanel ?
+                cctPanel.getSortingOrder() : combinedCCT.getSortingOrder();
+        boolean cctPanelSorting = cctSorting;
+        boolean combinedCCTSorting = cctSorting;
+//        boolean cctPanelSorting = cctPanel.getSortingOrder();
+//        boolean combinedCCTSorting = combinedCCT.getSortingOrder();
+        boolean flatPanelSorting = flatPanel.getSortingOrder();
+        boolean combinedFlatSorting = combinedFlat.getSortingOrder();
+        
+        // Workaround - cct's share the model (=> one sorting/filtering config)
+        String cctFilterValue = getSelectedView() == cctPanel ?
+                cctPanel.getFilterValue() : combinedCCT.getFilterValue();
+        String cctPanelFilterValue = cctFilterValue;
+        String combinedCCTFilterValue = cctFilterValue;
+//        String cctPanelFilterValue = cctPanel.getFilterValue();
+//        String combinedCCTFilterValue = combinedCCT.getFilterValue();
+        String flatPanelFilterValue = flatPanel.getFilterValue();
+        String combinedFlatFilterValue = combinedFlat.getFilterValue();
+        
+        // Workaround - cct's share the model (=> one sorting/filtering config)
+        int cctFilterType = getSelectedView() == cctPanel ?
+                cctPanel.getFilterType() : combinedCCT.getFilterType();
+        int cctPanelFilterType = cctFilterType;
+        int combinedCCTFilterType = cctFilterType;
+//        int cctPanelFilterType = cctPanel.getFilterType();
+//        int combinedCCTFilterType = combinedCCT.getFilterType();
+        int flatPanelFilterType = flatPanel.getFilterType();
+        int combinedFlatFilterType = combinedFlat.getFilterType();
+        
+        
+        return new State(selectedTab,
+                new boolean[] {   cctPanelFilter, combinedCCTFilter,
+                                  flatPanelFilter, combinedFlatFilter },
+                new boolean[][] { cctPanelVisibilities, combinedCCTVisibilities,
+                                  flatPanelVisibilities, combinedFlatVisibilities },
+                new int[] {       cctPanelColumn, combinedCCTColumn,
+                                  flatPanelColumn, combinedFlatColumn },
+                new boolean[] {   cctPanelSorting, combinedCCTSorting,
+                                  flatPanelSorting, combinedFlatSorting },
+                new String[] {    cctPanelFilterValue, combinedCCTFilterValue,
+                                  flatPanelFilterValue, combinedFlatFilterValue },
+                new int[] {       cctPanelFilterType, combinedCCTFilterType,
+                                  flatPanelFilterType, combinedFlatFilterType });
+    }
+    // -------------------------------------------------------------------------
+    
+    
+    public static class State extends SnapshotPanel.State {
+        
+        private int selectedTab;
+        private boolean[] visibleFilters;
+        private boolean[][] visibleColumns;
+        private int[] sortingColumns;
+        private boolean[] sortingOrders;
+        private String[] filterValues;
+        private int[] filterTypes;
+        
+        State(int selectedTab,
+              boolean[] visibleFilters, boolean[][] visibleColumns,
+              int[] sortingColumns, boolean[] sortingOrders,
+              String[] filterValues, int[] filterTypes) {
+            this.selectedTab = selectedTab;
+            this.visibleFilters = visibleFilters;
+            this.visibleColumns = visibleColumns;
+            this.sortingColumns = sortingColumns;
+            this.sortingOrders = sortingOrders;
+            this.filterValues = filterValues;
+            this.filterTypes = filterTypes;
+        }
+        
+        int getSelectedTab() { return selectedTab; }
+        boolean[] getVisibleFilters() { return visibleFilters; }
+        boolean[][] getVisibleColumns() { return visibleColumns; }
+        int[] getSortingColumns() { return sortingColumns; }
+        boolean[] getSortingOrders() { return sortingOrders; }
+        String[] getFilterValues() { return filterValues; }
+        int[] getFilterTypes() { return filterTypes; }
+        
     }
 }

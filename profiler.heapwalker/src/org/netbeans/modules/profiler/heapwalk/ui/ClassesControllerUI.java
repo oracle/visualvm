@@ -158,6 +158,7 @@ public class ClassesControllerUI extends JPanel {
     }
 
     private void tweakSplitPaneUI(JSplitPane splitPane) {
+        splitPane.setOpaque(false);
         splitPane.setBorder(null);
         splitPane.setDividerSize(3);
 

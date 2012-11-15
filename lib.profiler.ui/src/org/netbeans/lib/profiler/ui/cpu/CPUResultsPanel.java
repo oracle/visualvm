@@ -270,6 +270,10 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
         // do nothing, has to be overridden by classes that do support showing subtree call graphs and return
         // true from supportsSubtreeCallGraph
     }
+    
+    public void setColumnsVisibility(boolean[] columnsVisibility) {}
+    
+    public boolean[] getColumnsVisibility() { return null; }
 
     void menuActionPerformed(ActionEvent evt) {
         Object src = evt.getSource();

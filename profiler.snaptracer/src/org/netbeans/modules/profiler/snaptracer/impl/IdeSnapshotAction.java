@@ -65,24 +65,35 @@ import org.openide.windows.WindowManager;
  */
 public final class IdeSnapshotAction implements ActionListener {
 
+    private File lastDirectory;
+    
     public void actionPerformed(ActionEvent e) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 final File file = snapshotFile();
                 if (file == null) return;
-                
-                TracerSupportImpl.getInstance().perform(new Runnable() {
-                    public void run() {
-                        final IdeSnapshot snapshot = snapshot(file);
-                        if (snapshot == null) return;
-                        openSnapshot(snapshot);
-                    }
-                });
+                openSnapshot(FileUtil.toFileObject(file));
+            }
+        });
+    }
+    
+    @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot {0}:\n{1}")
+    static void openSnapshot(final FileObject primary) {
+        TracerSupportImpl.getInstance().perform(new Runnable() {
+            public void run() {
+                try {
+                    FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
+                    IdeSnapshot snapshot = new IdeSnapshot(primary, uigestureFO);
+                    openSnapshotImpl(snapshot);
+                } catch (Throwable t) {
+                    ProfilerDialogs.displayError(Bundle.MSG_SnapshotLoadFailedMsg(
+                                                 primary.getNameExt(), t.getLocalizedMessage()));
+                }
             }
         });
     }
 
-    static void openSnapshot(final IdeSnapshot snapshot) {
+    private static void openSnapshotImpl(final IdeSnapshot snapshot) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 TracerModel model = new TracerModel(snapshot);
@@ -101,23 +112,11 @@ public final class IdeSnapshotAction implements ActionListener {
         return tc;
     }
 
-    @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot: {0}")
-    private IdeSnapshot snapshot(File file) {
-        try {
-            FileObject primary = FileUtil.toFileObject(file);
-            FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
-            
-            return new IdeSnapshot(primary, uigestureFO);
-        } catch (Throwable t) {
-            ProfilerDialogs.displayError(Bundle.MSG_SnapshotLoadFailedMsg(file.getName()));
-            return null;
-        }
-    }
-
     private File snapshotFile() {
-        JFileChooser chooser = createFileChooser();
+        JFileChooser chooser = createFileChooser(lastDirectory);
         Frame mainWindow = WindowManager.getDefault().getMainWindow();
         if (chooser.showOpenDialog(mainWindow) == JFileChooser.APPROVE_OPTION) {
+            lastDirectory = chooser.getCurrentDirectory();
             return chooser.getSelectedFile();
         } else {
             return null;
@@ -128,7 +127,7 @@ public final class IdeSnapshotAction implements ActionListener {
         "ACTION_IdeSnapshot_dialog=Load IDE Snapshot",
         "ACTION_IdeSnapshot_filter=IDE Snapshots"
     })
-    private static JFileChooser createFileChooser() {
+    private static JFileChooser createFileChooser(File directory) {
         JFileChooser chooser = new JFileChooser();
 
         chooser.setDialogTitle(Bundle.ACTION_IdeSnapshot_dialog());
@@ -136,7 +135,10 @@ public final class IdeSnapshotAction implements ActionListener {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         chooser.setAcceptAllFileFilterUsed(false);
-
+        if (directory != null) {
+            chooser.setCurrentDirectory(directory);
+        }
+        
         String descr = Bundle.ACTION_IdeSnapshot_filter();
         String ext = "."+ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION; // NOI18N
         Filter filter = Filter.create(descr, ext);
