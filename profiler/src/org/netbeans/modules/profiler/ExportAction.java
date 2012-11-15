@@ -92,7 +92,8 @@ import org.openide.windows.WindowManager;
     "ExportAction_ExportDialogExcelFilter=Excel Compatible CSV (*.csv)",
     "ExportAction_ExportDialogXMLFilter=XML File (*.xml)",
     "ExportAction_ExportDialogHTMLFilter=Web page (*.html)",
-    "ExportAction_ExportDialogNPSFilter=Profiler Snapshot File (*.nps)"
+    "ExportAction_ExportDialogNPSFilter=Profiler Snapshot File (*.nps)",
+    "ExportAction_SavingSnapshot=Saving snapshot..."
 })
 public final class ExportAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(ExportAction.class.getName());
@@ -369,7 +370,7 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
             new NBSwingWorker(true) {
-                final private ProgressHandle ph = ProgressHandleFactory.createHandle("Saving snapshot");
+                final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.ExportAction_SavingSnapshot());
                 @Override
                 protected void doInBackground() {
                     try {
