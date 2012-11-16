@@ -267,10 +267,11 @@ public final class ExportAction extends AbstractAction {
     private boolean checkFileExists(File file) {
         if (file.exists()) {
             if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(
-                    Bundle.ExportAction_OverwriteFileCaption(),new Object[] { file.getName() }),
-                    Bundle.ExportAction_OverwriteFileCaption()))
+                    Bundle.ExportAction_OverwriteFileMsg(file.getName()),new Object[] { file.getName() }),
+                    Bundle.ExportAction_OverwriteFileCaption())) {
                 return false; // cancelled by the user
-
+            }
+            
             if (!file.delete()) {
                 ProfilerDialogs.displayError(Bundle.ExportAction_CannotOverwriteFileMsg(file.getName()));
                 return false; // Insufficient rights to overwrite file
