@@ -184,7 +184,7 @@ public final class ExportAction extends AbstractAction {
             fileChooser.addChoosableFileFilter(new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_XML);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_XML);
                 }
 
                 @Override
@@ -195,7 +195,7 @@ public final class ExportAction extends AbstractAction {
             fileChooser.addChoosableFileFilter(new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_HTML);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_HTML);
                 }
 
                 @Override
@@ -206,7 +206,7 @@ public final class ExportAction extends AbstractAction {
             fileChooser.addChoosableFileFilter(new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_CSV);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_CSV);
                 }
 
                 @Override
@@ -218,7 +218,7 @@ public final class ExportAction extends AbstractAction {
 
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_CSV);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_CSV);
                 }
 
                 @Override
@@ -232,7 +232,7 @@ public final class ExportAction extends AbstractAction {
 
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_NPS);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_NPS);
                 }
 
                 @Override
