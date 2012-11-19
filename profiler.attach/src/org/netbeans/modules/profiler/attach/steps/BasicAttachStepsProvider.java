@@ -49,6 +49,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.AttachSettings;
@@ -57,6 +58,7 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.attach.providers.RemotePackExporter;
 import org.netbeans.modules.profiler.attach.spi.AttachStepsProvider;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -322,22 +324,32 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     }
     
     protected void createRemotePack(final AttachSettings settings) {
-        try {
-            final JFileChooser chooser = new JFileChooser();
-            final File tmpDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
-            chooser.setDialogTitle(Bundle.AttachDialog_RemotePackDialogCaption());
-            chooser.setAcceptAllFileFilterUsed(false);
-            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            chooser.setSelectedFile(tmpDir);
-            chooser.setCurrentDirectory(tmpDir);
-            chooser.setMultiSelectionEnabled(false);
-            if ((JFileChooser.CANCEL_OPTION & chooser.showSaveDialog(chooser)) == 0) {
-                String packPath = exportRemotePack(chooser.getSelectedFile().getAbsolutePath(), settings, currentJDK);
-                ProfilerDialogs.displayInfo(Bundle.AttachDialog_RemotePackSaved(packPath));
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JFileChooser chooser = new JFileChooser();
+                File tmpDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
+                chooser.setDialogTitle(Bundle.AttachDialog_RemotePackDialogCaption());
+                chooser.setAcceptAllFileFilterUsed(false);
+                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                chooser.setSelectedFile(tmpDir);
+                chooser.setCurrentDirectory(tmpDir);
+                chooser.setMultiSelectionEnabled(false);
+                if ((JFileChooser.CANCEL_OPTION & chooser.showSaveDialog(chooser)) == 0) {
+                    final String path = chooser.getSelectedFile().getAbsolutePath();
+                    final String jdkF = currentJDK;
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            try {
+                                String packPath = exportRemotePack(path, settings, jdkF);
+                                ProfilerDialogs.displayInfo(Bundle.AttachDialog_RemotePackSaved(packPath));
+                            } catch (IOException ex) {
+                                System.err.println("Exception creating remote pack: " + ex); // NOI18N
+                            }
+                        }
+                    });
+                }
             }
-        } catch (IOException ex) {
-            System.err.println("Exception creating remote pack: " + ex); // NOI18N
-        }
+        });
     }
     
     private static final AtomicBoolean exportRunning = new AtomicBoolean(false);
