@@ -196,7 +196,6 @@ public class HeapTest {
     @Test
     public void testGetSystemProperties() {
         System.out.println("getSystemProperties");
-        Properties expResult = null;
         Properties result = heap.getSystemProperties();
         assertEquals("2.4.18-openmosix4", result.getProperty("os.version"));
     }
