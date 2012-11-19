@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -213,6 +214,20 @@ public class HeapTest {
         assertEquals(25056, i2.getRetainedSize());
     }
     
+    /**
+     * Test of getRetainedSizeByClass method, of class JavaClass.
+     */
+    @Test
+    public void testGetRetainedSizeByClass() {
+        System.out.println("getRetainedSizeByClass");
+        JavaClass string = heap.getJavaClassByName(String.class.getName());
+        JavaClass hashMap = heap.getJavaClassByName(HashMap.class.getName());
+        JavaClass array = heap.getJavaClassByName(ArrayList.class.getName());
+        
+        assertEquals(18044, string.getRetainedSizeByClass());
+        assertEquals(11315, hashMap.getRetainedSizeByClass());
+        assertEquals(566, array.getRetainedSizeByClass());
+    }
     
     @Test
     public void testHeapDumpLog() throws IOException, URISyntaxException {
