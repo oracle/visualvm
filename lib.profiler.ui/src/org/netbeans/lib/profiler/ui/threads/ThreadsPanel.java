@@ -325,7 +325,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         table.setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
         table.setShowGrid(false);
         table.setRowMargin(0);
-        table.setRowHeight(23);
+        table.setRowHeight(UIUtils.getDefaultRowHeight() + 4);
 
         DefaultTableCellRenderer defaultHeaderRenderer = new DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
@@ -390,6 +390,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         monitorLegend.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 8));
+        legendPanel.setOpaque(false);
         legendPanel.add(runningLegend);
         legendPanel.add(sleepingLegend);
 
@@ -402,6 +403,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
 
         //legendPanel.add(unknownLegend);
         JPanel bottomPanel = new JPanel(new BorderLayout());
+        UIUtils.decorateProfilerPanel(bottomPanel);
         bottomPanel.add(UIUtils.createHorizontalLine(bottomPanel.getBackground()), BorderLayout.NORTH);
         bottomPanel.add(legendPanel, BorderLayout.EAST);
 
@@ -429,6 +431,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         notificationPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 15));
         notificationPanel.setBorder(dataPanel.getBorder());
         notificationPanel.setBackground(table.getBackground());
+        UIUtils.decorateProfilerPanel(notificationPanel);
 
         Border myRolloverBorder = new CompoundBorder(new FlatToolBar.FlatRolloverButtonBorder(Color.GRAY, Color.LIGHT_GRAY),
                                                      new FlatToolBar.FlatMarginBorder());

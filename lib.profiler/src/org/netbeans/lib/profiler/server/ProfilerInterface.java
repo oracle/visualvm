@@ -138,7 +138,7 @@ public class ProfilerInterface implements CommonConstants {
                         initiateInstrumentation(instrType);
                         break;
                     case INSTR_NONE_MEMORY_SAMPLING:
-                        if (Histogram.initialize()) {
+                        if (Histogram.isAvailable()) {
                             profilerServer.notifyClientOnResultsAvailability();
                         }
                         break;
@@ -527,6 +527,7 @@ public class ProfilerInterface implements CommonConstants {
         evBufManager = new EventBufferManager(profilerServer);
         heapHistgramManager = new HeapHistogramManager();
         ProfilerInterface.status = status;
+        detachStarted = false;
 
         // Check that all profiler's own threads are running, and then record them internally, so that target app threads
         // are accounted for properly.

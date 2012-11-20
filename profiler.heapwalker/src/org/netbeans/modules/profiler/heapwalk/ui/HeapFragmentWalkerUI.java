@@ -223,6 +223,7 @@ public class HeapFragmentWalkerUI extends JPanel {
             };
         forwardAction.putValue(Action.SHORT_DESCRIPTION, Bundle.HeapFragmentWalkerUI_NavigateForwardDescr());
 
+        setOpaque(false);
         setLayout(new BorderLayout());
 
         //unifyComponentsSize(classesControllerPresenter, instancesControllerPresenter);
@@ -248,6 +249,7 @@ public class HeapFragmentWalkerUI extends JPanel {
         controllerUIsLayout = new CardLayout();
 
         controllerUIsPanel = new JPanel(controllerUIsLayout);
+        controllerUIsPanel.setOpaque(false);
         controllerUIsPanel.add(summaryControllerPanel, summaryControllerPresenter.getText());
         controllerUIsPanel.add(classesControllerPanel, classesControllerPresenter.getText());
         controllerUIsPanel.add(instancesControllerPanel, instancesControllerPresenter.getText());

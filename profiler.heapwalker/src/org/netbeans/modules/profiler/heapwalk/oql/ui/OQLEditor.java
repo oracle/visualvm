@@ -48,6 +48,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -187,7 +188,8 @@ public class OQLEditor extends JPanel {
                     super.setText(text);
                 }
             };
-            queryEditor.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            int fontsize = new JTextArea().getFont().getSize();
+            queryEditor.setFont(new Font("Monospaced", Font.PLAIN, fontsize)); // NOI18N
             lexervalid = true; // no lexer info available; assume the lexing info is valid
         }
 

@@ -60,6 +60,7 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.components.VerticalLayout;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
@@ -141,6 +142,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
         noContentPanel = new JPanel();
         noContentPanel.setLayout(new BorderLayout());
         noContentPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        UIUtils.decorateProfilerPanel(noContentPanel);
 
         JLabel noContentIcon = new JLabel(Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
         noContentIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
@@ -194,6 +196,7 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
 
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
+        UIUtils.decorateProfilerPanel(contentPanel);
         scrollPane = new JScrollPane(contentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
@@ -202,30 +205,8 @@ public class ThreadsDetailsPanel extends JPanel implements ActionListener, DataM
 
         // perform layout
         setLayout(new BorderLayout());
-        content.setLayout(new GridLayout(0, 1)); /*new GridLayout(0, 1) {
-           public void layoutContainer(Container parent) {
-             Component[] list = parent.getComponents();
-             if (list.length == 0) return;
-        
-             Insets insets = parent.getInsets();
-             Dimension parentSize = parent.getSize();
-             int availableW = parentSize.width - (insets.left + insets.right);
-             int availableH = parentSize.height - (insets.top + insets.bottom);
-        
-             int targetHeight = 0;
-             for (int i = 0; i < list.length; i++) targetHeight += list[i].getPreferredSize().height;
-             if (targetHeight >= availableH)
-               super.layoutContainer(parent);
-             else {
-               int ypos = insets.top;
-               for (int i = 0 ; i < list.length; i++) {
-                 int prefHeight = list[i].getPreferredSize().height;
-                 list[i].setBounds(insets.left, ypos, availableW, prefHeight);
-                 ypos += prefHeight;
-               }
-             }
-           }
-           });*/
+        content.setLayout(new VerticalLayout(0, 0));
+        content.setOpaque(false);
 
         contentPanel.add(content, BorderLayout.NORTH);
         buttonsToolBar.add(showLabel);

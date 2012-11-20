@@ -375,7 +375,6 @@ class HprofHeap implements Heap {
             ClassDump classDump = null;
             long start = offset[0];
             int tag = readDumpTag(offset);
-            long instanceId = 0L;
             LongMap.Entry instanceEntry = null;
 
             if (tag == INSTANCE_DUMP) {
@@ -391,7 +390,7 @@ class HprofHeap implements Heap {
             }
 
             if (instanceIdOffset != 0) {
-                instanceId = dumpBuffer.getID(start + instanceIdOffset);
+                long instanceId = dumpBuffer.getID(start + instanceIdOffset);
                 instanceEntry = idToOffsetMap.put(instanceId, start);
             }
 
@@ -604,7 +603,6 @@ class HprofHeap implements Heap {
             if (idom != 0) {
                 int size;
                 LongMap.Entry entry;
-                Object[] domPath = null;
                 
                 if (isTreeObj) {
                     size = instanceEntry.getRetainedSize();
@@ -650,7 +648,9 @@ class HprofHeap implements Heap {
             long instanceId = dumpBuffer.getID(start + instanceIdOffset);
             Instance i = getInstanceByID(instanceId);
             ClassDump javaClass = (ClassDump) i.getJavaClass();
-            javaClass.addSizeForInstance(i);
+            if (javaClass != null) {
+                javaClass.addSizeForInstance(i);
+            }
         }
         retainedSizeByClassComputed = true;
     }

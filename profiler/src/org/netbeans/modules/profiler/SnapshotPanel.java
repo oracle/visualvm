@@ -59,4 +59,12 @@ public abstract class SnapshotPanel extends ResultsView {
     public abstract ResultsSnapshot getSnapshot();
 
     public abstract void updateSavedState();
+    
+    
+    public void setState(State state) {}
+    
+    public State getState() { return null; }
+    
+    
+    public static abstract class State {};
 }

@@ -377,17 +377,17 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
         if (popup == null) {
             popup = new JPopupMenu();
 
+            popupRemoveProfForClass = new JMenuItem();
+            popupRemoveProfForClassesBelow = new JMenuItem();
+            popupRemoveProfForClass.setText(STOP_CLASS_POPUP_ITEM_NAME);
+            popupRemoveProfForClassesBelow.setText(STOP_BELOW_LINE_POPUP_ITEM_NAME);
+
             if (GoToSource.isAvailable()) {
                 Font boldfont = popup.getFont().deriveFont(Font.BOLD);
 
                 popupShowSource = new JMenuItem();
-                popupRemoveProfForClass = new JMenuItem();
-                popupRemoveProfForClassesBelow = new JMenuItem();
-
                 popupShowSource.setText(GO_SOURCE_POPUP_ITEM_NAME);
                 popupShowSource.setFont(boldfont);
-                popupRemoveProfForClass.setText(STOP_CLASS_POPUP_ITEM_NAME);
-                popupRemoveProfForClassesBelow.setText(STOP_BELOW_LINE_POPUP_ITEM_NAME);
 
                 popup.add(popupShowSource);
                 popup.addSeparator();

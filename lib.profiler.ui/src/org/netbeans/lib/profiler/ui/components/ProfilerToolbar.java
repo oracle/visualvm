@@ -104,10 +104,10 @@ public abstract class ProfilerToolbar {
         
         protected Impl(boolean showSeparator) {
             toolbar = new JToolBar() {
-                public Component add(Component comp) {
+                protected void addImpl(Component comp, Object constraints, int index) {
                     if (comp instanceof JButton)
                         UIUtils.fixButtonUI((JButton) comp);
-                    return super.add(comp);
+                    super.addImpl(comp, constraints, index);
                 }
                 public Dimension getPreferredSize() {
                     Dimension dim = super.getPreferredSize();
@@ -140,6 +140,8 @@ public abstract class ProfilerToolbar {
                     super.doLayout();
                 }
             };
+            if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
+                toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
             toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
             toolbar.setBorderPainted(false);
             toolbar.setRollover(true);
@@ -172,55 +174,55 @@ public abstract class ProfilerToolbar {
 
         @Override
         public Component add(Action action) {
-            return toolbar.add(action);
+            Component c = toolbar.add(action);
+            toolbar.repaint();
+            return c;
         }
 
         @Override
         public Component add(Component component) {
-            return toolbar.add(component);
+            Component c = toolbar.add(component);
+            toolbar.repaint();
+            return c;
         }
         
         @Override
         public Component add(Component component, int index) {
-            return toolbar.add(component, index);
+            Component c = toolbar.add(component, index);
+            toolbar.repaint();
+            return c;
         }
 
         @Override
         public void addSeparator() {
             toolbar.addSeparator();
+            toolbar.repaint();
         }
         
         @Override
         public void addSpace(int width) {
             toolbar.addSeparator(new Dimension(width, 0));
+            toolbar.repaint();
         }
         
         @Override
         public void addFiller() {
-            JPanel toolbarFiller = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0)) {
-                public Dimension getPreferredSize() {
-                    if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
-                        int currentWidth = toolbar.getSize().width;
-                        int minimumWidth = toolbar.getMinimumSize().width;
-                        int extraWidth = currentWidth - minimumWidth;
-                        return new Dimension(Math.max(extraWidth, 0), 0);
-                    } else {
-                        return super.getPreferredSize();
-                    }
-                }
-            };
-            toolbarFiller.setOpaque(false);
-            toolbar.add(toolbarFiller);
+            Dimension minDim = new Dimension(0, 0);
+            Dimension maxDim = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+            toolbar.add(new Box.Filler(minDim, minDim, maxDim));
+            toolbar.repaint();
         }
         
         @Override
         public void remove(Component component) {
             toolbar.remove(component);
+            toolbar.repaint();
         }
         
         @Override
         public void remove(int index) {
             toolbar.remove(index);
+            toolbar.repaint();
         }
         
         @Override

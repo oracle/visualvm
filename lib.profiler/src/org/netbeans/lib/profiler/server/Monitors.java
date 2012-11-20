@@ -750,7 +750,7 @@ public class Monitors implements CommonConstants {
 
     protected static long time; // Used just for estimating the overhead
 
-    private static ActiveServerState activeServerState = new ActiveServerState(CommonConstants.SERVER_RUNNING);
+    private static ActiveServerState activeServerState;
     private static final Object activeServerStateLock = new Object();
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -819,6 +819,7 @@ public class Monitors implements CommonConstants {
         ThreadInfo.addProfilerServerThread(stMonitor);
         startTimeMilis = System.currentTimeMillis();
         startTimeCounts = Timers.getCurrentTimeInCounts();
+        activeServerState = new ActiveServerState(CommonConstants.SERVER_RUNNING);
         stMonitor.start();
     }
 

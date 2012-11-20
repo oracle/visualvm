@@ -257,7 +257,7 @@ public class ThreadStateCellRenderer extends JPanel implements TableCellRenderer
         }
 
         g.setColor(threadStateColor);
-        g.fillRect(x, 6, xx - x, getHeight() - 12);
+        g.fillRect(x, 4, xx - x, getHeight() - 8);
     }
 
     private void paintTimeMarks(Graphics g) {

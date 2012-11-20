@@ -52,7 +52,6 @@ import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
 import org.openide.nodes.Node;
 import org.openide.nodes.Children;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 /**
@@ -83,26 +82,6 @@ public class NpssDataObject extends MultiDataObject implements OpenCookie {
 
     @Override
     public void open() {
-        TracerSupportImpl.getInstance().perform(new Runnable() {
-
-            @Override
-            public void run() {
-                openImpl();
-            }
-        });
-    }
-
-    private void openImpl() {
-        IdeSnapshot snapshot;
-        FileObject primary = getPrimaryFile();
-        FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
-        
-        try {
-            snapshot = new IdeSnapshot(primary, uigestureFO);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-            return;
-        }
-        IdeSnapshotAction.openSnapshot(snapshot);
+        IdeSnapshotAction.openSnapshot(getPrimaryFile());
     }
 }
