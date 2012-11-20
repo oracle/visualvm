@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -73,6 +73,7 @@ class DominatorTree {
     private LongBuffer currentMultipleParents;
     private Map<Long,Long> map;
     private Set dirtySet = Collections.EMPTY_SET;
+    private Map canContainItself;
     private Map nearestGCRootCache = new NearestGCRootCache(400000);
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -105,7 +106,6 @@ class DominatorTree {
             ex.printStackTrace();
         }
         deleteBuffers();
-        nearestGCRootCache = null;
         dirtySet = Collections.EMPTY_SET;
     }
     
@@ -226,6 +226,42 @@ class DominatorTree {
             entry = heap.idToOffsetMap.get(instanceId);
         }
         return entry.getNearestGCRootPointer();
+    }
+    
+    boolean hasInstanceInChain(int tag, Instance i) {
+        ClassDump javaClass;
+        long idom;
+        long instanceId;
+        
+        if (tag == HprofHeap.PRIMITIVE_ARRAY_DUMP) {
+            return false;
+        }        
+        javaClass = (ClassDump) i.getJavaClass();
+        if (canContainItself == null) {
+            canContainItself = new HashMap(heap.getAllClasses().size()/2);
+        }
+        if (tag == HprofHeap.INSTANCE_DUMP) {
+            Boolean canContain = (Boolean) canContainItself.get(javaClass);
+
+            if (canContain == null) {
+                canContain = Boolean.valueOf(javaClass.canContainItself());
+                canContainItself.put(javaClass,canContain);
+            }
+            if (!canContain.booleanValue()) {
+                return false;
+            }
+        }
+        instanceId = i.getInstanceId();
+        idom = getIdomId(instanceId);
+        for (;idom!=0;idom=getIdomId(idom)) {
+            Instance ip = heap.getInstanceByID(idom);
+            JavaClass cls = ip.getJavaClass();
+            
+            if (javaClass.equals(cls)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Long getNearestGCRootPointer(Long instanceIdLong) {
