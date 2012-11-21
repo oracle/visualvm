@@ -82,7 +82,10 @@ public final class IdeSnapshotAction implements ActionListener {
         TracerSupportImpl.getInstance().perform(new Runnable() {
             public void run() {
                 try {
+                    // First try to find the log file in the same directory, same file name with .log extension
                     FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
+                    // Second try to find the log file using the virtual filesystem
+                    if (uigestureFO == null) uigestureFO = primary.getParent().getFileObject(primary.getPath(), "log"); // NOI18N
                     IdeSnapshot snapshot = new IdeSnapshot(primary, uigestureFO);
                     openSnapshotImpl(snapshot);
                 } catch (Throwable t) {
@@ -98,15 +101,15 @@ public final class IdeSnapshotAction implements ActionListener {
             public void run() {
                 TracerModel model = new TracerModel(snapshot);
                 TracerController controller = new TracerController(model);
-                TopComponent ui = ui(model, controller, snapshot.getNpssFileName());
+                TopComponent ui = ui(model, controller, snapshot.getNpssFileName(), snapshot.getNpssFilePath());
                 ui.open();
                 ui.requestActive();
             }
         });
     }
 
-    private static TopComponent ui(TracerModel model, TracerController controller, String npssFileName) {
-        TopComponent tc = new IdeSnapshotComponent(npssFileName);
+    private static TopComponent ui(TracerModel model, TracerController controller, String npssFileName, String npssFilePath) {
+        TopComponent tc = new IdeSnapshotComponent(npssFileName, npssFilePath);
         TracerView tracer = new TracerView(model, controller);
         tc.add(tracer.createComponent(), BorderLayout.CENTER);
         return tc;
@@ -149,8 +152,9 @@ public final class IdeSnapshotAction implements ActionListener {
 
     private static class IdeSnapshotComponent extends ProfilerTopComponent {
 
-        IdeSnapshotComponent(String npssFileName) {
+        IdeSnapshotComponent(String npssFileName, String npssFilePath) {
             setDisplayName(npssFileName);
+            setToolTipText(npssFilePath);
             setLayout(new BorderLayout());
         }
 
