@@ -50,9 +50,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.ProgressDisplayer;
-import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -130,11 +130,12 @@ public class HeapFragmentWalker {
                 for (JavaClass jclass : classes) {
                     List<Instance> instances = jclass.getInstances();
                     if (instances.size() > 0) {
-                        ProgressDisplayer pd = interactive ? ProfilerProgressDisplayer.getDefault() : null;
-                        if (pd != null) pd.showProgress(Bundle.HeapFragmentWalker_ComputingRetainedCaption(),
-                                                        Bundle.HeapFragmentWalker_ComputingRetainedMsg(), null);
+                        ProgressHandle pd = interactive ? ProgressHandleFactory.createHandle(Bundle.HeapFragmentWalker_ComputingRetainedMsg()) : null;
+                        if (pd != null) {
+                            pd.start();
+                        }
                         instances.get(0).getRetainedSize();
-                        if (pd != null) pd.close();
+                        if (pd != null) pd.finish();
                         break;
                     }
                 }
