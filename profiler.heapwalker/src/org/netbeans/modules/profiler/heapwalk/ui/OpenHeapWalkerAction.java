@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -46,6 +46,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.heapwalk.HeapWalkerManager;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.NbBundle;
@@ -83,6 +85,8 @@ public final class OpenHeapWalkerAction implements ActionListener {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(false);
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
+        chooser.addChoosableFileFilter(new FileFilterImpl());
         chooser.setDialogTitle(
             Bundle.OpenHeapWalkerAction_DialogCaption()
         );
@@ -94,5 +98,21 @@ public final class OpenHeapWalkerAction implements ActionListener {
         }
 
         return null;
+    }
+
+    private static class FileFilterImpl extends FileFilter {
+
+        @Override
+        public boolean accept(File f) {
+            return ResultsManager.checkHprofFile(f);
+        }
+
+        @NbBundle.Messages({
+            "FileDescription=Heap Dumps (*.hprof, *.bin, *.*)"
+        })
+        @Override
+        public String getDescription() {
+            return Bundle.FileDescription();
+        }
     }
 }
