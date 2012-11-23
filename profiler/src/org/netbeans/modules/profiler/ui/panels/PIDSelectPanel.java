@@ -279,7 +279,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener, Help
         // --- PID -------------------------------------------------------------
         buffer.append("<tr>"); //NOI18N
         
-        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.PIDSelectPanel_PidLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
@@ -293,7 +293,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener, Help
         
         buffer.append("<tr>"); //NOI18N
         
-        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.PIDSelectPanel_MainClassLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
@@ -307,7 +307,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener, Help
         
         buffer.append("<tr>"); //NOI18N
         
-        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.PIDSelectPanel_ArgumentsLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
@@ -321,7 +321,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener, Help
         
         buffer.append("<tr>"); //NOI18N
         
-        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.PIDSelectPanel_VmArgumentsLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
@@ -335,7 +335,7 @@ public final class PIDSelectPanel extends JPanel implements ActionListener, Help
         
         buffer.append("<tr>"); //NOI18N
         
-        buffer.append("<td><nobr><b>"); //NOI18N
+        buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.PIDSelectPanel_VmFlagsLabelText());
         buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
