@@ -254,6 +254,7 @@ public final class ExportAction extends AbstractAction {
         if (fileChooser == null) {
             // File chooser
             fileChooser = new JFileChooser();
+            fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             fileChooser.setMultiSelectionEnabled(false);
             fileChooser.setDialogTitle(Bundle.ExportAction_ExportDialogTitle());
