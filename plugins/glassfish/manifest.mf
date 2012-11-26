@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: net.java.visualvm.modules.glassfish
+OpenIDE-Module-Install: net/java/visualvm/modules/glassfish/Installer.class
+OpenIDE-Module-Localizing-Bundle: net/java/visualvm/modules/glassfish/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.5
+
