@@ -292,7 +292,7 @@ public final class ExportAction extends AbstractAction {
         if (exportDir != null) {
             chooser.setCurrentDirectory(exportDir);
         }
-        int result = chooser.showSaveDialog(WindowManager.getDefault().getMainWindow());
+        int result = chooser.showSaveDialog(WindowManager.getDefault().getRegistry().getActivated()); 
         if (result != JFileChooser.APPROVE_OPTION) {
             return null; // cancelled by the user
         }
