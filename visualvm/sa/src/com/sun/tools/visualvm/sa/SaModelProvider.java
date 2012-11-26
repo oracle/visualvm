@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -55,6 +56,18 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
             Application app = (Application) ds;
             if (Host.LOCALHOST.equals(app.getHost())) {
                 JvmJvmstatModel jvmstat = JvmJvmstatModelFactory.getJvmstatModelFor(app);
+            
+                if (jvmstat != null && Utilities.isWindows()) {
+                    // on Windows, SA can only attach to the process of the same
+                    // architecture ( 32bit / 64bit )
+                    Boolean this64bitArch = is64BitArchitecture();
+                    Boolean app64bitArch = is64BitArchitecture(jvmstat);
+                    if (this64bitArch != null && app64bitArch != null) {
+                        if (!this64bitArch.equals(app64bitArch)) {
+                            return null;
+                        }
+                    }
+                }
                 File jdkHome = getJdkHome(jvmstat);
                 File saJar = getSaJar(jdkHome);
 
@@ -110,5 +123,20 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
         return null;
     }
     
+    private static Boolean is64BitArchitecture(JvmJvmstatModel jvmstat) {
+        String name = jvmstat.getVmName();
+        if (name != null) {
+            return name.toLowerCase().contains("64-bit");   // NOI18N
+        }
+        return null;
+    }
+    
+    private static Boolean is64BitArchitecture() {
+        String thisArch = System.getProperty("sun.arch.data.model");    // NOI18N
+        if (thisArch != null) {
+            return Boolean.valueOf("64".equals(thisArch));  // NOI18N
+        }
+        return null;
+    }
     
 }
