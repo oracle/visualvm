@@ -64,6 +64,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 
@@ -213,14 +217,29 @@ public class ReferencesBrowserController extends AbstractController {
 
     public void navigateToNearestGCRoot(final InstanceNode instanceNode) {
         new NBSwingWorker(true) {
-            private Dialog progress = null;
+            private ProgressHandle progress = null;
             private HeapWalkerNode gcRootNode = null;
             private BoundedRangeModel progressModel = null;
+            private ChangeListener cl = null;
             private boolean done = false;
 
+            @Override
             public void doInBackground() {
                 progressModel = HeapProgress.getProgress();
-                gcRootNode = BrowserUtils.computeChildrenToNearestGCRoot(instanceNode);
+                cl = new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        if (progress != null) {
+                            progress.progress(progressModel.getValue());
+                        }
+                    }
+                };
+                progressModel.addChangeListener(cl);
+                try {
+                    gcRootNode = BrowserUtils.computeChildrenToNearestGCRoot(instanceNode);
+                } finally {
+                    HeapProgress.getProgress().removeChangeListener(cl);
+                }                    
             }
 
             @Override
@@ -228,8 +247,8 @@ public class ReferencesBrowserController extends AbstractController {
                 SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             if (!done) {
-                                progress = createProgressPanel(Bundle.ReferencesBrowserController_ProgressMsg(),progressModel);
-                                progress.setVisible(true);
+                                progress = ProgressHandleFactory.createHandle(Bundle.ReferencesBrowserController_ProgressMsg());
+                                progress.start(HeapProgress.PROGRESS_MAX);
                             }
                         }
                     });
@@ -239,19 +258,20 @@ public class ReferencesBrowserController extends AbstractController {
             public void done() {
                 done = false;
                 if (progress != null) {
-                    progress.setVisible(false);
-                    progress.dispose();
+                    progress.finish();
                 }
-
-                if (gcRootNode != null) {
-                    if (instanceNode == gcRootNode) {
-                        ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_SelfGcRootMsg());
+                
+                ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
+                if (instanceNode.equals(controlerUI.getSelectedNode(0))) {
+                    if (gcRootNode != null) {
+                        if (instanceNode == gcRootNode) {
+                            ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_SelfGcRootMsg());
+                        } else {
+                            controlerUI.selectNode(gcRootNode);
+                        }
                     } else {
-                        ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
-                        controlerUI.selectNode(gcRootNode);
+                        ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_NoGcRootMsg());
                     }
-                } else {
-                    ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_NoGcRootMsg());
                 }
             }
         }.execute();
