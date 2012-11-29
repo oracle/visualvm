@@ -53,6 +53,7 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.ProfilerLogger;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -81,7 +82,7 @@ import org.openide.windows.WindowManager;
 })
 final class ExportSnapshotAction extends AbstractAction {
     
-    private static final String NPSS_EXT = ".npss"; // NOI18N
+    private static final String NPSS_EXT = "."+ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION; // NOI18N
     private static String LAST_DIRECTORY;
             
     private final String snapshotPath;
