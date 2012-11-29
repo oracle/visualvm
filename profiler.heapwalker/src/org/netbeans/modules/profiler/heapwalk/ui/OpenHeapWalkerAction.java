@@ -104,6 +104,9 @@ public final class OpenHeapWalkerAction implements ActionListener {
 
         @Override
         public boolean accept(File f) {
+            if (f.isDirectory()) {
+                return true;
+            }
             return ResultsManager.checkHprofFile(f);
         }
 
