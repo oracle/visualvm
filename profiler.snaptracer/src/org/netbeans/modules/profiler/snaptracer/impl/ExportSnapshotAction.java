@@ -85,11 +85,11 @@ final class ExportSnapshotAction extends AbstractAction {
     private static final String NPSS_EXT = "."+ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION; // NOI18N
     private static String LAST_DIRECTORY;
             
-    private final String snapshotPath;
+    private final FileObject snapshotFileObject;
     
     
-    ExportSnapshotAction(String snapshotPath) {
-        this.snapshotPath = snapshotPath;
+    ExportSnapshotAction(FileObject snapshot) {
+        snapshotFileObject = snapshot;
         
         putValue(Action.NAME, Bundle.ExportSnapshotAction_ActionName());
         putValue(Action.SHORT_DESCRIPTION, Bundle.ExportSnapshotAction_ActionDescr());
@@ -102,7 +102,7 @@ final class ExportSnapshotAction extends AbstractAction {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JFileChooser chooser = createFileChooser();
-                File file = new File(snapshotPath);
+                File file = FileUtil.toFile(snapshotFileObject);
                 String filename = file.getName();
                 File lastDir = LAST_DIRECTORY != null ? new File(LAST_DIRECTORY) :
                                                         chooser.getCurrentDirectory();
