@@ -42,7 +42,6 @@
  */
 package org.netbeans.modules.profiler.snaptracer.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -73,13 +72,11 @@ public final class IdeSnapshot {
     private LogRecord lastRecord;
     private Map<Integer, LogRecord> recordsMap;
     private Map<Integer, LogRecordInfo> infosMap;
-    private final String npssFileName;
-    private final String npssFilePath;
+    private final FileObject npssFileObject;
 
     IdeSnapshot(FileObject npssFO, FileObject uigestureFO) throws IOException {
         cpuSnapshot = new SampledCPUSnapshot(npssFO);
-        npssFileName = new File(npssFO.getNameExt()).getName();
-        npssFilePath = new File(npssFO.getPath()).getAbsolutePath();
+        npssFileObject = npssFO;
         if (uigestureFO != null) {
             xmlLogs = new LogReader(uigestureFO);
             xmlLogs.load();
@@ -96,12 +93,8 @@ public final class IdeSnapshot {
         return cpuSnapshot.getTimestamp(sampleIndex);
     }
 
-    String getNpssFileName() {
-        return npssFileName;
-    }
-    
-    String getNpssFilePath() {
-        return npssFilePath;
+    FileObject getNpssFileObject() {
+        return npssFileObject;
     }
 
     public boolean hasUiGestures() {
