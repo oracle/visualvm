@@ -108,8 +108,7 @@ public class ProfilerValidationTest extends JellyTestCase {
                 "testProfilerCalibration",
                 "testProfilerProperties",
                 "testProfilerMenus",
-                "testProfiler",
-                "issue144699Hack");
+                "testProfiler");
         return conf.suite();
     }
 
@@ -292,7 +291,7 @@ public class ProfilerValidationTest extends JellyTestCase {
                 return ("Wait menu item is enabled."); // NOI18N
             }
         }).waitAction(takeSnapshotAction);
-        new EventTool().waitNoEvent(5000);
+        new EventTool().waitNoEvent(1000);
         takeSnapshotAction.perform();
         TopComponentOperator collectedResults;
         try {
