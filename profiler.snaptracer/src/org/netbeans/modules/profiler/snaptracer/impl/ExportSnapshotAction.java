@@ -53,6 +53,7 @@ import javax.swing.filechooser.FileFilter;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.ProfilerLogger;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -81,14 +82,14 @@ import org.openide.windows.WindowManager;
 })
 final class ExportSnapshotAction extends AbstractAction {
     
-    private static final String NPSS_EXT = ".npss"; // NOI18N
+    private static final String NPSS_EXT = "."+ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION; // NOI18N
     private static String LAST_DIRECTORY;
             
-    private final String snapshotPath;
+    private final FileObject snapshotFileObject;
     
     
-    ExportSnapshotAction(String snapshotPath) {
-        this.snapshotPath = snapshotPath;
+    ExportSnapshotAction(FileObject snapshot) {
+        snapshotFileObject = snapshot;
         
         putValue(Action.NAME, Bundle.ExportSnapshotAction_ActionName());
         putValue(Action.SHORT_DESCRIPTION, Bundle.ExportSnapshotAction_ActionDescr());
@@ -101,7 +102,7 @@ final class ExportSnapshotAction extends AbstractAction {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JFileChooser chooser = createFileChooser();
-                File file = new File(snapshotPath);
+                File file = FileUtil.toFile(snapshotFileObject);
                 String filename = file.getName();
                 File lastDir = LAST_DIRECTORY != null ? new File(LAST_DIRECTORY) :
                                                         chooser.getCurrentDirectory();
