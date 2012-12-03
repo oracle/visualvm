@@ -92,7 +92,8 @@ import org.openide.windows.WindowManager;
     "ExportAction_ExportDialogExcelFilter=Excel Compatible CSV (*.csv)",
     "ExportAction_ExportDialogXMLFilter=XML File (*.xml)",
     "ExportAction_ExportDialogHTMLFilter=Web page (*.html)",
-    "ExportAction_ExportDialogNPSFilter=Profiler Snapshot File (*.nps)"
+    "ExportAction_ExportDialogNPSFilter=Profiler Snapshot File (*.nps)",
+    "ExportAction_SavingSnapshot=Saving snapshot..."
 })
 public final class ExportAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(ExportAction.class.getName());
@@ -183,7 +184,7 @@ public final class ExportAction extends AbstractAction {
             fileChooser.addChoosableFileFilter(new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_XML);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_XML);
                 }
 
                 @Override
@@ -194,7 +195,7 @@ public final class ExportAction extends AbstractAction {
             fileChooser.addChoosableFileFilter(new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_HTML);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_HTML);
                 }
 
                 @Override
@@ -205,7 +206,7 @@ public final class ExportAction extends AbstractAction {
             fileChooser.addChoosableFileFilter(new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_CSV);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_CSV);
                 }
 
                 @Override
@@ -217,7 +218,7 @@ public final class ExportAction extends AbstractAction {
 
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_CSV);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_CSV);
                 }
 
                 @Override
@@ -231,7 +232,7 @@ public final class ExportAction extends AbstractAction {
 
                 @Override
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().toLowerCase().endsWith(FILE_EXTENSION_NPS);
+                    return f.isDirectory() || f.getName().toLowerCase().endsWith("."+FILE_EXTENSION_NPS);
                 }
 
                 @Override
@@ -253,6 +254,7 @@ public final class ExportAction extends AbstractAction {
         if (fileChooser == null) {
             // File chooser
             fileChooser = new JFileChooser();
+            fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             fileChooser.setMultiSelectionEnabled(false);
             fileChooser.setDialogTitle(Bundle.ExportAction_ExportDialogTitle());
@@ -266,10 +268,11 @@ public final class ExportAction extends AbstractAction {
     private boolean checkFileExists(File file) {
         if (file.exists()) {
             if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(
-                    Bundle.ExportAction_OverwriteFileCaption(),new Object[] { file.getName() }),
-                    Bundle.ExportAction_OverwriteFileCaption()))
+                    Bundle.ExportAction_OverwriteFileMsg(file.getName()),new Object[] { file.getName() }),
+                    Bundle.ExportAction_OverwriteFileCaption())) {
                 return false; // cancelled by the user
-
+            }
+            
             if (!file.delete()) {
                 ProfilerDialogs.displayError(Bundle.ExportAction_CannotOverwriteFileMsg(file.getName()));
                 return false; // Insufficient rights to overwrite file
@@ -289,7 +292,7 @@ public final class ExportAction extends AbstractAction {
         if (exportDir != null) {
             chooser.setCurrentDirectory(exportDir);
         }
-        int result = chooser.showSaveDialog(WindowManager.getDefault().getMainWindow());
+        int result = chooser.showSaveDialog(WindowManager.getDefault().getRegistry().getActivated()); 
         if (result != JFileChooser.APPROVE_OPTION) {
             return null; // cancelled by the user
         }
@@ -369,7 +372,7 @@ public final class ExportAction extends AbstractAction {
                 return; // user doesn't want to overwrite existing file or it can't be overwritten
             }
             new NBSwingWorker(true) {
-                final private ProgressHandle ph = ProgressHandleFactory.createHandle("Saving snapshot");
+                final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.ExportAction_SavingSnapshot());
                 @Override
                 protected void doInBackground() {
                     try {

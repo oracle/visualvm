@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -44,12 +44,15 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -60,6 +63,12 @@ class ClassDump extends HprofObject implements JavaClass {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     
     private static final boolean DEBUG = false;
+    private static final Set CANNOT_CONTAIN_ITSELF = new HashSet(Arrays.asList(new String[] {
+        "java.lang.String",         // NOI18N
+        "java.lang.StringBuffer",   // NOI18N
+        "java.lang.StringBuilder",  // NOI18N
+        "java.io.File"              // NOI18N   
+        }));
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -428,6 +437,24 @@ class ClassDump extends HprofObject implements JavaClass {
         retainedSizeByClass+=i.getRetainedSize();
     }
 
+    boolean canContainItself() {
+        if (getInstancesCount()>=2 && !CANNOT_CONTAIN_ITSELF.contains(getName())) {
+            Iterator fieldsIt = getAllInstanceFields().iterator();
+
+            while(fieldsIt.hasNext()) {
+                Field f = (Field) fieldsIt.next();
+
+                if (f.getType().getName().equals("object")) {
+                    return true;
+                }
+            }
+        }
+        if (DEBUG) {
+            if (instances>10) System.out.println(getName()+" cannot contain itself "+instances);
+        }
+        return false;
+    }
+    
     private static Boolean isSubClass(JavaClass jcls, Map subclassesMap) {
         JavaClass superClass = jcls.getSuperClass();
         Boolean b;

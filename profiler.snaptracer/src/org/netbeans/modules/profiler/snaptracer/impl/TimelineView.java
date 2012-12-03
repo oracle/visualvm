@@ -162,6 +162,9 @@ final class TimelineView {
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
 
+        toolbar.add(new ExportSnapshotAction(model.getSnapshot().getNpssFileObject()));
+        toolbar.addSeparator();
+        
         toolbar.add(panel.zoomInAction());
         toolbar.add(panel.zoomOutAction());
         toolbar.add(panel.toggleViewAction());
