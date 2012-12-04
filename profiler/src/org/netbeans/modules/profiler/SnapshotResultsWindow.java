@@ -165,8 +165,6 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-    private static final String RECENT_FILE_KEY = "nb.recent.file.path"; // NOI18N
-    
     private static final String HELP_CTX_KEY_CPU = "CpuSnapshot.HelpCtx"; // NOI18N
     private static final String HELP_CTX_KEY_MEM = "MemorySnapshot.HelpCtx"; // NOI18N
     
