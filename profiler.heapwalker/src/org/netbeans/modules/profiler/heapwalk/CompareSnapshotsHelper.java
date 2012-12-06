@@ -363,10 +363,10 @@ class CompareSnapshotsHelper {
                             c.setText(ResultsManager.getDefault().
                                     getHeapDumpDisplayName(fo.getName()));
 
+                            File f = FileUtil.toFile(fo);
                             Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
                             for (TopComponent tc : tcs) {
-                                Object o = tc.getClientProperty("HeapDumpFileName"); // NOI18N
-                                if (o != null && FileUtil.toFile(fo).equals(new File(o.toString()))) {
+                                if (f.equals(tc.getClientProperty(ProfilerTopComponent.RECENT_FILE_KEY))) {
                                     c.setFont(c.getFont().deriveFont(Font.BOLD));
                                     break;
                                 }
