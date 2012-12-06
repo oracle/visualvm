@@ -96,11 +96,13 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
     protected int columnCount = 0;
     protected int currentView; // View AKA aggregation level: CPUResultsSnapshot.METHOD_LEVEL, CLASS_LEVEL or PACKAGE_LEVEL
     protected int methodId;
+    private Boolean sampling;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public CPUResultsPanel(CPUResUserActionsHandler actionsHandler) {
+    public CPUResultsPanel(CPUResUserActionsHandler actionsHandler, Boolean sampling) {
         this.actionsHandler = actionsHandler;
+        this.sampling = sampling;
         callGraphPopupMenu = createPopupMenu();
 
         if (popupFind != null) {
@@ -124,6 +126,10 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
     // Should be overridden whenever possible
     public boolean getSortingOrder() {
         return false;
+    }
+    
+    public Boolean isSampling() {
+        return sampling;
     }
 
     /** Changes the aggregation level for the CPU Results
