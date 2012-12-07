@@ -60,8 +60,8 @@ public abstract class SnapshotCPUResultsPanel extends CPUResultsPanel implements
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SnapshotCPUResultsPanel(CPUResUserActionsHandler actionsHandler) {
-        super(actionsHandler);
+    public SnapshotCPUResultsPanel(CPUResUserActionsHandler actionsHandler, Boolean sampling) {
+        super(actionsHandler, sampling);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

@@ -202,7 +202,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                 removeView(backtraceView);
             }
 
-            backtraceView = new ReverseCallGraphPanel(this);
+            backtraceView = new ReverseCallGraphPanel(this, sampling);
             backtraceView.setDataToDisplay(s, threadId, view);
             backtraceView.setSelectedMethodId(methodId);
             backtraceView.setSorting(sortingColumn, sortingOrder);
@@ -225,7 +225,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
                 removeView(subtreeView);
             }
 
-            subtreeView = new SubtreeCallGraphPanel(this);
+            subtreeView = new SubtreeCallGraphPanel(this, sampling);
             subtreeView.setDataToDisplay(s, (PrestimeCPUCCTNode) node, view);
             subtreeView.setSorting(sortingColumn, sortingOrder);
             subtreeView.prepareResults();
@@ -318,11 +318,11 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     }
     
     private class CustomCCTDisplay extends CCTDisplay {
-        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, Boolean sampling) {
             super(actionsHandler, sampling);
         }
 
-        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, boolean sampling) {
+        private CustomCCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, Boolean sampling) {
             super(actionsHandler, selectionHandler, sampling);
         }
 
@@ -389,6 +389,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
     private boolean slaveModeDown = true;
     private boolean slaveModeUp = true;
     private int currentAggregationMode;
+    private Boolean sampling;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -400,7 +401,7 @@ public final class CPUSnapshotPanel extends SnapshotPanel implements ActionListe
         CPUSnapshotSelectionHandler combinedActionsHandlerCCT = new CPUSnapshotSelectionHandler(true);
         CPUSnapshotSelectionHandler combinedActionsHandlerFlat = new CPUSnapshotSelectionHandler(false);
         
-        boolean sampling = ls.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED;
+        sampling = Boolean.valueOf(ls.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED);
 
         flatPanel = new SnapshotFlatProfilePanel(actionsHandler, sampling);
         cctPanel = new CustomCCTDisplay(actionsHandler, sampling);
