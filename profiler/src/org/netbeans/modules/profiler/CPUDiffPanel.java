@@ -202,7 +202,7 @@ public final class CPUDiffPanel extends SnapshotPanel implements ActionListener,
                 removeView(subtreeView);
             }
 
-            subtreeView = new SubtreeCallGraphPanel(this);
+            subtreeView = new SubtreeCallGraphPanel(this, sampling);
             subtreeView.setDataToDisplay(s, (PrestimeCPUCCTNode) node, view);
             subtreeView.setSorting(sortingColumn, sortingOrder);
             subtreeView.prepareResults();
@@ -234,16 +234,20 @@ public final class CPUDiffPanel extends SnapshotPanel implements ActionListener,
 //    private int[] threadIds;
     private boolean internalChange = false;
     private int currentAggregationMode;
+    
+    private Boolean sampling; // true: both sampled, false: both instr, null: sampled + instr 
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public CPUDiffPanel(Lookup context, final LoadedSnapshot ls, LoadedSnapshot snapshot1, LoadedSnapshot snapshot2, final int sortingColumn, final boolean sortingOrder) {
         this.loadedSnapshot = ls;
         this.snapshot = (CPUResultsDiff)ls.getSnapshot();
-
+        
         CPUActionsHandler actionsHandler = new CPUActionsHandler();
         
-        boolean sampling = ls.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED;
+        boolean sampling1 = snapshot1.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED;
+        boolean sampling2 = snapshot2.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED;
+        sampling = sampling1 != sampling2 ? null : Boolean.valueOf(sampling1);
 
         flatPanel = new DiffFlatProfilePanel(actionsHandler, sampling);
         cctPanel = new DiffCCTDisplay(actionsHandler, sampling);
