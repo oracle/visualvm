@@ -1222,8 +1222,8 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
             if (s.isHeapDump()) {
                 Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
                 for (TopComponent tc : tcs) {
-                    Object o = tc.getClientProperty("HeapDumpFileName"); // NOI18N
-                    if (o != null && f.equals(new File(o.toString()))) return true;
+                    if (f.equals(tc.getClientProperty(ProfilerTopComponent.RECENT_FILE_KEY)))
+                        return true;
                 }
             } else {
                 LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(f);

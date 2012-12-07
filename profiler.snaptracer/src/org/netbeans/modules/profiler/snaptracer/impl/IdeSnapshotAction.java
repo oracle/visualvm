@@ -98,15 +98,22 @@ public final class IdeSnapshotAction implements ActionListener {
             public void run() {
                 TracerModel model = new TracerModel(snapshot);
                 TracerController controller = new TracerController(model);
-                TopComponent ui = ui(model, controller, snapshot.getNpssFileName());
+                TopComponent ui = ui(model, controller, snapshot.getNpssFileObject());
                 ui.open();
                 ui.requestActive();
             }
         });
     }
 
-    private static TopComponent ui(TracerModel model, TracerController controller, String npssFileName) {
-        TopComponent tc = new IdeSnapshotComponent(npssFileName);
+    private static TopComponent ui(TracerModel model, TracerController controller, FileObject snapshotFo) {
+        String npssFileName = snapshotFo.getName();
+        String npssFilePath = null;
+        File f = FileUtil.toFile(snapshotFo);
+        
+        if (f != null) {
+            npssFilePath = f.getAbsolutePath();
+        }
+        TopComponent tc = new IdeSnapshotComponent(npssFileName, npssFilePath);
         TracerView tracer = new TracerView(model, controller);
         tc.add(tracer.createComponent(), BorderLayout.CENTER);
         return tc;
@@ -149,8 +156,11 @@ public final class IdeSnapshotAction implements ActionListener {
 
     private static class IdeSnapshotComponent extends ProfilerTopComponent {
 
-        IdeSnapshotComponent(String npssFileName) {
-            setDisplayName(npssFileName);
+        IdeSnapshotComponent(String displayName, String toolTip) {
+            setDisplayName(displayName);
+            if (toolTip != null) {
+                setToolTipText(toolTip);
+            }
             setLayout(new BorderLayout());
         }
 
