@@ -1544,7 +1544,7 @@ public class ProfilerClient implements CommonConstants {
     }
 
     /**
-     * Check if we can't instrument more methods because the 64K limit is reachec
+     * Check if we can't instrument more methods because the 64K limit is reached
      */
     private void checkForInstrMethodsLimitReached() {
         if ((status.getStartingMethodId() >= 65535) && !instrMethodsLimitReported && status.targetAppRunning) {

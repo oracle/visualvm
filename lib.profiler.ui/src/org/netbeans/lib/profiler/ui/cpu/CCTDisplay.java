@@ -141,19 +141,17 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
     private Icon nodeIcon = Icons.getIcon(ProfilerIcons.NODE_FORWARD);
     private JButton cornerButton;
     private int minNamesColumnWidth; // minimal width of classnames columns
-    private boolean sampling;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public CCTDisplay(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+    public CCTDisplay(CPUResUserActionsHandler actionsHandler, Boolean sampling) {
         this(actionsHandler, null, sampling);
     }
 
-    public CCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, boolean sampling) {
-        super(actionsHandler);
+    public CCTDisplay(CPUResUserActionsHandler actionsHandler, CPUSelectionHandler selectionHandler, Boolean sampling) {
+        super(actionsHandler, sampling);
 
         this.selectionHandler = selectionHandler;
-        this.sampling = sampling;
 
         enhancedTreeCellRenderer.setLeafIcon(leafIcon);
         enhancedTreeCellRenderer.setClosedIcon(nodeIcon);
@@ -878,7 +876,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         columnsVisibility = new boolean[columnCount];
         for (int i = 0; i < columnCount - 1; i++)
             columnsVisibility[i] = true;
-        if (!sampling) columnsVisibility[columnCount - 1] = true;
+        if (isSampling() != null && !isSampling()) columnsVisibility[columnCount - 1] = true;
 
         int idx = 0;
         columnNames = new String[columnCount];
@@ -890,7 +888,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             columnNames[idx++] = TIME_CPU_COLUMN_NAME;
         }
 
-        columnNames[idx++] = sampling ? SAMPLES_COLUMN_NAME :
+        columnNames[idx++] = isSampling() != null && isSampling() ? SAMPLES_COLUMN_NAME :
                                         INVOCATIONS_COLUMN_NAME;
 
         if (DEBUG) {
@@ -907,7 +905,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             columnToolTips[idx++] = TIME_CPU_COLUMN_TOOLTIP;
         }
 
-        columnToolTips[idx++] = sampling ? SAMPLES_COLUMN_TOOLTIP :
+        columnToolTips[idx++] = isSampling() != null && isSampling() ? SAMPLES_COLUMN_TOOLTIP :
                                            INVOCATIONS_COLUMN_TOOLTIP;
 
         if (DEBUG) {
@@ -934,6 +932,8 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             columnWidths[i - 1] = maxWidth;
             columnRenderers[i] = labelTableCellRenderer;
         }
+        
+        if (isSampling() == null) columnCount--;
     }
 
     private void initVariableColumnNames() {
@@ -975,7 +975,6 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
             }
         }
 
-        columnsVisibility = null;
         columnsVisibility = treeTableModel.getColumnsVisibility();
     }
     
