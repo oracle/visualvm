@@ -281,7 +281,7 @@ public class ProfilerValidationTest extends JellyTestCase {
         //                            "ProfilerServer_LocalConnectionMsg") ); //"Established local connection with the tool"
         Action takeSnapshotAction = new Action(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
                 "LBL_TakeSnapshotAction"), null);
-        new Waiter(new Waitable() {
+        Waiter waiter = new Waiter(new Waitable() {
             @Override
             public Object actionProduced(Object takeSnapshotAction) {
                 MainWindowOperator.getDefault().toFront();
@@ -292,7 +292,9 @@ public class ProfilerValidationTest extends JellyTestCase {
             public String getDescription() {
                 return ("Wait menu item is enabled."); // NOI18N
             }
-        }).waitAction(takeSnapshotAction);
+        });
+        waiter.getTimeouts().setTimeout("Waiter.WaitingTime", 60000);
+        waiter.waitAction(takeSnapshotAction);
         new EventTool().waitNoEvent(1000);
         takeSnapshotAction.perform();
         TopComponentOperator collectedResults;
