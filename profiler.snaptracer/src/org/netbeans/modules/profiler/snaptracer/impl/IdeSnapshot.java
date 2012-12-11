@@ -72,11 +72,11 @@ public final class IdeSnapshot {
     private LogRecord lastRecord;
     private Map<Integer, LogRecord> recordsMap;
     private Map<Integer, LogRecordInfo> infosMap;
-    private final String npssFileName;
+    private final FileObject npssFileObject;
 
     IdeSnapshot(FileObject npssFO, FileObject uigestureFO) throws IOException {
         cpuSnapshot = new SampledCPUSnapshot(npssFO);
-        this.npssFileName = npssFO.getName();
+        npssFileObject = npssFO;
         if (uigestureFO != null) {
             xmlLogs = new LogReader(uigestureFO);
             xmlLogs.load();
@@ -93,8 +93,8 @@ public final class IdeSnapshot {
         return cpuSnapshot.getTimestamp(sampleIndex);
     }
 
-    String getNpssFileName() {
-        return npssFileName;
+    FileObject getNpssFileObject() {
+        return npssFileObject;
     }
 
     public boolean hasUiGestures() {
