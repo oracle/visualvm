@@ -53,7 +53,7 @@ import org.netbeans.lib.profiler.utils.StringUtils;
  */
 public class DiffFlatProfilePanel extends SnapshotFlatProfilePanel {
     
-    public DiffFlatProfilePanel(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+    public DiffFlatProfilePanel(CPUResUserActionsHandler actionsHandler, Boolean sampling) {
         super(actionsHandler, sampling);
     }
     

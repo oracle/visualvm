@@ -62,6 +62,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
+import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 
 /**
@@ -161,7 +162,13 @@ final class TimelineView {
         }
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
-
+        FileObject npssFo = model.getSnapshot().getNpssFileObject();
+        toolbar.add(new ExportSnapshotAction(npssFo));
+        if (AttachToBugAction.isSupported()) {
+            toolbar.add(new AttachToBugAction(npssFo));
+        }
+        toolbar.addSeparator();
+        
         toolbar.add(panel.zoomInAction());
         toolbar.add(panel.zoomOutAction());
         toolbar.add(panel.toggleViewAction());
