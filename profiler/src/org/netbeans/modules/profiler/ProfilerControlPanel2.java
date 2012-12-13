@@ -1539,7 +1539,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
     @NbBundle.Messages({
         "ProfilerControlPanel2_ModeLabelString=Mode:",
         "ProfilerControlPanel2_ConfigLabelString=Configuration:",
-        "ProfilerControlPanel2_OnLabelString=On:",
+        "ProfilerControlPanel2_OnLabelString=Host:",
         "ProfilerControlPanel2_StatusLabelString=Status:",
         "ProfilerControlPanel2_NoConfigurationString=None",
         "ProfilerControlPanel2_AttachLabelString=Attach",
