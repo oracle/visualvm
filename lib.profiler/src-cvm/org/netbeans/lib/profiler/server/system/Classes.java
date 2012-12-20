@@ -94,6 +94,8 @@ public class Classes {
 
     public static native boolean setWaitTrackingEnabled(boolean value);
 
+    public static native boolean setParkTrackingEnabled(boolean value);
+
     public static native void cacheLoadedClasses(Class[] nonSystemClasses, int nonSystemIndex);
 
     /** Disables the above class load hook */
