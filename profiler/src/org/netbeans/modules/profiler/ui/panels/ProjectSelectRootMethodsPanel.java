@@ -43,7 +43,6 @@
 package org.netbeans.modules.profiler.ui.panels;
 
 import java.awt.*;
-import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -66,7 +65,6 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import javax.swing.*;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
@@ -263,14 +261,14 @@ final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpC
                 Lookup.Provider project = context.lookup(Lookup.Provider.class);
                 
                 if (project != null) {
-                    List<SourceClassInfo> srcClzs = new ArrayList<SourceClassInfo>(ProfilerTypeUtils.findClasses(pattern, EnumSet.of(SourcePackageInfo.Scope.SOURCE), project));
-                    List<SourceClassInfo> libClzs = new ArrayList<SourceClassInfo>(ProfilerTypeUtils.findClasses(pattern, EnumSet.of(SourcePackageInfo.Scope.DEPENDENCIES), project));
-
-                    Collections.sort(srcClzs, SourceClassInfo.COMPARATOR);
-                    Collections.sort(libClzs, SourceClassInfo.COMPARATOR);
-
-                    List<SourceClassInfo> scis = new ArrayList<SourceClassInfo>(srcClzs);
-                    scis.addAll(libClzs);
+                    List<SourceClassInfo> scis = new ArrayList<SourceClassInfo>(ProfilerTypeUtils.findClasses(pattern, EnumSet.of(SourcePackageInfo.Scope.SOURCE), project));
+                    Collections.sort(scis, SourceClassInfo.COMPARATOR);
+                    
+                    if (!Boolean.getBoolean("profiler.roots.hide.libraries")) { // NOI18N
+                        List<SourceClassInfo> libClzs = new ArrayList<SourceClassInfo>(ProfilerTypeUtils.findClasses(pattern, EnumSet.of(SourcePackageInfo.Scope.DEPENDENCIES), project));
+                        Collections.sort(libClzs, SourceClassInfo.COMPARATOR);
+                        scis.addAll(libClzs);
+                    }
 
                     return scis;
                 }
