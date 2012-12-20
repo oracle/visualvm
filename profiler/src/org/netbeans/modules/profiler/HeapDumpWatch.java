@@ -168,14 +168,16 @@ public class HeapDumpWatch extends SessionListener.Adapter {
             return; // custom heapdump
         }
 
-        ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // refresh list of snapshots
+        if (ProfilerControlPanel2.hasDefault())
+            ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // refresh list of snapshots
 
         try {
             if (ProfilerDialogs.displayConfirmation(Bundle.HeapDumpWatch_OOME_PROTECTION_OPEN_HEAPDUMP())) {
                 ResultsManager.getDefault().openSnapshot(heapDump);
             } else if (ProfilerDialogs.displayConfirmation(Bundle.HeapDumpWatch_OOME_PROTECTION_REMOVE_HEAPDUMP())) {
                 heapDump.delete();
-                ProfilerControlPanel2.getDefault().refreshSnapshotsList();
+                if (ProfilerControlPanel2.hasDefault())
+                    ProfilerControlPanel2.getDefault().refreshSnapshotsList();
             }
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();

@@ -89,9 +89,11 @@ void JNICALL vm_object_alloc(
 
 typedef void (JNICALL *waitCall) (JNIEnv *env, jobject obj, jlong arg);
 typedef void (JNICALL *sleepCall) (JNIEnv *env, jclass clazz, jlong arg);
+typedef void (JNICALL *parkCall) (JNIEnv *env, jclass clazz, jboolean arg0, jlong arg1);
 
 void JNICALL waitInterceptor(JNIEnv *env, jobject obj, jlong arg);
 void JNICALL sleepInterceptor(JNIEnv *env, jclass clazz, jlong arg);
+void JNICALL parkInterceptor(JNIEnv *env, jclass clazz, jboolean arg0, jlong arg1);
 
 void get_saved_class_file_bytes(JNIEnv *env, char *name, jobject loader, jint *class_data_len, unsigned char **class_data);
 
