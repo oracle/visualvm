@@ -484,6 +484,7 @@ public class ProfilerInterface implements CommonConstants {
 
     public static void disableProfilerHooks() {
         Classes.setWaitTrackingEnabled(false);
+        Classes.setParkTrackingEnabled(false);
         Classes.setSleepTrackingEnabled(false);
         Classes.disableClassLoadHook();
         ProfilerRuntimeCPU.setJavaLangReflectMethodInvokeInterceptEnabled(false);
