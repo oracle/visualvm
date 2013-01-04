@@ -933,6 +933,8 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
 
             if (ProfilerIDESettings.getInstance().getAutoSaveSnapshot()) {
                 ResultsManager.getDefault().saveSnapshot(ls);
+                if (!ProfilerIDESettings.getInstance().getAutoOpenSnapshot())
+                    ResultsManager.getDefault().closeSnapshot(ls);
             }
         }
     }
