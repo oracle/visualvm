@@ -169,7 +169,7 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_SnapshotsNotDeletedMsg=<html><b>Problem deleting snapshot(s).</b><br><br>The snapshot(s) might not have been deleted<br>or have already been deleted outside of the IDE.</html>",
     "ProfilerControlPanel2_RenameSnapshotCaption=Rename Snapshot",
     "ProfilerControlPanel2_NewFileNameLbl=&New file name:",
-    "ProfilerControlPanel2_RenameSnapshotFailedMsg=Failed to rename snapshot to {0}",
+    "ProfilerControlPanel2_RenameSnapshotFailedMsg=<html><b>Failed to rename snapshot to \"{0}\".</b><br><br>Make sure you have provided a valid and unique file name.</html>",
     "ProfilerControlPanel2_EmptyNameMsg=Snapshot name cannot be empty.",
     "MSG_Loading_Progress=Loading...",
     "LAB_ControlPanelName=Profiler",
