@@ -119,6 +119,8 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("ReverseCallGraphPanel_InvocationsColumnToolTip"); // NOI18N
     private static final String TREETABLE_ACCESS_NAME = messages.getString("ReverseCallGraphPanel_TreeTableAccessName"); // NOI18N
     private static final String FILTER_ITEM_NAME = messages.getString("FlatProfilePanel_FilterItemName"); // NOI18N
+    private static final String SAMPLES_COLUMN_NAME = messages.getString("CCTDisplay_SamplesColumnName"); // NOI18N
+    private static final String SAMPLES_COLUMN_TOOLTIP = messages.getString("CCTDisplay_SamplesColumnToolTip"); // NOI18N
                                                                                                                          // -----
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -140,8 +142,8 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public ReverseCallGraphPanel(CPUResUserActionsHandler actionsHandler) {
-        super(actionsHandler);
+    public ReverseCallGraphPanel(CPUResUserActionsHandler actionsHandler, Boolean sampling) {
+        super(actionsHandler, sampling);
 
         enhancedTreeCellRenderer.setLeafIcon(leafIcon);
         enhancedTreeCellRenderer.setClosedIcon(nodeIcon);
@@ -775,7 +777,12 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
         columnWidths = new int[columnCount - 1]; // Width of the first column fits to width
         columnNames = new String[columnCount];
         columnRenderers = new TableCellRenderer[columnCount];
-        columnsVisibility = null;
+        
+        columnsVisibility = new boolean[columnCount];
+        for (int i = 0; i < columnCount - 1; i++)
+            columnsVisibility[i] = true;
+        if (isSampling() != null && !isSampling())
+            columnsVisibility[columnCount - 1] = true;
 
         if (columnCount == 5) {
             columnNames = new String[] {
@@ -791,6 +798,11 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
             columnToolTips = new String[] {
                                  METHOD_COLUMN_TOOLTIP, TIME_REL_COLUMN_TOOLTIP, TIME_COLUMN_TOOLTIP, INVOCATIONS_COLUMN_TOOLTIP
                              };
+        }
+        
+        if (isSampling() != null && isSampling()) {
+            columnNames[columnCount - 1] = SAMPLES_COLUMN_NAME;
+            columnToolTips[columnCount - 1] = SAMPLES_COLUMN_TOOLTIP;
         }
 
         int maxWidth = getFontMetrics(getFont()).charWidth('W') * 12; // NOI18N // initial width of data columns
@@ -813,6 +825,8 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
             columnWidths[i - 1] = maxWidth;
             columnRenderers[i] = labelTableCellRenderer;
         }
+        
+        if (isSampling() == null) columnCount--;
     }
 
     private void initFirstColumnName() {

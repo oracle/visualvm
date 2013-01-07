@@ -174,7 +174,7 @@ public final class TelemetryWindow extends ProfilerTopComponent {
                 col2Name=Bundle.Surviving_Generations();
                 col3Name=Bundle.Relative_Time_Spent_in_GC();
             } else if (panel instanceof ThreadsGraphPanel) {
-                System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
+                System.arraycopy(data.nTotalThreads, 0, col2, 0, nItems);
                 System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
                 col2Name=Bundle.Number_of_Threads();
                 col3Name=Bundle.Loaded_Classes_Count();
@@ -216,7 +216,7 @@ public final class TelemetryWindow extends ProfilerTopComponent {
                 col2Name=Bundle.Surviving_Generations();
                 col3Name=Bundle.Relative_Time_Spent_in_GC();
             } else if (panel instanceof ThreadsGraphPanel) {
-                System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
+                System.arraycopy(data.nTotalThreads, 0, col2, 0, nItems);
                 System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
                 viewName=Bundle.TelemetryWindow_ThreadsStatisticsTabName();
                 col2Name=Bundle.Number_of_Threads();
@@ -261,7 +261,7 @@ public final class TelemetryWindow extends ProfilerTopComponent {
                 col2Name=Bundle.Surviving_Generations();
                 col3Name=Bundle.Relative_Time_Spent_in_GC();
             } else if (panel instanceof ThreadsGraphPanel) {
-                System.arraycopy(data.nUserThreads, 0, col2, 0, nItems);
+                System.arraycopy(data.nTotalThreads, 0, col2, 0, nItems);
                 System.arraycopy(data.loadedClassesCount, 0, col3, 0, nItems);
                 viewName=Bundle.TelemetryWindow_ThreadsStatisticsTabName();
                 col2Name=Bundle.Number_of_Threads();

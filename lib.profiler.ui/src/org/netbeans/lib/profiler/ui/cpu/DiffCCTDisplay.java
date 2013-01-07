@@ -53,7 +53,7 @@ import org.netbeans.lib.profiler.utils.StringUtils;
  */
 public class DiffCCTDisplay extends CCTDisplay {
     
-    public DiffCCTDisplay(CPUResUserActionsHandler actionsHandler, boolean sampling) {
+    public DiffCCTDisplay(CPUResUserActionsHandler actionsHandler, Boolean sampling) {
         super(actionsHandler, sampling);
     }
     
