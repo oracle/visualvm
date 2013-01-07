@@ -116,7 +116,8 @@ public class HeapWalkerManager {
                     }
 
                     tc.close();
-                    ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // Refresh to display closed HW using plain font
+                    if (ProfilerControlPanel2.hasDefault())
+                        ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // Refresh to display closed HW using plain font
                 }
             });
     }
@@ -193,7 +194,8 @@ public class HeapWalkerManager {
                     tc.open();
                     //        tc.requestActive(); // For some reason steals focus from Dump Heap button in ProfilerControlPanel2 and causes http://www.netbeans.org/issues/show_bug.cgi?id=92425
                     tc.requestVisible(); // Workaround for the above problem
-                    ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // Refresh to display opened HW using bold font
+                    if (ProfilerControlPanel2.hasDefault())
+                        ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // Refresh to display opened HW using bold font
                 }
             });
     }
@@ -239,7 +241,8 @@ public class HeapWalkerManager {
                             ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotDeleteHeapDumpMsg());
                         }
                     } else {
-                        ProfilerControlPanel2.getDefault().refreshSnapshotsList();
+                        if (ProfilerControlPanel2.hasDefault())
+                            ProfilerControlPanel2.getDefault().refreshSnapshotsList();
                     }
                 }
             });

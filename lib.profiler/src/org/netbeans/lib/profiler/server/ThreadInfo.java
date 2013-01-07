@@ -186,6 +186,16 @@ public class ThreadInfo {
         }
     }
 
+    static int getLiveServerThreads() {
+        int serverThreads = 0;
+        for (int i = 0; i < nProfilerServerThreads; i++) {
+            if (profilerServerThreads[i].isAlive()) {
+                serverThreads++;
+            }
+        }
+        return serverThreads;
+    }
+
     public static void resumeProfiling() {
         profilingSuspended = false;
     }
