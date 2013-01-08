@@ -1466,6 +1466,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 Monitors.setThreadsSamplingEnabled(threadSampling);
                 ProfilerRuntimeCPU.setWaitAndSleepTracking(waitTracking,sleepTracking);
                 Classes.setWaitTrackingEnabled(threadSampling || waitTracking);
+                Classes.setParkTrackingEnabled(threadSampling || waitTracking);
                 Classes.setSleepTrackingEnabled(threadSampling || sleepTracking);
                 sendSimpleResponseToClient(true, null);
 
