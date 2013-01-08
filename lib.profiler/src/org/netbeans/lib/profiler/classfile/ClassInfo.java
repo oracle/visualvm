@@ -910,6 +910,13 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         return stackMapTables;
     }
     
+    public void resetTables() {
+        lineNumberTables = null;
+        localVariableTables = null;
+        localVariableTypeTables = null;
+        stackMapTables = null;
+    }
+    
     public boolean isMethodAbstract(int i) {
         return Modifier.isAbstract(methodAccessFlags[i]);
     }

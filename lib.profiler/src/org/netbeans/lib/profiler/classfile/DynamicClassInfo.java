@@ -527,6 +527,13 @@ public class DynamicClassInfo extends ClassInfo {
         methodScanStatus[i] &= (~128);
     }
 
+    @Override
+    public void resetTables() {
+        if (modifiedAndSavedMethodInfos == null) {
+            super.resetTables();
+        }
+    }
+
     public void addGlobalCatchStackMapTableEntry(int methodIdx, int endPC) {
         if (majorVersion >= 50) {
             boolean isStatic = isMethodStatic(methodIdx);
