@@ -49,6 +49,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.io.File;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -114,6 +115,7 @@ public class HeapWalkerUI extends ProfilerTopComponent {
             setToolTipText(heapWalker.getHeapDumpFile().getAbsolutePath());
         getAccessibleContext().setAccessibleDescription(Bundle.HeapWalkerUI_ComponentDescr());
         
-        putClientProperty("HeapDumpFileName", heapWalker.getHeapDumpFile().toURI().getPath()); // NOI18N
+        File file = heapWalker.getHeapDumpFile();
+        putClientProperty(RECENT_FILE_KEY, file); // #221709, add heap dump to Open Recent File list
     }
 }

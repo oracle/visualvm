@@ -129,6 +129,9 @@ public class ClassBytesLoader {
 
         java.util.HashMap h = new java.util.HashMap();
         h.keySet().iterator();
+ 
+        // compressed remote profiling
+        java.util.zip.Deflater d = new java.util.zip.Deflater();
     }
 
     private static byte[] readFile(final URL classUrl)

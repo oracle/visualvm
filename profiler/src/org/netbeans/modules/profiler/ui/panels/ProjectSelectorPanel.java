@@ -289,26 +289,25 @@ public class ProjectSelectorPanel extends javax.swing.JPanel implements HelpCtx.
     }
     
     private void addProjects(AbstractListModel model, List<Lookup.Provider> data, Lookup.Provider ... project) {
-        int oldI = data.size();
-        int newI = oldI + project.length;
+       data.addAll(Arrays.asList(project));
         
-        data.addAll(Arrays.asList(project));
+        ListDataListener[] listeners = model.getListDataListeners();
+        if (listeners.length == 0) return;
         
-        for(ListDataListener l : model.getListDataListeners()) {
-            l.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, oldI, newI));
-        }
+        ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED,
+                data.size() - project.length, data.size());
+        for(ListDataListener l : model.getListDataListeners()) l.intervalAdded(e);
     }
     
     private void removeProjects(AbstractListModel model, List<Lookup.Provider> data, Lookup.Provider ... project) {
-        int oldI = data.size();
-        
         data.removeAll(Arrays.asList(project));
         
-        int newI = data.size();
+        ListDataListener[] listeners = model.getListDataListeners();
+        if (listeners.length == 0) return;
         
-        for(ListDataListener l : model.getListDataListeners()) {
-            l.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, oldI, newI));
-        }
+        ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED,
+                data.size(), data.size() + project.length);        
+        for(ListDataListener l : listeners) l.intervalRemoved(e);
     }
     
     public void setSelection(List<Lookup.Provider> selection) {

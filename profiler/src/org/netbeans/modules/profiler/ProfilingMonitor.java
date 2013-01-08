@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import java.awt.EventQueue;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import org.netbeans.lib.profiler.ProfilerClient;
@@ -55,7 +54,9 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -66,6 +67,10 @@ import org.netbeans.modules.profiler.utilities.ProfilerUtils;
  * @author Ian Formanek
  */
 public final class ProfilingMonitor {
+    
+    @NbBundle.Messages({
+        "ProfilingMonitor_OomeMsg=<html><b>Not enough memory to store profiling data.</b><br><br>To avoid this error, increase the -Xmx value<br>in the etc/netbeans.conf file in NetBeans IDE installation.</html>"
+    })
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     final class UpdateThread extends Thread {
@@ -80,6 +85,7 @@ public final class ProfilingMonitor {
         private VMTelemetryDataManager vmTelemetryManager;
         private boolean doUpdateLiveResults;
         private boolean keepRunning = true;
+        private volatile boolean oomeNotified;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -90,6 +96,7 @@ public final class ProfilingMonitor {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void monitor(final TargetAppRunner runner) {
+            oomeNotified = false;
             this.runner = runner;
             this.threadsDataManager = Profiler.getDefault().getThreadsManager();
             this.vmTelemetryManager = Profiler.getDefault().getVMTelemetryManager();
@@ -112,10 +119,11 @@ public final class ProfilingMonitor {
                             SwingUtilities.invokeAndWait(new Runnable() {
                                     public void run() {
                                         try {
-                                            threadsDataManager.processData(md);
-                                            vmTelemetryManager.processData(md);
                                             setServerState(md.getServerState());
                                             setServerProgress(md.getServerProgress());
+                                            
+                                            threadsDataManager.processData(md);
+                                            vmTelemetryManager.processData(md);
 
                                             // ---------------------------------------------------------
                                             // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
@@ -148,6 +156,11 @@ public final class ProfilingMonitor {
                                             doUpdateLiveResults = !doUpdateLiveResults;
                                         } catch (Exception e) {
                                             Profiler.getDefault().notifyException(Profiler.EXCEPTION, e);
+                                        } catch (OutOfMemoryError e) {
+                                            if (!oomeNotified) {
+                                                oomeNotified = true;
+                                                ProfilerDialogs.displayError(Bundle.ProfilingMonitor_OomeMsg());
+                                            }
                                         }
                                     }
                                 });
