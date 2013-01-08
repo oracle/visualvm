@@ -108,6 +108,15 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_
 
 /*
  * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Method:    setParkTrackingEnabled
+ * Signature: (Z)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled
+  (JNIEnv *, jclass, jboolean);
+
+
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Classes
  * Method:    setSleepTrackingEnabled
  * Signature: (Z)Z
  */
