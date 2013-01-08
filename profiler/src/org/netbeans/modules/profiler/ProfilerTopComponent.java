@@ -61,6 +61,8 @@ import org.openide.windows.TopComponent;
  */
 public class ProfilerTopComponent extends TopComponent {
     
+    public static final String RECENT_FILE_KEY = "nb.recent.file.path"; // NOI18N
+    
     private Component lastFocusOwner;
     
     private final PropertyChangeListener focusListener = new PropertyChangeListener() {

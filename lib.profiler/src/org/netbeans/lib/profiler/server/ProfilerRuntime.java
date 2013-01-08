@@ -383,6 +383,14 @@ public class ProfilerRuntime implements CommonConstants {
         Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_RUNNING, timeStamp, null);
         ti.inProfilingRuntimeMethod--;
     }
+    
+    public static void parkEntry() {
+        waitEntry();
+    }
+
+    public static void parkExit() {
+        waitExit();
+    }
 
     public static void writeProfilingPointHitEvent(int id, long absTimeStamp) {
         ThreadInfo ti = ThreadInfo.getThreadInfo();
