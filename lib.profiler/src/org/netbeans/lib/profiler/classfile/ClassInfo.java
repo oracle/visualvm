@@ -376,7 +376,7 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
         public void updateTable(int injectionPos, int injectedBytesCount, int methodIdx, boolean changeTypeIsInjectNewInstr, boolean injectionBindsToFollowingInstruction) {
             String method = getMethodName(methodIdx);
             if ("cpuTest".equals(method)) {
-                System.out.println("11!!!!");
+                System.out.println("!!!!!!");
             }
             if (hasTable()) {
                 StackMapFrame[] frms = frames[methodIdx];
