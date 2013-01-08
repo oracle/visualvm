@@ -46,11 +46,15 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.attach.spi.AbstractRemotePackExporter;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
+@NbBundle.Messages({
+    "RemotePackExporter_GeneratingRemotePack=Generating Remote Pack to {0}" // NOI18N
+})
 final public class RemotePackExporter {
 
     private static final class Singleton {
@@ -73,7 +77,8 @@ final public class RemotePackExporter {
             throw new IOException();
         }
         
-        ProgressHandle ph = ProgressHandleFactory.createHandle("Generating Remote Pack to " + impl.getRemotePackPath(exportPath, hostOS));
+        ProgressHandle ph = ProgressHandleFactory.createHandle(
+                Bundle.RemotePackExporter_GeneratingRemotePack(impl.getRemotePackPath(exportPath, hostOS)));
         ph.setInitialDelay(500);
         ph.start();
         try {
