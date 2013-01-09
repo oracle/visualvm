@@ -47,7 +47,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -64,7 +63,6 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -81,6 +79,7 @@ import org.openide.windows.WindowManager;
     "ExportAction_NoViewMsg=No view to export.",
     "ExportAction_OomeExportingMsg=<html><b>Not enough memory to save the file.</b><br><br>To avoid this error increase the -Xmx<br>value in the etc/netbeans.conf file in NetBeans IDE installation.</html>",
     "ExportAction_IOException_Exporting_Msg=<html>IOException occurred during export, see IDE log for details</html>",
+    "ExportAction_ExportToItselfMsg=Exporting the snapshot to itself.",
     "ExportAction_OverwriteFileCaption=Overwrite Existing File",
     "ExportAction_OverwriteFileMsg=<html><b>File {0} already exists.</b><br><br>Do you want to replace it?</html>",
     "ExportAction_CannotOverwriteFileMsg=File {0} cannot be replaced. Check permissions.",
@@ -265,26 +264,23 @@ public final class ExportAction extends AbstractAction {
         return fileChooser;
     }
 
-    private boolean checkFileExists(File file) {
-        if (file.exists()) {
-            if (!ProfilerDialogs.displayConfirmation(MessageFormat.format(
-                    Bundle.ExportAction_OverwriteFileMsg(file.getName()),new Object[] { file.getName() }),
-                    Bundle.ExportAction_OverwriteFileCaption())) {
-                return false; // cancelled by the user
-            }
-            
-            if (!file.delete()) {
-                ProfilerDialogs.displayError(Bundle.ExportAction_CannotOverwriteFileMsg(file.getName()));
-                return false; // Insufficient rights to overwrite file
-            }
-        }
-
-        return true;
-    }
+      private boolean checkFileExists(File source, File target) {
+          if (target.exists()) {
+              if (source!=null && source.equals(target)) { // do not allow to overwrite the source nps
+                  ProfilerDialogs.displayError(Bundle.ExportAction_ExportToItselfMsg());
+                  return false;
+              } else if (!ProfilerDialogs.displayConfirmation(
+                      Bundle.ExportAction_OverwriteFileMsg(target.getName()),
+                      Bundle.ExportAction_OverwriteFileCaption())) {  // choose whether to overwrite
+                  return false; // user chose not to overwrite
+              }
+          }
+          return true;
+      }
 
     private SelectedFile selectExportTargetFile(final ExportProvider exportProvider) {
         File targetDir;
-        String targetName=null;
+        String targetName;
         String defaultName = exportProvider.getViewName();
 
         // 1. let the user choose file or directory
@@ -339,8 +335,7 @@ public final class ExportAction extends AbstractAction {
         return new SelectedFile(targetDir, targetName, targetExt);
     }
 
-
-
+    @Override
     public void actionPerformed(ActionEvent evt) {
         if (!exportProvider.hasExportableView() && !exportProvider.hasLoadedSnapshot()) { // nothing to export
             ProfilerDialogs.displayError(Bundle.ExportAction_NoViewMsg());
@@ -363,14 +358,15 @@ public final class ExportAction extends AbstractAction {
             return; // cancelled
         }
         
-        if (exportedFileType==MODE_NPS) {
-            final File file = saveFile.getSelectedFile();
-            if (!checkFileExists(file)) {
-                if (lrw != null) {
-                    statusHandler.resumeLiveUpdates();
-                }
-                return; // user doesn't want to overwrite existing file or it can't be overwritten
+        final File file = saveFile.getSelectedFile();
+        if (!checkFileExists(snapshot.getFile(),file)) {
+            if (lrw != null) {
+                statusHandler.resumeLiveUpdates();
             }
+            return; // user doesn't want to overwrite existing file or it can't be overwritten
+        }
+        
+        if (exportedFileType==MODE_NPS) {
             new NBSwingWorker(true) {
                 final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.ExportAction_SavingSnapshot());
                 @Override
@@ -405,16 +401,6 @@ public final class ExportAction extends AbstractAction {
             }.execute();
             
         } else {
-            final File file = saveFile.getSelectedFile();
-            saveFile = null;
-
-            if (!checkFileExists(file)) {
-                if (lrw != null) {
-                    statusHandler.resumeLiveUpdates();
-                }
-                return; // user doesn't want to overwrite existing file or it can't be overwritten
-            }
-
             new NBSwingWorker(true) {
                 final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.ExportAction_ExportingViewMsg());
                 @Override
