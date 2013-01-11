@@ -187,6 +187,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
     private static final String FIXED_SCALE_TOOLTIP = messages.getString("ThreadsPanel_FixedScaleToolTip"); // NOI18N
     private static final String SCALE_TO_FIT_TOOLTIP = messages.getString("ThreadsPanel_ScaleToFitToolTip"); // NOI18N
     private static final String THREADS_MONITORING_DISABLED_MSG = messages.getString("ThreadsPanel_ThreadsMonitoringDisabledMsg"); // NOI18N
+    private static final String THREADS_MONITORING_DISABLED_TOOLTIP = messages.getString("ThreadsPanel_ThreadsMonitoringDisabledTooltip"); // NOI18N
     private static final String NO_PROFILING_MSG = messages.getString("ThreadsPanel_NoProfilingMsg"); // NOI18N
     private static final String THREADS_COLUMN_NAME = messages.getString("ThreadsPanel_ThreadsColumnName"); // NOI18N
     private static final String TIMELINE_COLUMN_NAME = messages.getString("ThreadsPanel_TimelineColumnName"); // NOI18N
@@ -441,6 +442,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         enableThreadsMonitoringLabel1.setForeground(Color.DARK_GRAY);
 
         enableThreadsMonitoringButton = new JButton(Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
+        enableThreadsMonitoringButton.setToolTipText(THREADS_MONITORING_DISABLED_TOOLTIP);
         enableThreadsMonitoringButton.setContentAreaFilled(false);
         enableThreadsMonitoringButton.setMargin(new Insets(3, 3, 3, 3));
         enableThreadsMonitoringButton.setVerticalTextPosition(SwingConstants.BOTTOM);

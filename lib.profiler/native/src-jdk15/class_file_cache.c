@@ -81,17 +81,15 @@ static int     *_ctable_classdata_lens = NULL;
 static int      _ctable_size = 0, _ctable_threshold = -1, _ctable_elements = 0, _total_cached_class_count = 0;
 static jobject  _ctable_lock = NULL;
 
-static jboolean  waitTrackingEnabled = TRUE;
-static jboolean  sleepTrackingEnabled = TRUE;
+static jboolean  waitTrackingEnabled = FALSE;
+static jboolean  sleepTrackingEnabled = FALSE;
+static jboolean  parkTrackingEnabled = FALSE;
 
 static jboolean  trackingMethodsInitialized = FALSE;
-static jboolean  waitInitError = FALSE;
-static jboolean  sleepInitError = FALSE;
 
-static jmethodID waitID = NULL;
-static jmethodID sleepID = NULL;
 static waitCall  waitAddress = NULL;
 static sleepCall sleepAddress = NULL;
+static parkCall  parkAddress = NULL;
 
 static jclass    profilerRuntimeID = NULL;
 static jmethodID waitEntryID = NULL;
@@ -100,6 +98,8 @@ static jmethodID monitorEntryID = NULL;
 static jmethodID monitorExitID = NULL;
 static jmethodID sleepEntryID = NULL;
 static jmethodID sleepExitID = NULL;
+static jmethodID parkEntryID = NULL;
+static jmethodID parkExitID = NULL;
 static jmethodID traceVMObjectAllocID = NULL;
 static jboolean retransformIsRunning = FALSE;
 static unsigned char BOGUS_CLASSFILE[] = "HAHA";
@@ -357,42 +357,9 @@ void JNICALL class_file_load_hook(
 
 void initializeMethods (JNIEnv *env) {
 
-    jclass objectClassID, threadClassID;
     jclass localProfilerRuntimeID;
     jclass localProfilerRuntimeMemoryID;  
     jboolean error = FALSE;
-  
-    if (waitID == NULL && !waitInitError) {
-        objectClassID = (*env)->FindClass (env, "java/lang/Object");
-        if (objectClassID == NULL) {
-            (*env)->ExceptionDescribe (env);
-            fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup java.lang.Object class!!!\n");
-            waitInitError = TRUE; waitTrackingEnabled = FALSE;
-        } else {
-            waitID = (*env)->GetMethodID(env, objectClassID, "wait", "(J)V");
-            if (waitID == NULL) {
-                fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup wait method in java.lang.Object!!! \n");
-                (*env)->ExceptionDescribe (env);
-                waitInitError = TRUE; waitTrackingEnabled = FALSE;
-            }
-        }
-    }
-  
-    if (sleepID == NULL && !sleepInitError) {
-        threadClassID = (*env)->FindClass (env, "java/lang/Thread");
-        if (threadClassID == NULL) {
-            (*env)->ExceptionDescribe (env);
-            fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup java.lang.Thread class!!!\n");
-            sleepInitError = TRUE; sleepTrackingEnabled = FALSE;
-        } else {
-            sleepID = (*env)->GetStaticMethodID(env, threadClassID, "sleep", "(J)V");
-            if (sleepID == NULL) {
-                fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup sleep method in java.lang.Thread!!! \n");
-                (*env)->ExceptionDescribe (env);
-                sleepInitError = TRUE; sleepTrackingEnabled = FALSE;
-            }
-        }
-    }
   
     localProfilerRuntimeID = (*env)->FindClass (env, "org/netbeans/lib/profiler/server/ProfilerRuntime");
     if (localProfilerRuntimeID == NULL) {
@@ -445,6 +412,20 @@ void initializeMethods (JNIEnv *env) {
             (*env)->ExceptionDescribe (env);
             error = TRUE;
         }
+
+        parkEntryID = (*env)->GetStaticMethodID(env, profilerRuntimeID, "parkEntry", "()V");
+        if (parkEntryID == NULL) {
+            fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup parkEntry method!!! \n");
+            (*env)->ExceptionDescribe (env);
+            error = TRUE;
+        }
+    
+        parkExitID = (*env)->GetStaticMethodID(env, profilerRuntimeID, "parkExit", "()V");
+        if (parkExitID == NULL) {
+            fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup parkExit method!!! \n");
+            (*env)->ExceptionDescribe (env);
+            error = TRUE;
+        }    
     }
     localProfilerRuntimeMemoryID = (*env)->FindClass (env, "org/netbeans/lib/profiler/server/ProfilerRuntimeMemory");
     if (localProfilerRuntimeMemoryID == NULL) {
@@ -463,11 +444,10 @@ void initializeMethods (JNIEnv *env) {
 
     }
     if (error) {
-        // if there was an error initializing callbacks into agent, we disable both wait and sleep tracking
-        waitInitError = TRUE;
-        sleepInitError = TRUE;
+        // if there was an error initializing callbacks into agent, we disable wait,park and sleep tracking
         waitTrackingEnabled = FALSE;
         sleepTrackingEnabled = FALSE;
+        parkTrackingEnabled = FALSE;
     }
     trackingMethodsInitialized = TRUE;
 }
@@ -480,25 +460,77 @@ void JNICALL native_method_bind_hook(
             void* address,
             void** new_address_ptr) {
 
+    jclass declaringClass;
+    char *className, *genericSignature, *methodName, *methodSig, *genericMethodSig;
+    int res;
+
     if (env == NULL) {
         return; // primordial phase
     }
-  
-    if (!trackingMethodsInitialized && !waitInitError) {
-        initializeMethods (env);
-    }
-  
-    if (!waitInitError) {
-        if (method == waitID) {
-            waitAddress = (waitCall)address;
-            *new_address_ptr = (void*) &waitInterceptor;
-            // fprintf(stderr, "Profiler Agent: Object.wait intercepted.\n");
-        } else if (method == sleepID) {
-            sleepAddress = (sleepCall)address;
-            *new_address_ptr = (void*) &sleepInterceptor;
-            // fprintf(stderr, "Profiler Agent: Thread.sleep intercepted.\n");
+
+    //fprintf (stderr, "Going to call GetMethodDeclaringClass for methodId = %d\n", *(int*)method);
+
+    res = (*_jvmti)->GetMethodDeclaringClass(_jvmti, method, &declaringClass);
+    if (res != JVMTI_ERROR_NONE || declaringClass == NULL || *((int*)declaringClass) == 0) { /* Also a bug workaround */
+        fprintf(stderr, "Profiler Agent Warning: Invalid declaringClass obtained from jmethodID\n");
+        fprintf(stderr, "Profiler Agent Warning: mId = %p, *mId = %d\n", method, *(int*)method);
+        fprintf(stderr, "Profiler Agent Warning: dCl = %p", declaringClass);
+        if (declaringClass != NULL) {
+            fprintf(stderr, ", *dCl = %d\n", *((int*)declaringClass));
+        } else {
+            fprintf(stderr, "\n");
         }
+        //fprintf(stderr, "*** res = %d", res);
+        return;
     }
+
+    //fprintf (stderr, "Going to call GetClassSignature for methodId = %d, last res = %d, declaring class: %d\n", *(int*)method, res, *((int*)declaringClass));
+
+    res = (*_jvmti)->GetClassSignature(_jvmti, declaringClass, &className, &genericSignature);
+    if (res != JVMTI_ERROR_NONE) {
+        fprintf(stderr, "Profiler Agent Warning: Couldn't obtain name of declaringClass = %p\n", declaringClass);
+        return;
+    }
+
+    //fprintf (stderr, "Going to call GetMethodName for methodId = %d, last res = %d, signature: %s\n", *(int*)method, res, genericSignature);
+
+    res = (*_jvmti)->GetMethodName(_jvmti, method, &methodName, &methodSig, &genericMethodSig);
+
+    if (res != JVMTI_ERROR_NONE) {
+        fprintf(stderr, "Profiler Agent Warning: Couldn't obtain name for methodID = %p\n", method);
+        return;
+    }
+
+    //fprintf (stderr, "Method class: %s, method name: %s, sig: %s\n", className, methodName, methodSig);
+
+    // check for java.lang.Object.wait(long )
+    if (strcmp("Ljava/lang/Object;",className)==0 && strcmp("wait",methodName)==0 && strcmp("(J)V",methodSig)==0) {
+        waitAddress = (waitCall)address;
+        *new_address_ptr = (void*) &waitInterceptor;
+        // fprintf(stderr, "Profiler Agent: Object.wait intercepted.\n");
+    } else // check for java.lang.Thread.sleep(long )
+      if (strcmp("Ljava/lang/Thread;",className)==0 && strcmp("sleep",methodName)==0 && strcmp("(J)V",methodSig)==0) {
+        sleepAddress = (sleepCall)address;
+        *new_address_ptr = (void*) &sleepInterceptor;
+        // fprintf(stderr, "Profiler Agent: Thread.sleep intercepted.\n");
+    } else // check for sun.misc.Unsafe.park(boolean, long )
+      if (strcmp("Lsun/misc/Unsafe;",className)==0 && strcmp("park",methodName)==0 && strcmp("(ZJ)V",methodSig)==0) {
+        parkAddress = (parkCall)address;
+        *new_address_ptr = (void*) &parkInterceptor;
+        // fprintf(stderr, "Profiler Agent: Unsafe.park intercepted.\n");
+    }         
+
+    (*_jvmti)->Deallocate(_jvmti, (void*)className);
+
+    if (genericSignature != NULL) {
+        (*_jvmti)->Deallocate(_jvmti, (void*)genericSignature);
+    }
+
+    (*_jvmti)->Deallocate(_jvmti, (void*)methodName);
+    (*_jvmti)->Deallocate(_jvmti, (void*)methodSig);
+    if (genericMethodSig != NULL) {
+        (*_jvmti)->Deallocate(_jvmti, (void*)genericMethodSig);
+    }  
 }
 
 
@@ -556,13 +588,40 @@ void JNICALL sleepInterceptor (JNIEnv *env, jclass clazz, jlong arg) {
     }
 }
 
+void JNICALL parkInterceptor (JNIEnv *env, jobject obj, jboolean arg0, jlong arg1) {
+    jthrowable exception = NULL;
+    
+    if (parkTrackingEnabled) {
+        (*env)->CallStaticVoidMethod (env, profilerRuntimeID, parkEntryID, NULL);
+        (*env)->ExceptionDescribe (env);
+    }
+    
+    parkAddress(env, obj, arg0, arg1);
+    
+    if (parkTrackingEnabled) {
+        // if an exception was thrown (InterruptedException), we need to catch and clear it for the exit handling
+        // and then rethrow
+        exception = (*env)->ExceptionOccurred (env);
+        if (exception != NULL) {
+            (*env)->ExceptionClear (env);
+        }
+        
+        (*env)->CallStaticVoidMethod (env, profilerRuntimeID, parkExitID, NULL);
+        (*env)->ExceptionDescribe (env);
+        
+        if (exception != NULL) {
+            (*env)->Throw (env, exception);
+        }
+    }
+}
+
 void JNICALL monitor_contended_enter_hook(
             jvmtiEnv *jvmti_env,
             JNIEnv* jni_env,
             jthread thread,
             jobject object) {
 
-    if (!trackingMethodsInitialized && !waitInitError) {
+    if (!trackingMethodsInitialized) {
         initializeMethods (jni_env);
     }
   
@@ -578,7 +637,7 @@ void JNICALL monitor_contended_entered_hook(
             jthread thread,
             jobject object) {
 
-    if (!trackingMethodsInitialized && !waitInitError) {
+    if (!trackingMethodsInitialized) {
         initializeMethods (jni_env);
     }
     
@@ -607,15 +666,37 @@ void JNICALL vm_object_alloc(jvmtiEnv *jvmti_env,
 
 /*
  * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Method:    setParkTrackingEnabled
+ * Signature: (Z)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled
+  (JNIEnv *env, jclass clazz, jboolean value) {
+
+    if (!trackingMethodsInitialized) {
+        initializeMethods (env);
+    }  
+    if (parkAddress != NULL && parkEntryID != NULL && parkExitID != NULL) {
+        parkTrackingEnabled = value;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Classes
  * Method:    setWaitTrackingEnabled
  * Signature: (Z)Z
  */
 JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled
   (JNIEnv *env, jclass clazz, jboolean value) {
-    if (!waitInitError) {
+    if (!trackingMethodsInitialized) {
+        initializeMethods (env);
+    }  
+    if (waitAddress != NULL && waitEntryID != NULL && waitExitID != NULL && monitorEntryID != NULL && monitorExitID != NULL) {
         waitTrackingEnabled = value;
+        return TRUE;
     }
-    return !waitInitError;
+    return FALSE;
 }
 
 /*
@@ -625,10 +706,14 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_
  */
 JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled
   (JNIEnv *env, jclass clazz, jboolean value) {
-    if (!sleepInitError) {
+    if (!trackingMethodsInitialized) {
+        initializeMethods (env);
+    }  
+    if (sleepAddress != NULL && sleepEntryID != NULL && sleepExitID != NULL) {
         sleepTrackingEnabled = value;
+        return TRUE;
     }
-    return !sleepInitError;
+    return FALSE;
 }
 
 /*

@@ -508,7 +508,8 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
                         if (heapdumpTaken) {
                             // Refresh list of snapshots
-                            ProfilerControlPanel2.getDefault().refreshSnapshotsList();
+                            if (ProfilerControlPanel2.hasDefault())
+                                ProfilerControlPanel2.getDefault().refreshSnapshotsList();
 
                             if (askForDestination) {
                                 // Heapdump saved, open in HeapWalker?

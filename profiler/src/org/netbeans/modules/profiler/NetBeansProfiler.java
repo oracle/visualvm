@@ -1340,7 +1340,8 @@ public abstract class NetBeansProfiler extends Profiler {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                ProfilerControlPanel2.getDefault().setProfiledProject(profiledProject);
+                if (ProfilerControlPanel2.hasDefault())
+                    ProfilerControlPanel2.getDefault().setProfiledProject(profiledProject);
             }
         });
     }
