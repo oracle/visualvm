@@ -114,7 +114,7 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
     class ThreadMonitoredDataResponse extends MonitoredNumbersResponse {
 
         ThreadMonitoredDataResponse() {
-            super(dummyLong);
+            super(dummyLong, CommonConstants.SERVER_RUNNING, CommonConstants.SERVER_PROGRESS_INDETERMINATE);
             setGCstartFinishData(dummyLong, dummyLong);
         }
 
