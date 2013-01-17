@@ -68,6 +68,7 @@ abstract public class AbstractRemotePackExporter {
     };
     private static final Map<String, String> jdkMapper = new HashMap<String, String>() {
         {
+            // NOTE: 15 is used to only generate Ant task name which always ends with '-15'
             put(TargetPlatformEnum.JDK5.toString(), "15"); //NOI18N
             put(TargetPlatformEnum.JDK6.toString(), "15"); //NOI18N
             put(TargetPlatformEnum.JDK7.toString(), "15"); //NOI18N
