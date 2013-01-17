@@ -358,7 +358,8 @@ final class ApplicationProfilerView extends DataSourceView {
         public void profilingStateChanged(ProfilingStateEvent e) { refreshStatus(); }
         public void threadsMonitoringChanged() { refreshStatus(); }
         public void instrumentationChanged(int oldInstrType, int currentInstrType) { refreshStatus(); }
-
+        public void serverStateChanged(int serverState, int serverProgress) {}
+        
 
         private synchronized void refreshStatus() {
 
@@ -721,7 +722,7 @@ final class ApplicationProfilerView extends DataSourceView {
         private JLabel statusLabel;
         private HTMLLabel statusValueLabel;
         private static final int refLabelHeight = new HTMLLabel("X").getPreferredSize().height; // NOI18N
-        
+
     }
     
     private static final class OneWayToggleButton extends JToggleButton {
