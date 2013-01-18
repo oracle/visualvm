@@ -282,7 +282,9 @@ public class ProfilerValidationTest extends JellyTestCase {
         TopComponentOperator tco = new TopComponentOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",
                 "LAB_ControlPanelName")); // "Profiler"
         // wait for application visible
-        new OutputTabOperator("profile").waitText(visibleToken);
+        OutputTabOperator oto = new OutputTabOperator("profile");
+        oto.getTimeouts().setTimeout("ComponentOperator.WaitStateTimeout", 120000);
+        oto.waitText(visibleToken);
         new EventTool().waitNoEvent(1000);
         Action takeSnapshotAction = new Action(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
                 "LBL_TakeSnapshotAction"), null);
