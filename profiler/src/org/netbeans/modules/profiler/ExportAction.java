@@ -82,9 +82,8 @@ import org.openide.windows.WindowManager;
     "ExportAction_ExportToItselfMsg=Exporting the snapshot to itself.",
     "ExportAction_OverwriteFileCaption=Overwrite Existing File",
     "ExportAction_OverwriteFileMsg=<html><b>File {0} already exists.</b><br><br>Do you want to replace it?</html>",
-    "ExportAction_CannotOverwriteFileMsg=File {0} cannot be replaced. Check permissions.",
+    "ExportAction_CannotWriteFileMsg=Failed to export File. Reason: {0}.",
     "ExportAction_InvalidLocationForFileMsg=Invalid location for file.",
-    "ExportAction_FileWriteErrorMsg=Failed to save image to {0}.",
     "ExportAction_ExportDialogTitle=Select File or Directory",
     "ExportAction_ExportDialogButton=Export",
     "ExportAction_ExportDialogCSVFilter=CSV File (*.csv)",
@@ -387,7 +386,8 @@ public final class ExportAction extends AbstractAction {
 
                         ResultsManager.getDefault().saveSnapshot(snapshot, fo);
                     } catch (IOException e1) {
-                        LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotCreateFailedMsg(e1.getMessage()), e1);
+                        ProfilerDialogs.displayError(Bundle.ExportAction_CannotWriteFileMsg(e1.getLocalizedMessage()));
+                        LOGGER.log(Level.WARNING, e1.toString());
                     }
                 }
 
@@ -416,10 +416,11 @@ public final class ExportAction extends AbstractAction {
                         if (eDD.getCaughtException()!=null) {
                             ProfilerDialogs.displayError(eDD.getNumExceptions()+Bundle.ExportAction_IOException_Exporting_Msg());
                         }
-                    } catch (FileNotFoundException ex) {
-                        ex.printStackTrace();
                     } catch (OutOfMemoryError e) {
                         ProfilerDialogs.displayError(Bundle.ExportAction_OomeExportingMsg()+e.getMessage());
+                    } catch (IOException e1) {
+                        ProfilerDialogs.displayError(Bundle.ExportAction_CannotWriteFileMsg(e1.getLocalizedMessage()));
+                        LOGGER.log(Level.WARNING, e1.toString());
                     }
                 }
 
