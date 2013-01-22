@@ -358,13 +358,11 @@ public final class ExportAction extends AbstractAction {
         }
         
         final File file = saveFile.getSelectedFile();
-        if (snapshot!=null) {
-            if (!checkFileExists(snapshot.getFile(),file)) {
-                if (lrw != null) {
-                    statusHandler.resumeLiveUpdates();
-                }
-                return; // user doesn't want to overwrite existing file or it can't be overwritten
+        if (!checkFileExists(snapshot == null ? null : snapshot.getFile(),file)) {
+            if (lrw != null) {
+                statusHandler.resumeLiveUpdates();
             }
+            return; // user doesn't want to overwrite existing file or it can't be overwritten
         }
         
         if (exportedFileType==MODE_NPS) {
