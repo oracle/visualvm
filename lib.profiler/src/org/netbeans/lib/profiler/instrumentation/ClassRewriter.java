@@ -128,6 +128,7 @@ public class ClassRewriter {
         // Copy what remains - class attributes
         count = origBytes.length - clazz.getOrigAttrsStartOfs();
         System.arraycopy(origBytes, clazz.getOrigAttrsStartOfs(), res, destPos, count);
+        clazz.resetTables();
 
         // For debugging
         //if (clazz.getName().equals("profilertestapp/Main")) {
