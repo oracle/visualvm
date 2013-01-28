@@ -358,7 +358,7 @@ public final class ExportAction extends AbstractAction {
         }
         
         final File file = saveFile.getSelectedFile();
-        if (!checkFileExists(snapshot.getFile(),file)) {
+        if (!checkFileExists(snapshot == null ? null : snapshot.getFile(),file)) {
             if (lrw != null) {
                 statusHandler.resumeLiveUpdates();
             }
