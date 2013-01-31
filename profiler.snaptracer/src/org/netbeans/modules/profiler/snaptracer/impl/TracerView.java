@@ -59,6 +59,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.snaptracer.TracerPackage;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -71,6 +73,7 @@ import org.netbeans.modules.profiler.SnapshotResultsWindow;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -363,25 +366,40 @@ final class TracerView {
             super(Bundle.LBL_FindMethod());
         }
         
+        @NbBundle.Messages("LBL_SelectingIntervals=Selecting method intervals...")
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             assert cctDisplay != null;
-            try {
-                List<Integer> ints = model.getIntervals(node);
-                assert ints.size() % 2 == 0;
-                System.out.println("Intervals " + ints.toString());
-                TimelineSupport support = model.getTimelineSupport();
-                support.resetSelectedIntervals();
-                Iterator<Integer> iter = ints.iterator();
-                while (iter.hasNext()) {
-                    int start = iter.next();
-                    int stop  = iter.next();
-                    support.selectInterval(start, stop);
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    ProgressHandle pHandle = null;
+                    try {
+                        pHandle = ProgressHandleFactory.createHandle(Bundle.LBL_SelectingIntervals());
+                        pHandle.setInitialDelay(0);
+                        pHandle.start();
+                        
+                        List<Integer> ints = model.getIntervals(node);
+                        assert ints.size() % 2 == 0;
+                        final Iterator<Integer> iter = ints.iterator();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                TimelineSupport support = model.getTimelineSupport();
+                                support.resetSelectedIntervals();
+                                while (iter.hasNext()) {
+                                    int start = iter.next();
+                                    int stop  = iter.next();
+                                    support.selectInterval(start, stop);
+                                }
+                                support.selectedIntervalsChanged();
+                            }
+                        });
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } finally {
+                        if (pHandle != null) pHandle.finish();
+                    }
                 }
-                support.selectedIntervalsChanged();
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
+            });
         }
 
         private void enhancePopup(JPopupMenu popup, CCTDisplay cctd) {
