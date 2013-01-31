@@ -114,36 +114,33 @@ public class HeapFragmentWalker {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public synchronized final int computeRetainedSizes(boolean masterAction, boolean interactive) {
-
-        if (retainedSizesStatus != RETAINED_SIZES_UNSUPPORTED &&
-            retainedSizesStatus != RETAINED_SIZES_COMPUTED) {
-
-            if (interactive && !ProfilerDialogs.displayConfirmationDNSA(
-                    Bundle.HeapFragmentWalker_ComputeRetainedMsg(), 
-                    Bundle.HeapFragmentWalker_ComputeRetainedCaption(),
-                    null, "HeapFragmentWalker.computeRetainedSizes", false)) { //NOI18N
-                changeState(RETAINED_SIZES_CANCELLED, masterAction);
-            } else {
-                changeState(RETAINED_SIZES_COMPUTING, masterAction);
-                List<JavaClass> classes = heapFragment.getAllClasses();
-                for (JavaClass jclass : classes) {
-                    List<Instance> instances = jclass.getInstances();
-                    if (instances.size() > 0) {
-                        ProgressHandle pd = interactive ? ProgressHandleFactory.createHandle(Bundle.HeapFragmentWalker_ComputingRetainedMsg()) : null;
-                        if (pd != null) {
-                            pd.start();
-                        }
-                        instances.get(0).getRetainedSize();
-                        if (pd != null) pd.finish();
-                        break;
-                    }
-                }
-                changeState(RETAINED_SIZES_COMPUTED, masterAction);
-            }
+    public final int computeRetainedSizes(boolean masterAction, boolean interactive) {
+        
+        synchronized(this) {
+           if (retainedSizesStatus == RETAINED_SIZES_UNSUPPORTED ||
+               retainedSizesStatus == RETAINED_SIZES_COMPUTED)
+               return retainedSizesStatus;
         }
 
-        return retainedSizesStatus;
+        if (interactive && !ProfilerDialogs.displayConfirmationDNSA(
+                Bundle.HeapFragmentWalker_ComputeRetainedMsg(), 
+                Bundle.HeapFragmentWalker_ComputeRetainedCaption(),
+                null, "HeapFragmentWalker.computeRetainedSizes", false)) { //NOI18N
+            return changeState(RETAINED_SIZES_CANCELLED, masterAction);
+        } else {
+            changeState(RETAINED_SIZES_COMPUTING, masterAction);
+            List<JavaClass> classes = heapFragment.getAllClasses();
+            if (classes.size() > 0) {
+                ProgressHandle pd = interactive ? ProgressHandleFactory.createHandle(Bundle.HeapFragmentWalker_ComputingRetainedMsg()) : null;
+                if (pd != null) {
+                    pd.start();
+                }
+                classes.get(0).getRetainedSizeByClass();
+                if (pd != null) pd.finish();
+            }
+            
+            return changeState(RETAINED_SIZES_COMPUTED, masterAction);
+        }
     }
 
     public synchronized final int getRetainedSizesStatus() {
@@ -161,16 +158,17 @@ public class HeapFragmentWalker {
         if (stateListeners.size() == 0) stateListeners = null;
     }
 
-    private void changeState(int newState, final boolean masterChange) {
+    private synchronized int changeState(final int newState, final boolean masterChange) {
         retainedSizesStatus = newState;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (stateListeners == null) return;
-                StateEvent e = new StateEvent(retainedSizesStatus, masterChange);
+                StateEvent e = new StateEvent(newState, masterChange);
                 for (StateListener listener : stateListeners)
                     listener.stateChanged(e);
             }
         });
+        return retainedSizesStatus;
     }
 
 
