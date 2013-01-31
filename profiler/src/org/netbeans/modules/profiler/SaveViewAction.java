@@ -74,6 +74,7 @@ import org.openide.windows.WindowManager;
     "SaveViewAction_OverwriteFileCaption=Overwrite Existing File",
     "SaveViewAction_OverwriteFileMsg=<html><b>File {0} already exists.</b><br><br>Do you want to replace it?</html>",
     "SaveViewAction_CannotOverwriteFileMsg=File {0} cannot be replaced. Check permissions.",
+    "SaveViewAction_FileWriteErrorMsg=Failed to save image to {0}.",
     "SaveViewAction_SaveDialogTitle=Select File or Directory",
     "SaveViewAction_SaveDialogButton=Save",
     "SaveViewAction_SaveDialogFilter=PNG Image (*.png)",
@@ -210,8 +211,7 @@ class SaveViewAction extends AbstractAction {
                         ProfilerDialogs.displayError(Bundle.SaveViewAction_OomeSavingMsg());
                     } catch (IOException ex) {
                         ProfilerDialogs.displayError(
-                                Bundle.ExportAction_FileWriteErrorMsg(
-                                file.getAbsolutePath()));
+                                Bundle.SaveViewAction_FileWriteErrorMsg(file.getAbsolutePath()));
                     }
                     finally {
                         if (bImage != null) {
