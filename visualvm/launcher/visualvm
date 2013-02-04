@@ -179,8 +179,8 @@ launchNbexec() {
     nbexec=`grep -v "^#" "$basedir"/etc/visualvm.clusters | grep -v "^$" | grep platform | while read X; do
         if expr "$X" : "/.*" >/dev/null; then
            echo $X/lib/nbexec
-        elif [ -f "$progdir"/../$X/lib/nbexec ]; then
-            echo "$progdir"/../$X/lib/nbexec
+        elif [ -f "$basedir"/$X/lib/nbexec ]; then
+            echo "$basedir"/$X/lib/nbexec
         fi
     done | head -n 1`
     if [ \! -n "$nbexec" ] ; then

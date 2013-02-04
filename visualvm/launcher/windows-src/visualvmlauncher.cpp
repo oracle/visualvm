@@ -23,7 +23,12 @@
  * questions.
  */
 
+#ifndef _WIN32_WINNT        
+#define _WIN32_WINNT 0x05010100
+#endif
+
 #include <io.h>
+#include <shlobj.h>
 #include "visualvmlauncher.h"
 #include "o.n.bootstrap/utilsfuncs.h"
 #include "o.n.bootstrap/argnames.h"
@@ -41,10 +46,6 @@ const char *VisualVMLauncher::ENV_USER_PROFILE = "USERPROFILE";
 const char *VisualVMLauncher::HOME_TOKEN = "${HOME}";
 const char *VisualVMLauncher::DEFAULT_USERDIR_ROOT_TOKEN = "${DEFAULT_USERDIR_ROOT}";
 const char *VisualVMLauncher::DEFAULT_CACHEDIR_ROOT_TOKEN = "${DEFAULT_CACHEDIR_ROOT}";
-const char *VisualVMLauncher::REG_SHELL_FOLDERS_KEY = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders";
-const char *VisualVMLauncher::REG_DESKTOP_NAME = "Desktop";
-const char *VisualVMLauncher::REG_DEFAULT_USERDIR_ROOT = "AppData";
-const char *VisualVMLauncher::REG_DEFAULT_CACHEDIR_ROOT = "Local AppData";
 const char *VisualVMLauncher::VISUALVM_DIRECTORY = "\\VisualVM\\";
 const char *VisualVMLauncher::VISUALVM_CACHES_DIRECTORY = "\\VisualVM\\Cache\\";
 
@@ -94,6 +95,7 @@ int VisualVMLauncher::start(int argc, char *argv[]) {
     adjustHeapAndPermGenSize();
     addExtraClusters();
     string nbexecPath;
+    SetDllDirectory(baseDir.c_str());
     if (dirExists(platformDir.c_str())) {
         nbexecPath = platformDir;
     } else {
@@ -168,7 +170,7 @@ bool VisualVMLauncher::initBaseNames() {
         return false;
     }
     appName = bslash + 1;
-    appName.erase(appName.find('.'));
+    appName.erase(appName.rfind('.'));
     
     if (ARCHITECTURE == 64) {
         appName = appName.erase(appName.length() - 2);
@@ -356,30 +358,26 @@ bool VisualVMLauncher::findUserDir(const char *str) {
             if (userProfile) {
                 userHome = userProfile;
             } else {
-
-                if (!getStringFromRegistry(HKEY_CURRENT_USER, REG_SHELL_FOLDERS_KEY, REG_DESKTOP_NAME, userHome)) {
+                TCHAR userHomeChar[MAX_PATH]; 
+                if (FAILED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, userHomeChar))) {    
                     return false;
                 }
+                userHome = userHomeChar;
                 userHome.erase(userHome.rfind('\\'));
             }
             logMsg("User home: %s", userHome.c_str());
         }
         userDir = userHome + (str + strlen(HOME_TOKEN));
     } else if (strncmp(str, DEFAULT_USERDIR_ROOT_TOKEN, strlen(DEFAULT_USERDIR_ROOT_TOKEN)) == 0) {
-        if (!getStringFromRegistry(HKEY_CURRENT_USER, REG_SHELL_FOLDERS_KEY, REG_DEFAULT_USERDIR_ROOT, defUserDirRoot)) {
+        TCHAR defUserDirRootChar[MAX_PATH];
+        if (FAILED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, defUserDirRootChar))) {
             return false;
         }
-        defUserDirRoot = defUserDirRoot + VISUALVM_DIRECTORY;
+        defUserDirRoot = ((string) defUserDirRootChar) + VISUALVM_DIRECTORY;
         defUserDirRoot.erase(defUserDirRoot.rfind('\\'));
         logMsg("Default Userdir Root: %s", defUserDirRoot.c_str());
         userDir = defUserDirRoot + (str + strlen(DEFAULT_USERDIR_ROOT_TOKEN));
     } else {
-        if (!getStringFromRegistry(HKEY_CURRENT_USER, REG_SHELL_FOLDERS_KEY, REG_DEFAULT_USERDIR_ROOT, defUserDirRoot)) {
-            return false;
-        }
-        defUserDirRoot = defUserDirRoot + VISUALVM_DIRECTORY;
-        defUserDirRoot.erase(defUserDirRoot.rfind('\\'));
-        logMsg("Default Userdir Root: %s", defUserDirRoot.c_str());
         userDir = str;
     }
     return true;
@@ -393,30 +391,26 @@ bool VisualVMLauncher::findCacheDir(const char *str) {
             if (userProfile) {
                 userHome = userProfile;
             } else {
-
-                if (!getStringFromRegistry(HKEY_CURRENT_USER, REG_SHELL_FOLDERS_KEY, REG_DESKTOP_NAME, userHome)) {
+                TCHAR userHomeChar[MAX_PATH]; 
+                if (FAILED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, userHomeChar))) {    
                     return false;
                 }
+                userHome = userHomeChar;
                 userHome.erase(userHome.rfind('\\'));
             }
             logMsg("User home: %s", userHome.c_str());
         }
         cacheDir = userHome + (str + strlen(HOME_TOKEN));
     } else if (strncmp(str, DEFAULT_CACHEDIR_ROOT_TOKEN, strlen(DEFAULT_CACHEDIR_ROOT_TOKEN)) == 0) {
-        if (!getStringFromRegistry(HKEY_CURRENT_USER, REG_SHELL_FOLDERS_KEY, REG_DEFAULT_CACHEDIR_ROOT, defCacheDirRoot)) {
+        TCHAR defCacheDirRootChar[MAX_PATH];
+        if (FAILED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, defCacheDirRootChar))) {
             return false;
         }
-        defCacheDirRoot = defCacheDirRoot + VISUALVM_CACHES_DIRECTORY;
+        defCacheDirRoot = ((string) defCacheDirRootChar) + VISUALVM_CACHES_DIRECTORY;
         defCacheDirRoot.erase(defCacheDirRoot.rfind('\\'));
         logMsg("Default Cachedir Root: %s", defCacheDirRoot.c_str());
         cacheDir = defCacheDirRoot + (str + strlen(DEFAULT_CACHEDIR_ROOT_TOKEN));
     } else {
-        if (!getStringFromRegistry(HKEY_CURRENT_USER, REG_SHELL_FOLDERS_KEY, REG_DEFAULT_CACHEDIR_ROOT, defCacheDirRoot)) {
-            return false;
-        }
-        defCacheDirRoot = defCacheDirRoot + VISUALVM_CACHES_DIRECTORY;
-        defCacheDirRoot.erase(defCacheDirRoot.rfind('\\'));
-        logMsg("Default Cachedir Root: %s", defCacheDirRoot.c_str());
         cacheDir = str;
     }
     return true;

@@ -23,6 +23,10 @@
  * questions.
  */
 
+#ifndef KEY_WOW64_64KEY
+#define KEY_WOW64_64KEY 0x0100
+#endif
+
 #include "utilsfuncs.h"
 #include "argnames.h"
 #include <tlhelp32.h>
@@ -62,9 +66,7 @@ bool getStringFromRegistry64bit(HKEY rootKey, const char *keyName, const char *v
     return getStringFromRegistryEx(rootKey, keyName, valueName, value, true);
 }
 
-#ifndef KEY_WOW64_64KEY
-#define KEY_WOW64_64KEY 0x0100
-#endif
+
 
 bool getStringFromRegistryEx(HKEY rootKey, const char *keyName, const char *valueName, string &value, bool read64bit) {
     logMsg("getStringFromRegistry()\n\tkeyName: %s\n\tvalueName: %s", keyName, valueName);
@@ -422,11 +424,11 @@ bool getParentProcessID(DWORD &id) {
 
 bool isWow64()
 {
-    bool IsWow64 = FALSE;
-    typedef bool (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, bool*);
+    BOOL IsWow64 = FALSE;
+    typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
     LPFN_ISWOW64PROCESS fnIsWow64Process;
 
-    fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(TEXT("kernel32")),"IsWow64Process");
+    fnIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress(GetModuleHandle(TEXT("kernel32")),"IsWow64Process");
   
     if (NULL != fnIsWow64Process)
     {
