@@ -97,12 +97,12 @@ public abstract class InstanceDetailsProvider {
             }
 
             StringBuilder value = new StringBuilder();
-            value.append("\"");
+            value.append("\"");         // NOI18N
             for (int i = offset; i < offset+charsSize; i++)
                 value.append(chars.get(i));
             if (truncated) 
-                value.append("...");
-            value.append("\"");
+                value.append("...");    // NOI18N
+            value.append("\"");         // NOI18N
 
             return value.toString();
         }
@@ -114,7 +114,7 @@ public abstract class InstanceDetailsProvider {
     }
     
     public static String getArrayFieldValue(Instance instance, String field, int count) {
-        Object value = instance.getValueOfField(field); // NOI18N
+        Object value = instance.getValueOfField(field);
         if (value instanceof Instance) return getArrayValue((Instance)value, 0, count);
         return null;
     }

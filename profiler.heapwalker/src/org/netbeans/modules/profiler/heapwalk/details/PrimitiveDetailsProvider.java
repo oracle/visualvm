@@ -54,7 +54,7 @@ public class PrimitiveDetailsProvider extends InstanceDetailsProvider {
     public String getDetailsString(Instance instance) {
         if (isInstanceOf(instance, Character.class.getName())) {                // Character
             Object value = instance.getValueOfField("value"); // NOI18N
-            return value instanceof Character ? "'" + ((Character)value).toString() + "'" : null;
+            return value instanceof Character ? "'" + ((Character)value).toString() + "'" : null; // NOI18N
         } else if (isInstanceOf(instance, Integer.class.getName()) ||           // Integer
                    isInstanceOf(instance, Byte.class.getName()) ||              // Byte
                    isInstanceOf(instance, Long.class.getName()) ||              // Long
