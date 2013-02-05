@@ -81,13 +81,13 @@ public abstract class InstanceDetailsProvider {
     }
     
     public static String getArrayValue(Instance instance) {
-        return getArrayValue(instance, -1);
+        return getArrayValue(instance, 0, -1);
     }
     
-    public static String getArrayValue(Instance instance, int count) {
+    public static String getArrayValue(Instance instance, int offset, int count) {
         if (instance instanceof PrimitiveArrayInstance) {
             PrimitiveArrayInstance array = (PrimitiveArrayInstance)instance;
-            List chars = array.getValues();
+            List<String> chars = array.getValues();
             int charsSize = count < 0 ? chars.size() : Math.min(count, chars.size());
             boolean truncated = false;
 
@@ -98,8 +98,8 @@ public abstract class InstanceDetailsProvider {
 
             StringBuilder value = new StringBuilder();
             value.append("\"");
-            for (int i = 0; i < charsSize; i++)
-                value.append((String)chars.get(i));
+            for (int i = offset; i < offset+charsSize; i++)
+                value.append(chars.get(i));
             if (truncated) 
                 value.append("...");
             value.append("\"");
@@ -115,13 +115,25 @@ public abstract class InstanceDetailsProvider {
     
     public static String getArrayFieldValue(Instance instance, String field, int count) {
         Object value = instance.getValueOfField(field); // NOI18N
-        if (value instanceof Instance) return getArrayValue((Instance)value, count);
+        if (value instanceof Instance) return getArrayValue((Instance)value, 0, count);
         return null;
     }
     
     public static String getStringValue(Instance instance) {
         if (isInstanceOf(instance, String.class.getName())) {
-            return getArrayFieldValue(instance, "value"); // NOI18N
+            PrimitiveArrayInstance chars = (PrimitiveArrayInstance)instance.getValueOfField("value"); // NOI18N
+            if (chars != null) {
+                Integer offset = (Integer) instance.getValueOfField("offset"); // NOI18N
+                Integer len = (Integer) instance.getValueOfField("count"); // NOI18N
+                
+                if (offset == null) {
+                    offset = Integer.valueOf(0);
+                }
+                if (len == null) {
+                    len = new Integer(chars.getLength());
+                }
+                return getArrayValue(chars, offset.intValue(), len.intValue());
+            }
         }
         return null;
     }
