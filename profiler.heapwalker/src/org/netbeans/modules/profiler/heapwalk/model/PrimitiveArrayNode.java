@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.heapwalk.model;
 
 import org.netbeans.lib.profiler.heap.*;
 import org.openide.util.NbBundle;
-import java.text.MessageFormat;
 import java.util.List;
 
 
@@ -189,34 +188,4 @@ public class PrimitiveArrayNode extends ArrayNode {
             };
     }
 
-    protected String computeValue() {
-        if (!hasInstance()) {
-            return super.computeValue();
-        }
-
-        if (getInstance().getJavaClass().getName().equals("char[]")) { // NOI18N
-
-            List fields = getInstance().getValues();
-            StringBuilder logicalValue = new StringBuilder();
-            int fieldsSize = fields.size();
-            boolean truncated = false;
-
-            if (fieldsSize > MAX_CHAR_ARRAY_STRING_SIZE) {
-                truncated = true;
-                fieldsSize = MAX_CHAR_ARRAY_STRING_SIZE;
-            }
-
-            for (int i = 0; i < fieldsSize; i++) {
-                logicalValue.append((String) fields.get(i));
-            }
-
-            if (truncated) {
-                logicalValue.append(Bundle.PrimitiveArrayNode_TruncatedString());
-            }
-
-            return super.computeValue() + " (\"" + logicalValue.toString() + "\"" + ")"; // NOI18N
-        }
-
-        return super.computeValue() + " " + Bundle.PrimitiveArrayNode_ItemsNumberString(getInstance().getLength());
-    }
 }

@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.heapwalk.model;
 
 import org.netbeans.lib.profiler.heap.*;
 import org.openide.util.NbBundle;
-import java.text.MessageFormat;
 import java.util.List;
 
 
@@ -185,11 +184,4 @@ public class ObjectArrayNode extends ArrayNode {
             };
     }
 
-    protected String computeValue() {
-        if (!hasInstance()) {
-            return super.computeValue();
-        }
-
-        return super.computeValue() + " " + Bundle.ObjectArrayNode_ItemsNumberString(getInstance().getLength());
-    }
 }
