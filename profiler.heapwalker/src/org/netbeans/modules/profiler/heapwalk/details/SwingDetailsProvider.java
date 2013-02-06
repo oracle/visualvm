@@ -42,7 +42,10 @@
 package org.netbeans.modules.profiler.heapwalk.details;
 
 import java.awt.BorderLayout;
-import javax.swing.JTextArea;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.openide.util.lookup.ServiceProvider;
@@ -52,53 +55,69 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=InstanceDetailsProvider.class)
-public final class StringDetailsProvider extends InstanceDetailsProvider {
+public class SwingDetailsProvider extends InstanceDetailsProvider {
     
     public String getDetailsString(Instance instance) {
-        return getValue(instance);
-    }
-    
-    public View getDetailsView(Instance instance) {
-        if (isInstanceOf(instance, StringBuffer.class.getName()) ||             // StringBuffer
-            isInstanceOf(instance, StringBuilder.class.getName()) ||            // StringBuilder
-            isInstanceOf(instance, String.class.getName())) {                   // String
-            return new StringView(instance);
+        if (isSubclassOf(instance, "javax.swing.JLabel")) { // NOI18N           // JLabel+
+            return getStringFieldValue(instance, "text"); // NOI18N
         }
         return null;
     }
     
-    
-    private static String getValue(Instance instance) {
-        if (isInstanceOf(instance, StringBuffer.class.getName()) ||             // StringBuffer
-            isInstanceOf(instance, StringBuilder.class.getName())) {            // StringBuilder
-            int count = getIntFieldValue(instance, "count"); // NOI18N
-            return getArrayFieldValue(instance, "value", count); // NOI18N
+    public View getDetailsView(Instance instance) {
+        if (isSubclassOf(instance, "javax.swing.JLabel")) { // NOI18N           // JLabel+
+            return new LabelView(instance);
         }
-        return getStringValue(instance);                                        // String
+        return null;
     }
     
+    static JLabel createLabel(Instance instance) {
+        JLabel label = new JLabel();
+        
+        String text = getStringFieldValue(instance, "text"); // NOI18N
+        if (text != null) label.setText(text);
+        
+        Object _background = instance.getValueOfField("background"); // NOI18N
+        if (_background instanceof Instance) {
+            Color background = AwtDetailsProvider.createColor((Instance)_background);
+            if (background != null) label.setBackground(background);
+        }
+        
+        Object _foreground = instance.getValueOfField("foreground"); // NOI18N
+        if (_foreground instanceof Instance) {
+            Color foreground = AwtDetailsProvider.createColor((Instance)_foreground);
+            if (foreground != null) label.setForeground(foreground);
+        }
+        
+        Object _font = instance.getValueOfField("font"); // NOI18N
+        if (_font instanceof Instance) {
+            Font font = AwtDetailsProvider.createFont((Instance)_font);
+            if (font != null) label.setFont(font);
+        }
+        
+        Dimension size = AwtDetailsProvider.createDimension(instance);
+        if (size != null) label.setSize(size);
+        
+        label.setEnabled(getBooleanFieldValue(instance, "enabled")); // NOI18N
+        
+        return label;
+    }
     
-    private static class StringView extends View {
+    private static class LabelView extends View {
         
-        private JTextArea textArea;
-        
-        StringView(Instance instance) {
+        LabelView(final Instance instance) {
             super(instance);
         }
         
-        protected void initView(Instance instance) {
-            removeAll();
-            textArea = new JTextArea("Loading content...");
-            textArea.setEditable(false);
-            textArea.setLineWrap(true);
-            add(textArea, BorderLayout.CENTER);
-        }
-        
         protected void computeView(Instance instance) {
-            final String value = getValue(instance);
+            final JLabel labell = createLabel(instance);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    textArea.setText(value);
+                    removeAll();
+                    add(labell, BorderLayout.CENTER);
+                    invalidate();
+                    revalidate();
+                    doLayout();
                 }
             });
         }

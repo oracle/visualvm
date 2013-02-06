@@ -391,5 +391,16 @@ public class BrowserUtils {
         
         return null;
     }
+    
+    public static InstanceDetailsProvider.View getInstanceDetailsView(Instance instance) {
+        Collection<? extends InstanceDetailsProvider> providers =
+                Lookup.getDefault().lookupAll(InstanceDetailsProvider.class);
+        for (InstanceDetailsProvider provider : providers) {
+            InstanceDetailsProvider.View instanceView = provider.getDetailsView(instance);
+            if (instanceView != null) return instanceView;
+        }
+        
+        return null;
+    }
 
 }

@@ -42,11 +42,14 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details;
 
-//import java.awt.Component;
+import java.awt.BorderLayout;
 import java.util.List;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 
 /**
  * Class to provide custom/detailed information for an Instance.
@@ -62,9 +65,30 @@ public abstract class InstanceDetailsProvider {
         return null;
     }
     
-//    public Component getDetailsView(Instance instance) {
-//        return null;
-//    }
+    public View getDetailsView(Instance instance) {
+        return null;
+    }
+    
+    
+    public static abstract class View extends JPanel {
+        
+        protected View(final Instance instance) {
+            setLayout(new BorderLayout());
+            JLabel label = new JLabel("Loading content...", JLabel.CENTER);
+            add(label, BorderLayout.CENTER);
+            
+            initView(instance);
+            
+            BrowserUtils.performTask(new Runnable() {
+                public void run() { computeView(instance); }
+            });
+        }
+        
+        protected void initView(Instance instance) {}
+        
+        protected abstract void computeView(Instance instance);
+        
+    }
     
     
     public static boolean isInstanceOf(Instance instance, String clsName) {
@@ -147,6 +171,11 @@ public abstract class InstanceDetailsProvider {
     public static int getIntFieldValue(Instance instance, String field) {
         Object value = instance.getValueOfField(field);
         return value instanceof Integer ? ((Integer)value).intValue() : Integer.MIN_VALUE;
+    }
+    
+    public static boolean getBooleanFieldValue(Instance instance, String field) {
+        Object value = instance.getValueOfField(field);
+        return value instanceof Boolean ? ((Boolean)value).booleanValue() : false;
     }
     
 }

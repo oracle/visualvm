@@ -41,6 +41,15 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -52,10 +61,151 @@ import org.openide.util.lookup.ServiceProvider;
 public class AwtDetailsProvider extends InstanceDetailsProvider {
     
     public String getDetailsString(Instance instance) {
-        if (isSubclassOf(instance, "java.awt.Font")) { // NOI18N        // Font+
+        if (isSubclassOf(instance, "java.awt.Font")) { // NOI18N                // Font+
             return getStringFieldValue(instance, "name"); // NOI18N
+        } else if (isSubclassOf(instance, "java.awt.Color")) { // NOI18N        // Color+
+            Color color = createColor(instance);
+            if (color != null) return "[" + color.getRed() + ", " + color.getGreen() + // NOI18N
+                                      ", " + color.getBlue() + ", " + color.getAlpha() + "]"; // NOI18N
+        } else if (isSubclassOf(instance, "java.awt.Point")) { // NOI18N        // Point+
+            Point point = createPoint(instance);
+            if (point != null) return "[" + point.x + ", " + point.y + "]"; // NOI18N
+        } else if (isSubclassOf(instance, "java.awt.Dimension")) { // NOI18N    // Dimension+
+            Dimension dimension = createDimension(instance);
+            if (dimension != null) return "[" + dimension.width + ", " + dimension.height + "]"; // NOI18N
+        } else if (isSubclassOf(instance, "java.awt.Rectangle")) { // NOI18N    // Rectangle+
+            Rectangle rectangle = createRectangle(instance);
+            if (rectangle != null) return "[" + rectangle.x + ", " + rectangle.y + // NOI18N
+                                      ", " + rectangle.width + ", " + rectangle.height + "]"; // NOI18N
+        } else if (isSubclassOf(instance, "java.awt.Insets")) { // NOI18N       // Insets+
+            Insets insets = createInsets(instance);
+            if (insets != null) return "[" + insets.top + ", " + insets.left + // NOI18N
+                                      ", " + insets.bottom + ", " + insets.right + "]"; // NOI18N
         }
         return null;
+    }
+    
+    public View getDetailsView(Instance instance) {
+        if (isSubclassOf(instance, "java.awt.Font")) { // NOI18N                // Font+
+            return new FontView(instance);
+        } else if (isSubclassOf(instance, "java.awt.Color")) { // NOI18N                // Font+
+            return new ColorView(instance);
+        }
+        return null;
+    }
+    
+    static Font createFont(Instance instance) {
+        String name = getStringFieldValue(instance, "name"); // NOI18N
+        if (name != null && name.trim().isEmpty()) name = null;
+                
+        int style = getIntFieldValue(instance, "style"); // NOI18N
+        if (style == Integer.MIN_VALUE) style = 0;
+        
+        int size = getIntFieldValue(instance, "size"); // NOI18N
+        if (size == Integer.MIN_VALUE) size = 10; // TODO: should use default font size
+        
+        return new Font(name, style, size);
+    }
+    
+    static Color createColor(Instance instance) {
+        int rgba = getIntFieldValue(instance, "value"); // NOI18N
+        return rgba != Integer.MIN_VALUE ? new Color(rgba) : null;
+    }
+    
+    static Point createPoint(Instance instance) {
+        int x = getIntFieldValue(instance, "x"); // NOI18N
+//        if (x == Integer.MIN_VALUE) x = 0;
+        
+        int y = getIntFieldValue(instance, "y"); // NOI18N
+//        if (y == Integer.MIN_VALUE) y = 0;
+        
+        return new Point(x, y);
+    }
+    
+    static Dimension createDimension(Instance instance) {
+        int width = getIntFieldValue(instance, "width"); // NOI18N
+//        if (width == Integer.MIN_VALUE) width = 0;
+        
+        int height = getIntFieldValue(instance, "height"); // NOI18N
+//        if (height == Integer.MIN_VALUE) width = 0;
+        
+        return new Dimension(width, height);
+    }
+    
+    static Rectangle createRectangle(Instance instance) {
+        int x = getIntFieldValue(instance, "x"); // NOI18N
+//        if (x == Integer.MIN_VALUE) x = 0;
+        
+        int y = getIntFieldValue(instance, "y"); // NOI18N
+//        if (y == Integer.MIN_VALUE) y = 0;
+        
+        int width = getIntFieldValue(instance, "width"); // NOI18N
+//        if (width == Integer.MIN_VALUE) width = 0;
+        
+        int height = getIntFieldValue(instance, "height"); // NOI18N
+//        if (height == Integer.MIN_VALUE) width = 0;
+        
+        return new Rectangle(x, y, width, height);
+    }
+    
+    static Insets createInsets(Instance instance) {
+        int top = getIntFieldValue(instance, "top"); // NOI18N
+//        if (top == Integer.MIN_VALUE) top = 0;
+        
+        int left = getIntFieldValue(instance, "left"); // NOI18N
+//        if (left == Integer.MIN_VALUE) left = 0;
+        
+        int bottom = getIntFieldValue(instance, "bottom"); // NOI18N
+//        if (bottom == Integer.MIN_VALUE) bottom = 0;
+        
+        int right = getIntFieldValue(instance, "right"); // NOI18N
+//        if (right == Integer.MIN_VALUE) right = 0;
+        
+        return new Insets(top, left, bottom, right);
+    }
+    
+    private static class FontView extends View {
+        
+        FontView(Instance instance) {
+            super(instance);
+        }
+        
+        protected void computeView(Instance instance) {
+            final Font font = createFont(instance);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    removeAll();
+                    JLabel label = new JLabel();
+                    label.setHorizontalAlignment(JLabel.CENTER);
+                    label.setFont(font);
+                    label.setText("ABCabc123");
+                    add(label, BorderLayout.CENTER);
+                    invalidate();
+                    revalidate();
+                    doLayout();
+                }
+            });
+        }
+        
+    }
+    
+    private static class ColorView extends View {
+        
+        ColorView(Instance instance) {
+            super(instance);
+        }
+        
+        protected void computeView(Instance instance) {
+            final Color color = createColor(instance);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    removeAll();
+                    setOpaque(true);
+                    setBackground(color);
+                }
+            });
+        }
+        
     }
     
 }
