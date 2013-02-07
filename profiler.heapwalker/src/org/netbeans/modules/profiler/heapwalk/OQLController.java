@@ -43,7 +43,6 @@ package org.netbeans.modules.profiler.heapwalk;
 
 import java.awt.Color;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +58,6 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Utils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -399,8 +397,11 @@ public class OQLController extends AbstractTopLevelController
 
     private static String printInstance(Instance in) {
         String className = in.getJavaClass().getName();
+        String details = BrowserUtils.getInstanceDetailsString(in);  
+        
 
-        return "<a href='file://instance/" + className + "@" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
+        return "<a href='file://instance/" + className + "@" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>" + // NOI18N
+                (details != null ? " - " + details : ""); // NOI18N
 //        return "<a href='file://instance/" + className + "/" + in.getInstanceNumber() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
 //        return in.getJavaClass().getName() + '@' + Long.toHexString(in.getInstanceId()) + '#' + in.getInstanceNumber();
     }
