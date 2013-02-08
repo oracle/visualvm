@@ -90,6 +90,7 @@ import org.openide.util.RequestProcessor;
 })
 final class AttachToBugAction extends AbstractAction {
 
+    private static final Logger LOG = Logger.getLogger(AttachToBugAction.class.getName());
     private static final String BUZILLA_CLASS = "org.netbeans.modules.bugzilla.api.NBBugzillaUtils"; // NOI18N
     private static final String ATTACH_FILE_METHOD = "attachFiles"; // NOI18N
     private static final String ICON_PATH = "org/netbeans/modules/profiler/snaptracer/impl/icons/bugtracking.png"; // NOI18N
@@ -102,11 +103,11 @@ final class AttachToBugAction extends AbstractAction {
             Class bugzilla = Class.forName(BUZILLA_CLASS, true, Thread.currentThread().getContextClassLoader());
             ATTACH_FILE = bugzilla.getMethod(ATTACH_FILE_METHOD, String.class, String.class, String[].class, String[].class, File[].class);
         } catch (NoSuchMethodException ex) {
-            Exceptions.printStackTrace(ex);
+            LOG.log(Level.FINE, "isSupported", ex);
         } catch (SecurityException ex) {
-            Exceptions.printStackTrace(ex);
+            LOG.log(Level.FINE, "isSupported", ex);
         } catch (ClassNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOG.log(Level.FINE, "isSupported", ex);
         }
         return ATTACH_FILE != null;
     }
