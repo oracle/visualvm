@@ -103,11 +103,11 @@ final class AttachToBugAction extends AbstractAction {
             Class bugzilla = Class.forName(BUZILLA_CLASS, true, Thread.currentThread().getContextClassLoader());
             ATTACH_FILE = bugzilla.getMethod(ATTACH_FILE_METHOD, String.class, String.class, String[].class, String[].class, File[].class);
         } catch (NoSuchMethodException ex) {
-            LOG.log(Level.FINE, "isSupported", ex);
+            LOG.log(Level.FINE, "isSupported", ex);     // NOI18N
         } catch (SecurityException ex) {
-            LOG.log(Level.FINE, "isSupported", ex);
+            LOG.log(Level.FINE, "isSupported", ex);     // NOI18N
         } catch (ClassNotFoundException ex) {
-            LOG.log(Level.FINE, "isSupported", ex);
+            LOG.log(Level.FINE, "isSupported", ex);     // NOI18N
         }
         return ATTACH_FILE != null;
     }
@@ -119,7 +119,7 @@ final class AttachToBugAction extends AbstractAction {
         putValue(Action.NAME, Bundle.AttachToBugAction_ActionName());
         putValue(Action.SHORT_DESCRIPTION, Bundle.AttachToBugAction_ActionDescr());
         putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon(ICON_PATH, true));
-        putValue("iconBase", ICON_PATH);
+        putValue("iconBase", ICON_PATH);        // NOI18N
     }
 
     @Override
