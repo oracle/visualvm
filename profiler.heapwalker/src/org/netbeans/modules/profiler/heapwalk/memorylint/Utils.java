@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.heapwalk.memorylint;
 
+import java.util.ArrayDeque;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
@@ -55,8 +56,8 @@ import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.Value;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -83,7 +84,7 @@ public class Utils {
         Logger.getLogger(Utils.class.getName()).log(Level.FINE, "Utils.isReachableFrom {0}, {1}", new Object[] { source, target });
 
         Set<Instance> processed = new HashSet<Instance>();
-        List<Instance> fifo = new LinkedList<Instance>();
+        Deque<Instance> fifo = new ArrayDeque<Instance>();
         fifo.add(source);
 
         while (!fifo.isEmpty()) {
@@ -93,7 +94,7 @@ public class Utils {
                 break;
             }
 
-            Instance act = fifo.remove(0);
+            Instance act = fifo.removeFirst();
 
             if (act.equals(target)) {
                 return true;
@@ -191,7 +192,7 @@ public class Utils {
         @SuppressWarnings("unchecked")
         Collection<GCRoot> roots = heap.getGCRoots();
         Set<Instance> marked = new HashSet<Instance>();
-        List<Instance> fifo = new LinkedList<Instance>();
+        Deque<Instance> fifo = new ArrayDeque<Instance>();
 
         for (GCRoot r : roots) {
             Instance curr = r.getInstance();
@@ -202,7 +203,7 @@ public class Utils {
         }
 
         while (!fifo.isEmpty()) {
-            Instance curr = fifo.remove(0);
+            Instance curr = fifo.removeFirst();
 
             if (!marked.add(curr)) {
                 continue;
@@ -242,7 +243,7 @@ public class Utils {
         results.addAll(objSet);
 
         while (!fifo.isEmpty()) {
-            Instance curr = fifo.remove(0);
+            Instance curr = fifo.removeFirst();
 
             for (Object /*FieldValue*/ val : curr.getFieldValues()) {
                 FieldValue fv = (FieldValue) val;
@@ -308,7 +309,7 @@ public class Utils {
     public static String getSignificantIncommingString(Instance in) {
         Set<Instance> processed = new HashSet<Instance>();
         String temp = null;
-        List<Instance> fifo = new LinkedList<Instance>();
+        Deque<Instance> fifo = new ArrayDeque<Instance>();
         fifo.add(in);
 
         while (!fifo.isEmpty()) {
@@ -318,7 +319,7 @@ public class Utils {
                 break;
             }
 
-            Instance act = fifo.remove(0);
+            Instance act = fifo.removeFirst();
             @SuppressWarnings("unchecked")
             List<Value> incoming = act.getReferences();
 
