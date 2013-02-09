@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.heapwalk.ui;
 
-import java.awt.datatransfer.Transferable;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIConstants;
@@ -69,6 +68,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -76,9 +77,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
 import java.util.Set;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -87,6 +90,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
@@ -720,7 +724,9 @@ public class InstancesListControllerUI extends JTitledPanel {
         tablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
 
         setLayout(new BorderLayout());
-        add(tablePanel, BorderLayout.CENTER);
+        
+        final InstanceScrollPane scroll = new InstanceScrollPane();        
+        add(new CollapsibleSplitPane(tablePanel, scroll), BorderLayout.CENTER);
 
         instancesListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
@@ -740,12 +746,58 @@ public class InstancesListControllerUI extends JTitledPanel {
                             selectedInstance = ((InstancesListController.InstancesListInstanceNode) selectedNode).getInstance();
                         }
                     }
+                    
+                    scroll.showInstance(selectedInstance);
 
                     instancesListController.instanceSelected(selectedInstance);
                 }
             });
 
         setPreferredSize(new Dimension(225, 500));
+    }
+    
+    private static class InstanceScrollPane extends JScrollPane {
+        
+        private Instance selectedInstance = null;
+        private boolean instancePending = false;
+        
+        
+        InstanceScrollPane() {
+            setBorder(BorderFactory.createEmptyBorder());
+            setViewportBorder(BorderFactory.createLineBorder(
+                    UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
+                    UIManager.getColor("Button.darkShadow") : // NOI18N
+                    UIManager.getColor("Button.shadow"))); // NOI18N
+            
+            addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                        if (instancePending && isShowing()) showInstanceImpl();
+                    }
+                }
+            });
+        }
+        
+        
+        void showInstance(Instance instance) {
+            if (selectedInstance == instance) return;
+            selectedInstance = instance;
+            if (isShowing()) showInstanceImpl();
+            else instancePending = true;
+        }
+        
+        private void showInstanceImpl() {
+            JComponent instanceView = selectedInstance == null ? null :
+                       BrowserUtils.getInstanceDetailsView(selectedInstance);
+            if (instanceView == null) {
+                instanceView = new JLabel("<No details>", JLabel.CENTER);
+                instanceView.setEnabled(false);
+            }
+            setViewportView(instanceView);
+            //doLayout();
+            instancePending = false;
+        }
+        
     }
 
     // --- Private implementation ------------------------------------------------
