@@ -48,11 +48,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.io.SequenceInputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -257,7 +257,7 @@ public final class LogRecords {
                     String more = values.get(Elem.MORE);
                     if (more != null) currentEx.more = Integer.parseInt(more);
                     if (exceptions == null){
-                        exceptions = new LinkedList<FakeException>();
+                        exceptions = new ArrayDeque<FakeException>();
                     }
                     exceptions.add(currentEx);
                     values = currentEx.values;
