@@ -43,14 +43,13 @@
 
 package org.netbeans.lib.profiler.classfile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.instrumentation.JavaClassConstants;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 import org.netbeans.lib.profiler.classfile.ClassInfo.StackMapFrame.FrameType;
+import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.instrumentation.JavaClassConstants;
 
 
 /**
@@ -375,9 +374,6 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
 
         public void updateTable(int injectionPos, int injectedBytesCount, int methodIdx, boolean changeTypeIsInjectNewInstr, boolean injectionBindsToFollowingInstruction) {
             String method = getMethodName(methodIdx);
-            if ("cpuTest".equals(method)) {
-                System.out.println("11!!!!");
-            }
             if (hasTable()) {
                 StackMapFrame[] frms = frames[methodIdx];
                 
@@ -908,6 +904,13 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     public StackMapTables getStackMapTables() {
         initStackMapTables();
         return stackMapTables;
+    }
+    
+    public void resetTables() {
+        lineNumberTables = null;
+        localVariableTables = null;
+        localVariableTypeTables = null;
+        stackMapTables = null;
     }
     
     public boolean isMethodAbstract(int i) {
