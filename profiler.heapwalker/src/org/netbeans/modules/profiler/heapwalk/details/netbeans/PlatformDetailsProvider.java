@@ -133,7 +133,7 @@ public class PlatformDetailsProvider extends InstanceDetailsProvider {
             if (name != null) {
                 String nameString = getDetailsString(name);
                 if (parent != null) {
-                    nameString = getDetailsString(parent).concat("/").concat(nameString);
+                    nameString = getDetailsString(parent).concat("/").concat(nameString);   // NOI18N
                 }
                 return nameString;
             }
