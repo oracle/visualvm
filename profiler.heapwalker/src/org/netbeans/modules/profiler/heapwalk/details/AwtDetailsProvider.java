@@ -62,7 +62,20 @@ public class AwtDetailsProvider extends InstanceDetailsProvider {
     
     public String getDetailsString(Instance instance) {
         if (isSubclassOf(instance, "java.awt.Font")) { // NOI18N                // Font+
-            return getStringFieldValue(instance, "name"); // NOI18N
+            String name = getStringFieldValue(instance, "name"); // NOI18N
+            if (name == null) {
+                Instance font2DHandle = (Instance) instance.getValueOfField("font2DHandle"); // NOI18N
+                if (font2DHandle != null) {
+                    Instance font2D = (Instance) font2DHandle.getValueOfField("font2D"); // NOI18N
+                    if (font2D != null) {
+                        name = getStringFieldValue(font2D, "fullName"); // NOI18N
+                        if (name == null) {
+                            name = getStringFieldValue(font2D, "nativeFontName"); // NOI18N
+                        }
+                    }
+                }
+            }
+            return name;
         } else if (isSubclassOf(instance, "java.awt.Color")) { // NOI18N        // Color+
             Color color = createColor(instance);
             if (color != null) return "[" + color.getRed() + ", " + color.getGreen() + // NOI18N
