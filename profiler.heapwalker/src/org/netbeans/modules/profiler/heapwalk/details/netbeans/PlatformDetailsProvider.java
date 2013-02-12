@@ -126,14 +126,24 @@ public class PlatformDetailsProvider extends InstanceDetailsProvider {
             if (fileName != null) {
                 return getDetailsString(fileName);
             }
-        } else if (isSubclassOf(instance, "org.netbeans.modules.masterfs.filebasedfs.naming.FileName")) {   // NOI18N
+        } else if (isSubclassOf(instance, "org.netbeans.modules.masterfs.filebasedfs.naming.FileName") ||     // NOI18N
+                   isSubclassOf(instance, "org.netbeans.modules.masterfs.filebasedfs.naming.FolderName")) {   // NOI18N
             Instance parent = (Instance) instance.getValueOfField("parent"); // NOI18N
             Instance name = (Instance) instance.getValueOfField("name"); // NOI18N
 
             if (name != null) {
                 String nameString = getDetailsString(name);
-                if (parent != null) {
-                    nameString = getDetailsString(parent).concat("/").concat(nameString);   // NOI18N
+                if (nameString == null) {
+                    nameString = getStringValue(name);
+                    if (nameString != null) {
+                        nameString = nameString.substring(1,nameString.length()-1);
+                    }
+                }
+                if (parent != null && nameString != null) {
+                    String parentDetail = getDetailsString(parent);
+                    if (parentDetail != null) {
+                        nameString = parentDetail.concat("/").concat(nameString);   // NOI18N                    
+                    }
                 }
                 return nameString;
             }
