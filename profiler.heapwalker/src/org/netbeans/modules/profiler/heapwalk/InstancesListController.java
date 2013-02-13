@@ -53,7 +53,6 @@ import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
 import org.netbeans.modules.profiler.heapwalk.ui.InstancesListControllerUI;
 import org.openide.util.NbBundle;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -437,10 +436,16 @@ public class InstancesListController extends AbstractController {
             this.parent = parent;
             this.instance = instance;
 
-            this.name = "#" + instance.getInstanceNumber(); // NOI18N
+            this.name = computeName(instance);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
+        
+        private static String computeName(Instance instance) {
+            String details = BrowserUtils.getInstanceDetailsString(instance);
+            return "#" + instance.getInstanceNumber() + (details == null ? // NOI18N
+                    "" : " - " + details); // NOI18N
+        }
 
         public HeapWalkerNode getChild(int index) {
             return null;

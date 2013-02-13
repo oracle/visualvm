@@ -69,8 +69,6 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.Mnemonics;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -92,47 +90,47 @@ import org.openide.util.RequestProcessor;
 })
 final class AttachToBugAction extends AbstractAction {
 
+    private static final Logger LOG = Logger.getLogger(AttachToBugAction.class.getName());
     private static final String BUZILLA_CLASS = "org.netbeans.modules.bugzilla.api.NBBugzillaUtils"; // NOI18N
     private static final String ATTACH_FILE_METHOD = "attachFiles"; // NOI18N
     private static final String ICON_PATH = "org/netbeans/modules/profiler/snaptracer/impl/icons/bugtracking.png"; // NOI18N
     private static final String NPSS_MINE = "application/x-npss"; // NOI18N
     private static Method ATTACH_FILE;
-    private final FileObject snapshotFileObject;
+    private final File snapshotFile;
 
     static boolean isSupported() {
         try {
             Class bugzilla = Class.forName(BUZILLA_CLASS, true, Thread.currentThread().getContextClassLoader());
             ATTACH_FILE = bugzilla.getMethod(ATTACH_FILE_METHOD, String.class, String.class, String[].class, String[].class, File[].class);
         } catch (NoSuchMethodException ex) {
-            Exceptions.printStackTrace(ex);
+            LOG.log(Level.FINE, "isSupported", ex);     // NOI18N
         } catch (SecurityException ex) {
-            Exceptions.printStackTrace(ex);
+            LOG.log(Level.FINE, "isSupported", ex);     // NOI18N
         } catch (ClassNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+            LOG.log(Level.FINE, "isSupported", ex);     // NOI18N
         }
         return ATTACH_FILE != null;
     }
 
-    AttachToBugAction(FileObject fo) {
-        snapshotFileObject = fo;
+    AttachToBugAction(File file) {
+        snapshotFile = file;
 
+        assert file.isFile();
         putValue(Action.NAME, Bundle.AttachToBugAction_ActionName());
         putValue(Action.SHORT_DESCRIPTION, Bundle.AttachToBugAction_ActionDescr());
         putValue(Action.SMALL_ICON, ImageUtilities.loadImageIcon(ICON_PATH, true));
-        putValue("iconBase", ICON_PATH);
+        putValue("iconBase", ICON_PATH);        // NOI18N
     }
 
     @Override
     public void actionPerformed(final ActionEvent e) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                File file = FileUtil.toFile(snapshotFileObject);
-                String filename = file.getName();
                 IssueNumberDialog issue = new IssueNumberDialog();
                 String bugNumber = issue.getIssueString();
 
                 if (bugNumber != null) {
-                    attachtoBug(bugNumber, file);
+                    attachtoBug(bugNumber, snapshotFile);
                 }
             }
         });
