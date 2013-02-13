@@ -301,7 +301,7 @@ final public class ExternalPackages {
             root = fo;
         }
         if (fo != null) {
-            Queue<FileObject> stack = new LinkedList<FileObject>();
+            Queue<FileObject> stack = new ArrayDeque<FileObject>();
             Set<FileObject> packages = new TreeSet<FileObject>(pathComparator);
             Set<String> pkgsContent = new HashSet<String>();
 

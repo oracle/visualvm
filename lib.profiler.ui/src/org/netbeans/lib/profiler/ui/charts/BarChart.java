@@ -57,7 +57,7 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
@@ -76,7 +76,7 @@ import javax.swing.event.AncestorListener;
 public class BarChart extends JComponent implements ComponentListener, AncestorListener, ChartModelListener, Accessible {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    List horizAxisXes = new LinkedList();
+    List horizAxisXes = new ArrayList();
     int horizAxisHeight = 0;
     int horizLegendWidth = 0;
     int vertAxisWidth = 0;

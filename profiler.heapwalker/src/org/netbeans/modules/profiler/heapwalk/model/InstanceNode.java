@@ -48,7 +48,6 @@ import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 import org.openide.util.NbBundle;
-import java.text.MessageFormat;
 import javax.swing.BoundedRangeModel;
 import javax.swing.ImageIcon;
 import javax.swing.event.ChangeEvent;
@@ -196,12 +195,14 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
                                                                                                                                                              .getInstanceId());
 
                 if (javaClass != null) {
-                    return "#" + instance.getInstanceNumber() + " (" + BrowserUtils.getSimpleType(javaClass.getName()) + ")"; // NOI18N
+                    return "#" + instance.getInstanceNumber() + " - " + BrowserUtils.getSimpleType(javaClass.getName()); // NOI18N
                 }
             }
         }
 
-        return "#" + instance.getInstanceNumber(); // NOI18N
+        String detailsValue = BrowserUtils.getInstanceDetailsString(instance);
+        return detailsValue == null ? "#" + instance.getInstanceNumber() : // NOI18N
+               "#" + instance.getInstanceNumber() + " - " + detailsValue; // NOI18N
     }
 
     protected String computeSize() {
