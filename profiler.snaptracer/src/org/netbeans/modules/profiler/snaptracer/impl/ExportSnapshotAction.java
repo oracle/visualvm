@@ -102,8 +102,7 @@ final class ExportSnapshotAction extends AbstractAction {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JFileChooser chooser = createFileChooser();
-                File file = FileUtil.toFile(snapshotFileObject);
-                String filename = file.getName();
+                String filename = snapshotFileObject.getName();
                 File lastDir = LAST_DIRECTORY != null ? new File(LAST_DIRECTORY) :
                                                         chooser.getCurrentDirectory();
                 chooser.setSelectedFile(new File(lastDir, filename));
@@ -117,14 +116,14 @@ final class ExportSnapshotAction extends AbstractAction {
                 } else {
                     LAST_DIRECTORY = selected.getParent();
                 }
-                if (!checkItselfOrOverwrite(file, selected)) actionPerformed(e);
-                else export(file, selected);
+                if (!checkItselfOrOverwrite(snapshotFileObject, selected)) actionPerformed(e);
+                else export(snapshotFileObject, selected);
             }
         });
     }
     
     // TODO: export also UI gestures file if available, preferably based on user option
-    private static void export(final File sourceFile, final File targetFile) {
+    private static void export(final FileObject sourceFO, final File targetFile) {
         final ProgressHandle progress = ProgressHandleFactory.createHandle(
                 Bundle.ExportSnapshotAction_ProgressMsg());
         progress.setInitialDelay(500);
@@ -136,7 +135,6 @@ final class ExportSnapshotAction extends AbstractAction {
                         ProfilerDialogs.displayError(
                                 Bundle.ExportSnapshotAction_CannotReplaceMsg(targetFile.getName()));
                     } else {
-                        FileObject sourceFO = FileUtil.toFileObject(sourceFile);
                         FileObject targetFO = FileUtil.toFileObject(targetFile.getParentFile());
                         String targetName = targetFile.getName();
                         int targetExtIndex = targetName.indexOf('.'); // NOI18N
@@ -172,10 +170,15 @@ final class ExportSnapshotAction extends AbstractAction {
         return fileChooser;
     }
     
-    private static boolean checkItselfOrOverwrite(File source, File target) {
+    private static boolean checkItselfOrOverwrite(FileObject sourceFO, File target) {
         if (!target.exists()) {
             return true;
-        } else if (source.equals(target)) {
+        }
+        File source = FileUtil.toFile(sourceFO);
+        if (source == null) {   // sourceFO is in memory
+            return true;
+        }
+        if (source.equals(target)) {
             ProfilerDialogs.displayError(Bundle.ExportSnapshotAction_ExportToItselfMsg());
             return false;
         } else {

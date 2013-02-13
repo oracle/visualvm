@@ -43,12 +43,12 @@
 
 package org.netbeans.modules.profiler.heapwalk.memorylint;
 
+import java.util.ArrayDeque;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
@@ -140,7 +140,7 @@ public final class Walker {
     }
 
     public void walk(Instance in, Filter f) {
-        Queue<Instance> q = new LinkedList<Instance>();
+        Queue<Instance> q = new ArrayDeque<Instance>();
         q.add(in);
 
         log.add(in);

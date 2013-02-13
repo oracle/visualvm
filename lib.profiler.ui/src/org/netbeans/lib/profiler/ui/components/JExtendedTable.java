@@ -46,7 +46,7 @@ package org.netbeans.lib.profiler.ui.components;
 import org.netbeans.lib.profiler.ui.components.table.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -318,11 +318,7 @@ public class JExtendedTable extends JTable implements CellTipAware, MouseListene
     }
 
     public void selectRowsByInstances(Object[] instances, int columnIndex, boolean setVisible) {
-        List instancesList = new LinkedList();
-
-        for (int i = 0; i < instances.length; i++) {
-            instancesList.add(instances[i]);
-        }
+        List instancesList = Arrays.asList(instances);
 
         getSelectionModel().clearSelection();
 
