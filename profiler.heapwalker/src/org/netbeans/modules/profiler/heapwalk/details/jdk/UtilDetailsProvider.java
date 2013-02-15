@@ -76,12 +76,15 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
         } else if (LOCALE_MASK.equals(className)) {
             String language = DetailsUtils.getInstanceFieldString(
                     instance, "language", heap);                                // NOI18N
-            if (language != null && !language.isEmpty()) {
-                String country = DetailsUtils.getInstanceFieldString(
+            if (language == null) language = "";                                // NOI18N
+            String country = DetailsUtils.getInstanceFieldString(
                     instance, "country", heap);                                 // NOI18N
-                if (country != null && !country.isEmpty())
-                    language += "_" + country;                                  // NOI18N
-                return language;
+            if (country == null) country = "";                                  // NOI18N
+            if (!language.isEmpty() || !country.isEmpty()) {
+                if (language.isEmpty() || country.isEmpty())
+                    return language + country;
+                else
+                    return language + "_" + country;                            // NOI18N
             }
         } else if (DATE_MASK.equals(className)) {
             long fastTime = DetailsUtils.getLongFieldValue(
