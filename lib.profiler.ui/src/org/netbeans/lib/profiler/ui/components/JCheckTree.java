@@ -57,9 +57,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -119,7 +118,7 @@ public class JCheckTree extends JExtendedTree {
                 TreePath[] paths = getSelectionPaths();
 
                 if ((paths != null) && (paths.length > 0)) {
-                    Collection changedNodes = new LinkedList();
+                    Collection changedNodes = new ArrayList();
 
                     for (int i = 0; i < paths.length; i++) {
                         TreePath path = paths[i];
