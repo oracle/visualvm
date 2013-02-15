@@ -45,6 +45,7 @@ package org.netbeans.modules.profiler.snaptracer.impl;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import org.netbeans.modules.profiler.snaptracer.impl.swing.VisibilityHandler;
@@ -63,6 +64,7 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
 import org.netbeans.modules.profiler.snaptracer.impl.timeline.TimelineSupport;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
 
 /**
@@ -165,7 +167,11 @@ final class TimelineView {
         FileObject npssFo = model.getSnapshot().getNpssFileObject();
         toolbar.add(new ExportSnapshotAction(npssFo));
         if (AttachToBugAction.isSupported()) {
-            toolbar.add(new AttachToBugAction(npssFo));
+            File snapshotFile = FileUtil.toFile(npssFo);
+            
+            if (snapshotFile != null) {
+                toolbar.add(new AttachToBugAction(snapshotFile));
+            }
         }
         toolbar.addSeparator();
         

@@ -334,7 +334,7 @@ public class Snapshot {
                 this.path = path;
             }
         }
-        Deque<State> stack = new LinkedList<State>();
+        Deque<State> stack = new ArrayDeque<State>();
         Set ignored = new HashSet();
         
         List<ReferenceChain> result = new ArrayList<ReferenceChain>();
