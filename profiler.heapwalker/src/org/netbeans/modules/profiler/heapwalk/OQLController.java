@@ -55,10 +55,12 @@ import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalk.memorylint.Utils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.OQLControllerUI;
@@ -253,7 +255,7 @@ public class OQLController extends AbstractTopLevelController
         }
         if (o instanceof Instance) {
             Instance i = (Instance) o;
-            sb.append(printInstance(i));
+            sb.append(printInstance(i, heapFragmentWalker.getHeapFragment()));
         } else if (o instanceof JavaClass) {
             JavaClass c = (JavaClass)o;
             sb.append(printClass(c));
@@ -268,7 +270,7 @@ public class OQLController extends AbstractTopLevelController
                 }
                 o = rc.getObj();
                 if (o instanceof Instance) {
-                    sb.append(printInstance((Instance)o));
+                    sb.append(printInstance((Instance)o, heapFragmentWalker.getHeapFragment()));
                 } else if (o instanceof JavaClass) {
                     sb.append(printClass((JavaClass)o));
                 }
@@ -390,14 +392,14 @@ public class OQLController extends AbstractTopLevelController
             field = "." + clsName.substring(colonIdx + 1); // NOI18N
         }
 
-        String dispName = clsName.substring(dotIdx + 1);
+//        String dispName = clsName.substring(dotIdx + 1);
 
         return "<a href='file://class/" + cls.getJavaClassId() + "'>" + fullName + "</a>" + field; // NOI18N
     }
 
-    private static String printInstance(Instance in) {
+    private static String printInstance(Instance in, Heap heap) {
         String className = in.getJavaClass().getName();
-        String details = BrowserUtils.getInstanceDetailsString(in);  
+        String details = DetailsUtils.getInstanceString(in, heap);
         
 
         return "<a href='file://instance/" + className + "@" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>" + // NOI18N

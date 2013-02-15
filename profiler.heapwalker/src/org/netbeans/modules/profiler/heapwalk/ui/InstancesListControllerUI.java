@@ -96,9 +96,11 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
+import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker;
+import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
@@ -121,7 +123,8 @@ import org.openide.util.Lookup;
     "InstancesListControllerUI_RetainedSizeColumnDescr=Retained size of the instance",
     "InstancesListControllerUI_ReachableSizeColumnName=Reachable",
     "InstancesListControllerUI_ReachableSizeColumnDescr=Reachable size of the instance",
-    "InstancesListControllerUI_CopyIdString=Copy ID"
+    "InstancesListControllerUI_CopyIdString=Copy ID",
+    "InstancesListControllerUI_NoDetails=<No details>"
 })
 public class InstancesListControllerUI extends JTitledPanel {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -283,7 +286,7 @@ public class InstancesListControllerUI extends JTitledPanel {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ExtendedTreeTableModel instancesListTableModel;
-    private FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
+    private FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer(true);
     private Instance instanceToSelect = null;
     private InstancesListController instancesListController;
     private InstancesListTreeTableModel realInstancesListModel;
@@ -631,10 +634,10 @@ public class InstancesListControllerUI extends JTitledPanel {
         //    columnToolTips[3] = REACHABLE_SIZE_COLUMN_DESCR;
         int maxWidth = getFontMetrics(getFont()).charWidth('W') * 7; // NOI18N // initial width of data columns
 
-        FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
-        treeCellRenderer.setLeafIcon(null);
-        treeCellRenderer.setClosedIcon(null);
-        treeCellRenderer.setOpenIcon(null);
+//        FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
+//        treeCellRenderer.setLeafIcon(null);
+//        treeCellRenderer.setClosedIcon(null);
+//        treeCellRenderer.setOpenIcon(null);
 
         LabelTableCellRenderer dataCellRenderer = new LabelTableCellRenderer(JLabel.TRAILING);
 
@@ -725,7 +728,9 @@ public class InstancesListControllerUI extends JTitledPanel {
 
         setLayout(new BorderLayout());
         
-        final InstanceScrollPane scroll = new InstanceScrollPane();        
+        Heap heap = instancesListController.getInstancesController().
+                    getHeapFragmentWalker().getHeapFragment();
+        final InstanceScrollPane scroll = new InstanceScrollPane(heap);        
         add(new CollapsibleSplitPane(tablePanel, scroll), BorderLayout.CENTER);
 
         instancesListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -753,16 +758,19 @@ public class InstancesListControllerUI extends JTitledPanel {
                 }
             });
 
-        setPreferredSize(new Dimension(225, 500));
+        setPreferredSize(new Dimension(275, 500));
     }
     
     private static class InstanceScrollPane extends JScrollPane {
         
+        private final Heap heap;
         private Instance selectedInstance = null;
         private boolean instancePending = false;
         
         
-        InstanceScrollPane() {
+        InstanceScrollPane(Heap heap) {
+            this.heap = heap;
+            
             setBorder(BorderFactory.createEmptyBorder());
             setViewportBorder(BorderFactory.createLineBorder(
                     UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
@@ -788,9 +796,9 @@ public class InstancesListControllerUI extends JTitledPanel {
         
         private void showInstanceImpl() {
             JComponent instanceView = selectedInstance == null ? null :
-                       BrowserUtils.getInstanceDetailsView(selectedInstance);
+                       DetailsSupport.getDetailsView(selectedInstance, heap);
             if (instanceView == null) {
-                instanceView = new JLabel("<No details>", JLabel.CENTER);
+                instanceView = new JLabel(Bundle.InstancesListControllerUI_NoDetails(), JLabel.CENTER);
                 instanceView.setEnabled(false);
             }
             setViewportView(instanceView);

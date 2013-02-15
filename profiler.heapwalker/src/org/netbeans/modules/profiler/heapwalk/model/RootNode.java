@@ -71,6 +71,10 @@ public interface RootNode {
      * is returned so that <CODE>heap.getJavaClassByID(javaclassId).getJavaClassId() == javaclassId</CODE>
      */
     JavaClass getJavaClassByID(long javaclassId);
+    
+    String getDetails(Instance instance);
+    
+    void repaintView();
 
     /**
      * Called from inside of the model when visual appearance should be updated

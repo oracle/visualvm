@@ -60,6 +60,7 @@ import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.Value;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 
 
 /**
@@ -392,8 +393,8 @@ public class HeapWalkerNodeFactory {
         }
     }
 
-    public static ClassNode createRootClassNode(JavaClass javaClass, String name, final Runnable refresher, int mode,
-                                                final Heap heap) {
+    public static ClassNode createRootClassNode(JavaClass javaClass, String name, final Runnable refresher,
+                                                final Runnable repainter, int mode, final Heap heap) {
         return new ClassNode.RootNode(javaClass, name, null, mode) {
             public void refreshView() {
                 refresher.run();
@@ -406,11 +407,19 @@ public class HeapWalkerNodeFactory {
             public JavaClass getJavaClassByID(long javaclassId) {
                 return heap.getJavaClassByID(javaclassId);
             }
+            
+            public String getDetails(Instance instance) {
+                return DetailsSupport.getDetailsString(instance, heap);
+            }
+
+            public void repaintView() {
+                repainter.run();
+            }
         };
     }
 
     public static HeapWalkerInstanceNode createRootInstanceNode(Instance instance, String name, final Runnable refresher,
-                                                                int mode, final Heap heap) {
+                                                                final Runnable repainter, int mode, final Heap heap) {
         if (instance instanceof PrimitiveArrayInstance) {
             return new PrimitiveArrayNode.RootNode((PrimitiveArrayInstance) instance, name, null, mode) {
                 public void refreshView() {
@@ -423,6 +432,14 @@ public class HeapWalkerNodeFactory {
 
                 public JavaClass getJavaClassByID(long javaclassId) {
                     return heap.getJavaClassByID(javaclassId);
+                }
+                
+                public String getDetails(Instance instance) {
+                    return DetailsSupport.getDetailsString(instance, heap);
+                }
+
+                public void repaintView() {
+                    repainter.run();
                 }
             };
         } else if (instance instanceof ObjectArrayInstance) {
@@ -438,6 +455,14 @@ public class HeapWalkerNodeFactory {
                 public JavaClass getJavaClassByID(long javaclassId) {
                     return heap.getJavaClassByID(javaclassId);
                 }
+                
+                public String getDetails(Instance instance) {
+                    return DetailsSupport.getDetailsString(instance, heap);
+                }
+
+                public void repaintView() {
+                    repainter.run();
+                }
             };
         } else {
             return new ObjectNode.RootNode(instance, name, null, mode) {
@@ -451,6 +476,14 @@ public class HeapWalkerNodeFactory {
 
                 public JavaClass getJavaClassByID(long javaclassId) {
                     return heap.getJavaClassByID(javaclassId);
+                }
+                
+                public String getDetails(Instance instance) {
+                    return DetailsSupport.getDetailsString(instance, heap);
+                }
+
+                public void repaintView() {
+                    repainter.run();
                 }
             };
         }
