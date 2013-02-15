@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,6 +24,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,16 +39,15 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.details;
+package org.netbeans.modules.profiler.heapwalk.details.basic;
 
+import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -52,24 +56,29 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "ArrayDetailsProvider_ItemsNumberString={0} items"
+    "ArrayDetailsProvider_OneItemString=1 item",                                // NOI18N
+    "ArrayDetailsProvider_ItemsNumberString={0} items"                          // NOI18N
 })
-@ServiceProvider(service=InstanceDetailsProvider.class)
-public class ArrayDetailsProvider extends InstanceDetailsProvider {
+@ServiceProvider(service=DetailsProvider.class)
+public final class ArrayDetailsProvider extends DetailsProvider {
     
-    public String getDetailsString(Instance instance) {
+    public String getDetailsString(String className, Instance instance, Heap heap) {
         if (instance instanceof PrimitiveArrayInstance) {
-            if ("char[]".equals(instance.getJavaClass().getName())) { // NOI18N
-                return getArrayValue(instance);
+            if ("char[]".equals(instance.getJavaClass().getName())) {           // NOI18N
+                return DetailsUtils.getPrimitiveArrayString(
+                        instance, 0, -1, null, "...");                          // NOI18N
             } else {
-                return Bundle.ArrayDetailsProvider_ItemsNumberString(
-                       ((PrimitiveArrayInstance)instance).getLength());
+                return getItemsString(((PrimitiveArrayInstance)instance).getLength());
             }
         } else if (instance instanceof ObjectArrayInstance) {
-            return Bundle.ArrayDetailsProvider_ItemsNumberString(
-                   ((ObjectArrayInstance)instance).getLength());
+            return getItemsString(((ObjectArrayInstance)instance).getLength());
         }
         return null;
+    }
+    
+    private static String getItemsString(int length) {
+        return length == 1 ? Bundle.ArrayDetailsProvider_OneItemString() :
+                             Bundle.ArrayDetailsProvider_ItemsNumberString(length);
     }
     
 }

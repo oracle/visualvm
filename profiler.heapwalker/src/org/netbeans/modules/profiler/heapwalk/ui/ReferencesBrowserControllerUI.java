@@ -240,7 +240,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
                 case 2:
                     return fieldNode.getType();
                 case 3:
-                    return fieldNode.getValue();
+                    return fieldNode;
                 case 4:
                     return fieldNode.getSize();
                 case 5:
@@ -261,7 +261,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private CardLayout contents;
-    private FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
+    private FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer(false);
     private FieldsListTreeTableModel realFieldsListTableModel;
     private ExtendedTreeTableModel fieldsListTableModel;
 //    private JMenuItem showClassItem;
@@ -684,10 +684,10 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
         int unitWidth = getFontMetrics(getFont()).charWidth('W'); // NOI18N // initial width of data columns
 
-        FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
-        treeCellRenderer.setLeafIcon(null);
-        treeCellRenderer.setClosedIcon(null);
-        treeCellRenderer.setOpenIcon(null);
+//        FieldTreeCellRenderer treeCellRenderer = new FieldTreeCellRenderer();
+//        treeCellRenderer.setLeafIcon(null);
+//        treeCellRenderer.setClosedIcon(null);
+//        treeCellRenderer.setOpenIcon(null);
 
         LabelTableCellRenderer dataCellRendererL = new LabelTableCellRenderer(JLabel.LEADING);
         LabelTableCellRenderer dataCellRendererT = new LabelTableCellRenderer(JLabel.TRAILING);
@@ -701,8 +701,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         columnWidths[2 - 1] = unitWidth * 28;
         columnRenderers[2] = dataCellRendererL;
 
-        columnWidths[3 - 1] = unitWidth * 14;
-        columnRenderers[3] = dataCellRendererT;
+        columnWidths[3 - 1] = unitWidth * 20;
+        columnRenderers[3] = new FieldTableCellRenderer();
 
         columnWidths[4 - 1] = unitWidth * 7;
         columnRenderers[4] = dataCellRendererT;

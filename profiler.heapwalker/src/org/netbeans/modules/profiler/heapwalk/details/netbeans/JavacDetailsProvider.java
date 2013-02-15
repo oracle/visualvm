@@ -43,9 +43,10 @@ package org.netbeans.modules.profiler.heapwalk.details.netbeans;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import org.netbeans.modules.profiler.heapwalk.details.InstanceDetailsProvider;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -53,12 +54,19 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Tomas Hurka
  */
-@ServiceProvider(service=InstanceDetailsProvider.class)
-public class JavacDetailsProvider extends InstanceDetailsProvider{
+@ServiceProvider(service=DetailsProvider.class)
+public class JavacDetailsProvider extends DetailsProvider.Basic {
+    
+    private static final String SHAREDNAMETABLE_NAMEIMPL_MASK =
+            "com.sun.tools.javac.util.SharedNameTable$NameImpl";                // NOI18N
+    
+    public JavacDetailsProvider() {
+        super(SHAREDNAMETABLE_NAMEIMPL_MASK);
+    }
 
     @Override
-    public String getDetailsString(Instance instance) {
-        if (isInstanceOf(instance, "com.sun.tools.javac.util.SharedNameTable$NameImpl")) { // NOI18N
+    public String getDetailsString(String className, Instance instance, Heap heap) {
+        if (SHAREDNAMETABLE_NAMEIMPL_MASK.equals(className)) { // NOI18N
             Integer length = (Integer) instance.getValueOfField("length"); // NOI18N
             Integer index = (Integer) instance.getValueOfField("index"); // NOI18N
             Instance table = (Instance) instance.getValueOfField("table"); // NOI18N
