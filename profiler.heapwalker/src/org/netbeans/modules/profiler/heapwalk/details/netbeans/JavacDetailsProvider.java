@@ -66,7 +66,7 @@ public class JavacDetailsProvider extends DetailsProvider.Basic {
 
     @Override
     public String getDetailsString(String className, Instance instance, Heap heap) {
-        if (SHAREDNAMETABLE_NAMEIMPL_MASK.equals(className)) { // NOI18N
+        if (SHAREDNAMETABLE_NAMEIMPL_MASK.equals(className)) {
             Integer length = (Integer) instance.getValueOfField("length"); // NOI18N
             Integer index = (Integer) instance.getValueOfField("index"); // NOI18N
             Instance table = (Instance) instance.getValueOfField("table"); // NOI18N
@@ -81,7 +81,7 @@ public class JavacDetailsProvider extends DetailsProvider.Basic {
                     data[i] = Byte.valueOf(el).byteValue();
                 }
                 try {
-                    return new String(data, "UTF-8");
+                    return new String(data, "UTF-8");   // NOI18N
                 } catch (UnsupportedEncodingException ex) {
                     Exceptions.printStackTrace(ex);
                 }
