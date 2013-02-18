@@ -46,7 +46,6 @@ package org.netbeans.modules.profiler.heapwalk.model;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.netbeans.lib.profiler.heap.*;
@@ -59,9 +58,7 @@ import javax.swing.tree.TreePath;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.heapwalk.details.InstanceDetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-import org.openide.util.Lookup;
 
 
 /**
@@ -101,7 +98,7 @@ public class BrowserUtils {
     public static final ImageIcon ICON_STATIC = Icons.getImageIcon(HeapWalkerIcons.STATIC);
     public static final ImageIcon ICON_LOOP = Icons.getImageIcon(HeapWalkerIcons.LOOP);
     public static final ImageIcon ICON_GCROOT = Icons.getImageIcon(HeapWalkerIcons.GC_ROOT);
-    private static final RequestProcessor requestProcessor = new RequestProcessor("HeapWalker Processor", 3); // NOI18N
+    private static final RequestProcessor REQUEST_PROCESSOR = new RequestProcessor("HeapWalker Processor", 5); // NOI18N
 
     private static final int MAX_FULLNAME_LENGTH = 100;
 
@@ -356,12 +353,12 @@ public class BrowserUtils {
         while (i-- > 0) b.append(" "); // NOI18N
     }
 
-    public static void performTask(Runnable task) {
-        requestProcessor.post(task);
+    public static RequestProcessor.Task performTask(Runnable task) {
+        return REQUEST_PROCESSOR.post(task);
     }
     
-    public static void performTask(Runnable task, int timeToWait) {
-        requestProcessor.post(task, timeToWait);
+    public static RequestProcessor.Task performTask(Runnable task, int timeToWait) {
+        return REQUEST_PROCESSOR.post(task, timeToWait);
     }
 
     private static String getNodeName(HeapWalkerNode node) {
@@ -379,28 +376,6 @@ public class BrowserUtils {
      */
     public static boolean isPrimitiveType(String className) {
         return PRIMITIVE_TYPES.contains(className);
-    }
-    
-    public static String getInstanceDetailsString(Instance instance) {
-        Collection<? extends InstanceDetailsProvider> providers =
-                Lookup.getDefault().lookupAll(InstanceDetailsProvider.class);
-        for (InstanceDetailsProvider provider : providers) {
-            String instanceDetails = provider.getDetailsString(instance);
-            if (instanceDetails != null) return instanceDetails;
-        }
-        
-        return null;
-    }
-    
-    public static InstanceDetailsProvider.View getInstanceDetailsView(Instance instance) {
-        Collection<? extends InstanceDetailsProvider> providers =
-                Lookup.getDefault().lookupAll(InstanceDetailsProvider.class);
-        for (InstanceDetailsProvider provider : providers) {
-            InstanceDetailsProvider.View instanceView = provider.getDetailsView(instance);
-            if (instanceView != null) return instanceView;
-        }
-        
-        return null;
     }
 
 }

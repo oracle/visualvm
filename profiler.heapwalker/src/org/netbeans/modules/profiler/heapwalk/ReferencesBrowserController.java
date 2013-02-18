@@ -331,11 +331,9 @@ public class ReferencesBrowserController extends AbstractController {
 
     private HeapWalkerNode getReferences(final Instance instance) {
         return HeapWalkerNodeFactory.createRootInstanceNode(instance, "this", // NOI18N
-                                                            new Runnable() {
-                public void run() {
-                    ((ReferencesBrowserControllerUI) getPanel()).refreshView();
-                }
-            }, HeapWalkerNode.MODE_REFERENCES, referencesControllerHandler.getHeapFragmentWalker().getHeapFragment());
+                new Runnable() { public void run() { ((ReferencesBrowserControllerUI) getPanel()).refreshView(); } },
+                new Runnable() { public void run() { getPanel().repaint(); } },
+                HeapWalkerNode.MODE_REFERENCES, referencesControllerHandler.getHeapFragmentWalker().getHeapFragment());
     }
 
     private HeapWalkerNode getFilteredReferences(HeapWalkerNode references, String filterValue) {

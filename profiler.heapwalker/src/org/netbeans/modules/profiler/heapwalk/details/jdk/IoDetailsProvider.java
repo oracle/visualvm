@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,6 +24,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,59 +39,36 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.details.netbeans;
+package org.netbeans.modules.profiler.heapwalk.details.jdk;
 
-import java.io.UnsupportedEncodingException;
-import java.util.List;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
-import org.openide.util.Exceptions;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
 @ServiceProvider(service=DetailsProvider.class)
-public class JavacDetailsProvider extends DetailsProvider.Basic {
+public final class IoDetailsProvider extends DetailsProvider.Basic {
     
-    private static final String SHAREDNAMETABLE_NAMEIMPL_MASK =
-            "com.sun.tools.javac.util.SharedNameTable$NameImpl";                // NOI18N
+    private static final String FILE_MASK = "java.io.File+";                    // NOI18N
+    private static final String ZIPFILE_MASK = "java.util.zip.ZipFile+";        // NOI18N
     
-    public JavacDetailsProvider() {
-        super(SHAREDNAMETABLE_NAMEIMPL_MASK);
+    public IoDetailsProvider() {
+        super(FILE_MASK, ZIPFILE_MASK);
     }
-
-    @Override
+    
     public String getDetailsString(String className, Instance instance, Heap heap) {
-        if (SHAREDNAMETABLE_NAMEIMPL_MASK.equals(className)) {
-            Integer length = (Integer) instance.getValueOfField("length"); // NOI18N
-            Integer index = (Integer) instance.getValueOfField("index"); // NOI18N
-            Instance table = (Instance) instance.getValueOfField("table"); // NOI18N
-            
-            if (length != null && index != null && table != null) {
-                PrimitiveArrayInstance bytes = (PrimitiveArrayInstance) table.getValueOfField("bytes"); // NOI18N
-                List elements = bytes.getValues();
-                byte[] data = new byte[length];
-                
-                for (int i = 0; i < length; i++) {
-                    String el = (String) elements.get(index+i);
-                    data[i] = Byte.valueOf(el).byteValue();
-                }
-                try {
-                    return new String(data, "UTF-8");   // NOI18N
-                } catch (UnsupportedEncodingException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
+        if (FILE_MASK.equals(className)) {                                      // File+
+            return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N
+        } else if (ZIPFILE_MASK.equals(className)) {                            // ZipFile+
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
+        
         return null;
     }
     
