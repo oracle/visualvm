@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,6 +24,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,36 +39,36 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.details;
+package org.netbeans.modules.profiler.heapwalk.details.jdk;
 
+import java.lang.ref.Reference;
+import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service=InstanceDetailsProvider.class)
-public class PrimitiveDetailsProvider extends InstanceDetailsProvider {
+@ServiceProvider(service=DetailsProvider.class)
+public final class ReferenceDetailsProvider extends DetailsProvider.Basic {
     
-    public String getDetailsString(Instance instance) {
-        if (isInstanceOf(instance, Character.class.getName())) {                // Character
-            Object value = instance.getValueOfField("value"); // NOI18N
-            return value instanceof Character ? "'" + ((Character)value).toString() + "'" : null; // NOI18N
-        } else if (isInstanceOf(instance, Integer.class.getName()) ||           // Integer
-                   isInstanceOf(instance, Byte.class.getName()) ||              // Byte
-                   isInstanceOf(instance, Long.class.getName()) ||              // Long
-                   isInstanceOf(instance, Short.class.getName()) ||             // Short
-                   isInstanceOf(instance, Double.class.getName()) ||            // Double
-                   isInstanceOf(instance, Float.class.getName()) ||             // Float
-                   isInstanceOf(instance, Boolean.class.getName())) {           // Boolean
-            Object value = instance.getValueOfField("value"); // NOI18N
-            return value != null ? value.toString() : null;
+    public ReferenceDetailsProvider() {
+        super(Reference.class.getName() + "+");                                 // NOI18N
+    }
+    
+    public String getDetailsString(String className, Instance instance, Heap heap) {
+        Object value = instance.getValueOfField("referent");                    // NOI18N
+        if (value instanceof Instance) {
+            Instance i = (Instance)value;
+            // TODO: can create cycle?
+            String s = DetailsUtils.getInstanceString(i, heap);
+            s = s == null ? "#" + i.getInstanceNumber() : ": " + s;             // NOI18N
+            return BrowserUtils.getSimpleType(i.getJavaClass().getName()) + s;
         }
         return null;
     }

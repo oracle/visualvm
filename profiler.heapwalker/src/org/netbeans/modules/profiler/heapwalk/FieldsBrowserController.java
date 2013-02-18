@@ -274,21 +274,17 @@ public class FieldsBrowserController extends AbstractController {
     }
 
     private HeapWalkerNode getFields(final Instance instance) {
-        return HeapWalkerNodeFactory.createRootInstanceNode(instance, "this", // NOI18N
-                                                            new Runnable() {
-            public void run() {
-                ((FieldsBrowserControllerUI) getPanel()).refreshView();
-            }
-        }, HeapWalkerNode.MODE_FIELDS, instancesControllerHandler.getHeapFragmentWalker().getHeapFragment());
+        return HeapWalkerNodeFactory.createRootInstanceNode(instance, "this",   // NOI18N
+                new Runnable() { public void run() { ((FieldsBrowserControllerUI) getPanel()).refreshView(); } },
+                new Runnable() { public void run() { getPanel().repaint(); } },
+                HeapWalkerNode.MODE_FIELDS, instancesControllerHandler.getHeapFragmentWalker().getHeapFragment());
     }
 
     private HeapWalkerNode getFields(final JavaClass javaClass) {
         return HeapWalkerNodeFactory.createRootClassNode(javaClass, "class", // NOI18N
-                                                         new Runnable() {
-            public void run() {
-                ((FieldsBrowserControllerUI) getPanel()).refreshView();
-            }
-        }, HeapWalkerNode.MODE_FIELDS, instancesControllerHandler.getHeapFragmentWalker().getHeapFragment());
+                new Runnable() { public void run() { ((FieldsBrowserControllerUI) getPanel()).refreshView(); } },
+                new Runnable() { public void run() { getPanel().repaint(); } },
+                HeapWalkerNode.MODE_FIELDS, instancesControllerHandler.getHeapFragmentWalker().getHeapFragment());
     }
 
     private HeapWalkerNode getFilteredFields(HeapWalkerNode fields, String filterValue) {

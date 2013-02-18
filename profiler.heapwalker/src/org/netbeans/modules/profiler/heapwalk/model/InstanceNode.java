@@ -50,6 +50,7 @@ import java.util.List;
 import org.openide.util.NbBundle;
 import javax.swing.BoundedRangeModel;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
@@ -78,6 +79,7 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
     HeapWalkerNode loopTo;
     private Instance instance;
     private String name;
+    private String details;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -117,6 +119,15 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
 
     public boolean hasInstance() {
         return instance != null;
+    }
+    
+    public String getDetails() {
+        if (!hasInstance()) return null;
+        if (details == null) {
+            details = "";
+            computeDetails();
+        }
+        return details;
     }
 
     protected List getReferences() {
@@ -186,6 +197,7 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
             return "null"; // NOI18N
         }
 
+        // TODO: can/should this be implemented using a DetailsProvider?
         if ("java.lang.Class".equals(instance.getJavaClass().getName())) { // NOI18N
 
             HeapWalkerNode root = BrowserUtils.getRoot(this);
@@ -199,10 +211,26 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
                 }
             }
         }
-
-        String detailsValue = BrowserUtils.getInstanceDetailsString(instance);
-        return detailsValue == null ? "#" + instance.getInstanceNumber() : // NOI18N
-               "#" + instance.getInstanceNumber() + " - " + detailsValue; // NOI18N
+        
+        return "#" + instance.getInstanceNumber(); // NOI18N
+    }
+    
+    protected void computeDetails() {
+        HeapWalkerNode _root = BrowserUtils.getRoot(this);
+        if (_root instanceof RootNode) {
+            final RootNode root = (RootNode)_root;
+            BrowserUtils.performTask(new Runnable() {
+                public void run() {
+                    final String d = root.getDetails(instance);
+                    if (d != null) SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            details = d;
+                            root.repaintView();
+                        }
+                    });
+                }
+            });
+        }
     }
 
     protected String computeSize() {
