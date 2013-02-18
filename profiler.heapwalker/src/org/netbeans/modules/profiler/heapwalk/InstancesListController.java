@@ -61,10 +61,13 @@ import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
+import org.netbeans.modules.profiler.heapwalk.model.RootNode;
 
 
 /**
@@ -140,7 +143,7 @@ public class InstancesListController extends AbstractController {
 
             return instancePath;
         }
-
+        
         @Override
         public String getID() {
             return "0x"+Long.toHexString(getJavaClass().getJavaClassId());
@@ -148,6 +151,14 @@ public class InstancesListController extends AbstractController {
 
         public JavaClass getJavaClassByID(long javaclassId) {
             return instancesController.getHeapFragmentWalker().getHeapFragment().getJavaClassByID(javaclassId);
+        }
+        
+        public String getDetails(Instance instance) {
+            return DetailsSupport.getDetailsString(instance, instancesController.getHeapFragmentWalker().getHeapFragment());
+        }
+    
+        public void repaintView() {
+            getPanel().repaint();
         }
 
         public boolean isLeaf() {
@@ -429,6 +440,7 @@ public class InstancesListController extends AbstractController {
         private String reachableSize;
         private String retainedSize;
         private String size;
+        private String details;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -436,17 +448,11 @@ public class InstancesListController extends AbstractController {
             this.parent = parent;
             this.instance = instance;
 
-            this.name = computeName(instance);
+            this.name = "#" + instance.getInstanceNumber(); // NOI18N
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
         
-        private static String computeName(Instance instance) {
-            String details = BrowserUtils.getInstanceDetailsString(instance);
-            return "#" + instance.getInstanceNumber() + (details == null ? // NOI18N
-                    "" : " - " + details); // NOI18N
-        }
-
         public HeapWalkerNode getChild(int index) {
             return null;
         }
@@ -546,6 +552,28 @@ public class InstancesListController extends AbstractController {
 
         public String getValue() {
             return parent.getValue();
+        }
+        
+        public String getDetails() {
+            if (details == null) {
+                details = "";
+                HeapWalkerNode _root = BrowserUtils.getRoot(parent);
+                if (_root instanceof RootNode) {
+                    final RootNode root = (RootNode)_root;
+                    BrowserUtils.performTask(new Runnable() {
+                        public void run() {
+                            final String d = root.getDetails(instance);
+                            if (d != null) SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    details = d;
+                                    root.repaintView();
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+            return details;
         }
 
         public boolean currentlyHasChildren() {
