@@ -84,6 +84,8 @@ public interface HeapWalkerNode extends CCTNode {
     public String getType();
 
     public String getValue();
+    
+    public String getDetails();
 
     public String getSize();
 

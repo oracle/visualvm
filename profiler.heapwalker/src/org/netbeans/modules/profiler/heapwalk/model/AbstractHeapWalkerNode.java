@@ -178,6 +178,10 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
 
         return value;
     }
+    
+    public String getDetails() {
+        return null;
+    }
 
     public String getSize() {
         if (size == null) {
