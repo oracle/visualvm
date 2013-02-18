@@ -44,13 +44,15 @@ package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.DefaultButtonModel;
@@ -58,17 +60,27 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.text.JTextComponent;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.PlaceholderIcon;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.PlaceholderPanel;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
@@ -77,6 +89,7 @@ import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
  */
 final class Builders {
     
+    // Make sure subclasses are listed before base class if using isSubclassOf
     static ComponentBuilder getComponentBuilder(Instance instance, Heap heap) {
         if (DetailsUtils.isSubclassOf(instance, JLabel.class.getName())) {
             return new JLabelBuilder(instance, heap);
@@ -96,6 +109,28 @@ final class Builders {
             return new JMenuBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JMenuItem.class.getName())) {
             return new JMenuItemBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JPanel.class.getName())) {
+            return new JPanelBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JComboBox.class.getName())) {
+            return new JComboBoxBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JTextField.class.getName())) {
+            return new JTextFieldBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JTextArea.class.getName())) {
+            return new JTextAreaBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JEditorPane.class.getName())) {
+            return new JEditorPaneBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JToolBar.class.getName())) {
+            return new JToolBarBuilder(instance, heap);
+        }
+        
+        
+        // Always at the end - support for unrecognized components
+         else if (DetailsUtils.isSubclassOf(instance, JComponent.class.getName())) {
+            return new JComponentBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, Container.class.getName())) {
+            return new ContainerBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, Component.class.getName())) {
+            return new ComponentBuilder(instance, heap);
         }
         return null;
     }
@@ -121,15 +156,16 @@ final class Builders {
     
     static final class PointBuilder extends InstanceBuilder<Point> {
         
+        private final int x;
+        private final int y;
+        
         PointBuilder(Instance instance, Heap heap) {
             super(instance, heap);
-            map.put("x", DetailsUtils.getIntFieldValue(instance, "x", 0));
-            map.put("y", DetailsUtils.getIntFieldValue(instance, "y", 0));
+            x = DetailsUtils.getIntFieldValue(instance, "x", 0);
+            y = DetailsUtils.getIntFieldValue(instance, "y", 0);
         }
         
         protected Point createInstanceImpl() {
-            int x = (Integer)map.get("x");
-            int y = (Integer)map.get("y");
             return new Point(x, y);
         }
         
@@ -137,15 +173,16 @@ final class Builders {
     
     static final class DimensionBuilder extends InstanceBuilder<Dimension> {
         
+        private final int width;
+        private final int height;
+        
         DimensionBuilder(Instance instance, Heap heap) {
             super(instance, heap);
-            map.put("width", DetailsUtils.getIntFieldValue(instance, "width", 0));
-            map.put("height", DetailsUtils.getIntFieldValue(instance, "height", 0));
+            width = DetailsUtils.getIntFieldValue(instance, "width", 0);
+            height = DetailsUtils.getIntFieldValue(instance, "height", 0);
         }
         
         protected Dimension createInstanceImpl() {
-            int width = (Integer)map.get("width");
-            int height = (Integer)map.get("height");
             return new Dimension(width, height);
         }
         
@@ -170,19 +207,20 @@ final class Builders {
     
     static final class InsetsBuilder extends InstanceBuilder<Insets> {
         
+        private final int top;
+        private final int left;
+        private final int bottom;
+        private final int right;
+        
         InsetsBuilder(Instance instance, Heap heap) {
             super(instance, heap);
-            map.put("top", DetailsUtils.getIntFieldValue(instance, "top", 0));
-            map.put("left", DetailsUtils.getIntFieldValue(instance, "left", 0));
-            map.put("bottom", DetailsUtils.getIntFieldValue(instance, "bottom", 0));
-            map.put("right", DetailsUtils.getIntFieldValue(instance, "right", 0));
+            top = DetailsUtils.getIntFieldValue(instance, "top", 0);
+            left = DetailsUtils.getIntFieldValue(instance, "left", 0);
+            bottom = DetailsUtils.getIntFieldValue(instance, "bottom", 0);
+            right = DetailsUtils.getIntFieldValue(instance, "right", 0);
         }
         
         protected Insets createInstanceImpl() {
-            int top = (Integer)map.get("top");
-            int left = (Integer)map.get("left");
-            int bottom = (Integer)map.get("bottom");
-            int right = (Integer)map.get("right");
             return new Insets(top, left, bottom, right);
         }
         
@@ -190,17 +228,18 @@ final class Builders {
     
     static final class FontBuilder extends InstanceBuilder<Font> {
         
+        private final String name;
+        private final int style;
+        private final int size;
+        
         FontBuilder(Instance instance, Heap heap) {
             super(instance, heap);
-            map.put("name", Utils.getFontName(instance, heap));
-            map.put("style", DetailsUtils.getIntFieldValue(instance, "style", 0));
-            map.put("size", DetailsUtils.getIntFieldValue(instance, "size", 10));
+            name = Utils.getFontName(instance, heap);
+            style = DetailsUtils.getIntFieldValue(instance, "style", 0);
+            size = DetailsUtils.getIntFieldValue(instance, "size", 10);
         }
         
         protected Font createInstanceImpl() {
-            String name = (String)map.get("name");
-            int style = (Integer)map.get("style");
-            int size = (Integer)map.get("size");
             return new Font(name, style, size);
         }
         
@@ -208,13 +247,14 @@ final class Builders {
     
     static final class ColorBuilder extends InstanceBuilder<Color> {
         
+        private final int value;
+        
         ColorBuilder(Instance instance, Heap heap) {
             super(instance, heap);
-            map.put("value", DetailsUtils.getIntFieldValue(instance, "value", 0));
+            value = DetailsUtils.getIntFieldValue(instance, "value", 0);
         }
         
         protected Color createInstanceImpl() {
-            int value = (Integer)map.get("value");
             return new Color(value);
         }
         
@@ -222,42 +262,75 @@ final class Builders {
     
     static final class IconBuilder extends InstanceBuilder<Icon> {
         
+        private final int width;
+        private final int height;
+        
         IconBuilder(Instance instance, Heap heap) {
             super(instance, heap);
-            map.put("width", DetailsUtils.getIntFieldValue(instance, "width", 0));
-            map.put("height", DetailsUtils.getIntFieldValue(instance, "height", 0));
+            width = DetailsUtils.getIntFieldValue(instance, "width", 0);
+            height = DetailsUtils.getIntFieldValue(instance, "height", 0);
         }
         
         protected Icon createInstanceImpl() {
-            final int width = (Integer)map.get("width");
-            final int height = (Integer)map.get("height");
-            return new Icon() {
-                public int getIconWidth() {
-                    return width;
-                }
-
-                public int getIconHeight() {
-                    return height;
-                }
-
-                public void paintIcon(Component c, Graphics g, int x, int y) {
-                    g.setColor(Color.WHITE);
-                    g.fillRect(x, y, width, height);
-                    g.setColor(Color.BLACK);
-                    g.drawLine(x, y, x + width - 1, y + height - 1);
-                    g.drawLine(x, y + height - 1, x + width - 1, y);
-                }
-            };
+            return new PlaceholderIcon(width, height);
         }
         
     }
     
-    static abstract class ComponentBuilder<T extends Component> extends InstanceBuilder<T> {
+    static final class ChildrenBuilder extends InstanceBuilder<Component[]> {
+        
+        private final List<InstanceBuilder<Component>> component;
+        
+        ChildrenBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            component = new ArrayList();
+            
+            if (instance instanceof ObjectArrayInstance) {                      // Component[] (JDK 5)
+                List<Instance> components = ((ObjectArrayInstance)instance).getValues();
+                for (Instance c : components) {
+                    // TODO: read ncomponents, skip trailing null items
+                    if (c != null) {
+                        ComponentBuilder builder = getComponentBuilder(c, heap);
+                        if (builder != null) component.add(builder);
+                    }
+                }
+            } else {                                                            // ArrayList<Component> (JDK 6+)
+                int size = DetailsUtils.getIntFieldValue(instance, "size", 0);
+                if (size > 0) {
+                    Object elementData = instance.getValueOfField("elementData");
+                    if (elementData instanceof ObjectArrayInstance) {
+                        List<Instance> components = ((ObjectArrayInstance)elementData).getValues();
+                        for (Instance c : components) {
+                            if (c != null) {
+                                ComponentBuilder builder = getComponentBuilder(c, heap);
+                                if (builder != null) component.add(builder);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        protected Component[] createInstanceImpl() {
+            Component[] components = new Component[component.size()];
+            for (int i = 0; i < components.length; i++)
+                components[i] = component.get(i).createInstance();
+            return components;
+        }
+        
+    }
+    
+    static class ComponentBuilder<T extends Component> extends InstanceBuilder<T> {
+        
+        protected final String className;
         
         private final RectangleBuilder bounds;
         
         ComponentBuilder(Instance instance, Heap heap) {
             super(instance, heap);
+            
+            className = instance.getJavaClass().getName();
             
             bounds = new RectangleBuilder(instance, heap);
             
@@ -293,6 +366,10 @@ final class Builders {
             instance.setEnabled((Boolean)map.get("enabled"));
         }
         
+        protected T createInstanceImpl() {
+            return (T)new PlaceholderPanel(className);
+        }
+        
         protected Component createPresenterImpl(T instance) { return instance; }
         
         final Component createPresenter() {
@@ -302,7 +379,32 @@ final class Builders {
         
     }
     
-    private static abstract class JComponentBuilder<T extends JComponent> extends ComponentBuilder<T> {
+    private static class ContainerBuilder<T extends Container> extends ComponentBuilder<T> {
+        
+        ContainerBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            Object component = instance.getValueOfField("component");
+            if (component instanceof Instance)
+                map.put("component", new ChildrenBuilder((Instance)component, heap));
+        }
+        
+        protected void setupInstance(T instance) {
+            super.setupInstance(instance);
+            
+            ChildrenBuilder component = (ChildrenBuilder)map.get("component");
+            if (component != null) {
+                Component[] components = component.createInstance();
+                for (Component c : components) instance.add(c);
+            }
+        }
+        
+        protected T createInstanceImpl() {
+            return (T)new PlaceholderPanel(className);
+        }
+        
+    }
+    
+    private static class JComponentBuilder<T extends JComponent> extends ContainerBuilder<T> {
         
         JComponentBuilder(Instance instance, Heap heap) {
             super(instance, heap);
@@ -326,6 +428,10 @@ final class Builders {
             int opaque_mask = (1 << 3);
             boolean opaque = ((Integer)map.get("flags") & opaque_mask) == opaque_mask;
             instance.setOpaque(opaque);
+        }
+        
+        protected T createInstanceImpl() {
+            return (T)new PlaceholderPanel(className);
         }
         
     }
@@ -476,10 +582,6 @@ final class Builders {
         
         JToggleButtonBuilder(Instance instance, Heap heap) {
             super(instance, heap);
-            
-            Object margin = instance.getValueOfField("margin");
-            if (margin instanceof Instance)
-                map.put("margin", new InsetsBuilder((Instance)margin, heap));
         }
         
         protected JToggleButton createInstanceImpl() {
@@ -577,6 +679,130 @@ final class Builders {
             JMenuBar menuBar = new JMenuBar();
             menuBar.add(instance);
             return menuBar;
+        }
+        
+    }
+    
+    private static class JPanelBuilder extends JComponentBuilder<JPanel> {
+        
+        JPanelBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+        }
+        
+        protected JPanel createInstanceImpl() {
+            return new JPanel(null);
+        }
+        
+    }
+    
+    private static class JComboBoxBuilder extends JComponentBuilder<JComboBox> {
+        
+        JComboBoxBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            map.put("isEditable", DetailsUtils.getBooleanFieldValue(instance, "isEditable", false));
+        }
+        
+        protected void setupInstance(JComboBox instance) {
+            super.setupInstance(instance);
+            
+            instance.setEditable((Boolean)map.get("isEditable"));
+        }
+        
+        protected JComboBox createInstanceImpl() {
+            return new JComboBox();
+        }
+        
+    }
+    
+    private static abstract class JTextComponentBuilder<T extends JTextComponent> extends JComponentBuilder<T> {
+        
+        JTextComponentBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            map.put("isEditable", DetailsUtils.getBooleanFieldValue(instance, "isEditable", false));
+            
+            Object margin = instance.getValueOfField("margin");
+            if (margin instanceof Instance)
+                map.put("margin", new InsetsBuilder((Instance)margin, heap));
+        }
+        
+        protected void setupInstance(T instance) {
+            super.setupInstance(instance);
+            
+            instance.setEditable((Boolean)map.get("isEditable"));
+            
+            InsetsBuilder margin = (InsetsBuilder)map.get("margin");
+            if (margin != null) instance.setMargin(margin.createInstance());
+        }
+        
+    }
+    
+    private static class JTextFieldBuilder extends JTextComponentBuilder<JTextField> {
+        
+        JTextFieldBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+        }
+        
+        protected JTextField createInstanceImpl() {
+            return new JTextField();
+        }
+        
+    }
+    
+    private static class JTextAreaBuilder extends JTextComponentBuilder<JTextArea> {
+        
+        JTextAreaBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+        }
+        
+        protected JTextArea createInstanceImpl() {
+            return new JTextArea();
+        }
+        
+    }
+    
+    private static class JEditorPaneBuilder extends JTextComponentBuilder<JEditorPane> {
+        
+        JEditorPaneBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+        }
+        
+        protected JEditorPane createInstanceImpl() {
+            return new JEditorPane();
+        }
+        
+    }
+    
+    private static class JToolBarBuilder extends JComponentBuilder<JToolBar> {
+        
+        JToolBarBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            map.put("paintBorder", DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true));
+            
+            Object margin = instance.getValueOfField("margin");
+            if (margin instanceof Instance)
+                map.put("margin", new InsetsBuilder((Instance)margin, heap));
+            
+            map.put("floatable", DetailsUtils.getBooleanFieldValue(instance, "floatable", true));
+            map.put("orientation", DetailsUtils.getIntFieldValue(instance, "orientation", JToolBar.HORIZONTAL));
+        }
+        
+        protected void setupInstance(JToolBar instance) {
+            super.setupInstance(instance);
+            
+            instance.setBorderPainted((Boolean)map.get("paintBorder"));
+            
+            InsetsBuilder margin = (InsetsBuilder)map.get("margin");
+            if (margin != null) instance.setMargin(margin.createInstance());
+            
+            instance.setFloatable((Boolean)map.get("floatable"));
+            instance.setOrientation((Integer)map.get("orientation"));
+        }
+        
+        protected JToolBar createInstanceImpl() {
+            return new JToolBar();
         }
         
     }

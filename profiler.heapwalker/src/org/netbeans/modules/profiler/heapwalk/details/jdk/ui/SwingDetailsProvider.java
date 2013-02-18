@@ -63,10 +63,11 @@ public final class SwingDetailsProvider extends DetailsProvider.Basic {
     private static final String JFILECHOOSER_MASK = "javax.swing.JFileChooser+";    // NOI18N
     private static final String JINTERNALFRAME_MASK = "javax.swing.JInternalFrame+";// NOI18N
     private static final String TABLECOLUMN_MASK = "javax.swing.table.TableColumn+";// NOI18N
+    private static final String JPANEL_MASK = "javax.swing.JPanel+";// NOI18N
     
     public SwingDetailsProvider() {
         super(JLABEL_MASK, ABSTRACTBUTTON_MASK, JTOOLTIP_MASK, JFILECHOOSER_MASK,
-              JINTERNALFRAME_MASK, TABLECOLUMN_MASK);
+              JINTERNALFRAME_MASK, TABLECOLUMN_MASK, JPANEL_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -92,7 +93,8 @@ public final class SwingDetailsProvider extends DetailsProvider.Basic {
     
     public View getDetailsView(String className, Instance instance, Heap heap) {
         if (JLABEL_MASK.equals(className) ||                                        // JLabel+
-            ABSTRACTBUTTON_MASK.equals(className)) {                                // AbstractButton+
+            ABSTRACTBUTTON_MASK.equals(className) ||                                // AbstractButton+
+            JPANEL_MASK.equals(className)) {                                        // JPanel+
             return new ComponentView(instance, heap);
         }
         return null;

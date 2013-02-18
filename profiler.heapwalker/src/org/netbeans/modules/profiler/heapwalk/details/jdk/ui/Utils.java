@@ -43,17 +43,26 @@
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyAdapter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionAdapter;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.InstanceBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.NbBundle;
 
 /**
@@ -87,6 +96,60 @@ final class Utils {
         return name;
     }
     
+    static final class PlaceholderIcon implements Icon {
+        
+        private final int width;
+        private final int height;
+        
+        PlaceholderIcon(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+        
+        public int getIconWidth() {
+            return width;
+        }
+
+        public int getIconHeight() {
+            return height;
+        }
+
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            g.setColor(Color.WHITE);
+            g.fillRect(x, y, width, height);
+            g.setColor(Color.BLACK);
+            g.drawLine(x, y, x + width - 1, y + height - 1);
+            g.drawLine(x, y + height - 1, x + width - 1, y);
+        }
+        
+    }
+    
+    static final class PlaceholderPanel extends JPanel {
+        
+        private static final Color LINE =
+                          UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
+                          UIManager.getColor("Button.darkShadow") : // NOI18N
+                          UIManager.getColor("Button.shadow"); // NOI18N
+        
+        PlaceholderPanel(String className) {
+            setOpaque(true);
+            setBorder(BorderFactory.createLineBorder(LINE));
+            
+            if (className != null) {
+                JLabel label = new JLabel(BrowserUtils.getSimpleType(className), JLabel.CENTER);
+                setLayout(new BorderLayout());
+                add(label, BorderLayout.CENTER);
+            }
+        }
+        
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(LINE);
+            g.drawLine(0, 0, getWidth() - 1, getHeight() - 1);
+            g.drawLine(0, getHeight() - 1, getWidth() - 1, 0);
+        }
+        
+    }
     
     static abstract class View<T extends InstanceBuilder> extends DetailsProvider.View {
         
@@ -96,7 +159,8 @@ final class Utils {
         private final boolean pattern;
         private final boolean stretch;
         
-        private boolean displayingComponent = false;
+        private Component component;
+        private JPanel glassPane;
         
         View(Instance instance, Heap heap) {
             this(10, true, false, instance, heap);
@@ -122,13 +186,19 @@ final class Utils {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     removeAll();
-                    Component component = builder == null ? null :
-                                          getComponent(builder);
+                    component = builder == null ? null : getComponent(builder);
                     if (component != null) {
                         component.setVisible(true);
                         if (stretch) {
                             add(component, BorderLayout.CENTER);
                         } else {
+                            glassPane = new JPanel(null);
+                            glassPane.setOpaque(false);
+                            glassPane.addMouseListener(new MouseAdapter() {});
+                            glassPane.addMouseMotionListener(new MouseMotionAdapter() {});
+                            glassPane.addKeyListener(new KeyAdapter() {});
+                            add(glassPane);
+                            
                             setLayout(null);
                             add(component);
                         }
@@ -140,7 +210,6 @@ final class Utils {
                         setPreferredSize(d);
                         setBackground(UIUtils.getProfilerResultsBackground());
                         setForeground(UIUtils.getDarker(getBackground()));
-                        displayingComponent = true;
                     } else {
                         component = new JLabel(Bundle.Utils_NoDetails(), JLabel.CENTER);
                         component.setEnabled(false);
@@ -158,19 +227,21 @@ final class Utils {
                 super.doLayout();
             } else {
                 Dimension size = getSize();
-                Dimension comp = getComponent(0).getSize();
+                Dimension comp = component.getSize();
                 
                 int x = comp.width >= size.width ? 0 :
                         (size.width - comp.width) / 2;
                 int y = comp.height >= size.height ? 0 :
                         (size.height - comp.height) / 2;
                 
-                getComponent(0).setLocation(x, y);
+                component.setLocation(x, y);
+                
+                glassPane.setBounds(component.getBounds());
             }
         }
         
         protected void paintComponent(Graphics g) {
-            if (!displayingComponent || !pattern) {
+            if (!pattern || component == null) {
                 super.paintComponent(g);
             } else {
                 int x = 0;
