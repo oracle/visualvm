@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,6 +24,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,28 +39,41 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.details;
+package org.netbeans.modules.profiler.heapwalk.details.basic;
 
+import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service=InstanceDetailsProvider.class)
-public class ThreadDetailsProvider extends InstanceDetailsProvider {
+@ServiceProvider(service=DetailsProvider.class)
+public final class StringDetailsProvider extends DetailsProvider.Basic {
     
-    public String getDetailsString(Instance instance) {
-        if (isSubclassOf(instance, Thread.class.getName())) {             // Thread+
-            return getArrayFieldValue(instance, "name"); // NOI18N
-        } else if (isSubclassOf(instance, ThreadGroup.class.getName())) { // ThreadGroup+
-            return getStringFieldValue(instance, "name"); // NOI18N
+    private static final String STRING_MASK = "java.lang.String";                   // NOI18N
+    private static final String BUILDERS_MASK = "java.lang.AbstractStringBuilder+"; // NOI18N
+    
+    public StringDetailsProvider() {
+        super(STRING_MASK, BUILDERS_MASK);
+    }
+    
+    public String getDetailsString(String className, Instance instance, Heap heap) {
+        if (STRING_MASK.equals(className)) {                                        // String
+            int offset = DetailsUtils.getIntFieldValue(instance, "offset", 0);      // NOI18N
+            int count = DetailsUtils.getIntFieldValue(instance, "count", -1);       // NOI18N
+            return DetailsUtils.getPrimitiveArrayFieldString(instance, "value",     // NOI18N
+                                                             offset, count, null,
+                                                             "...");                // NOI18N
+        } else if (BUILDERS_MASK.equals(className)) {                               // AbstractStringBuilder+
+            int count = DetailsUtils.getIntFieldValue(instance, "count", -1);       // NOI18N
+            return DetailsUtils.getPrimitiveArrayFieldString(instance, "value",     // NOI18N
+                                                             0, count, null,
+                                                             "...");                // NOI18N
         }
         return null;
     }

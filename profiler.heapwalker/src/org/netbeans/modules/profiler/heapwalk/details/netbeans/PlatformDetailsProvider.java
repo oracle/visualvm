@@ -45,18 +45,39 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import org.netbeans.modules.profiler.heapwalk.details.InstanceDetailsProvider;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Tomas Hurka
  */
-@ServiceProvider(service=InstanceDetailsProvider.class)
-public class PlatformDetailsProvider extends InstanceDetailsProvider {
+@ServiceProvider(service=DetailsProvider.class)
+public class PlatformDetailsProvider extends DetailsProvider.Basic {
 
+    private static final String STANDARD_MODULE = "org.netbeans.StandardModule+"; // NOI18N
+    private static final String SPECIFICATION_VERSION = "org.openide.modules.SpecificationVersion"; // NOI18N
+    private static final String TOP_COMPONENT = "org.openide.windows.TopComponent+"; // NOI18N
+    private static final String ABSTRACT_NODE = "org.openide.nodes.AbstractNode+"; // NOI18N
+    private static final String FILE_ENTRY = "org.openide.loaders.FileEntry+"; // NOI18N
+    private static final String DATA_OBJECT = "org.openide.loaders.DataObject+"; // NOI18N
+    private static final String FILE_OBJ = "org.netbeans.modules.masterfs.filebasedfs.fileobjects.FileObj+"; // NOI18N
+    private static final String FOLDER_OBJ = "org.netbeans.modules.masterfs.filebasedfs.fileobjects.FolderObj+"; // NOI18N
+    private static final String FILE_NAME = "org.netbeans.modules.masterfs.filebasedfs.naming.FileName+"; // NOI18N
+    private static final String FOLDER_NAME = "org.netbeans.modules.masterfs.filebasedfs.naming.FolderName+"; // NOI18N
+    private static final String FIXED_0_7 = "org.openide.util.CharSequences$Fixed_0_7"; // NOI18N
+    private static final String FIXED_8_15 = "org.openide.util.CharSequences$Fixed_8_15"; // NOI18N
+    private static final String FIXED_16_23 = "org.openide.util.CharSequences$Fixed_16_23"; // NOI18N
+    private static final String FIXED_1_10 = "org.openide.util.CharSequences$Fixed6Bit_1_10"; // NOI18N
+    private static final String FIXED_11_20 = "org.openide.util.CharSequences$Fixed6Bit_11_20"; // NOI18N
+    private static final String FIXED_21_30 = "org.openide.util.CharSequences$Fixed6Bit_21_30"; // NOI18N
+    private static final String BYTE_BASED_SEQUENCE = "org.openide.util.CharSequences$ByteBasedSequence"; // NOI18N
+    private static final String CHAR_BASED_SEQUENCE = "org.openide.util.CharSequences$CharBasedSequence"; // NOI18N
+    
     LinkedHashMap<Instance, String> cache = new LinkedHashMap<Instance, String>(10000) {
 
         @Override
@@ -64,22 +85,29 @@ public class PlatformDetailsProvider extends InstanceDetailsProvider {
             return size() > 10000;
         }
     };
+    
+    public PlatformDetailsProvider() {
+        super(STANDARD_MODULE,SPECIFICATION_VERSION,TOP_COMPONENT,ABSTRACT_NODE,
+              FILE_ENTRY,DATA_OBJECT,FILE_OBJ,FOLDER_OBJ,FILE_NAME,FIXED_0_7,
+              FIXED_8_15,FIXED_16_23,FIXED_1_10,FIXED_11_20,FIXED_21_30,
+              BYTE_BASED_SEQUENCE,CHAR_BASED_SEQUENCE);
+    }
 
     @Override
-    public String getDetailsString(Instance instance) {
+    public String getDetailsString(String className, Instance instance, Heap heap) {
         String s = cache.get(instance);
         if (s != null) {
             return s;
         }
-        s = getDetailsStringImpl(instance);
+        s = getDetailsStringImpl(className, instance, heap);
         cache.put(instance, s);
         return s;
     }
 
-    private String getDetailsStringImpl(Instance instance) {
-        if (isSubclassOf(instance, "org.netbeans.StandardModule"))  { // NOI18N
-            return getStringFieldValue(instance, "codeName");   // NOI18N
-        } else if (isSubclassOf(instance, "org.openide.modules.SpecificationVersion")) {   // NOI18N
+    private String getDetailsStringImpl(String className, Instance instance, Heap heap) {
+        if (STANDARD_MODULE.equals(className))  {
+            return DetailsUtils.getInstanceFieldString(instance, "codeName", heap);     // NOI18N
+        } else if (SPECIFICATION_VERSION.equals(className)) {
             PrimitiveArrayInstance digits = (PrimitiveArrayInstance) instance.getValueOfField("digits"); // NOI18N
             if (digits != null) {
                 StringBuilder specVersion = new StringBuilder();
@@ -90,104 +118,76 @@ public class PlatformDetailsProvider extends InstanceDetailsProvider {
                 }
                 return specVersion.substring(0, specVersion.length()-1);
             }
-        } else if (isSubclassOf(instance, "org.openide.windows.TopComponent")) {   // NOI18N
-            return getStringFieldValue(instance, "name"); // NOI18N
-        } else if (isSubclassOf(instance, "org.openide.nodes.AbstractNode")) {   // NOI18N
-            String name = getStringFieldValue(instance, "displayName"); // NOI18N
+        } else if (TOP_COMPONENT.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap);     // NOI18N
+        } else if (ABSTRACT_NODE.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "displayName", heap); // NOI18N
 
             if (name == null) {
-                name = getStringFieldValue(instance, "name"); // NOI18N
+                name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
             }
             if (name == null || name.length() == 0) {
-                name = getStringFieldValue(instance, "shortDescription"); // NOI18N
+                name = DetailsUtils.getInstanceFieldString(instance, "shortDescription", heap); // NOI18N
             }
             return name;
-        } else if (isSubclassOf(instance, "org.openide.loaders.FileEntry")) {   // NOI18N
-            Instance file = (Instance) instance.getValueOfField("file"); // NOI18N
+        } else if (FILE_ENTRY.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "file", heap); // NOI18N
+        } else if (DATA_OBJECT.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "primary", heap); // NOI18N
+        } else if (FILE_OBJ.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "fileName", heap); // NOI18N
+        } else if (FOLDER_OBJ.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "fileName", heap); // NOI18N
+        } else if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)) {
+            String nameString = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
 
-            if (file != null) {
-                return getDetailsString(file);
-            }
-        } else if (isSubclassOf(instance, "org.openide.loaders.DataObject")) {   // NOI18N
-            Instance primary = (Instance) instance.getValueOfField("primary"); // NOI18N
-
-            if (primary != null) {
-                return getDetailsString(primary);
-            }
-        } else if (isSubclassOf(instance, "org.netbeans.modules.masterfs.filebasedfs.fileobjects.FileObj")) {
-            Instance fileName = (Instance) instance.getValueOfField("fileName"); // NOI18N
-
-            if (fileName != null) {
-                return getDetailsString(fileName);
-            }
-        } else if (isSubclassOf(instance, "org.netbeans.modules.masterfs.filebasedfs.fileobjects.FolderObj")) {
-            Instance fileName = (Instance) instance.getValueOfField("fileName"); // NOI18N
-
-            if (fileName != null) {
-                return getDetailsString(fileName);
-            }
-        } else if (isSubclassOf(instance, "org.netbeans.modules.masterfs.filebasedfs.naming.FileName") ||     // NOI18N
-                   isSubclassOf(instance, "org.netbeans.modules.masterfs.filebasedfs.naming.FolderName")) {   // NOI18N
-            Instance parent = (Instance) instance.getValueOfField("parent"); // NOI18N
-            Instance name = (Instance) instance.getValueOfField("name"); // NOI18N
-
-            if (name != null) {
-                String nameString = getDetailsString(name);
-                if (nameString == null) {
-                    nameString = getStringValue(name);
-                    if (nameString != null) {
-                        nameString = nameString.substring(1,nameString.length()-1);
-                    }
+            if (nameString != null) {
+                String parentDetail = DetailsUtils.getInstanceFieldString(instance, "parent", heap); // NOI18N
+                if (parentDetail != null) {
+                    nameString = parentDetail.concat("/").concat(nameString);   // NOI18N                    
                 }
-                if (parent != null && nameString != null) {
-                    String parentDetail = getDetailsString(parent);
-                    if (parentDetail != null) {
-                        nameString = parentDetail.concat("/").concat(nameString);   // NOI18N                    
-                    }
-                }
-                return nameString;
             }
-            return null;
-        } else if (isInstanceOf(instance, "org.openide.util.CharSequences$Fixed_0_7")) {    // NOI18N
-            Integer i1 = (Integer) instance.getValueOfField("i1");
-            Integer i2 = (Integer) instance.getValueOfField("i2");
+            return nameString;
+        } else if (FIXED_0_7.equals(className)) {
+            Integer i1 = (Integer) instance.getValueOfField("i1"); // NOI18N
+            Integer i2 = (Integer) instance.getValueOfField("i2"); // NOI18N
             if (i1 != null && i2 != null) {
                 return new Fixed_0_7(i1, i2).toString();
             }
-        } else if (isInstanceOf(instance, "org.openide.util.CharSequences$Fixed_8_15")) {    // NOI18N
-            Integer i1 = (Integer) instance.getValueOfField("i1");
-            Integer i2 = (Integer) instance.getValueOfField("i2");
-            Integer i3 = (Integer) instance.getValueOfField("i3");
-            Integer i4 = (Integer) instance.getValueOfField("i4");
+        } else if (FIXED_8_15.equals(className)) {
+            Integer i1 = (Integer) instance.getValueOfField("i1"); // NOI18N
+            Integer i2 = (Integer) instance.getValueOfField("i2"); // NOI18N
+            Integer i3 = (Integer) instance.getValueOfField("i3"); // NOI18N
+            Integer i4 = (Integer) instance.getValueOfField("i4"); // NOI18N
             if (i1 != null && i2 != null && i3 != null && i4 != null) {
                 return new Fixed_8_15(i1, i2, i3, i4).toString();
             }
-        } else if (isInstanceOf(instance, "org.openide.util.CharSequences$Fixed_16_23")) {    // NOI18N
-            Long i1 = (Long) instance.getValueOfField("i1");
-            Long i2 = (Long) instance.getValueOfField("i2");
-            Long i3 = (Long) instance.getValueOfField("i3");
+        } else if (FIXED_16_23.equals(className)) {
+            Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
+            Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
+            Long i3 = (Long) instance.getValueOfField("i3"); // NOI18N
             if (i1 != null && i2 != null && i3 != null) {
                 return new Fixed_16_23(i1, i2, i3).toString();
             }
-        } else if (isInstanceOf(instance, "org.openide.util.CharSequences$Fixed6Bit_1_10")) {    // NOI18N
-            Long i1 = (Long) instance.getValueOfField("i");
+        } else if (FIXED_1_10.equals(className)) {
+            Long i1 = (Long) instance.getValueOfField("i"); // NOI18N
             if (i1 != null) {
                 return new Fixed6Bit_1_10(i1).toString();
             }
-        } else if (isInstanceOf(instance, "org.openide.util.CharSequences$Fixed6Bit_11_20")) {    // NOI18N
-            Long i1 = (Long) instance.getValueOfField("i1");
-            Long i2 = (Long) instance.getValueOfField("i2");
+        } else if (FIXED_11_20.equals(className)) {
+            Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
+            Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
             if (i1 != null && i2 != null) {
                 return new Fixed6Bit_11_20(i1, i2).toString();
             }
-        } else if (isInstanceOf(instance, "org.openide.util.CharSequences$Fixed6Bit_21_30")) {    // NOI18N
-            Long i1 = (Long) instance.getValueOfField("i1");
-            Long i2 = (Long) instance.getValueOfField("i2");
-            Long i3 = (Long) instance.getValueOfField("i3");
+        } else if (FIXED_11_20.equals(className)) {
+            Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
+            Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
+            Long i3 = (Long) instance.getValueOfField("i3"); // NOI18N
             if (i1 != null && i2 != null && i3 != null) {
                 return new Fixed6Bit_21_30(i1, i2, i3).toString();
             }
-        } else if (isInstanceOf(instance, "org.openide.util.CharSequences$ByteBasedSequence")) {    // NOI18N
+        } else if (BYTE_BASED_SEQUENCE.equals(className)) {
             Object value = instance.getValueOfField("value");  // NOI18N
             if (value instanceof PrimitiveArrayInstance) {
                 PrimitiveArrayInstance bytesArr = (PrimitiveArrayInstance) value;
@@ -199,8 +199,8 @@ public class PlatformDetailsProvider extends InstanceDetailsProvider {
                 }
                 return new String(bytes);
             }
-        } else if (isInstanceOf(instance, "org.openide.util.CharSequences$CharBasedSequence")) {    // NOI18N
-            return getArrayFieldValue(instance, "value");  // NOI18N
+        } else if (CHAR_BASED_SEQUENCE.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "value", heap);    // NOI18N
         }
         return null;
     }
