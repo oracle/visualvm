@@ -45,8 +45,11 @@ package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
@@ -54,6 +57,8 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JViewport;
+import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -131,15 +136,25 @@ final class Utils {
                           UIManager.getColor("Button.darkShadow") : // NOI18N
                           UIManager.getColor("Button.shadow"); // NOI18N
         
+        private final JLabel label;
+        
         PlaceholderPanel(String className) {
+            super(null);
             setOpaque(true);
             setBorder(BorderFactory.createLineBorder(LINE));
             
-            if (className != null) {
-                JLabel label = new JLabel(BrowserUtils.getSimpleType(className), JLabel.CENTER);
-                setLayout(new BorderLayout());
-                add(label, BorderLayout.CENTER);
-            }
+            label = new JLabel(BrowserUtils.getSimpleType(className), JLabel.CENTER);
+            label.setOpaque(true);
+        }
+        
+        public void doLayout() {
+            Dimension s = getSize();
+            Dimension p = label.getPreferredSize();
+            
+            int x = (s.width - p.width) / 2;
+            int y = (s.height - p.height) / 2;
+            
+            label.setBounds(x, y, p.width, p.height);
         }
         
         protected void paintComponent(Graphics g) {
@@ -147,11 +162,16 @@ final class Utils {
             g.setColor(LINE);
             g.drawLine(0, 0, getWidth() - 1, getHeight() - 1);
             g.drawLine(0, getHeight() - 1, getWidth() - 1, 0);
+            
+            Point p = label.getLocation();
+            g.translate(p.x, p.y);
+            label.paint(g);
+            g.translate(-p.x, -p.y);
         }
         
     }
     
-    static abstract class View<T extends InstanceBuilder> extends DetailsProvider.View {
+    static abstract class View<T extends InstanceBuilder> extends DetailsProvider.View implements Scrollable {
         
         private static final int DASH_SIZE = 20;
         
@@ -261,6 +281,35 @@ final class Utils {
                     y += DASH_SIZE;
                 }
             }
+        }
+        
+        public Dimension getPreferredScrollableViewportSize() {
+            return null;
+        }
+
+        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+            // Scroll almost one screen
+            Container parent = getParent();
+            if ((parent == null) || !(parent instanceof JViewport)) return 50;
+            return (int)(((JViewport)parent).getHeight() * 0.95f);
+        }
+
+        public boolean getScrollableTracksViewportHeight() {
+            // Allow dynamic vertical enlarging of the panel but request the vertical scrollbar when needed
+            Container parent = getParent();
+            if ((parent == null) || !(parent instanceof JViewport)) return false;
+            return getPreferredSize().height < ((JViewport)parent).getHeight();
+        }
+
+        public boolean getScrollableTracksViewportWidth() {
+            // Allow dynamic horizontal enlarging of the panel but request the vertical scrollbar when needed
+            Container parent = getParent();
+            if ((parent == null) || !(parent instanceof JViewport)) return false;
+            return getPreferredSize().width < ((JViewport)parent).getWidth();
+        }
+
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 20;
         }
         
     }

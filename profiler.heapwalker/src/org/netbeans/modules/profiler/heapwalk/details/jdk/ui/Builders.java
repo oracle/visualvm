@@ -53,8 +53,12 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.DefaultButtonModel;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
@@ -67,12 +71,24 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollBar;
+import javax.swing.JSeparator;
+import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
@@ -119,6 +135,20 @@ final class Builders {
             return new JEditorPaneBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JToolBar.class.getName())) {
             return new JToolBarBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, Box.Filler.class.getName())) {
+            return new BoxFillerBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, Box.class.getName())) {
+            return new BoxBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JScrollBar.class.getName())) {
+            return new JScrollBarBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JToolBar.Separator.class.getName())) {
+            return new JToolBarSeparatorBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JSeparator.class.getName())) {
+            return new JSeparatorBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JProgressBar.class.getName())) {
+            return new JProgressBarBuilder(instance, heap);
+        } else if (DetailsUtils.isSubclassOf(instance, JSlider.class.getName())) {
+            return new JSliderBuilder(instance, heap);
         }
         
         
@@ -161,6 +191,12 @@ final class Builders {
             y = DetailsUtils.getIntFieldValue(instance, "y", 0);
         }
         
+        static PointBuilder fromField(Instance instance, Heap heap, String field) {
+            Object point = instance.getValueOfField(field);
+            if (!(point instanceof Instance)) return null;
+            return new PointBuilder((Instance)point, heap);
+        }
+        
         protected Point createInstanceImpl() {
             return new Point(x, y);
         }
@@ -178,6 +214,12 @@ final class Builders {
             height = DetailsUtils.getIntFieldValue(instance, "height", 0);
         }
         
+        static DimensionBuilder fromField(Instance instance, Heap heap, String field) {
+            Object dimension = instance.getValueOfField(field);
+            if (!(dimension instanceof Instance)) return null;
+            return new DimensionBuilder((Instance)dimension, heap);
+        }
+        
         protected Dimension createInstanceImpl() {
             return new Dimension(width, height);
         }
@@ -193,6 +235,12 @@ final class Builders {
             super(instance, heap);
             point = new PointBuilder(instance, heap);
             dimension = new DimensionBuilder(instance, heap);
+        }
+        
+        static RectangleBuilder fromField(Instance instance, Heap heap, String field) {
+            Object rectangle = instance.getValueOfField(field);
+            if (!(rectangle instanceof Instance)) return null;
+            return new RectangleBuilder((Instance)rectangle, heap);
         }
         
         protected Rectangle createInstanceImpl() {
@@ -216,6 +264,12 @@ final class Builders {
             right = DetailsUtils.getIntFieldValue(instance, "right", 0);
         }
         
+        static InsetsBuilder fromField(Instance instance, Heap heap, String field) {
+            Object insets = instance.getValueOfField(field);
+            if (!(insets instanceof Instance)) return null;
+            return new InsetsBuilder((Instance)insets, heap);
+        }
+        
         protected Insets createInstanceImpl() {
             return new Insets(top, left, bottom, right);
         }
@@ -235,6 +289,19 @@ final class Builders {
             size = DetailsUtils.getIntFieldValue(instance, "size", 10);
         }
         
+        static FontBuilder fromField(Instance instance, Heap heap, String field) {
+            Object font = instance.getValueOfField(field);
+            if (!(font instanceof Instance)) return null;
+            
+            Instance _font = (Instance)font;
+            
+            // Do not build FontUIResource, mostly the defaults for JComponents
+            if (DetailsUtils.isSubclassOf(_font, "javax.swing.plaf.FontUIResource"))
+                return null;
+            
+            return new FontBuilder(_font, heap);
+        }
+        
         protected Font createInstanceImpl() {
             return new Font(name, style, size);
         }
@@ -248,6 +315,19 @@ final class Builders {
         ColorBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             value = DetailsUtils.getIntFieldValue(instance, "value", 0);
+        }
+        
+        static ColorBuilder fromField(Instance instance, Heap heap, String field) {
+            Object color = instance.getValueOfField(field);
+            if (!(color instanceof Instance)) return null;
+            
+            Instance _color = (Instance)color;
+            
+            // Do not build ColorUIResource, mostly the defaults for JComponents
+            if (DetailsUtils.isSubclassOf(_color, "javax.swing.plaf.ColorUIResource"))
+                return null;
+            
+            return new ColorBuilder((Instance)color, heap);
         }
         
         protected Color createInstanceImpl() {
@@ -265,6 +345,13 @@ final class Builders {
             super(instance, heap);
             width = DetailsUtils.getIntFieldValue(instance, "width", 0);
             height = DetailsUtils.getIntFieldValue(instance, "height", 0);
+        }
+        
+        static IconBuilder fromField(Instance instance, Heap heap, String field) {
+            Object icon = instance.getValueOfField(field);
+            if (!(icon instanceof Instance)) return null;
+            if (!DetailsUtils.isSubclassOf((Instance)icon, ImageIcon.class.getName())) return null;
+            return new IconBuilder((Instance)icon, heap);
         }
         
         protected Icon createInstanceImpl() {
@@ -307,6 +394,12 @@ final class Builders {
             }
         }
         
+        static ChildrenBuilder fromField(Instance instance, Heap heap, String field) {
+            Object children = instance.getValueOfField(field);
+            if (!(children instanceof Instance)) return null;
+            return new ChildrenBuilder((Instance)children, heap);
+        }
+        
         protected Component[] createInstanceImpl() {
             Component[] components = new Component[component.size()];
             for (int i = 0; i < components.length; i++)
@@ -334,16 +427,10 @@ final class Builders {
             
             bounds = new RectangleBuilder(instance, heap);
             
-            Object _foreground = instance.getValueOfField("foreground");
-            foreground = _foreground instanceof Instance ? 
-                    new ColorBuilder((Instance)_foreground, heap) : null;
-            Object _background = instance.getValueOfField("background");
-            background = _background instanceof Instance ? 
-                    new ColorBuilder((Instance)_background, heap) : null;
+            foreground = ColorBuilder.fromField(instance, heap, "foreground");
+            background = ColorBuilder.fromField(instance, heap, "background");
             
-            Object _font = instance.getValueOfField("font");
-            font = _font instanceof Instance ? 
-                    new FontBuilder((Instance)_font, heap) : null;
+            font = FontBuilder.fromField(instance, heap, "font");
             
             visible = DetailsUtils.getBooleanFieldValue(instance, "visible", true);
             enabled = DetailsUtils.getBooleanFieldValue(instance, "enabled", true);
@@ -381,11 +468,13 @@ final class Builders {
         private final ChildrenBuilder component;
         
         ContainerBuilder(Instance instance, Heap heap) {
+            this(instance, heap, true);
+        }
+        
+        protected ContainerBuilder(Instance instance, Heap heap, boolean trackChildren) {
             super(instance, heap);
             
-            Object _component = instance.getValueOfField("component");
-            component = _component instanceof Instance ? 
-                    new ChildrenBuilder((Instance)_component, heap) : null;
+            component = trackChildren ? ChildrenBuilder.fromField(instance, heap, "component") : null;
         }
         
         protected void setupInstance(T instance) {
@@ -409,15 +498,22 @@ final class Builders {
         private final float alignmentX;
         private final boolean isAlignmentYSet;
         private final float alignmentY;
+        private final BorderBuilder border;
         private final int flags;
         
         JComponentBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+            this(instance, heap, true);
+        }
+        
+        protected JComponentBuilder(Instance instance, Heap heap, boolean trackChildren) {
+            super(instance, heap, trackChildren);
             
             isAlignmentXSet = DetailsUtils.getBooleanFieldValue(instance, "isAlignmentXSet", false);
             alignmentX = DetailsUtils.getFloatFieldValue(instance, "alignmentX", 0);
             isAlignmentYSet = DetailsUtils.getBooleanFieldValue(instance, "isAlignmentYSet", false);
             alignmentY = DetailsUtils.getFloatFieldValue(instance, "alignmentY", 0);
+            
+            border = BorderBuilderFactory.fromField(instance, heap, "border");
             
             flags = DetailsUtils.getIntFieldValue(instance, "flags", 0);
         }
@@ -427,6 +523,11 @@ final class Builders {
             
             if (isAlignmentXSet) instance.setAlignmentX(alignmentX);
             if (isAlignmentYSet) instance.setAlignmentY(alignmentY);
+            
+            if (border != null) {
+                Border b = border.createInstance();
+                if (b != null) instance.setBorder(b);
+            }
             
             int opaque_mask = (1 << 3);
             boolean opaque = (flags & opaque_mask) == opaque_mask;
@@ -450,14 +551,11 @@ final class Builders {
         private final int iconTextGap;
         
         JLabelBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+            super(instance, heap, false);
             
             text = DetailsUtils.getInstanceFieldString(instance, "text", heap);
             
-            Object _defaultIcon = instance.getValueOfField("defaultIcon");
-            defaultIcon = _defaultIcon instanceof Instance &&
-                DetailsUtils.isSubclassOf((Instance)_defaultIcon, "javax.swing.ImageIcon") ?
-                    new IconBuilder((Instance)_defaultIcon, heap) : null;
+            defaultIcon = IconBuilder.fromField(instance, heap, "defaultIcon");
             
             verticalAlignment = DetailsUtils.getIntFieldValue(instance, "verticalAlignment", JLabel.CENTER);
             horizontalAlignment = DetailsUtils.getIntFieldValue(instance, "horizontalAlignment", JLabel.LEADING);
@@ -496,6 +594,13 @@ final class Builders {
             stateMask = DetailsUtils.getIntFieldValue(instance, "stateMask", 0);
         }
         
+        static DefaultButtonModelBuilder fromField(Instance instance, Heap heap, String field) {
+            Object model = instance.getValueOfField(field);
+            if (!(model instanceof Instance)) return null;
+            if (!DetailsUtils.isSubclassOf((Instance)model, DefaultButtonModel.class.getName())) return null;
+            return new DefaultButtonModelBuilder((Instance)model, heap);
+        }
+        
         protected void setupInstance(DefaultButtonModel instance) {
             super.setupInstance(instance);
             
@@ -529,27 +634,19 @@ final class Builders {
         private final int iconTextGap;
         
         AbstractButtonBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+            this(instance, heap, false);
+        }
+        
+        AbstractButtonBuilder(Instance instance, Heap heap, boolean trackChildren) {
+            super(instance, heap, false);
             
-            Object _model = instance.getValueOfField("model");
-            if (_model instanceof Instance) {
-                Instance __model = (Instance)_model;
-                model = DetailsUtils.isSubclassOf(__model, DefaultButtonModel.class.getName()) ?
-                        new DefaultButtonModelBuilder(__model, heap) : null;
-            } else {
-                model = null;
-            }
+            model = DefaultButtonModelBuilder.fromField(instance, heap, "model");
             
             text = DetailsUtils.getInstanceFieldString(instance, "text", heap);
             
-            Object _margin = instance.getValueOfField("margin");
-            margin = _margin instanceof Instance ?
-                    new InsetsBuilder((Instance)_margin, heap) : null;
+            margin = InsetsBuilder.fromField(instance, heap, "margin");
             
-            Object _defaultIcon = instance.getValueOfField("defaultIcon");
-            defaultIcon = _defaultIcon instanceof Instance &&
-                DetailsUtils.isSubclassOf((Instance)_defaultIcon, "javax.swing.ImageIcon") ?
-                    new IconBuilder((Instance)_defaultIcon, heap) : null;
+            defaultIcon = IconBuilder.fromField(instance, heap, "defaultIcon");
             
             borderPaintedSet = DetailsUtils.getBooleanFieldValue(instance, "borderPaintedSet", false);
             paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);
@@ -643,7 +740,7 @@ final class Builders {
     private static class JMenuItemBuilder extends AbstractButtonBuilder<JMenuItem> {
         
         JMenuItemBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+            super(instance, heap, true);
         }
         
         protected JMenuItem createInstanceImpl() {
@@ -722,7 +819,7 @@ final class Builders {
         private final boolean isEditable;
         
         JComboBoxBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+            super(instance, heap, false);
             
             isEditable = DetailsUtils.getBooleanFieldValue(instance, "isEditable", false);
         }
@@ -745,13 +842,11 @@ final class Builders {
         private final InsetsBuilder margin;
         
         JTextComponentBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
+            super(instance, heap, false);
             
             isEditable = DetailsUtils.getBooleanFieldValue(instance, "isEditable", false);
             
-            Object _margin = instance.getValueOfField("margin");
-            margin = _margin instanceof Instance ?
-                    new InsetsBuilder((Instance)_margin, heap) : null;
+            margin = InsetsBuilder.fromField(instance, heap, "margin");
         }
         
         protected void setupInstance(T instance) {
@@ -812,9 +907,7 @@ final class Builders {
             
             paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);
             
-            Object _margin = instance.getValueOfField("margin");
-            margin = _margin instanceof Instance ?
-                    new InsetsBuilder((Instance)_margin, heap) : null;
+            margin = InsetsBuilder.fromField(instance, heap, "margin");
             
             floatable = DetailsUtils.getBooleanFieldValue(instance, "floatable", true);
             orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JToolBar.HORIZONTAL);
@@ -833,6 +926,428 @@ final class Builders {
         
         protected JToolBar createInstanceImpl() {
             return new JToolBar();
+        }
+        
+    }
+    
+    private static class BoxBuilder extends JComponentBuilder<Box> {
+        
+        BoxBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+        }
+        
+        protected Box createInstanceImpl() {
+            return Box.createHorizontalBox();
+        }
+        
+    }
+    
+    private static class BoxFillerBuilder extends JComponentBuilder<Box.Filler> {
+        
+        BoxFillerBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+        }
+        
+        protected Box.Filler createInstanceImpl() {
+            return new Box.Filler(null, null, null);
+        }
+        
+    }
+    
+    private static class DefaultBoundedRangeModelBuilder extends InstanceBuilder<DefaultBoundedRangeModel> {
+        
+        private final int value;
+        private final int extent;
+        private final int min;
+        private final int max;
+        
+        DefaultBoundedRangeModelBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            value = DetailsUtils.getIntFieldValue(instance, "value", 0);
+            extent = DetailsUtils.getIntFieldValue(instance, "extent", 0);
+            min = DetailsUtils.getIntFieldValue(instance, "min", 0);
+            max = DetailsUtils.getIntFieldValue(instance, "max", 100);
+        }
+        
+        static DefaultBoundedRangeModelBuilder fromField(Instance instance, Heap heap, String field) {
+            Object model = instance.getValueOfField(field);
+            if (!(model instanceof Instance)) return null;
+            if (!DetailsUtils.isSubclassOf((Instance)model, DefaultBoundedRangeModel.class.getName())) return null;
+            return new DefaultBoundedRangeModelBuilder((Instance)model, heap);
+        }
+        
+        protected DefaultBoundedRangeModel createInstanceImpl() {
+            return new DefaultBoundedRangeModel(value, extent, min, max);
+        }
+        
+    }
+    
+    private static class JScrollBarBuilder extends JComponentBuilder<JScrollBar> {
+        
+        private final DefaultBoundedRangeModelBuilder model;
+        private final int orientation;
+        
+        JScrollBarBuilder(Instance instance, Heap heap) {
+            super(instance, heap, false);
+            
+            model = DefaultBoundedRangeModelBuilder.fromField(instance, heap, "model");
+            orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JScrollBar.VERTICAL);
+        }
+        
+        protected void setupInstance(JScrollBar instance) {
+            super.setupInstance(instance);
+            
+            if (model != null) instance.setModel(model.createInstance());
+        }
+        
+        protected JScrollBar createInstanceImpl() {
+            return new JScrollBar(orientation);
+        }
+        
+    }
+    
+    private static class JSeparatorBuilder extends JComponentBuilder<JSeparator> {
+        
+        private final int orientation;
+        
+        JSeparatorBuilder(Instance instance, Heap heap) {
+            super(instance, heap, false);
+            
+            orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JSeparator.HORIZONTAL);
+        }
+        
+        protected JSeparator createInstanceImpl() {
+            return new JSeparator(orientation);
+        }
+        
+    }
+    
+    private static class JToolBarSeparatorBuilder extends JSeparatorBuilder {
+        
+        private final DimensionBuilder separatorSize;
+        
+        JToolBarSeparatorBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            separatorSize = DimensionBuilder.fromField(instance, heap, "separatorSize");
+        }
+        
+        protected JSeparator createInstanceImpl() {
+            return separatorSize == null ? new JToolBar.Separator() :
+                    new JToolBar.Separator(separatorSize.createInstance());
+        }
+        
+    }
+    
+    private static class JProgressBarBuilder extends JComponentBuilder<JProgressBar> {
+        
+        private final int orientation;
+        private final boolean paintBorder;
+        private final DefaultBoundedRangeModelBuilder model;
+        private final String progressString;
+        private final boolean paintString;
+        private final boolean indeterminate;
+        
+        JProgressBarBuilder(Instance instance, Heap heap) {
+            super(instance, heap, false);
+            
+            orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JProgressBar.HORIZONTAL);
+            paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);
+            model = DefaultBoundedRangeModelBuilder.fromField(instance, heap, "model");
+            progressString = DetailsUtils.getInstanceFieldString(instance, "progressString", heap);
+            paintString = DetailsUtils.getBooleanFieldValue(instance, "paintString", false);
+            indeterminate = DetailsUtils.getBooleanFieldValue(instance, "indeterminate", false);
+        }
+        
+        protected void setupInstance(JProgressBar instance) {
+            super.setupInstance(instance);
+            
+            instance.setBorderPainted(paintBorder);
+            if (model != null) instance.setModel(model.createInstance());
+            if (progressString != null) instance.setString(className);
+            instance.setStringPainted(paintString);
+            instance.setIndeterminate(indeterminate);
+        }
+        
+        protected JProgressBar createInstanceImpl() {
+            return new JProgressBar(orientation);
+        }
+        
+    }
+    
+    private static class JSliderBuilder extends JComponentBuilder<JSlider> {
+        
+        private final boolean paintTicks;
+        private final boolean paintTrack;
+        private final boolean paintLabels;
+        private final boolean isInverted;
+        private final DefaultBoundedRangeModelBuilder sliderModel;
+        private final int majorTickSpacing;
+        private final int minorTickSpacing;
+        private final boolean snapToTicks;
+        private final int orientation;
+        
+        JSliderBuilder(Instance instance, Heap heap) {
+            super(instance, heap, false);
+            
+            paintTicks = DetailsUtils.getBooleanFieldValue(instance, "paintTicks", false);
+            paintTrack = DetailsUtils.getBooleanFieldValue(instance, "paintTrack", true);
+            paintLabels = DetailsUtils.getBooleanFieldValue(instance, "paintLabels", false);
+            isInverted = DetailsUtils.getBooleanFieldValue(instance, "isInverted", false);
+            sliderModel = DefaultBoundedRangeModelBuilder.fromField(instance, heap, "sliderModel");
+            majorTickSpacing = DetailsUtils.getIntFieldValue(instance, "majorTickSpacing", 0);
+            minorTickSpacing = DetailsUtils.getIntFieldValue(instance, "minorTickSpacing", 0);
+            snapToTicks = DetailsUtils.getBooleanFieldValue(instance, "snapToTicks", false);
+            orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JProgressBar.HORIZONTAL);
+        }
+        
+        protected void setupInstance(JSlider instance) {
+            super.setupInstance(instance);
+            
+            instance.setPaintTicks(paintTicks);
+            instance.setPaintTrack(paintTrack);
+            instance.setPaintLabels(paintLabels);
+            instance.setInverted(isInverted);
+            if (sliderModel != null) instance.setModel(sliderModel.createInstance());
+            instance.setMajorTickSpacing(majorTickSpacing);
+            instance.setMinorTickSpacing(minorTickSpacing);
+            instance.setSnapToTicks(snapToTicks);
+        }
+        
+        protected JSlider createInstanceImpl() {
+            return new JSlider(orientation);
+        }
+        
+    }
+    
+    private static class BorderBuilderFactory {
+        
+        static BorderBuilder fromField(Instance instance, Heap heap, String field) {
+            Object _border = instance.getValueOfField(field);
+            if (!(_border instanceof Instance)) return null;
+            
+            Instance border = (Instance)_border;
+            
+            // Do not build BorderUIResource, mostly the defaults for JComponents
+            if (border.getJavaClass().getName().startsWith("javax.swing.plaf.BorderUIResource$"))
+                return null;
+                
+            if (DetailsUtils.isSubclassOf(border, BevelBorder.class.getName())) {
+                return new BevelBorderBuilder(border, heap);
+            } else if (DetailsUtils.isSubclassOf(border, MatteBorder.class.getName())) { // Must be before EmptyBorder (extends EmptyBorder)
+                return new EmptyBorderBuilder(border, heap);
+            } else if (DetailsUtils.isSubclassOf(border, EmptyBorder.class.getName())) {
+                return new MatteBorderBuilder(border, heap);
+            } else if (DetailsUtils.isSubclassOf(border, EtchedBorder.class.getName())) {
+                return new EtchedBorderBuilder(border, heap);
+            } else if (DetailsUtils.isSubclassOf(border, LineBorder.class.getName())) {
+                return new LineBorderBuilder(border, heap);
+            } else if (DetailsUtils.isSubclassOf(border, TitledBorder.class.getName())) {
+                return new TitledBorderBuilder(border, heap);
+            } else if (DetailsUtils.isSubclassOf(border, CompoundBorder.class.getName())) {
+                return new CompoundBorderBuilder(border, heap);
+            }
+            
+            return null;
+        }
+        
+    }
+    
+    private static abstract class BorderBuilder extends InstanceBuilder<Border> {
+        BorderBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+        }
+    }
+    
+    private static class BevelBorderBuilder extends BorderBuilder {
+        
+        private final int bevelType;
+        private final ColorBuilder highlightOuter;
+        private final ColorBuilder highlightInner;
+        private final ColorBuilder shadowInner;
+        private final ColorBuilder shadowOuter;
+        
+        BevelBorderBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            bevelType = DetailsUtils.getIntFieldValue(instance, "bevelType", BevelBorder.LOWERED);
+            highlightOuter = ColorBuilder.fromField(instance, heap, "highlightOuter");
+            highlightInner = ColorBuilder.fromField(instance, heap, "highlightInner");
+            shadowInner = ColorBuilder.fromField(instance, heap, "shadowInner");
+            shadowOuter = ColorBuilder.fromField(instance, heap, "shadowOuter");
+        }
+        
+        protected Border createInstanceImpl() {
+            if (highlightOuter == null && shadowInner == null) {
+                if (highlightInner == null && shadowOuter == null) {
+                    return BorderFactory.createBevelBorder(bevelType);
+                } else {
+                    return BorderFactory.createBevelBorder(bevelType,
+                            highlightInner.createInstance(), shadowOuter.createInstance());
+                }
+            } else {
+                return BorderFactory.createBevelBorder(bevelType,
+                        highlightOuter.createInstance(), highlightInner.createInstance(),
+                        shadowOuter.createInstance(), shadowInner.createInstance());
+            }
+        }
+        
+    }
+    
+    private static class EmptyBorderBuilder extends BorderBuilder {
+        
+        private final InsetsBuilder insets;
+        
+        EmptyBorderBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            insets = new InsetsBuilder(instance, heap);
+        }
+        
+        protected Border createInstanceImpl() {
+            Insets i = insets.createInstance();
+            if (i.top == 0 && i.left == 0 && i.bottom == 0 && i.right == 0) {
+                return BorderFactory.createEmptyBorder();
+            } else {
+                return BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right);
+            }
+        }
+        
+    }
+    
+    private static class MatteBorderBuilder extends BorderBuilder {
+        
+        private final InsetsBuilder insets;
+        private final ColorBuilder color;
+        private final IconBuilder tileIcon;
+        
+        MatteBorderBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            insets = new InsetsBuilder(instance, heap);
+            color = ColorBuilder.fromField(instance, heap, "color");
+            tileIcon = IconBuilder.fromField(instance, heap, "tileIcon");
+        }
+        
+        protected Border createInstanceImpl() {
+            Insets i = insets.createInstance();
+            if (color == null) {
+                return BorderFactory.createMatteBorder(i.top, i.left, i.bottom,
+                        i.right, tileIcon == null ? null : tileIcon.createInstance());
+            } else {
+                return BorderFactory.createMatteBorder(i.top, i.left, i.bottom,
+                        i.right, color.createInstance());
+            }
+        }
+        
+    }
+    
+    private static class EtchedBorderBuilder extends BorderBuilder {
+        
+        private final int etchType;
+        private final ColorBuilder highlight;
+        private final ColorBuilder shadow;
+        
+        EtchedBorderBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            etchType = DetailsUtils.getIntFieldValue(instance, "etchType", EtchedBorder.LOWERED);
+            highlight = ColorBuilder.fromField(instance, heap, "highlight");
+            shadow = ColorBuilder.fromField(instance, heap, "shadow");
+        }
+        
+        protected Border createInstanceImpl() {
+            if (highlight == null && shadow == null) {
+                return BorderFactory.createEtchedBorder(etchType);
+            } else {
+                return BorderFactory.createEtchedBorder(etchType,
+                        highlight == null ? null : highlight.createInstance(),
+                        shadow == null ? null : shadow.createInstance());
+            }
+        }
+        
+    }
+    
+    private static class LineBorderBuilder extends BorderBuilder {
+        
+        private final int thickness;
+        private final ColorBuilder lineColor;
+        private final boolean roundedCorners;
+        
+        LineBorderBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            thickness = DetailsUtils.getIntFieldValue(instance, "thickness", 1);
+            lineColor = ColorBuilder.fromField(instance, heap, "lineColor");
+            roundedCorners = DetailsUtils.getBooleanFieldValue(instance, "roundedCorners", false);
+        }
+        
+        protected Border createInstanceImpl() {
+            Color c = lineColor == null ? null : lineColor.createInstance();
+            if (c == null) c = Color.BLACK;
+            if (roundedCorners) {
+                return new LineBorder(c, thickness, roundedCorners);
+            } else if (thickness == 1) {
+                return BorderFactory.createLineBorder(c);
+            } else {
+                return BorderFactory.createLineBorder(c, thickness);
+            }
+        }
+        
+    }
+    
+    private static class TitledBorderBuilder extends BorderBuilder {
+        
+        private final String title;
+        private final BorderBuilder border;
+        private final int titlePosition;
+        private final int titleJustification;
+        private final FontBuilder titleFont;
+        private final ColorBuilder titleColor;
+        
+        TitledBorderBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            title = DetailsUtils.getInstanceFieldString(instance, "title", heap);
+            border = BorderBuilderFactory.fromField(instance, heap, "border");
+            titlePosition = DetailsUtils.getIntFieldValue(instance, "titlePosition", TitledBorder.DEFAULT_POSITION);
+            titleJustification = DetailsUtils.getIntFieldValue(instance, "titleJustification", TitledBorder.LEADING);
+            titleFont = FontBuilder.fromField(instance, heap, "titleFont");
+            titleColor = ColorBuilder.fromField(instance, heap, "titleColor");
+        }
+        
+        protected Border createInstanceImpl() {
+            return new TitledBorder(border == null ? null : border.createInstance(),
+                    title, titleJustification, titlePosition, titleFont == null ?
+                    null : titleFont.createInstance(), titleColor == null ?
+                    null : titleColor.createInstance());
+        }
+        
+    }
+    
+    private static class CompoundBorderBuilder extends BorderBuilder {
+        
+        private final BorderBuilder outsideBorder;
+        private final BorderBuilder insideBorder;
+        
+        CompoundBorderBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            outsideBorder = BorderBuilderFactory.fromField(instance, heap, "outsideBorder");
+            insideBorder = BorderBuilderFactory.fromField(instance, heap, "insideBorder");
+        }
+        
+        protected Border createInstanceImpl() {
+            if (outsideBorder == null && insideBorder == null) {
+                return BorderFactory.createEmptyBorder();
+            } else if (outsideBorder == null || insideBorder == null) {
+                if (outsideBorder == null) return insideBorder.createInstance();
+                else return outsideBorder.createInstance();
+            } else {
+                return BorderFactory.createCompoundBorder(
+                        outsideBorder.createInstance(), insideBorder.createInstance());
+            }
         }
         
     }

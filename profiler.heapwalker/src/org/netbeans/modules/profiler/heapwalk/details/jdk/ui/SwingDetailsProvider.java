@@ -63,7 +63,7 @@ public final class SwingDetailsProvider extends DetailsProvider.Basic {
     private static final String JFILECHOOSER_MASK = "javax.swing.JFileChooser+";    // NOI18N
     private static final String JINTERNALFRAME_MASK = "javax.swing.JInternalFrame+";// NOI18N
     private static final String TABLECOLUMN_MASK = "javax.swing.table.TableColumn+";// NOI18N
-    private static final String JPANEL_MASK = "javax.swing.JPanel+";// NOI18N
+    private static final String JPANEL_MASK = "javax.swing.JPanel+";                // NOI18N
     
     public SwingDetailsProvider() {
         super(JLABEL_MASK, ABSTRACTBUTTON_MASK, JTOOLTIP_MASK, JFILECHOOSER_MASK,
