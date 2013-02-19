@@ -51,9 +51,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.DefaultButtonModel;
 import javax.swing.Icon;
@@ -137,8 +135,6 @@ final class Builders {
     
     
     static abstract class InstanceBuilder<T> {
-    
-        protected final Map<String, Object> map = new HashMap();
 
         InstanceBuilder(Instance instance, Heap heap) {}
 
@@ -286,10 +282,9 @@ final class Builders {
             
             component = new ArrayList();
             
-            if (instance instanceof ObjectArrayInstance) {                      // Component[] (JDK 5)
+            if (instance instanceof ObjectArrayInstance) {                      // Component[] (JDK 5-)
                 List<Instance> components = ((ObjectArrayInstance)instance).getValues();
                 for (Instance c : components) {
-                    // TODO: read ncomponents, skip trailing null items
                     if (c != null) {
                         ComponentBuilder builder = getComponentBuilder(c, heap);
                         if (builder != null) component.add(builder);
@@ -326,6 +321,11 @@ final class Builders {
         protected final String className;
         
         private final RectangleBuilder bounds;
+        private final ColorBuilder foreground;
+        private final ColorBuilder background;
+        private final FontBuilder font;
+        private final boolean visible;
+        private final boolean enabled;
         
         ComponentBuilder(Instance instance, Heap heap) {
             super(instance, heap);
@@ -334,19 +334,19 @@ final class Builders {
             
             bounds = new RectangleBuilder(instance, heap);
             
-            Object foreground = instance.getValueOfField("foreground");
-            if (foreground instanceof Instance)
-                map.put("foreground", new ColorBuilder((Instance)foreground, heap));
-            Object background = instance.getValueOfField("background");
-            if (background instanceof Instance)
-                map.put("background", new ColorBuilder((Instance)background, heap));
+            Object _foreground = instance.getValueOfField("foreground");
+            foreground = _foreground instanceof Instance ? 
+                    new ColorBuilder((Instance)_foreground, heap) : null;
+            Object _background = instance.getValueOfField("background");
+            background = _background instanceof Instance ? 
+                    new ColorBuilder((Instance)_background, heap) : null;
             
-            Object font = instance.getValueOfField("font");
-            if (font instanceof Instance)
-                map.put("font", new FontBuilder((Instance)font, heap));
+            Object _font = instance.getValueOfField("font");
+            font = _font instanceof Instance ? 
+                    new FontBuilder((Instance)_font, heap) : null;
             
-            map.put("visible", DetailsUtils.getBooleanFieldValue(instance, "visible", true));
-            map.put("enabled", DetailsUtils.getBooleanFieldValue(instance, "enabled", true));
+            visible = DetailsUtils.getBooleanFieldValue(instance, "visible", true);
+            enabled = DetailsUtils.getBooleanFieldValue(instance, "enabled", true);
         }
         
         protected void setupInstance(T instance) {
@@ -354,16 +354,13 @@ final class Builders {
             
             instance.setBounds(bounds.createInstance());
             
-            ColorBuilder foreground = (ColorBuilder)map.get("foreground");
             if (foreground != null) instance.setForeground(foreground.createInstance());
-            ColorBuilder background = (ColorBuilder)map.get("background");
             if (background != null) instance.setBackground(background.createInstance());
             
-            FontBuilder font = (FontBuilder)map.get("font");
             if (font != null) instance.setFont(font.createInstance());
             
-            instance.setVisible((Boolean)map.get("visible"));
-            instance.setEnabled((Boolean)map.get("enabled"));
+            instance.setVisible(visible);
+            instance.setEnabled(enabled);
         }
         
         protected T createInstanceImpl() {
@@ -381,17 +378,19 @@ final class Builders {
     
     private static class ContainerBuilder<T extends Container> extends ComponentBuilder<T> {
         
+        private final ChildrenBuilder component;
+        
         ContainerBuilder(Instance instance, Heap heap) {
             super(instance, heap);
-            Object component = instance.getValueOfField("component");
-            if (component instanceof Instance)
-                map.put("component", new ChildrenBuilder((Instance)component, heap));
+            
+            Object _component = instance.getValueOfField("component");
+            component = _component instanceof Instance ? 
+                    new ChildrenBuilder((Instance)_component, heap) : null;
         }
         
         protected void setupInstance(T instance) {
             super.setupInstance(instance);
             
-            ChildrenBuilder component = (ChildrenBuilder)map.get("component");
             if (component != null) {
                 Component[] components = component.createInstance();
                 for (Component c : components) instance.add(c);
@@ -406,27 +405,31 @@ final class Builders {
     
     private static class JComponentBuilder<T extends JComponent> extends ContainerBuilder<T> {
         
+        private final boolean isAlignmentXSet;
+        private final float alignmentX;
+        private final boolean isAlignmentYSet;
+        private final float alignmentY;
+        private final int flags;
+        
         JComponentBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
-            boolean isAlignmentXSet = DetailsUtils.getBooleanFieldValue(instance, "isAlignmentXSet", false);
-            if (isAlignmentXSet) map.put("alignmentX", DetailsUtils.getFloatFieldValue(instance, "alignmentX", 0));
-            boolean isAlignmentYSet = DetailsUtils.getBooleanFieldValue(instance, "isAlignmentYSet", false);
-            if (isAlignmentYSet) map.put("alignmentY", DetailsUtils.getFloatFieldValue(instance, "alignmentY", 0));
+            isAlignmentXSet = DetailsUtils.getBooleanFieldValue(instance, "isAlignmentXSet", false);
+            alignmentX = DetailsUtils.getFloatFieldValue(instance, "alignmentX", 0);
+            isAlignmentYSet = DetailsUtils.getBooleanFieldValue(instance, "isAlignmentYSet", false);
+            alignmentY = DetailsUtils.getFloatFieldValue(instance, "alignmentY", 0);
             
-            map.put("flags", DetailsUtils.getIntFieldValue(instance, "flags", 0));
+            flags = DetailsUtils.getIntFieldValue(instance, "flags", 0);
         }
         
         protected void setupInstance(T instance) {
             super.setupInstance(instance);
             
-            Float alignmentX = (Float)map.get("alignmentX");
-            if (alignmentX != null) instance.setAlignmentX(alignmentX);
-            Float alignmentY = (Float)map.get("alignmentY");
-            if (alignmentY != null) instance.setAlignmentY(alignmentY);
+            if (isAlignmentXSet) instance.setAlignmentX(alignmentX);
+            if (isAlignmentYSet) instance.setAlignmentY(alignmentY);
             
             int opaque_mask = (1 << 3);
-            boolean opaque = ((Integer)map.get("flags") & opaque_mask) == opaque_mask;
+            boolean opaque = (flags & opaque_mask) == opaque_mask;
             instance.setOpaque(opaque);
         }
         
@@ -438,37 +441,43 @@ final class Builders {
     
     private static final class JLabelBuilder extends JComponentBuilder<JLabel> {
         
+        private final String text;
+        private final IconBuilder defaultIcon;
+        private final int verticalAlignment;
+        private final int horizontalAlignment;
+        private final int verticalTextPosition;
+        private final int horizontalTextPosition;
+        private final int iconTextGap;
+        
         JLabelBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
-            map.put("text", DetailsUtils.getInstanceFieldString(instance, "text", heap));
+            text = DetailsUtils.getInstanceFieldString(instance, "text", heap);
             
-            Object defaultIcon = instance.getValueOfField("defaultIcon");
-//            if (defaultIcon instanceof Instance)
-            if (defaultIcon instanceof Instance &&
-                DetailsUtils.isSubclassOf((Instance)defaultIcon, "javax.swing.ImageIcon"))
-                map.put("defaultIcon", new IconBuilder((Instance)defaultIcon, heap));
+            Object _defaultIcon = instance.getValueOfField("defaultIcon");
+            defaultIcon = _defaultIcon instanceof Instance &&
+                DetailsUtils.isSubclassOf((Instance)_defaultIcon, "javax.swing.ImageIcon") ?
+                    new IconBuilder((Instance)_defaultIcon, heap) : null;
             
-            map.put("verticalAlignment", DetailsUtils.getIntFieldValue(instance, "verticalAlignment", JLabel.CENTER));
-            map.put("horizontalAlignment", DetailsUtils.getIntFieldValue(instance, "horizontalAlignment", JLabel.LEADING));
-            map.put("verticalTextPosition", DetailsUtils.getIntFieldValue(instance, "verticalTextPosition", JLabel.CENTER));
-            map.put("horizontalTextPosition", DetailsUtils.getIntFieldValue(instance, "horizontalTextPosition", JLabel.TRAILING));
-            map.put("iconTextGap", DetailsUtils.getIntFieldValue(instance, "iconTextGap", 4));
+            verticalAlignment = DetailsUtils.getIntFieldValue(instance, "verticalAlignment", JLabel.CENTER);
+            horizontalAlignment = DetailsUtils.getIntFieldValue(instance, "horizontalAlignment", JLabel.LEADING);
+            verticalTextPosition = DetailsUtils.getIntFieldValue(instance, "verticalTextPosition", JLabel.CENTER);
+            horizontalTextPosition = DetailsUtils.getIntFieldValue(instance, "horizontalTextPosition", JLabel.TRAILING);
+            iconTextGap = DetailsUtils.getIntFieldValue(instance, "iconTextGap", 4);
         }
         
         protected void setupInstance(JLabel instance) {
             super.setupInstance(instance);
             
-            instance.setText((String)map.get("text"));
+            instance.setText(text);
             
-            IconBuilder defaultIcon = (IconBuilder)map.get("defaultIcon");
             if (defaultIcon != null) instance.setIcon(defaultIcon.createInstance());
             
-            instance.setVerticalAlignment((Integer)map.get("verticalAlignment"));
-            instance.setHorizontalAlignment((Integer)map.get("horizontalAlignment"));
-            instance.setVerticalTextPosition((Integer)map.get("verticalTextPosition"));
-            instance.setHorizontalTextPosition((Integer)map.get("horizontalTextPosition"));
-            instance.setIconTextGap((Integer)map.get("iconTextGap"));
+            instance.setVerticalAlignment(verticalAlignment);
+            instance.setHorizontalAlignment(horizontalAlignment);
+            instance.setVerticalTextPosition(verticalTextPosition);
+            instance.setHorizontalTextPosition(horizontalTextPosition);
+            instance.setIconTextGap(iconTextGap);
         }
         
         protected JLabel createInstanceImpl() {
@@ -479,16 +488,17 @@ final class Builders {
     
     private static final class DefaultButtonModelBuilder extends InstanceBuilder<DefaultButtonModel> {
         
+        private final int stateMask;
+        
         DefaultButtonModelBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
-            map.put("stateMask", DetailsUtils.getIntFieldValue(instance, "stateMask", 0));
+            stateMask = DetailsUtils.getIntFieldValue(instance, "stateMask", 0);
         }
         
         protected void setupInstance(DefaultButtonModel instance) {
             super.setupInstance(instance);
             
-            int stateMask = (Integer)map.get("stateMask");
             instance.setArmed((stateMask & DefaultButtonModel.ARMED) != 0);
             instance.setSelected((stateMask & DefaultButtonModel.SELECTED) != 0);
             instance.setEnabled((stateMask & DefaultButtonModel.ENABLED) != 0);
@@ -504,64 +514,74 @@ final class Builders {
     
     private static abstract class AbstractButtonBuilder<T extends AbstractButton> extends JComponentBuilder<T> {
         
+        private final DefaultButtonModelBuilder model;
+        private final String text;
+        private final InsetsBuilder margin;
+        private final IconBuilder defaultIcon;
+        private final int verticalAlignment;
+        private final boolean borderPaintedSet;
+        private final boolean paintBorder;
+        private final boolean contentAreaFilledSet;
+        private final boolean contentAreaFilled;
+        private final int horizontalAlignment;
+        private final int verticalTextPosition;
+        private final int horizontalTextPosition;
+        private final int iconTextGap;
+        
         AbstractButtonBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
             Object _model = instance.getValueOfField("model");
             if (_model instanceof Instance) {
-                Instance model = (Instance)_model;
-                if (DetailsUtils.isSubclassOf(model, DefaultButtonModel.class.getName()))
-                    map.put("model", new DefaultButtonModelBuilder(model, heap));
+                Instance __model = (Instance)_model;
+                model = DetailsUtils.isSubclassOf(__model, DefaultButtonModel.class.getName()) ?
+                        new DefaultButtonModelBuilder(__model, heap) : null;
+            } else {
+                model = null;
             }
             
-            map.put("text", DetailsUtils.getInstanceFieldString(instance, "text", heap));
+            text = DetailsUtils.getInstanceFieldString(instance, "text", heap);
             
-            Object margin = instance.getValueOfField("margin");
-            if (margin instanceof Instance)
-                map.put("margin", new InsetsBuilder((Instance)margin, heap));
+            Object _margin = instance.getValueOfField("margin");
+            margin = _margin instanceof Instance ?
+                    new InsetsBuilder((Instance)_margin, heap) : null;
             
-            Object defaultIcon = instance.getValueOfField("defaultIcon");
-//            if (defaultIcon instanceof Instance)
-            if (defaultIcon instanceof Instance &&
-                DetailsUtils.isSubclassOf((Instance)defaultIcon, "javax.swing.ImageIcon"))
-                map.put("defaultIcon", new IconBuilder((Instance)defaultIcon, heap));
+            Object _defaultIcon = instance.getValueOfField("defaultIcon");
+            defaultIcon = _defaultIcon instanceof Instance &&
+                DetailsUtils.isSubclassOf((Instance)_defaultIcon, "javax.swing.ImageIcon") ?
+                    new IconBuilder((Instance)_defaultIcon, heap) : null;
             
-            boolean borderPaintedSet = DetailsUtils.getBooleanFieldValue(instance, "borderPaintedSet", false);
-            if (borderPaintedSet) map.put("paintBorder", DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true));
-            boolean contentAreaFilledSet = DetailsUtils.getBooleanFieldValue(instance, "contentAreaFilledSet", false);
-            if (contentAreaFilledSet) map.put("contentAreaFilled", DetailsUtils.getBooleanFieldValue(instance, "contentAreaFilled", true));
+            borderPaintedSet = DetailsUtils.getBooleanFieldValue(instance, "borderPaintedSet", false);
+            paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);
+            contentAreaFilledSet = DetailsUtils.getBooleanFieldValue(instance, "contentAreaFilledSet", false);
+            contentAreaFilled = DetailsUtils.getBooleanFieldValue(instance, "contentAreaFilled", true);
             
-            map.put("verticalAlignment", DetailsUtils.getIntFieldValue(instance, "verticalAlignment", AbstractButton.CENTER));
-            map.put("horizontalAlignment", DetailsUtils.getIntFieldValue(instance, "horizontalAlignment", AbstractButton.CENTER));
-            map.put("verticalTextPosition", DetailsUtils.getIntFieldValue(instance, "verticalTextPosition", AbstractButton.CENTER));
-            map.put("horizontalTextPosition", DetailsUtils.getIntFieldValue(instance, "horizontalTextPosition", AbstractButton.TRAILING));
-            map.put("iconTextGap", DetailsUtils.getIntFieldValue(instance, "iconTextGap", 4));
+            verticalAlignment = DetailsUtils.getIntFieldValue(instance, "verticalAlignment", JLabel.CENTER);
+            horizontalAlignment = DetailsUtils.getIntFieldValue(instance, "horizontalAlignment", JLabel.LEADING);
+            verticalTextPosition = DetailsUtils.getIntFieldValue(instance, "verticalTextPosition", JLabel.CENTER);
+            horizontalTextPosition = DetailsUtils.getIntFieldValue(instance, "horizontalTextPosition", JLabel.TRAILING);
+            iconTextGap = DetailsUtils.getIntFieldValue(instance, "iconTextGap", 4);
         }
         
         protected void setupInstance(T instance) {
             super.setupInstance(instance);
             
-            DefaultButtonModelBuilder model = (DefaultButtonModelBuilder)map.get("model");
             if (model != null) instance.setModel(model.createInstance());
             
-            instance.setText((String)map.get("text"));
+            instance.setText(text);
             
-            InsetsBuilder margin = (InsetsBuilder)map.get("margin");
             if (margin != null) instance.setMargin(margin.createInstance());
             
-            IconBuilder defaultIcon = (IconBuilder)map.get("defaultIcon");
             if (defaultIcon != null) instance.setIcon(defaultIcon.createInstance());
             
-            Boolean paintBorder = (Boolean)map.get("paintBorder");
-            if (paintBorder != null) instance.setBorderPainted(paintBorder);
-            Boolean contentAreaFilled = (Boolean)map.get("contentAreaFilled");
-            if (contentAreaFilled != null) instance.setContentAreaFilled(contentAreaFilled);
+            if (borderPaintedSet) instance.setBorderPainted(paintBorder);
+            if (contentAreaFilledSet) instance.setContentAreaFilled(contentAreaFilled);
             
-            instance.setVerticalAlignment((Integer)map.get("verticalAlignment"));
-            instance.setHorizontalAlignment((Integer)map.get("horizontalAlignment"));
-            instance.setVerticalTextPosition((Integer)map.get("verticalTextPosition"));
-            instance.setHorizontalTextPosition((Integer)map.get("horizontalTextPosition"));
-            instance.setIconTextGap((Integer)map.get("iconTextGap"));
+            instance.setVerticalAlignment(verticalAlignment);
+            instance.setHorizontalAlignment(horizontalAlignment);
+            instance.setVerticalTextPosition(verticalTextPosition);
+            instance.setHorizontalTextPosition(horizontalTextPosition);
+            instance.setIconTextGap(iconTextGap);
         }
         
     }
@@ -592,15 +612,17 @@ final class Builders {
     
     private static class JCheckBoxBuilder extends JToggleButtonBuilder {
         
+        private final boolean flat;
+        
         JCheckBoxBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
-            map.put("flat", DetailsUtils.getBooleanFieldValue(instance, "flat", false));
+            flat = DetailsUtils.getBooleanFieldValue(instance, "flat", false);
         }
         
         protected JToggleButton createInstanceImpl() {
             JCheckBox checkBox = new JCheckBox();
-            checkBox.setBorderPaintedFlat((Boolean)map.get("flat"));
+            checkBox.setBorderPaintedFlat(flat);
             return checkBox;
         }
         
@@ -697,16 +719,18 @@ final class Builders {
     
     private static class JComboBoxBuilder extends JComponentBuilder<JComboBox> {
         
+        private final boolean isEditable;
+        
         JComboBoxBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
-            map.put("isEditable", DetailsUtils.getBooleanFieldValue(instance, "isEditable", false));
+            isEditable = DetailsUtils.getBooleanFieldValue(instance, "isEditable", false);
         }
         
         protected void setupInstance(JComboBox instance) {
             super.setupInstance(instance);
             
-            instance.setEditable((Boolean)map.get("isEditable"));
+            instance.setEditable(isEditable);
         }
         
         protected JComboBox createInstanceImpl() {
@@ -717,22 +741,24 @@ final class Builders {
     
     private static abstract class JTextComponentBuilder<T extends JTextComponent> extends JComponentBuilder<T> {
         
+        private final boolean isEditable;
+        private final InsetsBuilder margin;
+        
         JTextComponentBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
-            map.put("isEditable", DetailsUtils.getBooleanFieldValue(instance, "isEditable", false));
+            isEditable = DetailsUtils.getBooleanFieldValue(instance, "isEditable", false);
             
-            Object margin = instance.getValueOfField("margin");
-            if (margin instanceof Instance)
-                map.put("margin", new InsetsBuilder((Instance)margin, heap));
+            Object _margin = instance.getValueOfField("margin");
+            margin = _margin instanceof Instance ?
+                    new InsetsBuilder((Instance)_margin, heap) : null;
         }
         
         protected void setupInstance(T instance) {
             super.setupInstance(instance);
             
-            instance.setEditable((Boolean)map.get("isEditable"));
+            instance.setEditable(isEditable);
             
-            InsetsBuilder margin = (InsetsBuilder)map.get("margin");
             if (margin != null) instance.setMargin(margin.createInstance());
         }
         
@@ -776,29 +802,33 @@ final class Builders {
     
     private static class JToolBarBuilder extends JComponentBuilder<JToolBar> {
         
+        private final boolean paintBorder;
+        private final InsetsBuilder margin;
+        private final boolean floatable;
+        private final int orientation;
+        
         JToolBarBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
-            map.put("paintBorder", DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true));
+            paintBorder = DetailsUtils.getBooleanFieldValue(instance, "paintBorder", true);
             
-            Object margin = instance.getValueOfField("margin");
-            if (margin instanceof Instance)
-                map.put("margin", new InsetsBuilder((Instance)margin, heap));
+            Object _margin = instance.getValueOfField("margin");
+            margin = _margin instanceof Instance ?
+                    new InsetsBuilder((Instance)_margin, heap) : null;
             
-            map.put("floatable", DetailsUtils.getBooleanFieldValue(instance, "floatable", true));
-            map.put("orientation", DetailsUtils.getIntFieldValue(instance, "orientation", JToolBar.HORIZONTAL));
+            floatable = DetailsUtils.getBooleanFieldValue(instance, "floatable", true);
+            orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JToolBar.HORIZONTAL);
         }
         
         protected void setupInstance(JToolBar instance) {
             super.setupInstance(instance);
             
-            instance.setBorderPainted((Boolean)map.get("paintBorder"));
+            instance.setBorderPainted(paintBorder);
             
-            InsetsBuilder margin = (InsetsBuilder)map.get("margin");
             if (margin != null) instance.setMargin(margin.createInstance());
             
-            instance.setFloatable((Boolean)map.get("floatable"));
-            instance.setOrientation((Integer)map.get("orientation"));
+            instance.setFloatable(floatable);
+            instance.setOrientation(orientation);
         }
         
         protected JToolBar createInstanceImpl() {
