@@ -42,14 +42,10 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
+import java.awt.Component;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.ComponentBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -61,76 +57,64 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=DetailsProvider.class)
 public final class SwingDetailsProvider extends DetailsProvider.Basic {
     
-    private static final String JLABEL_MASK = "javax.swing.JLabel+";            // NOI18N
+    private static final String JLABEL_MASK = "javax.swing.JLabel+";                // NOI18N
+    private static final String ABSTRACTBUTTON_MASK = "javax.swing.AbstractButton+";// NOI18N
+    private static final String JTOOLTIP_MASK = "javax.swing.JToolTip+";            // NOI18N
+    private static final String JFILECHOOSER_MASK = "javax.swing.JFileChooser+";    // NOI18N
+    private static final String JINTERNALFRAME_MASK = "javax.swing.JInternalFrame+";// NOI18N
+    private static final String TABLECOLUMN_MASK = "javax.swing.table.TableColumn+";// NOI18N
+    private static final String JPANEL_MASK = "javax.swing.JPanel+";                // NOI18N
     
     public SwingDetailsProvider() {
-        super(JLABEL_MASK);
+        super(JLABEL_MASK, ABSTRACTBUTTON_MASK, JTOOLTIP_MASK, JFILECHOOSER_MASK,
+              JINTERNALFRAME_MASK, TABLECOLUMN_MASK, JPANEL_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
-        if (JLABEL_MASK.equals(className)) {                                    // JLabel+
-            return DetailsUtils.getInstanceFieldString(instance, "text", heap); // NOI18N
+        if (JLABEL_MASK.equals(className) ||                                        // JLabel+
+            ABSTRACTBUTTON_MASK.equals(className)) {                                // AbstractButton+
+            return DetailsUtils.getInstanceFieldString(
+                    instance, "text", heap);                                        // NOI18N
+        } else if (JTOOLTIP_MASK.equals(className)) {                               // JToolTip+
+            return DetailsUtils.getInstanceFieldString(
+                    instance, "tipText", heap);                                     // NOI18N
+        } else if (JFILECHOOSER_MASK.equals(className)) {                           // JFileChooser+
+            return DetailsUtils.getInstanceFieldString(
+                    instance, "dialogTitle", heap);                                 // NOI18N
+        } else if (JINTERNALFRAME_MASK.equals(className)) {                         // JInternalFrame+
+            return DetailsUtils.getInstanceFieldString(
+                    instance, "title", heap);                                       // NOI18N
+        } else if (TABLECOLUMN_MASK.equals(className)) {                            // TableColumn+
+            return DetailsUtils.getInstanceFieldString(
+                    instance, "headerValue", heap);                                 // NOI18N
         }
         return null;
     }
     
     public View getDetailsView(String className, Instance instance, Heap heap) {
-        if (JLABEL_MASK.equals(className)) {                                    // JLabel+
-            return new LabelView(instance, heap);
+        if (JLABEL_MASK.equals(className) ||                                        // JLabel+
+            ABSTRACTBUTTON_MASK.equals(className) ||                                // AbstractButton+
+            JPANEL_MASK.equals(className)) {                                        // JPanel+
+            return new ComponentView(instance, heap);
         }
         return null;
     }
     
-    static JLabel createLabel(Instance instance, Heap heap) {
-        JLabel label = new JLabel();
-        
-        String text = DetailsUtils.getInstanceFieldString(instance, "text", heap); // NOI18N
-        if (text != null) label.setText(text);
-        
-        Object _background = instance.getValueOfField("background");            // NOI18N
-        if (_background instanceof Instance) {
-            Color background = AwtDetailsProvider.createColor((Instance)_background, heap);
-            if (background != null) label.setBackground(background);
-        }
-        
-        Object _foreground = instance.getValueOfField("foreground");            // NOI18N
-        if (_foreground instanceof Instance) {
-            Color foreground = AwtDetailsProvider.createColor((Instance)_foreground, heap);
-            if (foreground != null) label.setForeground(foreground);
-        }
-        
-        Object _font = instance.getValueOfField("font");                        // NOI18N
-        if (_font instanceof Instance) {
-            Font font = AwtDetailsProvider.createFont((Instance)_font, heap);
-            if (font != null) label.setFont(font);
-        }
-        
-        Dimension size = AwtDetailsProvider.createDimension(instance, heap);
-        if (size != null) label.setSize(size);
-        
-        boolean enabled = DetailsUtils.getBooleanFieldValue(instance, "enabled", true); // NOI18N
-        label.setEnabled(enabled);
-        
-        return label;
-    }
     
-    private static class LabelView extends View {
+    private static class ComponentView extends Utils.View<ComponentBuilder> {
         
-        LabelView(final Instance instance, Heap heap) {
+        ComponentView(Instance instance, Heap heap) {
             super(instance, heap);
         }
         
-        protected void computeView(Instance instance, Heap heap) {
-            final JLabel labell = createLabel(instance, heap);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    removeAll();
-                    add(labell, BorderLayout.CENTER);
-                    invalidate();
-                    revalidate();
-                    doLayout();
-                }
-            });
+        protected ComponentBuilder getBuilder(Instance instance, Heap heap) {
+            return Builders.getComponentBuilder(instance, heap);
+        }
+        
+        protected Component getComponent(ComponentBuilder builder) {
+            Component component = builder.createPresenter();
+            component.setVisible(true);
+            return component;
         }
         
     }
