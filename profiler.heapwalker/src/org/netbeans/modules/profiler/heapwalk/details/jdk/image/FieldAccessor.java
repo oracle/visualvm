@@ -282,6 +282,10 @@ public class FieldAccessor {
         return get(instance, field, Number.class, false).intValue();
     }
 
+    public boolean getBoolean(Instance instance, String field) throws InvalidFieldException {
+        return get(instance, field, Boolean.class, false).booleanValue();
+    }
+
     public String getString(Instance instance, String field, boolean allowNull) throws InvalidFieldException {
         return build(instance, field, InstanceBuilder.STRING_BUILDER, allowNull);
     }

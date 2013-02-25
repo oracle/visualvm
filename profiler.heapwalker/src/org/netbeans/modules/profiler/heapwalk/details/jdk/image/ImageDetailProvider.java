@@ -45,12 +45,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.color.ColorSpace;
 import java.awt.image.BandedSampleModel;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
+import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.MultiPixelPackedSampleModel;
 import java.awt.image.PixelInterleavedSampleModel;
@@ -58,8 +61,7 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -139,6 +141,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
 
                 label = new JLabel(new ImageIcon(background));
             } catch (InvalidFieldException ex) {
+                ex.printStackTrace();
                 LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage());
                 label = new JLabel(ImageUtilities.loadImageIcon(BROKEN_IMAGE_NAME, false));
                 if(LOGGER.isLoggable(Level.FINE)) {
@@ -176,13 +179,11 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
     }
 
     private static Image buildImageInternal(Instance instance, Heap heap) throws InvalidFieldException {
-
         InstanceBuilder<? extends Image> builder = builders.getBuilder(instance, Image.class);
         if (builder == null) {
             return null;
         }
         return builder.convert(new FieldAccessor(heap, builders), instance);
-
     }
 
     /**
@@ -198,6 +199,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
             return null;
         }
     }
+    
     private static final InstanceBuilder<String> TOOKIT_IMAGE_STRING_BUILDER =
             new InstanceBuilder.ReferringInstanceBuilder<String>(String.class, "imagerep", "bimage");
     private static final InstanceBuilder<Image> TOOKIT_IMAGE_IMAGE_BUILDER =
@@ -231,15 +233,14 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
             try {
                 int imageType = fa.getInt(instance, "imageType"); // NOI18N
                 WritableRaster raster = fa.build(instance, "raster", WritableRaster.class, false);
-                Instance colorModel = fa.getInstance(instance, "colorModel", ColorModel.class, true);
+                ColorModel cm  = fa.build(instance, "colorModel", ColorModel.class, false);
                 BufferedImage result;
-                if (FieldAccessor.isInstanceOf(colorModel, IndexColorModel.class)) {
-                    IndexColorModel indexColorModel = buildIndexColorModel(fa, colorModel);
-                    result = new BufferedImage(raster.getWidth(), raster.getHeight(), imageType, indexColorModel);
-                } else {
-                    //we hope the same color model will be constructed for the same image type
-                    result = new BufferedImage(raster.getWidth(), raster.getHeight(), imageType);
-                }
+                //if (cm instanceof IndexColorModel) {
+                //    result = new BufferedImage(raster.getWidth(), raster.getHeight(), imageType, (IndexColorModel)cm);
+                //} else {
+                    boolean ap = fa.getBoolean(instance, "isAlphaPremultiplied"); // NOI18N
+                    result = new BufferedImage(cm, raster, ap, null);
+                //}
                 result.setData(raster);
                 return result;
             } catch (InvalidFieldException ex) {
@@ -249,15 +250,52 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
             }
         }
     };
-
-    private static IndexColorModel buildIndexColorModel(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-        int bits = fa.getInt(instance, "pixel_bits"); // NOI18N
+    private static final InstanceBuilder<ColorModel> INDEX_COLOR_MODEL_BUILDER = new InstanceBuilder<ColorModel>(ColorModel.class)
+    {
+        @Override
+        public ColorModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
+            int bits = fa.getInt(instance, "pixel_bits"); // NOI18N
         int[] cmap = fa.getIntArray(instance, "rgb", false);// NOI18N
         int size = fa.getInt(instance, "map_size"); // NOI18N
         int trans = fa.getInt(instance, "transparent_index"); // NOI18N
         int transferType = fa.getInt(instance, "transferType"); // NOI18N
         return new IndexColorModel(bits, size, cmap, 0, true, trans, transferType);
-    }
+        }
+    };
+    private static final InstanceBuilder<ColorModel> DIRECT_COLOR_MODEL_BUILDER = new InstanceBuilder<ColorModel>(ColorModel.class)
+    {
+        @Override
+        public ColorModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
+           int bits = fa.getInt(instance, "pixel_bits"); // NOI18N
+        int rmask = fa.getInt(instance, "red_mask"); // NOI18N
+        int gmask = fa.getInt(instance, "green_mask"); // NOI18N
+        int bmask = fa.getInt(instance, "blue_mask"); // NOI18N
+        int amask = fa.getInt(instance, "alpha_mask"); // NOI18N
+        boolean ap = fa.getBoolean(instance, "isAlphaPremultiplied"); // NOI18N
+        int transferType = fa.getInt(instance, "transferType"); // NOI18N
+        return new DirectColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), bits, rmask, gmask, bmask, amask, ap, transferType);
+        }
+    };
+    private static final InstanceBuilder<ColorModel> COMPONENT_COLOR_MODEL_BUILDER = new InstanceBuilder<ColorModel>(ColorModel.class)
+    {
+     @Override
+        public ColorModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
+            int[] bits = fa.getIntArray(instance, "nBits", false);// NOI18N
+        int transparency = fa.getInt(instance, "transparency"); // NOI18N
+        boolean hasAlpha = fa.getBoolean(instance, "supportsAlpha"); // NOI18N
+        boolean ap = fa.getBoolean(instance, "isAlphaPremultiplied"); // NOI18N
+        int transferType = fa.getInt(instance, "transferType"); // NOI18N
+        return new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), bits, hasAlpha, ap, transparency, transferType);
+        }
+    };
+    private static final InstanceBuilder<ColorSpace> DEFAULT_COLOR_SPACE_BUILDER = new InstanceBuilder<ColorSpace>(ColorSpace.class)
+    {
+
+        @Override
+        public ColorSpace convert(FieldAccessor accessor, Instance instance) throws InvalidFieldException {
+            return ColorSpace.getInstance(ColorSpace.CS_sRGB);
+        }
+    };
     private static final InstanceBuilder<WritableRaster> WRITABLE_RASTER_BUILDER = new InstanceBuilder<WritableRaster>(WritableRaster.class) {
         @Override
         public WritableRaster convert(FieldAccessor accessor, Instance instance) throws InvalidFieldException {
@@ -336,6 +374,10 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
     };
 
     static {
+        builders.register(ColorSpace.class, true, DEFAULT_COLOR_SPACE_BUILDER);
+        builders.register(IndexColorModel.class, true, INDEX_COLOR_MODEL_BUILDER);
+        builders.register(ComponentColorModel.class, true, COMPONENT_COLOR_MODEL_BUILDER);
+        builders.register(DirectColorModel.class, true, DIRECT_COLOR_MODEL_BUILDER);
         builders.register(SinglePixelPackedSampleModel.class, false, SPP_SAMPLE_MODEL_BUILDER);
         builders.register(PixelInterleavedSampleModel.class, false, PI_SAMPLE_MODEL_BUILDER);
         builders.register(BandedSampleModel.class, false, B_SAMPLE_MODEL_BUILDER);
