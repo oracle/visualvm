@@ -56,6 +56,7 @@ import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.FontBu
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.RectangleBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BorderBuilders.BorderBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.InstanceBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.PlaceholderPanel;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
@@ -154,6 +155,8 @@ final class ComponentBuilders {
         private final boolean visible;
         private final boolean enabled;
         
+        private boolean isPlaceholder = false;
+        
         ComponentBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
@@ -161,10 +164,10 @@ final class ComponentBuilders {
             
             bounds = new RectangleBuilder(instance, heap);
             
-            foreground = ColorBuilder.fromField(instance, "foreground", false, heap);
-            background = ColorBuilder.fromField(instance, "background", false, heap);
+            foreground = ColorBuilder.fromField(instance, "foreground", heap);
+            background = ColorBuilder.fromField(instance, "background", heap);
             
-            font = FontBuilder.fromField(instance, "font", false, heap);
+            font = FontBuilder.fromField(instance, "font", heap);
             
             visible = DetailsUtils.getBooleanFieldValue(instance, "visible", true);
             enabled = DetailsUtils.getBooleanFieldValue(instance, "enabled", true);
@@ -178,14 +181,29 @@ final class ComponentBuilders {
             if (foreground != null) instance.setForeground(foreground.createInstance());
             if (background != null) instance.setBackground(background.createInstance());
             
-            if (font != null) instance.setFont(font.createInstance());
+            if (foreground != null && (isPlaceholder || !foreground.isUIResource()))
+                    instance.setForeground(foreground.createInstance());
+            if (background != null && (isPlaceholder || !background.isUIResource()))
+                instance.setBackground(background.createInstance());
+            
+            if (font != null && (isPlaceholder || !font.isUIResource()))
+                instance.setFont(font.createInstance());
             
             instance.setVisible(visible);
             instance.setEnabled(enabled);
         }
         
+        protected final void setPlaceholder() {
+            isPlaceholder = true;
+        }
+        
+        protected final boolean isPlaceholder() {
+            return isPlaceholder;
+        }
+        
         protected T createInstanceImpl() {
-            return (T)new Utils.PlaceholderPanel(className);
+            setPlaceholder();
+            return (T)new PlaceholderPanel(className);
         }
         
         protected Component createPresenterImpl(T instance) { return instance; }
@@ -223,7 +241,8 @@ final class ComponentBuilders {
         }
         
         protected T createInstanceImpl() {
-            return (T)new Utils.PlaceholderPanel(className);
+            setPlaceholder();
+            return (T)new PlaceholderPanel(className);
         }
         
     }
@@ -260,7 +279,7 @@ final class ComponentBuilders {
             if (isAlignmentXSet) instance.setAlignmentX(alignmentX);
             if (isAlignmentYSet) instance.setAlignmentY(alignmentY);
             
-            if (border != null) {
+            if (border != null && (isPlaceholder() || !border.isUIResource())) {
                 Border b = border.createInstance();
                 if (b != null) instance.setBorder(b);
             }
@@ -271,7 +290,8 @@ final class ComponentBuilders {
         }
         
         protected T createInstanceImpl() {
-            return (T)new Utils.PlaceholderPanel(className);
+            setPlaceholder();
+            return (T)new PlaceholderPanel(className);
         }
         
     }

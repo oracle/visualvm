@@ -165,25 +165,24 @@ final class BaseBuilders {
         private final String name;
         private final int style;
         private final int size;
+        private final boolean isUIResource;
         
         FontBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             name = Utils.getFontName(instance, heap);
             style = DetailsUtils.getIntFieldValue(instance, "style", 0);
             size = DetailsUtils.getIntFieldValue(instance, "size", 10);
+            isUIResource = DetailsUtils.isSubclassOf(instance, "javax.swing.plaf.FontUIResource");
         }
         
-        static FontBuilder fromField(Instance instance, String field, boolean uiresource, Heap heap) {
+        boolean isUIResource() {
+            return isUIResource;
+        }
+        
+        static FontBuilder fromField(Instance instance, String field, Heap heap) {
             Object font = instance.getValueOfField(field);
             if (!(font instanceof Instance)) return null;
-            
-            Instance _font = (Instance)font;
-            
-            // Do not build FontUIResource, mostly the defaults for JComponents
-            if (!uiresource && DetailsUtils.isSubclassOf(_font, "javax.swing.plaf.FontUIResource"))
-                return null;
-            
-            return new FontBuilder(_font, heap);
+            return new FontBuilder((Instance)font, heap);
         }
         
         protected Font createInstanceImpl() {
@@ -195,22 +194,21 @@ final class BaseBuilders {
     static final class ColorBuilder extends InstanceBuilder<Color> {
         
         private final int value;
+        private final boolean isUIResource;
         
         ColorBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             value = DetailsUtils.getIntFieldValue(instance, "value", 0);
+            isUIResource = DetailsUtils.isSubclassOf(instance, "javax.swing.plaf.ColorUIResource");
         }
         
-        static ColorBuilder fromField(Instance instance, String field, boolean uiresource, Heap heap) {
+        boolean isUIResource() {
+            return isUIResource;
+        }
+        
+        static ColorBuilder fromField(Instance instance, String field, Heap heap) {
             Object color = instance.getValueOfField(field);
-            if (!(color instanceof Instance)) return null;
-            
-            Instance _color = (Instance)color;
-            
-            // Do not build ColorUIResource, mostly the defaults for JComponents
-            if (!uiresource && DetailsUtils.isSubclassOf(_color, "javax.swing.plaf.ColorUIResource"))
-                return null;
-            
+            if (!(color instanceof Instance)) return null;            
             return new ColorBuilder((Instance)color, heap);
         }
         

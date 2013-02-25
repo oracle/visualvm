@@ -43,6 +43,7 @@
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
@@ -74,10 +75,6 @@ final class BorderBuilders {
 
         Instance border = (Instance)_border;
 
-        // Do not build BorderUIResource, mostly the defaults for JComponents
-        if (!uiresource && border.getJavaClass().getName().startsWith("javax.swing.plaf.BorderUIResource$"))
-            return null;
-
         // Make sure subclasses are listed before base class if using isSubclassOf
         if (DetailsUtils.isSubclassOf(border, BevelBorder.class.getName())) {
             return new BevelBorderBuilder(border, heap);
@@ -99,8 +96,14 @@ final class BorderBuilders {
     }
     
     static abstract class BorderBuilder extends InstanceBuilder<Border> {
+        private final boolean isUIResource;
         BorderBuilder(Instance instance, Heap heap) {
             super(instance, heap);
+            this.isUIResource = instance.getJavaClass().getName().
+                    startsWith("javax.swing.plaf.BorderUIResource$");
+        }
+        boolean isUIResource() {
+            return isUIResource;
         }
     }
     
@@ -116,10 +119,10 @@ final class BorderBuilders {
             super(instance, heap);
             
             bevelType = DetailsUtils.getIntFieldValue(instance, "bevelType", BevelBorder.LOWERED);
-            highlightOuter = ColorBuilder.fromField(instance, "highlightOuter", true, heap);
-            highlightInner = ColorBuilder.fromField(instance, "highlightInner", true, heap);
-            shadowInner = ColorBuilder.fromField(instance, "shadowInner", true, heap);
-            shadowOuter = ColorBuilder.fromField(instance, "shadowOuter", true, heap);
+            highlightOuter = ColorBuilder.fromField(instance, "highlightOuter", heap);
+            highlightInner = ColorBuilder.fromField(instance, "highlightInner", heap);
+            shadowInner = ColorBuilder.fromField(instance, "shadowInner", heap);
+            shadowOuter = ColorBuilder.fromField(instance, "shadowOuter", heap);
         }
         
         protected Border createInstanceImpl() {
@@ -170,7 +173,7 @@ final class BorderBuilders {
             super(instance, heap);
             
             insets = new InsetsBuilder(instance, heap);
-            color = ColorBuilder.fromField(instance, "color", true, heap);
+            color = ColorBuilder.fromField(instance, "color", heap);
             tileIcon = IconBuilder.fromField(instance, "tileIcon", heap);
         }
         
@@ -197,8 +200,8 @@ final class BorderBuilders {
             super(instance, heap);
             
             etchType = DetailsUtils.getIntFieldValue(instance, "etchType", EtchedBorder.LOWERED);
-            highlight = ColorBuilder.fromField(instance, "highlight", true, heap);
-            shadow = ColorBuilder.fromField(instance, "shadow", true, heap);
+            highlight = ColorBuilder.fromField(instance, "highlight", heap);
+            shadow = ColorBuilder.fromField(instance, "shadow", heap);
         }
         
         protected Border createInstanceImpl() {
@@ -223,7 +226,7 @@ final class BorderBuilders {
             super(instance, heap);
             
             thickness = DetailsUtils.getIntFieldValue(instance, "thickness", 1);
-            lineColor = ColorBuilder.fromField(instance, "lineColor", true, heap);
+            lineColor = ColorBuilder.fromField(instance, "lineColor", heap);
             roundedCorners = DetailsUtils.getBooleanFieldValue(instance, "roundedCorners", false);
         }
         
@@ -257,15 +260,18 @@ final class BorderBuilders {
             border = fromField(instance, "border", false, heap);
             titlePosition = DetailsUtils.getIntFieldValue(instance, "titlePosition", TitledBorder.DEFAULT_POSITION);
             titleJustification = DetailsUtils.getIntFieldValue(instance, "titleJustification", TitledBorder.LEADING);
-            titleFont = FontBuilder.fromField(instance, "titleFont", false, heap);
-            titleColor = ColorBuilder.fromField(instance, "titleColor", false, heap);
+            titleFont = FontBuilder.fromField(instance, "titleFont", heap);
+            titleColor = ColorBuilder.fromField(instance, "titleColor", heap);
         }
         
         protected Border createInstanceImpl() {
+            Font font = titleFont == null || titleFont.isUIResource() ?
+                        null : titleFont.createInstance();
+            Color color = titleColor == null || titleColor.isUIResource() ?
+                        null : titleColor.createInstance();
+            
             return new TitledBorder(border == null ? null : border.createInstance(),
-                    title, titleJustification, titlePosition, titleFont == null ?
-                    null : titleFont.createInstance(), titleColor == null ?
-                    null : titleColor.createInstance());
+                    title, titleJustification, titlePosition, font, color);
         }
         
     }
@@ -283,14 +289,17 @@ final class BorderBuilders {
         }
         
         protected Border createInstanceImpl() {
-            if (outsideBorder == null && insideBorder == null) {
+            Border outside = outsideBorder == null || outsideBorder.isUIResource() ?
+                             null : outsideBorder.createInstance();
+            Border inside = insideBorder == null || insideBorder.isUIResource() ?
+                             null : insideBorder.createInstance();
+            if (outside == null && inside == null) {
                 return BorderFactory.createEmptyBorder();
-            } else if (outsideBorder == null || insideBorder == null) {
-                if (outsideBorder == null) return insideBorder.createInstance();
-                else return outsideBorder.createInstance();
+            } else if (outside == null || inside == null) {
+                if (outside == null) return inside;
+                else return outside;
             } else {
-                return BorderFactory.createCompoundBorder(
-                        outsideBorder.createInstance(), insideBorder.createInstance());
+                return BorderFactory.createCompoundBorder(outside, inside);
             }
         }
         
