@@ -58,6 +58,8 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -100,12 +102,14 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         try {
             InstanceBuilder<? extends String> builder = builders.getBuilder(instance, String.class);
             if (builder == null) {
-                return null;
+                LOGGER.log(Level.FINE, "Unable to get String builder for %s", className);
+            } else {
+                return builder.convert(new FieldAccessor(heap, builders), instance);
             }
-            return builder.convert(new FieldAccessor(heap, builders), instance);
         } catch (InvalidFieldException ex) {
-            return null;
+            LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage());
         }
+        return null;
     }
 
     @Override
@@ -135,7 +139,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
 
                 label = new JLabel(new ImageIcon(background));
             } catch (InvalidFieldException ex) {
-                LOGGER.fine(ex.getMessage());
+                LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage());
                 label = new JLabel(ImageUtilities.loadImageIcon(BROKEN_IMAGE_NAME, false));
                 if(LOGGER.isLoggable(Level.FINE)) {
                     label.setToolTipText(ex.getMessage()); //TODO: unlocalized message exposed, only in debug mode
@@ -190,6 +194,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         try {
             return buildImageInternal(instance, heap);
         } catch (InvalidFieldException ex) {
+            LOGGER.log(Level.FINE, "Unable to create image for instance", ex.getMessage());
             return null;
         }
     }
@@ -338,12 +343,12 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         builders.register(DataBufferInt.class, false, INT_DATA_BUFFER_BUILDER);
         builders.register(DataBufferByte.class, false, BYTE_DATA_BUFFER_BUILDER);
         builders.register(WritableRaster.class, true, WRITABLE_RASTER_BUILDER);
-        builders.register("sun.awt.image.ToolkitImage", TOOKIT_IMAGE_STRING_BUILDER);
-        builders.register("sun.awt.image.ToolkitImage", TOOKIT_IMAGE_IMAGE_BUILDER);
+        builders.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_STRING_BUILDER);
+        builders.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_IMAGE_BUILDER);
         builders.register(ImageIcon.class, false, IMAGE_ICON_STRING_BUILDER);
         builders.register(ImageIcon.class, false, IMAGE_ICON_IMAGE_BUILDER);
-        builders.register(BufferedImage.class, false, BUFFERED_IMAGE_STRING_BUILDER);
-        builders.register(BufferedImage.class, false, BUFFERED_IMAGE_IMAGE_BUILDER);
+        builders.register(BufferedImage.class, true, BUFFERED_IMAGE_STRING_BUILDER);
+        builders.register(BufferedImage.class, true, BUFFERED_IMAGE_IMAGE_BUILDER);
     }
     private static final String[] SUPPORTED_CLASSES = builders.getMasks(Image.class, String.class);
 }
