@@ -64,7 +64,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
@@ -211,7 +210,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
             Instance colorModel = fa.getInstance(instance, "colorModel", ColorModel.class, true);
 
             int color_count = 0;
-            if (DetailsUtils.isInstanceOf(colorModel, IndexColorModel.class)) {
+            if (FieldAccessor.isInstanceOf(colorModel, IndexColorModel.class)) {
                 color_count = DetailsUtils.getIntFieldValue(colorModel, "map_size", 0); // NOI18N
             }
             if (color_count > 0) {
@@ -229,7 +228,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
                 WritableRaster raster = fa.build(instance, "raster", WritableRaster.class, false);
                 Instance colorModel = fa.getInstance(instance, "colorModel", ColorModel.class, true);
                 BufferedImage result;
-                if (DetailsUtils.isInstanceOf(colorModel, IndexColorModel.class)) {
+                if (FieldAccessor.isInstanceOf(colorModel, IndexColorModel.class)) {
                     IndexColorModel indexColorModel = buildIndexColorModel(fa, colorModel);
                     result = new BufferedImage(raster.getWidth(), raster.getHeight(), imageType, indexColorModel);
                 } else {

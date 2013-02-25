@@ -76,7 +76,7 @@ class InstanceBuilderRegistry {
     }
 
     public void register(Class<?> type, boolean subtypes, InstanceBuilder<?> builder) {
-        register(DetailsUtils.getClassMask(type, subtypes), builder);
+        register(FieldAccessor.getClassMask(type, subtypes), builder);
     }
 
     /**
@@ -88,7 +88,7 @@ class InstanceBuilderRegistry {
      */
     public <T> InstanceBuilder<? extends T> getBuilder(Instance instance, Class<T> type) {
         for (RegisteredBuilder builder : builders) {
-            if (DetailsUtils.matchClassMask(instance, builder.mask)) {
+            if (FieldAccessor.matchClassMask(instance, builder.mask)) {
                 if (type.isAssignableFrom(builder.builder.getType())) {
                     return (InstanceBuilder<? extends T>) builder.builder;
                 }

@@ -61,31 +61,10 @@ public final class DetailsUtils {
     
     
     // --- Check types ---------------------------------------------------------
-
-    public static String getClassMask(Class<?> type, boolean subtypes)
-    {
-        if(subtypes) {
-            return type.getName() + "+"; // NOI18N
-        }
-        return type.getName();
-    }
-
-    public static boolean matchClassMask(Instance instance, String mask)
-    {
-        if(mask.endsWith("+")) {
-            return isSubclassOf(instance, mask.substring(0, mask.length()-1));
-        }
-        return isInstanceOf(instance, mask);
-    }
-
+    
     public static boolean isInstanceOf(Instance instance, String clsName) {
         if (instance == null) return false;
         return instance.getJavaClass().getName().equals(clsName);
-    }
-
-    public static boolean isInstanceOf(Instance instance, Class<?> type) {
-        if (instance == null) return false;
-        return instance.getJavaClass().getName().equals(type.getName());
     }
     
     public static boolean isSubclassOf(Instance instance, String clsName) {

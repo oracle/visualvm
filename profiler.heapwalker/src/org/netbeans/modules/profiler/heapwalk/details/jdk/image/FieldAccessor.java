@@ -74,6 +74,27 @@ public class FieldAccessor {
     }
 
     // Utils -----------------------------------------------------------------------------
+    public static String getClassMask(Class<?> type, boolean subtypes) {
+        if (subtypes) {
+            return type.getName() + "+"; // NOI18N
+        }
+        return type.getName();
+    }
+
+    public static boolean matchClassMask(Instance instance, String mask) {
+        if (mask.endsWith("+")) {
+            return DetailsUtils.isSubclassOf(instance, mask.substring(0, mask.length() - 1));
+        }
+        return DetailsUtils.isInstanceOf(instance, mask);
+    }
+
+    public static boolean isInstanceOf(Instance instance, Class<?> type) {
+        if (instance == null) {
+            return false;
+        }
+        return instance.getJavaClass().getName().equals(type.getName());
+    }
+
     /**
      * Exception thrown by the field accessors if the field doesn't exists or has unexpected value.
      */
@@ -173,7 +194,7 @@ public class FieldAccessor {
      * @return never null
      */
     public Instance getInstance(Instance instance, String field, Class<?> type, boolean subclasses) throws InvalidFieldException {
-        return getInstance(instance, field, DetailsUtils.getClassMask(type, subclasses));
+        return getInstance(instance, field, getClassMask(type, subclasses));
     }
 
     /**
@@ -206,16 +227,18 @@ public class FieldAccessor {
         return builder.convert(this, get(instance, field, Instance.class, allowNull));
     }
 
-    /** Builds using registry */
+    /**
+     * Builds using registry
+     */
     public <T> T build(Instance instance, String field, Class<T> type, boolean allowNull)
             throws InvalidFieldException {
         Instance value = get(instance, field, Instance.class, allowNull);
-        if(value == null) {
+        if (value == null) {
             return null;
         }
         InstanceBuilder<? extends T> builder = registry.getBuilder(value, type);
-        if(builder == null) {
-            if(allowNull) {
+        if (builder == null) {
+            if (allowNull) {
                 return null;
             }
             throw new InvalidFieldException(instance, field, "No builder for %s returning %s registered", //NOI18N
@@ -247,16 +270,14 @@ public class FieldAccessor {
     }
 
     // Builder functions -----------------------------------------------------------------
-    
     public String toString(Instance instance) {
-        if(instance == null) {
+        if (instance == null) {
             return null;
         }
         return DetailsSupport.getDetailsString(instance, heap);
     }
 
     // Predefined type accessors ---------------------------------------------------------
-
     public int getInt(Instance instance, String field) throws InvalidFieldException {
         return get(instance, field, Number.class, false).intValue();
     }
