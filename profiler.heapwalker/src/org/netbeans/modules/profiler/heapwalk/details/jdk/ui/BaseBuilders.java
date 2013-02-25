@@ -42,9 +42,11 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
+import org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageDetailProvider;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -222,11 +224,13 @@ final class BaseBuilders {
         
         private final int width;
         private final int height;
+        private final Image image;
         
         IconBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             width = DetailsUtils.getIntFieldValue(instance, "width", 0);
             height = DetailsUtils.getIntFieldValue(instance, "height", 0);
+            image = ImageDetailProvider.buildImage(instance, heap);
         }
         
         static IconBuilder fromField(Instance instance, String field, Heap heap) {
@@ -237,7 +241,10 @@ final class BaseBuilders {
         }
         
         protected Icon createInstanceImpl() {
-            return new PlaceholderIcon(width, height);
+            if(image == null) {
+                return new PlaceholderIcon(width, height);
+            }
+            return new ImageIcon(image);
         }
         
     }
