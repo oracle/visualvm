@@ -42,7 +42,9 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.spi;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
@@ -61,17 +63,45 @@ public final class DetailsUtils {
     // --- Check types ---------------------------------------------------------
     
     public static boolean isInstanceOf(Instance instance, String clsName) {
-        return clsName.equals(instance.getJavaClass().getName());
+        if (instance == null) return false;
+        return instance.getJavaClass().getName().equals(clsName);
     }
     
     public static boolean isSubclassOf(Instance instance, String clsName) {
+        if (instance == null) return false;
         JavaClass cls = instance.getJavaClass();
+        
+        // NOTE: currently optimized for Builders, two-dimensional cache would be more general
+        if (!cls.getName().equals(LAST_SUBCLASS_INSTANCE)) {
+            SUBCLASS_CACHE.clear();
+        } else {
+            Boolean subclass = SUBCLASS_CACHE.get(clsName);
+            if (subclass != null) return subclass.booleanValue();
+        }
+        
+        LAST_SUBCLASS_INSTANCE = cls.getName();
+        
+        boolean result = false;
         while (cls != null) {
-            if (cls.getName().equals(clsName)) return true;
+            if (cls.getName().equals(clsName)) {
+                result = true;
+                break;
+            }
             cls = cls.getSuperClass();
         }
-        return false;
+        
+        SUBCLASS_CACHE.put(clsName, Boolean.valueOf(result));
+        
+        return result;
     }
+    
+    private static String LAST_SUBCLASS_INSTANCE;
+    private static final LinkedHashMap<String, Boolean> SUBCLASS_CACHE =
+            new LinkedHashMap<String, Boolean>(100) {
+                protected boolean removeEldestEntry(Map.Entry eldest) {
+                    return size() > 5000;
+                }
+            };
     
     
     // --- Primitive types -----------------------------------------------------

@@ -42,19 +42,26 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
+import javax.swing.JPanel;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.ColorBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.DimensionBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.FontBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.InsetsBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.PointBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.RectangleBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -70,58 +77,57 @@ public final class AwtDetailsProvider extends DetailsProvider.Basic {
     private static final String DIMENSION_MASK = "java.awt.Dimension+";         // NOI18N
     private static final String RECTANGLE_MASK = "java.awt.Rectangle+";         // NOI18N
     private static final String INSETS_MASK = "java.awt.Insets+";               // NOI18N
+    private static final String TEXTATTRIBUTE_MASK = "java.text.AttributedCharacterIterator$Attribute+"; // NOI18N
+    private static final String CURSOR_MASK = "java.awt.Cursor+";               // NOI18N
+    
+    private static final String FRAME_MASK = "java.awt.Frame+";                 // NOI18N
+    private static final String DIALOG_MASK = "java.awt.Dialog+";               // NOI18N
     
     public AwtDetailsProvider() {
         super(FONT_MASK, COLOR_MASK, POINT_MASK, DIMENSION_MASK,
-              RECTANGLE_MASK, INSETS_MASK);
+              RECTANGLE_MASK, INSETS_MASK, TEXTATTRIBUTE_MASK, CURSOR_MASK,
+              
+              FRAME_MASK, DIALOG_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (FONT_MASK.equals(className)) {                                      // Font+
-            String name = DetailsUtils.getInstanceFieldString(
-                    instance, "name", heap);                                    // NOI18N
-            if (name == null) {
-                Instance font2DHandle = (Instance)instance.getValueOfField(
-                        "font2DHandle");                                        // NOI18N
-                if (font2DHandle != null) {
-                    Instance font2D = (Instance)font2DHandle.getValueOfField(
-                            "font2D");                                          // NOI18N
-                    if (font2D != null) {
-                        name = DetailsUtils.getInstanceFieldString(
-                                instance, "fullName", heap);                    // NOI18N
-                        if (name == null) {
-                            name = DetailsUtils.getInstanceFieldString(
-                                    instance, "nativeFontName", heap);          // NOI18N
-                        }
-                    }
-                }
-            }
+            String name = Utils.getFontName(instance, heap);
+            if (name == null) name = "Default";                                 // NOI18N
             int size = DetailsUtils.getIntFieldValue(instance, "size", 10);     // NOI18N // TODO: should use default font size
-            if (name == null) name = size + "pt";                               // NOI18N
-            else name += ", " + size + "pt";                                    // NOI18N
+            name += ", " + size + "pt";                                         // NOI18N
             int style = DetailsUtils.getIntFieldValue(instance, "style", 0);    // NOI18N
             if ((style & 1) != 0) name += ", bold";                             // NOI18N
             if ((style & 2) != 0) name += ", italic";                           // NOI18N
             return name;
         } else if (COLOR_MASK.equals(className)) {                              // Color+
-            Color color = createColor(instance, heap);
-            if (color != null) return color.getRed() + ", " + color.getGreen() +// NOI18N
-                               ", " + color.getBlue() + ", " + color.getAlpha();// NOI18N
+            Color color = new ColorBuilder(instance, heap).createInstance();
+            return color.getRed() + ", " + color.getGreen() +                   // NOI18N
+                   ", " + color.getBlue() + ", " + color.getAlpha();            // NOI18N
         } else if (POINT_MASK.equals(className)) {                              // Point+
-            Point point = createPoint(instance, heap);
-            if (point != null) return point.x + ", " + point.y;                 // NOI18N
+            Point point = new PointBuilder(instance, heap).createInstance();
+            return point.x + ", " + point.y;                                    // NOI18N
         } else if (DIMENSION_MASK.equals(className)) {                          // Dimension+
-            Dimension dimension = createDimension(instance, heap);
-            if (dimension != null) return dimension.width + ", " +              // NOI18N
-                                   dimension.height;
+            Dimension dimension = new DimensionBuilder(instance, heap).createInstance();
+            return dimension.width + ", " + dimension.height;                   // NOI18N
         } else if (RECTANGLE_MASK.equals(className)) {                          // Rectangle+
-            Rectangle rectangle = createRectangle(instance, heap);
-            if (rectangle != null) return rectangle.x + ", " + rectangle.y +    // NOI18N
-                                   ", " + rectangle.width + ", " + rectangle.height; // NOI18N
+            Rectangle rectangle = new RectangleBuilder(instance, heap).createInstance();
+            return rectangle.x + ", " + rectangle.y +                           // NOI18N
+                   ", " + rectangle.width + ", " + rectangle.height;            // NOI18N
         } else if (INSETS_MASK.equals(className)) {                             // Insets+
-            Insets insets = createInsets(instance, heap);
-            if (insets != null) return insets.top + ", " + insets.left +        // NOI18N
-                                 ", " + insets.bottom + ", " + insets.right;    // NOI18N
+            Insets insets = new InsetsBuilder(instance, heap).createInstance();
+            return insets.top + ", " + insets.left +                            // NOI18N
+                   ", " + insets.bottom + ", " + insets.right;                  // NOI18N
+        } else if (TEXTATTRIBUTE_MASK.equals(className) ||                      // AttributedCharacterIterator$Attribute+
+                   CURSOR_MASK.equals(className)) {                             // Cursor+
+            return DetailsUtils.getInstanceFieldString(
+                    instance, "name", heap);                                    // NOI18N
+        }
+        
+         else if (FRAME_MASK.equals(className) ||                               // Frame+
+                  DIALOG_MASK.equals(className)) {                              // Dialog+
+            return DetailsUtils.getInstanceFieldString(
+                    instance, "title", heap);                                   // NOI18N
         }
         return null;
     }
@@ -135,86 +141,49 @@ public final class AwtDetailsProvider extends DetailsProvider.Basic {
         return null;
     }
     
-    static Font createFont(Instance instance, Heap heap) {
-        String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
-        int style = DetailsUtils.getIntFieldValue(instance, "style", 0);        // NOI18N       
-        int size = DetailsUtils.getIntFieldValue(instance, "size", 10);         // NOI18N // TODO: should use default font size
-        return new Font(name, style, size);
-    }
-    
-    static Color createColor(Instance instance, Heap heap) {
-        int rgba = DetailsUtils.getIntFieldValue(instance, "value", 0);         // NOI18N
-        return new Color(rgba);
-    }
-    
-    static Point createPoint(Instance instance, Heap heap) {
-        int x = DetailsUtils.getIntFieldValue(instance, "x", 0);                // NOI18N
-        int y = DetailsUtils.getIntFieldValue(instance, "y", 0);                // NOI18N
-        return new Point(x, y);
-    }
-    
-    static Dimension createDimension(Instance instance, Heap heap) {
-        int width = DetailsUtils.getIntFieldValue(instance, "width", 0);        // NOI18N
-        int height = DetailsUtils.getIntFieldValue(instance, "height", 0);      // NOI18N
-        return new Dimension(width, height);
-    }
-    
-    static Rectangle createRectangle(Instance instance, Heap heap) {
-        int x = DetailsUtils.getIntFieldValue(instance, "x", 0);                // NOI18N
-        int y = DetailsUtils.getIntFieldValue(instance, "y", 0);                // NOI18N
-        int width = DetailsUtils.getIntFieldValue(instance, "width", 0);        // NOI18N
-        int height = DetailsUtils.getIntFieldValue(instance, "height", 0);      // NOI18N
-        return new Rectangle(x, y, width, height);
-    }
-    
-    static Insets createInsets(Instance instance, Heap heap) {
-        int top = DetailsUtils.getIntFieldValue(instance, "top", 0);            // NOI18N
-        int left = DetailsUtils.getIntFieldValue(instance, "left", 0);          // NOI18N
-        int bottom = DetailsUtils.getIntFieldValue(instance, "bottom", 0);      // NOI18N
-        int right = DetailsUtils.getIntFieldValue(instance, "right", 0);        // NOI18N
-        return new Insets(top, left, bottom, right);
-    }
-    
-    private static class FontView extends View {
+    @NbBundle.Messages({
+        "FontView_Preview=ABCabc123"
+    })
+    private static class FontView extends Utils.View<FontBuilder> {
         
         FontView(Instance instance, Heap heap) {
-            super(instance, heap);
+            super(0, false, true, instance, heap);
         }
         
-        protected void computeView(Instance instance, Heap heap) {
-            final Font font = createFont(instance, heap);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    removeAll();
-                    JLabel label = new JLabel();
-                    label.setHorizontalAlignment(JLabel.CENTER);
-                    label.setFont(font);
-                    label.setText("ABCabc123");
-                    add(label, BorderLayout.CENTER);
-                    invalidate();
-                    revalidate();
-                    doLayout();
-                }
-            });
+        protected FontBuilder getBuilder(Instance instance, Heap heap) {
+            return new FontBuilder(instance, heap);
+        }
+        
+        protected Component getComponent(FontBuilder builder) {
+            JLabel label = new JLabel();
+            label.setHorizontalAlignment(JLabel.CENTER);
+            label.setFont(builder.createInstance());
+            label.setText(Bundle.FontView_Preview());
+            return label;
         }
         
     }
     
-    private static class ColorView extends View {
+    private static class ColorView extends Utils.View<ColorBuilder> {
         
         ColorView(Instance instance, Heap heap) {
-            super(instance, heap);
+            super(0, true, true, instance, heap);
         }
         
-        protected void computeView(Instance instance, Heap heap) {
-            final Color color = createColor(instance, heap);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    removeAll();
-                    setOpaque(true);
-                    setBackground(color);
+        protected ColorBuilder getBuilder(Instance instance, Heap heap) {
+            return new ColorBuilder(instance, heap);
+        }
+        
+        protected Component getComponent(ColorBuilder builder) {
+            final Color color = builder.createInstance();
+            JPanel panel = new JPanel(null) {
+                public void paint(Graphics g) {
+                    g.setColor(color);
+                    g.fillRect(0, 0, getWidth(), getHeight());
                 }
-            });
+            };
+            panel.setOpaque(false);
+            return panel;
         }
         
     }
