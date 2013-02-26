@@ -45,7 +45,7 @@ package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 import java.awt.Component;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.ComponentBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.ComponentBuilders.ComponentBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -55,19 +55,26 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=DetailsProvider.class)
-public final class SwingDetailsProvider extends DetailsProvider.Basic {
+public final class ComponentDetailsProvider extends DetailsProvider.Basic {
     
     private static final String JLABEL_MASK = "javax.swing.JLabel+";                // NOI18N
     private static final String ABSTRACTBUTTON_MASK = "javax.swing.AbstractButton+";// NOI18N
     private static final String JTOOLTIP_MASK = "javax.swing.JToolTip+";            // NOI18N
     private static final String JFILECHOOSER_MASK = "javax.swing.JFileChooser+";    // NOI18N
-    private static final String JINTERNALFRAME_MASK = "javax.swing.JInternalFrame+";// NOI18N
     private static final String TABLECOLUMN_MASK = "javax.swing.table.TableColumn+";// NOI18N
     private static final String JPANEL_MASK = "javax.swing.JPanel+";                // NOI18N
+    private static final String JPROGRESSBAR_MASK = "javax.swing.JProgressBar+";    // NOI18N
     
-    public SwingDetailsProvider() {
+    private static final String JINTERNALFRAME_MASK = "javax.swing.JInternalFrame+";// NOI18N
+    private static final String FRAME_MASK = "java.awt.Frame+";                     // NOI18N
+    private static final String DIALOG_MASK = "java.awt.Dialog+";                   // NOI18N
+    
+    private static final String COMPONENT_MASK = "java.awt.Component+";             // NOI18N
+    
+    public ComponentDetailsProvider() {
         super(JLABEL_MASK, ABSTRACTBUTTON_MASK, JTOOLTIP_MASK, JFILECHOOSER_MASK,
-              JINTERNALFRAME_MASK, TABLECOLUMN_MASK, JPANEL_MASK);
+              JINTERNALFRAME_MASK, TABLECOLUMN_MASK, JPANEL_MASK, JPROGRESSBAR_MASK,
+              FRAME_MASK, DIALOG_MASK, COMPONENT_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -81,22 +88,42 @@ public final class SwingDetailsProvider extends DetailsProvider.Basic {
         } else if (JFILECHOOSER_MASK.equals(className)) {                           // JFileChooser+
             return DetailsUtils.getInstanceFieldString(
                     instance, "dialogTitle", heap);                                 // NOI18N
-        } else if (JINTERNALFRAME_MASK.equals(className)) {                         // JInternalFrame+
+        } else if (JINTERNALFRAME_MASK.equals(className) ||                         // JInternalFrame+
+                   FRAME_MASK.equals(className) ||                                  // Frame+
+                   DIALOG_MASK.equals(className)) {                                 // Dialog+
             return DetailsUtils.getInstanceFieldString(
                     instance, "title", heap);                                       // NOI18N
         } else if (TABLECOLUMN_MASK.equals(className)) {                            // TableColumn+
             return DetailsUtils.getInstanceFieldString(
                     instance, "headerValue", heap);                                 // NOI18N
+        } else if (JPROGRESSBAR_MASK.equals(className)) {                           // JProgressBar+
+            boolean b = DetailsUtils.getBooleanFieldValue(
+                    instance, "paintString", false);                                // NOI18N
+            if (b) return DetailsUtils.getInstanceFieldString(
+                    instance, "progressString", heap);                              // NOI18N
         }
-        return null;
+        
+        // Value for a generic Component
+        String string = getStringField(instance, "displayName", heap);
+        if (string == null) string = getStringField(instance, "label", heap);
+        if (string == null) string = getStringField(instance, "name", heap);
+        // TODO: check tooltip
+        
+        if (string != null && string.trim().isEmpty()) string = null;
+        
+        return string;
     }
     
     public View getDetailsView(String className, Instance instance, Heap heap) {
-        if (JLABEL_MASK.equals(className) ||                                        // JLabel+
-            ABSTRACTBUTTON_MASK.equals(className) ||                                // AbstractButton+
-            JPANEL_MASK.equals(className)) {                                        // JPanel+
-            return new ComponentView(instance, heap);
-        }
+        return new ComponentView(instance, heap);
+    }
+    
+    
+    private static String getStringField(Instance instance, String field, Heap heap) {
+        Object string = instance.getValueOfField(field);
+        if (string instanceof Instance &&
+            String.class.getName().equals(((Instance)string).getJavaClass().getName()))
+            return DetailsUtils.getInstanceString((Instance)string, heap);
         return null;
     }
     
@@ -108,7 +135,7 @@ public final class SwingDetailsProvider extends DetailsProvider.Basic {
         }
         
         protected ComponentBuilder getBuilder(Instance instance, Heap heap) {
-            return Builders.getComponentBuilder(instance, heap);
+            return ComponentBuilders.getBuilder(instance, heap);
         }
         
         protected Component getComponent(ComponentBuilder builder) {
