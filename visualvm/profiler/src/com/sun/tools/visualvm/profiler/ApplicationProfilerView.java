@@ -63,7 +63,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.AttachSettings;
-import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
@@ -71,7 +70,6 @@ import org.netbeans.modules.profiler.LiveResultsWindow;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.netbeans.modules.profiler.utils.IDEUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -236,25 +234,27 @@ final class ApplicationProfilerView extends DataSourceView {
         
         private static JComponent getLiveResultsView() {
             JComponent view = LiveResultsWindow.getDefault();
-
             Component[] components = view.getComponents();
+            boolean buttonFound = false;
+            
             if (components.length > 0 && components[0] instanceof JPanel) {
                 components = ((JPanel)components[0]).getComponents();
-                if (components.length > 0 && components[0] instanceof JToolBar) {
-                    JToolBar toolbar = (JToolBar)components[0];
-                    toolbar.setOpaque(false);
-                    components = toolbar.getComponents();
-                    for (int i = 0; i < components.length; i++) {
-                        Component component = components[i];
-                        if (component instanceof AbstractButton) {
-                            ((AbstractButton)component).setOpaque(false);
-                            if (i == 5)
-                                ((AbstractButton)component).setText(NbBundle.getMessage(
-                                        ApplicationProfilerView.class, "LBL_Snapshot")); // NOI18N
-                        }
+                if (components.length > 0 && components[0] instanceof JPanel) {
+                    JPanel toolbarPanel = (JPanel)components[0];
+                    components = toolbarPanel.getComponents();
+                    if (components.length > 0 && components[0] instanceof JToolBar) {
+                        JToolBar toolbar = (JToolBar)components[0];
+                        components = toolbar.getComponents();
+                    }
+                    if (components.length > 5 && components[5] instanceof AbstractButton) {
+                        AbstractButton takeSnapshot = (AbstractButton)components[5];
+                        takeSnapshot.setText(NbBundle.getMessage(
+                                ApplicationProfilerView.class, "LBL_Snapshot")); // NOI18N
+                        buttonFound = true;
                     }
                 }
             }
+            assert buttonFound : "Take Snapshot button was not found in the toolbar";  // NOI18N
 
             view.setPreferredSize(new Dimension(1, 1));
             return view;
