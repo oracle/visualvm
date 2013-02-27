@@ -61,7 +61,6 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
 
     private static final String STANDARD_MODULE = "org.netbeans.StandardModule+"; // NOI18N
     private static final String SPECIFICATION_VERSION = "org.openide.modules.SpecificationVersion"; // NOI18N
-    private static final String TOP_COMPONENT = "org.openide.windows.TopComponent+"; // NOI18N
     private static final String ABSTRACT_NODE = "org.openide.nodes.AbstractNode+"; // NOI18N
     private static final String FILE_ENTRY = "org.openide.loaders.FileEntry+"; // NOI18N
     private static final String DATA_OBJECT = "org.openide.loaders.DataObject+"; // NOI18N
@@ -87,7 +86,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     };
     
     public PlatformDetailsProvider() {
-        super(STANDARD_MODULE,SPECIFICATION_VERSION,TOP_COMPONENT,ABSTRACT_NODE,
+        super(STANDARD_MODULE,SPECIFICATION_VERSION,ABSTRACT_NODE,
               FILE_ENTRY,DATA_OBJECT,FILE_OBJ,FOLDER_OBJ,FILE_NAME,FIXED_0_7,
               FIXED_8_15,FIXED_16_23,FIXED_1_10,FIXED_11_20,FIXED_21_30,
               BYTE_BASED_SEQUENCE,CHAR_BASED_SEQUENCE);
@@ -118,8 +117,9 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
                 }
                 return specVersion.substring(0, specVersion.length()-1);
             }
-        } else if (TOP_COMPONENT.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap);     // NOI18N
+          // TopComponent covered by details.jdk.ui.ComponentDetailsProvider
+//        } else if (TOP_COMPONENT.equals(className)) {
+//            return DetailsUtils.getInstanceFieldString(instance, "displayName", heap);     // NOI18N
         } else if (ABSTRACT_NODE.equals(className)) {
             String name = DetailsUtils.getInstanceFieldString(instance, "displayName", heap); // NOI18N
 
