@@ -186,7 +186,7 @@ final class WindowBuilders {
                         dim.height = Math.max(dim.height, s.height);
                     }
                 }
-                presenter.setSize(dim);
+                if (dim != null) presenter.setSize(dim);
                 return presenter;
             } else {
                 JInternalFrame presenter = new JInternalFrame(instance.getTitle());
