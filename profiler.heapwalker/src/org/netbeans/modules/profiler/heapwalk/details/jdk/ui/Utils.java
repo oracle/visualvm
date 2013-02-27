@@ -52,6 +52,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -158,6 +159,9 @@ final class Utils {
         
         PlaceholderPanel(String className) {
             super(null);
+            
+            putClientProperty("className", className);
+            
             setOpaque(true);
             setBorder(BorderFactory.createLineBorder(LINE));
             
@@ -255,6 +259,8 @@ final class Utils {
             return null;
         }
         
+        protected void setupGlassPane(JPanel glassPane) {}
+        
         protected final void computeView(Instance instance, Heap heap) {
             final T builder = getBuilder(instance, heap);
             SwingUtilities.invokeLater(new Runnable() {
@@ -266,11 +272,18 @@ final class Utils {
                         if (stretch) {
                             add(component, BorderLayout.CENTER);
                         } else {
-                            glassPane = new JPanel(null);
+                            glassPane = new JPanel(null) {
+                                public Point getToolTipLocation(MouseEvent event) {
+                                    Point p = event.getPoint();
+                                    p.translate(15, 15);
+                                    return p;
+                                }
+                            };
                             glassPane.setOpaque(false);
                             glassPane.addMouseListener(new MouseAdapter() {});
                             glassPane.addMouseMotionListener(new MouseMotionAdapter() {});
                             glassPane.addKeyListener(new KeyAdapter() {});
+                            setupGlassPane(glassPane);
                             add(glassPane);
                             
                             setLayout(null);
