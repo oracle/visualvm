@@ -53,10 +53,13 @@ import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
@@ -64,7 +67,6 @@ import javax.swing.UIManager;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.InstanceBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -80,8 +82,7 @@ import org.openide.util.NbBundle;
 final class Utils {
     
     static String getFontName(Instance instance, Heap heap) {
-        String name = DetailsUtils.getInstanceFieldString(
-                    instance, "name", heap);                                    // NOI18N
+        String name = getFieldString(instance, "name");                         // NOI18N
         if (name == null) {
             Instance font2DHandle = (Instance)instance.getValueOfField(
                     "font2DHandle");                                            // NOI18N
@@ -89,16 +90,33 @@ final class Utils {
                 Instance font2D = (Instance)font2DHandle.getValueOfField(
                         "font2D");                                              // NOI18N
                 if (font2D != null) {
-                    name = DetailsUtils.getInstanceFieldString(
-                            instance, "fullName", heap);                        // NOI18N
-                    if (name == null) {
-                        name = DetailsUtils.getInstanceFieldString(
-                                instance, "nativeFontName", heap);              // NOI18N
-                    }
+                    name = getFieldString(instance, "fullName");                // NOI18N
+                    if (name == null)
+                        name = getFieldString(instance, "nativeFontName");      // NOI18N
                 }
             }
         }
         return name;
+    }
+    
+    static String getFieldString(Instance instance, String field) {
+        Object _s = instance.getValueOfField(field);
+        if (_s instanceof Instance) {
+            Instance s = (Instance)_s;
+            int offset = DetailsUtils.getIntFieldValue(s, "offset", 0);         // NOI18N
+            int count = DetailsUtils.getIntFieldValue(s, "count", -1);          // NOI18N
+            List<String> ch = DetailsUtils.getPrimitiveArrayFieldValues(s, "value"); // NOI18N
+            if (ch != null) {
+                int valuesCount = count < 0 ? ch.size() - offset :
+                                  Math.min(count, ch.size() - offset);            
+                StringBuilder value = new StringBuilder(valuesCount * 2);
+                int lastValue = offset + valuesCount - 1;
+                for (int i = offset; i <= lastValue; i++)
+                    value.append(ch.get(i));
+                return value.toString();
+            }
+        }
+        return null;
     }
     
     static final class PlaceholderIcon implements Icon {
@@ -132,9 +150,9 @@ final class Utils {
     static final class PlaceholderPanel extends JPanel {
         
         private static final Color LINE =
-                          UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
-                          UIManager.getColor("Button.darkShadow") : // NOI18N
-                          UIManager.getColor("Button.shadow"); // NOI18N
+                          UIManager.getLookAndFeel().getID().equals("Metal") ?  // NOI18N
+                          UIManager.getColor("Button.darkShadow") :             // NOI18N
+                          UIManager.getColor("Button.shadow");                  // NOI18N
         
         private final JLabel label;
         
@@ -169,6 +187,42 @@ final class Utils {
             g.translate(-p.x, -p.y);
         }
         
+    }
+    
+    static final class JPopupMenuImpl extends JPopupMenu {
+        
+        public void setVisible(boolean visible) {}
+        public boolean isVisible() { return true; }
+
+        // Workarounds for best apperance of JPopupMenu preview
+        public Component add(Component comp) {
+            if (comp instanceof JComponent)
+                ((JComponent)comp).setOpaque(false);
+            return super.add(comp);
+        }
+        public void addNotify() {
+            super.addNotify();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { repaint(); }
+            });
+        }
+        
+    }
+    
+    static abstract class InstanceBuilder<T> {
+
+        InstanceBuilder(Instance instance, Heap heap) {}
+
+        protected void setupInstance(T instance) {}
+
+        protected T createInstanceImpl() { return null; }
+        
+        final T createInstance() {
+            T instance = createInstanceImpl();
+            if (instance != null) setupInstance(instance);
+            return instance;
+        }
+
     }
     
     static abstract class View<T extends InstanceBuilder> extends DetailsProvider.View implements Scrollable {
@@ -254,7 +308,7 @@ final class Utils {
                 int y = comp.height >= size.height ? 0 :
                         (size.height - comp.height) / 2;
                 
-                component.setLocation(x, y);
+                component.move(x, y); // required to correctly setup JPopupMenu
                 
                 glassPane.setBounds(component.getBounds());
             }
