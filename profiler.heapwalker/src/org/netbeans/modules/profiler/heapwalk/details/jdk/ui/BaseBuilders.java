@@ -240,7 +240,7 @@ final class BaseBuilders {
         
         protected Icon createInstanceImpl() {
             if(image == null) {
-                return new PlaceholderIcon(width, height);
+                    return new PlaceholderIcon(width, height);
             }
             return new ImageIcon(image);
         }
