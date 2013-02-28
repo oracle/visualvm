@@ -42,18 +42,40 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.ComponentBuilders.ComponentBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.openide.util.HelpCtx;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.windows.TopComponent;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ComponentDetailsProvider_NewWindow=Analyze in new window"
+})
 @ServiceProvider(service=DetailsProvider.class)
 public final class ComponentDetailsProvider extends DetailsProvider.Basic {
     
@@ -130,18 +152,183 @@ public final class ComponentDetailsProvider extends DetailsProvider.Basic {
     
     private static class ComponentView extends Utils.View<ComponentBuilder> {
         
+        private ComponentBuilder builder;
+        private Component component;
+        private Component hover;
+        private final MouseHandler mouse;
+        
+        private JComponent glassPane;
+        
+        private final String className;
+        private final int instanceNumber;
+        
+        private final boolean enableNewWindow;
+        private final boolean enableInteraction;
+        
         ComponentView(Instance instance, Heap heap) {
+            this(instance, heap, null, true, false);
+        }
+        
+        private ComponentView(Instance instance, Heap heap, ComponentBuilder builder,
+                              boolean enableNewWindow, boolean enableInteraction) {
             super(instance, heap);
+            
+            this.builder = builder;
+            this.enableNewWindow = enableNewWindow;
+            this.enableInteraction = enableInteraction;
+            
+            if (enableNewWindow || enableInteraction) {
+                mouse = new MouseHandler();
+                addMouseListener(mouse);
+            } else {
+                mouse = null;
+            }
+            
+            if (enableNewWindow) {
+                className = instance.getJavaClass().getName();
+                instanceNumber = instance.getInstanceNumber();
+            } else {
+                className = null;
+                instanceNumber = -1;
+            }
         }
         
         protected ComponentBuilder getBuilder(Instance instance, Heap heap) {
-            return ComponentBuilders.getBuilder(instance, heap);
+            if (builder == null)
+                builder = ComponentBuilders.getBuilder(instance, heap);
+            return builder;
         }
         
         protected Component getComponent(ComponentBuilder builder) {
-            Component component = builder.createPresenter();
-            component.setVisible(true);
+            component = builder.createPresenter();
+            if (component != null) component.setVisible(true);
             return component;
+        }
+        
+        protected void setupGlassPane(JPanel glassPane) {
+            this.glassPane = glassPane;
+            if (mouse != null) {
+                glassPane.addMouseListener(mouse);
+                if (enableInteraction) {
+                    glassPane.addMouseMotionListener(mouse);
+                }
+            }
+        }
+        
+        private class MouseHandler extends MouseAdapter {
+            
+            public void mousePressed(final MouseEvent e) {
+                if (e.isPopupTrigger()) showPopup(e);
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) showPopup(e);
+            }
+            
+            public void mouseMoved(MouseEvent e) {
+                Component at = e == null ? null :
+                        componentAt(component, e.getX(), e.getY());
+                if (hover == at) return;
+                hover = at;
+                hoverChanged();
+            }
+            
+            public void mouseExited(MouseEvent e) {
+                if (!enableInteraction) return;
+                mouseMoved(null);
+            }
+            
+        }
+        
+        
+        private void hoverChanged() {
+            if (hover != null) {                
+                JComponent jc = hover instanceof JComponent ? (JComponent)hover : null;
+                Object cn = jc == null ? null : jc.getClientProperty("className");
+                String name = cn == null ? "" : cn.toString();
+                
+                glassPane.setToolTipText(name.isEmpty() ? null : name);
+            } else {
+                glassPane.setToolTipText(null);
+            }
+            repaint();
+        }
+        
+        public void paint(Graphics g) {
+            super.paint(g);
+            
+            if (hover != null) {
+                Rectangle b = SwingUtilities.convertRectangle(
+                        hover.getParent(), hover.getBounds(), this);
+                g.setColor(Color.RED);
+                g.drawRect(b.x, b.y, b.width, b.height);
+            }
+        }
+        
+        static Component componentAt(Component comp, int x, int y) {
+            if (!comp.contains(x, y)) return null;
+            
+            if (comp instanceof Container) {
+                for (Component c : ((Container)comp).getComponents()) {
+                    if (c != null && c.isVisible()) {
+                        Component at = componentAt(c, x - c.getX(), y - c.getY());
+                        if (at != null) return at;
+                    }
+                }
+            }
+                
+            return comp;
+        }
+        
+        private void showPopup(MouseEvent e) {
+            if (!enableNewWindow || builder == null || component == null) return;
+            
+            JMenuItem test = new JMenuItem(Bundle.ComponentDetailsProvider_NewWindow()) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    openNewWindow();
+                }
+            };
+            
+            JPopupMenu popup = new JPopupMenu();
+            popup.add(test);
+            popup.show(e.getComponent(), e.getX(), e.getY());
+        }
+        
+        private void openNewWindow() {
+            Component c = new ComponentView(null, null, builder, false, true);
+            ComponentTopComponent ctc =
+                    new ComponentTopComponent(c, className, instanceNumber);
+            ctc.open();
+            ctc.requestActive();
+        }
+        
+    }
+    
+    private static class ComponentTopComponent extends ProfilerTopComponent {
+        
+        private static final String HELP_CTX_KEY = "HeapWalker.ComponentPreview.HelpCtx"; // NOI18N
+        private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+        
+        ComponentTopComponent(Component c, String className, int instanceNumber) {
+            setName(BrowserUtils.getSimpleType(className) + " #" + instanceNumber);
+//            setIcon(Icons.getImage(ProfilerIcons.HEAP_DUMP));
+            setToolTipText("Preview of " + className + " #" + instanceNumber);
+//            getAccessibleContext().setAccessibleDescription(org.netbeans.modules.profiler.heapwalk.ui.Bundle.HeapWalkerUI_ComponentDescr());
+            
+            setLayout(new BorderLayout());
+            add(new JScrollPane(c), BorderLayout.CENTER);
+        }
+        
+        public int getPersistenceType() {
+            return TopComponent.PERSISTENCE_NEVER;
+        }
+        
+        protected String preferredID() {
+            return this.getClass().getName();
+        }
+        
+        public HelpCtx getHelpCtx() {
+            return HELP_CTX;
         }
         
     }

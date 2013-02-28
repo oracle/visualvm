@@ -104,12 +104,12 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         try {
             InstanceBuilder<? extends String> builder = builders.getBuilder(instance, String.class);
             if (builder == null) {
-                LOGGER.log(Level.FINE, "Unable to get String builder for %s", className);
+                LOGGER.log(Level.FINE, "Unable to get String builder for %s", className); //NOI18N
             } else {
                 return builder.convert(new FieldAccessor(heap, builders), instance);
             }
         } catch (InvalidFieldException ex) {
-            LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage());
+            LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage()); //NOI18N
         }
         return null;
     }
@@ -181,7 +181,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
     private static Image buildImageInternal(Instance instance, Heap heap) throws InvalidFieldException {
         InstanceBuilder<? extends Image> builder = builders.getBuilder(instance, Image.class);
         if (builder == null) {
-            return null;
+            throw new InvalidFieldException("Unable to get Image builder for %s#%d", instance.getJavaClass().getName(), instance.getInstanceNumber()); //NOI18N
         }
         return builder.convert(new FieldAccessor(heap, builders), instance);
     }
@@ -199,7 +199,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
             return null;
         }
     }
-    
+
     private static final InstanceBuilder<String> TOOKIT_IMAGE_STRING_BUILDER =
             new InstanceBuilder.ReferringInstanceBuilder<String>(String.class, "imagerep", "bimage");
     private static final InstanceBuilder<Image> TOOKIT_IMAGE_IMAGE_BUILDER =
@@ -387,8 +387,8 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         builders.register(WritableRaster.class, true, WRITABLE_RASTER_BUILDER);
         builders.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_STRING_BUILDER);
         builders.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_IMAGE_BUILDER);
-        builders.register(ImageIcon.class, false, IMAGE_ICON_STRING_BUILDER);
-        builders.register(ImageIcon.class, false, IMAGE_ICON_IMAGE_BUILDER);
+        builders.register(ImageIcon.class, true, IMAGE_ICON_STRING_BUILDER);
+        builders.register(ImageIcon.class, true, IMAGE_ICON_IMAGE_BUILDER);
         builders.register(BufferedImage.class, true, BUFFERED_IMAGE_STRING_BUILDER);
         builders.register(BufferedImage.class, true, BUFFERED_IMAGE_IMAGE_BUILDER);
     }
