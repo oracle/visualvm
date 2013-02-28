@@ -113,8 +113,9 @@ public class FieldAccessor {
         }
 
         public InvalidFieldException(Instance instance, String field, String message, Object... args) {
-            this("%s#%s: %s", // NOI18N
+            this("%s#%d->%s: %s", // NOI18N
                     instance == null ? "null" : instance.getJavaClass().getName(), // NOI18N
+                    instance == null ? -1: instance.getInstanceNumber(), // NOI18N
                     field, String.format(message, args));
         }
 
@@ -247,12 +248,38 @@ public class FieldAccessor {
         return builder.convert(this, value);
     }
 
-    public Instance[] getArray(Instance instance, String field, boolean allowNull, boolean allowNullValues) throws InvalidFieldException {
-        return getArray(instance, field, InstanceBuilder.IDENTITY_BUILDER, allowNull, allowNullValues);
+    /**
+     * Convert filed of the instance to the array of represented objects. Use builder registry to get builder for each
+     * item in the array.
+     *
+     * @param instance parent instance of the array
+     * @param field name of the field containing the array
+     * @param type base type of returned array
+     * @param allowNull never return null, throw exception instead
+     * @param allowNullValues returned array can contain nulls
+     */
+    public <T> T[] buildArray(Instance instance, String field, Class<T> type,
+            boolean allowNull, boolean allowNullValues) throws InvalidFieldException {
+        return buildArray(instance, field, type, null, allowNull, allowNullValues);
     }
 
-    public <T> T[] getArray(Instance instance, String field, InstanceBuilder<T> builder,
+    /**
+     * Convert filed of the instance to the array of represented objects. Use given builder to convert the array items.
+     *
+     * @param instance parent instance of the array
+     * @param field name of the field containing the array
+     * @param builder builder used to convert items in the array
+     * @param allowNull never return null, throw exception instead
+     * @param allowNullValues returned array can contain nulls
+     */
+    public <T> T[] buildArray(Instance instance, String field, InstanceBuilder<T> builder,
             boolean allowNull, boolean allowNullValues) throws InvalidFieldException {
+        return buildArray(instance, field, builder.getType(), builder, allowNull, allowNullValues);
+    }
+
+    private <T> T[] buildArray(Instance instance, String field, Class<T> type, InstanceBuilder<? extends T> builder,
+            boolean allowNull, boolean allowNullValues) throws InvalidFieldException {
+
         ObjectArrayInstance array = get(instance, field, ObjectArrayInstance.class, allowNull);
         if (array == null) {
             return null;
@@ -261,7 +288,8 @@ public class FieldAccessor {
         T[] result = (T[]) Array.newInstance(builder.getType(), list.size());
         for (int i = 0; i < result.length; i++) {
             try {
-                result[i] = builder.convert(this, castValue(notNullCheck(list.get(i), allowNullValues), Instance.class));
+                InstanceBuilder<? extends T> itemBuilder = builder == null ? registry.getBuilder(instance, type) : builder;
+                result[i] = itemBuilder.convert(this, castValue(notNullCheck(list.get(i), allowNullValues), Instance.class));
             } catch (InvalidFieldException ex) {
                 throw new InvalidFieldException(instance, field, "Invalid value at index %d: %s", i, ex.getMessage()).initCause(ex);
             }
@@ -299,10 +327,10 @@ public class FieldAccessor {
     }
 
     public int[][] getIntArray2(Instance instance, String field, boolean allowNull) throws InvalidFieldException {
-        return getArray(instance, field, InstanceBuilder.INT_ARRAY_BUILDER, allowNull, false);
+        return buildArray(instance, field, InstanceBuilder.INT_ARRAY_BUILDER, allowNull, false);
     }
 
     public byte[][] getByteArray2(Instance instance, String field, boolean allowNull) throws InvalidFieldException {
-        return getArray(instance, field, InstanceBuilder.BYTE_ARRAY_BUILDER, allowNull, false);
+        return buildArray(instance, field, InstanceBuilder.BYTE_ARRAY_BUILDER, allowNull, false);
     }
 }

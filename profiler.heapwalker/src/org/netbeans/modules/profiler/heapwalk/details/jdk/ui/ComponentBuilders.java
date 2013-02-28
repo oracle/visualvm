@@ -152,7 +152,7 @@ final class ComponentBuilders {
         private final ColorBuilder foreground;
         private final ColorBuilder background;
         private final FontBuilder font;
-        private final boolean visible;
+        protected final boolean visible;
         private final boolean enabled;
         
         private boolean isPlaceholder = false;
@@ -226,7 +226,8 @@ final class ComponentBuilders {
         protected ContainerBuilder(Instance instance, Heap heap, boolean trackChildren) {
             super(instance, heap);
             
-            component = trackChildren ? ChildrenBuilder.fromField(instance, "component", heap) : null;
+            component = visible && trackChildren ?
+                    ChildrenBuilder.fromField(instance, "component", heap) : null;
         }
         
         protected void setupInstance(T instance) {
@@ -275,6 +276,8 @@ final class ComponentBuilders {
         
         protected void setupInstance(T instance) {
             super.setupInstance(instance);
+            
+            instance.putClientProperty("className", className);
             
             if (isAlignmentXSet) instance.setAlignmentX(alignmentX);
             if (isAlignmentYSet) instance.setAlignmentY(alignmentY);
