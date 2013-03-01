@@ -53,27 +53,19 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
-import javax.swing.JViewport;
-import javax.swing.border.Border;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.table.JTableHeader;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.DimensionBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.IconBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.InsetsBuilder;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BorderBuilders.BorderBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.ComponentBuilders.ComponentBuilder;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.ComponentBuilders.ContainerBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.ComponentBuilders.JComponentBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.InstanceBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
@@ -118,18 +110,10 @@ final class JComponentBuilders {
             return new JTableBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JTableHeader.class.getName())) {
             return new JTableHeaderBuilder(instance, heap);
-        } else if (DetailsUtils.isSubclassOf(instance, JViewport.class.getName())) {
-            return new JViewportBuilder(instance, heap);
-        } else if (DetailsUtils.isSubclassOf(instance, JScrollPane.class.getName())) {
-            return new JScrollPaneBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JSpinner.class.getName())) {
             return new JSpinnerBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JPopupMenu.class.getName())) {
             return new JPopupMenuBuilder(instance, heap);
-        } else if (DetailsUtils.isSubclassOf(instance, JSplitPane.class.getName())) {
-            return new JSplitPaneBuilder(instance, heap);
-        } else if (DetailsUtils.isSubclassOf(instance, BasicSplitPaneDivider.class.getName())) {
-            return new BasicSplitPaneDividerBuilder(instance, heap);
         }
         return null;
     }
@@ -518,44 +502,6 @@ final class JComponentBuilders {
         
     }
     
-    private static class JViewportBuilder extends JComponentBuilder<JViewport> {
-        
-        JViewportBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
-        }
-        
-        protected JViewport createInstanceImpl() {
-            return new JViewport();
-        }
-        
-    }
-    
-    private static class JScrollPaneBuilder extends JComponentBuilder<JScrollPane> {
-        
-        private final BorderBuilder viewportBorder;
-        
-        JScrollPaneBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
-            
-            viewportBorder = BorderBuilders.fromField(instance, "viewportBorder", false, heap);
-
-        }
-        
-        protected void setupInstance(JScrollPane instance) {
-            super.setupInstance(instance);
-            
-            if (viewportBorder != null) {
-                Border b = viewportBorder.createInstance();
-                if (b != null) instance.setViewportBorder(b);
-            }
-        }
-        
-        protected JScrollPane createInstanceImpl() {
-            return new JScrollPane();
-        }
-        
-    }
-    
     private static class JSpinnerBuilder extends JComponentBuilder<JSpinner> {
         
         JSpinnerBuilder(Instance instance, Heap heap) {
@@ -589,58 +535,6 @@ final class JComponentBuilders {
         
         protected JPopupMenu createInstanceImpl() {
             return new Utils.JPopupMenuImpl();
-        }
-        
-    }
-    
-    private static class JSplitPaneBuilder extends JComponentBuilder<JSplitPane> {
-        
-        private final int orientation;
-        
-        JSplitPaneBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
-            
-            orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JSplitPane.HORIZONTAL_SPLIT);
-
-        }
-        
-        protected JSplitPane createInstanceImpl() {
-            return new JSplitPane(orientation);
-        }
-        
-    }
-    
-    private static class BasicSplitPaneDividerBuilder extends ContainerBuilder<BasicSplitPaneDivider> {
-        
-        private final int orientation;
-//        private final int dividerSize;
-        private final BorderBuilder border;
-        
-        BasicSplitPaneDividerBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
-            
-            orientation = DetailsUtils.getIntFieldValue(instance, "orientation", JSplitPane.HORIZONTAL_SPLIT);
-//            dividerSize = DetailsUtils.getIntFieldValue(instance, "dividerSize", 0);
-            border = BorderBuilders.fromField(instance, "border", false, heap);
-        }
-        
-        protected void setupInstance(BasicSplitPaneDivider instance) {
-            super.setupInstance(instance);
-            
-//            instance.setDividerSize(dividerSize);
-            if (border != null) {
-                Border b = border.createInstance();
-                if (b != null) instance.setBorder(b);
-            }
-        }
-        
-        protected BasicSplitPaneDivider createInstanceImpl() {
-            final JSplitPane split = new JSplitPane(orientation);
-            BasicSplitPaneUI ui = split.getUI() instanceof BasicSplitPaneUI ?
-                    (BasicSplitPaneUI)split.getUI() : new BasicSplitPaneUI() {
-                        { installUI(split); }
-                    };
-            return new BasicSplitPaneDivider(ui);
         }
         
     }
