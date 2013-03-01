@@ -212,7 +212,7 @@ final class PaneBuilders {
                 int size = DetailsUtils.getIntFieldValue(instance, "size", Integer.MIN_VALUE); // ArrayList, JDK 7+
                 if (size == Integer.MIN_VALUE) size = DetailsUtils.getIntFieldValue(instance, "elementCount", 0); // Vector, JDK 6-
                 
-                if (size > 0) {
+                if (size > 0) { // TODO: should read up to 'size' elements
                     ObjectArrayInstance elementData = (ObjectArrayInstance)_elementData;
                     for (Object _page : elementData.getValues()) {
                         if (_page instanceof Instance) {
