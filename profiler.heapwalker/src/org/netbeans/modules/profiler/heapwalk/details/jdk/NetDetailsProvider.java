@@ -42,6 +42,8 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.jdk;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
@@ -72,7 +74,19 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (URL_MASK.equals(className)) {                                           // URL
-            return DetailsUtils.getInstanceFieldString(instance, "path", heap);     // NOI18N
+            String file = DetailsUtils.getInstanceFieldString(instance, "file", heap); // NOI18N
+            String host = DetailsUtils.getInstanceFieldString(instance, "host", heap);  // NOI18N
+            String protocol = DetailsUtils.getInstanceFieldString(instance, "protocol", heap);  // NOI18N
+            int port = DetailsUtils.getIntFieldValue(instance, "port", -1); // NOI18N
+            if (file != null && protocol != null) {
+                try {
+                    return new URL(protocol,host,port,file).toExternalForm();
+                } catch (MalformedURLException ex) {
+                    
+                }
+            }
+            // fallback
+            return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N;
         } else if (INET4_ADDRESS_MASK.equals(className) ||                          // Inet4Address
                    INET6_ADDRESS_MASK.equals(className)) {                          // Inet6Address
             String str = DetailsUtils.getInstanceFieldString(
@@ -135,7 +149,7 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
             return /*instance.getJavaClass().getName() + ":" +*/ url;               // NOI18N
         } else if (URI_MASK.equals(className)) {                                    // URI
             String name = DetailsUtils.getInstanceFieldString(
-                                           instance, "name", heap);                 // NOI18N
+                                           instance, "string", heap);                 // NOI18N
             if (name != null) return name;
             String scheme = DetailsUtils.getInstanceFieldString(
                                            instance, "scheme", heap);               // NOI18N

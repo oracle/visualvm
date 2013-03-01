@@ -152,7 +152,7 @@ final class ComponentBuilders {
         private final ColorBuilder foreground;
         private final ColorBuilder background;
         private final FontBuilder font;
-        protected final boolean visible;
+        private final boolean visible;
         private final boolean enabled;
         
         private boolean isPlaceholder = false;
@@ -193,6 +193,10 @@ final class ComponentBuilders {
             instance.setEnabled(enabled);
         }
         
+        protected final boolean isVisible() {
+            return visible;
+        }
+        
         protected final void setPlaceholder() {
             isPlaceholder = true;
         }
@@ -217,6 +221,7 @@ final class ComponentBuilders {
     
     static class ContainerBuilder<T extends Container> extends ComponentBuilder<T> {
         
+        private final boolean trackChildren;
         private final ChildrenBuilder component;
         
         ContainerBuilder(Instance instance, Heap heap) {
@@ -226,18 +231,21 @@ final class ComponentBuilders {
         protected ContainerBuilder(Instance instance, Heap heap, boolean trackChildren) {
             super(instance, heap);
             
-            component = visible && trackChildren ?
+            this.trackChildren = trackChildren;
+            component = isVisible() && trackChildren ?
                     ChildrenBuilder.fromField(instance, "component", heap) : null;
         }
         
         protected void setupInstance(T instance) {
             super.setupInstance(instance);
             
-            if (component != null) {
+            if (trackChildren) {
                 instance.setLayout(null);
                 instance.removeAll();
-                Component[] components = component.createInstance();
-                for (Component c : components) instance.add(c);
+                if (component != null) {
+                    Component[] components = component.createInstance();
+                    for (Component c : components) instance.add(c);
+                }
             }
         }
         
