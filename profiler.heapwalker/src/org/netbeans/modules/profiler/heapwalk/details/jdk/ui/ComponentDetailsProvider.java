@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
@@ -242,15 +243,20 @@ public final class ComponentDetailsProvider extends DetailsProvider.Basic {
         
         
         private void hoverChanged() {
+            String toolTipText;
             if (hover != null) {                
                 JComponent jc = hover instanceof JComponent ? (JComponent)hover : null;
                 Object cn = jc == null ? null : jc.getClientProperty("className");
                 String name = cn == null ? "" : cn.toString();
                 
-                glassPane.setToolTipText(name.isEmpty() ? null : name);
+                toolTipText = name.isEmpty() ? null : name;
             } else {
-                glassPane.setToolTipText(null);
+                toolTipText = null;
             }
+            // ToolTipManager doesn't like changing the tooltip from mouseMoved().
+            // This is a workaround to hide the tip when needed and prevent NPEs.
+            if (toolTipText == null) ToolTipManager.sharedInstance().mousePressed(null);
+            glassPane.setToolTipText(toolTipText);
             repaint();
         }
         
