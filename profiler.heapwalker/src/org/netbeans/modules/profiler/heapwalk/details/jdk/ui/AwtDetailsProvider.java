@@ -53,12 +53,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.ColorBuilder;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.DimensionBuilder;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.FontBuilder;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.InsetsBuilder;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.PointBuilder;
-import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Builders.RectangleBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.ColorBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.DimensionBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.FontBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.InsetsBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.PointBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.RectangleBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.NbBundle;
@@ -80,14 +80,9 @@ public final class AwtDetailsProvider extends DetailsProvider.Basic {
     private static final String TEXTATTRIBUTE_MASK = "java.text.AttributedCharacterIterator$Attribute+"; // NOI18N
     private static final String CURSOR_MASK = "java.awt.Cursor+";               // NOI18N
     
-    private static final String FRAME_MASK = "java.awt.Frame+";                 // NOI18N
-    private static final String DIALOG_MASK = "java.awt.Dialog+";               // NOI18N
-    
     public AwtDetailsProvider() {
         super(FONT_MASK, COLOR_MASK, POINT_MASK, DIMENSION_MASK,
-              RECTANGLE_MASK, INSETS_MASK, TEXTATTRIBUTE_MASK, CURSOR_MASK,
-              
-              FRAME_MASK, DIALOG_MASK);
+              RECTANGLE_MASK, INSETS_MASK, TEXTATTRIBUTE_MASK, CURSOR_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -122,12 +117,6 @@ public final class AwtDetailsProvider extends DetailsProvider.Basic {
                    CURSOR_MASK.equals(className)) {                             // Cursor+
             return DetailsUtils.getInstanceFieldString(
                     instance, "name", heap);                                    // NOI18N
-        }
-        
-         else if (FRAME_MASK.equals(className) ||                               // Frame+
-                  DIALOG_MASK.equals(className)) {                              // Dialog+
-            return DetailsUtils.getInstanceFieldString(
-                    instance, "title", heap);                                   // NOI18N
         }
         return null;
     }
