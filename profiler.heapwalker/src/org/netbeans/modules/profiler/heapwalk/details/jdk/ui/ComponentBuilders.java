@@ -184,13 +184,13 @@ final class ComponentBuilders {
             
             instance.setBounds(bounds.createInstance());
             
-            if (foreground != null) instance.setForeground(foreground.createInstance());
-            if (background != null) instance.setBackground(background.createInstance());
+//            if (foreground != null) instance.setForeground(foreground.createInstance());
+//            if (background != null) instance.setBackground(background.createInstance());
             
             if (foreground != null && (isPlaceholder || !foreground.isUIResource()))
                     instance.setForeground(foreground.createInstance());
             if (background != null && (isPlaceholder || !background.isUIResource()))
-                instance.setBackground(background.createInstance());
+                    instance.setBackground(background.createInstance());
             
             if (font != null && (isPlaceholder || !font.isUIResource()))
                 instance.setFont(font.createInstance());

@@ -407,10 +407,49 @@ final class JComponentBuilders {
         
     }
     
+    private static Number getNumber(Instance number, Heap heap) {
+        if (!DetailsUtils.isSubclassOf(number, Number.class.getName())) return null;
+        String _number = DetailsUtils.getInstanceString(number, heap);
+        if (_number == null || _number.isEmpty()) return null;
+        
+        try {
+            if (DetailsUtils.isSubclassOf(number, Integer.class.getName()))
+                return Integer.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Byte.class.getName()))
+                return Byte.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Short.class.getName()))
+                return Short.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Long.class.getName()))
+                return Long.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Float.class.getName()))
+                return Float.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Double.class.getName()))
+                return Double.valueOf(_number);
+        } catch (NumberFormatException e) {}
+        
+        return null;
+    }
+    
     private static class JSpinnerBuilder extends JComponentBuilder<JSpinner> {
+        
+        private Number value;
         
         JSpinnerBuilder(Instance instance, Heap heap) {
             super(instance, heap, false);
+            
+            Number val = null;
+            Object model = instance.getValueOfField("model");
+            if (model instanceof Instance) {
+                Object _value = ((Instance)model).getValueOfField("value");
+                if (_value instanceof Instance) val = getNumber((Instance)_value, heap);
+            }
+            value = val;
+        }
+        
+        protected void setupInstance(JSpinner instance) {
+            super.setupInstance(instance);
+            
+            if (value != null) instance.setValue(value);
         }
         
         protected JSpinner createInstanceImpl() {
