@@ -82,6 +82,9 @@ final class ComponentBuilders {
         ComponentBuilder pane = PaneBuilders.getBuilder(instance, heap);
         if (pane != null) return pane;
         
+        ComponentBuilder dataView = DataViewBuilders.getBuilder(instance, heap);
+        if (dataView != null) return dataView;
+        
         ComponentBuilder window = WindowBuilders.getBuilder(instance, heap);
         if (window != null) return window;
         
