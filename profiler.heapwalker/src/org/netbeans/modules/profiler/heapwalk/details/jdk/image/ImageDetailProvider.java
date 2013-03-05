@@ -142,7 +142,6 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
 
                 label = new JLabel(new ImageIcon(background));
             } catch (InvalidFieldException ex) {
-                ex.printStackTrace();
                 LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage());
                 label = new JLabel(ImageUtilities.loadImageIcon(BROKEN_IMAGE_NAME, false));
                 if(LOGGER.isLoggable(Level.FINE)) {
