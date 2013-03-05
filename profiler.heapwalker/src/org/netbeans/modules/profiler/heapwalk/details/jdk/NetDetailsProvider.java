@@ -66,10 +66,12 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
     private static final String URL_CONN_MASK = "java.net.URLConnection+";          // NOI18N
     private static final String URI_MASK = "java.net.URI";                          // NOI18N
     private static final String HTTP_COOKIE_MASK = "java.net.HttpCookie";           // NOI18N
+    private static final String INET_SOCKET_ADDRERSS = "java.net.InetSocketAddress+"; // NOI18N           // NOI18N
     
     public NetDetailsProvider() {
         super(URL_MASK, INET4_ADDRESS_MASK, INET6_ADDRESS_MASK, NETWORK_IF_MASK,
-              IF_ADDRESS_MASK, URL_CONN_MASK, URI_MASK, HTTP_COOKIE_MASK);
+              IF_ADDRESS_MASK, URL_CONN_MASK, URI_MASK, HTTP_COOKIE_MASK,
+              INET_SOCKET_ADDRERSS);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -89,15 +91,14 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N;
         } else if (INET4_ADDRESS_MASK.equals(className) ||                          // Inet4Address
                    INET6_ADDRESS_MASK.equals(className)) {                          // Inet6Address
-            String str = DetailsUtils.getInstanceFieldString(
+            String host = DetailsUtils.getInstanceFieldString(
                          instance, "hostName", heap);                               // NOI18N
-            if (str == null) str = new String();
-            if (!"0.0.0.0".equals(str)) {
-                if (!str.isEmpty()) str += ": ";                                    // NOI18N
+            String addr = null;
+            if (!"0.0.0.0".equals(host)) {                                           // NOI18N
                 if (INET4_ADDRESS_MASK.equals(className)) {
                     int address = DetailsUtils.getIntFieldValue(
                                   instance, "address", 0);                          // NOI18N
-                    str += getHostInet4Address(address);
+                    addr = getHostInet4Address(address);
                 } else {
                     List<String> items = DetailsUtils.getPrimitiveArrayFieldValues(
                                            instance, "ipaddress");                  // NOI18N
@@ -118,11 +119,17 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
                                            (instance, "scope_id_set", false);       // NOI18N
                     int scope_id = DetailsUtils.getIntFieldValue
                                            (instance, "scope_id", 0);               // NOI18N
-                    str += getHostInet6Address(ipaddress, scope_ifname_set,
+                    addr = getHostInet6Address(ipaddress, scope_ifname_set,
                                            scope_ifname, scope_id_set, scope_id);
                 }
             }
-            return str;
+            if (host == null) {
+                return addr;
+            }
+            if (addr == null) {
+                return host;
+            }
+            return host+" ["+addr+"]";                                              // NOI18N
         } else if (NETWORK_IF_MASK.equals(className)) {                             // NetworkInterface
             String name = DetailsUtils.getInstanceFieldString(
                                            instance, "name", heap);                 // NOI18N
@@ -135,7 +142,7 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
         } else if (IF_ADDRESS_MASK.equals(className)) {                             // InterfaceAddress+
             String address = DetailsUtils.getInstanceFieldString(
                                            instance, "address", heap);              // NOI18N
-            if (address == null) address = new String();
+            if (address == null) address = "";
             String broadcast = DetailsUtils.getInstanceFieldString(
                                            instance, "broadcast", heap);            // NOI18N
             if (broadcast == null) broadcast = new String();
@@ -145,7 +152,7 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
         } else if (URL_CONN_MASK.equals(className)) {                               // URLConnection+
             String url = DetailsUtils.getInstanceFieldString(
                                            instance, "url", heap);                  // NOI18N
-            if (url == null) url = new String();
+            if (url == null) url = "";
             return /*instance.getJavaClass().getName() + ":" +*/ url;               // NOI18N
         } else if (URI_MASK.equals(className)) {                                    // URI
             String name = DetailsUtils.getInstanceFieldString(
@@ -177,6 +184,23 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
             String value = DetailsUtils.getInstanceFieldString(
                                            instance, "value", heap);                // NOI18N
             return name + "=" + value;                                              // NOI18N
+        } else if (INET_SOCKET_ADDRERSS.equals(className)) {
+            String host = DetailsUtils.getInstanceFieldString(instance, "hostname", heap);  // NOI18N
+            String address = DetailsUtils.getInstanceFieldString(instance, "addr", heap); // NOI18N
+            int port = DetailsUtils.getIntFieldValue(instance, "port", -1); // NOI18N
+            StringBuilder str = new StringBuilder();
+            if (host != null) {
+                str.append(host);
+            }
+            if (address != null) {
+                if (host != null) {
+                    str.append("[").append(address).append("]");    // NOI18N
+                } else {
+                    str.append(address);
+                }
+            }
+            str.append(":").append(port);       // NOI18N
+            return str.toString();
         }
         return null;
     }
