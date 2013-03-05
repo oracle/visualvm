@@ -53,6 +53,7 @@ import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
+import java.awt.image.DataBufferUShort;
 import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.MultiPixelPackedSampleModel;
@@ -366,10 +367,17 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         public DataBuffer convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
             int size = fa.getInt(instance, "size");                        // NOI18N
             int[] offsets = fa.getIntArray(instance, "offsets", false);      // NOI18N
-            byte[] data = fa.getByteArray(instance, "data", false);  // NOI18N
             byte[][] bankdata = fa.getByteArray2(instance, "bankdata", false); // NOI18N
             return new DataBufferByte(bankdata, size, offsets);
-
+        }
+    };
+    private static final InstanceBuilder<DataBuffer> USHORT_DATA_BUFFER_BUILDER = new InstanceBuilder<DataBuffer>(DataBuffer.class) {
+        @Override
+        public DataBuffer convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
+            int size = fa.getInt(instance, "size");                        // NOI18N
+            int[] offsets = fa.getIntArray(instance, "offsets", false);      // NOI18N
+            short[][] bankdata = fa.getShortArray2(instance, "bankdata", false); // NOI18N
+            return new DataBufferUShort(bankdata, size, offsets);
         }
     };
 
@@ -384,6 +392,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         builders.register(MultiPixelPackedSampleModel.class, false, MPP_SAMPLE_MODEL_BUILDER);
         builders.register(DataBufferInt.class, false, INT_DATA_BUFFER_BUILDER);
         builders.register(DataBufferByte.class, false, BYTE_DATA_BUFFER_BUILDER);
+        builders.register(DataBufferUShort.class, false, USHORT_DATA_BUFFER_BUILDER);
         builders.register(WritableRaster.class, true, WRITABLE_RASTER_BUILDER);
         builders.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_STRING_BUILDER);
         builders.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_IMAGE_BUILDER);
