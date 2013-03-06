@@ -45,8 +45,8 @@ package org.netbeans.modules.profiler.heapwalk;
 
 import java.awt.Color;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
@@ -56,8 +56,11 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.HintsControllerUI;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.NbBundle;
 
 
@@ -69,7 +72,8 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "HintsController_NoData=&lt;No Data&gt;",
     "HintsController_ClassName=Class Name",
-    "HintsController_RetainedSize=Retained Size"
+    "HintsController_RetainedSize=Retained Size",
+    "HintsController_ApplicationWindowsCaption=Application windows:"
 })
 public class HintsController extends AbstractController {
     
@@ -214,10 +218,69 @@ public class HintsController extends AbstractController {
         return "<a href='" + CLASS_URL_PREFIX + className + "/" + jcls.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
     }
     
+    private String printWindow(Instance window, Heap heap) {
+        boolean visible = DetailsUtils.getBooleanFieldValue(window, "visible", false); // NOI18N
+        if (!visible) return null;
+        
+        String string = "&nbsp;&nbsp;&nbsp;&nbsp;"; // NOI18N
+        string += printInstance(window);
+        String details = DetailsUtils.getInstanceString(window, heap);
+        if (details != null) string += " - " + details; // NOI18N
+        
+        return string;
+    }
+    
+    private void populateUIPreview() {
+        boolean hasWindows = false;
+        StringBuilder sb = new StringBuilder();
+        String windowsRes = Icons.getResource(HeapWalkerIcons.WINDOW);
+        String hintsCaption = new String("<b><img border='0' align='bottom' src='nbresloc:/" + // NOI18N
+                windowsRes + "'>&nbsp;&nbsp;" + Bundle.HintsController_ApplicationWindowsCaption() + "</b><br><hr>"); // NOI18N
+        sb.append(hintsCaption);
+        
+        Heap heap = getSummaryController().getHeapFragmentWalker().getHeapFragment();
+        JavaClass frameClass = heap.getJavaClassByName("java.awt.Frame"); // NOI18N
+        Collection<JavaClass> frames = frameClass.getSubClasses();
+        for (JavaClass frame : frames) {
+            for (Instance f : (List<Instance>)frame.getInstances()) {
+                String string = printWindow(f, heap);
+                if (string != null) {
+                    sb.append(string);
+                    sb.append("<br>"); // NOI18N
+                    hasWindows = true;
+                }
+            }
+        }
+        frameClass = heap.getJavaClassByName("java.awt.Dialog"); // NOI18N
+        frames = frameClass.getSubClasses();
+        for (JavaClass frame : frames) {
+            for (Instance f : (List<Instance>)frame.getInstances()) {
+                String string = printWindow(f, heap);
+                if (string != null) {
+                    sb.append(string);
+                    sb.append("<br>"); // NOI18N
+                    hasWindows = true;
+                }
+            }
+        }
+        
+        if (!hasWindows) return;
+        
+        sb.append("<br>"); // NOI18N
+        
+        final String s = sb.toString();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { ((HintsControllerUI)getPanel()).setComponents(s); }
+        });
+    }
     
     // --- Protected implementation ----------------------------------------------
     protected JPanel createControllerUI() {
-        return new HintsControllerUI(this);
+        HintsControllerUI ui = new HintsControllerUI(this);
+        BrowserUtils.performTask(new Runnable() {
+            public void run() { populateUIPreview(); }
+        });
+        return ui;
     }
     
 }
