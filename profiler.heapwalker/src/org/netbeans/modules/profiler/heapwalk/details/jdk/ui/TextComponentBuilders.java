@@ -42,14 +42,18 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
+import java.util.List;
 import javax.swing.JEditorPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.text.GapContent;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.InsetsBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.ComponentBuilders.JComponentBuilder;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.InstanceBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
@@ -71,13 +75,63 @@ final class TextComponentBuilders {
     }
     
     
+    private static class ContentTextBuilder extends InstanceBuilder<String> {
+        
+        private final char[] array;
+        
+        ContentTextBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            List<String> values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "array");
+            array = values != null ? DetailsUtils.getCharArray(values) : null;
+        }
+        
+        static ContentTextBuilder fromField(Instance instance, String field, Heap heap) {
+            Object model = instance.getValueOfField(field);
+            if (!(model instanceof Instance)) return null;
+            if (!DetailsUtils.isSubclassOf((Instance)model, GapContent.class.getName())) return null;
+            return new ContentTextBuilder((Instance)model, heap);
+        }
+        
+        protected String createInstanceImpl() {
+            return array != null ? new String(array).trim() : "";
+        }
+        
+    }
+    
+    private static class DocumentTextBuilder extends InstanceBuilder<String> {
+        
+        private final ContentTextBuilder data;
+        
+        DocumentTextBuilder(Instance instance, Heap heap) {
+            super(instance, heap);
+            
+            data = ContentTextBuilder.fromField(instance, "data", heap);
+        }
+        
+        static DocumentTextBuilder fromField(Instance instance, String field, Heap heap) {
+            Object model = instance.getValueOfField(field);
+            if (!(model instanceof Instance)) return null;
+            if (!DetailsUtils.isSubclassOf((Instance)model, PlainDocument.class.getName())) return null;
+            return new DocumentTextBuilder((Instance)model, heap);
+        }
+        
+        protected String createInstanceImpl() {
+            return data != null ? data.createInstance() : "";
+        }
+        
+    }
+    
     private static abstract class JTextComponentBuilder<T extends JTextComponent> extends JComponentBuilder<T> {
         
+        private final DocumentTextBuilder model;
         private final boolean isEditable;
         private final InsetsBuilder margin;
         
         JTextComponentBuilder(Instance instance, Heap heap) {
             super(instance, heap, false);
+            
+            model = DocumentTextBuilder.fromField(instance, "model", heap);
             
             isEditable = DetailsUtils.getBooleanFieldValue(instance, "editable", false);
             
@@ -86,6 +140,8 @@ final class TextComponentBuilders {
         
         protected void setupInstance(T instance) {
             super.setupInstance(instance);
+            
+            if (model != null) instance.setText(model.createInstance());
             
             instance.setEditable(isEditable);
             
