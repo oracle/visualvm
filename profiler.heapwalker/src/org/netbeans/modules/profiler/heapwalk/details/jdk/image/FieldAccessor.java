@@ -333,4 +333,8 @@ public class FieldAccessor {
     public byte[][] getByteArray2(Instance instance, String field, boolean allowNull) throws InvalidFieldException {
         return buildArray(instance, field, InstanceBuilder.BYTE_ARRAY_BUILDER, allowNull, false);
     }
+
+    public short[][] getShortArray2(Instance instance, String field, boolean allowNull) throws InvalidFieldException {
+        return buildArray(instance, field, InstanceBuilder.SHORT_ARRAY_BUILDER, allowNull, false);
+    }
 }
