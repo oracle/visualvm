@@ -82,6 +82,9 @@ final class ComponentBuilders {
         ComponentBuilder pane = PaneBuilders.getBuilder(instance, heap);
         if (pane != null) return pane;
         
+        ComponentBuilder dataView = DataViewBuilders.getBuilder(instance, heap);
+        if (dataView != null) return dataView;
+        
         ComponentBuilder window = WindowBuilders.getBuilder(instance, heap);
         if (window != null) return window;
         
@@ -181,13 +184,13 @@ final class ComponentBuilders {
             
             instance.setBounds(bounds.createInstance());
             
-            if (foreground != null) instance.setForeground(foreground.createInstance());
-            if (background != null) instance.setBackground(background.createInstance());
+//            if (foreground != null) instance.setForeground(foreground.createInstance());
+//            if (background != null) instance.setBackground(background.createInstance());
             
             if (foreground != null && (isPlaceholder || !foreground.isUIResource()))
                     instance.setForeground(foreground.createInstance());
             if (background != null && (isPlaceholder || !background.isUIResource()))
-                instance.setBackground(background.createInstance());
+                    instance.setBackground(background.createInstance());
             
             if (font != null && (isPlaceholder || !font.isUIResource()))
                 instance.setFont(font.createInstance());

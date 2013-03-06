@@ -42,34 +42,21 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
-import java.awt.Component;
 import java.awt.LayoutManager;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
-import javax.swing.JTable;
 import javax.swing.JToolBar;
-import javax.swing.JTree;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.DimensionBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.IconBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.InsetsBuilder;
@@ -90,8 +77,6 @@ final class JComponentBuilders {
             return new JLabelBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JPanel.class.getName())) {
             return new JPanelBuilder(instance, heap);
-        } else if (DetailsUtils.isSubclassOf(instance, JComboBox.class.getName())) {
-            return new JComboBoxBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JToolBar.class.getName())) {
             return new JToolBarBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, Box.Filler.class.getName())) {
@@ -110,14 +95,6 @@ final class JComponentBuilders {
             return new JProgressBarBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JSlider.class.getName())) {
             return new JSliderBuilder(instance, heap);
-        } else if (DetailsUtils.isSubclassOf(instance, JList.class.getName())) {
-            return new JListBuilder(instance, heap);
-        } else if (DetailsUtils.isSubclassOf(instance, JTree.class.getName())) {
-            return new JTreeBuilder(instance, heap);
-        } else if (DetailsUtils.isSubclassOf(instance, JTable.class.getName())) {
-            return new JTableBuilder(instance, heap);
-        } else if (DetailsUtils.isSubclassOf(instance, JTableHeader.class.getName())) {
-            return new JTableHeaderBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JSpinner.class.getName())) {
             return new JSpinnerBuilder(instance, heap);
         } else if (DetailsUtils.isSubclassOf(instance, JPopupMenu.class.getName())) {
@@ -179,28 +156,6 @@ final class JComponentBuilders {
         
         protected JPanel createInstanceImpl() {
             return new JPanel(null);
-        }
-        
-    }
-    
-    private static class JComboBoxBuilder extends JComponentBuilder<JComboBox> {
-        
-        private final boolean isEditable;
-        
-        JComboBoxBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
-            
-            isEditable = DetailsUtils.getBooleanFieldValue(instance, "isEditable", false);
-        }
-        
-        protected void setupInstance(JComboBox instance) {
-            super.setupInstance(instance);
-            
-            instance.setEditable(isEditable);
-        }
-        
-        protected JComboBox createInstanceImpl() {
-            return new JComboBox();
         }
         
     }
@@ -452,178 +407,49 @@ final class JComponentBuilders {
         
     }
     
-    private static class JListBuilder extends JComponentBuilder<JList> {
+    private static Number getNumber(Instance number, Heap heap) {
+        if (!DetailsUtils.isSubclassOf(number, Number.class.getName())) return null;
+        String _number = DetailsUtils.getInstanceString(number, heap);
+        if (_number == null || _number.isEmpty()) return null;
         
-        JListBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
-        }
+        try {
+            if (DetailsUtils.isSubclassOf(number, Integer.class.getName()))
+                return Integer.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Byte.class.getName()))
+                return Byte.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Short.class.getName()))
+                return Short.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Long.class.getName()))
+                return Long.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Float.class.getName()))
+                return Float.valueOf(_number);
+            else if (DetailsUtils.isSubclassOf(number, Double.class.getName()))
+                return Double.valueOf(_number);
+        } catch (NumberFormatException e) {}
         
-        protected JList createInstanceImpl() {
-            return new JList();
-        }
-        
-    }
-    
-    private static class JTreeBuilder extends JComponentBuilder<JTree> {
-        
-        private final boolean editable;
-        
-        JTreeBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
-            
-            editable = DetailsUtils.getBooleanFieldValue(instance, "editable", false);
-        }
-        
-        protected void setupInstance(JTree instance) {
-            super.setupInstance(instance);
-            
-            instance.setEditable(editable);
-        }
-        
-        protected JTree createInstanceImpl() {
-            return new JTree(new Object[0]);
-        }
-        
-    }
-    
-    private static class TableColumnBuilder extends InstanceBuilder<TableColumn> {
-        private final int modelIndex;
-        private final int width;
-        private final String headerValue;
-        
-        TableColumnBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
-            
-            modelIndex = DetailsUtils.getIntFieldValue(instance, "modelIndex", 0);
-            width = DetailsUtils.getIntFieldValue(instance, "width", 75);
-            
-            String _headerValue = Utils.getFieldString(instance, "headerValue");
-            headerValue = _headerValue != null ? _headerValue : "Col " + (modelIndex + 1);
-        }
-        
-        protected void setupInstance(TableColumn instance) {
-            super.setupInstance(instance);
-            
-            instance.setHeaderValue(headerValue);
-        }
-        
-        protected TableColumn createInstanceImpl() {
-            return new TableColumn(modelIndex, width, null, null);
-        }
-    }
-    
-    private static class TableColumnModelBuilder extends InstanceBuilder<DefaultTableColumnModel> {
-        
-        private final List<TableColumnBuilder> tableColumns;
-        private final int columnMargin;
-        
-        TableColumnModelBuilder(Instance instance, Heap heap) {
-            super(instance, heap);
-            
-            tableColumns = new ArrayList();
-            columnMargin = DetailsUtils.getIntFieldValue(instance, "columnMargin", 1);
-            
-            Object _columns = instance.getValueOfField("tableColumns");
-            if (_columns instanceof Instance) {
-                Instance columns = (Instance)_columns;
-                Object _elementData = columns.getValueOfField("elementData");
-                if (_elementData instanceof ObjectArrayInstance) {
-                    int size = DetailsUtils.getIntFieldValue(columns, "elementCount", 0);
-                    if (size > 0) { // TODO: should read up to 'size' elements
-                        ObjectArrayInstance elementData = (ObjectArrayInstance)_elementData;
-                        for (Object column : elementData.getValues()) {
-                            if (column instanceof Instance)
-                                tableColumns.add(new TableColumnBuilder((Instance)column, heap));
-                        }
-                    }
-                }
-            }
-        }
-        
-        static TableColumnModelBuilder fromField(Instance instance, String field, Heap heap) {
-            Object model = instance.getValueOfField(field);
-            if (!(model instanceof Instance)) return null;
-            if (!DetailsUtils.isSubclassOf((Instance)model, DefaultTableColumnModel.class.getName())) return null;
-            return new TableColumnModelBuilder((Instance)model, heap);
-        }
-        
-        protected void setupInstance(DefaultTableColumnModel instance) {
-            super.setupInstance(instance);
-            
-            for (TableColumnBuilder builder : tableColumns)
-                instance.addColumn(builder.createInstance());
-            instance.setColumnMargin(columnMargin); 
-        }
-        
-        protected DefaultTableColumnModel createInstanceImpl() {
-            return new DefaultTableColumnModel();
-        }
-        
-    }
-    
-    private static class JTableBuilder extends JComponentBuilder<JTable> {
-        
-        private final TableColumnModelBuilder columnModel;
-        
-        JTableBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
-            
-            columnModel = TableColumnModelBuilder.fromField(instance, "columnModel", heap);
-        }
-        
-        protected JTable createInstanceImpl() {
-            return new JTable();
-        }
-        
-        protected Component createPresenterImpl(JTable instance) {
-            TableColumnModel _columnModel = columnModel == null ? null : columnModel.createInstance();
-            if (_columnModel == null || _columnModel.getColumnCount() == 0) {
-                TableColumn column = new TableColumn(0, instance.getWidth());
-                column.setHeaderValue("Table");
-                _columnModel = new DefaultTableColumnModel();
-                _columnModel.addColumn(column);
-            }
-            instance.setColumnModel(_columnModel);
-            instance.setPreferredScrollableViewportSize(instance.getSize());
-            
-            return new JScrollPane(instance);
-        }
-        
-    }
-    
-    private static class JTableHeaderBuilder extends JComponentBuilder<JTableHeader> {
-        
-        private final TableColumnModelBuilder columnModel;
-        
-        JTableHeaderBuilder(Instance instance, Heap heap) {
-            super(instance, heap, false);
-            
-            columnModel = TableColumnModelBuilder.fromField(instance, "columnModel", heap);
-        }
-        
-        protected void setupInstance(JTableHeader instance) {
-            super.setupInstance(instance);
-            
-            TableColumnModel _columnModel = columnModel == null ? null : columnModel.createInstance();
-            if (_columnModel == null || _columnModel.getColumnCount() == 0) {
-                TableColumn column = new TableColumn(0, instance.getWidth());
-                column.setHeaderValue("Table");
-                _columnModel = new DefaultTableColumnModel();
-                _columnModel.addColumn(column);
-            }
-            instance.setColumnModel(_columnModel);
-        }
-        
-        protected JTableHeader createInstanceImpl() {
-            return new JTableHeader();
-        }
-        
+        return null;
     }
     
     private static class JSpinnerBuilder extends JComponentBuilder<JSpinner> {
         
+        private Number value;
+        
         JSpinnerBuilder(Instance instance, Heap heap) {
             super(instance, heap, false);
+            
+            Number val = null;
+            Object model = instance.getValueOfField("model");
+            if (model instanceof Instance) {
+                Object _value = ((Instance)model).getValueOfField("value");
+                if (_value instanceof Instance) val = getNumber((Instance)_value, heap);
+            }
+            value = val;
+        }
+        
+        protected void setupInstance(JSpinner instance) {
+            super.setupInstance(instance);
+            
+            if (value != null) instance.setValue(value);
         }
         
         protected JSpinner createInstanceImpl() {
