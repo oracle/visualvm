@@ -65,8 +65,10 @@ import javax.swing.SpinnerNumberModel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
+import org.netbeans.lib.profiler.ui.components.NoCaret;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 
 /**
  *
@@ -78,7 +80,8 @@ import org.netbeans.modules.profiler.api.icons.Icons;
     "HintsControllerUI_FindButton=Find",
     "HintsControllerUI_FindButtonTooltip=Find objects with biggest retained size",
     "HintsControllerUI_Label1String=Find",
-    "HintsControllerUI_Label2String=biggest objects by retained size:"
+    "HintsControllerUI_Label2String=biggest objects by retained size:",
+    "HintsControllerUI_BiggestObjectsCaption=Biggest objects:"
 })
 public class HintsControllerUI extends JTitledPanel {
     private static final Number OBJECTS_DEFAULT = 20;
@@ -88,6 +91,7 @@ public class HintsControllerUI extends JTitledPanel {
     
     private HintsController hintsController;
     // --- UI definition ---------------------------------------------------------
+    private HTMLTextArea componentsArea;
     private JPanel hintsTextContainer;
     private JSpinner spinner;
     private JLabel textLabel1;
@@ -113,6 +117,12 @@ public class HintsControllerUI extends JTitledPanel {
     
     
     // --- Public interface ------------------------------------------------------
+    public void setComponents(String components) {
+        componentsArea.setText(components);
+        try { componentsArea.setCaretPosition(0); } catch (Exception e) {}
+        componentsArea.setVisible(true);
+    }
+    
     public void setResult(String result) {
         dataArea.setText(result);
         try { dataArea.setCaretPosition(0); } catch (Exception e) {}
@@ -207,19 +217,61 @@ public class HintsControllerUI extends JTitledPanel {
             }
         };
         
-        JPanel contentsPanel = new JPanel();
-        contentsPanel.setLayout(new BorderLayout());
+        // componentsArea
+        componentsArea = new HTMLTextArea() {
+            protected void showURL(URL url) {
+                if (url == null) return;
+                hintsController.showURL(url);
+            }
+        };
+        componentsArea.setVisible(false);
+        
+        JPanel contentsPanel = new JPanel(new GridBagLayout());
         contentsPanel.setOpaque(true);
         contentsPanel.setBackground(dataArea.getBackground());
-        contentsPanel.add(hintsTextContainer, BorderLayout.NORTH);
-        contentsPanel.add(dataArea, BorderLayout.CENTER);
+        
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        contentsPanel.add(componentsArea, constraints);
+        
+        String biggestObjectsRes = Icons.getResource(HeapWalkerIcons.BIGGEST_OBJECTS);
+        HTMLTextArea hintsCaption = new HTMLTextArea("<b><img border='0' align='bottom' src='nbresloc:/" +
+                biggestObjectsRes + "'>&nbsp;&nbsp;" + Bundle.HintsControllerUI_BiggestObjectsCaption() + "</b><br><hr>");
+        hintsCaption.setCaret(new NoCaret());
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        contentsPanel.add(hintsCaption, constraints);
+        
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(0, 9, 0, 0);
+        contentsPanel.add(hintsTextContainer, constraints);
+        
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.insets = new Insets(0, 9, 0, 0);
+        contentsPanel.add(dataArea, constraints);
 
         JScrollPane contentsPanelScrollPane = new JScrollPane(contentsPanel,
                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         contentsPanelScrollPane.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 1, 0, 0, getTitleBorderColor()),
-                BorderFactory.createMatteBorder(10, 4, 5, 5, UIUtils.getProfilerResultsBackground())));
+                BorderFactory.createMatteBorder(5, 4, 5, 5, UIUtils.getProfilerResultsBackground())));
         contentsPanelScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
         contentsPanelScrollPane.getVerticalScrollBar().setUnitIncrement(10);
         contentsPanelScrollPane.getHorizontalScrollBar().setUnitIncrement(10);
@@ -235,5 +287,5 @@ public class HintsControllerUI extends JTitledPanel {
     
     // --- Private implementation ------------------------------------------------
     
-
+        
 }

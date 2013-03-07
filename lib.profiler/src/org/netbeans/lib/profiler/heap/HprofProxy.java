@@ -94,22 +94,25 @@ class HprofProxy {
         if (stringInstance == null) {
             return "*null*"; // NOI18N
         }
-        assert stringInstance.getJavaClass().getName().equals(String.class.getName());
+        String className = stringInstance.getJavaClass().getName();
+        if (String.class.getName().equals(className)) {
+            PrimitiveArrayDump chars = (PrimitiveArrayDump) stringInstance.getValueOfField("value"); // NOI18N
+            if (chars != null) {
+                Integer offset = (Integer) stringInstance.getValueOfField("offset"); // NOI18N
+                Integer len = (Integer) stringInstance.getValueOfField("count"); // NOI18N
+                if (offset == null) {
+                    offset = Integer.valueOf(0);
+                }
+                if (len == null) {
+                    len = new Integer(chars.getLength());
+                }
+                char[] charArr = chars.getChars(offset.intValue(), len.intValue());
 
-        PrimitiveArrayDump chars = (PrimitiveArrayDump) stringInstance.getValueOfField("value"); // NOI18N
-        if (chars != null) {
-            Integer offset = (Integer) stringInstance.getValueOfField("offset"); // NOI18N
-            Integer len = (Integer) stringInstance.getValueOfField("count"); // NOI18N
-            if (offset == null) {
-                offset = Integer.valueOf(0);
+                return new String(charArr).intern();
             }
-            if (len == null) {
-                len = new Integer(chars.getLength());
-            }
-            char[] charArr = chars.getChars(offset.intValue(), len.intValue());
-
-            return new String(charArr).intern();
+            return "*null*"; // NOI18N
         }
-        return "*null*"; // NOI18N
+        // what? Non-string in system properties?
+        return "*"+className+"#"+stringInstance.getInstanceNumber()+"*";  // NOI18N
     }
 }
