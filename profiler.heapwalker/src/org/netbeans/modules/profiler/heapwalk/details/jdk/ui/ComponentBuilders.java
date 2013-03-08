@@ -166,7 +166,7 @@ final class ComponentBuilders {
         ComponentBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
-            className = instance.getJavaClass().getName();
+            className = instance.getJavaClass().getName()+"#"+instance.getInstanceNumber();
             
             bounds = new RectangleBuilder(instance, heap);
             
