@@ -214,6 +214,22 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
         }
         return null;
     }
+    
+    private Long getUniqueInstanceId(Heap heap, Instance instance) {
+        long id = instance.getInstanceId()^System.identityHashCode(heap);
+        
+        return new Long(id);
+    }
+
+    private String getFileSeparator(Heap heap) {
+        Long id = new Long(System.identityHashCode(heap));
+        String sep = cache.get(id);
+        if (sep == null) {
+            sep = heap.getSystemProperties().getProperty("file.separator","/"); // NOI18N
+            cache.put(id,sep);
+        }
+        return sep;
+    }
 
     //<editor-fold defaultstate="collapsed" desc="Private Classes">
 
@@ -367,22 +383,6 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
 
     private static char decode6BitChar(int d) {
         return decodeTable[d];
-    }
-
-    private Long getUniqueInstanceId(Heap heap, Instance instance) {
-        long id = instance.getInstanceId()^System.identityHashCode(heap);
-        
-        return new Long(id);
-    }
-
-    private String getFileSeparator(Heap heap) {
-        Long id = new Long(System.identityHashCode(heap));
-        String sep = cache.get(id);
-        if (sep == null) {
-            sep = heap.getSystemProperties().getProperty("file.separator","/"); // NOI18N
-            cache.put(id,sep);
-        }
-        return sep;
     }
 
     private static final class Fixed6Bit_1_10 implements CompactCharSequence, Comparable<CharSequence> {
