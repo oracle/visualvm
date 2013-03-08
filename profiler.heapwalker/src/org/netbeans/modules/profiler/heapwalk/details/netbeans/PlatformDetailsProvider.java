@@ -153,8 +153,19 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             if (nameString != null) {
                 String parentDetail = DetailsUtils.getInstanceFieldString(instance, "parent", heap); // NOI18N
                 if (parentDetail != null) {
-                    String sep = getFileSeparator(heap);
-                    nameString = parentDetail.concat(sep).concat(nameString);   // NOI18N                    
+                    String sep;
+                    
+                    if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)) {
+                        // FileObject on the disk - find correct file seperator
+                        sep = getFileSeparator(heap);
+                        if (parentDetail.endsWith(sep)) {
+                            // do not duplicate separator
+                            sep = "";
+                        }
+                    } else {
+                        sep = "/";
+                    }
+                    nameString = parentDetail.concat(sep).concat(nameString);
                 }
             }
             return nameString;
