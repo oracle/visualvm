@@ -96,12 +96,14 @@ public interface ProfilerIcons extends Icons.Keys {
     public static final String WINDOW_TELEMETRY_OVERVIEW = "ProfilerIcons.WindowTelemetryOverview"; // NOI18N
     public static final String WINDOW_TELEMETRY = "ProfilerIcons.WindowTelemetry"; // NOI18N
     public static final String WINDOW_THREADS = "ProfilerIcons.WindowThreads"; // NOI18N
+    public static final String WINDOW_LOCKS = "ProfilerIcons.WindowLocks"; // NOI18N
     
     public static final String VIEW_LIVE_RESULTS_CPU_32 = "ProfilerIcons.ViewLiveResultsCpu32"; // NOI18N
     public static final String VIEW_LIVE_RESULTS_FRAGMENT_32 = "ProfilerIcons.ViewLiveResultsFragment32"; // NOI18N
     public static final String VIEW_LIVE_RESULTS_MEMORY_32 = "ProfilerIcons.ViewLiveResultsMemory32"; // NOI18N
     public static final String VIEW_THREADS_32 = "ProfilerIcons.ViewThreads32"; // NOI18N
     public static final String VIEW_TELEMETRY_32 = "ProfilerIcons.ViewTelemetry32"; // NOI18N
+    public static final String VIEW_LOCKS_32 = "ProfilerIcons.ViewLocks32"; // NOI18N
     
     public static final String CPU = "ProfilerIcons.Cpu"; // NOI18N
     public static final String CPU_32 = "ProfilerIcons.Cpu32"; // NOI18N
