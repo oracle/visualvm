@@ -80,10 +80,10 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     private static final String BYTE_BASED_SEQUENCE = "org.openide.util.CharSequences$ByteBasedSequence"; // NOI18N
     private static final String CHAR_BASED_SEQUENCE = "org.openide.util.CharSequences$CharBasedSequence"; // NOI18N
     
-    LinkedHashMap<Instance, String> cache = new LinkedHashMap<Instance, String>(10000) {
+    LinkedHashMap<Long, String> cache = new LinkedHashMap<Long, String>(10000) {
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<Instance, String> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Long, String> eldest) {
             return size() > 10000;
         }
     };
@@ -98,12 +98,13 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
 
     @Override
     public String getDetailsString(String className, Instance instance, Heap heap) {
-        String s = cache.get(instance);
+        Long id = getUniqueInstanceId(heap,instance);
+        String s = cache.get(id);
         if (s != null) {
             return s;
         }
         s = getDetailsStringImpl(className, instance, heap);
-        cache.put(instance, s);
+        cache.put(id, s);
         return s;
     }
 
@@ -152,7 +153,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             if (nameString != null) {
                 String parentDetail = DetailsUtils.getInstanceFieldString(instance, "parent", heap); // NOI18N
                 if (parentDetail != null) {
-                    String sep = heap.getSystemProperties().getProperty("file.separator","/"); // NOI18N
+                    String sep = getFileSeparator(heap);
                     nameString = parentDetail.concat(sep).concat(nameString);   // NOI18N                    
                 }
             }
@@ -366,6 +367,22 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
 
     private static char decode6BitChar(int d) {
         return decodeTable[d];
+    }
+
+    private Long getUniqueInstanceId(Heap heap, Instance instance) {
+        long id = instance.getInstanceId()^System.identityHashCode(heap);
+        
+        return new Long(id);
+    }
+
+    private String getFileSeparator(Heap heap) {
+        Long id = new Long(System.identityHashCode(heap));
+        String sep = cache.get(id);
+        if (sep == null) {
+            sep = heap.getSystemProperties().getProperty("file.separator","/"); // NOI18N
+            cache.put(id,sep);
+        }
+        return sep;
     }
 
     private static final class Fixed6Bit_1_10 implements CompactCharSequence, Comparable<CharSequence> {
