@@ -54,6 +54,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.InstanceBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.Utils.PlaceholderIcon;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
@@ -228,7 +229,7 @@ final class BaseBuilders {
             super(instance, heap);
             width = DetailsUtils.getIntFieldValue(instance, "width", 0);
             height = DetailsUtils.getIntFieldValue(instance, "height", 0);
-            image = ImageDetailProvider.buildImage(instance, heap);
+            image = ImageBuilder.buildImage(instance, heap);
         }
         
         static IconBuilder fromField(Instance instance, String field, Heap heap) {
