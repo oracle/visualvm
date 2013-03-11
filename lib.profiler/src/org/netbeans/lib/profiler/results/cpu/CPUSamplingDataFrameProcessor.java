@@ -213,6 +213,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
             case CommonConstants.THREAD_STATUS_MONITOR:
                 return Thread.State.BLOCKED;
             case CommonConstants.THREAD_STATUS_WAIT:
+            case CommonConstants.THREAD_STATUS_PARK:
                 return Thread.State.WAITING;
             default:
                 return Thread.State.TERMINATED;
