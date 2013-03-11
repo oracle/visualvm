@@ -299,6 +299,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
         transaction.beginTrans(false);
 
         try {
+            updateNumberOfClasses(); // performance hit is ~ 1ms
             return nProfiledClasses;
         } finally {
             transaction.endTrans();
