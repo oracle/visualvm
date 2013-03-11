@@ -43,40 +43,36 @@ package org.netbeans.modules.profiler.heapwalk.details.jdk.image;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.color.ColorSpace;
-import java.awt.image.BandedSampleModel;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.awt.image.DataBufferUShort;
-import java.awt.image.DirectColorModel;
-import java.awt.image.IndexColorModel;
-import java.awt.image.MultiPixelPackedSampleModel;
-import java.awt.image.PixelInterleavedSampleModel;
-import java.awt.image.Raster;
-import java.awt.image.SampleModel;
-import java.awt.image.SinglePixelPackedSampleModel;
-import java.awt.image.WritableRaster;
-import java.util.Hashtable;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.image.FieldAccessor.InvalidFieldException;
-import org.openide.util.ImageUtilities;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.windows.TopComponent;
+import static org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageBuilder.LOGGER;
+import static org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageBuilder.BUILDERS;
 
 /**
  *
@@ -84,30 +80,47 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "ImageDetailProvider_ImageDescr={0}x{1}", // NOI18N
-    "ImageDetailProvider_ImageDescrColors=size={0}x{1}, {2} colors" // NOI18N
+    "ImageDetailProvider_ImageDescrColors=size={0}x{1}, {2} colors", // NOI18N
+    "ImageDetailProvider_NotSupported=Unsupported image", // NOI18N
+    "ImageDetailProvider_Zoom=Zoom: 1/{0}", // NOI18N
+    "ImageDetailProvider_Dimension=Dimension: {0}x{1}", // NOI18N
+    "ImageDetailProvider_Action_Show=Open in window", // NOI18N
+    "ImageDetailProvider_Action_Export=Export image", // NOI18N
+    "ImageDetailProvider_Toolbar=Export toolbar" // NOI18N
 })
 @ServiceProvider(service = DetailsProvider.class)
 public class ImageDetailProvider extends DetailsProvider.Basic {
 
-    private static final Logger LOGGER = Logger.getLogger(ImageDetailProvider.class.getName());
-    private static final String BROKEN_IMAGE_NAME = "org/netbeans/modules/profiler/heapwalk/details/jdk/image/broken-image.png"; //NOI18N
     private static final int CHECKER_SIZE = 8;
+    private static final int PREVIEW_BORDER = 8;
     private static final Color CHECKER_BG = Color.LIGHT_GRAY;
     private static final Color CHECKER_FG = Color.DARK_GRAY;
-    private static final InstanceBuilderRegistry builders = new InstanceBuilderRegistry();
+
+    private static void drawChecker(Graphics g, int x, int y, int width, int height) {
+        g.setColor(CHECKER_BG);
+        g.fillRect(x, y, width, height);
+        g.setColor(CHECKER_FG);
+        for (int i = 0; i < width; i += CHECKER_SIZE) {
+            for (int j = 0; j < height; j += CHECKER_SIZE) {
+                if ((i / CHECKER_SIZE + j / CHECKER_SIZE) % 2 == 0) {
+                    g.fillRect(x + i, y + j, Math.min(CHECKER_SIZE, width - i), Math.min(CHECKER_SIZE, height - j));
+                }
+            }
+        }
+    }
 
     public ImageDetailProvider() {
-        super(SUPPORTED_CLASSES);
+        super(ImageBuilder.BUILDERS.getMasks(Image.class, String.class));
     }
 
     @Override
     public String getDetailsString(String className, Instance instance, Heap heap) {
         try {
-            InstanceBuilder<? extends String> builder = builders.getBuilder(instance, String.class);
+            InstanceBuilder<? extends String> builder = BUILDERS.getBuilder(instance, String.class);
             if (builder == null) {
                 LOGGER.log(Level.FINE, "Unable to get String builder for %s", className); //NOI18N
             } else {
-                return builder.convert(new FieldAccessor(heap, builders), instance);
+                return builder.convert(new FieldAccessor(heap, BUILDERS), instance);
             }
         } catch (InvalidFieldException ex) {
             LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage()); //NOI18N
@@ -120,285 +133,212 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         return new ImageView(instance, heap);
     }
 
-    private static class ImageView extends DetailsProvider.View {
+    private static class ImageView extends DetailsProvider.View implements Scrollable {
+
+        private final String instanceName;
+        private final int instanceNumber;
+        private Image instanceImage = null;
 
         public ImageView(Instance instance, Heap heap) {
             super(instance, heap);
+            this.instanceName = instance.getJavaClass().getName();
+            this.instanceNumber = instance.getInstanceNumber();
+            addMouseListener(new MouseHandler());
         }
 
         @Override
         protected void computeView(Instance instance, Heap heap) {
-            FieldAccessor fa = new FieldAccessor(heap, builders);
-            JLabel label;
+            FieldAccessor fa = new FieldAccessor(heap, BUILDERS);
+            Image image = null;
+            JLabel label = null;
             try {
-                Image image = buildImageInternal(instance, heap);
-
-                int width = image.getWidth(null);
-                int height = image.getHeight(null);
-                BufferedImage background = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-                Graphics2D g = background.createGraphics();
-                drawChecker(g, width, height);
-                g.drawImage(image, 0, 0, null);
-
-                label = new JLabel(new ImageIcon(background));
+                image = ImageBuilder.buildImageInternal(instance, heap);
             } catch (InvalidFieldException ex) {
                 LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage());
-                label = new JLabel(ImageUtilities.loadImageIcon(BROKEN_IMAGE_NAME, false));
-                if(LOGGER.isLoggable(Level.FINE)) {
-                    label.setToolTipText(ex.getMessage()); //TODO: unlocalized message exposed, only in debug mode
-                }
+                label = new JLabel(Bundle.ImageDetailProvider_NotSupported(), JLabel.CENTER);
+                label.setEnabled(false);
             }
-            if (label != null) {
-                final JComponent component = label;
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeAll();
+
+            final JComponent component = label;
+            final Image im = image;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    removeAll();
+                    if (component != null) {
                         add(component, BorderLayout.CENTER);
-                        revalidate();
-                        doLayout();
-                        repaint();
                     }
-                });
-            }
-        }
-
-        private static void drawChecker(Graphics2D g, int width, int height) {
-            g.setColor(CHECKER_BG);
-            g.fillRect(0, 0, width, height);
-            g.setColor(CHECKER_FG);
-            for (int i = 0; i < (width + CHECKER_SIZE - 1) / CHECKER_SIZE; i++) {
-                for (int j = 0; j < (height + CHECKER_SIZE - 1) / CHECKER_SIZE; j++) {
-                    if ((i + j) % 2 == 0) {
-                        g.fillRect(i * CHECKER_SIZE, j * CHECKER_SIZE, CHECKER_SIZE, CHECKER_SIZE);
-                    }
+                    revalidate();
+                    doLayout();
+                    repaint();
+                    instanceImage = im;
                 }
+            });
+        }
 
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            if (instanceImage == null) {
+                return;
+            }
+
+            int lineHeight = g.getFontMetrics().getHeight();
+            int lineAscent = g.getFontMetrics().getAscent();
+
+            int viewWidth = getWidth() - 2 * PREVIEW_BORDER;
+            int viewHeight = getHeight() - 3 * PREVIEW_BORDER - 2 * lineHeight;
+            if (viewWidth < 1 || viewHeight < 1) {
+                return;
+            }
+
+            int imgWidth = instanceImage.getWidth(null);
+            int imgHeight = instanceImage.getHeight(null);
+            if (imgWidth < 1 || imgHeight < 1) {
+                return;
+            }
+
+            int width = imgWidth;
+            int height = imgHeight;
+            int scale = 1;
+            int scaleX = (int) Math.ceil((float) imgWidth / viewWidth);
+            int scaleY = (int) Math.ceil((float) imgHeight / viewHeight);
+            if (scaleX > 1 || scaleY > 1) {
+                scale = Math.max(scaleX, scaleY);
+                width = (int) ((float) imgWidth / scale);
+                height = (int) ((float) imgHeight / scale);
+            }
+            int x = PREVIEW_BORDER + (viewWidth - width) / 2;
+            int y = PREVIEW_BORDER + (viewHeight - height) / 2;
+
+            drawChecker(g, x, y, width, height);
+            g.drawImage(instanceImage, x, y, x + width, y + height, 0, 0, imgWidth, imgHeight, null);
+
+            g.setColor(getForeground());
+            if (scale != 1) {
+                g.drawString(Bundle.ImageDetailProvider_Zoom(scale), PREVIEW_BORDER, getHeight() - lineAscent - lineHeight);
+            }
+            g.drawString(Bundle.ImageDetailProvider_Dimension(imgWidth, imgHeight), PREVIEW_BORDER, getHeight() - lineAscent);
+        }
+
+        private class MouseHandler extends MouseAdapter {
+
+            public void mousePressed(final MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    showPopup(e);
+                }
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    showPopup(e);
+                }
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+                    openNewWindow();
+                }
             }
         }
-    }
 
-    private static Image buildImageInternal(Instance instance, Heap heap) throws InvalidFieldException {
-        InstanceBuilder<? extends Image> builder = builders.getBuilder(instance, Image.class);
-        if (builder == null) {
-            throw new InvalidFieldException("Unable to get Image builder for %s#%d", instance.getJavaClass().getName(), instance.getInstanceNumber()); //NOI18N
+        private void showPopup(MouseEvent e) {
+            if (instanceImage == null) {
+                return;
+            }
+            JMenuItem showItem = new JMenuItem(Bundle.ImageDetailProvider_Action_Show()) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    openNewWindow();
+                }
+            };
+            JPopupMenu popup = new JPopupMenu();
+            popup.add(showItem);
+            popup.add(new ImageExportAction(instanceImage));
+            popup.show(e.getComponent(), e.getX(), e.getY());
         }
-        return builder.convert(new FieldAccessor(heap, builders), instance);
-    }
 
-    /**
-     * Create image from heap instance.
-     *
-     * @return <code>null</code> is the image cannot be reconstructed from the heap.
-     */
-    public static Image buildImage(Instance instance, Heap heap) {
-        try {
-            return buildImageInternal(instance, heap);
-        } catch (InvalidFieldException ex) {
-            LOGGER.log(Level.FINE, "Unable to create image for instance", ex.getMessage());
+        private void openNewWindow() {
+            if (instanceImage == null) {
+                return;
+            }
+            ImageTopComponent itc = new ImageTopComponent(instanceImage, instanceName, instanceNumber);
+            itc.open();
+            itc.requestActive();
+        }
+
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
             return null;
         }
+
+        @Override
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 20;
+        }
+
+        @Override
+        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 50;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return true;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return true;
+        }
     }
 
-    private static final InstanceBuilder<String> TOOKIT_IMAGE_STRING_BUILDER =
-            new InstanceBuilder.ReferringInstanceBuilder<String>(String.class, "imagerep", "bimage");
-    private static final InstanceBuilder<Image> TOOKIT_IMAGE_IMAGE_BUILDER =
-            new InstanceBuilder.ReferringInstanceBuilder<Image>(Image.class, "imagerep", "bimage");
-    private static final InstanceBuilder<String> IMAGE_ICON_STRING_BUILDER =
-            new InstanceBuilder.ReferringInstanceBuilder<String>(String.class, "image");
-    private static final InstanceBuilder<Image> IMAGE_ICON_IMAGE_BUILDER =
-            new InstanceBuilder.ReferringInstanceBuilder<Image>(Image.class, "image");
-    private static final InstanceBuilder<String> BUFFERED_IMAGE_STRING_BUILDER = new InstanceBuilder<String>(String.class) {
-        @Override
-        public String convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            Instance raster = fa.getInstance(instance, "raster", WritableRaster.class, true);   // NOI18N
-            int width = fa.getInt(raster, "width");   // NOI18N
-            int height = fa.getInt(raster, "height");   // NOI18N
-            Instance colorModel = fa.getInstance(instance, "colorModel", ColorModel.class, true);
+    private static class ImageTopComponent extends ProfilerTopComponent {
 
-            int color_count = 0;
-            if (FieldAccessor.isInstanceOf(colorModel, IndexColorModel.class)) {
-                color_count = DetailsUtils.getIntFieldValue(colorModel, "map_size", 0); // NOI18N
-            }
-            if (color_count > 0) {
-                return Bundle.ImageDetailProvider_ImageDescrColors(width, height, color_count);
-            } else {
-                return Bundle.ImageDetailProvider_ImageDescr(width, height);
-            }
+        private static final String HELP_CTX_KEY = "HeapWalker.ImagePreview.HelpCtx"; // NOI18N
+        private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+
+        ImageTopComponent(Image image, String className, int instanceNumber) {
+            setName(BrowserUtils.getSimpleType(className) + "#" + instanceNumber);
+            setToolTipText("Preview of " + className + "#" + instanceNumber);
+            setLayout(new BorderLayout());
+
+            int width = image.getWidth(null);
+            int height = image.getHeight(null);
+            BufferedImage displayedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics g = displayedImage.createGraphics();
+            drawChecker(g, 0, 0, width, height);
+            g.drawImage(image, 0, 0, null);
+
+            JComponent c = new JScrollPane(new JLabel(new ImageIcon(displayedImage)));
+            add(c, BorderLayout.CENTER);
+
+
+            JToolBar toolBar = new JToolBar();
+            toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
+            toolBar.setFloatable(false);
+            toolBar.setName(Bundle.ImageDetailProvider_Toolbar());
+
+            //JButton button = new JButton();
+            //button.setText("");
+            toolBar.add(new ImageExportAction(image));
+            add(toolBar, BorderLayout.NORTH);
         }
-    };
-    private static final InstanceBuilder<Image> BUFFERED_IMAGE_IMAGE_BUILDER = new InstanceBuilder<Image>(Image.class) {
-        @Override
-        public Image convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            try {
-                int imageType = fa.getInt(instance, "imageType"); // NOI18N
-                WritableRaster raster = fa.build(instance, "raster", WritableRaster.class, false);
-                ColorModel cm  = fa.build(instance, "colorModel", ColorModel.class, false);
-                BufferedImage result;
-                //if (cm instanceof IndexColorModel) {
-                //    result = new BufferedImage(raster.getWidth(), raster.getHeight(), imageType, (IndexColorModel)cm);
-                //} else {
-                    boolean ap = fa.getBoolean(instance, "isAlphaPremultiplied"); // NOI18N
-                    result = new BufferedImage(cm, raster, ap, null);
-                //}
-                result.setData(raster);
-                return result;
-            } catch (InvalidFieldException ex) {
-                throw ex;
-            } catch (Throwable ex) {
-                throw new InvalidFieldException("unable to recreate raster: %s", ex.getMessage()).initCause(ex); // NOI18N
-            }
-        }
-    };
-    private static final InstanceBuilder<ColorModel> INDEX_COLOR_MODEL_BUILDER = new InstanceBuilder<ColorModel>(ColorModel.class)
-    {
-        @Override
-        public ColorModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            int bits = fa.getInt(instance, "pixel_bits"); // NOI18N
-        int[] cmap = fa.getIntArray(instance, "rgb", false);// NOI18N
-        int size = fa.getInt(instance, "map_size"); // NOI18N
-        int trans = fa.getInt(instance, "transparent_index"); // NOI18N
-        int transferType = fa.getInt(instance, "transferType"); // NOI18N
-        return new IndexColorModel(bits, size, cmap, 0, true, trans, transferType);
-        }
-    };
-    private static final InstanceBuilder<ColorModel> DIRECT_COLOR_MODEL_BUILDER = new InstanceBuilder<ColorModel>(ColorModel.class)
-    {
-        @Override
-        public ColorModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-           int bits = fa.getInt(instance, "pixel_bits"); // NOI18N
-        int rmask = fa.getInt(instance, "red_mask"); // NOI18N
-        int gmask = fa.getInt(instance, "green_mask"); // NOI18N
-        int bmask = fa.getInt(instance, "blue_mask"); // NOI18N
-        int amask = fa.getInt(instance, "alpha_mask"); // NOI18N
-        boolean ap = fa.getBoolean(instance, "isAlphaPremultiplied"); // NOI18N
-        int transferType = fa.getInt(instance, "transferType"); // NOI18N
-        return new DirectColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), bits, rmask, gmask, bmask, amask, ap, transferType);
-        }
-    };
-    private static final InstanceBuilder<ColorModel> COMPONENT_COLOR_MODEL_BUILDER = new InstanceBuilder<ColorModel>(ColorModel.class)
-    {
-     @Override
-        public ColorModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            int[] bits = fa.getIntArray(instance, "nBits", false);// NOI18N
-        int transparency = fa.getInt(instance, "transparency"); // NOI18N
-        boolean hasAlpha = fa.getBoolean(instance, "supportsAlpha"); // NOI18N
-        boolean ap = fa.getBoolean(instance, "isAlphaPremultiplied"); // NOI18N
-        int transferType = fa.getInt(instance, "transferType"); // NOI18N
-        return new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), bits, hasAlpha, ap, transparency, transferType);
-        }
-    };
-    private static final InstanceBuilder<ColorSpace> DEFAULT_COLOR_SPACE_BUILDER = new InstanceBuilder<ColorSpace>(ColorSpace.class)
-    {
 
         @Override
-        public ColorSpace convert(FieldAccessor accessor, Instance instance) throws InvalidFieldException {
-            return ColorSpace.getInstance(ColorSpace.CS_sRGB);
+        public int getPersistenceType() {
+            return TopComponent.PERSISTENCE_NEVER;
         }
-    };
-    private static final InstanceBuilder<WritableRaster> WRITABLE_RASTER_BUILDER = new InstanceBuilder<WritableRaster>(WritableRaster.class) {
-        @Override
-        public WritableRaster convert(FieldAccessor accessor, Instance instance) throws InvalidFieldException {
-            DataBuffer dataBuffer = accessor.build(instance, "dataBuffer", DataBuffer.class, false);
-            SampleModel sampleModel = accessor.build(instance, "sampleModel", SampleModel.class, false); // NOI18N
-            return Raster.createWritableRaster(sampleModel, dataBuffer, null);
-        }
-    };
-    private static final InstanceBuilder<SampleModel> SPP_SAMPLE_MODEL_BUILDER = new InstanceBuilder<SampleModel>(SampleModel.class) {
-        @Override
-        public SampleModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            int width = fa.getInt(instance, "width");          // NOI18N
-            int height = fa.getInt(instance, "height");  // NOI18N
-            int dataType = fa.getInt(instance, "dataType");   // NOI18N
-            int scanlineStride = fa.getInt(instance, "scanlineStride");  // NOI18N
-            int[] bitMasks = fa.getIntArray(instance, "bitMasks", false);  // NOI18N
-            return new SinglePixelPackedSampleModel(dataType, width, height, scanlineStride, bitMasks);
-        }
-    };
-    private static final InstanceBuilder<SampleModel> PI_SAMPLE_MODEL_BUILDER = new InstanceBuilder<SampleModel>(SampleModel.class) {
-        @Override
-        public SampleModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            int width = fa.getInt(instance, "width");          // NOI18N
-            int height = fa.getInt(instance, "height");  // NOI18N
-            int dataType = fa.getInt(instance, "dataType");   // NOI18N
-            int pixelStride = fa.getInt(instance, "pixelStride");  // NOI18N
-            int scanlineStride = fa.getInt(instance, "scanlineStride");  // NOI18N
-            int[] bandOffsets = fa.getIntArray(instance, "bandOffsets", false);  // NOI18N
-            return new PixelInterleavedSampleModel(dataType, width, height, pixelStride, scanlineStride, bandOffsets);
-        }
-    };
-    private static final InstanceBuilder<SampleModel> B_SAMPLE_MODEL_BUILDER = new InstanceBuilder<SampleModel>(SampleModel.class) {
-        @Override
-        public SampleModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            int width = fa.getInt(instance, "width");          // NOI18N
-            int height = fa.getInt(instance, "height");  // NOI18N
-            int dataType = fa.getInt(instance, "dataType");   // NOI18N
-            int scanlineStride = fa.getInt(instance, "scanlineStride");  // NOI18N
-            int[] bankIndices = fa.getIntArray(instance, "bankIndices", false);  // NOI18N
-            int[] bandOffsets = fa.getIntArray(instance, "bandOffsets", false);  // NOI18N
-            return new BandedSampleModel(dataType, width, height, scanlineStride, bankIndices, bandOffsets);
-        }
-    };
-    private static final InstanceBuilder<SampleModel> MPP_SAMPLE_MODEL_BUILDER = new InstanceBuilder<SampleModel>(SampleModel.class) {
-        @Override
-        public SampleModel convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            int width = fa.getInt(instance, "width");          // NOI18N
-            int height = fa.getInt(instance, "height");  // NOI18N
-            int dataType = fa.getInt(instance, "dataType");   // NOI18N
-            int scanlineStride = fa.getInt(instance, "scanlineStride");  // NOI18N
-            int numberOfBits = fa.getInt(instance, "numberOfBits");  // NOI18N
-            int dataBitOffset = fa.getInt(instance, "dataBitOffset");  // NOI18N
-            return new MultiPixelPackedSampleModel(dataType, width, height, numberOfBits, scanlineStride, dataBitOffset);
-        }
-    };
-    private static final InstanceBuilder<DataBuffer> INT_DATA_BUFFER_BUILDER = new InstanceBuilder<DataBuffer>(DataBuffer.class) {
-        @Override
-        public DataBuffer convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            int size = fa.getInt(instance, "size");                        // NOI18N
-            int[] offsets = fa.getIntArray(instance, "offsets", false);      // NOI18N
-            int[] data = fa.getIntArray(instance, "data", false);     // NOI18N
-            int[][] bankdata = fa.getIntArray2(instance, "bankdata", false); // NOI18N
-            return new DataBufferInt(bankdata, size, offsets);
-        }
-    };
-    private static final InstanceBuilder<DataBuffer> BYTE_DATA_BUFFER_BUILDER = new InstanceBuilder<DataBuffer>(DataBuffer.class) {
-        @Override
-        public DataBuffer convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            int size = fa.getInt(instance, "size");                        // NOI18N
-            int[] offsets = fa.getIntArray(instance, "offsets", false);      // NOI18N
-            byte[][] bankdata = fa.getByteArray2(instance, "bankdata", false); // NOI18N
-            return new DataBufferByte(bankdata, size, offsets);
-        }
-    };
-    private static final InstanceBuilder<DataBuffer> USHORT_DATA_BUFFER_BUILDER = new InstanceBuilder<DataBuffer>(DataBuffer.class) {
-        @Override
-        public DataBuffer convert(FieldAccessor fa, Instance instance) throws InvalidFieldException {
-            int size = fa.getInt(instance, "size");                        // NOI18N
-            int[] offsets = fa.getIntArray(instance, "offsets", false);      // NOI18N
-            short[][] bankdata = fa.getShortArray2(instance, "bankdata", false); // NOI18N
-            return new DataBufferUShort(bankdata, size, offsets);
-        }
-    };
 
-    static {
-        builders.register(ColorSpace.class, true, DEFAULT_COLOR_SPACE_BUILDER);
-        builders.register(IndexColorModel.class, true, INDEX_COLOR_MODEL_BUILDER);
-        builders.register(ComponentColorModel.class, true, COMPONENT_COLOR_MODEL_BUILDER);
-        builders.register(DirectColorModel.class, true, DIRECT_COLOR_MODEL_BUILDER);
-        builders.register(SinglePixelPackedSampleModel.class, false, SPP_SAMPLE_MODEL_BUILDER);
-        builders.register(PixelInterleavedSampleModel.class, false, PI_SAMPLE_MODEL_BUILDER);
-        builders.register(BandedSampleModel.class, false, B_SAMPLE_MODEL_BUILDER);
-        builders.register(MultiPixelPackedSampleModel.class, false, MPP_SAMPLE_MODEL_BUILDER);
-        builders.register(DataBufferInt.class, false, INT_DATA_BUFFER_BUILDER);
-        builders.register(DataBufferByte.class, false, BYTE_DATA_BUFFER_BUILDER);
-        builders.register(DataBufferUShort.class, false, USHORT_DATA_BUFFER_BUILDER);
-        builders.register(WritableRaster.class, true, WRITABLE_RASTER_BUILDER);
-        builders.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_STRING_BUILDER);
-        builders.register("sun.awt.image.ToolkitImage+", TOOKIT_IMAGE_IMAGE_BUILDER);
-        builders.register(ImageIcon.class, true, IMAGE_ICON_STRING_BUILDER);
-        builders.register(ImageIcon.class, true, IMAGE_ICON_IMAGE_BUILDER);
-        builders.register(BufferedImage.class, true, BUFFERED_IMAGE_STRING_BUILDER);
-        builders.register(BufferedImage.class, true, BUFFERED_IMAGE_IMAGE_BUILDER);
+        @Override
+        protected String preferredID() {
+            return this.getClass().getName();
+        }
+
+        @Override
+        public HelpCtx getHelpCtx() {
+            return HELP_CTX;
+        }
     }
-    private static final String[] SUPPORTED_CLASSES = builders.getMasks(Image.class, String.class);
 }

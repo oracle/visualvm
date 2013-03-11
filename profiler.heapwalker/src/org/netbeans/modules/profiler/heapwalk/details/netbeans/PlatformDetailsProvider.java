@@ -80,10 +80,10 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     private static final String BYTE_BASED_SEQUENCE = "org.openide.util.CharSequences$ByteBasedSequence"; // NOI18N
     private static final String CHAR_BASED_SEQUENCE = "org.openide.util.CharSequences$CharBasedSequence"; // NOI18N
     
-    LinkedHashMap<Instance, String> cache = new LinkedHashMap<Instance, String>(10000) {
+    LinkedHashMap<Long, String> cache = new LinkedHashMap<Long, String>(10000) {
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<Instance, String> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Long, String> eldest) {
             return size() > 10000;
         }
     };
@@ -98,12 +98,13 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
 
     @Override
     public String getDetailsString(String className, Instance instance, Heap heap) {
-        String s = cache.get(instance);
+        Long id = getUniqueInstanceId(heap,instance);
+        String s = cache.get(id);
         if (s != null) {
             return s;
         }
         s = getDetailsStringImpl(className, instance, heap);
-        cache.put(instance, s);
+        cache.put(id, s);
         return s;
     }
 
@@ -152,8 +153,19 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             if (nameString != null) {
                 String parentDetail = DetailsUtils.getInstanceFieldString(instance, "parent", heap); // NOI18N
                 if (parentDetail != null) {
-                    String sep = heap.getSystemProperties().getProperty("file.separator","/"); // NOI18N
-                    nameString = parentDetail.concat(sep).concat(nameString);   // NOI18N                    
+                    String sep;
+                    
+                    if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)) {
+                        // FileObject on the disk - find correct file seperator
+                        sep = getFileSeparator(heap);
+                        if (parentDetail.endsWith(sep)) {
+                            // do not duplicate separator
+                            sep = "";
+                        }
+                    } else {
+                        sep = "/";
+                    }
+                    nameString = parentDetail.concat(sep).concat(nameString);
                 }
             }
             return nameString;
@@ -212,6 +224,22 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "value", heap);    // NOI18N
         }
         return null;
+    }
+    
+    private Long getUniqueInstanceId(Heap heap, Instance instance) {
+        long id = instance.getInstanceId()^System.identityHashCode(heap);
+        
+        return new Long(id);
+    }
+
+    private String getFileSeparator(Heap heap) {
+        Long id = new Long(System.identityHashCode(heap));
+        String sep = cache.get(id);
+        if (sep == null) {
+            sep = heap.getSystemProperties().getProperty("file.separator","/"); // NOI18N
+            cache.put(id,sep);
+        }
+        return sep;
     }
 
     //<editor-fold defaultstate="collapsed" desc="Private Classes">
