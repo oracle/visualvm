@@ -82,12 +82,12 @@
 /* These masks essentially map JVMTI thread states into the above states */
 static jint JF_THREAD_STATE_MASK       = JVMTI_THREAD_STATE_TERMINATED |
                                          JVMTI_THREAD_STATE_ALIVE |
-                             JVMTI_THREAD_STATE_RUNNABLE |
-                       JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER |
-                       JVMTI_THREAD_STATE_WAITING |
-                       JVMTI_THREAD_STATE_WAITING_INDEFINITELY |
-                       JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT |
-                       JVMTI_THREAD_STATE_SLEEPING;
+                                         JVMTI_THREAD_STATE_RUNNABLE |
+                                         JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER |
+                                         JVMTI_THREAD_STATE_WAITING |
+                                         JVMTI_THREAD_STATE_WAITING_INDEFINITELY |
+                                         JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT |
+                                         JVMTI_THREAD_STATE_SLEEPING;
 static jint JF_THREAD_STATE_NEW        = 0;
 static jint JF_THREAD_STATE_TERMINATED = JVMTI_THREAD_STATE_TERMINATED;
 static jint JF_THREAD_STATE_RUNNABLE   = JVMTI_THREAD_STATE_ALIVE |
@@ -96,14 +96,14 @@ static jint JF_THREAD_STATE_BLOCKED    = JVMTI_THREAD_STATE_ALIVE |
                                          JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER;
 static jint JF_THREAD_STATE_WAITING    = JVMTI_THREAD_STATE_ALIVE |
                                          JVMTI_THREAD_STATE_WAITING |
-                         JVMTI_THREAD_STATE_WAITING_INDEFINITELY;
+                                         JVMTI_THREAD_STATE_WAITING_INDEFINITELY;
 static jint JF_THREAD_STATE_TIMED_WAITING = JVMTI_THREAD_STATE_ALIVE |
                                          JVMTI_THREAD_STATE_WAITING |
-                       JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT;
+                                         JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT;
 static jint JF_THREAD_STATE_SLEEPING   = JVMTI_THREAD_STATE_ALIVE |
                                          JVMTI_THREAD_STATE_WAITING |
                                          JVMTI_THREAD_STATE_SLEEPING |
-                     JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT;
+                                         JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT;
 
 
 static int nProfThreads;
