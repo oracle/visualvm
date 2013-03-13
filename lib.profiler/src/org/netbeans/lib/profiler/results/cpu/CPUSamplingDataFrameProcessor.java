@@ -192,9 +192,11 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
         
         super.startup(client);
         
-         foreachListener(new ListenerFunctor() {
+        foreachListener(new ListenerFunctor() {
             public void execute(ProfilingResultListener listener) {
-                ccgb[0] = (CPUCallGraphBuilder) listener;
+                if (listener instanceof CPUCallGraphBuilder) {
+                    ccgb[0] = (CPUCallGraphBuilder) listener;
+                }
             }
         });
         builder = new StackTraceSnapshotBuilder(ccgb[0],client.getSettings().getInstrumentationFilter(),client.getStatus());
