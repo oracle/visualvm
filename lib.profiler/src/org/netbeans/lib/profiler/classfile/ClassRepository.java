@@ -610,7 +610,8 @@ public abstract class ClassRepository implements CommonConstants {
         int realLoaderId = ClassFileCache.getDefault().hasVMSuppliedClassFile(className, classLoaderId);
 
         if (realLoaderId != -1) {
-            return new DynamicClassInfo(className, classLoaderId, LOCATION_VMSUPPLIED + realLoaderId);
+            String classFileLoc = (LOCATION_VMSUPPLIED + realLoaderId).intern();
+            return new DynamicClassInfo(className, classLoaderId, classFileLoc);
         } else {
             return null;
         }
