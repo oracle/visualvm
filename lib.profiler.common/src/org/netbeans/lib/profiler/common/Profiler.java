@@ -172,6 +172,10 @@ public abstract class Profiler {
     public abstract void setThreadsMonitoringEnabled(boolean enabled);
 
     public abstract boolean getThreadsMonitoringEnabled();
+    
+    public abstract void setLockContentionMonitoringEnabled(boolean enabled);
+
+    public abstract boolean getLockContentionMonitoringEnabled();
 
     public abstract VMTelemetryDataManager getVMTelemetryManager();
 
@@ -388,6 +392,33 @@ public abstract class Profiler {
             public void run() {
                 while (iterator.hasNext()) {
                     ((ProfilingStateListener) iterator.next()).threadsMonitoringChanged();
+                }
+            }
+        };
+
+        if (EventQueue.isDispatchThread()) {
+            r.run();
+        } else {
+            EventQueue.invokeLater(r);
+        }
+    }
+    
+    protected final void fireLockContentionMonitoringChange() {
+        if (profilingStateListeners == null) {
+            return;
+        }
+
+        final Vector toNotify;
+
+        synchronized (this) {
+            toNotify = (Vector) profilingStateListeners.clone();
+        }
+
+        final Iterator iterator = toNotify.iterator();
+        final Runnable r = new Runnable() {
+            public void run() {
+                while (iterator.hasNext()) {
+                    ((ProfilingStateListener) iterator.next()).lockContentionMonitoringChanged();
                 }
             }
         };
