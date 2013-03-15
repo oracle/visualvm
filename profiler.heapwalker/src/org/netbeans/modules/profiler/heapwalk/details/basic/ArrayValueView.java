@@ -65,6 +65,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
@@ -84,7 +85,7 @@ import org.openide.util.NbBundle;
     "ArrayValueView_Save=Save to file",                                             // NOI18N
     "ArrayValueView_OutOfMemory=Out of memory - value too long."                    // NOI18N
 })
-final class ArrayValueView extends DetailsProvider.View implements Scrollable {
+final class ArrayValueView extends DetailsProvider.View implements Scrollable, BasicExportAction.ExportProvider {
     
     private static final int MAX_PREVIEW_LENGTH = 256;
     private static final int MAX_ARRAY_ITEMS = 1000;
@@ -103,10 +104,16 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable {
     private int count;
     private boolean truncated;
     private boolean chararray;
+    private String instanceIdentifier;
+    private int type;
     
     protected ArrayValueView(String className, Instance instance, Heap heap) {
         super(instance, heap);
         this.className = className;
+    }
+    
+    private ArrayValueView getArrayValueView() {
+        return this;
     }
 
     protected void computeView(Instance instance, Heap heap) {
@@ -117,12 +124,14 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable {
             count = DetailsUtils.getIntFieldValue(instance, "count", -1);           // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
+            type = 1;
         } else if (StringDetailsProvider.BUILDERS_MASK.equals(className)) {         // AbstractStringBuilder+
             separator = "";                                                         // NOI18N
             offset = 0;
             count = DetailsUtils.getIntFieldValue(instance, "count", -1);           // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
+            type = 2;
         } else if (instance instanceof PrimitiveArrayInstance) {                    // Primitive array
             chararray = "char[]".equals(instance.getJavaClass().getName());         // NOI18N
             separator = chararray ? "" : ", ";                                      // NOI18N
@@ -130,8 +139,9 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable {
             values = DetailsUtils.getPrimitiveArrayValues(instance);
             count = values == null ? 0 : values.size();
             caption = Bundle.ArrayValueView_Items();
+            type = 3;
         }
-        
+        instanceIdentifier=instance.getJavaClass().getName()+"#"+instance.getInstanceNumber(); // NOI18N
         final String preview = getString(true);
         
         SwingUtilities.invokeLater(new Runnable() {
@@ -171,7 +181,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable {
                 
                 JButton save = htmlButton(Bundle.ArrayValueView_Save(), !preview.isEmpty(), new Runnable() {
                     public void run() {
-                        ProfilerDialogs.displayInfo("Petr will happily implement this.");
+                        new BasicExportAction(getArrayValueView()).actionPerformed(null);
                     }
                 });
                 c = new GridBagConstraints();
@@ -294,6 +304,57 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable {
             public void actionPerformed(ActionEvent e) { handler.run(); }
         });
         return b;
+    }
+
+    @Override
+    public void exportData(int exportedFileType, ExportDataDumper eDD) {
+        StringBuffer result;
+        String comma = ","; // NOI18N
+        if (values == null) {
+            result = new StringBuffer(""); //NOI18N
+        } else {
+            int valuesCount = count < 0 ? values.size() - offset :
+                              Math.min(count, values.size() - offset);            
+            int separatorLength = separator == null ? 0 : separator.length();
+            int estimatedSize = Math.min(valuesCount * (2 + separatorLength), MAX_PREVIEW_LENGTH + TRUNCATED.length());
+            result = new StringBuffer(estimatedSize);
+            int lastValue = offset + valuesCount - 1;
+            if (exportedFileType == BasicExportAction.MODE_CSV) {
+                for (int i = offset; i <= lastValue; i++) {
+                    result.append(values.get(i));
+                    result.append(comma);
+                }
+                result.deleteCharAt(result.length()-1);
+            } else if (exportedFileType==BasicExportAction.MODE_TXT) {
+                for (int i = offset; i <= lastValue; i++) {
+                    result.append(values.get(i));
+                }
+            } else {
+                throw new IllegalArgumentException(); //Illegal export type
+            }
+        }
+        eDD.dumpData(result);
+        eDD.close();
+    }
+
+    @Override
+    public String getViewName() {
+        return instanceIdentifier;
+    }
+
+    @Override
+    public boolean hasRawData() {
+        return type==3;
+    }
+
+    @Override
+    public boolean hasText() {
+        return type<3 || chararray;
+    }
+
+    @Override
+    public boolean isExportable() {
+        return hasText() || hasRawData();
     }
     
 }
