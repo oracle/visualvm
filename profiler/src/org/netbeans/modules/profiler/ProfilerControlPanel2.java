@@ -53,7 +53,6 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.EqualFlowLayout;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.SnippetPanel;
 import org.netbeans.modules.profiler.actions.*;
@@ -132,6 +131,8 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_TelemetryButtonToolTip=Show VM Telemetry graphs",
     "ProfilerControlPanel2_ThreadsButtonName=Threads",
     "ProfilerControlPanel2_ThreadsButtonToolTip=Show application threads timeline",
+    "ProfilerControlPanel2_LocksButtonName=Lock Contention",
+    "ProfilerControlPanel2_LocksButtonToolTip=Show lock contention details",
     "ProfilerControlPanel2_GlobalComboItemString=<Global>",
     "ProfilerControlPanel2_ConfirmDeleteSnapshotCaption=Confirm File Delete",
     "ProfilerControlPanel2_ConfirmDeleteSnapshotMsg=Do you really want to delete the selected snapshot(s) from the disk?\nYou cannot undo this operation.",
@@ -1743,11 +1744,13 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
 
         private final JButton threadsButton;
         private final JButton vmTelemetryButton;
+        private final JButton locksButton;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         ViewPanel() {
-            setLayout(new EqualFlowLayout(FlowLayout.LEFT, 0, 0));
+//            setLayout(new EqualFlowLayout(FlowLayout.LEFT, 0, 0));
+            setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
             setBorder(BorderFactory.createEmptyBorder(7, 6, 8, 6));
 
             final Border myRolloverBorder = new CompoundBorder(new FlatToolBar.FlatRolloverButtonBorder(Color.GRAY,
@@ -1775,9 +1778,21 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
             threadsButton.setRolloverEnabled(true);
             threadsButton.setBorder(myRolloverBorder);
             threadsButton.setToolTipText(Bundle.ProfilerControlPanel2_ThreadsButtonToolTip());
+            
+            locksButton = new JButton(Bundle.ProfilerControlPanel2_LocksButtonName(), Icons.getIcon(ProfilerIcons.VIEW_LOCKS_32));
+            UIUtils.fixButtonUI(locksButton);
+            locksButton.addActionListener(this);
+            locksButton.setContentAreaFilled(false);
+            locksButton.setMargin(new Insets(1, 1, 1, 1));
+            locksButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+            locksButton.setHorizontalTextPosition(SwingConstants.CENTER);
+            locksButton.setRolloverEnabled(true);
+            locksButton.setBorder(myRolloverBorder);
+            locksButton.setToolTipText(Bundle.ProfilerControlPanel2_LocksButtonToolTip());
 
             add(vmTelemetryButton);
             add(threadsButton);
+            add(locksButton);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -1787,6 +1802,8 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
                 new ShowTelemetryViewAction().actionPerformed(null);
             } else if (e.getSource() == threadsButton) {
                 ThreadsWindow.getDefault().showThreads();
+            } else if (e.getSource() == locksButton) {
+                LockContentionWindow.getDefault().showView();
             }
         }
     }
