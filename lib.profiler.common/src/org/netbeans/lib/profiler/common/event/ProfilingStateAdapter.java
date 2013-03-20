@@ -59,6 +59,10 @@ public class ProfilingStateAdapter implements ProfilingStateListener {
     public void threadsMonitoringChanged() {
         //ignore
     }
+    
+    public void lockContentionMonitoringChanged() {
+        //ignore
+    }
 
     public void serverStateChanged(int serverState, int serverProgress) {
         //ignore
