@@ -44,6 +44,7 @@ package org.netbeans.modules.profiler.heapwalk.details.jdk.image;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -92,7 +93,7 @@ import static org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageBuil
 public class ImageDetailProvider extends DetailsProvider.Basic {
 
     private static final int CHECKER_SIZE = 8;
-    private static final int PREVIEW_BORDER = 8;
+    private static final int PREVIEW_BORDER = 4;
     private static final Color CHECKER_BG = Color.LIGHT_GRAY;
     private static final Color CHECKER_FG = Color.DARK_GRAY;
 
@@ -138,6 +139,9 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
         private final String instanceName;
         private final int instanceNumber;
         private Image instanceImage = null;
+
+        private JLabel paintLabel;
+
 
         public ImageView(Instance instance, Heap heap) {
             super(instance, heap);
@@ -216,10 +220,23 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
             g.drawImage(instanceImage, x, y, x + width, y + height, 0, 0, imgWidth, imgHeight, null);
 
             g.setColor(getForeground());
+            int nextY = getHeight() - drawText(g, PREVIEW_BORDER, getHeight(), Bundle.ImageDetailProvider_Dimension(imgWidth, imgHeight));
             if (scale != 1) {
-                g.drawString(Bundle.ImageDetailProvider_Zoom(scale), PREVIEW_BORDER, getHeight() - lineAscent - lineHeight);
+                drawText(g, PREVIEW_BORDER, nextY, Bundle.ImageDetailProvider_Zoom(scale));
             }
-            g.drawString(Bundle.ImageDetailProvider_Dimension(imgWidth, imgHeight), PREVIEW_BORDER, getHeight() - lineAscent);
+        }
+
+        private int drawText(Graphics g, int x, int y, String text) {
+            if(paintLabel == null) {
+                paintLabel = new JLabel();
+            }
+            paintLabel.setFont(g.getFont());
+            paintLabel.setText(text);
+            paintLabel.setSize(paintLabel.getPreferredSize());
+            g.translate(x, y - paintLabel.getHeight());
+            paintLabel.paint(g);
+            g.translate(-x, paintLabel.getHeight() - y);
+            return paintLabel.getHeight();
         }
 
         private class MouseHandler extends MouseAdapter {
@@ -253,6 +270,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
                     openNewWindow();
                 }
             };
+            showItem.setFont(showItem.getFont().deriveFont(Font.BOLD));
             JPopupMenu popup = new JPopupMenu();
             popup.add(showItem);
             popup.add(new ImageExportAction(instanceImage));

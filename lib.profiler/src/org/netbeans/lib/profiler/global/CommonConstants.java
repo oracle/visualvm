@@ -63,6 +63,7 @@ public interface CommonConstants {
     public static final String THREAD_STATUS_SLEEPING_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusSleepingString"); // NOI18N;
     public static final String THREAD_STATUS_MONITOR_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusMonitorString"); // NOI18N
     public static final String THREAD_STATUS_WAIT_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusWaitString"); // NOI18N
+    public static final String THREAD_STATUS_PARK_STRING = ResourceBundle.getBundle("org.netbeans.lib.profiler.global.Bundle").getString("CommonConstants_ThreadStatusParkString"); // NOI18N
                                                                                         // -----
 
     /** Names of our own classes, in various forms */
@@ -136,18 +137,23 @@ public interface CommonConstants {
     public static final byte METHOD_EXIT_UNSTAMPED = 17;
     public static final byte MARKER_ENTRY_UNSTAMPED = 18;
     public static final byte MARKER_EXIT_UNSTAMPED = 19;
+    
+    // locks/wait monitoring
     public static final byte METHOD_ENTRY_WAIT = 20;
     public static final byte METHOD_EXIT_WAIT = 21;
     public static final byte METHOD_ENTRY_MONITOR = 22;
     public static final byte METHOD_EXIT_MONITOR = 23;
     public static final byte METHOD_ENTRY_SLEEP = 24;
     public static final byte METHOD_EXIT_SLEEP = 25;
-    public static final byte BUFFEREVENT_PROFILEPOINT_HIT = 26;
-    public static final byte SERVLET_DO_METHOD = 27;
-    public static final byte THREAD_DUMP_START = 28;
-    public static final byte THREAD_DUMP_END = 29;
-    public static final byte THREAD_INFO_IDENTICAL = 30;
-    public static final byte THREAD_INFO = 31;
+    public static final byte METHOD_ENTRY_PARK = 26;
+    public static final byte METHOD_EXIT_PARK = 27;
+    
+    public static final byte BUFFEREVENT_PROFILEPOINT_HIT = 28;
+    public static final byte SERVLET_DO_METHOD = 29;
+    public static final byte THREAD_DUMP_START = 30;
+    public static final byte THREAD_DUMP_END = 31;
+    public static final byte THREAD_INFO_IDENTICAL = 32;
+    public static final byte THREAD_INFO = 33;
 
     // The following are used when storing unstamped method entry/exit events in the "compact" format, when both
     // event code and method id are packed in a single char. See more comments in ProfilerRuntimeCPUSampledInstr.java
@@ -229,7 +235,8 @@ public interface CommonConstants {
                                                         // s actually running or pre-empted by another thread...
     public static final byte THREAD_STATUS_SLEEPING = 2; // Thread is sleeping - Thread.sleep() or JVM_Sleep() was called
     public static final byte THREAD_STATUS_MONITOR = 3; // Thread is waiting on a java monitor
-    public static final byte THREAD_STATUS_WAIT = 4; // Thread is waiting - Thread.wait() or JVM_MonitorWait() was called
+    public static final byte THREAD_STATUS_WAIT = 4; // Thread is waiting - Object.wait() or JVM_MonitorWait() was called
+    public static final byte THREAD_STATUS_PARK = 5; // Thread is parked - sun/misc/Unsafe.park() was called
 
     // Thread state color constants.
 
@@ -249,8 +256,11 @@ public interface CommonConstants {
     /** Thread is waiting on a java monitor */
     public static final java.awt.Color THREAD_STATUS_MONITOR_COLOR = new java.awt.Color(255, 114, 102);
 
-    /** Thread is waiting - Thread.wait() or JVM_MonitorWait() was called */
+    /** Thread is waiting - Object.wait() or JVM_MonitorWait() was called */
     public static final java.awt.Color THREAD_STATUS_WAIT_COLOR = new java.awt.Color(255, 228, 90);
+
+    /** Thread is parked - sun/misc/Unsafe.park() was called */
+    public static final java.awt.Color THREAD_STATUS_PARK_COLOR = new java.awt.Color(230, 128, 30);
 
     // Thread state description constants.
     // see I18N String constants at the top of this file
@@ -290,5 +300,6 @@ public interface CommonConstants {
     public static final int AGENT_VERSION_610_M2 = 11;
     public static final int AGENT_VERSION_71 = 12;
     public static final int AGENT_VERSION_73 = 13;
-    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_73;
+    public static final int AGENT_VERSION_74 = 14;
+    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_74;
 }
