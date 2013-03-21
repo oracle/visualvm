@@ -121,6 +121,7 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.lib.profiler.results.cpu.cct</package>
                 <package>org.netbeans.lib.profiler.results.cpu.cct.nodes</package>
                 <package>org.netbeans.lib.profiler.results.cpu.marking</package>
+                <package>org.netbeans.lib.profiler.results.locks</package>
                 <package>org.netbeans.lib.profiler.results.memory</package>
                 <package>org.netbeans.lib.profiler.results.monitor</package>
                 <package>org.netbeans.lib.profiler.results.threads</package>

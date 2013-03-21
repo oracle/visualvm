@@ -106,6 +106,29 @@ abstract class InstanceBuilder<T> {
         }
     };
     /**
+     * Builds
+     * <code>short[]</code> from {@link PrimitiveArrayInstance}
+     */
+    public static final InstanceBuilder<short[]> SHORT_ARRAY_BUILDER = new InstanceBuilder<short[]>(short[].class) {
+        @Override
+        public short[] convert(FieldAccessor accessor, Instance instance) throws InvalidFieldException {
+            if (instance == null) {
+                return null;
+            }
+            PrimitiveArrayInstance array = FieldAccessor.castValue(instance, PrimitiveArrayInstance.class);
+            List<?> list = array.getValues();
+            short[] result = new short[list.size()];
+            for (int i = 0; i < result.length; i++) {
+                try {
+                    result[i] = Short.parseShort((String) list.get(i));
+                } catch (NumberFormatException e) {
+                    throw new InvalidFieldException("invalid format of short at index %d: %s", i, list.get(i));
+                }
+            }
+            return result;
+        }
+    };
+    /**
      * Builder which returns original instance.
      */
     public static final InstanceBuilder<Instance> IDENTITY_BUILDER = new InstanceBuilder<Instance>(Instance.class) {
