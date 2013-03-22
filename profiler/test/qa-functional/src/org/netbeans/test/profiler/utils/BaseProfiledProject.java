@@ -41,20 +41,11 @@
  */
 package org.netbeans.test.profiler.utils;
 
-import com.sun.management.HotSpotDiagnosticMXBean;
-import java.io.IOException;
-import org.netbeans.jellytools.NbDialogOperator;
 import org.netbeans.jellytools.nodes.ProjectRootNode;
-import org.netbeans.jemmy.DialogWaiter;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.JavaProjectsTabOperator;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.actions.Action;
-import org.netbeans.jemmy.EventTool;
-import org.netbeans.jemmy.Waitable;
-import org.netbeans.jemmy.Waiter;
-import org.openide.util.Exceptions;
-import sun.management.ManagementFactory;
 
 /**
  * Abstract base class representing a project to be used for profiler test. This class should
