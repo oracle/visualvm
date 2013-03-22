@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,6 +24,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,42 +39,23 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.ui.icons.impl;
+package org.netbeans.lib.profiler.results.locks;
 
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-import java.util.Map;
-import org.netbeans.modules.profiler.spi.IconsProvider;
+import org.netbeans.lib.profiler.results.CCTNode;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.spi.IconsProvider.class)
-public final class HeapWalkerIconsProviderImpl extends IconsProvider.Basic {
-    
-    @Override
-    protected final void initStaticImages(Map<String, String> cache) {
-        cache.put(HeapWalkerIcons.CLASSES, "classes.png"); // NOI18N
-        cache.put(HeapWalkerIcons.DATA, "data.png"); // NOI18N
-        cache.put(HeapWalkerIcons.GC_ROOT, "gcRoot.png"); // NOI18N
-        cache.put(HeapWalkerIcons.GC_ROOTS, "gcRoots.png"); // NOI18N
-        cache.put(HeapWalkerIcons.INCOMING_REFERENCES, "incomingRef.png"); // NOI18N
-        cache.put(HeapWalkerIcons.INSTANCES, "instances.png"); // NOI18N
-        cache.put(HeapWalkerIcons.LOOP, "loop.png"); // NOI18N
-        cache.put(HeapWalkerIcons.MEMORY_LINT, "memoryLint.png"); // NOI18N
-        cache.put(HeapWalkerIcons.PROGRESS, "progress.png"); // NOI18N
-        cache.put(HeapWalkerIcons.PROPERTIES, "properties.png"); // NOI18N
-        cache.put(HeapWalkerIcons.RULES, "rules.png"); // NOI18N
-        cache.put(HeapWalkerIcons.SAVED_OQL_QUERIES, "savedOQL.png"); // NOI18N
-        cache.put(HeapWalkerIcons.STATIC, "static.png"); // NOI18N
-        cache.put(HeapWalkerIcons.SYSTEM_INFO, "sysinfo.png"); // NOI18N
-        cache.put(HeapWalkerIcons.WINDOW, "window.png"); // NOI18N
-        cache.put(HeapWalkerIcons.BIGGEST_OBJECTS, "biggestObjects.png"); // NOI18N
-    }
+public abstract class LockCCTNode implements CCTNode {
+        
+    public abstract String getNodeName();
+
+    public abstract long getTime();
+
+    public abstract float getTimeInPerCent();
+
+    public abstract int getWaits();
     
 }
