@@ -385,11 +385,67 @@ public class ProfilerRuntime implements CommonConstants {
     }
     
     public static void parkEntry() {
-        waitEntry();
+        if (ThreadInfo.profilingSuspended() || ThreadInfo.isCurrentThreadProfilerServerThread()) {
+            // nothing done for profiler own threads or if in instrumentation
+            return;
+        }
+        long timeStamp = -1;
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+        ti.inProfilingRuntimeMethod++;
+
+        ProfilingSessionStatus status = ProfilerServer.getProfilingSessionStatus();
+
+        if (status != null) {
+            switch (status.currentInstrType) {
+                case INSTR_RECURSIVE_FULL:
+                case INSTR_RECURSIVE_SAMPLED:
+                    timeStamp = ProfilerRuntimeCPU.parkEntryCPU(ti);
+
+                    break;
+                case INSTR_CODE_REGION:
+                    ProfilerRuntimeCPUCodeRegion.parkEntryRegion();
+
+                    break;
+            }
+        }
+
+        Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_PARK, timeStamp, null);
+        ti.inProfilingRuntimeMethod--;
     }
 
     public static void parkExit() {
-        waitExit();
+        if (ThreadInfo.profilingSuspended() || ThreadInfo.isCurrentThreadProfilerServerThread()) {
+            // nothing done for profiler own threads or if in instrumentation
+            return;
+        }
+        long timeStamp = -1;
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+        ti.inProfilingRuntimeMethod++;
+
+        ProfilingSessionStatus status = ProfilerServer.getProfilingSessionStatus();
+
+        if (status != null) {
+            switch (status.currentInstrType) {
+                case INSTR_RECURSIVE_FULL:
+                case INSTR_RECURSIVE_SAMPLED:
+                    timeStamp = ProfilerRuntimeCPU.parkExitCPU(ti);
+
+                    break;
+                case INSTR_CODE_REGION:
+                    ProfilerRuntimeCPUCodeRegion.parkExitRegion();
+
+                    break;
+            }
+        }
+
+        Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_RUNNING, timeStamp, null);
+        ti.inProfilingRuntimeMethod--;
     }
 
     public static void writeProfilingPointHitEvent(int id, long absTimeStamp) {

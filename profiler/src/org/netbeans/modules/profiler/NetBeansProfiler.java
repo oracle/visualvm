@@ -422,6 +422,7 @@ public abstract class NetBeansProfiler extends Profiler {
     // TODO: implement better approach for refreshing profiling points and remove this code
 //    private boolean processesProfilingPoints;
     private boolean threadsMonitoringEnabled = false;
+    private boolean lockContentionMonitoringEnabled = false;
     private boolean waitDialogOpen = false;
     private int lastMode = MODE_PROFILE;
     private int profilingMode = MODE_PROFILE;
@@ -684,6 +685,21 @@ public abstract class NetBeansProfiler extends Profiler {
     public boolean getThreadsMonitoringEnabled() {
         return threadsMonitoringEnabled;
     }
+    
+    public void setLockContentionMonitoringEnabled(final boolean enabled) {
+//        getThreadsManager().setThreadsMonitoringEnabled(enabled);
+
+        if (lockContentionMonitoringEnabled == enabled) {
+            return;
+        }
+
+        lockContentionMonitoringEnabled = enabled;
+        fireLockContentionMonitoringChange();
+    }
+
+    public boolean getLockContentionMonitoringEnabled() {
+        return lockContentionMonitoringEnabled;
+    }
 
     public synchronized VMTelemetryModels getVMTelemetryModels() {
         if (vmTelemetryModels == null) {
@@ -746,6 +762,7 @@ public abstract class NetBeansProfiler extends Profiler {
             cleanupBeforeProfiling(sSettings);
             
             setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
+            setLockContentionMonitoringEnabled(profilingSettings.getLockContentionMonitoringEnabled());
             
             if (shouldOpenWindowsOnProfilingStart()) {
                 CommonUtils.runInEventDispatchThread(new Runnable() {
@@ -953,6 +970,7 @@ public abstract class NetBeansProfiler extends Profiler {
         cleanupBeforeProfiling(getTargetAppRunner().getProfilerEngineSettings());
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
+        setLockContentionMonitoringEnabled(profilingSettings.getLockContentionMonitoringEnabled());
 
         if (shouldOpenWindowsOnProfilingStart()) {
             CommonUtils.runInEventDispatchThread(new Runnable() {
@@ -1080,6 +1098,7 @@ public abstract class NetBeansProfiler extends Profiler {
         GestureSubmitter.logConfig(profilingSettings, sharedSettings.getInstrumentationFilter());
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
+        setLockContentionMonitoringEnabled(profilingSettings.getLockContentionMonitoringEnabled());
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -1184,6 +1203,7 @@ public abstract class NetBeansProfiler extends Profiler {
         cleanupBeforeProfiling(sSettings);
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
+        setLockContentionMonitoringEnabled(profilingSettings.getLockContentionMonitoringEnabled());
         //    System.err.println("------------------------------------------ 3: "+ (System.currentTimeMillis() - time));
         if (shouldOpenWindowsOnProfilingStart()) {
             openWindowsOnProfilingStart();
@@ -1677,8 +1697,10 @@ public abstract class NetBeansProfiler extends Profiler {
     private void openWindowsOnProfilingStart() {
         int telemetryBehavior = ideSettings.getTelemetryOverviewBehavior();
         int threadsBehavior = ideSettings.getThreadsViewBehavior();
+        int locksBehavior = ideSettings.getLockContentionViewBehavior();
 
         boolean threadsEnabled = lastProfilingSettings.getThreadsMonitoringEnabled();
+        boolean lockContentionEnabled = lastProfilingSettings.getLockContentionMonitoringEnabled();
         int type = lastProfilingSettings.getProfilingType();
 
         // 1. Telemetry Overview
@@ -1696,8 +1718,17 @@ public abstract class NetBeansProfiler extends Profiler {
                 ThreadsWindow.getDefault().requestVisible();
             }
         }
+        
+        // 3. Lock Contention view
+        if (lockContentionEnabled) {
+            if ((locksBehavior == ProfilerIDESettings.OPEN_ALWAYS)
+                    || ((locksBehavior == ProfilerIDESettings.OPEN_MONITORING) && (type == ProfilingSettings.PROFILE_MONITOR))) {
+                LockContentionWindow.getDefault().open();
+                LockContentionWindow.getDefault().requestVisible();
+            }
+        }
 
-        // 3. Live Results
+        // 4. Live Results
         if ((ideSettings.getDisplayLiveResultsCPU()
                 && ((type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)
                     || (type == ProfilingSettings.PROFILE_CPU_SAMPLING)))
@@ -1710,7 +1741,7 @@ public abstract class NetBeansProfiler extends Profiler {
             LiveResultsWindow.getDefault().requestVisible();
         }
 
-        // 4. Control Panel displayed always, and getting focus
+        // 5. Control Panel displayed always, and getting focus
         final ProfilerControlPanel2 controlPanel2 = ProfilerControlPanel2.getDefault();
         controlPanel2.open();
         controlPanel2.requestActive();
