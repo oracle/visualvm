@@ -77,7 +77,6 @@ import org.openide.util.lookup.ServiceProviders;
 import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -163,21 +162,40 @@ public final class LiveResultsWindow extends ProfilerTopComponent
     @ServiceProvider(service=ResultsListener.class)
     public static class Listener extends Delegate<LiveResultsWindow> implements ResultsListener {
 
+        private boolean callResultsAvailable;
+        
+        @Override
+        public void setDelegate(LiveResultsWindow delegate) {
+            super.setDelegate(delegate);
+            if (callResultsAvailable) {
+                resultsAvailable();
+            }
+        }
+
         @Override
         public void resultsAvailable() {
             LiveResultsWindow win = getDelegate();
-            win.resultsAvailableinTA = true;
-            TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-            int instrType = runner.getProfilerClient().getCurrentInstrType();
-            if (instrType == ProfilerEngineSettings.INSTR_NONE_MEMORY_SAMPLING) {
-                win.resultsAvailable();
+            if (win!=null) {
+                win.resultsAvailableinTA = true;
+                TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
+                int instrType = runner.getProfilerClient().getCurrentInstrType();
+                if (instrType == ProfilerEngineSettings.INSTR_NONE_MEMORY_SAMPLING) {
+                    win.resultsAvailable();
+                }
+            } else {
+                callResultsAvailable = true;
             }
         }
 
         @Override
         public void resultsReset() {
-            getDefault().resultsAvailableinTA = false; // getDefault() causes #223672, fix it!
-            if (getDelegate() != null) getDelegate().reset();
+            LiveResultsWindow win = getDelegate();
+            if (win != null) {
+                win.resultsAvailableinTA = false;
+                win.reset();
+            } else {
+                callResultsAvailable = false;
+            }
         }
         
     }
