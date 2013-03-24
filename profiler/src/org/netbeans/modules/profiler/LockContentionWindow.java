@@ -116,7 +116,6 @@ public final class LockContentionWindow extends ProfilerTopComponent implements 
             public void lockContentionMonitoringChanged() {
                 updateLocksView();
             }
-            public void threadsMonitoringChanged() {}
         });
     }
 
@@ -233,8 +232,7 @@ public final class LockContentionWindow extends ProfilerTopComponent implements 
     }
 //
     private void updateLocksView() {
-//        if (Profiler.getDefault().getLockContentionEnabled()) {
-        if (Profiler.getDefault().getThreadsMonitoringEnabled()) {
+        if (Profiler.getDefault().getLockContentionMonitoringEnabled()) {
             locksPanel.lockContentionEnabled();
         } else {
             locksPanel.lockContentionDisabled();
