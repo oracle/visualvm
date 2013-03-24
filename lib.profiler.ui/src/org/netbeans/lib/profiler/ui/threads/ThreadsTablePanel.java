@@ -172,9 +172,12 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
                         return sortOrder ? data1.waitTime.compareTo(data2.waitTime) :
                             data2.waitTime.compareTo(data1.waitTime);
                     case 4:
+                        return sortOrder ? data1.parkTime.compareTo(data2.parkTime) :
+                            data2.parkTime.compareTo(data1.parkTime);
+                    case 5:
                         return sortOrder ? data1.monitorTime.compareTo(data2.monitorTime) :
                             data2.monitorTime.compareTo(data1.monitorTime);
-                    case 5:
+                    case 6:
                         return sortOrder ? data1.totalTime.compareTo(data2.totalTime) :
                             data2.totalTime.compareTo(data1.totalTime);
                     default:
@@ -245,6 +248,7 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
         long runningTime = dataAvailable ? 0 : -1;
         long sleepingTime = dataAvailable ? 0 : -1;
         long waitTime = dataAvailable ? 0 : -1;
+        long parkTime = dataAvailable ? 0 : -1;
         long monitorTime = dataAvailable ? 0 : -1;
         
         for (int i = 0; i < threadData.size(); i++) {
@@ -261,14 +265,17 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
                 case CommonConstants.THREAD_STATUS_WAIT:
                     waitTime += stateDuration;
                     break;
+                case CommonConstants.THREAD_STATUS_PARK:
+                    parkTime += stateDuration;
+                    break;
                 case CommonConstants.THREAD_STATUS_MONITOR:
                     monitorTime += stateDuration;
                     break;
             }
         }
         
-        return new Data(threadIndex, tdmanager.getThreadName(threadIndex), runningTime, sleepingTime, waitTime, monitorTime,
-                runningTime + sleepingTime + waitTime + monitorTime);
+        return new Data(threadIndex, tdmanager.getThreadName(threadIndex), runningTime, sleepingTime, waitTime, parkTime, monitorTime,
+                runningTime + sleepingTime + waitTime + parkTime + monitorTime);
     }
     
     private long getThreadStateDuration(ThreadData threadData, int index) {
@@ -386,8 +393,10 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
                     case 3:
                         return data.waitTime == 0 ? "0.0 (0.0%)" : TimeLineUtils.getMillisValue2(data.waitTime) + " (" + getPercentValue(data.waitTime, data.totalTime) + "%)"; // NOI18N
                     case 4:
-                        return data.monitorTime == 0 ? "0.0 (0.0%)" : TimeLineUtils.getMillisValue2(data.monitorTime) + " (" + getPercentValue(data.monitorTime, data.totalTime) + "%)"; // NOI18N
+                        return data.parkTime == 0 ? "0.0 (0.0%)" : TimeLineUtils.getMillisValue2(data.parkTime) + " (" + getPercentValue(data.parkTime, data.totalTime) + "%)"; // NOI18N
                     case 5:
+                        return data.monitorTime == 0 ? "0.0 (0.0%)" : TimeLineUtils.getMillisValue2(data.monitorTime) + " (" + getPercentValue(data.monitorTime, data.totalTime) + "%)"; // NOI18N
+                    case 6:
                         return data.totalTime == 0 ? "0.0" : TimeLineUtils.getMillisValue2(data.totalTime); // NOI18N
                     default:
                         return null;
@@ -502,13 +511,13 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
         LabelTableCellRenderer labelTableCellRenderer2 = new LabelTableCellRenderer(JLabel.TRAILING);
         LabelBracketTableCellRenderer labelBracketTableCellRenderer = new LabelBracketTableCellRenderer(JLabel.TRAILING);
 
-        columnNames = new String[] { THREADS_COLUMN_NAME, RUNNING_COLUMN_NAME, SLEEPING_COLUMN_NAME, WAIT_COLUMN_NAME, MONITOR_COLUMN_NAME, TOTAL_COLUMN_NAME };
-        columnToolTips = new String[] { THREADS_COLUMN_DESCR, RUNNING_COLUMN_DESCR, SLEEPING_COLUMN_DESCR, WAIT_COLUMN_DESCR, MONITOR_COLUMN_DESCR, TOTAL_COLUMN_DESCR };
-        columnTypes = new Class[] { String.class, String.class, String.class, String.class, String.class, String.class };
+        columnNames = new String[] { THREADS_COLUMN_NAME, RUNNING_COLUMN_NAME, SLEEPING_COLUMN_NAME, WAIT_COLUMN_NAME, PARK_COLUMN_NAME, MONITOR_COLUMN_NAME, TOTAL_COLUMN_NAME };
+        columnToolTips = new String[] { THREADS_COLUMN_DESCR, RUNNING_COLUMN_DESCR, SLEEPING_COLUMN_DESCR, WAIT_COLUMN_DESCR, PARK_COLUMN_DESCR, MONITOR_COLUMN_DESCR, TOTAL_COLUMN_DESCR };
+        columnTypes = new Class[] { String.class, String.class, String.class, String.class, String.class, String.class, String.class };
         columnRenderers = new TableCellRenderer[] {
-                              labelTableCellRenderer1, labelBracketTableCellRenderer, labelBracketTableCellRenderer, labelBracketTableCellRenderer, labelBracketTableCellRenderer, labelTableCellRenderer2
+                              labelTableCellRenderer1, labelBracketTableCellRenderer, labelBracketTableCellRenderer, labelBracketTableCellRenderer, labelBracketTableCellRenderer, labelBracketTableCellRenderer, labelTableCellRenderer2
                           };
-        columnWidths = new int[] { maxWidth, maxWidth, maxWidth, maxWidth, maxWidth, maxWidth };
+        columnWidths = new int[] { maxWidth, maxWidth, maxWidth, maxWidth, maxWidth, maxWidth, maxWidth };
     }
     
     private void setColumnsData() {
@@ -691,15 +700,17 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
         Long runningTime;
         Long sleepingTime;
         Long waitTime;
+        Long parkTime;
         Long monitorTime;
         Long totalTime;
         
-        public Data(Integer threadIndex, String threadName, Long runningTime, Long sleepingTime, Long waitTime, Long monitorTime, Long totalTime) {
+        Data(Integer threadIndex, String threadName, Long runningTime, Long sleepingTime, Long waitTime, Long parkTime, Long monitorTime, Long totalTime) {
             this.threadIndex = threadIndex;
             this.threadName = threadName;
             this.runningTime = runningTime;
             this.sleepingTime = sleepingTime;
             this.waitTime = waitTime;
+            this.parkTime = parkTime;
             this.monitorTime = monitorTime;
             this.totalTime = totalTime;
         }
@@ -717,12 +728,14 @@ public class ThreadsTablePanel extends JPanel implements ActionListener, DataMan
     private static final String RUNNING_COLUMN_NAME = messages.getString("ThreadsTablePanel_RunningColumnName"); // NOI18N
     private static final String SLEEPING_COLUMN_NAME = messages.getString("ThreadsTablePanel_SleepingColumnName"); // NOI18N
     private static final String WAIT_COLUMN_NAME = messages.getString("ThreadsTablePanel_WaitColumnName"); // NOI18N
+    private static final String PARK_COLUMN_NAME = messages.getString("ThreadsTablePanel_ParkColumnName"); // NOI18N
     private static final String MONITOR_COLUMN_NAME = messages.getString("ThreadsTablePanel_MonitorColumnName"); // NOI18N
     private static final String TOTAL_COLUMN_NAME = messages.getString("ThreadsTablePanel_TotalColumnName"); // NOI18N
     private static final String THREADS_COLUMN_DESCR = messages.getString("ThreadsTablePanel_ThreadsColumnDescr"); // NOI18N
     private static final String RUNNING_COLUMN_DESCR = messages.getString("ThreadsTablePanel_RunningColumnDescr"); // NOI18N
     private static final String SLEEPING_COLUMN_DESCR = messages.getString("ThreadsTablePanel_SleepingColumnDescr"); // NOI18N
     private static final String WAIT_COLUMN_DESCR = messages.getString("ThreadsTablePanel_WaitColumnDescr"); // NOI18N
+    private static final String PARK_COLUMN_DESCR = messages.getString("ThreadsTablePanel_ParkColumnDescr"); // NOI18N
     private static final String MONITOR_COLUMN_DESCR = messages.getString("ThreadsTablePanel_MonitorColumnDescr"); // NOI18N
     private static final String TOTAL_COLUMN_DESCR = messages.getString("ThreadsTablePanel_TotalColumnDescr"); // NOI18N
     private static final String SELECTED_THREADS_ITEM = messages.getString("ThreadsPanel_SelectedThreadsItem"); // NOI18N

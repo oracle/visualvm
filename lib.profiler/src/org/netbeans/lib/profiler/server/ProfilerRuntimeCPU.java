@@ -371,6 +371,30 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         return -1;
     }
 
+    protected static long parkEntryCPU(ThreadInfo ti) {
+        if (recursiveInstrumentationDisabled || !waitTrackingEnabled) {
+            return -1; // See the comment at the recursiveInstrumentationDisabled variable declaration
+        }
+
+        if (ti.isInitialized() && ti.inCallGraph) {
+            //System.out.println("++++++parkEntry, depth = " + ti.stackDepth);
+            return writeWaitTimeEvent(METHOD_ENTRY_PARK, ti);
+        }
+        return -1;
+    }
+
+    protected static long parkExitCPU(ThreadInfo ti) {
+        if (recursiveInstrumentationDisabled || !waitTrackingEnabled) {
+            return -1; // See the comment at the recursiveInstrumentationDisabled variable declaration
+        }
+
+        if (ti.isInitialized() && ti.inCallGraph) {
+            //System.out.println("++++++parkExit, depth = " + ti.stackDepth);
+            return writeWaitTimeEvent(METHOD_EXIT_PARK, ti);
+        }
+        return -1;
+    }
+
     protected static void firstTimeMethodInvoke(final ThreadInfo ti, final char methodId) {
         if (enableFirstTimeMethodInvoke) {
             long absTimeStamp = Timers.getCurrentTimeInCounts();
