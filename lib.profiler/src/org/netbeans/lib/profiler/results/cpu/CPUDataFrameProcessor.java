@@ -91,10 +91,14 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                     long timeStamp1 = 0;
 
                     if ((eventType != CommonConstants.ADJUST_TIME // those events do not carry methodId
-                        ) && (eventType != CommonConstants.METHOD_ENTRY_WAIT) && (eventType != CommonConstants.METHOD_EXIT_WAIT)
+                        ) && (eventType != CommonConstants.METHOD_ENTRY_WAIT) 
+                            && (eventType != CommonConstants.METHOD_EXIT_WAIT)
+                            && (eventType != CommonConstants.METHOD_ENTRY_PARK) 
+                            && (eventType != CommonConstants.METHOD_EXIT_PARK)
                             && (eventType != CommonConstants.METHOD_ENTRY_MONITOR)
                             && (eventType != CommonConstants.METHOD_EXIT_MONITOR)
-                            && (eventType != CommonConstants.METHOD_ENTRY_SLEEP) && (eventType != CommonConstants.METHOD_EXIT_SLEEP)) {
+                            && (eventType != CommonConstants.METHOD_ENTRY_SLEEP) 
+                            && (eventType != CommonConstants.METHOD_EXIT_SLEEP)) {
                         methodId = (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
                     }
 
@@ -278,6 +282,24 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                             }
 
                             fireWaitExit(currentThreadId, timeStamp0, timeStamp1);
+
+                            break;
+                        }
+                        case CommonConstants.METHOD_ENTRY_PARK: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Park entry , tId={0}", currentThreadId); // NOI18N
+                            }
+
+                            fireParkEntry(currentThreadId, timeStamp0, timeStamp1);
+
+                            break;
+                        }
+                        case CommonConstants.METHOD_EXIT_PARK: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Park exit , tId={0}", currentThreadId); // NOI18N
+                            }
+
+                            fireParkExit(currentThreadId, timeStamp0, timeStamp1);
 
                             break;
                         }
@@ -515,6 +537,22 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
                     ((CPUProfilingResultListener) listener).waitExit(threadId, timeStamp0, timeStamp1);
+                }
+            });
+    }
+
+    private void fireParkEntry(final int threadId, final long timeStamp0, final long timeStamp1) {
+        foreachListener(new ListenerFunctor() {
+                public void execute(ProfilingResultListener listener) {
+                    ((CPUProfilingResultListener) listener).parkEntry(threadId, timeStamp0, timeStamp1);
+                }
+            });
+    }
+
+    private void fireParkExit(final int threadId, final long timeStamp0, final long timeStamp1) {
+        foreachListener(new ListenerFunctor() {
+                public void execute(ProfilingResultListener listener) {
+                    ((CPUProfilingResultListener) listener).parkExit(threadId, timeStamp0, timeStamp1);
                 }
             });
     }

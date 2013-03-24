@@ -50,7 +50,7 @@ made subject to such option by the copyright holder.
             <folder name="Profile">
                 <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Menu/Window/Profile"/>
                 <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/impl/icons/empty.gif"/>
-                <attr name="position" intvalue="1500"/>
+                <attr name="position" intvalue="1100"/>
             </folder>
         </folder>
 
