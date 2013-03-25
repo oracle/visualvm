@@ -60,6 +60,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class PlatformDetailsProvider extends DetailsProvider.Basic {
 
     private static final String STANDARD_MODULE = "org.netbeans.StandardModule+"; // NOI18N
+    private static final String STANDARD_MODULE_DATA = "org.netbeans.StandardModuleData"; // NOI18N
     private static final String SPECIFICATION_VERSION = "org.openide.modules.SpecificationVersion"; // NOI18N
     private static final String ABSTRACT_NODE = "org.openide.nodes.AbstractNode+"; // NOI18N
     private static final String FILE_ENTRY = "org.openide.loaders.FileEntry+"; // NOI18N
@@ -68,6 +69,8 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     private static final String FOLDER_OBJ = "org.netbeans.modules.masterfs.filebasedfs.fileobjects.FolderObj+"; // NOI18N
     private static final String FILE_NAME = "org.netbeans.modules.masterfs.filebasedfs.naming.FileName+"; // NOI18N
     private static final String FOLDER_NAME = "org.netbeans.modules.masterfs.filebasedfs.naming.FolderName+"; // NOI18N
+    private static final String ABSTRACT_FOLDER = "org.openide.filesystems.AbstractFolder+"; // NOI18N
+    private static final String BFS_BASE = "org.netbeans.core.startup.layers.BinaryFS$BFSBase+"; // NOI18N
     private static final String FIXED_0_7 = "org.openide.util.CharSequences$Fixed_0_7"; // NOI18N
     private static final String FIXED_8_15 = "org.openide.util.CharSequences$Fixed_8_15"; // NOI18N
     private static final String FIXED_16_23 = "org.openide.util.CharSequences$Fixed_16_23"; // NOI18N
@@ -77,35 +80,41 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     private static final String BYTE_BASED_SEQUENCE = "org.openide.util.CharSequences$ByteBasedSequence"; // NOI18N
     private static final String CHAR_BASED_SEQUENCE = "org.openide.util.CharSequences$CharBasedSequence"; // NOI18N
     
-    LinkedHashMap<Instance, String> cache = new LinkedHashMap<Instance, String>(10000) {
+    LinkedHashMap<Long, String> cache = new LinkedHashMap<Long, String>(10000) {
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<Instance, String> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Long, String> eldest) {
             return size() > 10000;
         }
     };
     
     public PlatformDetailsProvider() {
-        super(STANDARD_MODULE,SPECIFICATION_VERSION,ABSTRACT_NODE,
-              FILE_ENTRY,DATA_OBJECT,FILE_OBJ,FOLDER_OBJ,FILE_NAME,FIXED_0_7,
-              FIXED_8_15,FIXED_16_23,FIXED_1_10,FIXED_11_20,FIXED_21_30,
-              BYTE_BASED_SEQUENCE,CHAR_BASED_SEQUENCE);
+        super(STANDARD_MODULE,STANDARD_MODULE_DATA,SPECIFICATION_VERSION,
+              ABSTRACT_NODE,FILE_ENTRY,DATA_OBJECT,FILE_OBJ,FOLDER_OBJ,
+              FILE_NAME,FOLDER_NAME,ABSTRACT_FOLDER,BFS_BASE,
+              FIXED_0_7,FIXED_8_15,FIXED_16_23,FIXED_1_10,FIXED_11_20,
+              FIXED_21_30,BYTE_BASED_SEQUENCE,CHAR_BASED_SEQUENCE);
     }
 
     @Override
     public String getDetailsString(String className, Instance instance, Heap heap) {
-        String s = cache.get(instance);
+        Long id = getUniqueInstanceId(heap,instance);
+        String s = cache.get(id);
         if (s != null) {
             return s;
         }
         s = getDetailsStringImpl(className, instance, heap);
-        cache.put(instance, s);
+        cache.put(id, s);
         return s;
     }
 
     private String getDetailsStringImpl(String className, Instance instance, Heap heap) {
         if (STANDARD_MODULE.equals(className))  {
-            return DetailsUtils.getInstanceFieldString(instance, "codeName", heap);     // NOI18N
+            String codeName = DetailsUtils.getInstanceFieldString(instance, "codeName", heap);     // NOI18N
+            if (codeName != null) {
+                return codeName;
+            }
+            return DetailsUtils.getInstanceFieldString(instance, "data", heap);     // NOI18N
         } else if (SPECIFICATION_VERSION.equals(className)) {
             PrimitiveArrayInstance digits = (PrimitiveArrayInstance) instance.getValueOfField("digits"); // NOI18N
             if (digits != null) {
@@ -117,9 +126,8 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
                 }
                 return specVersion.substring(0, specVersion.length()-1);
             }
-          // TopComponent covered by details.jdk.ui.ComponentDetailsProvider
-//        } else if (TOP_COMPONENT.equals(className)) {
-//            return DetailsUtils.getInstanceFieldString(instance, "displayName", heap);     // NOI18N
+        } else if (STANDARD_MODULE_DATA.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "codeName", heap);     // NOI18N
         } else if (ABSTRACT_NODE.equals(className)) {
             String name = DetailsUtils.getInstanceFieldString(instance, "displayName", heap); // NOI18N
 
@@ -138,13 +146,26 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "fileName", heap); // NOI18N
         } else if (FOLDER_OBJ.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "fileName", heap); // NOI18N
-        } else if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)) {
+        } else if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)
+                || ABSTRACT_FOLDER.equals(className) || BFS_BASE.equals(className)) {
             String nameString = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
 
             if (nameString != null) {
                 String parentDetail = DetailsUtils.getInstanceFieldString(instance, "parent", heap); // NOI18N
                 if (parentDetail != null) {
-                    nameString = parentDetail.concat("/").concat(nameString);   // NOI18N                    
+                    String sep;
+                    
+                    if (FILE_NAME.equals(className) || FOLDER_NAME.equals(className)) {
+                        // FileObject on the disk - find correct file seperator
+                        sep = getFileSeparator(heap);
+                        if (parentDetail.endsWith(sep)) {
+                            // do not duplicate separator
+                            sep = "";
+                        }
+                    } else {
+                        sep = "/";
+                    }
+                    nameString = parentDetail.concat(sep).concat(nameString);
                 }
             }
             return nameString;
@@ -203,6 +224,22 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "value", heap);    // NOI18N
         }
         return null;
+    }
+    
+    private Long getUniqueInstanceId(Heap heap, Instance instance) {
+        long id = instance.getInstanceId()^System.identityHashCode(heap);
+        
+        return new Long(id);
+    }
+
+    private String getFileSeparator(Heap heap) {
+        Long id = new Long(System.identityHashCode(heap));
+        String sep = cache.get(id);
+        if (sep == null) {
+            sep = heap.getSystemProperties().getProperty("file.separator","/"); // NOI18N
+            cache.put(id,sep);
+        }
+        return sep;
     }
 
     //<editor-fold defaultstate="collapsed" desc="Private Classes">

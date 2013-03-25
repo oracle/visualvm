@@ -88,4 +88,8 @@ public interface CPUProfilingResultListener extends ProfilingResultListener {
     void waitEntry(final int threadId, final long timeStamp0, final long timeStamp1);
 
     void waitExit(final int threadId, final long timeStamp0, final long timeStamp1);
+
+    void parkEntry(final int threadId, final long timeStamp0, final long timeStamp1);
+
+    void parkExit(final int threadId, final long timeStamp0, final long timeStamp1);
 }

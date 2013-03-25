@@ -72,6 +72,8 @@ public class ThreadNameCellRenderer extends LabelTableCellRenderer {
                                                                      THREAD_ICON_SIZE);
     private static ThreadStateIcon waitIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_WAIT, THREAD_ICON_SIZE,
                                                                   THREAD_ICON_SIZE);
+    private static ThreadStateIcon parkIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_PARK, THREAD_ICON_SIZE,
+                                                                  THREAD_ICON_SIZE);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -137,6 +139,10 @@ public class ThreadNameCellRenderer extends LabelTableCellRenderer {
                         break;
                     case CommonConstants.THREAD_STATUS_WAIT:
                         label.setIcon(waitIcon);
+
+                        break;
+                    case CommonConstants.THREAD_STATUS_PARK:
+                        label.setIcon(parkIcon);
 
                         break;
                 }

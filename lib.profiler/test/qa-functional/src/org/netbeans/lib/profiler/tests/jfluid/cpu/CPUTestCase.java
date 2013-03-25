@@ -132,9 +132,9 @@ public abstract class CPUTestCase extends CommonProfilerTestCase {
             }
         }
 
-        public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
-            log("cctEstablished "+emtpy+" "+System.currentTimeMillis());
-            if (!emtpy) {
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+            log("cctEstablished "+empty+" "+System.currentTimeMillis());
+            if (!empty) {
                 cctEstablished(appRootNode);
             }
             //throw new UnsupportedOperationException("Not supported yet.");

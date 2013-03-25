@@ -161,7 +161,8 @@ public final class DetailsUtils {
             int valuesCount = count < 0 ? values.size() - offset :
                               Math.min(count, values.size() - offset);            
             int separatorLength = separator == null ? 0 : separator.length();
-            StringBuilder value = new StringBuilder(valuesCount * (2 + separatorLength));
+            int estimatedSize = Math.min(valuesCount * (2 + separatorLength), MAX_ARRAY_LENGTH + trailer.length());
+            StringBuilder value = new StringBuilder(estimatedSize);
             int lastValue = offset + valuesCount - 1;
             for (int i = offset; i <= lastValue; i++) {
                 value.append(values.get(i));
