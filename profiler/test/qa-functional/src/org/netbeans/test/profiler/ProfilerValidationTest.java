@@ -48,6 +48,7 @@ import java.util.logging.Level;
 import javax.swing.JCheckBox;
 import junit.framework.Test;
 import org.netbeans.jellytools.Bundle;
+import org.netbeans.jellytools.EditorOperator;
 import org.netbeans.jellytools.JavaProjectsTabOperator;
 import org.netbeans.jellytools.JellyTestCase;
 import org.netbeans.jellytools.MainWindowOperator;
@@ -55,12 +56,15 @@ import org.netbeans.jellytools.NbDialogOperator;
 import org.netbeans.jellytools.NewJavaProjectNameLocationStepOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OptionsOperator;
+import org.netbeans.jellytools.OutputTabOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
 import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jellytools.actions.Action;
 import org.netbeans.jellytools.actions.ActionNoBlock;
+import org.netbeans.jellytools.actions.EditAction;
 import org.netbeans.jellytools.nodes.JavaProjectRootNode;
 import org.netbeans.jellytools.nodes.Node;
+import org.netbeans.jellytools.nodes.SourcePackagesNode;
 import org.netbeans.jemmy.EventTool;
 import org.netbeans.jemmy.JemmyException;
 import org.netbeans.jemmy.JemmyProperties;
@@ -105,7 +109,7 @@ public class ProfilerValidationTest extends JellyTestCase {
      */
     public static Test suite() {
         NbModuleSuite.Configuration conf = NbModuleSuite.createConfiguration(
-                ProfilerValidationTest.class).clusters("profiler|nb").enableModules(".*").honorAutoloadEager(true).failOnException(Level.SEVERE).failOnMessage(Level.SEVERE);
+                ProfilerValidationTest.class).clusters(".*").enableModules(".*").honorAutoloadEager(true).failOnException(Level.SEVERE).failOnMessage(Level.SEVERE);
         conf = conf.addTest(
                 "testProfilerCalibration",
                 "testProfilerProperties",
@@ -260,13 +264,13 @@ public class ProfilerValidationTest extends JellyTestCase {
         WatchProjects.waitScanFinished();
         projectNode.buildProject();
         MainWindowOperator.getDefault().waitStatusText(Bundle.getStringTrimmed("org.apache.tools.ant.module.run.Bundle", "FMT_finished_target_status")); // "Finished Building"
-
+        // add log message to application to 
+        Node anagramsNode = new Node(new SourcePackagesNode(projectNode), "ui|Anagrams.java");
+        new EditAction().perform(anagramsNode);
+        String visibleToken = "VISIBLE";
+        new EditorOperator("Anagrams.java").replace("setVisible(true);", "setVisible(true);\nSystem.out.println(\"" + visibleToken + "\");");
         // call Profile|Profile Main Project
         new ActionNoBlock(ProfileMenu + "|" + Bundle.getStringTrimmed("org.netbeans.modules.profiler.actions.Bundle", "LBL_ProfileMainProjectAction"), null).perform();
-        // confirm changes in project when profiled for the first time
-        //new NbDialogOperator( Bundle.getStringTrimmed("org.netbeans.modules.profiler.j2se.Bundle",
-        //                "J2SEProjectTypeProfiler_ModifyBuildScriptCaption") ).ok(); //"Enable Profiling of {0}"
-        //wait
         // click Run in Profile AnagramGame dialog
         NbDialogOperator profileOper = new NbDialogOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.stp.Bundle",
                 "SelectProfilingTask_ProfileDialogCaption")); // "Profile "+anagramGamePrName
@@ -277,8 +281,11 @@ public class ProfilerValidationTest extends JellyTestCase {
                 "NetBeansProfiler_ProgressDialogCaption"), 50000); // "Progress ..."
         TopComponentOperator tco = new TopComponentOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",
                 "LAB_ControlPanelName")); // "Profiler"
-        //new OutputTabOperator(anagramGamePrName).waitText( Bundle.getStringTrimmed(PROFILER_LIB_BUNDLE,
-        //                            "ProfilerServer_LocalConnectionMsg") ); //"Established local connection with the tool"
+        // wait for application visible
+        OutputTabOperator oto = new OutputTabOperator("profile");
+        oto.getTimeouts().setTimeout("ComponentOperator.WaitStateTimeout", 120000);
+        oto.waitText(visibleToken);
+        new EventTool().waitNoEvent(1000);
         Action takeSnapshotAction = new Action(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
                 "LBL_TakeSnapshotAction"), null);
         Waiter waiter = new Waiter(new Waitable() {
