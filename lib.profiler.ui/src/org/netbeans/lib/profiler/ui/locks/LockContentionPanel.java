@@ -74,7 +74,10 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.results.CCTNode;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTNode;
+import org.netbeans.lib.profiler.results.locks.LockCCTProvider;
+import org.netbeans.lib.profiler.results.locks.LockRuntimeCCTNode;
 import org.netbeans.lib.profiler.ui.ResultsPanel;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -90,6 +93,7 @@ import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
 import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -238,8 +242,27 @@ public class LockContentionPanel extends ResultsPanel {
         
         cornerPopup = new JPopupMenu();
         treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
+        LockCCTProvider cctProvider = Lookup.getDefault().lookup(LockCCTProvider.class);
+        assert cctProvider != null;
+        cctProvider.addListener(new Listener());        
     }
     
+    private class Listener implements LockCCTProvider.Listener {
+
+        @Override
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+            if (!empty && appRootNode instanceof LockRuntimeCCTNode) {
+                LockRuntimeCCTNode root = (LockRuntimeCCTNode) appRootNode;
+                // Debug output for testing
+                // root.getMonitors().debug();
+                // root.getThreads().debug();
+            }
+        }
+
+        @Override
+        public void cctReset() {
+        }  
+    }
     
     public void prepareResults() {
         
@@ -419,8 +442,8 @@ public class LockContentionPanel extends ResultsPanel {
             public CCTNode getParent() { return null; }
             public String getNodeName() { return "invisible root"; }
             public long getTime() { return 0; }
-            public float getTimeInPerCent() { return 0; }
-            public int getWaits() { return 0; }
+            public double getTimeInPerCent() { return 0; }
+            public long getWaits() { return 0; }
         };
     private class LocksTreeTableModel extends AbstractTreeTableModel {
         

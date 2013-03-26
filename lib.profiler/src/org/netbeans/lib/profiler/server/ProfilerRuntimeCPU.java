@@ -307,7 +307,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
         if (ti.isInitialized() && ti.inCallGraph) {
             //System.out.println("++++++monitorEntry, depth = " + ti.stackDepth);
-            return writeWaitTimeEvent(METHOD_ENTRY_MONITOR, ti);
+            return writeWaitTimeEvent(METHOD_ENTRY_MONITOR, ti, monitor);
         }
         return -1;
     }
@@ -319,7 +319,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
         if (ti.isInitialized() && ti.inCallGraph) {
             //System.out.println("++++++monitorExit, depth = " + ti.stackDepth);
-            return writeWaitTimeEvent(METHOD_EXIT_MONITOR, ti);
+            return writeWaitTimeEvent(METHOD_EXIT_MONITOR, ti, monitor);
         }
         return -1;
     }
@@ -570,8 +570,12 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
         ti.evBufPos = curPos;
     }
-
+    
     static long writeWaitTimeEvent(byte eventType, ThreadInfo ti) {
+        return writeWaitTimeEvent(eventType, ti, null);
+    }
+    
+    static long writeWaitTimeEvent(byte eventType, ThreadInfo ti, Object id) {
         // if (printEvents) System.out.println("*** Writing event " + eventType + ", metodId = " + (int)methodId);
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
@@ -590,7 +594,9 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         long absTimeStamp = Timers.getCurrentTimeInCounts();
 
         if (DEBUG) {
-            System.out.println("ProfilerRuntimeCPU.DEBUG: Writing waitTime event type = " + eventType + ", timestamp: " + absTimeStamp); // NOI18N
+            System.out.println("ProfilerRuntimeCPU.DEBUG: Writing waitTime event type = " + eventType + // NOI18N
+                    ", timestamp: " + absTimeStamp + // NOI18N
+                    id==null ? "" : ", id: "+System.identityHashCode(id)); // NOI18N
         }
 
         evBuf[curPos++] = (byte) ((absTimeStamp >> 48) & 0xFF);
@@ -600,6 +606,13 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         evBuf[curPos++] = (byte) ((absTimeStamp >> 16) & 0xFF);
         evBuf[curPos++] = (byte) ((absTimeStamp >> 8) & 0xFF);
         evBuf[curPos++] = (byte) ((absTimeStamp) & 0xFF);
+        if (id != null) {
+            int hash = System.identityHashCode(id);
+            evBuf[curPos++] = (byte) ((hash >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash) & 0xFF);            
+        }
 
         ti.evBufPos = curPos;
         return absTimeStamp;
