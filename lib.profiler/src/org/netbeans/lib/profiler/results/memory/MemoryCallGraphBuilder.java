@@ -222,11 +222,11 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
      */
     private int[] maxSurvGen;
 
-    /** [0 - nProfiledClasses] index: classId, contains tracked allocated instrances # for this class */
+    /** [0 - nProfiledClasses] index: classId, contains tracked allocated instances # for this class */
     private long[] nTrackedAllocObjects;
 
     /** [0 - nProfiledClasses] index: classId,
-     * contains tracked live instrances # for this class - assumption: smaller than allocated, thus only int
+     * contains tracked live instances # for this class - assumption: smaller than allocated, thus only int
      */
     private int[] nTrackedLiveObjects;
     private long[] objectsSizePerClass; // [0-nProfiledClasses] total size in bytes for tracked instances of this class
@@ -299,6 +299,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
         transaction.beginTrans(false);
 
         try {
+            updateNumberOfClasses(); // performance hit is ~ 1ms
             return nProfiledClasses;
         } finally {
             transaction.endTrans();

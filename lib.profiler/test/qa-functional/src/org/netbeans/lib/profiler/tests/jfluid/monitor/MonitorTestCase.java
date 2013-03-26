@@ -81,6 +81,7 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
     static final byte ST_SLEEPING = 8;
     static final byte ST_MONITOR = 16;
     static final byte ST_WAIT = 32;
+    static final byte ST_PARK = 64;
     static final int MONITOR_ONLY = 0;
     static final int WITH_CPU = 1;
     static final int WITH_MEMORY = 2;
@@ -110,6 +111,8 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
             return ('M');
         } else if (state == ST_WAIT) {
             return ('W');
+        } else if (state == ST_PARK) {
+            return ('P');
         }
 
         return '-';
@@ -335,6 +338,8 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
             return ST_MONITOR;
         } else if (state == CommonConstants.THREAD_STATUS_WAIT) {
             return ST_WAIT;
+        } else if (state == CommonConstants.THREAD_STATUS_PARK) {
+            return ST_PARK;
         }
 
         return 0;

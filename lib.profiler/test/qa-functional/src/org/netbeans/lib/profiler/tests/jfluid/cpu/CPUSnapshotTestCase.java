@@ -120,7 +120,7 @@ public abstract class CPUSnapshotTestCase extends CommonProfilerTestCase {
             }
         }
 
-        public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }

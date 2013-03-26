@@ -852,6 +852,9 @@ public class Monitors implements CommonConstants {
                 case CommonConstants.THREAD_STATUS_WAIT:
                     System.err.println("Thread state change: "+thread.getName()+", Wait: "+timeStamp);
                     break;
+                case CommonConstants.THREAD_STATUS_PARK:
+                    System.err.println("Thread state change: "+thread.getName()+", Park: "+timeStamp);
+                    break;
                 case CommonConstants.THREAD_STATUS_SLEEPING:
                     System.err.println("Thread state change: "+thread.getName()+", Sleep: "+timeStamp);
                     break;

@@ -101,6 +101,7 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
     private boolean targetWindowRemains = false;
     private boolean threadCPUTimerOn = false;
     private boolean threadsMonitoringEnabled;
+    private boolean lockContentionMonitoringEnabled;
     private boolean threadsSamplingEnabled;
     private int allocStackTraceLimit = -5; // Negative number means full (unlimited) depth actually used, although the limit is preserved
     private int allocTrackEvery = 10;
@@ -417,6 +418,14 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
 
     public boolean isThreadsMonitoringEnabled() {
         return threadsMonitoringEnabled;
+    }
+    
+    public void setLockContentionMonitoringEnabled(boolean b) {
+        lockContentionMonitoringEnabled = b;
+    }
+
+    public boolean isLockContentionMonitoringEnabled() {
+        return lockContentionMonitoringEnabled;
     }
 
     public void setThreadsSamplingEnabled(boolean b) {

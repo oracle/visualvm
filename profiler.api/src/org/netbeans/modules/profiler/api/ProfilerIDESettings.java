@@ -126,6 +126,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final String TO_BEHAVIOR_KEY = "TO_BEHAVIOR"; // NOI18N
     private final String TRACK_EVERY_KEY = "TRACK_EVERY"; // NOI18N
     private final String TV_BEHAVIOR_KEY = "TV_BEHAVIOR"; // NOI18N
+    private final String LCV_BEHAVIOR_KEY = "LCV_BEHAVIOR"; // NOI18N
     
     // Defaults for tracked properties
     private final String CUSTOM_HEAPDUMP_PATH_DEFAULT = ""; // NOI18N
@@ -148,6 +149,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final int TO_BEHAVIOR_DEFAULT = OPEN_MONITORING;
     private final int TRACK_EVERY_DEFAULT = 10;
     private final int TV_BEHAVIOR_DEFAULT = OPEN_ALWAYS;
+    private final int LCV_BEHAVIOR_DEFAULT = OPEN_ALWAYS;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -485,6 +487,14 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
 
     public int getThreadsViewBehavior() {
         return getPreferences().getInt(TV_BEHAVIOR_KEY, TV_BEHAVIOR_DEFAULT);
+    }
+    
+    public void setLockContentionViewBehavior(final int value) {
+        getPreferences().putInt(LCV_BEHAVIOR_KEY, value);
+    }
+
+    public int getLockContentionViewBehavior() {
+        return getPreferences().getInt(LCV_BEHAVIOR_KEY, LCV_BEHAVIOR_DEFAULT);
     }
 
     public void setTrackEveryDefault(int value) {

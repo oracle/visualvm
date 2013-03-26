@@ -43,9 +43,6 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
-import org.netbeans.lib.profiler.results.cpu.cct.*;
-
-
 /**
  *
  * @author Jaroslav Bachorik
