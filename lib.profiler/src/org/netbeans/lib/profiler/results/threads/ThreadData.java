@@ -157,6 +157,8 @@ public class ThreadData {
                 return CommonConstants.THREAD_STATUS_MONITOR_COLOR;
             case CommonConstants.THREAD_STATUS_WAIT:
                 return CommonConstants.THREAD_STATUS_WAIT_COLOR;
+            case CommonConstants.THREAD_STATUS_PARK:
+                return CommonConstants.THREAD_STATUS_PARK_COLOR;
             default:
                 return CommonConstants.THREAD_STATUS_UNKNOWN_COLOR;
         }

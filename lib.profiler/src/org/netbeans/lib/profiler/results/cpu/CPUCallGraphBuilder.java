@@ -643,6 +643,69 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         batchNotEmpty = true;
     }
 
+    public void parkEntry(final int threadId, long timeStamp0, long timeStamp1) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
+            return;
+        }
+
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
+        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("ENTRY PARK: " + debugNode(curNode) // NOI18N
+                          + ", time: " + timeStamp0 // NOI18N
+                          + ", delta: " + (timeStamp0 - delta) // NOI18N
+                          + ", ti: " + ti // NOI18N
+                          );
+            delta = timeStamp0;
+            LOGGER.finest(dumpStack(ti));
+        }
+
+        long diff = timeStamp0 - ti.topMethodEntryTime0;
+
+        if (diff > 0) {
+            curNode.addNetTime0(diff);
+        } else {
+            timeStamp0 = ti.topMethodEntryTime0;
+        }
+
+        ti.topMethodEntryTime0 = timeStamp0;
+
+        curNode.setLastWaitOrSleepStamp(timeStamp0);
+        batchNotEmpty = true;
+    }
+
+    public void parkExit(final int threadId, final long timeStamp0, final long timeStamp1) {
+        if (!isReady() || (threadInfos.threadInfos == null)) {
+            return;
+        }
+
+        ThreadInfo ti = threadInfos.threadInfos[threadId];
+        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+
+        long lastWait = timeStamp0 - curNode.getLastWaitOrSleepStamp();
+        curNode.setLastWaitOrSleepStamp(0);
+        curNode.addWaitTime0(lastWait);
+
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("EXIT PARK: " + debugNode(curNode) // NOI18N
+                          + ", time: " + timeStamp0 // NOI18N
+                          + ", delta: " + (timeStamp0 - delta) // NOI18N
+                          + ", waited: " + lastWait // NOI18N
+                          + ", ti: " + ti // NOI18N
+                          );
+            delta = timeStamp0;
+            LOGGER.finest(dumpStack(ti));
+        }
+
+        // move start timer for current method, so that the time spent park is ignored
+        if ((timeStamp0 - ti.topMethodEntryTime0) > 0) {
+            ti.topMethodEntryTime0 = timeStamp0;
+        }
+
+        batchNotEmpty = true;
+    }
+
     /**
      * For each monitored thread, returns the current absolute and thread-local CPU time. Returned thread-local time
      * may be just -1, indicating that it can't be reliably calculated for the given thread (at this moment or at all).
