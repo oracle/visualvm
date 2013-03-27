@@ -25,7 +25,6 @@
 
 package com.sun.tools.visualvm.jvm;
 
-import com.sun.management.OperatingSystemMXBean;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
@@ -243,7 +242,7 @@ public class JmxSupport implements DataRemovedListener {
             TimerTask task = new TimerTask() {
                 public void run() {
                     try {
-                        MonitoredData data = new MonitoredDataImpl(jvm, JmxSupport.this, jmx);
+                        MonitoredData data = new MonitoredDataImpl(JmxSupport.this, jmx);
                         jvm.notifyListeners(data);
                     } catch (UndeclaredThrowableException e) {
                         LOGGER.throwing(JmxSupport.class.getName(), "MonitoredDataImpl<init>", e); // NOI18N

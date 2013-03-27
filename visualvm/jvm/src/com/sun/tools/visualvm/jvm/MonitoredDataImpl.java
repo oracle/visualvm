@@ -26,8 +26,6 @@
 package com.sun.tools.visualvm.jvm;
 
 
-import com.sun.management.OperatingSystemMXBean;
-import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
@@ -39,7 +37,6 @@ import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.Collection;
 import java.util.logging.Logger;
-import sun.jvmstat.monitor.LongMonitor;
 
 /**
  *
@@ -47,9 +44,8 @@ import sun.jvmstat.monitor.LongMonitor;
  */
 public class MonitoredDataImpl extends MonitoredData {
   private final static Logger LOGGER = Logger.getLogger(MonitoredDataImpl.class.getName());
-  final private Jvm jvm;
 
-  private MonitoredDataImpl(Jvm vm,JmxSupport jmxSupport) {
+  private MonitoredDataImpl(JmxSupport jmxSupport) {
     try {
         Collection<GarbageCollectorMXBean> gcList = jmxSupport.getGarbageCollectorMXBeans();
 
@@ -64,11 +60,10 @@ public class MonitoredDataImpl extends MonitoredData {
     } catch (Exception ex) {
         LOGGER.throwing(MonitoredDataImpl.class.getName(), "MonitoredDataImpl.<init>", ex); // NOI18N
     }
-    jvm = vm;
   }
   
-  MonitoredDataImpl(Jvm vm,JvmJvmstatModel jvmstatModel,JmxSupport jmxSupport) {
-    this(vm,jmxSupport);
+  MonitoredDataImpl(JvmJvmstatModel jvmstatModel,JmxSupport jmxSupport) {
+    this(jmxSupport);
     loadedClasses = jvmstatModel.getLoadedClasses();
     sharedLoadedClasses = jvmstatModel.getSharedLoadedClasses();
     sharedUnloadedClasses = jvmstatModel.getSharedUnloadedClasses();
@@ -84,8 +79,8 @@ public class MonitoredDataImpl extends MonitoredData {
     genMaxCapacity = jvmstatModel.getGenMaxCapacity();
   }
 
-  MonitoredDataImpl(Jvm vm,JmxSupport jmxSupport,JvmMXBeans jmxModel) {
-    this(vm,jmxSupport);
+  MonitoredDataImpl(JmxSupport jmxSupport,JvmMXBeans jmxModel) {
+    this(jmxSupport);
     RuntimeMXBean runtimeBean = jmxModel.getRuntimeMXBean();
     upTime = runtimeBean.getUptime();
     ClassLoadingMXBean classBean = jmxModel.getClassLoadingMXBean();
@@ -114,16 +109,4 @@ public class MonitoredDataImpl extends MonitoredData {
         genMaxCapacity[1] = perm.getMax();
     }
   }
-  
-  private long getLongValue(LongMonitor mon) {
-    if (mon!=null) {
-      return mon.longValue();
-    }
-    return 0;
-  }
-  
-  public Jvm getJVM() {
-    return jvm;
-  }
-
 }

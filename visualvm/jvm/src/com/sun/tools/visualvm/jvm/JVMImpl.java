@@ -433,11 +433,11 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     public MonitoredData getMonitoredData() {     
         if (application.getState() == Stateful.STATE_AVAILABLE) {
             if (monitoredVm != null) {
-                return new MonitoredDataImpl(this,jvmstatModel,jmxSupport);
+                return new MonitoredDataImpl(jvmstatModel,jmxSupport);
             } else if (jmxSupport != null) {
                 JvmMXBeans jmx = jmxSupport.getJvmMXBeans();
                 if (jmx != null) {
-                    return new MonitoredDataImpl(this,jmxSupport,jmx);
+                    return new MonitoredDataImpl(jmxSupport,jmx);
                 }
             }
         }
@@ -508,7 +508,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public void dataChanged(JvmstatModel stat) {
         assert stat == monitoredVm;
-        MonitoredData data = new MonitoredDataImpl(this,jvmstatModel,jmxSupport);
+        MonitoredData data = new MonitoredDataImpl(jvmstatModel,jmxSupport);
         notifyListeners(data);        
     }
 
