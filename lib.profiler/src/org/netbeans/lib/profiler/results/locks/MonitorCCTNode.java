@@ -90,6 +90,20 @@ class MonitorCCTNode extends LockCCTNode {
         return allCount;
     }
 
+    @Override
+    public int hashCode() {
+        return monitor.hashCode();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MonitorCCTNode) {
+            return monitor.equals(((MonitorCCTNode)obj).monitor);
+        }
+        return false;
+    }
+
     private void summarize() {
         for (MonitorInfo.ThreadDetail td : threads) {
             allTime += td.waitTime;

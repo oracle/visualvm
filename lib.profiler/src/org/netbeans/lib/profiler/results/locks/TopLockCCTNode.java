@@ -73,6 +73,16 @@ class TopLockCCTNode extends LockCCTNode {
     }
 
     @Override
+    public int hashCode() {
+        return TopLockCCTNode.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof TopLockCCTNode;
+    }
+
+    @Override
     public double getTimeInPerCent() {
         throw new UnsupportedOperationException("Not supported");  //NOI18N
     }

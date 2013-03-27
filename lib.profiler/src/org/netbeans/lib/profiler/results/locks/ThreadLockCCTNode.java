@@ -91,6 +91,19 @@ class ThreadLockCCTNode extends LockCCTNode {
         return allCount;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ThreadLockCCTNode) {
+            return ti.equals(((ThreadLockCCTNode)obj).ti);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return ti.hashCode();
+    }
+
     private void summarize() {
         for (ThreadInfo.Monitor m : monitors) {
             allTime += m.waitTime;
