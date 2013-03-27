@@ -75,7 +75,7 @@ public class JvmJvmstatModelProvider extends AbstractModelProvider<JvmJvmstatMod
                     // JVM 1.7
                     else if (javaVersion.startsWith("1.7.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
                     // JVM 1.8
-                    else if (javaVersion.startsWith("1.8.")) model = new JvmJvmstatModel_5(app,jvmstat); // NOI18N
+                    else if (javaVersion.startsWith("1.8.")) model = new JvmJvmstatModel_8(app,jvmstat); // NOI18N
                 }
                 if (model == null) { // still not recognized, fallback to  JvmJvmstatModel_5
                     LOGGER.log(Level.WARNING, "Unrecognized java.vm.version " + vmVersion); // NOI18N
