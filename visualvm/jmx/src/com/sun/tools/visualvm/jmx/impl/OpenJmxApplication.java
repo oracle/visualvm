@@ -24,7 +24,6 @@
  */
 package com.sun.tools.visualvm.jmx.impl;
 
-import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
 import java.util.Collections;
