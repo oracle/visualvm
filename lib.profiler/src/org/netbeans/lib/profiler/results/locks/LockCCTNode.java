@@ -104,7 +104,7 @@ public abstract class LockCCTNode implements CCTNode {
 
     void addChild(CCTNode child) {
         if (children == null) {
-            children = new ArrayList();
+            computeChildren();
         }
         children.add(child);
     }
@@ -125,6 +125,9 @@ public abstract class LockCCTNode implements CCTNode {
     public abstract long getTime();
 
     public abstract long getWaits();
+    
+    public boolean isThreadLockNode() { return false; }
+    public boolean isMonitorNode() { return false; }
 
     public void debug() {
         if (parent != null) {

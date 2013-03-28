@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,6 +24,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,93 +39,56 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.locks;
+package org.netbeans.lib.profiler.ui.locks;
 
-import java.util.Collections;
-import java.util.List;
-import org.netbeans.lib.profiler.results.CCTNode;
+import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.JTree;
+import org.netbeans.lib.profiler.results.locks.LockCCTNode;
+import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
- * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
-class ThreadLockCCTNode extends LockCCTNode {
-
-    private final ThreadInfo ti;
-    private final List<ThreadInfo.Monitor> monitors;
-    private long allTime;
-    private long allCount;
-
-    ThreadLockCCTNode(CCTNode parent, ThreadInfo key, List<ThreadInfo.Monitor> value) {
-        super(parent);
-        ti = key;
-        monitors = value;
-    }
-
-    ThreadLockCCTNode(MonitorCCTNode parent, MonitorInfo.ThreadDetail td) {
-        super(parent);
-        ti = td.threadInfo;
-        allTime = td.waitTime;
-        allCount = td.count;
-        monitors = Collections.EMPTY_LIST;
-    }
-
-    @Override
-    public String getNodeName() {
-        return ti.getName();
-    }
-
-    @Override
-    public long getTime() {
-        if (allTime == 0) {
-            summarize();
-        }
-        return allTime;
-    }
-
-    @Override
-    public long getWaits() {
-        if (allCount == 0) {
-            summarize();
-        }
-        return allCount;
+public class LockContentionTreeCellRenderer extends EnhancedTreeCellRenderer {
+    
+    protected String getLabel1Text(Object node, String value) {
+        LockCCTNode n = (LockCCTNode)node;
+        return n.getNodeName();
     }
     
-    @Override
-    public boolean isThreadLockNode() {
-        return true;
+    private Icon getIcon(Object node) {
+        LockCCTNode n = (LockCCTNode)node;
+        if (n.isThreadLockNode()) return Icons.getIcon(ProfilerIcons.THREAD);
+        else if (n.isMonitorNode()) return Icons.getIcon(ProfilerIcons.WINDOW_LOCKS);
+        return null;
+    }
+    
+    protected Icon getLeafIcon(Object value) {
+        return getIcon(value);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ThreadLockCCTNode) {
-            return ti.equals(((ThreadLockCCTNode)obj).ti);
-        }
-        return false;
+    protected Icon getOpenIcon(Object value) {
+        return getIcon(value);
     }
+    
+    protected Icon getClosedIcon(Object value) {
+        return getIcon(value);
+    }
+    
+    
+    public Component getTreeCellRendererComponentPersistent(JTree tree, Object value, boolean sel, boolean expanded,
+                                                            boolean leaf, int row, boolean hasFocus) {
+        LockContentionTreeCellRenderer renderer = new LockContentionTreeCellRenderer();
+//        renderer.setLeafIcon(leafIcon);
+//        renderer.setClosedIcon(closedIcon);
+//        renderer.setOpenIcon(openIcon);
 
-    @Override
-    public int hashCode() {
-        return ti.hashCode();
+        return renderer.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
     }
-
-    private void summarize() {
-        for (ThreadInfo.Monitor m : monitors) {
-            allTime += m.waitTime;
-            allCount += m.count;
-        }
-    }
-
-    @Override
-    void computeChildren() {
-        super.computeChildren();
-        for (ThreadInfo.Monitor m : monitors) {
-            addChild(new MonitorCCTNode(this, m));
-        }
-    }
+    
 }

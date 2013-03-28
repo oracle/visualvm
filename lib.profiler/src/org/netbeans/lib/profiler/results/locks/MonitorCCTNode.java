@@ -89,6 +89,11 @@ class MonitorCCTNode extends LockCCTNode {
         }
         return allCount;
     }
+    
+    @Override
+    public boolean isMonitorNode() {
+        return true;
+    }
 
     @Override
     public int hashCode() {
