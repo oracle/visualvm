@@ -29,13 +29,17 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
+import java.util.List;
 
 /**
  *
  * @author Tomas Hurka
  */
 class JvmJvmstatModel_8 extends JvmJvmstatModel {
-    private static final String PERM_GEN_PREFIX = "sun.gc.metaspace.";   // NOI18N
+    private static final String PERM_GEN_PREFIX_META = "sun.gc.metaspace.";   // NOI18N
+    private static final String PERM_GEN_PREFIX_PERM = "sun.gc.generation.2.";   // NOI18N
+    
+    private String permGenPrefix = PERM_GEN_PREFIX_PERM;
 
     JvmJvmstatModel_8(Application app,JvmstatModel stat) {
         super(app,stat);
@@ -56,12 +60,22 @@ class JvmJvmstatModel_8 extends JvmJvmstatModel {
       MonitoredValue osFrequencyMon = jvmstat.findMonitoredValueByName("sun.os.hrt.frequency"); // NOI18N
       osFrequency = getLongValue(osFrequencyMon);
       genCapacity = jvmstat.findMonitoredValueByPattern("sun.gc.((generation.[0-9]+)|(metaspace)).capacity");   // NOI18N
+      initPermGenPrefix(genCapacity);
       genUsed = jvmstat.findMonitoredValueByPattern("sun.gc.((generation.[0-9]+.space.[0-9]+)|(metaspace)).used");  // NOI18N
       genMaxCapacity=getGenerationSum(jvmstat.findMonitoredValueByPattern("sun.gc.((generation.[0-9]+)|(metaspace)).maxCapacity")); // NOI18N
     }
 
+    private void initPermGenPrefix(List<MonitoredValue> monitors) {
+        for (MonitoredValue m : monitors) {
+            if (m.getName().startsWith(PERM_GEN_PREFIX_META)) {
+                permGenPrefix = PERM_GEN_PREFIX_META;
+                break;
+            }
+        }
+    }
+    
     protected String getPermGenPrefix() {
-        return PERM_GEN_PREFIX;
+        return permGenPrefix;
     }
     
 }
