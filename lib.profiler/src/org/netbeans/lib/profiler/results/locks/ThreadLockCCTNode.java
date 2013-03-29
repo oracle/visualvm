@@ -43,7 +43,6 @@ package org.netbeans.lib.profiler.results.locks;
 
 import java.util.Collections;
 import java.util.List;
-import org.netbeans.lib.profiler.results.CCTNode;
 
 /**
  *
@@ -56,7 +55,7 @@ class ThreadLockCCTNode extends LockCCTNode {
     private long allTime;
     private long allCount;
 
-    ThreadLockCCTNode(CCTNode parent, ThreadInfo key, List<ThreadInfo.Monitor> value) {
+    ThreadLockCCTNode(LockCCTNode parent, ThreadInfo key, List<ThreadInfo.Monitor> value) {
         super(parent);
         ti = key;
         monitors = value;

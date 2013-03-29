@@ -44,6 +44,8 @@ package org.netbeans.lib.profiler.results.locks;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.netbeans.lib.profiler.results.CCTNode;
 
@@ -53,20 +55,24 @@ import org.netbeans.lib.profiler.results.CCTNode;
  * @author Jiri Sedlacek
  */
 public abstract class LockCCTNode implements CCTNode {
+    
+    public static final int SORT_BY_NAME = 1;
+    public static final int SORT_BY_TIME = 2;
+    public static final int SORT_BY_WAITS = 3;
 
-    private List<CCTNode> children;
-    private final CCTNode parent;
+    private List<LockCCTNode> children;
+    private final LockCCTNode parent;
 
     public LockCCTNode() { // temporary - only for testing
         parent = null;
     }
 
-    LockCCTNode(CCTNode p) {
+    LockCCTNode(LockCCTNode p) {
         parent = p;
     }
 
     @Override
-    public CCTNode getChild(int index) {
+    public LockCCTNode getChild(int index) {
         if (children == null) {
             computeChildren();
         }
@@ -74,11 +80,11 @@ public abstract class LockCCTNode implements CCTNode {
     }
 
     @Override
-    public CCTNode[] getChildren() {
+    public LockCCTNode[] getChildren() {
         if (children == null) {
             computeChildren();
         }
-        return children.toArray(new CCTNode[children.size()]);
+        return children.toArray(new LockCCTNode[children.size()]);
     }
 
     @Override
@@ -98,11 +104,11 @@ public abstract class LockCCTNode implements CCTNode {
     }
 
     @Override
-    public CCTNode getParent() {
+    public LockCCTNode getParent() {
         return parent;
     }
 
-    void addChild(CCTNode child) {
+    void addChild(LockCCTNode child) {
         if (children == null) {
             computeChildren();
         }
@@ -114,8 +120,7 @@ public abstract class LockCCTNode implements CCTNode {
     }
 
     public double getTimeInPerCent() {
-        LockCCTNode p = (LockCCTNode) getParent();
-        long allTime = p.getTime();
+        long allTime = getParent().getTime();
         long time = getTime();
         return 100.0 * time / allTime;
     }
@@ -128,6 +133,64 @@ public abstract class LockCCTNode implements CCTNode {
     
     public boolean isThreadLockNode() { return false; }
     public boolean isMonitorNode() { return false; }
+    
+    
+    public void sortChildren(int sortBy, boolean sortOrder) {
+        if (children == null || getNChildren() < 2) return;
+        doSortChildren(sortBy, sortOrder);
+    }
+    
+    protected void doSortChildren(int sortBy, boolean sortOrder) {
+        switch (sortBy) {
+            case SORT_BY_NAME:
+                sortChildrenByName(sortOrder);
+                break;
+            case SORT_BY_TIME:
+                sortChildrenByTime(sortOrder);
+                break;
+            case SORT_BY_WAITS:
+                sortChildrenByWaits(sortOrder);
+                break;
+        }
+        
+//        boolean main = getNodeName().startsWith("main");
+//        if (main) System.err.println(">>> SORTING MAIN " + System.identityHashCode(this));
+        for (LockCCTNode child : children) {
+            child.sortChildren(sortBy, sortOrder);
+//            if (main) System.err.println(">>>      Sorting child " + child.getNodeName());
+        }
+    }
+
+    protected void sortChildrenByName(final boolean sortOrder) {
+        Collections.sort(children, new Comparator<LockCCTNode>() {
+            public int compare(LockCCTNode n1, LockCCTNode n2) {
+                return sortOrder ?
+                       n1.getNodeName().toLowerCase().compareTo(n2.getNodeName().toLowerCase()) :
+                       n2.getNodeName().toLowerCase().compareTo(n1.getNodeName().toLowerCase());
+            }
+        });
+    }
+
+    protected void sortChildrenByTime(final boolean sortOrder) {
+        Collections.sort(children, new Comparator<LockCCTNode>() {
+            public int compare(LockCCTNode n1, LockCCTNode n2) {
+                return sortOrder ?
+                       (int)(n1.getTime() - n2.getTime()) :
+                       (int)(n2.getTime() - n1.getTime());
+            }
+        });
+    }
+    
+    protected void sortChildrenByWaits(final boolean sortOrder) {
+        Collections.sort(children, new Comparator<LockCCTNode>() {
+            public int compare(LockCCTNode n1, LockCCTNode n2) {
+                return sortOrder ?
+                       (int)(n1.getWaits() - n2.getWaits()) :
+                       (int)(n2.getWaits() - n1.getWaits());
+            }
+        });
+    }
+    
 
     public void debug() {
         if (parent != null) {
