@@ -42,20 +42,108 @@
  */
 package org.netbeans.lib.profiler.results.locks;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import org.netbeans.lib.profiler.results.CCTNode;
 
 /**
  *
+ * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
 public abstract class LockCCTNode implements CCTNode {
-        
+
+    private List<CCTNode> children;
+    private final CCTNode parent;
+
+    public LockCCTNode() { // temporary - only for testing
+        parent = null;
+    }
+
+    LockCCTNode(CCTNode p) {
+        parent = p;
+    }
+
+    @Override
+    public CCTNode getChild(int index) {
+        if (children == null) {
+            computeChildren();
+        }
+        return children.get(index);
+    }
+
+    @Override
+    public CCTNode[] getChildren() {
+        if (children == null) {
+            computeChildren();
+        }
+        return children.toArray(new CCTNode[children.size()]);
+    }
+
+    @Override
+    public int getIndexOfChild(Object child) {
+        if (children == null) {
+            computeChildren();
+        }
+        return children.indexOf(child);
+    }
+
+    @Override
+    public int getNChildren() {
+        if (children == null) {
+            computeChildren();
+        }
+        return children.size();
+    }
+
+    @Override
+    public CCTNode getParent() {
+        return parent;
+    }
+
+    void addChild(CCTNode child) {
+        if (children == null) {
+            computeChildren();
+        }
+        children.add(child);
+    }
+
+    void computeChildren() {
+        children = new ArrayList();
+    }
+
+    public double getTimeInPerCent() {
+        LockCCTNode p = (LockCCTNode) getParent();
+        long allTime = p.getTime();
+        long time = getTime();
+        return 100.0 * time / allTime;
+    }
+
     public abstract String getNodeName();
 
     public abstract long getTime();
 
-    public abstract float getTimeInPerCent();
-
-    public abstract int getWaits();
+    public abstract long getWaits();
     
+    public boolean isThreadLockNode() { return false; }
+    public boolean isMonitorNode() { return false; }
+
+    public void debug() {
+        if (parent != null) {
+            String offset = "";
+            for (CCTNode p = parent; p != null; p = p.getParent()) {
+                offset += "  ";
+            }
+            System.out.println(offset + getNodeName() + 
+                    " Waits: " + getWaits() + 
+                    " Time: " + getTime() + 
+                    " " + NumberFormat.getPercentInstance().format(getTimeInPerCent()/100));
+        }
+        for (CCTNode ch : getChildren()) {
+            if (ch instanceof LockCCTNode) {
+                ((LockCCTNode) ch).debug();
+            }
+        }
+    }
 }
