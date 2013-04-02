@@ -307,8 +307,8 @@ public class LockContentionPanel extends ResultsPanel {
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
             if (!empty && appRootNode instanceof LockRuntimeCCTNode) {
                 root = (LockRuntimeCCTNode)appRootNode;
+                prepareResults();
             }
-            prepareResults();
         }
 
         @Override
@@ -388,9 +388,9 @@ public class LockContentionPanel extends ResultsPanel {
                 } else if (MODE_MONITORS.equals(mode)) {
                     newRoot = root.getMonitors();
                 }
-                realTreeTableModel.setRoot(newRoot);
-                treeTableModel.sortByColumn(sortingColumn, sortingOrder);
-                treeTable.updateTreeTable();
+                
+                newRoot.sortChildren(getSortBy(sortingColumn), sortingOrder);
+                treeTable.changeRoot(newRoot);
             }
         });
     }
@@ -641,24 +641,25 @@ public class LockContentionPanel extends ResultsPanel {
             sortingOrder = order;
 
             LockCCTNode _root = (LockCCTNode)root;
-
-            switch (column) {
-                case 0:
-                    _root.sortChildren(LockCCTNode.SORT_BY_NAME, order);
-                    break;
-                case 1:
-                    _root.sortChildren(LockCCTNode.SORT_BY_TIME, order);
-                    break;
-                case 2:
-                    _root.sortChildren(LockCCTNode.SORT_BY_TIME, order);
-                    break;
-                case 3:
-                    _root.sortChildren(LockCCTNode.SORT_BY_WAITS, order);
-                    break;
-            }
+            _root.sortChildren(getSortBy(column), order);
         }
     }
     
+    
+    private int getSortBy(int column) {
+        switch (column) {
+            case 0:
+                return LockCCTNode.SORT_BY_NAME;
+            case 1:
+                return LockCCTNode.SORT_BY_TIME;
+            case 2:
+                return LockCCTNode.SORT_BY_TIME;
+            case 3:
+                return LockCCTNode.SORT_BY_WAITS;
+            default:
+                return -1;
+        }
+    }
     
     private JPopupMenu createTablePopup() {
         JPopupMenu popup = new JPopupMenu();

@@ -62,6 +62,9 @@ public abstract class LockCCTNode implements CCTNode {
 
     private List<LockCCTNode> children;
     private final LockCCTNode parent;
+    
+    private int sortBy;
+    private boolean sortOrder;
 
     public LockCCTNode() { // temporary - only for testing
         parent = null;
@@ -74,7 +77,7 @@ public abstract class LockCCTNode implements CCTNode {
     @Override
     public LockCCTNode getChild(int index) {
         if (children == null) {
-            computeChildren();
+            computeChildrenImpl();
         }
         return children.get(index);
     }
@@ -82,7 +85,7 @@ public abstract class LockCCTNode implements CCTNode {
     @Override
     public LockCCTNode[] getChildren() {
         if (children == null) {
-            computeChildren();
+            computeChildrenImpl();
         }
         return children.toArray(new LockCCTNode[children.size()]);
     }
@@ -90,7 +93,7 @@ public abstract class LockCCTNode implements CCTNode {
     @Override
     public int getIndexOfChild(Object child) {
         if (children == null) {
-            computeChildren();
+            computeChildrenImpl();
         }
         return children.indexOf(child);
     }
@@ -98,7 +101,7 @@ public abstract class LockCCTNode implements CCTNode {
     @Override
     public int getNChildren() {
         if (children == null) {
-            computeChildren();
+            computeChildrenImpl();
         }
         return children.size();
     }
@@ -110,13 +113,18 @@ public abstract class LockCCTNode implements CCTNode {
 
     void addChild(LockCCTNode child) {
         if (children == null) {
-            computeChildren();
+            computeChildrenImpl();
         }
         children.add(child);
     }
 
     void computeChildren() {
         children = new ArrayList();
+    }
+    
+    private void computeChildrenImpl() {
+        computeChildren();
+        sortChildren(sortBy, sortOrder);
     }
 
     public double getTimeInPerCent() {
@@ -136,7 +144,11 @@ public abstract class LockCCTNode implements CCTNode {
     
     
     public void sortChildren(int sortBy, boolean sortOrder) {
+        this.sortBy = sortBy;
+        this.sortOrder = sortOrder;
+        
         if (children == null || getNChildren() < 2) return;
+        
         doSortChildren(sortBy, sortOrder);
     }
     
@@ -153,12 +165,7 @@ public abstract class LockCCTNode implements CCTNode {
                 break;
         }
         
-//        boolean main = getNodeName().startsWith("main");
-//        if (main) System.err.println(">>> SORTING MAIN " + System.identityHashCode(this));
-        for (LockCCTNode child : children) {
-            child.sortChildren(sortBy, sortOrder);
-//            if (main) System.err.println(">>>      Sorting child " + child.getNodeName());
-        }
+        for (LockCCTNode child : children) child.sortChildren(sortBy, sortOrder);
     }
 
     protected void sortChildrenByName(final boolean sortOrder) {
@@ -174,9 +181,9 @@ public abstract class LockCCTNode implements CCTNode {
     protected void sortChildrenByTime(final boolean sortOrder) {
         Collections.sort(children, new Comparator<LockCCTNode>() {
             public int compare(LockCCTNode n1, LockCCTNode n2) {
-                return sortOrder ?
-                       (int)(n1.getTime() - n2.getTime()) :
-                       (int)(n2.getTime() - n1.getTime());
+                long result = sortOrder ? n1.getTime() - n2.getTime() :
+                                          n2.getTime() - n1.getTime();
+                return result == 0 ? 0 : (result > 0 ? 1 : -1);
             }
         });
     }
@@ -184,9 +191,9 @@ public abstract class LockCCTNode implements CCTNode {
     protected void sortChildrenByWaits(final boolean sortOrder) {
         Collections.sort(children, new Comparator<LockCCTNode>() {
             public int compare(LockCCTNode n1, LockCCTNode n2) {
-                return sortOrder ?
-                       (int)(n1.getWaits() - n2.getWaits()) :
-                       (int)(n2.getWaits() - n1.getWaits());
+                long result = sortOrder ? n1.getWaits() - n2.getWaits() :
+                                          n2.getWaits() - n1.getWaits();
+                return result == 0 ? 0 : (result > 0 ? 1 : -1);
             }
         });
     }
