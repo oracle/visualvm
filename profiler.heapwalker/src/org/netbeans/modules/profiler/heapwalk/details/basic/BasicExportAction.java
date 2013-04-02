@@ -165,8 +165,7 @@ public final class BasicExportAction extends AbstractAction {
             fileChooser.addChoosableFileFilter(new FileFilterImpl(FILE_EXTENSION_CSV));
         }
         if (exportProvider.hasText()) {
-            fileChooser.addChoosableFileFilter(new FileFilterImpl(FILE_EXTENSION_TXT) {
-            });
+            fileChooser.addChoosableFileFilter(new FileFilterImpl(FILE_EXTENSION_TXT));
         }
     }
 
