@@ -40,56 +40,55 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.lib.profiler.ui.locks;
 
-package org.netbeans.lib.profiler.results.cpu;
-
-import org.netbeans.lib.profiler.results.ProfilingResultListener;
-
+import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.JTree;
+import org.netbeans.lib.profiler.results.locks.LockCCTNode;
+import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-public interface CPUProfilingResultListener extends ProfilingResultListener {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+public class LockContentionTreeCellRenderer extends EnhancedTreeCellRenderer {
+    
+    protected String getLabel1Text(Object node, String value) {
+        LockCCTNode n = (LockCCTNode)node;
+        return n.getNodeName();
+    }
+    
+    private Icon getIcon(Object node) {
+        LockCCTNode n = (LockCCTNode)node;
+        if (n.isThreadLockNode()) return Icons.getIcon(ProfilerIcons.THREAD);
+        else if (n.isMonitorNode()) return Icons.getIcon(ProfilerIcons.WINDOW_LOCKS);
+        return null;
+    }
+    
+    protected Icon getLeafIcon(Object value) {
+        return getIcon(value);
+    }
 
-    static final int METHODTYPE_NORMAL = 1;
-    static final int METHODTYPE_ROOT = 2;
-    static final int METHODTYPE_MARKER = 3;
+    protected Icon getOpenIcon(Object value) {
+        return getIcon(value);
+    }
+    
+    protected Icon getClosedIcon(Object value) {
+        return getIcon(value);
+    }
+    
+    
+    public Component getTreeCellRendererComponentPersistent(JTree tree, Object value, boolean sel, boolean expanded,
+                                                            boolean leaf, int row, boolean hasFocus) {
+        LockContentionTreeCellRenderer renderer = new LockContentionTreeCellRenderer();
+//        renderer.setLeafIcon(leafIcon);
+//        renderer.setClosedIcon(closedIcon);
+//        renderer.setOpenIcon(openIcon);
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    void methodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1);
-
-    void methodEntryUnstamped(final int methodId, final int threadId, final int methodType);
-
-    void methodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1);
-
-    void methodExitUnstamped(final int methodId, final int threadId, final int methodType);
-
-    void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId);
-
-    void monitorExit(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId);
-
-    void newThread(final int threadId, final String threadName, final String threadClassName);
-
-    void servletRequest(final int threadId, final int requestType, final String servletPath, final int sessionId);
-
-    void sleepEntry(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void sleepExit(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void threadsResume(final long timeStamp0, final long timeStamp1);
-
-    void threadsSuspend(final long timeStamp0, final long timeStamp1);
-
-    void timeAdjust(final int threadId, final long timeDiff0, final long timeDiff1);
-
-    void waitEntry(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void waitExit(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void parkEntry(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void parkExit(final int threadId, final long timeStamp0, final long timeStamp1);
+        return renderer.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+    }
+    
 }
