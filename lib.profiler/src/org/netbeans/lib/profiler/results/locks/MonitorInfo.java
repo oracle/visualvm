@@ -53,6 +53,7 @@ import java.util.Map;
 class MonitorInfo {
 
     final private int monitorId;
+    private String className;
     private OpenThread openThread;
     private Map<ThreadInfo, ThreadDetail> threads;
 
@@ -60,8 +61,17 @@ class MonitorInfo {
         monitorId = id;
         threads = new HashMap();
     }
+    
+    MonitorInfo(int id, String cname) {
+        this(id);
+        className = cname;
+    }
 
-    @Override
+    void setClassName(String cname) {
+        className = cname;
+    }
+    
+   @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -115,7 +125,7 @@ class MonitorInfo {
     }
 
     String getName() {
-        return Integer.toHexString(monitorId);
+        return new StringBuffer(className).append('#').append(Integer.toHexString(monitorId)).toString();
     }
 
     private static class OpenThread {

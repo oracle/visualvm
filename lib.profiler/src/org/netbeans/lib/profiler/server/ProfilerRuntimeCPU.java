@@ -46,6 +46,8 @@ package org.netbeans.lib.profiler.server;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.server.system.Timers;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -80,6 +82,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     
     // ---------------------------------- Profile Data Acquisition --------------------------------------
     protected static boolean[] instrMethodInvoked;
+    private static Set knownMonitors;
     private static boolean javaLangReflectMethodInvokeInterceptEnabled = false;
     private static Method getRequestedSessionIdMethod;
     private static Method getMethodMethod;
@@ -218,6 +221,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     protected static void clearDataStructures() {
         ProfilerRuntime.clearDataStructures();
         nProfiledThreadsAllowed = nProfiledThreadsLimit;
+        knownMonitors = new HashSet();
     }
 
     protected static void copyLocalBuffer(ThreadInfo ti) {
@@ -576,6 +580,8 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     }
     
     static long writeWaitTimeEvent(byte eventType, ThreadInfo ti, Object id) {
+        int hash = writeNewMonitorEvent(ti,id);
+        
         // if (printEvents) System.out.println("*** Writing event " + eventType + ", metodId = " + (int)methodId);
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
@@ -607,7 +613,6 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         evBuf[curPos++] = (byte) ((absTimeStamp >> 8) & 0xFF);
         evBuf[curPos++] = (byte) ((absTimeStamp) & 0xFF);
         if (id != null) {
-            int hash = System.identityHashCode(id);
             evBuf[curPos++] = (byte) ((hash >> 24) & 0xFF);
             evBuf[curPos++] = (byte) ((hash >> 16) & 0xFF);
             evBuf[curPos++] = (byte) ((hash >> 8) & 0xFF);
@@ -618,6 +623,40 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         return absTimeStamp;
     }
 
+    private static int writeNewMonitorEvent(ThreadInfo ti, Object id) {
+        if (id == null) return -1;
+        int hash = System.identityHashCode(id);
+        Integer hashInt = new Integer(hash);
+        if (knownMonitors == null) {
+            knownMonitors = new HashSet();
+        }
+        if (!knownMonitors.contains(hashInt)) {
+            knownMonitors.add(hashInt);
+            int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
+
+            if (curPos > ThreadInfo.evBufPosThreshold) {
+                copyLocalBuffer(ti);
+                curPos = ti.evBufPos;
+            }
+
+            byte[] evBuf = ti.evBuf;
+            evBuf[curPos++] = NEW_MONITOR;
+            evBuf[curPos++] = (byte) ((hash >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash) & 0xFF);            
+
+            byte[] name = id.getClass().getName().getBytes();
+            int len = name.length;
+            evBuf[curPos++] = (byte) ((len >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((len) & 0xFF);
+            System.arraycopy(name, 0, evBuf, curPos, len);
+            curPos += len;
+            ti.evBufPos = curPos;
+        }
+        return hash;
+    }
+    
     private static void servletDoMethodHook(ThreadInfo ti, Object request) {
         String servletPath = null;
         String method = null;

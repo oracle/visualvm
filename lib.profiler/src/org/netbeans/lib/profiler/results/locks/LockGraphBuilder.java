@@ -141,7 +141,9 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (ti == null) {
             return;
         }
-        LOG.log(Level.FINEST, "Monitor entry thread id = {0}, id = {1}", new Object[]{threadId, Integer.toHexString(monitorId)});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Monitor entry thread id = {0}, id = {1}", new Object[]{threadId, Integer.toHexString(monitorId)});
+        }
         MonitorInfo m = getMonitorInfo(monitorId);
         ti.openMonitor(m, timeStamp0);
     }
@@ -153,7 +155,9 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (ti == null) {
             return;
         }
-        LOG.log(Level.FINEST, "Monitor exit thread id = {0}, id = {1}", new Object[]{threadId, Integer.toHexString(monitorId)});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Monitor exit thread id = {0}, id = {1}", new Object[]{threadId, Integer.toHexString(monitorId)});
+        }
         MonitorInfo m = getMonitorInfo(monitorId);
         ti.closeMonitor(m, timeStamp0);
         batchNotEmpty = true;
@@ -164,9 +168,20 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (!isReady()) {
             return;
         }
-
-        LOG.log(Level.FINEST, "New thread creation for thread id = {0}, name = {1}", new Object[]{threadId, threadName});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "New thread creation for thread id = {0}, name = {1}", new Object[]{threadId, threadName});
+        }
         threadInfos.newThreadInfo(threadId, threadName, threadClassName);
+    }
+
+    public void newMonitor(int hash, String className) {
+        if (!isReady()) {
+            return;
+        }
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "New monitor creation, mId = {0}, className = {1}", new Object[]{hash, className});
+        }
+        registerNewMonitor(hash,className);
     }
 
     @Override
@@ -275,5 +290,16 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
             monitorInfos.put(mid, mi);
         }
         return mi;
+    }
+
+    private void registerNewMonitor(int monitorId, String className) {
+        Integer mid = new Integer(monitorId);
+        MonitorInfo mi = monitorInfos.get(mid);
+        if (mi == null) {
+            mi = new MonitorInfo(monitorId,className);
+            monitorInfos.put(mid, mi);        
+        } else {
+            mi.setClassName(className);
+        }
     }
 }

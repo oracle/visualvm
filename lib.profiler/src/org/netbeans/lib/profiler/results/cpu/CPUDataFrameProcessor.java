@@ -85,7 +85,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
 
                 if (!((eventType == CommonConstants.BUFFEREVENT_PROFILEPOINT_HIT) || (eventType == CommonConstants.SERVLET_DO_METHOD)
                         || (eventType == CommonConstants.SET_FOLLOWING_EVENTS_THREAD) || (eventType == CommonConstants.NEW_THREAD)
-                        || (eventType == CommonConstants.RESET_COLLECTORS))) {
+                        || (eventType == CommonConstants.RESET_COLLECTORS) || (eventType == CommonConstants.NEW_MONITOR))) {
                     int methodId = -1;
                     long timeStamp0 = 0;
                     long timeStamp1 = 0;
@@ -382,6 +382,22 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
 
                             break;
                         }
+                        case CommonConstants.NEW_MONITOR: {
+                            int hash = (((int) buffer[position++] & 0xFF) << 24) 
+                                 | (((int) buffer[position++] & 0xFF) << 16)
+                                 | (((int) buffer[position++] & 0xFF) << 8) 
+                                 | ((int) buffer[position++] & 0xFF);
+                            int strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
+                            String className = new String(buffer, position, strLen);
+                            position += strLen;
+
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Creating new monitor , mId={0} , className={1}", new Object[] {hash, className}); // NOI18N
+                            }
+
+                            fireNewMonitor(hash, className);
+                            break;
+                        }
                         case CommonConstants.SERVLET_DO_METHOD: {
                             if (LOGGER.isLoggable(Level.FINEST)) {
                                 LOGGER.log(Level.FINEST, "Servlet track start , tId={0}", currentThreadId); // NOI18N
@@ -490,6 +506,14 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
                     ((CPUProfilingResultListener) listener).newThread(threadId, threadName, threadClassName);
+                }
+            });
+    }
+
+    private void fireNewMonitor(final int hash, final String className) {
+        foreachListener(new ListenerFunctor() {
+                public void execute(ProfilingResultListener listener) {
+                    ((CPUProfilingResultListener) listener).newMonitor(hash, className);
                 }
             });
     }

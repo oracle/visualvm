@@ -73,6 +73,8 @@ public interface CPUProfilingResultListener extends ProfilingResultListener {
 
     void newThread(final int threadId, final String threadName, final String threadClassName);
 
+    void newMonitor(final int hash, final String className);
+
     void servletRequest(final int threadId, final int requestType, final String servletPath, final int sessionId);
 
     void sleepEntry(final int threadId, final long timeStamp0, final long timeStamp1);
