@@ -113,7 +113,7 @@ public abstract class LockCCTNode implements CCTNode {
 
     void addChild(LockCCTNode child) {
         if (children == null) {
-            computeChildrenImpl();
+            children = new ArrayList();
         }
         children.add(child);
     }
