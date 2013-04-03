@@ -58,7 +58,47 @@ public class LockContentionTreeCellRenderer extends EnhancedTreeCellRenderer {
     
     protected String getLabel1Text(Object node, String value) {
         LockCCTNode n = (LockCCTNode)node;
-        return n.getNodeName();
+        String name = n.getNodeName();
+        if (n.isThreadLockNode()) return n.getParent().getParent() == null ? "" : name; // NOI18N
+        
+        int bracketIndex = name.indexOf('('); // NOI18N
+        int dotIndex = name.lastIndexOf('.'); // NOI18N
+
+        if ((dotIndex == -1) && (bracketIndex == -1)) return name;
+
+        if (bracketIndex != -1) {
+            name = name.substring(0, bracketIndex);
+            dotIndex = name.lastIndexOf('.'); // NOI18N
+        }
+
+        return name.substring(0, dotIndex + 1);
+    }
+
+    protected String getLabel2Text(Object node, String value) {
+        LockCCTNode n = (LockCCTNode)node;
+        String name = n.getNodeName();
+        if (n.isThreadLockNode()) return n.getParent().getParent() == null ? name : ""; // NOI18N
+        
+        int bracketIndex = name.indexOf('('); // NOI18N
+        int dotIndex = name.lastIndexOf('.'); // NOI18N
+
+        if ((dotIndex == -1) && (bracketIndex == -1)) return ""; // NOI18N
+
+        if (bracketIndex != -1) {
+            name = name.substring(0, bracketIndex);
+            dotIndex = name.lastIndexOf('.'); // NOI18N
+        }
+
+        return name.substring(dotIndex + 1);
+    }
+
+    protected String getLabel3Text(Object node, String value) {
+        LockCCTNode n = (LockCCTNode)node;
+        if (n.isThreadLockNode()) return ""; // NOI18N
+        
+        String name = n.getNodeName();
+        int bracketIndex = name.indexOf('('); // NOI18N
+        return bracketIndex != -1 ? " " + name.substring(bracketIndex) : ""; // NOI18N
     }
     
     private Icon getIcon(Object node) {

@@ -125,7 +125,7 @@ class MonitorInfo {
     }
 
     String getName() {
-        return new StringBuffer(className).append('#').append(Integer.toHexString(monitorId)).toString();
+        return new StringBuffer(className).append('(').append(Integer.toHexString(monitorId)).append(')').toString(); // NOI18N
     }
 
     private static class OpenThread {

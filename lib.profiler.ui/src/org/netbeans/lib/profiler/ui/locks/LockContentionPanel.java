@@ -410,7 +410,7 @@ public class LockContentionPanel extends ResultsPanel {
             assert cctProvider != null;
             cctProvider.addListener(cctListener);
         } else {
-            treeTableModel.setRoot(EMPTY_ROOT);
+            treeTableModel.setRoot(LockCCTNode.EMPTY);
             treeTable.clearSelection();
             treeTable.updateTreeTable();
         }
@@ -567,22 +567,10 @@ public class LockContentionPanel extends ResultsPanel {
     }
     
     
-    private static final LockCCTNode EMPTY_ROOT = new LockCCTNode() {
-        public LockCCTNode getChild(int index) { return null; }
-        public LockCCTNode[] getChildren() { return new LockCCTNode[0]; }
-        public int getIndexOfChild(Object child) { return -1; }
-        public int getNChildren() { return 0; }
-        public LockCCTNode getParent() { return null; }
-        public String getNodeName() { return "invisible root"; }
-        public long getTime() { return 0; }
-        public double getTimeInPerCent() { return 0; }
-        public long getWaits() { return 0; }
-    };
-    
     private class LocksTreeTableModel extends AbstractTreeTableModel {
         
         private LocksTreeTableModel() {
-            super(EMPTY_ROOT, true, sortingColumn, sortingOrder);
+            super(LockCCTNode.EMPTY, true, sortingColumn, sortingOrder);
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {

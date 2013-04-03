@@ -59,16 +59,23 @@ public abstract class LockCCTNode implements CCTNode {
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_TIME = 2;
     public static final int SORT_BY_WAITS = 3;
+    
+    public static final LockCCTNode EMPTY = new LockCCTNode(null) {
+        public LockCCTNode getChild(int index) { return null; }
+        public LockCCTNode[] getChildren() { return new LockCCTNode[0]; }
+        public int getIndexOfChild(Object child) { return -1; }
+        public int getNChildren() { return 0; }
+        public String getNodeName() { return ""; } // NOI18N
+        public long getTime() { return 0; }
+        public double getTimeInPerCent() { return 0; }
+        public long getWaits() { return 0; }
+    };
 
     private List<LockCCTNode> children;
     private final LockCCTNode parent;
     
     private int sortBy;
     private boolean sortOrder;
-
-    public LockCCTNode() { // temporary - only for testing
-        parent = null;
-    }
 
     LockCCTNode(LockCCTNode p) {
         parent = p;
