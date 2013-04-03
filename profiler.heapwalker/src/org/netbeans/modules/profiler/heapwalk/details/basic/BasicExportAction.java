@@ -214,10 +214,12 @@ public final class BasicExportAction extends AbstractAction {
         // 2. process both cases and extract file name and extension to use and set exported file type
         File file = chooser.getSelectedFile();
         String targetExt = null;
-        if (chooser.getFileFilter().getDescription().equals(Bundle.BasicExportAction_ExportDialogCSVFilter())) {
+        FileFilter selectedFileFilter = chooser.getFileFilter();
+        if (selectedFileFilter==null  // workaround for #227659
+                ||  selectedFileFilter.getDescription().equals(Bundle.BasicExportAction_ExportDialogCSVFilter())) {
             targetExt=FILE_EXTENSION_CSV;
             exportedFileType=MODE_CSV;
-        } else if (chooser.getFileFilter().getDescription().equals(Bundle.BasicExportAction_ExportDialogTXTFilter())) {
+        } else if (selectedFileFilter.getDescription().equals(Bundle.BasicExportAction_ExportDialogTXTFilter())) {
             targetExt=FILE_EXTENSION_TXT;
             exportedFileType=MODE_TXT;
         }
