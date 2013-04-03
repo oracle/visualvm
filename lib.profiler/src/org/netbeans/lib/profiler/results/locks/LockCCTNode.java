@@ -128,9 +128,11 @@ public abstract class LockCCTNode implements CCTNode {
     }
 
     public double getTimeInPerCent() {
-        long allTime = getParent().getTime();
+        LockCCTNode p = getParent();
+        long allTime = p.getTime();
+        double ppercent = p.getTimeInPerCent();
         long time = getTime();
-        return 100.0 * time / allTime;
+        return ppercent * time / allTime;
     }
 
     public abstract String getNodeName();

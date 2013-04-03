@@ -84,7 +84,7 @@ class TopLockCCTNode extends LockCCTNode {
 
     @Override
     public double getTimeInPerCent() {
-        throw new UnsupportedOperationException("Not supported");  //NOI18N
+        return 100;
     }
 
     @Override
