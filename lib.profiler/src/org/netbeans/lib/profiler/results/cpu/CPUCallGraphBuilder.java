@@ -433,7 +433,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             LOGGER.finest("ENTRY SLEEP: " + debugNode(curNode) // NOI18N
                           + ", time: " + timeStamp0 // NOI18N
                           + ", delta: " + (timeStamp0 - delta) // NOI18N
-                          + ", ti: " + ti // NOI18N
+                          + ", tid: " + ti.threadId // NOI18N
                           );
             delta = timeStamp0;
         }
@@ -467,7 +467,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                           + ", time: " + timeStamp0 // NOI18N
                           + ", delta: " + (timeStamp0 - delta) // NOI18N
                           + ", slept: " + lastSleep // NOI18N
-                          + ", ti: " + ti // NOI18N
+                          + ", tid: " + ti.threadId // NOI18N
                           );
             delta = timeStamp0;
             lastSleep = 0;
@@ -602,7 +602,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             LOGGER.finest("ENTRY WAIT: " + debugNode(curNode) // NOI18N
                           + ", time: " + timeStamp0 // NOI18N
                           + ", delta: " + (timeStamp0 - delta) // NOI18N
-                          + ", ti: " + ti // NOI18N
+                          + ", tid: " + ti.threadId // NOI18N
                           );
             delta = timeStamp0;
             LOGGER.finest(dumpStack(ti));
@@ -639,7 +639,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                           + ", time: " + timeStamp0 // NOI18N
                           + ", delta: " + (timeStamp0 - delta) // NOI18N
                           + ", waited: " + lastWait // NOI18N
-                          + ", ti: " + ti // NOI18N
+                          + ", tid: " + ti.threadId // NOI18N
                           );
             delta = timeStamp0;
             LOGGER.finest(dumpStack(ti));
@@ -665,7 +665,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             LOGGER.finest("ENTRY PARK: " + debugNode(curNode) // NOI18N
                           + ", time: " + timeStamp0 // NOI18N
                           + ", delta: " + (timeStamp0 - delta) // NOI18N
-                          + ", ti: " + ti // NOI18N
+                          + ", tid: " + ti.threadId // NOI18N
                           );
             delta = timeStamp0;
             LOGGER.finest(dumpStack(ti));
@@ -702,7 +702,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                           + ", time: " + timeStamp0 // NOI18N
                           + ", delta: " + (timeStamp0 - delta) // NOI18N
                           + ", waited: " + lastWait // NOI18N
-                          + ", ti: " + ti // NOI18N
+                          + ", tid: " + ti.threadId // NOI18N
                           );
             delta = timeStamp0;
             LOGGER.finest(dumpStack(ti));
@@ -1223,7 +1223,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     private TimedCPUCCTNode plainMethodExit(final int methodId, final ThreadInfo ti, long timeStamp0, long timeStamp1,
                                             boolean stamped) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.log(Level.FINEST, "MethodExit{0}: {1}, time: {2}, delta: {3}, ti: {4}", new Object[]{(!stamped) ? "(unstamped)" : "", debugMethod(methodId), timeStamp0, timeStamp0 - delta, ti});
+            LOGGER.log(Level.FINEST, "MethodExit{0}: {1}, time: {2}, delta: {3}, tid: {4}", new Object[]{(!stamped) ? "(unstamped)" : "", debugMethod(methodId), timeStamp0, timeStamp0 - delta, ti.threadId});
             delta = timeStamp0;
         }
 
