@@ -85,11 +85,12 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
 
                 if (!((eventType == CommonConstants.BUFFEREVENT_PROFILEPOINT_HIT) || (eventType == CommonConstants.SERVLET_DO_METHOD)
                         || (eventType == CommonConstants.SET_FOLLOWING_EVENTS_THREAD) || (eventType == CommonConstants.NEW_THREAD)
-                        || (eventType == CommonConstants.RESET_COLLECTORS))) {
+                        || (eventType == CommonConstants.RESET_COLLECTORS) || (eventType == CommonConstants.NEW_MONITOR))) {
                     int methodId = -1;
                     long timeStamp0 = 0;
                     long timeStamp1 = 0;
-
+                    int hash = -1;
+                    
                     if ((eventType != CommonConstants.ADJUST_TIME // those events do not carry methodId
                         ) && (eventType != CommonConstants.METHOD_ENTRY_WAIT) 
                             && (eventType != CommonConstants.METHOD_EXIT_WAIT)
@@ -116,12 +117,20 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                                 && (eventType != CommonConstants.METHOD_ENTRY_SLEEP)
                                 && (eventType != CommonConstants.METHOD_EXIT_SLEEP)) {
                             if (collectingTwoTimeStamps) {
-                                timeStamp1 = (((long) buffer[position++] & 0xFF) << 48) | (((long) buffer[position++] & 0xFF) << 40)
-                                             | (((long) buffer[position++] & 0xFF) << 32)
-                                             | (((long) buffer[position++] & 0xFF) << 24)
-                                             | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
-                                             | ((long) buffer[position++] & 0xFF);
+                                timeStamp1 = (((long) buffer[position++] & 0xFF) << 48) 
+                                           | (((long) buffer[position++] & 0xFF) << 40)
+                                           | (((long) buffer[position++] & 0xFF) << 32)
+                                           | (((long) buffer[position++] & 0xFF) << 24)
+                                           | (((long) buffer[position++] & 0xFF) << 16) 
+                                           | (((long) buffer[position++] & 0xFF) << 8)
+                                           | ((long) buffer[position++] & 0xFF);
                             }
+                        }
+                        if (eventType == CommonConstants.METHOD_ENTRY_MONITOR || eventType == CommonConstants.METHOD_EXIT_MONITOR) {
+                            hash = (((int) buffer[position++] & 0xFF) << 24) 
+                                 | (((int) buffer[position++] & 0xFF) << 16)
+                                 | (((int) buffer[position++] & 0xFF) << 8) 
+                                 | ((int) buffer[position++] & 0xFF);
                         }
                     }
 
@@ -233,19 +242,19 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                         }
                         case CommonConstants.METHOD_ENTRY_MONITOR: {
                             if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.log(Level.FINEST, "Monitor entry , tId={0}", currentThreadId); // NOI18N
+                                LOGGER.log(Level.FINEST, "Monitor entry , tId={0} , monitorId={1}", new Object[]{currentThreadId,hash}); // NOI18N
                             }
 
-                            fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1);
+                            fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1, hash);
 
                             break;
                         }
                         case CommonConstants.METHOD_EXIT_MONITOR: {
                             if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.log(Level.FINEST, "Monitor exit , tId={0}", currentThreadId); // NOI18N
+                                LOGGER.log(Level.FINEST, "Monitor exit , tId={0} , monitorId={1}", new Object[]{currentThreadId,hash}); // NOI18N
                             }
 
-                            fireMonitorExit(currentThreadId, timeStamp0, timeStamp1);
+                            fireMonitorExit(currentThreadId, timeStamp0, timeStamp1, hash);
 
                             break;
                         }
@@ -373,6 +382,22 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
 
                             break;
                         }
+                        case CommonConstants.NEW_MONITOR: {
+                            int hash = (((int) buffer[position++] & 0xFF) << 24) 
+                                 | (((int) buffer[position++] & 0xFF) << 16)
+                                 | (((int) buffer[position++] & 0xFF) << 8) 
+                                 | ((int) buffer[position++] & 0xFF);
+                            int strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
+                            String className = new String(buffer, position, strLen);
+                            position += strLen;
+
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Creating new monitor , mId={0} , className={1}", new Object[] {hash, className}); // NOI18N
+                            }
+
+                            fireNewMonitor(hash, className);
+                            break;
+                        }
                         case CommonConstants.SERVLET_DO_METHOD: {
                             if (LOGGER.isLoggable(Level.FINEST)) {
                                 LOGGER.log(Level.FINEST, "Servlet track start , tId={0}", currentThreadId); // NOI18N
@@ -461,18 +486,18 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
             });
     }
 
-    private void fireMonitorEntry(final int threadId, final long timeStamp0, final long timeStamp1) {
+    private void fireMonitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId) {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).monitorEntry(threadId, timeStamp0, timeStamp1);
+                    ((CPUProfilingResultListener) listener).monitorEntry(threadId, timeStamp0, timeStamp1, monitorId);
                 }
             });
     }
 
-    private void fireMonitorExit(final int threadId, final long timeStamp0, final long timeStamp1) {
+    private void fireMonitorExit(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId) {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).monitorExit(threadId, timeStamp0, timeStamp1);
+                    ((CPUProfilingResultListener) listener).monitorExit(threadId, timeStamp0, timeStamp1, monitorId);
                 }
             });
     }
@@ -481,6 +506,14 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
                     ((CPUProfilingResultListener) listener).newThread(threadId, threadName, threadClassName);
+                }
+            });
+    }
+
+    private void fireNewMonitor(final int hash, final String className) {
+        foreachListener(new ListenerFunctor() {
+                public void execute(ProfilingResultListener listener) {
+                    ((CPUProfilingResultListener) listener).newMonitor(hash, className);
                 }
             });
     }

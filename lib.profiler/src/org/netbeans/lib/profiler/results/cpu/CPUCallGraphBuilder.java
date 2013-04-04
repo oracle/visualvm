@@ -359,12 +359,12 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         batchNotEmpty = true;
     }
 
-    public void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1) {
+    public void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId) {
         waitEntry(threadId, timeStamp0, timeStamp1);
         batchNotEmpty = true;
     }
 
-    public void monitorExit(final int threadId, final long timeStamp0, final long timeStamp1) {
+    public void monitorExit(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId) {
         waitExit(threadId, timeStamp0, timeStamp1);
         batchNotEmpty = true;
     }
@@ -378,6 +378,16 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
         threadInfos.newThreadInfo(threadId, threadName, threadClassName);
         batchNotEmpty = true;
+    }
+
+    public void newMonitor(int hash, String className) {
+        if (!isReady()) {
+            return;
+        }
+
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.log(Level.FINEST, "New monitor creation, mId = {0}, className = {1}", new Object[]{hash, className});
+        }
     }
 
     public void servletRequest(final int threadId, final int requestType, final String servletPath, final int sessionId) {
