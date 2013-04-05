@@ -46,6 +46,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
@@ -56,40 +57,54 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import org.netbeans.lib.profiler.results.CCTNode;
+import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTNode;
+import org.netbeans.lib.profiler.results.locks.LockCCTProvider;
+import org.netbeans.lib.profiler.results.locks.LockRuntimeCCTNode;
 import org.netbeans.lib.profiler.ui.ResultsPanel;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.JTreeTable;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
+import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
+import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
-import org.netbeans.lib.profiler.ui.components.tree.MethodNameTreeCellRenderer;
 import org.netbeans.lib.profiler.ui.components.treetable.AbstractTreeTableModel;
 import org.netbeans.lib.profiler.ui.components.treetable.ExtendedTreeTableModel;
 import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
 import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
+import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -111,6 +126,9 @@ public class LockContentionPanel extends ResultsPanel {
     private static final String TIME_REL_COLUMN_TOOLTIP = messages.getString("LockContentionPanel_TimeRelColumnToolTip"); // NOI18N
     private static final String WAITS_COLUMN_NAME = messages.getString("LockContentionPanel_WaitsColumnName"); // NOI18N
     private static final String WAITS_COLUMN_TOOLTIP = messages.getString("LockContentionPanel_WaitsColumnToolTip"); // NOI18N
+    private static final String DISPLAY_MODE = messages.getString("LockContentionPanel_DisplayMode"); // NOI18N
+    private static final String MODE_THREADS = messages.getString("LockContentionPanel_ModeThreads"); // NOI18N
+    private static final String MODE_MONITORS = messages.getString("LockContentionPanel_ModeMonitors"); // NOI18N
     // -----
     
     private final ProfilerToolbar toolbar;
@@ -118,6 +136,8 @@ public class LockContentionPanel extends ResultsPanel {
     private final LocksTreeTableModel realTreeTableModel;
     private final ExtendedTreeTableModel treeTableModel;
     private final JTreeTable treeTable;
+    private final JTreeTablePanel treeTablePanel;
+    private final JComboBox modeCombo;
     
     private final JPopupMenu tablePopup;
     private final JPopupMenu cornerPopup;
@@ -129,7 +149,7 @@ public class LockContentionPanel extends ResultsPanel {
     
     private String[] columnNames;
     private TableCellRenderer[] columnRenderers;
-    private EnhancedTreeCellRenderer treeCellRenderer = new MethodNameTreeCellRenderer();
+    private EnhancedTreeCellRenderer treeCellRenderer = new LockContentionTreeCellRenderer();
     private String[] columnToolTips;
     private int[] columnWidths;
     
@@ -140,9 +160,46 @@ public class LockContentionPanel extends ResultsPanel {
     private final JLabel enableLockContentionLabel1;
     private final JLabel enableLockContentionLabel2;
     
+    private LockRuntimeCCTNode root;
+    private Listener cctListener;
+    
     
     public LockContentionPanel() {        
         toolbar = ProfilerToolbar.create(true);
+        
+        JLabel modeLabel = new JLabel(DISPLAY_MODE);
+        modeLabel.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+        toolbar.add(modeLabel);
+        
+        modeCombo = new JComboBox(new Object[] { MODE_THREADS, MODE_MONITORS }) {
+            protected void fireActionEvent() {
+                super.fireActionEvent();
+                treeTable.clearSelection();
+                prepareResults();
+            }
+            public Dimension getMaximumSize() {
+                Dimension dim = getPreferredSize();
+                dim.width += 20;
+                return dim;
+            }
+        };
+        modeCombo.setRenderer(new DefaultListCellRenderer() {
+            public Component getListCellRendererComponent(final JList list, final Object value, final int index,
+                                                          final boolean isSelected, final boolean cellHasFocus) {
+                DefaultListCellRenderer dlcr =
+                        (DefaultListCellRenderer)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                if (MODE_THREADS.equals(value.toString())) {
+                    dlcr.setIcon(Icons.getIcon(ProfilerIcons.THREAD));
+                } else if (MODE_MONITORS.equals(value.toString())) {
+                    dlcr.setIcon(Icons.getIcon(ProfilerIcons.WINDOW_LOCKS));
+                }
+
+                return dlcr;
+            }
+        });
+        modeLabel.setLabelFor(modeCombo);
+        toolbar.add(modeCombo);
         
         initColumnsData();
         
@@ -172,6 +229,7 @@ public class LockContentionPanel extends ResultsPanel {
                 };
             };
         treeTable.getTree().setRootVisible(false);
+        treeTable.getTree().setShowsRootHandles(true);
 //        treeTable.addMouseListener(new MouseListener());
 //        treeTable.addKeyListener(new KeyListener());
         treeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -195,7 +253,7 @@ public class LockContentionPanel extends ResultsPanel {
         
         setColumnsData();
         
-        JTreeTablePanel treeTablePanel = new JTreeTablePanel(treeTable);
+        treeTablePanel = new JTreeTablePanel(treeTable);
         treeTablePanel.clearBorders();
         
         notificationPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 15));
@@ -238,11 +296,103 @@ public class LockContentionPanel extends ResultsPanel {
         
         cornerPopup = new JPopupMenu();
         treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
+        
+        setDefaultSorting();
+        prepareResults(); // Disables combo
+    }
+    
+    private class Listener implements LockCCTProvider.Listener {
+
+        @Override
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+            if (!empty && appRootNode instanceof LockRuntimeCCTNode) {
+                root = (LockRuntimeCCTNode)appRootNode;
+                prepareResults();
+            }
+        }
+
+        @Override
+        public void cctReset() {
+        }  
+    }
+    
+    
+    public void addSaveViewAction(AbstractAction saveViewAction) {
+        Component actionButton = toolbar.add(saveViewAction);
+        toolbar.remove(actionButton);
+        toolbar.add(actionButton, 0);
+        toolbar.add(new JToolBar.Separator(), 1);
+    }
+    
+    public boolean fitsVisibleArea() {
+        return !treeTablePanel.getScrollPane().getVerticalScrollBar().isEnabled();
+    }
+
+    public boolean hasView() {
+        return modeCombo.isEnabled();
+    }
+    
+    public BufferedImage getCurrentViewScreenshot(boolean onlyVisibleArea) {
+        if (!hasView()) return null;
+        if (onlyVisibleArea) {
+            return UIUtils.createScreenshot(treeTablePanel.getScrollPane());
+        } else {
+            return UIUtils.createScreenshot(treeTable);
+        }
+    }
+    
+    
+    // NOTE: this method only sets sortingColumn, sortOrder and sortBy, it doesn't refresh UI!
+    public void setDefaultSorting() {
+        setSorting(1, SortableTableModel.SORT_ORDER_DESC);
+    }
+    
+    // NOTE: this method only sets sortingColumn, sortOrder and sortBy, it doesn't refresh UI!
+    public void setSorting(int sColumn, boolean sOrder) {
+        setSorting(sColumn, sOrder, false);
+    }
+    
+    public void setSorting(int sColumn, boolean sOrder, boolean refreshUI) {
+        if (!refreshUI && sColumn == CommonConstants.SORTING_COLUMN_DEFAULT) {
+            setDefaultSorting();
+        } else {
+            sortingColumn = sColumn;
+            sortingOrder = sOrder;
+        }
+        if (refreshUI) {
+            treeTable.setSortingColumn(treeTableModel.getVirtualColumn(sColumn));
+            treeTable.setSortingOrder(sOrder);
+            treeTableModel.sortByColumn(sColumn, sOrder);
+        }
+    }
+    
+    public int getSortingColumn() {
+        return treeTableModel.getRealColumn(treeTable.getSortingColumn());
+    }
+
+    public boolean getSortingOrder() {
+        return treeTable.getSortingOrder();
     }
     
     
     public void prepareResults() {
-        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                modeCombo.setEnabled(root != null);
+                if (root == null) return;
+                
+                String mode = modeCombo.getSelectedItem().toString();
+                LockCCTNode newRoot = null;
+                if (MODE_THREADS.equals(mode)) {
+                    newRoot = root.getThreads();
+                } else if (MODE_MONITORS.equals(mode)) {
+                    newRoot = root.getMonitors();
+                }
+                
+                newRoot.sortChildren(getSortBy(sortingColumn), sortingOrder);
+                treeTable.changeRoot(newRoot);
+            }
+        });
     }
     
     
@@ -254,6 +404,17 @@ public class LockContentionPanel extends ResultsPanel {
     }
 
     public void profilingSessionStarted() {
+        if (cctListener == null) {
+            cctListener = new Listener();
+            LockCCTProvider cctProvider = Lookup.getDefault().lookup(LockCCTProvider.class);
+            assert cctProvider != null;
+            cctProvider.addListener(cctListener);
+        } else {
+            treeTableModel.setRoot(LockCCTNode.EMPTY);
+            treeTable.clearSelection();
+            treeTable.updateTreeTable();
+        }
+        
         enableLockContentionButton.setEnabled(true);
         enableLockContentionButton.setVisible(true);
         enableLockContentionLabel1.setVisible(true);
@@ -305,20 +466,16 @@ public class LockContentionPanel extends ResultsPanel {
 
         int maxWidth = getFontMetrics(getFont()).charWidth('W') * 12; // NOI18N // initial width of data columns
 
-        LabelTableCellRenderer dataCellRenderer = new LabelTableCellRenderer(JLabel.TRAILING);
+        columnRenderers[0] = null;
 
-        // method / class / package name
-        columnRenderers[0] = new LabelTableCellRenderer(JLabel.LEADING);
-
-        // objectid
         columnWidths[1 - 1] = maxWidth;
-        columnRenderers[1] = dataCellRenderer;
+        columnRenderers[1] = new CustomBarCellRenderer(0, 100);
         
         columnWidths[2 - 1] = maxWidth;
-        columnRenderers[2] = dataCellRenderer;
+        columnRenderers[2] = new LabelBracketTableCellRenderer(JLabel.TRAILING);
 
         columnWidths[3 - 1] = maxWidth;
-        columnRenderers[3] = dataCellRenderer;
+        columnRenderers[3] = new LabelTableCellRenderer(JLabel.TRAILING);
     }
     
     private void setColumnsData() {
@@ -410,22 +567,10 @@ public class LockContentionPanel extends ResultsPanel {
     }
     
     
-    // To be deleted, used just for UI prototyping
-    private final LockCCTNode _root_ = new LockCCTNode() {
-            public CCTNode getChild(int index) { return null; }
-            public CCTNode[] getChildren() { return new CCTNode[0]; }
-            public int getIndexOfChild(Object child) { return -1; }
-            public int getNChildren() { return 0; }
-            public CCTNode getParent() { return null; }
-            public String getNodeName() { return "invisible root"; }
-            public long getTime() { return 0; }
-            public float getTimeInPerCent() { return 0; }
-            public int getWaits() { return 0; }
-        };
     private class LocksTreeTableModel extends AbstractTreeTableModel {
         
         private LocksTreeTableModel() {
-            super(_root_, true, sortingColumn, sortingOrder);
+            super(LockCCTNode.EMPTY, true, sortingColumn, sortingOrder);
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -453,12 +598,7 @@ public class LockContentionPanel extends ResultsPanel {
         }
 
         public boolean getInitialSorting(int column) {
-            switch (column) {
-                case 0:
-                    return true;
-                default:
-                    return false;
-            }
+            return column == 0;
         }
 
         public boolean isLeaf(Object node) {
@@ -470,11 +610,12 @@ public class LockContentionPanel extends ResultsPanel {
 
             switch (columnIndex) {
                 case 0:
-                    return node.getNodeName();
+                    return node;
                 case 1:
                     return node.getTimeInPerCent();
                 case 2:
-                    return node.getTime();
+                    return StringUtils.mcsTimeToString(node.getTime()) + " ms (" // NOI18N
+                    + percentFormat.format(node.getTimeInPerCent() / 100) + ")"; // NOI18N
                 case 3:
                     return node.getWaits();
                     
@@ -484,31 +625,29 @@ public class LockContentionPanel extends ResultsPanel {
         }
 
         public void sortByColumn(int column, boolean order) {
+            sortingColumn = column;
             sortingOrder = order;
 
-//            LockCCTNode _root = (LockCCTNode)root;
-//
-//            switch (column) {
-//                case 0:
-//                    _root.sortChildren(LockCCTNode.SORT_BY_NAME, order);
-//
-//                    break;
-//                case 1:
-//                    _root.sortChildren(LockCCTNode.SORT_BY_TIME_REL, order);
-//
-//                    break;
-//                case 2:
-//                    _root.sortChildren(LockCCTNode.SORT_BY_TIME, order);
-//
-//                    break;
-//                case 3:
-//                    _root.sortChildren(LockCCTNode.SORT_BY_WAITS, order);
-//
-//                    break;
-//            }
+            LockCCTNode _root = (LockCCTNode)root;
+            _root.sortChildren(getSortBy(column), order);
         }
     }
     
+    
+    private int getSortBy(int column) {
+        switch (column) {
+            case 0:
+                return LockCCTNode.SORT_BY_NAME;
+            case 1:
+                return LockCCTNode.SORT_BY_TIME;
+            case 2:
+                return LockCCTNode.SORT_BY_TIME;
+            case 3:
+                return LockCCTNode.SORT_BY_WAITS;
+            default:
+                return -1;
+        }
+    }
     
     private JPopupMenu createTablePopup() {
         JPopupMenu popup = new JPopupMenu();
