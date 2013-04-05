@@ -355,11 +355,10 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                             break;
                         }
                         case CommonConstants.SET_FOLLOWING_EVENTS_THREAD: {
+                            currentThreadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
                             if (LOGGER.isLoggable(Level.FINEST)) {
                                 LOGGER.log(Level.FINEST, "Change current thread , tId={0}", currentThreadId); // NOI18N
                             }
-
-                            currentThreadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
 
                             break;
                         }
