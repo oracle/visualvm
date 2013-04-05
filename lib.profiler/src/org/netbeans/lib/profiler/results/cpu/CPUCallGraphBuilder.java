@@ -1143,7 +1143,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                                              boolean stamped) {
         if (LOGGER.isLoggable(Level.FINEST)) {
             if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.log(Level.FINEST, "MethodEntry {0} for tId = {1}, time: {2}, delta: {3}, method:  {4}", new Object[]{(!stamped) ? "(unstamped)" : "", (int) ti.threadId, timeStamp0, timeStamp0 - delta, debugMethod(methodId)});
+                LOGGER.log(Level.FINEST, "MethodEntry {0}: for tId = {1}, time: {2}, delta: {3}, method:  {4}", new Object[]{(!stamped) ? "(unstamped)" : "", (int) ti.threadId, timeStamp0, timeStamp0 - delta, debugMethod(methodId)});
             }
         }
 
@@ -1223,7 +1223,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     private TimedCPUCCTNode plainMethodExit(final int methodId, final ThreadInfo ti, long timeStamp0, long timeStamp1,
                                             boolean stamped) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.log(Level.FINEST, "MethodExit{0}: {1}, time: {2}, delta: {3}, tid: {4}", new Object[]{(!stamped) ? "(unstamped)" : "", debugMethod(methodId), timeStamp0, timeStamp0 - delta, ti.threadId});
+            LOGGER.log(Level.FINEST, "MethodExit  {0}: for tId = {1}, time: {2}, delta: {3}, method:  {4}", new Object[]{(!stamped) ? "(unstamped)" : "", ti.threadId, timeStamp0, timeStamp0 - delta, debugMethod(methodId)});
             delta = timeStamp0;
         }
 
