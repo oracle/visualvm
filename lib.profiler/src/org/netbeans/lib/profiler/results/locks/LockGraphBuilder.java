@@ -174,6 +174,7 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         threadInfos.newThreadInfo(threadId, threadName, threadClassName);
     }
 
+    @Override
     public void newMonitor(int hash, String className) {
         if (!isReady()) {
             return;
@@ -196,7 +197,9 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (ti == null) {
             return;
         }
-        LOG.log(Level.FINEST, "Sleep entry thread id = {0}", new Object[]{threadId});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Sleep entry thread id = {0}", threadId);
+        }
     }
 
     @Override
@@ -206,7 +209,9 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (ti == null) {
             return;
         }
-        LOG.log(Level.FINEST, "Sleep exit thread id = {0}", new Object[]{threadId});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Sleep exit thread id = {0}", threadId);
+        }
     }
 
     @Override
@@ -226,7 +231,9 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (ti == null) {
             return;
         }
-        LOG.log(Level.FINEST, "Time adjust thread id = {0}, time = {1}, CPU time = {2}", new Object[]{threadId, timeDiff0, timeDiff1});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Time adjust thread id = {0}, time = {1}, CPU time = {2}", new Object[]{threadId, timeDiff0, timeDiff1});
+        }
         ti.timeAdjust(timeDiff0);
     }
 
@@ -237,7 +244,9 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (ti == null) {
             return;
         }
-        LOG.log(Level.FINEST, "Wait entry thread id = {0}", new Object[]{threadId});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Wait entry thread id = {0}", threadId);
+        }
     }
 
     @Override
@@ -247,7 +256,9 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (ti == null) {
             return;
         }
-        LOG.log(Level.FINEST, "Wait exit thread id = {0}", new Object[]{threadId});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Wait exit thread id = {0}", threadId);
+        }
     }
 
     @Override
@@ -257,7 +268,9 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (ti == null) {
             return;
         }
-        LOG.log(Level.FINEST, "Park entry thread id = {0}", new Object[]{threadId});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Park entry thread id = {0}", threadId);
+        }
     }
 
     @Override
@@ -267,7 +280,9 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         if (ti == null) {
             return;
         }
-        LOG.log(Level.FINEST, "Park entry thread id = {0}", new Object[]{threadId});
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Park entry thread id = {0}", threadId);
+        }
     }
 
     private boolean isReady() {
