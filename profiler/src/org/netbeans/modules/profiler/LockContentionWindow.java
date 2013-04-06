@@ -51,6 +51,7 @@ import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.CommonUtils;
@@ -69,8 +70,8 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "LockContentionWindow_WindowName=Lock Contention",
     "LockContentionWindow_WindowAccessDescr=Shows lock contention details"
 })
-public final class LockContentionWindow extends ProfilerTopComponent implements ActionListener, ChangeListener/*,
-                                                                 SaveViewAction.ViewProvider*/ {
+public final class LockContentionWindow extends ProfilerTopComponent implements ActionListener, ChangeListener,
+                                                                 SaveViewAction.ViewProvider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY = "LockContentionWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
@@ -94,6 +95,7 @@ public final class LockContentionWindow extends ProfilerTopComponent implements 
         add(lockView, BorderLayout.CENTER);
         
         locksPanel = new LockContentionPanel();
+        locksPanel.addSaveViewAction(new SaveViewAction(this));
 
         lockView.addView("Locks", null, "Locks", locksPanel, locksPanel.getToolbar());
 //        lockView.addView(Bundle.ThreadsWindow_ThreadsTableTabName(), null,
@@ -157,57 +159,21 @@ public final class LockContentionWindow extends ProfilerTopComponent implements 
         return null;
     }
 
-//    public BufferedImage getViewImage(boolean onlyVisibleArea) {
-//        Component selectedView = lockView.getSelectedView();
-//        if (selectedView == threadsTimelinePanelContainer) {
-//            return threadsPanel.getCurrentViewScreenshot(onlyVisibleArea);
-//        } else if (selectedView == threadsTablePanel) {
-//            return threadsTablePanel.getCurrentViewScreenshot(onlyVisibleArea);
-//        } else if (selectedView == threadsDetailsPanelContainer) {
-//            return threadsDetailsPanel.getCurrentViewScreenshot(onlyVisibleArea);
-//        }
-//
-//        return null;
-//    }
-//
-//    public String getViewName() {
-//        Component selectedView = lockView.getSelectedView();
-//        if (selectedView == threadsTimelinePanelContainer) {
-//            return "threads-timeline"; // NOI18N
-//        } else if (selectedView == threadsTablePanel) {
-//            return "threads-table"; // NOI18N
-//        } else if (selectedView == threadsDetailsPanelContainer) {
-//            return "threads-details"; // NOI18N
-//        }
-//
-//        return null;
-//    }
-//
-//    public boolean fitsVisibleArea() {
-//        Component selectedView = lockView.getSelectedView();
-//        if (selectedView == threadsTimelinePanelContainer) {
-//            return threadsPanel.fitsVisibleArea();
-//        } else if (selectedView == threadsTablePanel) {
-//            return threadsTablePanel.fitsVisibleArea();
-//        } else if (selectedView == threadsDetailsPanelContainer) {
-//            return threadsDetailsPanel.fitsVisibleArea();
-//        }
-//
-//        return true;
-//    }
-//
-//    public boolean hasView() {
-//        Component selectedView = lockView.getSelectedView();
-//        if (selectedView == threadsTimelinePanelContainer) {
-//            return threadsPanel.hasView();
-//        } else if (selectedView == threadsTablePanel) {
-//            return threadsTablePanel.hasView();
-//        } else if (selectedView == threadsDetailsPanelContainer) {
-//            return threadsDetailsPanel.hasView();
-//        }
-//
-//        return false;
-//    }
+    public BufferedImage getViewImage(boolean onlyVisibleArea) {
+        return locksPanel.getCurrentViewScreenshot(onlyVisibleArea);
+    }
+
+    public String getViewName() {
+        return "lock-contention"; // NOI18N
+    }
+
+    public boolean fitsVisibleArea() {
+        return locksPanel.fitsVisibleArea();
+    }
+
+    public boolean hasView() {
+        return locksPanel.hasView();
+    }
     
     public void showView() {
 //        lockView.selectView(threadsTimelinePanelContainer);
