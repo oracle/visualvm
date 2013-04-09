@@ -125,7 +125,6 @@ public class AllThreadsMergedCPUCCTContainer extends CPUCCTContainer {
             childContainer.totalTimePerMethodId0 = childContainer.totalTimePerMethodId1 = null;
             childContainer.invPerMethodId = null;
             childContainer.methodsOnStack = null;
-            childContainer.methodsOnStack = null;
         }
 
         return postGenerateFlatProfile();
