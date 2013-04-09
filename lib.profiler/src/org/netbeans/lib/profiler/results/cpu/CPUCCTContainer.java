@@ -420,12 +420,16 @@ public class CPUCCTContainer {
         int nChildren = getNChildrenForNodeOfs(dataOfs);
 
         if (nChildren > 0) {
-            methodsOnStack.add(methodIdInt);
+            if (!isRecursiveCall) {
+                methodsOnStack.add(methodIdInt);
+            }
             for (int i = 0; i < nChildren; i++) {
                 int childOfs = getChildOfsForNodeOfs(dataOfs, i);
                 addFlatProfTimeForNode(childOfs);
             }
-            methodsOnStack.remove(methodIdInt);
+            if (!isRecursiveCall) {
+                methodsOnStack.remove(methodIdInt);                
+            }
         }
 
         timePerMethodId0[methodId] += getSelfTime0ForNodeOfs(dataOfs);
