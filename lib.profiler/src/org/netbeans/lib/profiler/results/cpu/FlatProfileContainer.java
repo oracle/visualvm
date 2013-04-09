@@ -201,11 +201,11 @@ public abstract class FlatProfileContainer {
 
                 break;
             case SORT_BY_TOTAL_TIME:
-                sortDataByTime(true, order); // TODO: sortDataByTotalTime?
+                sortDataByTotalTime(true, order);
 
                 break;
             case SORT_BY_SECONDARY_TOTAL_TIME:
-                sortDataByTime(false, order); // TODO: sortDataByTotalTime?
+                sortDataByTotalTime(false, order);
 
                 break;
             case SORT_BY_INV_NUMBER:
@@ -467,8 +467,76 @@ public abstract class FlatProfileContainer {
                         super.swap(a, b);
                         FlatProfileContainer.this.swap(a, b);
 
+                        swap(totalTimeInMcs0,a,b);
+                        
                         if (collectingTwoTimeStamps) {
                             swap(tpmBF,a,b);
+                            swap(totalTimeInMcs1,a,b);
+                        }
+
+                        swap(methodIds,a,b);
+                    }
+                }).sort(sortOrder);
+        }
+    }
+
+    private void sortDataByTotalTime(boolean usePrimaryTime, boolean sortOrder) {
+        long[] tpmA = null;
+        long[] tpmB = null;
+
+        if (collectingTwoTimeStamps) {
+            if (usePrimaryTime) {
+                tpmA = totalTimeInMcs0;
+                tpmB = totalTimeInMcs1;
+            } else {
+                tpmA = totalTimeInMcs1;
+                tpmB = totalTimeInMcs0;
+            }
+        } else {
+            tpmA = totalTimeInMcs0;
+        }
+
+        final long[] tpmBF = tpmB;
+
+        (new LongSorter(tpmA, 0, nRows) {
+                protected void swap(int a, int b) {
+                    super.swap(a, b);
+                    FlatProfileContainer.this.swap(a, b);
+
+                    swap(timeInMcs0,a,b);
+                    
+                    if (collectingTwoTimeStamps) {
+                        swap(tpmBF,a,b);
+                        swap(timeInMcs1,a,b);
+                    }
+
+                    swap(methodIds,a,b);
+                    swap(nInvocations,a,b);
+
+                    if (percent != null) {
+                        swap(percent,a,b);
+                    }
+                }
+            }).sort(sortOrder);
+
+        // Next, sort the methods with zero time by the number of invocations
+        int len = nRows - 1;
+
+        while ((len >= 0) && (tpmA[len] == 0)) {
+            len--;
+        }
+
+        if (len < (nRows - 1)) {
+            (new IntSorter(nInvocations, len + 1, nRows - len - 1) {
+                    protected void swap(int a, int b) {
+                        super.swap(a, b);
+                        FlatProfileContainer.this.swap(a, b);
+
+                        swap(timeInMcs0,a,b);
+
+                        if (collectingTwoTimeStamps) {
+                            swap(tpmBF,a,b);
+                            swap(timeInMcs1,a,b);
                         }
 
                         swap(methodIds,a,b);
