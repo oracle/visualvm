@@ -65,14 +65,16 @@ public class FlatProfileContainerBacked extends FlatProfileContainer {
      * once at an arbitrary moment.
      *
      * @param cctContainer The CPU results
-     * @param timeInMcs0   Array of Absolute timer values for each method - always used
-     * @param timeInMcs1   Array of CPU timer values for each method - optional, may be null
+     * @param timeInMcs0   Array of Absolute timer values (self-time) for each method - always used
+     * @param timeInMcs1   Array of CPU timer values (self-time) for each method - optional, may be null
+     * @param totalTimeInMcs0   Array of Absolute timer (total time) values for each method - always used
+     * @param totalTimeInMcs1   Array of CPU timer (total time) values for each method - optional, may be null
      * @param nInvocations Array of number of invocations for each method
      * @param nMethods     Total number of profiled methods - length of the provided arrays
      */
-    public FlatProfileContainerBacked(CPUCCTContainer cctContainer, long[] timeInMcs0, long[] timeInMcs1, int[] nInvocations,
-                                      int nMethods) {
-        super(timeInMcs0, timeInMcs1, nInvocations, null, nMethods);
+    public FlatProfileContainerBacked(CPUCCTContainer cctContainer, long[] timeInMcs0, long[] timeInMcs1, 
+            long[] totalTimeInMcs0, long[] totalTimeInMcs1, int[] nInvocations, int nMethods) {
+        super(timeInMcs0, timeInMcs1, totalTimeInMcs0, totalTimeInMcs1, nInvocations, null, nMethods);
         this.cctContainer = cctContainer;
 
         collectingTwoTimeStamps = cctContainer.isCollectingTwoTimeStamps();

@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import java.util.HashSet;
 import java.util.ResourceBundle;
 
 
@@ -113,12 +114,18 @@ public class AllThreadsMergedCPUCCTContainer extends CPUCCTContainer {
             CPUCCTContainer childContainer = children[i].getContainer();
             childContainer.timePerMethodId0 = this.timePerMethodId0;
             childContainer.timePerMethodId1 = this.timePerMethodId1;
+            childContainer.totalTimePerMethodId0 = this.totalTimePerMethodId0;
+            childContainer.totalTimePerMethodId1 = this.totalTimePerMethodId1;
             childContainer.invPerMethodId = this.invPerMethodId;
-
+            childContainer.methodsOnStack = new HashSet();
+            
             childContainer.addFlatProfTimeForNode(0);
 
             childContainer.timePerMethodId0 = childContainer.timePerMethodId1 = null;
+            childContainer.totalTimePerMethodId0 = childContainer.totalTimePerMethodId1 = null;
             childContainer.invPerMethodId = null;
+            childContainer.methodsOnStack = null;
+            childContainer.methodsOnStack = null;
         }
 
         return postGenerateFlatProfile();

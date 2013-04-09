@@ -81,6 +81,8 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     private int[] nCalleeInvocations;
     private long[] timePM0;
     private long[] timePM1;
+    private long[] totalTimePM0;
+    private long[] totalTimePM1;
     private int nMethods;
 
     private CCTResultsFilter currentFilter;
@@ -113,6 +115,8 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         nMethods = status.getNInstrMethods();
         timePM0 = new long[nMethods];
         timePM1 = new long[status.collectingTwoTimeStamps() ? nMethods : 0];
+        totalTimePM0 = new long[nMethods];
+        totalTimePM1 = new long[status.collectingTwoTimeStamps() ? nMethods : 0];
         invPM = new int[nMethods];
         invDiff = new int[nMethods];
         nCalleeInvocations = new int[nMethods];
@@ -179,11 +183,12 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         }
 
         synchronized (containerGuard) {
-            container = new FlatProfileContainerFree(status, timePM0, timePM1, invPM, new char[0], wholeGraphTime0,
-                                                     wholeGraphTime1, invPM.length);
+            container = new FlatProfileContainerFree(status, timePM0, timePM1, totalTimePM0, totalTimePM1,
+                    invPM, new char[0], wholeGraphTime0, wholeGraphTime1, invPM.length);
         }
 
         timePM0 = timePM1 = null;
+        totalTimePM0 = totalTimePM1 = null;
         invPM = invDiff = nCalleeInvocations = null;
         parentStack.clear();
         instrFilter = null;
