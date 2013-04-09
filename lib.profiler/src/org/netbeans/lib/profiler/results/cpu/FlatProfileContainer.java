@@ -156,23 +156,14 @@ public abstract class FlatProfileContainer {
                 // Swap the current element and the one at (nRows - 1) index
                 swap(i, endIdx);
                 
-                int tmp = methodIds[i];
-                methodIds[i] = methodIds[endIdx];
-                methodIds[endIdx] = tmp;
-
-                long time = timeInMcs0[i];
-                timeInMcs0[i] = timeInMcs0[endIdx];
-                timeInMcs0[endIdx] = time;
+                swap(methodIds,i,endIdx);
+                swap(timeInMcs0,i,endIdx);
 
                 if (collectingTwoTimeStamps) {
-                    time = timeInMcs1[i];
-                    timeInMcs1[i] = timeInMcs1[endIdx];
-                    timeInMcs1[endIdx] = time;
+                    swap(timeInMcs1,i,endIdx);
                 }
 
-                tmp = nInvocations[i];
-                nInvocations[i] = nInvocations[endIdx];
-                nInvocations[endIdx] = tmp;
+                swap(nInvocations,i,endIdx);
                 i--; // Because we've just put an unchecked element at the current position
             }
         }
@@ -331,25 +322,16 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    long tmp;
-                    tmp = timeInMcs0[a];
-                    timeInMcs0[a] = timeInMcs0[b];
-                    timeInMcs0[b] = tmp;
+                    swap(timeInMcs0,a,b);
 
                     if (collectingTwoTimeStamps) {
-                        tmp = timeInMcs1[a];
-                        timeInMcs1[a] = timeInMcs1[b];
-                        timeInMcs1[b] = tmp;
+                        swap(timeInMcs1,a,b);
                     }
 
-                    int itmp = methodIds[a];
-                    methodIds[a] = methodIds[b];
-                    methodIds[b] = itmp;
+                    swap(methodIds,a,b);
 
                     if (percent != null) {
-                        float ftmp = percent[a];
-                        percent[a] = percent[b];
-                        percent[b] = ftmp;
+                        swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -371,28 +353,17 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    long tmp;
-                    tmp = timeInMcs0[a];
-                    timeInMcs0[a] = timeInMcs0[b];
-                    timeInMcs0[b] = tmp;
+                    swap(timeInMcs0,a,b);
 
                     if (collectingTwoTimeStamps) {
-                        tmp = timeInMcs1[a];
-                        timeInMcs1[a] = timeInMcs1[b];
-                        timeInMcs1[b] = tmp;
+                        swap(timeInMcs1,a,b);
                     }
 
-                    int itmp = methodIds[a];
-                    methodIds[a] = methodIds[b];
-                    methodIds[b] = itmp;
-                    itmp = nInvocations[a];
-                    nInvocations[a] = nInvocations[b];
-                    nInvocations[b] = itmp;
+                    swap(methodIds,a,b);
+                    swap(nInvocations,a,b);
 
                     if (percent != null) {
-                        float ftmp = percent[a];
-                        percent[a] = percent[b];
-                        percent[b] = ftmp;
+                        swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -426,25 +397,15 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    long tmp;
-
                     if (collectingTwoTimeStamps) {
-                        tmp = tpmBF[a];
-                        tpmBF[a] = tpmBF[b];
-                        tpmBF[b] = tmp;
+                        swap(tpmBF,a,b);
                     }
 
-                    int itmp = methodIds[a];
-                    methodIds[a] = methodIds[b];
-                    methodIds[b] = itmp;
-                    itmp = nInvocations[a];
-                    nInvocations[a] = nInvocations[b];
-                    nInvocations[b] = itmp;
+                    swap(methodIds,a,b);
+                    swap(nInvocations,a,b);
 
                     if (percent != null) {
-                        float ftmp = percent[a];
-                        percent[a] = percent[b];
-                        percent[b] = ftmp;
+                        swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -462,22 +423,34 @@ public abstract class FlatProfileContainer {
                         super.swap(a, b);
                         FlatProfileContainer.this.swap(a, b);
 
-                        long tmp;
-
                         if (collectingTwoTimeStamps) {
-                            tmp = tpmBF[a];
-                            tpmBF[a] = tpmBF[b];
-                            tpmBF[b] = tmp;
+                            swap(tpmBF,a,b);
                         }
 
-                        int itmp = methodIds[a];
-                        methodIds[a] = methodIds[b];
-                        methodIds[b] = itmp;
+                        swap(methodIds,a,b);
                     }
                 }).sort(sortOrder);
         }
     }
+
+    private static void swap(float[] arr, int i1, int i2) {
+        float itmp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = itmp;
+    }
+
+    private static void swap(long[] arr, int i1, int i2) {
+        long itmp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = itmp;
+    }
     
+    private static void swap(int[] arr, int i1, int i2) {
+        int itmp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = itmp;
+    }
+        
     protected void swap(int a, int b) {}
     
 }

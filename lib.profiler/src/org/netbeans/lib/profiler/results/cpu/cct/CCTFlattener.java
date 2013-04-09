@@ -43,19 +43,20 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct;
 
+import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.ProfilerEngineSettings;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
+import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainerFree;
 import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 
 
 /**
@@ -82,8 +83,12 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     private long[] timePM1;
     private int nMethods;
 
-    private CCTResultsFilter currentFilter = null;
-    
+    private CCTResultsFilter currentFilter;
+    private InstrumentationFilter instrFilter;
+    private String[] instrMethodClasses;
+    private int cpuProfilingType;
+    private boolean twoTimestamps;
+  
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public CCTFlattener(ProfilerClient client, CCTResultsFilter filter) {
@@ -103,6 +108,8 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     @Override
     public void onStart() {
         ProfilingSessionStatus status = client.getStatus();
+        ProfilerEngineSettings pes = client.getSettings();
+        
         nMethods = status.getNInstrMethods();
         timePM0 = new long[nMethods];
         timePM1 = new long[status.collectingTwoTimeStamps() ? nMethods : 0];
@@ -110,8 +117,10 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         invDiff = new int[nMethods];
         nCalleeInvocations = new int[nMethods];
         parentStack.clear();
-
-//        currentFilter = (CCTResultsFilter)Lookup.getDefault().lookup(CCTResultsFilter.class);
+        instrFilter = pes.getInstrumentationFilter();
+        instrMethodClasses = status.getInstrMethodClasses();
+        cpuProfilingType = pes.getCPUProfilingType();
+        twoTimestamps = status.collectingTwoTimeStamps();
         
         synchronized (containerGuard) {
             container = null;
@@ -177,24 +186,22 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         timePM0 = timePM1 = null;
         invPM = invDiff = nCalleeInvocations = null;
         parentStack.clear();
-//        currentFilter = null;
+        instrFilter = null;
+        instrMethodClasses = null;
     }
     
     @Override
     public void onNode(MethodCPUCCTNode node) {
         final int nodeMethodId = node.getMethodId();
-                
-        ProfilingSessionStatus status = client.getStatus();
-        InstrumentationFilter filter = client.getSettings().getInstrumentationFilter();
+        final int nodeFilerStatus = node.getFilteredStatus();
+        final MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek();
+        boolean filteredOut = (nodeFilerStatus == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
 
-        MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek();
-        boolean filteredOut = (node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
+        if (!filteredOut && (cpuProfilingType == CommonConstants.CPU_SAMPLED || nodeFilerStatus == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
 
-        if (!filteredOut && (client.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED || node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
+            String jvmClassName = instrMethodClasses[nodeMethodId].replace('.', '/');
 
-            String jvmClassName = status.getInstrMethodClasses()[nodeMethodId].replace('.', '/');
-
-            if (!filter.passesFilter(jvmClassName)) {
+            if (!instrFilter.passesFilter(jvmClassName)) {
                 filteredOut = true;
             }
         }
@@ -205,6 +212,7 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         final int parentMethodId = currentParent != null ? currentParent.getMethodId() : -1;
         
         if (LOGGER.isLoggable(Level.FINEST)) {
+            ProfilingSessionStatus status = client.getStatus();
             LOGGER.log(Level.FINEST, "Processing runtime node: {0}.{1}; filtered={2}, time={3}, CPU time={4}", // NOI18N
                        new Object[]{status.getInstrMethodClasses()[nodeMethodId], status.getInstrMethodNames()[nodeMethodId], 
                        filteredOut, node.getNetTime0(), node.getNetTime1()});
@@ -221,14 +229,14 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
 
                 timePM0[parentMethodId] += node.getNetTime0();
 
-                if (status.collectingTwoTimeStamps()) {
+                if (twoTimestamps) {
                     timePM1[parentMethodId] += node.getNetTime1();
                 }
             }
         } else {
             timePM0[nodeMethodId] += node.getNetTime0();
 
-            if (status.collectingTwoTimeStamps()) {
+            if (twoTimestamps) {
                 timePM1[nodeMethodId] += node.getNetTime1();
             }
 
@@ -237,8 +245,6 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
             if ((currentParent != null) && !currentParent.isRoot()) {
                 nCalleeInvocations[parentMethodId] += node.getNCalls();
             }
-
-            currentParent = node;
         }
         parentStack.push(node);
     }
