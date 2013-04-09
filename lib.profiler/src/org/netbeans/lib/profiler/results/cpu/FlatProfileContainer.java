@@ -65,6 +65,8 @@ public abstract class FlatProfileContainer {
     public static final int SORT_BY_TIME = 2;
     public static final int SORT_BY_SECONDARY_TIME = 3;
     public static final int SORT_BY_INV_NUMBER = 4;
+    public static final int SORT_BY_TOTAL_TIME = 5;
+    public static final int SORT_BY_SECONDARY_TOTAL_TIME = 6;
 
     // This variable is used to remember the timestamp (absolute or thread-CPU) used to calculate percentage
     // numbers, between invocations of "Get results", i.e. creations of new objects of this class.
@@ -196,6 +198,14 @@ public abstract class FlatProfileContainer {
                 break;
             case SORT_BY_SECONDARY_TIME:
                 sortDataByTime(false, order);
+
+                break;
+            case SORT_BY_TOTAL_TIME:
+                sortDataByTime(true, order); // TODO: sortDataByTotalTime?
+
+                break;
+            case SORT_BY_SECONDARY_TOTAL_TIME:
+                sortDataByTime(false, order); // TODO: sortDataByTotalTime?
 
                 break;
             case SORT_BY_INV_NUMBER:
