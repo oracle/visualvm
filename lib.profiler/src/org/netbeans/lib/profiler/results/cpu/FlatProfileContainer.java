@@ -246,7 +246,7 @@ public abstract class FlatProfileContainer {
                 if (time < 0) {
                     time = 0;
                 }
-                oldTotalTime0[k] = time;
+                totalTimeInMcs0[k] = time;
 
                 if (collectingTwoTimeStamps) {
                     time = oldTime1[i];
@@ -259,7 +259,7 @@ public abstract class FlatProfileContainer {
                     if (time < 0) {
                         time = 0;
                     }
-                    oldTotalTime1[k] = time;
+                    totalTimeInMcs1[k] = time;
                 }
 
                 nInvocations[k] = oldNInvocations[i];
