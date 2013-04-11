@@ -110,7 +110,10 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                                      | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
                                      | ((long) buffer[position++] & 0xFF);
 
-                        if ((eventType != CommonConstants.METHOD_ENTRY_WAIT) && (eventType != CommonConstants.METHOD_EXIT_WAIT)
+                        if ((eventType != CommonConstants.METHOD_ENTRY_WAIT)
+                                && (eventType != CommonConstants.METHOD_EXIT_WAIT)
+                                && (eventType != CommonConstants.METHOD_ENTRY_PARK)
+                                && (eventType != CommonConstants.METHOD_EXIT_PARK)
                                 && (eventType != CommonConstants.METHOD_ENTRY_MONITOR)
                                 && (eventType != CommonConstants.METHOD_EXIT_MONITOR)
                                 && (eventType != CommonConstants.METHOD_ENTRY_SLEEP)
