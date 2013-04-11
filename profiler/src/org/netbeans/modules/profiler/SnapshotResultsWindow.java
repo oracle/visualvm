@@ -54,6 +54,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.swing.*;
@@ -88,11 +89,27 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
      * The following code is an externalization of various listeners registered
      * in the global lookup and needing access to an enclosing instance of
      * SnapshotResultsWindow. 
-     * The enclosing instance will use the FQN registration to obtain the shared instance
-     * of the listener implementation and inject itself as a delegate into the listener.
      */
     @ServiceProvider(service=SnapshotsListener.class)   
-    public static class SnapshotListener extends Delegate<SnapshotResultsWindow> implements SnapshotsListener {
+    public static class SnapshotListener implements SnapshotsListener {
+        
+        java.util.List<SnapshotResultsWindow> registeredWindows;
+        
+        void registerSnapshotResultsWindow(SnapshotResultsWindow w) {
+            assert SwingUtilities.isEventDispatchThread();
+            if (registeredWindows == null) {
+                registeredWindows = new ArrayList();
+            }
+            registeredWindows.add(w);
+        }
+
+        void unregisterSnapshotResultsWindow(SnapshotResultsWindow w) {
+            assert SwingUtilities.isEventDispatchThread();
+            if (registeredWindows != null) {
+                registeredWindows.remove(w);
+            }
+        }
+        
         @Override
         public void snapshotLoaded(LoadedSnapshot snapshot) {
             // ignore
@@ -105,7 +122,14 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 
         @Override
         public void snapshotSaved(LoadedSnapshot snapshot) {
-            if (getDelegate() != null) getDelegate().updateSaveState();
+            assert SwingUtilities.isEventDispatchThread();
+            if (registeredWindows != null) {
+                for (SnapshotResultsWindow w : registeredWindows) {
+                    if (w.snapshot == snapshot) {
+                        w.updateSaveState();
+                    }
+                }
+            }
         }
 
         @Override
@@ -231,7 +255,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 break;
         }
         listener = Lookup.getDefault().lookup(SnapshotListener.class);
-        listener.setDelegate(this);
+        listener.registerSnapshotResultsWindow(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -356,6 +380,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 
         ResultsManager.getDefault().closeSnapshot(snapshot);
         snapshot = null;
+        listener.unregisterSnapshotResultsWindow(this);
     }
 
     protected String preferredID() {
