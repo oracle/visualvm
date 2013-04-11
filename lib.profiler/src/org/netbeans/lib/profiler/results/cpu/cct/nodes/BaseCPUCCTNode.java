@@ -43,9 +43,7 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
-import java.lang.ref.WeakReference;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
 
 /**
@@ -59,17 +57,11 @@ public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private RuntimeCPUCCTNode[] children;
-    private final WeakReference factoryRef;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of BaseCPUCCTNode */
-    public BaseCPUCCTNode(CPUCCTNodeFactory parentFactory) {
-        if (parentFactory != null) {
-            this.factoryRef = new WeakReference(parentFactory);
-        } else {
-            this.factoryRef = null;
-        }
+    public BaseCPUCCTNode() {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -90,9 +82,5 @@ public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
             children = newChildren;
         }
         children[children.length-1] = node;
-    }
-    
-    protected CPUCCTNodeFactory getFactory() {
-        return (factoryRef != null) ? (CPUCCTNodeFactory) factoryRef.get() : null;
     }
 }

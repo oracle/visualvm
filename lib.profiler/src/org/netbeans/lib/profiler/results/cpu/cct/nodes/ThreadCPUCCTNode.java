@@ -43,9 +43,6 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
-import org.netbeans.lib.profiler.results.cpu.cct.*;
-
-
 /**
  *
  * @author Jaroslav Bachorik
@@ -58,8 +55,8 @@ public class ThreadCPUCCTNode extends TimedCPUCCTNode {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of ThreadCPUCCTNode */
-    public ThreadCPUCCTNode(CPUCCTNodeFactory factory, int threadId) {
-        super(factory);
+    public ThreadCPUCCTNode(int threadId) {
+        super();
         this.threadId = threadId;
     }
 
@@ -74,8 +71,6 @@ public class ThreadCPUCCTNode extends TimedCPUCCTNode {
     }
     
     protected TimedCPUCCTNode createSelfInstance() {
-        CPUCCTNodeFactory factory = getFactory();
-
-        return (factory != null) ? factory.createThreadNode(threadId) : null;
+        return new ThreadCPUCCTNode(threadId);
     }
 }

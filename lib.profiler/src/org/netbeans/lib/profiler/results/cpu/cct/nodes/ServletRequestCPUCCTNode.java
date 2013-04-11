@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
 
 /**
@@ -87,8 +86,8 @@ public class ServletRequestCPUCCTNode extends TimedCPUCCTNode {
     /**
      * Creates a new instance of ServletRequestCPUCCTNode
      */
-    public ServletRequestCPUCCTNode(CPUCCTNodeFactory factory, int requestType, String path) {
-        super(factory);
+    public ServletRequestCPUCCTNode(int requestType, String path) {
+        super();
         this.servletPath = path;
         this.requestType = requestType;
         setFilteredStatus(FILTERED_YES); // boundary node is going to be filtered by default
@@ -131,8 +130,6 @@ public class ServletRequestCPUCCTNode extends TimedCPUCCTNode {
     }
 
     protected TimedCPUCCTNode createSelfInstance() {
-        CPUCCTNodeFactory factory = getFactory();
-
-        return (factory != null) ? factory.createServletRequestNode(requestType, servletPath) : null;
+        return new ServletRequestCPUCCTNode(requestType, servletPath);
     }
 }

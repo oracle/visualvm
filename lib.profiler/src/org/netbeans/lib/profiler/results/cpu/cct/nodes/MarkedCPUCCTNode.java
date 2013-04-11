@@ -43,7 +43,6 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
-import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 
@@ -81,8 +80,8 @@ public class MarkedCPUCCTNode extends TimedCPUCCTNode {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of MarkedCPUCCTNode */
-    public MarkedCPUCCTNode(CPUCCTNodeFactory factory, Mark mark) {
-        super(factory);
+    public MarkedCPUCCTNode(Mark mark) {
+        super();
         this.mark = mark;
     }
 
@@ -113,6 +112,6 @@ public class MarkedCPUCCTNode extends TimedCPUCCTNode {
     }
 
     protected TimedCPUCCTNode createSelfInstance() {
-        return getFactory().createCategory(mark);
+        return new MarkedCPUCCTNode(mark);
     }
 }

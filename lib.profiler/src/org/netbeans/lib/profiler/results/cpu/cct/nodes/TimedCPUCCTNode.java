@@ -43,9 +43,6 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
-import org.netbeans.lib.profiler.results.cpu.cct.*;
-
-
 /**
  *
  * @author Jaroslav Bachorik
@@ -73,8 +70,8 @@ public abstract class TimedCPUCCTNode extends BaseCPUCCTNode implements Cloneabl
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public TimedCPUCCTNode(CPUCCTNodeFactory factory) {
-        super(factory);
+    public TimedCPUCCTNode() {
+        super();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

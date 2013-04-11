@@ -56,7 +56,6 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
 /**
  *
@@ -628,7 +627,6 @@ public class StackTraceSnapshotBuilder {
     private class StackTraceCallGraphBuilder extends CPUCallGraphBuilder {
 
         StackTraceCallGraphBuilder (MethodInfoMapper mapper) {
-            setFactory(new CPUCCTNodeFactory());
             setFilter(InstrumentationFilter.getDefault());
             setMethodInfoMapper(mapper);
         }

@@ -50,7 +50,6 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
@@ -119,7 +118,6 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private CPUCCTNodeFactory factory;
     private DebugInfoCollector debugCollector = null;
     private InstrumentationFilter instrFilter;
     private boolean stackIntegrityViolationReported;
@@ -406,7 +404,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         TimedCPUCCTNode curNode = ti.peek();
 
         if (curNode == null) {
-            curNode = factory.createThreadNode(threadId);
+            curNode = new ThreadCPUCCTNode(threadId);
             ti.totalNNodes++;
             ti.push(curNode);
             ti.totalNInv--;
@@ -416,7 +414,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                                                                                        curNode.getChildren());
 
         if (servletNode == null) {
-            servletNode = factory.createServletRequestNode(requestType, servletPath);
+            servletNode = new ServletRequestCPUCCTNode(requestType, servletPath);
             curNode.attachNodeAsChild(servletNode);
         }
 
@@ -864,9 +862,6 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         if (client != null) {
             timingAdjuster = TimingAdjusterOld.getInstance(client.getStatus());
         }
-        if (factory == null) {
-            factory = new CPUCCTNodeFactory();
-        } 
         threadInfos.beginTrans(true);
     }
 
@@ -889,7 +884,6 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
     protected void doShutdown() {
         threadInfos.reset();
-        factory = null;
         instrFilter = null;
     }
 
@@ -957,10 +951,6 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         profilerClient.registerCPUCCTProvider(this);
     }
 
-    protected void setFactory(CPUCCTNodeFactory factory) {
-        this.factory = factory;
-    }
-
     protected void setFilter(InstrumentationFilter filter) {
         this.instrFilter = filter;
     }
@@ -974,7 +964,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     protected boolean isReady() {
-        return (status != null) && (factory != null) && (instrFilter != null);
+        return (status != null) && (instrFilter != null);
     }
 
     private String debugMethod(int methodId) {
@@ -1020,20 +1010,20 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         TimedCPUCCTNode curNode = ti.peek();
 
         if (curNode == null) {
-            TimedCPUCCTNode rootNode = factory.createThreadNode(ti.threadId);
+            TimedCPUCCTNode rootNode = new ThreadCPUCCTNode(ti.threadId);
             ti.totalNNodes++;
             ti.push(rootNode);
             ti.totalNInv--;
 
             if (!mark.isDefault()) {
-                curNode = factory.createCategory(mark);
+                curNode = new MarkedCPUCCTNode(mark);
                 rootNode.attachNodeAsChild(curNode);
                 ti.totalNNodes++;
                 ti.push(curNode);
                 rootNode = curNode;
             }
 
-            curNode = factory.createMethodNode(methodId);
+            curNode = new MethodCPUCCTNode(methodId);
             rootNode.attachNodeAsChild(curNode);
             ti.totalNNodes++;
             ti.push(curNode);
@@ -1075,7 +1065,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 calleeNode = MarkedCPUCCTNode.Locator.locate(mark, curNode.getChildren());
 
                 if (calleeNode == null) {
-                    calleeNode = factory.createCategory(mark);
+                    calleeNode = new MarkedCPUCCTNode(mark);
                     curNode.attachNodeAsChild(calleeNode);
                     ti.totalNNodes++;
                 }
@@ -1088,7 +1078,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             calleeNode = MethodCPUCCTNode.Locator.locate(methodId, curNode.getChildren());
 
             if (calleeNode == null) {
-                calleeNode = factory.createMethodNode(methodId);
+                calleeNode = new MethodCPUCCTNode(methodId);
                 curNode.attachNodeAsChild(calleeNode);
                 ti.totalNNodes++;
             }
@@ -1183,7 +1173,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         // Appropriate sub-node not found, or there are no sub-nodes yet - create one
-        methodNode = factory.createMethodNode(methodId);
+        methodNode = new MethodCPUCCTNode(methodId);
         curNode.attachNodeAsChild(methodNode);
 
         curNode = methodNode;
@@ -1338,20 +1328,20 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
         if (curNode == null) { // no node on stack
 
-            TimedCPUCCTNode rootNode = factory.createThreadNode(ti.threadId); // create a new thread node
+            TimedCPUCCTNode rootNode = new ThreadCPUCCTNode(ti.threadId); // create a new thread node
             ti.totalNNodes++;
             ti.push(rootNode); // and place it on the stack
             ti.totalNInv--;
 
             if (!mark.isDefault()) {
-                curNode = factory.createCategory(mark);
+                curNode = new MarkedCPUCCTNode(mark);
                 rootNode.attachNodeAsChild(curNode);
                 ti.totalNNodes++;
                 ti.push(curNode);
                 rootNode = curNode;
             }
 
-            curNode = factory.createMethodNode(methodId); // now create the root method node
+            curNode = new MethodCPUCCTNode(methodId); // now create the root method node
             rootNode.attachNodeAsChild(curNode); // and attach it to the previously created thread node
             ti.totalNNodes++;
         } else {
@@ -1362,7 +1352,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 calleeNode = MarkedCPUCCTNode.Locator.locate(mark, curNode.getChildren());
 
                 if (calleeNode == null) {
-                    calleeNode = factory.createCategory(mark);
+                    calleeNode = new MarkedCPUCCTNode(mark);
                     curNode.attachNodeAsChild(calleeNode);
                     ti.totalNNodes++;
                 }
@@ -1374,7 +1364,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             calleeNode = MethodCPUCCTNode.Locator.locate(methodId, curNode.getChildren());
 
             if (calleeNode == null) {
-                calleeNode = factory.createMethodNode(methodId);
+                calleeNode = new MethodCPUCCTNode(methodId);
                 curNode.attachNodeAsChild(calleeNode);
                 ti.totalNNodes++;
             }

@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.*;
 
 
 /**
@@ -80,8 +79,8 @@ public class MethodCPUCCTNode extends TimedCPUCCTNode {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of MethodCPUCCTNode */
-    public MethodCPUCCTNode(CPUCCTNodeFactory factory, int methodId) {
-        super(factory);
+    public MethodCPUCCTNode(int methodId) {
+        super();
         this.methodId = methodId;
     }
 
@@ -96,8 +95,6 @@ public class MethodCPUCCTNode extends TimedCPUCCTNode {
     }
 
     protected TimedCPUCCTNode createSelfInstance() {
-        CPUCCTNodeFactory factory = getFactory();
-
-        return (factory != null) ? factory.createMethodNode(getMethodId()) : null;
+        return new MethodCPUCCTNode(getMethodId());
     }
 }
