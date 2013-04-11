@@ -173,7 +173,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             LoadedSnapshot toSave = snapshot;
             if (toSave == null) return; // #218565 snapshot already closed
             
-            ResultsManager.getDefault().saveSnapshot(snapshot);
+            ResultsManager.getDefault().saveSnapshot(toSave);
             ic.remove(this);
         }
 
