@@ -80,8 +80,8 @@ public class MethodCPUCCTNode extends TimedCPUCCTNode {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of MethodCPUCCTNode */
-    public MethodCPUCCTNode(CPUCCTNodeFactory factory, int methodId, boolean twoStamps) {
-        super(factory, twoStamps);
+    public MethodCPUCCTNode(CPUCCTNodeFactory factory, int methodId) {
+        super(factory);
         this.methodId = methodId;
     }
 

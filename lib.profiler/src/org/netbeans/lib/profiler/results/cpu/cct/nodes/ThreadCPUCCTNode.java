@@ -58,8 +58,8 @@ public class ThreadCPUCCTNode extends TimedCPUCCTNode {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of ThreadCPUCCTNode */
-    public ThreadCPUCCTNode(CPUCCTNodeFactory factory, int threadId, boolean twoStamps) {
-        super(factory, twoStamps);
+    public ThreadCPUCCTNode(CPUCCTNodeFactory factory, int threadId) {
+        super(factory);
         this.threadId = threadId;
     }
 

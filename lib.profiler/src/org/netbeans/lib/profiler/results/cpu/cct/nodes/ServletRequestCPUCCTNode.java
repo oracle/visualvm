@@ -87,8 +87,8 @@ public class ServletRequestCPUCCTNode extends TimedCPUCCTNode {
     /**
      * Creates a new instance of ServletRequestCPUCCTNode
      */
-    public ServletRequestCPUCCTNode(CPUCCTNodeFactory factory, int requestType, String path, boolean collectingTwoTimestamps) {
-        super(factory, collectingTwoTimestamps);
+    public ServletRequestCPUCCTNode(CPUCCTNodeFactory factory, int requestType, String path) {
+        super(factory);
         this.servletPath = path;
         this.requestType = requestType;
         setFilteredStatus(FILTERED_YES); // boundary node is going to be filtered by default

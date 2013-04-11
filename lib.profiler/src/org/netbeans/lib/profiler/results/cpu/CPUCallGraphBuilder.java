@@ -865,7 +865,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             timingAdjuster = TimingAdjusterOld.getInstance(client.getStatus());
         }
         if (factory == null) {
-            factory = new CPUCCTNodeFactory(isCollectingTwoTimeStamps());
+            factory = new CPUCCTNodeFactory();
         } 
         threadInfos.beginTrans(true);
     }

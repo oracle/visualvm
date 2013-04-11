@@ -628,7 +628,7 @@ public class StackTraceSnapshotBuilder {
     private class StackTraceCallGraphBuilder extends CPUCallGraphBuilder {
 
         StackTraceCallGraphBuilder (MethodInfoMapper mapper) {
-            setFactory(new CPUCCTNodeFactory(COLLECT_TWO_TIMESTAMPS));
+            setFactory(new CPUCCTNodeFactory());
             setFilter(InstrumentationFilter.getDefault());
             setMethodInfoMapper(mapper);
         }

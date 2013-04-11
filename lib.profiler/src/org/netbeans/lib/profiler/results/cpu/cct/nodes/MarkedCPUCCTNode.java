@@ -81,8 +81,8 @@ public class MarkedCPUCCTNode extends TimedCPUCCTNode {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of MarkedCPUCCTNode */
-    public MarkedCPUCCTNode(CPUCCTNodeFactory factory, Mark mark, boolean collectingTwoTimeStamps) {
-        super(factory, collectingTwoTimeStamps);
+    public MarkedCPUCCTNode(CPUCCTNodeFactory factory, Mark mark) {
+        super(factory);
         this.mark = mark;
     }
 

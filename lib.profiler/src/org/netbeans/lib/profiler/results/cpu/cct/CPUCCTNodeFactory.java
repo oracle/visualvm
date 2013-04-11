@@ -55,32 +55,28 @@ import org.netbeans.lib.profiler.marker.Mark;
  * @author Jaroslav Bachorik
  */
 public class CPUCCTNodeFactory {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private final boolean twoStamps;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of CPUCCTNodeFactory */
-    public CPUCCTNodeFactory(boolean twoStamps) {
-        this.twoStamps = twoStamps;
+    public CPUCCTNodeFactory() {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public MarkedCPUCCTNode createCategory(Mark mark) {
-        return new MarkedCPUCCTNode(this, mark, twoStamps);
+        return new MarkedCPUCCTNode(this, mark);
     }
 
     public MethodCPUCCTNode createMethodNode(int methodId) {
-        return new MethodCPUCCTNode(this, methodId, twoStamps);
+        return new MethodCPUCCTNode(this, methodId);
     }
 
     public ServletRequestCPUCCTNode createServletRequestNode(int requestType, String path) {
-        return new ServletRequestCPUCCTNode(this, requestType, path, twoStamps);
+        return new ServletRequestCPUCCTNode(this, requestType, path);
     }
 
     public ThreadCPUCCTNode createThreadNode(int threadId) {
-        return new ThreadCPUCCTNode(this, threadId, twoStamps);
+        return new ThreadCPUCCTNode(this, threadId);
     }
 }
