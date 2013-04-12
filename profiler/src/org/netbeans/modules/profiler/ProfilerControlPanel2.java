@@ -143,7 +143,6 @@ import org.openide.util.lookup.ServiceProvider;
     "ProfilerControlPanel2_TakeSnapshotButtonName=Take Snapshot",
     "ProfilerControlPanel2_DumpHeapButtonName=Dump Heap",
     "ProfilerControlPanel2_TakeSnapshotButtonToolTip=Obtains a snapshot of profiling results at the current moment",
-    "ProfilerControlPanel2_TakeHeapDumpButtonToolTip=Takes a heap snapshot of the application",
     "ProfilerControlPanel2_LiveResultsButtonName=Live Results",
     "ProfilerControlPanel2_LiveResultsButtonToolTip=Show live profiling results",
     "ProfilerControlPanel2_ResetResultsButtonName=Reset Collected Results",
@@ -766,7 +765,6 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
             takeHeapDumpButton.setHorizontalTextPosition(SwingConstants.CENTER);
             takeHeapDumpButton.setRolloverEnabled(true);
             takeHeapDumpButton.setBorder(myRolloverBorder);
-            takeHeapDumpButton.setToolTipText(Bundle.ProfilerControlPanel2_TakeHeapDumpButtonToolTip());
 
             // Take Fragment snapshot
             takeFragmentSnapshotButton = new JButton(Bundle.ProfilerControlPanel2_TakeSnapshotButtonName(), TAKE_SNAPSHOT_FRAGMENT_ICON);

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,48 +34,92 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
+package org.netbeans.lib.profiler.results.locks;
 
-package org.netbeans.lib.profiler.results.cpu.cct;
-
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
-import org.netbeans.lib.profiler.marker.Mark;
-
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Tomas Hurka
  */
-public class CPUCCTNodeFactory {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+class ThreadLockCCTNode extends LockCCTNode {
 
-    private final boolean twoStamps;
+    private final ThreadInfo ti;
+    private final List<ThreadInfo.Monitor> monitors;
+    private long allTime;
+    private long allCount;
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    /** Creates a new instance of CPUCCTNodeFactory */
-    public CPUCCTNodeFactory(boolean twoStamps) {
-        this.twoStamps = twoStamps;
+    ThreadLockCCTNode(LockCCTNode parent, ThreadInfo key, List<ThreadInfo.Monitor> value) {
+        super(parent);
+        ti = key;
+        monitors = value;
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public MarkedCPUCCTNode createCategory(Mark mark) {
-        return new MarkedCPUCCTNode(this, mark, twoStamps);
+    ThreadLockCCTNode(MonitorCCTNode parent, MonitorInfo.ThreadDetail td) {
+        super(parent);
+        ti = td.threadInfo;
+        allTime = td.waitTime;
+        allCount = td.count;
+        monitors = Collections.EMPTY_LIST;
     }
 
-    public MethodCPUCCTNode createMethodNode(int methodId) {
-        return new MethodCPUCCTNode(this, methodId, twoStamps);
+    @Override
+    public String getNodeName() {
+        return ti.getName();
     }
 
-    public ServletRequestCPUCCTNode createServletRequestNode(int requestType, String path) {
-        return new ServletRequestCPUCCTNode(this, requestType, path, twoStamps);
+    @Override
+    public long getTime() {
+        if (allTime == 0) {
+            summarize();
+        }
+        return allTime;
     }
 
-    public ThreadCPUCCTNode createThreadNode(int threadId) {
-        return new ThreadCPUCCTNode(this, threadId, twoStamps);
+    @Override
+    public long getWaits() {
+        if (allCount == 0) {
+            summarize();
+        }
+        return allCount;
+    }
+    
+    @Override
+    public boolean isThreadLockNode() {
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ThreadLockCCTNode) {
+            return ti.equals(((ThreadLockCCTNode)obj).ti);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return ti.hashCode();
+    }
+
+    private void summarize() {
+        for (ThreadInfo.Monitor m : monitors) {
+            allTime += m.waitTime;
+            allCount += m.count;
+        }
+    }
+
+    @Override
+    void computeChildren() {
+        super.computeChildren();
+        for (ThreadInfo.Monitor m : monitors) {
+            addChild(new MonitorCCTNode(this, m));
+        }
     }
 }
