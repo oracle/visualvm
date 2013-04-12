@@ -67,11 +67,13 @@ public interface CPUProfilingResultListener extends ProfilingResultListener {
 
     void methodExitUnstamped(final int methodId, final int threadId, final int methodType);
 
-    void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1);
+    void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId);
 
-    void monitorExit(final int threadId, final long timeStamp0, final long timeStamp1);
+    void monitorExit(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId);
 
     void newThread(final int threadId, final String threadName, final String threadClassName);
+
+    void newMonitor(final int hash, final String className);
 
     void servletRequest(final int threadId, final int requestType, final String servletPath, final int sessionId);
 
