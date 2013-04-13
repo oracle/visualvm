@@ -284,12 +284,10 @@ public class LoadedSnapshot {
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1000000); // ~1MB pre-allocated
-        BufferedOutputStream bufBaos = new BufferedOutputStream(baos);
-        DataOutputStream snapshotDataStream = new DataOutputStream(bufBaos);
+        DataOutputStream snapshotDataStream = new DataOutputStream(baos);
 
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream(10000); // ~10kB pre-allocated
-        BufferedOutputStream bufBaos2 = new BufferedOutputStream(baos2);
-        DataOutputStream settingsDataStream = new DataOutputStream(bufBaos2);
+        DataOutputStream settingsDataStream = new DataOutputStream(baos2);
 
         try {
             snapshot.writeToStream(snapshotDataStream);
@@ -336,10 +334,8 @@ public class LoadedSnapshot {
             dos.writeUTF(userComments);
         } catch (OutOfMemoryError e) {
             baos = null;
-            bufBaos = null;
             snapshotDataStream = null;
             baos2 = null;
-            bufBaos2 = null;
             settingsDataStream = null;
 
             throw e;
@@ -480,8 +476,7 @@ public class LoadedSnapshot {
             }
 
             ByteArrayInputStream bais2 = new ByteArrayInputStream(settingsBytes);
-            BufferedInputStream bufBais2 = new BufferedInputStream(bais2);
-            DataInputStream settingsDis = new DataInputStream(bufBais2);
+            DataInputStream settingsDis = new DataInputStream(bais2);
 
             try {
                 props.load(settingsDis);
