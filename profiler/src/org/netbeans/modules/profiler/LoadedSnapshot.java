@@ -59,10 +59,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
 import javax.management.openmbean.CompositeData;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
@@ -418,39 +417,10 @@ public class LoadedSnapshot {
             // 4. int length of snapshot data size
             int compressedDataLen = dis.readInt();
             int uncompressedDataLen = dis.readInt();
-            byte[] dataBytes = new byte[compressedDataLen];
 
             // 5. snapshot data bytes
-            int readLen1 = dis.read(dataBytes, 0, compressedDataLen);
-
-            if (compressedDataLen != readLen1) {
-                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_CannotReadSnapshotDataMsg()));
-            }
-
-            // 6. int length of settings data size
-            int settingsLen = dis.readInt();
-            byte[] settingsBytes = new byte[settingsLen];
-
-            // 7. settings data bytes (.properties plain text file format)
-            int readLen2 = dis.read(settingsBytes);
-
-            if (settingsLen != readLen2) {
-                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_CannotReadSettingsDataMsg()));
-            }
+            InputStream zipStream = new InflaterInputStream(new SubInputStream(dis,compressedDataLen));
             
-            if (minorVersion >= SNAPSHOT_FILE_VERSION_MINOR) {
-                userComments = dis.readUTF();
-            }
-
-            // Process read data:
-            if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("load version:" + majorVersion + "." + minorVersion); // NOI18N
-                LOGGER.finest("load type:" + type); // NOI18N
-                LOGGER.finest("load length of snapshot data:" + compressedDataLen); // NOI18N
-                LOGGER.finest("uncompressed length of snapshot data:" + uncompressedDataLen); // NOI18N
-                LOGGER.finest("load length of settings data:" + settingsLen); // NOI18N
-            }
-
             switch (type) {
                 case SNAPSHOT_TYPE_CPU:
                     snapshot = new CPUResultsSnapshot();
@@ -476,33 +446,37 @@ public class LoadedSnapshot {
                     throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_UnrecognizedSnapshotTypeMsg())); // not supported
             }
 
-            Inflater d = new Inflater();
-            d.setInput(dataBytes, 0, dataBytes.length);
-
-            byte[] decompressedBytes = new byte[uncompressedDataLen];
-
-            try {
-                int decLen = d.inflate(decompressedBytes);
-
-                if (decLen != uncompressedDataLen) {
-                    throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_SnapshotDataCorruptedMsg()));
-                }
-            } catch (DataFormatException e) {
-                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorrupted());
-            }
-
-            d.end();
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(decompressedBytes);
-            BufferedInputStream bufBais = new BufferedInputStream(bais);
+            BufferedInputStream bufBais = new BufferedInputStream(zipStream);
             DataInputStream dataDis = new DataInputStream(bufBais);
 
             try {
                 snapshot.readFromStream(dataDis);
             } catch (IOException e) {
                 throw new IOException(getCorruptedMessage(e));
-            } finally {
-                dataDis.close();
+            }
+
+            // 6. int length of settings data size
+            int settingsLen = dis.readInt();
+            byte[] settingsBytes = new byte[settingsLen];
+
+            // 7. settings data bytes (.properties plain text file format)
+            int readLen2 = dis.read(settingsBytes);
+
+            if (settingsLen != readLen2) {
+                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_CannotReadSettingsDataMsg()));
+            }
+            
+            if (minorVersion >= SNAPSHOT_FILE_VERSION_MINOR) {
+                userComments = dis.readUTF();
+            }
+
+            // Process read data:
+            if (LOGGER.isLoggable(Level.FINEST)) {
+                LOGGER.finest("load version:" + majorVersion + "." + minorVersion); // NOI18N
+                LOGGER.finest("load type:" + type); // NOI18N
+                LOGGER.finest("load length of snapshot data:" + compressedDataLen); // NOI18N
+                LOGGER.finest("uncompressed length of snapshot data:" + uncompressedDataLen); // NOI18N
+                LOGGER.finest("load length of settings data:" + settingsLen); // NOI18N
             }
 
             ByteArrayInputStream bais2 = new ByteArrayInputStream(settingsBytes);
@@ -533,6 +507,54 @@ public class LoadedSnapshot {
         return true;
     }
 
+    private static class SubInputStream extends FilterInputStream {
+        private int limit;
+        
+        private SubInputStream(InputStream is, int l) {
+            super(is);
+            limit = l;
+        }
+
+        @Override
+        public int available() throws IOException {
+            int avail = super.available();
+            return Math.min(avail, limit);
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (limit == 0) {
+                return -1;
+            }
+            limit--;
+            return super.read();
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            if (limit == 0) {
+                return -1;
+            }
+            int realLen = Math.min(len, limit);
+            int readBytes = super.read(b, off, realLen);
+            limit -= readBytes;
+            return readBytes;
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            long skip = Math.min(n, limit);
+            long skipped = super.skip(skip);
+            limit -= skipped;
+            return skipped;
+        }
+
+        @Override
+        public boolean markSupported() {
+            return false;
+        }
+    }
+    
     static class SamplesInputStream {
         static final String ID = "NPSS"; // NetBeans Profiler samples stream, it must match org.netbeans.modules.sampler.SamplesOutputStream.ID
         static final int MAX_SUPPORTED_VERSION = 2;
