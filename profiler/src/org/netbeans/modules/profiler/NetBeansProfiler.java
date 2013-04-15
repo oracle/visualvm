@@ -1615,7 +1615,7 @@ public abstract class NetBeansProfiler extends Profiler {
         }
         
         if (newState == PROFILING_RUNNING && CommonConstants.JDK_15_STRING.
-                equals(lastSessionSettings.getJavaVersionString())) {
+                equals(getTargetAppRunner().getProfilerEngineSettings().getTargetJDKVersionString())) {
             if (lastProfilingSettings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_SAMPLING)
                 SwingUtilities.invokeLater(new Runnable() { // Let the underlying dialogs close first
                     public void run() {
