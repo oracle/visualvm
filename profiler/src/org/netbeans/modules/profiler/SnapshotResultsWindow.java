@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.modules.profiler.utilities.Delegate;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.actions.FindAction;
 import org.openide.util.NbBundle;
