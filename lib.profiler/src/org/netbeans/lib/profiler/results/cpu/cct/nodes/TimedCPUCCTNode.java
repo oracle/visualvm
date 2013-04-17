@@ -43,130 +43,11 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
-import org.netbeans.lib.profiler.results.cpu.cct.*;
-
-
 /**
  *
  * @author Jaroslav Bachorik
  */
 public abstract class TimedCPUCCTNode extends BaseCPUCCTNode implements Cloneable, RuntimeCPUCCTNode {
-    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
-
-    private static interface TimingData {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        void setNetTime0(final long time);
-
-        long getNetTime0();
-
-        void setNetTime1(final long time);
-
-        long getNetTime1();
-
-        void setSleepTime0(final long time);
-
-        long getSleepTime0();
-
-        void setWaitTime0(final long time);
-
-        long getWaitTime0();
-
-        long addNetTime0(final long time);
-
-        long addNetTime1(final long time);
-
-        long addSleepTime0(final long time);
-
-        long addWaitTime0(final long time);
-    }
-
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
-    private static class TimingDataExtended extends TimingDataSimple {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private long netTime1;
-
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public synchronized void setNetTime1(final long time) {
-            netTime1 = time;
-        }
-
-        public synchronized long getNetTime1() {
-            return netTime1;
-        }
-
-        public synchronized long addNetTime1(final long time) {
-            netTime1 += time;
-
-            return netTime1;
-        }
-    }
-
-    private static class TimingDataSimple implements TimingData {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private long netTime0;
-        private long sleepTime0;
-        private long waitTime0;
-
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public synchronized void setNetTime0(final long time) {
-            netTime0 = time;
-        }
-
-        public synchronized long getNetTime0() {
-            return netTime0;
-        }
-
-        public void setNetTime1(final long time) {
-        }
-
-        public long getNetTime1() {
-            return 0;
-        }
-
-        public synchronized void setSleepTime0(final long time) {
-            sleepTime0 = time;
-        }
-
-        public synchronized long getSleepTime0() {
-            return sleepTime0;
-        }
-
-        public synchronized void setWaitTime0(final long time) {
-            waitTime0 = time;
-        }
-
-        public synchronized long getWaitTime0() {
-            return waitTime0;
-        }
-
-        public synchronized long addNetTime0(final long time) {
-            netTime0 += time;
-
-            return netTime0;
-        }
-
-        public long addNetTime1(final long time) {
-            return 0;
-        }
-
-        public synchronized long addSleepTime0(final long time) {
-            sleepTime0 += time;
-
-            return sleepTime0;
-        }
-
-        public synchronized long addWaitTime0(final long time) {
-            waitTime0 += time;
-
-            return waitTime0;
-        }
-    }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
@@ -176,7 +57,12 @@ public abstract class TimedCPUCCTNode extends BaseCPUCCTNode implements Cloneabl
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private TimingData timingData;
+    // timing data
+    private long netTime0;
+    private long netTime1;
+    private long sleepTime0;
+    private long waitTime0;
+            
     private char filteredStatus;
     private int nCalls;
     private int nCallsDiff;
@@ -184,17 +70,8 @@ public abstract class TimedCPUCCTNode extends BaseCPUCCTNode implements Cloneabl
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    //  volatile protected boolean twoStamps;
-    public TimedCPUCCTNode(CPUCCTNodeFactory factory, boolean collectingTwoTimestamps) {
-        super(factory);
-
-        if (collectingTwoTimestamps) {
-            timingData = new TimingDataExtended();
-        } else {
-            timingData = new TimingDataSimple();
-        }
-
-        //    twoStamps = collectingTwoTimestamps;
+    public TimedCPUCCTNode() {
+        super();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -254,35 +131,35 @@ public abstract class TimedCPUCCTNode extends BaseCPUCCTNode implements Cloneabl
     }
 
     public void setNetTime0(final long time) {
-        timingData.setNetTime0(time);
+        netTime0 = time;
     }
 
     public long getNetTime0() {
-        return timingData.getNetTime0();
+        return netTime0;
     }
 
     public void setNetTime1(final long time) {
-        timingData.setNetTime1(time);
+        netTime1 = time;
     }
 
     public long getNetTime1() {
-        return timingData.getNetTime1();
+        return netTime1;
     }
 
     public void setSleepTime0(final long time) {
-        timingData.setSleepTime0(time);
+        sleepTime0 = time;
     }
 
     public long getSleepTime0() {
-        return timingData.getSleepTime0();
+        return sleepTime0;
     }
 
     public void setWaitTime0(final long time) {
-        timingData.setWaitTime0(time);
+        waitTime0 = time;
     }
 
     public synchronized long getWaitTime0() {
-        return timingData.getWaitTime0();
+        return waitTime0;
     }
 
     public synchronized int addNCalls(final int calls) {
@@ -298,19 +175,23 @@ public abstract class TimedCPUCCTNode extends BaseCPUCCTNode implements Cloneabl
     }
 
     public long addNetTime0(final long time) {
-        return timingData.addNetTime0(time);
+        netTime0 += time;
+        return netTime0;
     }
 
     public long addNetTime1(final long time) {
-        return timingData.addNetTime1(time);
+        netTime1 += time;
+        return netTime1;
     }
 
     public long addSleepTime0(final long time) {
-        return timingData.addSleepTime0(time);
+        sleepTime0 += time;
+        return sleepTime0;
     }
 
     public long addWaitTime0(final long time) {
-        return timingData.addWaitTime0(time);
+        waitTime0 += time;
+        return waitTime0;
     }
 
     // @Override

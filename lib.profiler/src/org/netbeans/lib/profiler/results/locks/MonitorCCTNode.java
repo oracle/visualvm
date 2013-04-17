@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,38 +34,93 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
+package org.netbeans.lib.profiler.results.locks;
 
-package org.netbeans.lib.profiler.results.cpu.cct.nodes;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Tomas Hurka
  */
-public class ThreadCPUCCTNode extends TimedCPUCCTNode {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+class MonitorCCTNode extends LockCCTNode {
 
-    private final int threadId;
+    private final MonitorInfo monitor;
+    private final List<MonitorInfo.ThreadDetail> threads;
+    private long allTime;
+    private long allCount;
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    /** Creates a new instance of ThreadCPUCCTNode */
-    public ThreadCPUCCTNode(int threadId) {
-        super();
-        this.threadId = threadId;
+    MonitorCCTNode(LockCCTNode top, MonitorInfo key, List<MonitorInfo.ThreadDetail> value) {
+        super(top);
+        monitor = key;
+        threads = value;
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    MonitorCCTNode(ThreadLockCCTNode parent, ThreadInfo.Monitor m) {
+        super(parent);
+        monitor = m.monitor;
+        allTime = m.waitTime;
+        allCount = m.count;
+        threads = Collections.EMPTY_LIST;
+    }
 
-    public boolean isRoot() {
+    @Override
+    public String getNodeName() {
+        return monitor.getName();
+    }
+
+    @Override
+    public long getTime() {
+        if (allTime == 0) {
+            summarize();
+        }
+        return allTime;
+    }
+
+    @Override
+    public long getWaits() {
+        if (allCount == 0) {
+            summarize();
+        }
+        return allCount;
+    }
+    
+    @Override
+    public boolean isMonitorNode() {
         return true;
     }
 
-    public int getThreadId() {
-        return threadId;
+    @Override
+    public int hashCode() {
+        return monitor.hashCode();
     }
-    
-    protected TimedCPUCCTNode createSelfInstance() {
-        return new ThreadCPUCCTNode(threadId);
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MonitorCCTNode) {
+            return monitor.equals(((MonitorCCTNode)obj).monitor);
+        }
+        return false;
+    }
+
+    private void summarize() {
+        for (MonitorInfo.ThreadDetail td : threads) {
+            allTime += td.waitTime;
+            allCount += td.count;
+        }
+    }
+
+    @Override
+    void computeChildren() {
+        super.computeChildren();
+        for (MonitorInfo.ThreadDetail td : threads) {
+            addChild(new ThreadLockCCTNode(this, td));
+        }
     }
 }

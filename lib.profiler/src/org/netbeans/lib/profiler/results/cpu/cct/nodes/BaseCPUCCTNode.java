@@ -43,9 +43,7 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct.nodes;
 
-import java.lang.ref.WeakReference;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
 
 
 /**
@@ -53,72 +51,36 @@ import org.netbeans.lib.profiler.results.cpu.cct.CPUCCTNodeFactory;
  * @author Jaroslav Bachorik
  */
 public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
-    private static class ArrayChildren implements Children {
-        //~ Instance fields ------------------------------------------------------------------------------------------------------
-
-        private RuntimeCPUCCTNode[] children;
-
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public RuntimeCPUCCTNode getChildAt(int i) {
-            return (children != null) ? children[i] : null;
-        }
-
-        public void attachNode(RuntimeCPUCCTNode node) {
-            addChildEntry();
-            children[children.length - 1] = node;
-        }
-
-        public int size() {
-            return (children != null) ? children.length : 0;
-        }
-
-        private void addChildEntry() {
-            if (children == null) {
-                children = new RuntimeCPUCCTNode[1];
-            } else {
-                RuntimeCPUCCTNode[] newch = new RuntimeCPUCCTNode[children.length + 1];
-                System.arraycopy(children, 0, newch, 0, children.length);
-                children = newch;
-            }
-        }
-        
-        public RuntimeCPUCCTNode[] toArray() {
-            return children == null ? new RuntimeCPUCCTNode[0] : children;
-        }
-    }
-
+    
+    private static RuntimeCCTNode[] EMPTY_CHILDREN = new RuntimeCCTNode[0];    
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final ArrayChildren children;
-    private final WeakReference factoryRef;
+    private RuntimeCPUCCTNode[] children;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of BaseCPUCCTNode */
-    public BaseCPUCCTNode(CPUCCTNodeFactory parentFactory) {
-        if (parentFactory != null) {
-            this.factoryRef = new WeakReference(parentFactory);
-        } else {
-            this.factoryRef = null;
-        }
-
-        this.children = new ArrayChildren();
+    public BaseCPUCCTNode() {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public RuntimeCCTNode[] getChildren() {
-        return children.toArray();
+        if (children == null) {
+            return EMPTY_CHILDREN;
+        }
+        return children;
     }
 
     public void attachNodeAsChild(RuntimeCPUCCTNode node) {
-        children.attachNode(node);
-    }
-    
-    protected CPUCCTNodeFactory getFactory() {
-        return (factoryRef != null) ? (CPUCCTNodeFactory) factoryRef.get() : null;
+        if (children == null) {
+            children = new RuntimeCPUCCTNode[1];
+        } else {
+            RuntimeCPUCCTNode[] newChildren = new RuntimeCPUCCTNode[children.length+1];
+            System.arraycopy(children, 0, newChildren, 0, children.length);
+            children = newChildren;
+        }
+        children[children.length-1] = node;
     }
 }
