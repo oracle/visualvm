@@ -363,6 +363,10 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
             if (collectingTwoTimeStamps) {
                 result.append("<td align=right>").append((double) flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms</td>"); //NOI18N
             }
+            result.append("<td align=right>").append((double) flatProfileContainer.getTotalTimeInMcs0AtRow(i)/1000).append(" ms</td>"); //NOI18N
+            if (collectingTwoTimeStamps) {
+                result.append("<td align=right>").append((double) flatProfileContainer.getTotalTimeInMcs1AtRow(i)/1000).append(" ms</td>"); //NOI18N
+            }
             result.append("<td align=\"right\">").append(flatProfileContainer.getNInvocationsAtRow(i)).append("</td></tr>"); //NOI18N
             eDD.dumpData(result);
         }
@@ -385,6 +389,10 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
             result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline); //NOI18N
             if (collectingTwoTimeStamps) {
                 result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs1AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline); //NOI18N
+            }
+            result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTotalTimeInMcs0AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline); //NOI18N
+            if (collectingTwoTimeStamps) {
+                result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTotalTimeInMcs1AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline); //NOI18N
             }
             result.append("    <TableColumn><![CDATA[").append(flatProfileContainer.getNInvocationsAtRow(i)).append("]]></TableColumn>").append(newline).append("  </TableRow>").append(newline); //NOI18N
             eDD.dumpData(result);
@@ -413,6 +421,10 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
             result.append(quote).append((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms").append(quote).append(separator);
             if (collectingTwoTimeStamps) {
                 result.append(quote).append((double)flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            }
+            result.append(quote).append((double)flatProfileContainer.getTotalTimeInMcs0AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            if (collectingTwoTimeStamps) {
+                result.append(quote).append((double)flatProfileContainer.getTotalTimeInMcs1AtRow(i)/1000).append(" ms").append(quote).append(separator);
             }
             result.append(quote).append(flatProfileContainer.getNInvocationsAtRow(i)).append(quote).append(newLine);
             eDD.dumpData(result);

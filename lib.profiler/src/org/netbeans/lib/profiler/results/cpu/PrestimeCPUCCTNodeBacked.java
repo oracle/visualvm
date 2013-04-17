@@ -315,6 +315,9 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         result.append(indent).append(" <Parent>").append(replaceHTMLCharacters((getParent()==null)?("none"):(((PrestimeCPUCCTNodeBacked)getParent()).getNodeName()))).append("</Parent>").append(newline); //NOI18N
         result.append(indent).append(" <Time_Relative>").append(percentFormat.format(((double) getTotalTime0InPerCent())/100)).append("</Time_Relative>").append(newline); //NOI18N
         result.append(indent).append(" <Time>").append(getTotalTime0()).append("</Time>").append(newline); //NOI18N
+        if (container.collectingTwoTimeStamps) {
+            result.append(indent).append(" <Time-CPU>").append(getTotalTime1()).append("</Time-CPU>").append(newline); //NOI18N
+        }
         result.append(indent).append(" <Invocations>").append(getNCalls()).append("</Invocations>").append(newline); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
@@ -343,7 +346,11 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         for (int i=0; i<depth; i++) {
             result.append("."); //NOI18N
         }
-        result.append(replaceHTMLCharacters(getNodeName())).append("</pre></td><td class=\"right\">").append(percentFormat.format(((double) getTotalTime0InPerCent())/100)).append("</td><td class=\"right\">").append(getTotalTime0()).append("</td><td class=\"right\">").append(getNCalls()).append("</td></tr>"); //NOI18N
+        result.append(replaceHTMLCharacters(getNodeName())).append("</pre></td><td class=\"right\">").append(percentFormat.format(((double) getTotalTime0InPerCent())/100)).append("</td><td class=\"right\">").append(getTotalTime0()); //NOI18N
+        if (container.collectingTwoTimeStamps) {
+            result.append("</td><td class=\"right\">").append(getTotalTime1()); //NOI18N
+        }
+        result.append("</td><td class=\"right\">").append(getNCalls()).append("</td></tr>"); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
@@ -394,6 +401,9 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         result.append(getNodeName()).append(quote).append(separator);
         result.append(quote).append(getTotalTime0InPerCent()).append(quote).append(separator);
         result.append(quote).append(getTotalTime0()).append(quote).append(separator);
+        if (container.collectingTwoTimeStamps) {
+            result.append(quote).append(getTotalTime1()).append(quote).append(separator);
+        }
         result.append(quote).append(getNCalls()).append(quote).append(newLine);
         eDD.dumpData(result); //dumps the current row
         // children nodes
