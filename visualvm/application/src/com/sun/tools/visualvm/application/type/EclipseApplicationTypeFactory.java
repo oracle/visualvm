@@ -73,7 +73,7 @@ public class EclipseApplicationTypeFactory extends MainClassApplicationTypeFacto
     private String getName(Jvm jvm) {
         if (jvm.isGetSystemPropertiesSupported()) {
             Properties p = jvm.getSystemProperties();
-            if (p.containsKey(ECLIPSE_SYSPROP_ID)) {
+            if (p != null && p.containsKey(ECLIPSE_SYSPROP_ID)) {
                 return ECLIPSE_NAME;
             }
         }

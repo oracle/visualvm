@@ -32,6 +32,7 @@ import java.util.Set;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import static com.sun.tools.visualvm.application.type.NetBeansApplicationTypeFactory.PRODUCT_VERSION_PROPERTY;
+import java.util.Properties;
 
 /**
  * This {@link ApplicationType} represents application based on
@@ -50,7 +51,10 @@ public class NetBeansBasedApplicationType extends ApplicationType {
         clusters = cls;
         branding = br;
         if (jvm.isGetSystemPropertiesSupported()) {
-            fullVersionString = jvm.getSystemProperties().getProperty(PRODUCT_VERSION_PROPERTY);
+            Properties p = jvm.getSystemProperties();
+            if (p != null) {
+                fullVersionString = p.getProperty(PRODUCT_VERSION_PROPERTY);
+            }
         }
     }
     

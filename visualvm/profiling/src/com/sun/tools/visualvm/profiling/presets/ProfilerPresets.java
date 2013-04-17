@@ -210,20 +210,22 @@ public final class ProfilerPresets {
             mainClass = ""; // NOI18N
             if (jvm.isGetSystemPropertiesSupported()) {
                 Properties sysProp = jvm.getSystemProperties();
-                String userdir = sysProp.getProperty("user.dir");     // NOI18N
-                if (userdir != null) {
-                    String args = jvm.getCommandLine();
-                    int index = args.indexOf(JAR_SUFFIX);
-                    if (index != -1) {
-                        File jarFile = new File(userdir,args.substring(0,index+JAR_SUFFIX.length()));
-                        if (jarFile.exists()) {
-                            try {
-                                JarFile jf = new JarFile(jarFile);
-                                String mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
-                                assert mainClassName!=null;
-                                mainClass = mainClassName.replace('\\', '/').replace('/', '.'); // NOI18N
-                            } catch (IOException ex) {
-//                                LOGGER.log(Level.INFO, "getMainClass", ex);   // NOI18N
+                if (sysProp != null) {
+                    String userdir = sysProp.getProperty("user.dir");     // NOI18N
+                    if (userdir != null) {
+                        String args = jvm.getCommandLine();
+                        int index = args.indexOf(JAR_SUFFIX);
+                        if (index != -1) {
+                            File jarFile = new File(userdir,args.substring(0,index+JAR_SUFFIX.length()));
+                            if (jarFile.exists()) {
+                                try {
+                                    JarFile jf = new JarFile(jarFile);
+                                    String mainClassName = jf.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+                                    assert mainClassName!=null;
+                                    mainClass = mainClassName.replace('\\', '/').replace('/', '.'); // NOI18N
+                                } catch (IOException ex) {
+    //                                LOGGER.log(Level.INFO, "getMainClass", ex);   // NOI18N
+                                }
                             }
                         }
                     }
