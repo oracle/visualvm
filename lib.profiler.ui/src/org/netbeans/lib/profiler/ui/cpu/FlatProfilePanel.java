@@ -108,6 +108,10 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     private static final String SELFTIME_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_SelfTimeColumnToolTip"); // NOI18N
     private static final String SELFTIME_CPU_COLUMN_NAME = messages.getString("FlatProfilePanel_SelfTimeCpuColumnName"); // NOI18N
     private static final String SELFTIME_CPU_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_SelfTimeCpuColumnToolTip"); // NOI18N
+    private static final String TOTALTIME_COLUMN_NAME = messages.getString("FlatProfilePanel_TotalTimeColumnName"); // NOI18N
+    private static final String TOTALTIME_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_TotalTimeColumnToolTip"); // NOI18N
+    private static final String TOTALTIME_CPU_COLUMN_NAME = messages.getString("FlatProfilePanel_TotalTimeCpuColumnName"); // NOI18N
+    private static final String TOTALTIME_CPU_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_TotalTimeCpuColumnToolTip"); // NOI18N
     private static final String INVOCATIONS_COLUMN_NAME = messages.getString("FlatProfilePanel_InvocationsColumnName"); // NOI18N
     private static final String SAMPLES_COLUMN_NAME = messages.getString("FlatProfilePanel_SamplesColumnName"); // NOI18N
     private static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("FlatProfilePanel_InvocationsColumnToolTip"); // NOI18N
@@ -245,8 +249,13 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
                 return FlatProfileContainer.SORT_BY_TIME;
             case 3:
                 return collectingTwoTimeStamps ? FlatProfileContainer.SORT_BY_SECONDARY_TIME
-                                               : FlatProfileContainer.SORT_BY_INV_NUMBER;
+                                               : FlatProfileContainer.SORT_BY_TOTAL_TIME;
             case 4:
+                return collectingTwoTimeStamps ? FlatProfileContainer.SORT_BY_TOTAL_TIME
+                                               : FlatProfileContainer.SORT_BY_INV_NUMBER;
+            case 5:
+                return FlatProfileContainer.SORT_BY_SECONDARY_TOTAL_TIME;
+            case 6:
                 return FlatProfileContainer.SORT_BY_INV_NUMBER;
         }
 
@@ -443,7 +452,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
     }
 
     protected void initColumnsData() {
-        columnCount = collectingTwoTimeStamps ? 5 : 4;
+        columnCount = collectingTwoTimeStamps ? 7 : 5;
 
         columnsVisibility = new boolean[columnCount];
         for (int i = 0; i < columnCount - 1; i++)
@@ -467,20 +476,26 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         if (collectingTwoTimeStamps) {
             columnNames[3] = SELFTIME_CPU_COLUMN_NAME;
             columnToolTips[3] = SELFTIME_CPU_COLUMN_TOOLTIP;
+            columnNames[4] = TOTALTIME_COLUMN_NAME;
+            columnToolTips[4] = TOTALTIME_COLUMN_TOOLTIP;
+            columnNames[5] = TOTALTIME_CPU_COLUMN_NAME;
+            columnToolTips[5] = TOTALTIME_CPU_COLUMN_TOOLTIP;
+            if (isSampling() != null && isSampling()) {
+                columnNames[6] = SAMPLES_COLUMN_NAME;
+                columnToolTips[6] = SAMPLES_COLUMN_TOOLTIP;
+            } else {
+                columnNames[6] = INVOCATIONS_COLUMN_NAME;
+                columnToolTips[6] = INVOCATIONS_COLUMN_TOOLTIP;
+            }
+        } else { // just absolute
+            columnNames[3] = TOTALTIME_COLUMN_NAME;
+            columnToolTips[3] = TOTALTIME_COLUMN_TOOLTIP;
             if (isSampling() != null && isSampling()) {
                 columnNames[4] = SAMPLES_COLUMN_NAME;
                 columnToolTips[4] = SAMPLES_COLUMN_TOOLTIP;
             } else {
                 columnNames[4] = INVOCATIONS_COLUMN_NAME;
                 columnToolTips[4] = INVOCATIONS_COLUMN_TOOLTIP;
-            }
-        } else { // just absolute
-            if (isSampling() != null && isSampling()) {
-                columnNames[3] = SAMPLES_COLUMN_NAME;
-                columnToolTips[3] = SAMPLES_COLUMN_TOOLTIP;
-            } else {
-                columnNames[3] = INVOCATIONS_COLUMN_NAME;
-                columnToolTips[3] = INVOCATIONS_COLUMN_TOOLTIP;
             }
         }
 
@@ -532,7 +547,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         }
 
         // non-negative numbers are actual thread ids
-        int currentColumnCount = collectingTwoTimeStamps ? 5 : 4;
+        int currentColumnCount = collectingTwoTimeStamps ? 7 : 5;
 
         if (columnCount != currentColumnCount) {
             initColumnsData();
@@ -588,7 +603,7 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
         }
 
         // non-negative numbers are actual thread ids
-        int currentColumnCount = collectingTwoTimeStamps ? 5 : 4;
+        int currentColumnCount = collectingTwoTimeStamps ? 7 : 5;
 
         if (columnCount != currentColumnCount) {
             initColumnsData();
@@ -925,8 +940,14 @@ public abstract class FlatProfilePanel extends CPUResultsPanel {
             case 3:
                 return collectingTwoTimeStamps
                         ? (StringUtils.mcsTimeToString(flatProfileContainer.getTimeInMcs1AtRow(row)) + " ms" // NOI18N
-                ) : intFormat.format(flatProfileContainer.getNInvocationsAtRow(row));
+                ) : (StringUtils.mcsTimeToString(flatProfileContainer.getTotalTimeInMcs0AtRow(row)) + " ms"); // NOI18N
             case 4:
+                return collectingTwoTimeStamps
+                        ? (StringUtils.mcsTimeToString(flatProfileContainer.getTotalTimeInMcs0AtRow(row)) + " ms" // NOI18N
+                ) : intFormat.format(flatProfileContainer.getNInvocationsAtRow(row));
+            case 5:
+                return (StringUtils.mcsTimeToString(flatProfileContainer.getTotalTimeInMcs1AtRow(row)) + " ms"); // NOI18N
+            case 6:
                 return intFormat.format(flatProfileContainer.getNInvocationsAtRow(row));
             default:
                 return null;

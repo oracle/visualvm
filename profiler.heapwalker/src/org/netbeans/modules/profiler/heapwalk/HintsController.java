@@ -240,26 +240,30 @@ public class HintsController extends AbstractController {
         
         Heap heap = getSummaryController().getHeapFragmentWalker().getHeapFragment();
         JavaClass frameClass = heap.getJavaClassByName("java.awt.Frame"); // NOI18N
-        Collection<JavaClass> frames = frameClass.getSubClasses();
-        for (JavaClass frame : frames) {
-            for (Instance f : (List<Instance>)frame.getInstances()) {
-                String string = printWindow(f, heap);
-                if (string != null) {
-                    sb.append(string);
-                    sb.append("<br>"); // NOI18N
-                    hasWindows = true;
+        if (frameClass != null) {
+            Collection<JavaClass> frames = frameClass.getSubClasses();
+            for (JavaClass frame : frames) {
+                for (Instance f : (List<Instance>)frame.getInstances()) {
+                    String string = printWindow(f, heap);
+                    if (string != null) {
+                        sb.append(string);
+                        sb.append("<br>"); // NOI18N
+                        hasWindows = true;
+                    }
                 }
             }
         }
         frameClass = heap.getJavaClassByName("java.awt.Dialog"); // NOI18N
-        frames = frameClass.getSubClasses();
-        for (JavaClass frame : frames) {
-            for (Instance f : (List<Instance>)frame.getInstances()) {
-                String string = printWindow(f, heap);
-                if (string != null) {
-                    sb.append(string);
-                    sb.append("<br>"); // NOI18N
-                    hasWindows = true;
+        if (frameClass != null) {
+            Collection<JavaClass> frames = frameClass.getSubClasses();
+            for (JavaClass frame : frames) {
+                for (Instance f : (List<Instance>)frame.getInstances()) {
+                    String string = printWindow(f, heap);
+                    if (string != null) {
+                        sb.append(string);
+                        sb.append("<br>"); // NOI18N
+                        hasWindows = true;
+                    }
                 }
             }
         }
