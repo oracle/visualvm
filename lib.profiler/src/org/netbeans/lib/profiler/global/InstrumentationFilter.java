@@ -216,25 +216,12 @@ public class InstrumentationFilter implements Cloneable {
 
         boolean filterInclusive = (instrFilterType == INSTR_FILTER_INCLUSIVE);
 
-        if (filterInclusive) {
-            for (int i = 0; i < instrFilterStrings.length; i++) {
-                if (matches(string, instrFilterStrings[i])) {
-                    return true;
-                }
-            }
-        } else {
-            for (int i = 0; i < instrFilterStrings.length; i++) {
-                if (matches(string, instrFilterStrings[i])) {
-                    return false;
-                }
+        for (int i = 0; i < instrFilterStrings.length; i++) {
+            if (matches(string, instrFilterStrings[i])) {
+                return filterInclusive;
             }
         }
-
-        if (filterInclusive) {
-            return false;
-        } else {
-            return true;
-        }
+        return !filterInclusive;
     }
 
     private static boolean matches(String string, String filter) {
