@@ -1,1 +1,2 @@
 org.netbeans.lib.profiler.results.cpu.CPUCallGraphBuilder
+org.netbeans.lib.profiler.results.locks.LockGraphBuilder

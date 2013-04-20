@@ -42,6 +42,7 @@
 package org.netbeans.modules.profiler.heapwalk.details.jdk.image;
 
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.color.ColorSpace;
 import java.awt.image.BandedSampleModel;
 import java.awt.image.BufferedImage;
@@ -90,7 +91,7 @@ public class ImageBuilder {
             return null;
         }
     }
-    
+
     static Image buildImageInternal(Instance instance, Heap heap) throws FieldAccessor.InvalidFieldException {
         InstanceBuilder<? extends Image> builder = BUILDERS.getBuilder(instance, Image.class);
         if (builder == null) {
@@ -134,12 +135,8 @@ public class ImageBuilder {
                 WritableRaster raster = fa.build(instance, "raster", WritableRaster.class, false);
                 ColorModel cm = fa.build(instance, "colorModel", ColorModel.class, false);
                 BufferedImage result;
-                //if (cm instanceof IndexColorModel) {
-                //    result = new BufferedImage(raster.getWidth(), raster.getHeight(), imageType, (IndexColorModel)cm);
-                //} else {
                 boolean ap = fa.getBoolean(instance, "isAlphaPremultiplied"); // NOI18N
                 result = new BufferedImage(cm, raster, ap, null);
-                //}
                 result.setData(raster);
                 return result;
             } catch (FieldAccessor.InvalidFieldException ex) {
@@ -193,9 +190,23 @@ public class ImageBuilder {
     private static final InstanceBuilder<WritableRaster> WRITABLE_RASTER_BUILDER = new InstanceBuilder<WritableRaster>(WritableRaster.class) {
         @Override
         public WritableRaster convert(FieldAccessor accessor, Instance instance) throws FieldAccessor.InvalidFieldException {
-            DataBuffer dataBuffer = accessor.build(instance, "dataBuffer", DataBuffer.class, false);
-            SampleModel sampleModel = accessor.build(instance, "sampleModel", SampleModel.class, false); // NOI18N
-            return Raster.createWritableRaster(sampleModel, dataBuffer, null);
+            WritableRaster parent = accessor.build(instance, "parent", WritableRaster.class, true);
+            if (parent == null) {
+                DataBuffer dataBuffer = accessor.build(instance, "dataBuffer", DataBuffer.class, false);
+                SampleModel sampleModel = accessor.build(instance, "sampleModel", SampleModel.class, false); // NOI18N
+                int tx = accessor.getInt(instance, "sampleModelTranslateX");
+                int ty = accessor.getInt(instance, "sampleModelTranslateY");
+                return Raster.createWritableRaster(sampleModel, dataBuffer, new Point(tx, ty));
+            }
+            int width = accessor.getInt(instance, "width");
+            int height = accessor.getInt(instance, "height");
+            int minX = accessor.getInt(instance, "minX");
+            int minY = accessor.getInt(instance, "minY");
+            int tx = accessor.getInt(instance, "sampleModelTranslateX");
+            int ty = accessor.getInt(instance, "sampleModelTranslateY");
+            int px = parent.getSampleModelTranslateX();
+            int py = parent.getSampleModelTranslateY();
+            return parent.createWritableChild(minX, minY, width, height, tx - px + minX, ty - py + minY, null);
         }
     };
     private static final InstanceBuilder<SampleModel> SPP_SAMPLE_MODEL_BUILDER = new InstanceBuilder<SampleModel>(SampleModel.class) {
@@ -250,7 +261,7 @@ public class ImageBuilder {
         public DataBuffer convert(FieldAccessor fa, Instance instance) throws FieldAccessor.InvalidFieldException {
             int size = fa.getInt(instance, "size");                        // NOI18N
             int[] offsets = fa.getIntArray(instance, "offsets", false);      // NOI18N
-            int[] data = fa.getIntArray(instance, "data", false);     // NOI18N
+            //int[] data = fa.getIntArray(instance, "data", false);     // NOI18N
             int[][] bankdata = fa.getIntArray2(instance, "bankdata", false); // NOI18N
             return new DataBufferInt(bankdata, size, offsets);
         }
@@ -294,5 +305,5 @@ public class ImageBuilder {
         BUILDERS.register(ImageIcon.class, true, IMAGE_ICON_IMAGE_BUILDER);
         BUILDERS.register(BufferedImage.class, true, BUFFERED_IMAGE_STRING_BUILDER);
         BUILDERS.register(BufferedImage.class, true, BUFFERED_IMAGE_IMAGE_BUILDER);
-    }    
+    }
 }

@@ -59,10 +59,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
 import javax.management.openmbean.CompositeData;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
@@ -285,12 +284,10 @@ public class LoadedSnapshot {
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1000000); // ~1MB pre-allocated
-        BufferedOutputStream bufBaos = new BufferedOutputStream(baos);
-        DataOutputStream snapshotDataStream = new DataOutputStream(bufBaos);
+        DataOutputStream snapshotDataStream = new DataOutputStream(baos);
 
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream(10000); // ~10kB pre-allocated
-        BufferedOutputStream bufBaos2 = new BufferedOutputStream(baos2);
-        DataOutputStream settingsDataStream = new DataOutputStream(bufBaos2);
+        DataOutputStream settingsDataStream = new DataOutputStream(baos2);
 
         try {
             snapshot.writeToStream(snapshotDataStream);
@@ -337,10 +334,8 @@ public class LoadedSnapshot {
             dos.writeUTF(userComments);
         } catch (OutOfMemoryError e) {
             baos = null;
-            bufBaos = null;
             snapshotDataStream = null;
             baos2 = null;
-            bufBaos2 = null;
             settingsDataStream = null;
 
             throw e;
@@ -418,13 +413,42 @@ public class LoadedSnapshot {
             // 4. int length of snapshot data size
             int compressedDataLen = dis.readInt();
             int uncompressedDataLen = dis.readInt();
-            byte[] dataBytes = new byte[compressedDataLen];
 
             // 5. snapshot data bytes
-            int readLen1 = dis.read(dataBytes, 0, compressedDataLen);
+            InputStream zipStream = new InflaterInputStream(new SubInputStream(dis,compressedDataLen));
+            
+            switch (type) {
+                case SNAPSHOT_TYPE_CPU:
+                    snapshot = new CPUResultsSnapshot();
 
-            if (compressedDataLen != readLen1) {
-                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_CannotReadSnapshotDataMsg()));
+                    break;
+                case SNAPSHOT_TYPE_CODEFRAGMENT:
+                    snapshot = new CodeRegionResultsSnapshot();
+
+                    break;
+                case SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+                    snapshot = new AllocMemoryResultsSnapshot();
+
+                    break;
+                case SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                    snapshot = new LivenessMemoryResultsSnapshot();
+
+                    break;
+                case SNAPSHOT_TYPE_MEMORY_SAMPLED:
+                    snapshot = new SampledMemoryResultsSnapshot();
+                    
+                    break;
+                default:
+                    throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_UnrecognizedSnapshotTypeMsg())); // not supported
+            }
+
+            BufferedInputStream bufBais = new BufferedInputStream(zipStream);
+            DataInputStream dataDis = new DataInputStream(bufBais);
+
+            try {
+                snapshot.readFromStream(dataDis);
+            } catch (IOException e) {
+                throw new IOException(getCorruptedMessage(e));
             }
 
             // 6. int length of settings data size
@@ -451,63 +475,8 @@ public class LoadedSnapshot {
                 LOGGER.finest("load length of settings data:" + settingsLen); // NOI18N
             }
 
-            switch (type) {
-                case SNAPSHOT_TYPE_CPU:
-                    snapshot = new CPUResultsSnapshot();
-
-                    break;
-                case SNAPSHOT_TYPE_CODEFRAGMENT:
-                    snapshot = new CodeRegionResultsSnapshot();
-
-                    break;
-                case SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                    snapshot = new AllocMemoryResultsSnapshot();
-
-                    break;
-                case SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                    snapshot = new LivenessMemoryResultsSnapshot();
-
-                    break;
-                case SNAPSHOT_TYPE_MEMORY_SAMPLED:
-                    snapshot = new SampledMemoryResultsSnapshot();
-                    
-                    break;
-                default:
-                    throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_UnrecognizedSnapshotTypeMsg())); // not supported
-            }
-
-            Inflater d = new Inflater();
-            d.setInput(dataBytes, 0, dataBytes.length);
-
-            byte[] decompressedBytes = new byte[uncompressedDataLen];
-
-            try {
-                int decLen = d.inflate(decompressedBytes);
-
-                if (decLen != uncompressedDataLen) {
-                    throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_SnapshotDataCorruptedMsg()));
-                }
-            } catch (DataFormatException e) {
-                throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorrupted());
-            }
-
-            d.end();
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(decompressedBytes);
-            BufferedInputStream bufBais = new BufferedInputStream(bais);
-            DataInputStream dataDis = new DataInputStream(bufBais);
-
-            try {
-                snapshot.readFromStream(dataDis);
-            } catch (IOException e) {
-                throw new IOException(getCorruptedMessage(e));
-            } finally {
-                dataDis.close();
-            }
-
             ByteArrayInputStream bais2 = new ByteArrayInputStream(settingsBytes);
-            BufferedInputStream bufBais2 = new BufferedInputStream(bais2);
-            DataInputStream settingsDis = new DataInputStream(bufBais2);
+            DataInputStream settingsDis = new DataInputStream(bais2);
 
             try {
                 props.load(settingsDis);
@@ -533,6 +502,54 @@ public class LoadedSnapshot {
         return true;
     }
 
+    private static class SubInputStream extends FilterInputStream {
+        private int limit;
+        
+        private SubInputStream(InputStream is, int l) {
+            super(is);
+            limit = l;
+        }
+
+        @Override
+        public int available() throws IOException {
+            int avail = super.available();
+            return Math.min(avail, limit);
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (limit == 0) {
+                return -1;
+            }
+            limit--;
+            return super.read();
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            if (limit == 0) {
+                return -1;
+            }
+            int realLen = Math.min(len, limit);
+            int readBytes = super.read(b, off, realLen);
+            limit -= readBytes;
+            return readBytes;
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            long skip = Math.min(n, limit);
+            long skipped = super.skip(skip);
+            limit -= skipped;
+            return skipped;
+        }
+
+        @Override
+        public boolean markSupported() {
+            return false;
+        }
+    }
+    
     static class SamplesInputStream {
         static final String ID = "NPSS"; // NetBeans Profiler samples stream, it must match org.netbeans.modules.sampler.SamplesOutputStream.ID
         static final int MAX_SUPPORTED_VERSION = 2;
