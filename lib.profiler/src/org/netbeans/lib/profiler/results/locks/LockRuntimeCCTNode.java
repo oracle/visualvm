@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,38 +34,49 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
+package org.netbeans.lib.profiler.results.locks;
 
-package org.netbeans.lib.profiler.results.cpu.cct.nodes;
+import java.util.List;
+import java.util.Map;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Tomas Hurka
  */
-public class ThreadCPUCCTNode extends TimedCPUCCTNode {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+public class LockRuntimeCCTNode implements RuntimeCCTNode {
 
-    private final int threadId;
+    private final Map<ThreadInfo, List<ThreadInfo.Monitor>> threads;
+    private final Map<MonitorInfo, List<MonitorInfo.ThreadDetail>> monitors;
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    /** Creates a new instance of ThreadCPUCCTNode */
-    public ThreadCPUCCTNode(int threadId) {
-        super();
-        this.threadId = threadId;
+    LockRuntimeCCTNode(Map<ThreadInfo, List<ThreadInfo.Monitor>> threadsCopy, Map<MonitorInfo, List<MonitorInfo.ThreadDetail>> monitorCopy) {
+        threads = threadsCopy;
+        monitors = monitorCopy;
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isRoot() {
-        return true;
+    public LockCCTNode getThreads() {
+        LockCCTNode top = new TopLockCCTNode();
+        for (Map.Entry<ThreadInfo, List<ThreadInfo.Monitor>> entry : threads.entrySet()) {
+            top.addChild(new ThreadLockCCTNode(top, entry.getKey(), entry.getValue()));
+        }
+        return top;
     }
 
-    public int getThreadId() {
-        return threadId;
+    public LockCCTNode getMonitors() {
+        LockCCTNode top = new TopLockCCTNode();
+        for (Map.Entry<MonitorInfo, List<MonitorInfo.ThreadDetail>> entry : monitors.entrySet()) {
+            top.addChild(new MonitorCCTNode(top, entry.getKey(), entry.getValue()));
+        }
+        return top;
     }
-    
-    protected TimedCPUCCTNode createSelfInstance() {
-        return new ThreadCPUCCTNode(threadId);
+
+    @Override
+    public RuntimeCCTNode[] getChildren() {
+        throw new UnsupportedOperationException("Not supported.");  // NOI18N
     }
 }

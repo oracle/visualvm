@@ -925,6 +925,10 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     public void updateTreeTable() {
         treeTableModelAdapter.updateTreeTable();
     }
+    
+    public void changeRoot(CCTNode newRoot) {
+        treeTableModelAdapter.changeRoot(newRoot);
+    }
 
     public void updateTreeTableHeader() {
         TableColumnModel tableColumnModel = getColumnModel();

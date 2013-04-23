@@ -65,6 +65,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     private static final String ABSTRACT_NODE = "org.openide.nodes.AbstractNode+"; // NOI18N
     private static final String FILE_ENTRY = "org.openide.loaders.FileEntry+"; // NOI18N
     private static final String DATA_OBJECT = "org.openide.loaders.DataObject+"; // NOI18N
+    private static final String JAR_FILESYSTEM = "org.openide.filesystems.JarFileSystem+"; // NOI18N
     private static final String FILE_OBJ = "org.netbeans.modules.masterfs.filebasedfs.fileobjects.FileObj+"; // NOI18N
     private static final String FOLDER_OBJ = "org.netbeans.modules.masterfs.filebasedfs.fileobjects.FolderObj+"; // NOI18N
     private static final String FILE_NAME = "org.netbeans.modules.masterfs.filebasedfs.naming.FileName+"; // NOI18N
@@ -90,8 +91,9 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     
     public PlatformDetailsProvider() {
         super(STANDARD_MODULE,STANDARD_MODULE_DATA,SPECIFICATION_VERSION,
-              ABSTRACT_NODE,FILE_ENTRY,DATA_OBJECT,FILE_OBJ,FOLDER_OBJ,
-              FILE_NAME,FOLDER_NAME,ABSTRACT_FOLDER,BFS_BASE,
+              ABSTRACT_NODE,FILE_ENTRY,DATA_OBJECT,JAR_FILESYSTEM,
+              FILE_OBJ,FOLDER_OBJ, FILE_NAME,FOLDER_NAME,ABSTRACT_FOLDER,
+              BFS_BASE,
               FIXED_0_7,FIXED_8_15,FIXED_16_23,FIXED_1_10,FIXED_11_20,
               FIXED_21_30,BYTE_BASED_SEQUENCE,CHAR_BASED_SEQUENCE);
     }
@@ -138,6 +140,8 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
                 name = DetailsUtils.getInstanceFieldString(instance, "shortDescription", heap); // NOI18N
             }
             return name;
+        } else if (JAR_FILESYSTEM.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "foRoot", heap); // NOI18N
         } else if (FILE_ENTRY.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "file", heap); // NOI18N
         } else if (DATA_OBJECT.equals(className)) {
