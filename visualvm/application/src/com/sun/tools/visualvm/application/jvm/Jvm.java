@@ -187,7 +187,7 @@ public abstract class Jvm extends Model {
      * Tests if target JVM supports class monitoring. If true,
      * methods getLoadedClasses(), getSharedLoadedClasses(),
      * getSharedUnloadedClasses(), getUnloadedClasses()
-     * from {@link MonitoredData} returns meaningfull data.
+     * from {@link MonitoredData} returns meaningful data.
      * @return <CODE>true</CODE> if JVM supports class monitoring,
      * <CODE>false</CODE> otherwise
      */
@@ -197,7 +197,7 @@ public abstract class Jvm extends Model {
      * Tests if target JVM supports thread monitoring. If true,
      * methods getThreadsDaemon(), getThreadsLive(),
      * getThreadsLivePeak(), getThreadsStarted()
-     * from {@link MonitoredData} returns meaningfull data.
+     * from {@link MonitoredData} returns meaningful data.
      * @return <CODE>true</CODE> if JVM supports thread monitoring,
      * <CODE>false</CODE> otherwise
      */
@@ -206,7 +206,7 @@ public abstract class Jvm extends Model {
     /**
      * Tests if target JVM supports thread monitoring. If true,
      * methods getGenCapacity(), getGenUsed(), getGenMaxCapacity()
-     * from {@link MonitoredData} returns meaningfull data.
+     * from {@link MonitoredData} returns meaningful data.
      * @return <CODE>true</CODE> if JVM supports memory monitoring,
      * <CODE>false</CODE> otherwise
      */
@@ -215,7 +215,7 @@ public abstract class Jvm extends Model {
     /**
      * Tests if target JVM supports process CPU time monitoring. If true,
      * methods getProcessCpuTime()
-     * from {@link MonitoredData} returns meaningfull data.
+     * from {@link MonitoredData} returns meaningful data.
      * @return <CODE>true</CODE> if JVM supports process CPU time monitoring,
      * <CODE>false</CODE> otherwise
      */
@@ -224,7 +224,7 @@ public abstract class Jvm extends Model {
     /**
      * Tests if target JVM supports Garbage collection time monitoring. If true,
      * methods getCollectionTime()
-     * from {@link MonitoredData} returns meaningfull data.
+     * from {@link MonitoredData} returns meaningful data.
      * @return <CODE>true</CODE> if JVM supports Garbage collection time monitoring,
      * <CODE>false</CODE> otherwise
      */
