@@ -43,19 +43,22 @@
 
 package org.netbeans.lib.profiler.results.cpu.cct;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.ProfilerEngineSettings;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
+import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainerFree;
 import org.netbeans.lib.profiler.results.cpu.TimingAdjusterOld;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 
 
 /**
@@ -74,21 +77,30 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     // @GuardedBy containerGuard
     private FlatProfileContainer container;
     private ProfilerClient client;
-    private Stack parentStack;
+    private Stack<TotalTime> parentStack;
+    private Set methodsOnStack;
     private int[] invDiff;
     private int[] invPM;
     private int[] nCalleeInvocations;
     private long[] timePM0;
     private long[] timePM1;
+    private long[] totalTimePM0;
+    private long[] totalTimePM1;
     private int nMethods;
 
-    private CCTResultsFilter currentFilter = null;
-    
+    private CCTResultsFilter currentFilter;
+    private InstrumentationFilter instrFilter;
+    private String[] instrMethodClasses;
+    private int cpuProfilingType;
+    private boolean twoTimestamps;
+    private TimingAdjusterOld timingAdjuster;
+  
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public CCTFlattener(ProfilerClient client, CCTResultsFilter filter) {
         this.client = client;
         parentStack = new Stack();
+        methodsOnStack = new HashSet();
         this.currentFilter = filter;
     }
 
@@ -103,15 +115,23 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     @Override
     public void onStart() {
         ProfilingSessionStatus status = client.getStatus();
+        ProfilerEngineSettings pes = client.getSettings();
+        
         nMethods = status.getNInstrMethods();
         timePM0 = new long[nMethods];
         timePM1 = new long[status.collectingTwoTimeStamps() ? nMethods : 0];
+        totalTimePM0 = new long[nMethods];
+        totalTimePM1 = new long[status.collectingTwoTimeStamps() ? nMethods : 0];
         invPM = new int[nMethods];
         invDiff = new int[nMethods];
         nCalleeInvocations = new int[nMethods];
         parentStack.clear();
-
-//        currentFilter = (CCTResultsFilter)Lookup.getDefault().lookup(CCTResultsFilter.class);
+        methodsOnStack.clear();
+        instrFilter = pes.getInstrumentationFilter();
+        instrMethodClasses = status.getInstrMethodClasses();
+        cpuProfilingType = pes.getCPUProfilingType();
+        twoTimestamps = status.collectingTwoTimeStamps();
+        timingAdjuster = TimingAdjusterOld.getInstance(status);
         
         synchronized (containerGuard) {
             container = null;
@@ -136,8 +156,7 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         long totalNInv = 0;
 
         for (int i = 0; i < nMethods; i++) {
-            double time = TimingAdjusterOld.getInstance(status)
-                                           .adjustTime(timePM0[i], (invPM[i] + invDiff[i]), (nCalleeInvocations[i] + invDiff[i]),
+            double time = timingAdjuster.adjustTime(timePM0[i], (invPM[i] + invDiff[i]), (nCalleeInvocations[i] + invDiff[i]),
                                                        false);
 
             if (time < 0) {
@@ -154,9 +173,8 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
                 wholeGraphTime0 += time;
             }
 
-            if (status.collectingTwoTimeStamps()) {
-                time = TimingAdjusterOld.getInstance(status)
-                                        .adjustTime(timePM1[i], (invPM[i] + invDiff[i]), (nCalleeInvocations[i] + invDiff[i]),
+            if (twoTimestamps) {
+                time = timingAdjuster.adjustTime(timePM1[i], (invPM[i] + invDiff[i]), (nCalleeInvocations[i] + invDiff[i]),
                                                     true);
                 timePM1[i] = (long) time;
 
@@ -170,31 +188,32 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         }
 
         synchronized (containerGuard) {
-            container = new FlatProfileContainerFree(status, timePM0, timePM1, invPM, new char[0], wholeGraphTime0,
-                                                     wholeGraphTime1, invPM.length);
+            container = new FlatProfileContainerFree(status, timePM0, timePM1, totalTimePM0, totalTimePM1,
+                    invPM, new char[0], wholeGraphTime0, wholeGraphTime1, invPM.length);
         }
 
         timePM0 = timePM1 = null;
+        totalTimePM0 = totalTimePM1 = null;
         invPM = invDiff = nCalleeInvocations = null;
         parentStack.clear();
-//        currentFilter = null;
+        methodsOnStack.clear();
+        instrFilter = null;
+        instrMethodClasses = null;
     }
     
     @Override
     public void onNode(MethodCPUCCTNode node) {
         final int nodeMethodId = node.getMethodId();
-                
-        ProfilingSessionStatus status = client.getStatus();
-        InstrumentationFilter filter = client.getSettings().getInstrumentationFilter();
+        final int nodeFilerStatus = node.getFilteredStatus();
+        final MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek().node;
+        final TotalTime timeNode = new TotalTime(node,methodsOnStack.contains(nodeMethodId));
+        boolean filteredOut = (nodeFilerStatus == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
 
-        MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek();
-        boolean filteredOut = (node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
+        if (!filteredOut && (cpuProfilingType == CommonConstants.CPU_SAMPLED || nodeFilerStatus == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
 
-        if (!filteredOut && (client.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED || node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
+            String jvmClassName = instrMethodClasses[nodeMethodId].replace('.', '/');
 
-            String jvmClassName = status.getInstrMethodClasses()[nodeMethodId].replace('.', '/');
-
-            if (!filter.passesFilter(jvmClassName)) {
+            if (!instrFilter.passesFilter(jvmClassName)) {
                 filteredOut = true;
             }
         }
@@ -205,6 +224,7 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         final int parentMethodId = currentParent != null ? currentParent.getMethodId() : -1;
         
         if (LOGGER.isLoggable(Level.FINEST)) {
+            ProfilingSessionStatus status = client.getStatus();
             LOGGER.log(Level.FINEST, "Processing runtime node: {0}.{1}; filtered={2}, time={3}, CPU time={4}", // NOI18N
                        new Object[]{status.getInstrMethodClasses()[nodeMethodId], status.getInstrMethodNames()[nodeMethodId], 
                        filteredOut, node.getNetTime0(), node.getNetTime1()});
@@ -221,14 +241,14 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
 
                 timePM0[parentMethodId] += node.getNetTime0();
 
-                if (status.collectingTwoTimeStamps()) {
+                if (twoTimestamps) {
                     timePM1[parentMethodId] += node.getNetTime1();
                 }
             }
         } else {
             timePM0[nodeMethodId] += node.getNetTime0();
 
-            if (status.collectingTwoTimeStamps()) {
+            if (twoTimestamps) {
                 timePM1[nodeMethodId] += node.getNetTime1();
             }
 
@@ -237,14 +257,58 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
             if ((currentParent != null) && !currentParent.isRoot()) {
                 nCalleeInvocations[parentMethodId] += node.getNCalls();
             }
-
-            currentParent = node;
         }
-        parentStack.push(node);
+        timeNode.totalTimePM0+=node.getNetTime0();
+        if (twoTimestamps) timeNode.totalTimePM1+=node.getNetTime1();  
+        if (!timeNode.recursive) {
+            methodsOnStack.add(nodeMethodId);
+        }
+        parentStack.push(timeNode);
     }
 
     @Override
     public void onBackout(MethodCPUCCTNode node) {
-        parentStack.pop();
+        TotalTime current = parentStack.pop();
+        if (!current.recursive) {
+            int nodeMethodId = node.getMethodId();
+            methodsOnStack.remove(nodeMethodId);
+            long time = (long) timingAdjuster.adjustTime(current.totalTimePM0, node.getNCalls()+current.outCalls, current.outCalls,
+                                                       false);
+            if (time>0) {
+                totalTimePM0[nodeMethodId]+=time;
+            }
+            if (twoTimestamps) {
+                time = (long) timingAdjuster.adjustTime(current.totalTimePM1, node.getNCalls()+current.outCalls, current.outCalls,
+                                                       true);
+                if (time>0) {
+                    totalTimePM1[nodeMethodId]+=time;
+                }
+            }
+        }
+        // add self data to parent
+        if (!parentStack.isEmpty()) {
+            TotalTime parent = parentStack.peek();
+            parent.add(current);
+            parent.outCalls+=node.getNCalls();
+        }
+    }
+
+    private static class TotalTime {
+        private final MethodCPUCCTNode node;
+        private final boolean recursive;
+        private int outCalls;
+        private long totalTimePM0;
+        private long totalTimePM1;
+        
+        TotalTime(MethodCPUCCTNode n, boolean r) {
+            node = n;
+            recursive = r;
+        }
+
+        private void add(TotalTime current) {
+            outCalls += current.outCalls;
+            totalTimePM0 += current.totalTimePM0;
+            totalTimePM1 += current.totalTimePM1;
+        }
     }
 }
