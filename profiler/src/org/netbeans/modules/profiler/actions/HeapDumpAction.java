@@ -107,7 +107,9 @@ import org.openide.windows.WindowManager;
     "HeapDumpAction_DestinationLabelText=<html><b><nobr>Choose heap dump destination:</nobr></b></html>",
     "HeapDumpAction_DefaultLocationRadioText=Default location",
     "HeapDumpAction_CustomLocationRadioText=Custom directory:",
-    "HeapDumpAction_BrowseButtonText=Browse"
+    "HeapDumpAction_BrowseButtonText=Browse",
+    "HeapDumpAction_ToolTip=Takes a heap snapshot of the application",
+    "HeapDumpAction_ToolTipNoRemote=Takes a heap snapshot of the application (not supported for remote profiling)"
 })
 public final class HeapDumpAction extends ProfilingAwareAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -377,6 +379,26 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         } catch (IOException e) {
             return null;
         }
+    }
+    
+    protected void updateAction() {
+        boolean remote = false;
+        boolean enabled = shouldBeEnabled(Profiler.getDefault());
+        if (enabled) {
+            String remoteHost = Profiler.getDefault().getTargetAppRunner().
+                    getProfilerEngineSettings().getRemoteHost();
+            if (remoteHost != null && !remoteHost.isEmpty())
+                remote = true; // Not supported for remote attach
+        }
+        setEnabled(!remote && enabled);
+        setToolTipText(remote ? Bundle.HeapDumpAction_ToolTipNoRemote() :
+                                Bundle.HeapDumpAction_ToolTip());
+    }
+    
+    private void setToolTipText(String text) {
+        Object oldText = getProperty(SHORT_DESCRIPTION);
+        putProperty(SHORT_DESCRIPTION, text);
+        firePropertyChange(SHORT_DESCRIPTION, oldText, text);
     }
 
     private boolean isHeapDumpSupported() {
