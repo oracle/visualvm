@@ -41,11 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.global;
+package org.netbeans.lib.profiler.server;
 
 import org.netbeans.lib.profiler.server.ProfilerRuntime;
 import org.netbeans.lib.profiler.server.system.Timers;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 
 /**
@@ -56,34 +57,38 @@ import java.lang.reflect.Method;
  * @author Tomas Hurka
  * @author Maros Sandor
  */
-public class ProfilingPointServerHandler {
+public abstract class ProfilingPointServerHandler {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static ProfilingPointServerHandler instance;
+    private static ProfilingPointServerHandler[] profilingPointHandlers;
+    private static int[] profilingPointIDs;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public static synchronized ProfilingPointServerHandler getInstance(String clientInfo) {
-        if (instance == null) {
-            instance = new ProfilingPointServerHandler();
-        }
-
-        return instance;
+    public static synchronized void initInstances(int[] ppIDs, String[] handlerClassNames, String[] handlersInfo) {
+        profilingPointIDs = ppIDs;
+        profilingPointHandlers = getInstances(handlerClassNames, handlersInfo);
     }
 
-    public static synchronized ProfilingPointServerHandler[] getInstances(String[] handlerClassNames, String[] handlersInfo) {
-        ProfilingPointServerHandler[] profilingPointHandlers = new ProfilingPointServerHandler[handlerClassNames.length];
+    public static ProfilingPointServerHandler getHandler(char handlerId) {
+        int idx = Arrays.binarySearch(profilingPointIDs, handlerId);
+        if (idx >= 0) {
+            return profilingPointHandlers[idx];
+        }
+        return null;
+    }
+    
+    private static ProfilingPointServerHandler[] getInstances(String[] handlerClassNames, String[] handlersInfo) {
+        ProfilingPointServerHandler[] handlers = new ProfilingPointServerHandler[handlerClassNames.length];
 
         for (int i = 0; i < handlerClassNames.length; i++) {
             try {
                 Method method = Class.forName(handlerClassNames[i]).getMethod("getInstance", new Class[] { String.class }); //NOI18N
-                profilingPointHandlers[i] = (ProfilingPointServerHandler) method.invoke(null, new Object[] { handlersInfo[i] });
+                handlers[i] = (ProfilingPointServerHandler) method.invoke(null, new Object[] { handlersInfo[i] });
             } catch (Exception e) {
                 e.printStackTrace(System.err);
             }
         }
 
-        return profilingPointHandlers;
+        return handlers;
     }
 
     /**
