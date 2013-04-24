@@ -65,6 +65,8 @@ public abstract class FlatProfileContainer {
     public static final int SORT_BY_TIME = 2;
     public static final int SORT_BY_SECONDARY_TIME = 3;
     public static final int SORT_BY_INV_NUMBER = 4;
+    public static final int SORT_BY_TOTAL_TIME = 5;
+    public static final int SORT_BY_SECONDARY_TOTAL_TIME = 6;
 
     // This variable is used to remember the timestamp (absolute or thread-CPU) used to calculate percentage
     // numbers, between invocations of "Get results", i.e. creations of new objects of this class.
@@ -78,6 +80,8 @@ public abstract class FlatProfileContainer {
     protected float[] percent;
     protected long[] timeInMcs0;
     protected long[] timeInMcs1;
+    protected long[] totalTimeInMcs0;
+    protected long[] totalTimeInMcs1;
     protected boolean collectingTwoTimeStamps;
     protected long nTotalInvocations;
     protected int nRows; // Number of methods currently displayed
@@ -86,9 +90,12 @@ public abstract class FlatProfileContainer {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public FlatProfileContainer(long[] timeInMcs0, long[] timeInMcs1, int[] nInvocations, char[] marks, int nMethods) {
+    public FlatProfileContainer(long[] timeInMcs0, long[] timeInMcs1, long[] totalTimeInMcs0, long[] totalTimeInMcs1,
+            int[] nInvocations, char[] marks, int nMethods) {
         this.timeInMcs0 = timeInMcs0;
         this.timeInMcs1 = timeInMcs1;
+        this.totalTimeInMcs0 = totalTimeInMcs0;
+        this.totalTimeInMcs1 = totalTimeInMcs1;
         this.nInvocations = nInvocations;
         this.methodMarks = marks;
         totalMethods = nMethods;
@@ -130,6 +137,14 @@ public abstract class FlatProfileContainer {
         return timeInMcs1[row];
     }
 
+    public long getTotalTimeInMcs0AtRow(int row) {
+        return totalTimeInMcs0[row];
+    }
+
+    public long getTotalTimeInMcs1AtRow(int row) {
+        return totalTimeInMcs1[row];
+    }
+
     public abstract double getWholeGraphNetTime0();
 
     public abstract double getWholeGraphNetTime1();
@@ -156,23 +171,16 @@ public abstract class FlatProfileContainer {
                 // Swap the current element and the one at (nRows - 1) index
                 swap(i, endIdx);
                 
-                int tmp = methodIds[i];
-                methodIds[i] = methodIds[endIdx];
-                methodIds[endIdx] = tmp;
-
-                long time = timeInMcs0[i];
-                timeInMcs0[i] = timeInMcs0[endIdx];
-                timeInMcs0[endIdx] = time;
+                swap(methodIds,i,endIdx);
+                swap(timeInMcs0,i,endIdx);
+                swap(totalTimeInMcs0,i,endIdx);
 
                 if (collectingTwoTimeStamps) {
-                    time = timeInMcs1[i];
-                    timeInMcs1[i] = timeInMcs1[endIdx];
-                    timeInMcs1[endIdx] = time;
+                    swap(timeInMcs1,i,endIdx);
+                    swap(totalTimeInMcs1,i,endIdx);
                 }
 
-                tmp = nInvocations[i];
-                nInvocations[i] = nInvocations[endIdx];
-                nInvocations[endIdx] = tmp;
+                swap(nInvocations,i,endIdx);
                 i--; // Because we've just put an unchecked element at the current position
             }
         }
@@ -190,6 +198,14 @@ public abstract class FlatProfileContainer {
                 break;
             case SORT_BY_SECONDARY_TIME:
                 sortDataByTime(false, order);
+
+                break;
+            case SORT_BY_TOTAL_TIME:
+                sortDataByTotalTime(true, order);
+
+                break;
+            case SORT_BY_SECONDARY_TOTAL_TIME:
+                sortDataByTotalTime(false, order);
 
                 break;
             case SORT_BY_INV_NUMBER:
@@ -211,12 +227,16 @@ public abstract class FlatProfileContainer {
 
         long[] oldTime0 = timeInMcs0;
         long[] oldTime1 = timeInMcs1;
+        long[] oldTotalTime0 = totalTimeInMcs0;
+        long[] oldTotalTime1 = totalTimeInMcs1;
         int[] oldNInvocations = nInvocations;
 
         timeInMcs0 = new long[nRows];
+        totalTimeInMcs0 = new long[nRows];
 
         if (collectingTwoTimeStamps) {
             timeInMcs1 = new long[nRows];
+            totalTimeInMcs1 = new long[nRows];
         }
 
         nInvocations = new int[nRows];
@@ -227,21 +247,29 @@ public abstract class FlatProfileContainer {
         for (int i = 1; i < totalMethods; i++) {
             if (oldNInvocations[i] > 0) {
                 long time = oldTime0[i];
-
                 if (time < 0) {
                     time = 0; // Replace possible negative time entries with 0
                 }
-
                 timeInMcs0[k] = time;
+
+                time = oldTotalTime0[i];
+                if (time < 0) {
+                    time = 0;
+                }
+                totalTimeInMcs0[k] = time;
 
                 if (collectingTwoTimeStamps) {
                     time = oldTime1[i];
-
                     if (time < 0) {
                         time = 0;
                     }
-
                     timeInMcs1[k] = time;
+
+                    time = oldTotalTime1[i];
+                    if (time < 0) {
+                        time = 0;
+                    }
+                    totalTimeInMcs1[k] = time;
                 }
 
                 nInvocations[k] = oldNInvocations[i];
@@ -331,25 +359,18 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    long tmp;
-                    tmp = timeInMcs0[a];
-                    timeInMcs0[a] = timeInMcs0[b];
-                    timeInMcs0[b] = tmp;
+                    swap(timeInMcs0,a,b);
+                    swap(totalTimeInMcs0,a,b);
 
                     if (collectingTwoTimeStamps) {
-                        tmp = timeInMcs1[a];
-                        timeInMcs1[a] = timeInMcs1[b];
-                        timeInMcs1[b] = tmp;
+                        swap(timeInMcs1,a,b);
+                        swap(totalTimeInMcs1,a,b);
                     }
 
-                    int itmp = methodIds[a];
-                    methodIds[a] = methodIds[b];
-                    methodIds[b] = itmp;
+                    swap(methodIds,a,b);
 
                     if (percent != null) {
-                        float ftmp = percent[a];
-                        percent[a] = percent[b];
-                        percent[b] = ftmp;
+                        swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -371,28 +392,19 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    long tmp;
-                    tmp = timeInMcs0[a];
-                    timeInMcs0[a] = timeInMcs0[b];
-                    timeInMcs0[b] = tmp;
+                    swap(timeInMcs0,a,b);
+                    swap(totalTimeInMcs0,a,b);
 
                     if (collectingTwoTimeStamps) {
-                        tmp = timeInMcs1[a];
-                        timeInMcs1[a] = timeInMcs1[b];
-                        timeInMcs1[b] = tmp;
+                        swap(timeInMcs1,a,b);
+                        swap(totalTimeInMcs1,a,b);
                     }
 
-                    int itmp = methodIds[a];
-                    methodIds[a] = methodIds[b];
-                    methodIds[b] = itmp;
-                    itmp = nInvocations[a];
-                    nInvocations[a] = nInvocations[b];
-                    nInvocations[b] = itmp;
+                    swap(methodIds,a,b);
+                    swap(nInvocations,a,b);
 
                     if (percent != null) {
-                        float ftmp = percent[a];
-                        percent[a] = percent[b];
-                        percent[b] = ftmp;
+                        swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -426,25 +438,18 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    long tmp;
-
+                    swap(totalTimeInMcs0,a,b);
+                    
                     if (collectingTwoTimeStamps) {
-                        tmp = tpmBF[a];
-                        tpmBF[a] = tpmBF[b];
-                        tpmBF[b] = tmp;
+                        swap(tpmBF,a,b);
+                        swap(totalTimeInMcs1,a,b);
                     }
 
-                    int itmp = methodIds[a];
-                    methodIds[a] = methodIds[b];
-                    methodIds[b] = itmp;
-                    itmp = nInvocations[a];
-                    nInvocations[a] = nInvocations[b];
-                    nInvocations[b] = itmp;
+                    swap(methodIds,a,b);
+                    swap(nInvocations,a,b);
 
                     if (percent != null) {
-                        float ftmp = percent[a];
-                        percent[a] = percent[b];
-                        percent[b] = ftmp;
+                        swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -462,20 +467,100 @@ public abstract class FlatProfileContainer {
                         super.swap(a, b);
                         FlatProfileContainer.this.swap(a, b);
 
-                        long tmp;
-
+                        swap(totalTimeInMcs0,a,b);
+                        
                         if (collectingTwoTimeStamps) {
-                            tmp = tpmBF[a];
-                            tpmBF[a] = tpmBF[b];
-                            tpmBF[b] = tmp;
+                            swap(tpmBF,a,b);
+                            swap(totalTimeInMcs1,a,b);
                         }
 
-                        int itmp = methodIds[a];
-                        methodIds[a] = methodIds[b];
-                        methodIds[b] = itmp;
+                        swap(methodIds,a,b);
                     }
                 }).sort(sortOrder);
         }
+    }
+
+    private void sortDataByTotalTime(boolean usePrimaryTime, boolean sortOrder) {
+        long[] tpmA = null;
+        long[] tpmB = null;
+
+        if (collectingTwoTimeStamps) {
+            if (usePrimaryTime) {
+                tpmA = totalTimeInMcs0;
+                tpmB = totalTimeInMcs1;
+            } else {
+                tpmA = totalTimeInMcs1;
+                tpmB = totalTimeInMcs0;
+            }
+        } else {
+            tpmA = totalTimeInMcs0;
+        }
+
+        final long[] tpmBF = tpmB;
+
+        (new LongSorter(tpmA, 0, nRows) {
+                protected void swap(int a, int b) {
+                    super.swap(a, b);
+                    FlatProfileContainer.this.swap(a, b);
+
+                    swap(timeInMcs0,a,b);
+                    
+                    if (collectingTwoTimeStamps) {
+                        swap(tpmBF,a,b);
+                        swap(timeInMcs1,a,b);
+                    }
+
+                    swap(methodIds,a,b);
+                    swap(nInvocations,a,b);
+
+                    if (percent != null) {
+                        swap(percent,a,b);
+                    }
+                }
+            }).sort(sortOrder);
+
+        // Next, sort the methods with zero time by the number of invocations
+        int len = nRows - 1;
+
+        while ((len >= 0) && (tpmA[len] == 0)) {
+            len--;
+        }
+
+        if (len < (nRows - 1)) {
+            (new IntSorter(nInvocations, len + 1, nRows - len - 1) {
+                    protected void swap(int a, int b) {
+                        super.swap(a, b);
+                        FlatProfileContainer.this.swap(a, b);
+
+                        swap(timeInMcs0,a,b);
+
+                        if (collectingTwoTimeStamps) {
+                            swap(tpmBF,a,b);
+                            swap(timeInMcs1,a,b);
+                        }
+
+                        swap(methodIds,a,b);
+                    }
+                }).sort(sortOrder);
+        }
+    }
+    
+    private static void swap(float[] arr, int i1, int i2) {
+        float itmp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = itmp;
+    }
+
+    private static void swap(long[] arr, int i1, int i2) {
+        long itmp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = itmp;
+    }
+    
+    private static void swap(int[] arr, int i1, int i2) {
+        int itmp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = itmp;
     }
     
     protected void swap(int a, int b) {}
