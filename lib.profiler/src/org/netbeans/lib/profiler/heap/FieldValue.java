@@ -61,7 +61,7 @@ public interface FieldValue extends Value {
 
     /**
      * returns String representation of the value.
-     * If the value refers to {@link Instance}, instace id
+     * If the value refers to {@link Instance}, instance id
      * is used to compute its String representation
      * <br>
      * Speed: fast

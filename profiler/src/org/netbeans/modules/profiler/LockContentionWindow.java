@@ -43,22 +43,26 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
+import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.ui.ResultsView;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.HelpCtx;
+import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
 
 
 /** An IDE TopComponent to display lock contention data.
@@ -69,8 +73,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "LockContentionWindow_WindowName=Lock Contention",
     "LockContentionWindow_WindowAccessDescr=Shows lock contention details"
 })
-public final class LockContentionWindow extends ProfilerTopComponent implements ActionListener, ChangeListener/*,
-                                                                 SaveViewAction.ViewProvider*/ {
+public final class LockContentionWindow extends ProfilerTopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY = "LockContentionWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
@@ -85,15 +88,18 @@ public final class LockContentionWindow extends ProfilerTopComponent implements 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Initializes the window */
-    public LockContentionWindow() {
+    LockContentionWindow() {
+        // constructor must run in EDT
+        assert SwingUtilities.isEventDispatchThread();
         setName(Bundle.LockContentionWindow_WindowName());
         setIcon(windowIcon);
         getAccessibleContext().setAccessibleDescription(Bundle.LockContentionWindow_WindowAccessDescr());
         setLayout(new BorderLayout());
         lockView = new ResultsView();
         add(lockView, BorderLayout.CENTER);
-        
+
         locksPanel = new LockContentionPanel();
+        locksPanel.addSaveViewAction(new SaveViewAction(new SaveView()));
 
         lockView.addView("Locks", null, "Locks", locksPanel, locksPanel.getToolbar());
 //        lockView.addView(Bundle.ThreadsWindow_ThreadsTableTabName(), null,
@@ -107,9 +113,9 @@ public final class LockContentionWindow extends ProfilerTopComponent implements 
         setFocusable(true);
         setRequestFocusEnabled(true);
 
-        lockView.addChangeListener(this);
-        locksPanel.addLockContentionListener(this);
-        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter(){
+        lockView.addChangeListener(new Listener());
+        locksPanel.addLockContentionListener(new LockContentionListener());
+        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter() {
             public void profilingStateChanged(final ProfilingStateEvent e) {
                 LockContentionWindow.this.profilingStateChanged(e.getNewState());
             }
@@ -136,101 +142,33 @@ public final class LockContentionWindow extends ProfilerTopComponent implements 
     public static void closeIfOpened() {
         if (defaultInstance != null) {
             CommonUtils.runInEventDispatchThread(new Runnable() {
-                    public void run() {
-                        if (defaultInstance.isOpened()) {
-                            defaultInstance.close();
-                        }
+                public void run() {
+                    if (defaultInstance.isOpened()) {
+                        defaultInstance.close();
                     }
-                });
+                }
+            });
         }
     }
 
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;
     }
-    
+
     protected String preferredID() {
         return this.getClass().getName();
     }
-    
+
     protected Component defaultFocusOwner() {
         return null;
     }
 
-//    public BufferedImage getViewImage(boolean onlyVisibleArea) {
-//        Component selectedView = lockView.getSelectedView();
-//        if (selectedView == threadsTimelinePanelContainer) {
-//            return threadsPanel.getCurrentViewScreenshot(onlyVisibleArea);
-//        } else if (selectedView == threadsTablePanel) {
-//            return threadsTablePanel.getCurrentViewScreenshot(onlyVisibleArea);
-//        } else if (selectedView == threadsDetailsPanelContainer) {
-//            return threadsDetailsPanel.getCurrentViewScreenshot(onlyVisibleArea);
-//        }
-//
-//        return null;
-//    }
-//
-//    public String getViewName() {
-//        Component selectedView = lockView.getSelectedView();
-//        if (selectedView == threadsTimelinePanelContainer) {
-//            return "threads-timeline"; // NOI18N
-//        } else if (selectedView == threadsTablePanel) {
-//            return "threads-table"; // NOI18N
-//        } else if (selectedView == threadsDetailsPanelContainer) {
-//            return "threads-details"; // NOI18N
-//        }
-//
-//        return null;
-//    }
-//
-//    public boolean fitsVisibleArea() {
-//        Component selectedView = lockView.getSelectedView();
-//        if (selectedView == threadsTimelinePanelContainer) {
-//            return threadsPanel.fitsVisibleArea();
-//        } else if (selectedView == threadsTablePanel) {
-//            return threadsTablePanel.fitsVisibleArea();
-//        } else if (selectedView == threadsDetailsPanelContainer) {
-//            return threadsDetailsPanel.fitsVisibleArea();
-//        }
-//
-//        return true;
-//    }
-//
-//    public boolean hasView() {
-//        Component selectedView = lockView.getSelectedView();
-//        if (selectedView == threadsTimelinePanelContainer) {
-//            return threadsPanel.hasView();
-//        } else if (selectedView == threadsTablePanel) {
-//            return threadsTablePanel.hasView();
-//        } else if (selectedView == threadsDetailsPanelContainer) {
-//            return threadsDetailsPanel.hasView();
-//        }
-//
-//        return false;
-//    }
-    
     public void showView() {
 //        lockView.selectView(threadsTimelinePanelContainer);
         open();
         requestActive();
     }
-    
-    public void actionPerformed(final ActionEvent e) {
-//        Profiler.getDefault().setLockContentionEnabled(true);
-        locksPanel.lockContentionEnabled();
-    }
 
-    public void stateChanged(ChangeEvent e) {
-//        SwingUtilities.invokeLater(new Runnable() { // must be invoked lazily to override default focus of first component
-//                public void run() {
-//                    Component selectedView = lockView.getSelectedView();
-//                    if (selectedView != null) {
-//                        selectedView.requestFocus(); // move focus to results table when tab is switched
-//                    }
-//                }
-//            });
-    }
-//
     private void updateLocksView() {
         if (Profiler.getDefault().getLockContentionMonitoringEnabled()) {
             locksPanel.lockContentionEnabled();
@@ -254,5 +192,52 @@ public final class LockContentionWindow extends ProfilerTopComponent implements 
         } else {
             profilingStateChanged(false);
         }
+    }
+
+    private class LockContentionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+//        Profiler.getDefault().setLockContentionEnabled(true);
+            locksPanel.lockContentionEnabled();
+        }
+    }
+
+    private class Listener implements ChangeListener {
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+//        SwingUtilities.invokeLater(new Runnable() { // must be invoked lazily to override default focus of first component
+//                public void run() {
+//                    Component selectedView = lockView.getSelectedView();
+//                    if (selectedView != null) {
+//                        selectedView.requestFocus(); // move focus to results table when tab is switched
+//                    }
+//                }
+//            });
+        }
+    }
+    
+    private class SaveView implements SaveViewAction.ViewProvider {
+
+        @Override
+        public BufferedImage getViewImage(boolean onlyVisibleArea) {
+            return locksPanel.getCurrentViewScreenshot(onlyVisibleArea);
+        }
+
+        @Override
+        public String getViewName() {
+            return "lock-contention"; // NOI18N
+        }
+
+        @Override
+        public boolean fitsVisibleArea() {
+            return locksPanel.fitsVisibleArea();
+        }
+
+        @Override
+        public boolean hasView() {
+            return locksPanel.hasView();
+        } 
     }
 }

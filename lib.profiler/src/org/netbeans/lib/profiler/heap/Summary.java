@@ -43,9 +43,6 @@
 
 package org.netbeans.lib.profiler.heap;
 
-import java.nio.MappedByteBuffer;
-
-
 /**
  *
  * @author Tomas Hurka
