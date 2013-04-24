@@ -59,6 +59,8 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
+import org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.BaseBuilders.IconBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.ComponentBuilders.ComponentBuilder;
 import org.netbeans.modules.profiler.heapwalk.details.jdk.ui.ComponentBuilders.ContainerBuilder;
@@ -147,19 +149,34 @@ final class WindowBuilders {
         
         private final String title;
         private final boolean undecorated;
+        private final Image image;
         
         FrameBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
             title = Utils.getFieldString(instance, "title");
             undecorated = DetailsUtils.getBooleanFieldValue(instance, "undecorated", false);
+            
+            Image _image = null;
+            Object icons = instance.getValueOfField("icons");
+            if (icons instanceof Instance) {
+                Instance i = (Instance)icons;
+                if (DetailsUtils.getIntFieldValue(i, "size", 0) > 0) {
+                    Object elementData = i.getValueOfField("elementData");
+                    if (elementData instanceof ObjectArrayInstance) {
+                        Object o = ((ObjectArrayInstance)elementData).getValues().get(0);
+                        _image = o != null ? ImageBuilder.buildImage((Instance)o, heap) : null;
+                    }
+                }
+            }
+            image = _image;
         }
         
         protected void setupInstance(Frame instance) {
             super.setupInstance(instance);
             
             instance.setUndecorated(undecorated);
-            // TODO: read icon from Window.icons (List<Image>)
+            if (image != null) instance.setIconImage(image);
         }
         
         protected Frame createInstanceImpl() {
@@ -190,8 +207,8 @@ final class WindowBuilders {
                 return presenter;
             } else {
                 JInternalFrame presenter = new JInternalFrame(instance.getTitle());
-                Image image = instance.getIconImage();
-                if (image != null) presenter.setFrameIcon(new ImageIcon(image));
+                Image img = instance.getIconImage();
+                if (img != null) presenter.setFrameIcon(new ImageIcon(img));
                 for (Component c : instance.getComponents()) presenter.add(c);
                 presenter.pack();
                 return presenter;
@@ -204,19 +221,42 @@ final class WindowBuilders {
         
         private final String title;
         private final boolean undecorated;
+        private final Image image;
         
-       DialogBuilder(Instance instance, Heap heap) {
+        DialogBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             
             title = Utils.getFieldString(instance, "title");
             undecorated = DetailsUtils.getBooleanFieldValue(instance, "undecorated", false);
+            
+            Image _image = null;
+            Object icons = instance.getValueOfField("icons");
+            if (icons == null) {
+                Object parent = instance.getValueOfField("parent");
+                while (parent instanceof Instance) {
+                    icons = ((Instance)parent).getValueOfField("icons");
+                    if (icons instanceof Instance) break;
+                    parent = instance.getValueOfField("parent");
+                }
+            }
+            if (icons instanceof Instance) {
+                Instance i = (Instance)icons;
+                if (DetailsUtils.getIntFieldValue(i, "size", 0) > 0) {
+                    Object elementData = i.getValueOfField("elementData");
+                    if (elementData instanceof ObjectArrayInstance) {
+                        Object o = ((ObjectArrayInstance)elementData).getValues().get(0);
+                        _image = o != null ? ImageBuilder.buildImage((Instance)o, heap) : null;
+                    }
+                }
+            }
+            image = _image;
         }
         
         protected void setupInstance(Dialog instance) {
             super.setupInstance(instance);
             
             instance.setUndecorated(undecorated);
-            // TODO: read icon from Window.icons (List<Image>)
+            if (image != null) instance.setIconImage(image);
         }
         
         protected Dialog createInstanceImpl() {
@@ -248,8 +288,8 @@ final class WindowBuilders {
             } else {
                 JInternalFrame presenter = new JInternalFrame(instance.getTitle());
                 List<Image> images = instance.getIconImages();
-                Image image = images.isEmpty() ? null : images.get(0);
-                if (image != null) presenter.setFrameIcon(new ImageIcon(image));
+                Image img = images.isEmpty() ? null : images.get(0);
+                if (img != null) presenter.setFrameIcon(new ImageIcon(img));
                 for (Component c : instance.getComponents()) presenter.add(c);
                 presenter.pack();
                 return presenter;
