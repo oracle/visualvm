@@ -44,9 +44,7 @@
 package org.netbeans.lib.profiler.server;
 
 import java.lang.reflect.Method;
-import java.util.*;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingPointServerHandler;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.server.system.Histogram;
 
@@ -225,12 +223,8 @@ public class ProfilerRuntime implements CommonConstants {
 
         ti.inProfilingRuntimeMethod++;
 
-        int[] ids = ProfilerServer.getProfilingSessionStatus().profilingPointIDs;
-        int idx = Arrays.binarySearch(ids, id);
-
-        if (idx >= 0) {
-            ProfilingPointServerHandler method = ProfilerServer.getProfilingSessionStatus().profilingPointHandlers[idx];
-
+        ProfilingPointServerHandler method = ProfilingPointServerHandler.getHandler(id);
+        if (method != null) {
             try {
                 method.profilingPointHit(id);
             } catch (Exception e) {
