@@ -64,6 +64,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
 /**
  *
  * @author Jaroslav Bachorik
+ * @author Tomas Hurka
  */
 public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -205,8 +206,7 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     public void onNode(MethodCPUCCTNode node) {
         final int nodeMethodId = node.getMethodId();
         final int nodeFilerStatus = node.getFilteredStatus();
-        final MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek().node;
-        final TotalTime timeNode = new TotalTime(node,methodsOnStack.contains(nodeMethodId));
+        final MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek().parent;
         boolean filteredOut = (nodeFilerStatus == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
 
         if (!filteredOut && (cpuProfilingType == CommonConstants.CPU_SAMPLED || nodeFilerStatus == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
@@ -258,6 +258,8 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
                 nCalleeInvocations[parentMethodId] += node.getNCalls();
             }
         }
+        final MethodCPUCCTNode nextParent = filteredOut ? currentParent : node;
+        final TotalTime timeNode = new TotalTime(nextParent,methodsOnStack.contains(nodeMethodId));
         timeNode.totalTimePM0+=node.getNetTime0();
         if (twoTimestamps) timeNode.totalTimePM1+=node.getNetTime1();  
         if (!timeNode.recursive) {
@@ -294,14 +296,14 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
     }
 
     private static class TotalTime {
-        private final MethodCPUCCTNode node;
+        private final MethodCPUCCTNode parent;
         private final boolean recursive;
         private int outCalls;
         private long totalTimePM0;
         private long totalTimePM1;
         
         TotalTime(MethodCPUCCTNode n, boolean r) {
-            node = n;
+            parent = n;
             recursive = r;
         }
 
