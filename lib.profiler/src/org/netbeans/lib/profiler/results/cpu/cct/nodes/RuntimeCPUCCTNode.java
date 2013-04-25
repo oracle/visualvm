@@ -51,18 +51,6 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
  * @author Jaroslav Bachorik
  */
 public interface RuntimeCPUCCTNode extends RuntimeCCTNode {
-    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
-
-    public static interface Children {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        RuntimeCPUCCTNode getChildAt(int i);
-
-        void attachNode(RuntimeCPUCCTNode node);
-
-        int size();
-    }
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     boolean isRoot();
 

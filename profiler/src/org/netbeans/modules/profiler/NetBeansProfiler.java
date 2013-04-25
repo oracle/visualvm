@@ -173,7 +173,8 @@ import org.openide.awt.Mnemonics;
     "NetBeansProfiler_TargetAppNotRespondingDialogTitle=Question",
     "NetBeansProfiler_ModifyingInstrumentationMsg=Modifying instrumentation...",
     "NetBeansProfiler_StartingSession=Starting profiling session...",
-    "NetBeansProfiler_CancelBtn=&Cancel"
+    "NetBeansProfiler_CancelBtn=&Cancel",
+    "NetBeansProfiler_MemorySamplingJava5=<html><b>Memory sampling is not supported for Java 5.</b><br><br>Please run the profiled application using Java 6+ or use memory instrumentation.</html>"
 })
 public abstract class NetBeansProfiler extends Profiler {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -1611,6 +1612,16 @@ public abstract class NetBeansProfiler extends Profiler {
 
         if ((newState == PROFILING_INACTIVE) || (newState == PROFILING_STOPPED)) {
             cleanupAfterProfiling();
+        }
+        
+        if (newState == PROFILING_RUNNING && CommonConstants.JDK_15_STRING.
+                equals(getTargetAppRunner().getProfilerEngineSettings().getTargetJDKVersionString())) {
+            if (lastProfilingSettings.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_SAMPLING)
+                SwingUtilities.invokeLater(new Runnable() { // Let the underlying dialogs close first
+                    public void run() {
+                        ProfilerDialogs.displayWarning(Bundle.NetBeansProfiler_MemorySamplingJava5());
+                    }
+                });                    
         }
     }
 
