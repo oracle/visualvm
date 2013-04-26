@@ -206,50 +206,6 @@ public class ProfilerRuntime implements CommonConstants {
         ti.inProfilingRuntimeMethod--;
     }
 
-    public static void profilePointHit(char id) {
-        if (ThreadInfo.profilingSuspended() || ThreadInfo.isCurrentThreadProfilerServerThread()) {
-            return;
-        }
-
-        if (eventBuffer == null) {
-            return; // Instrumentation removal happened when we were in instrumentation
-        }
-
-        ThreadInfo ti = ThreadInfo.getThreadInfo();
-
-        if (ti.inProfilingRuntimeMethod > 0) {
-            return;
-        }
-
-        ti.inProfilingRuntimeMethod++;
-
-        ProfilingPointServerHandler method = ProfilingPointServerHandler.getHandler(id);
-        if (method != null) {
-            try {
-                method.profilingPointHit(id);
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
-            }
-        }
-
-        ti.inProfilingRuntimeMethod--;
-    }
-
-    public static boolean profiledTargetAppThreadsExist() {
-        return (ThreadInfo.getNProfiledAppThreads() > 0);
-    }
-
-    // ------------------------------ Common setup functionality ---------------------------------------
-    public static void resetProfilerCollectors(int instrType) {
-        if ((instrType != INSTR_CODE_REGION) && (eventBuffer != null)) {
-            synchronized (eventBuffer) {
-                doResetProfilerCollectors(instrType);
-            }
-        } else {
-            doResetProfilerCollectors(instrType);
-        }
-    }
-
     public static void sleepEntry() {
         if (ThreadInfo.profilingSuspended() || ThreadInfo.isCurrentThreadProfilerServerThread()) {
             // nothing done for profiler own threads or if in instrumentation
@@ -441,6 +397,17 @@ public class ProfilerRuntime implements CommonConstants {
         Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_RUNNING, timeStamp, null);
         ti.inProfilingRuntimeMethod--;
     }
+    
+    // ------------------------------ Common setup functionality ---------------------------------------
+    public static void resetProfilerCollectors(int instrType) {
+        if ((instrType != INSTR_CODE_REGION) && (eventBuffer != null)) {
+            synchronized (eventBuffer) {
+                doResetProfilerCollectors(instrType);
+            }
+        } else {
+            doResetProfilerCollectors(instrType);
+        }
+    }
 
     public static void writeProfilingPointHitEvent(int id, long absTimeStamp) {
         ThreadInfo ti = ThreadInfo.getThreadInfo();
@@ -471,6 +438,35 @@ public class ProfilerRuntime implements CommonConstants {
             byte[] evBuf = ti.evBuf;
             ti.evBufPos = writePPointHitToBuffer(evBuf, absTimeStamp, curPos, id, tid);
         }
+    }
+
+    public static void profilePointHit(char id) {
+        if (ThreadInfo.profilingSuspended() || ThreadInfo.isCurrentThreadProfilerServerThread()) {
+            return;
+        }
+
+        if (eventBuffer == null) {
+            return; // Instrumentation removal happened when we were in instrumentation
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+
+        ProfilingPointServerHandler method = ProfilingPointServerHandler.getHandler(id);
+        if (method != null) {
+            try {
+                method.profilingPointHit(id);
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+            }
+        }
+
+        ti.inProfilingRuntimeMethod--;
     }
 
     protected static void writeThreadCreationEvent(Thread thread, int threadId) {
@@ -513,6 +509,10 @@ public class ProfilerRuntime implements CommonConstants {
     }
 
     // -------------------------------- Thread-related stuff ------------------------------------------
+    public static boolean profiledTargetAppThreadsExist() {
+        return (ThreadInfo.getNProfiledAppThreads() > 0);
+    }
+
     protected static void changeAllThreadsInProfRuntimeMethodStatus(int val) {
         ThreadInfo.changeAllThreadsInProfRuntimeMethodStatus(val);
     }
