@@ -157,4 +157,8 @@ public class ClassNode extends AbstractHeapWalkerNode {
     protected String computeRetainedSize() {
         return numberFormat.format(javaClass.getRetainedSizeByClass());
     }
+    
+    public Object getNodeID() {
+        return javaClass;
+    }
 }

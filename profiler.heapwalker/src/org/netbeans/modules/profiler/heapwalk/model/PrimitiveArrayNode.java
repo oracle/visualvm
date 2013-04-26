@@ -102,6 +102,10 @@ public class PrimitiveArrayNode extends ArrayNode {
 
             return super.computeType();
         }
+        
+        public Object getNodeID() {
+            return itemIndex;
+        }
     }
 
     public abstract static class RootNode extends PrimitiveArrayNode implements org.netbeans.modules.profiler.heapwalk.model.RootNode {

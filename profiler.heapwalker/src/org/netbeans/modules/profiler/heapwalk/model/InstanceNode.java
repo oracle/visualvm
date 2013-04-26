@@ -255,4 +255,8 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
         progress.addChangeListener(cl);
         return cl;
     }
+    
+    public Object getNodeID() {
+        return instance;
+    }
 }

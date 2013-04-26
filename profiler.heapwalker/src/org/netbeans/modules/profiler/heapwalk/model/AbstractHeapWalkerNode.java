@@ -213,16 +213,18 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
         return getName();
     }
     
-    // TODO: use underlying data object for equals()
+    public Object getNodeID() {
+        return getName();
+    }
+    
     public boolean equals(Object o) {
         if (!(o instanceof HeapWalkerNode)) return false;
         HeapWalkerNode n = (HeapWalkerNode)o;
-        return (n.getName() + n.getType() + n.getValue()).equals(getName() + getType() + getValue());
+        return getNodeID().equals(n.getNodeID());
     }
     
-    // TODO: use underlying data object for hashCode()
     public int hashCode() {
-        return (getName() + getType() + getValue()).hashCode();
+        return getNodeID().hashCode();
     }
 
     protected abstract Icon computeIcon();

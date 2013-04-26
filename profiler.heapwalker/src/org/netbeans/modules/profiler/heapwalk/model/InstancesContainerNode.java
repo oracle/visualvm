@@ -104,5 +104,9 @@ public class InstancesContainerNode extends AbstractHeapWalkerNode {
         childrenValues = null;
         return nodes;
     }
+    
+    public Object getNodeID() {
+        return instances;
+    }
 
 }

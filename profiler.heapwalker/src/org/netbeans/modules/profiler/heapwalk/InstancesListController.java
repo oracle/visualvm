@@ -424,6 +424,10 @@ public class InstancesListController extends AbstractController {
         protected String computeRetainedSize() {
             return ""; // NOI18N
         }
+        
+        public Object getNodeID() {
+            return startIndex;
+        }
     }
 
     public static class InstancesListInstanceNode implements HeapWalkerNode, InstancesListNode {
@@ -585,6 +589,10 @@ public class InstancesListController extends AbstractController {
 
         protected ImageIcon computeIcon() {
             return getInstance().getJavaClass().isArray() ? BrowserUtils.ICON_ARRAY : BrowserUtils.ICON_INSTANCE;
+        }
+        
+        public Object getNodeID() {
+            return instance;
         }
     }
 

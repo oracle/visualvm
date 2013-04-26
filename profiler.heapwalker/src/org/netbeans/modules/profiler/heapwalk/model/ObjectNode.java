@@ -119,6 +119,10 @@ public class ObjectNode extends InstanceNode {
 
             return super.computeType();
         }
+        
+        public Object getNodeID() {
+            return itemIndex;
+        }
     }
 
     public abstract static class RootNode extends ObjectNode implements org.netbeans.modules.profiler.heapwalk.model.RootNode {
