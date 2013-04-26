@@ -43,10 +43,12 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
+import java.util.List;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.ui.InstancesControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -61,18 +63,43 @@ public class InstancesController extends AbstractTopLevelController implements F
     public static class Configuration extends NavigationHistoryManager.Configuration {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private long instanceID;
+        private final long instanceID;
+        private final List expandedFields;
+        private final TreePath selectedField;
+        private final List expandedReferences;
+        private final TreePath selectedReference;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public Configuration(long instanceID) {
+        public Configuration(long instanceID, List expandedFields, TreePath selectedField,
+                             List expandedReferences, TreePath selectedReference) {
             this.instanceID = instanceID;
+            this.expandedFields = expandedFields;
+            this.selectedField = selectedField;
+            this.expandedReferences = expandedReferences;
+            this.selectedReference = selectedReference;
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public long getInstanceID() {
             return instanceID;
+        }
+        
+        public List getExpandedFields() {
+            return expandedFields;
+        }
+        
+        public TreePath getSelectedField() {
+            return selectedField;
+        }
+        
+        public List getExpandedReferences() {
+            return expandedReferences;
+        }
+        
+        public TreePath getSelectedReference() {
+            return selectedReference;
         }
     }
 
@@ -139,13 +166,22 @@ public class InstancesController extends AbstractTopLevelController implements F
     public Configuration getCurrentConfiguration() {
         // Selected instance
         long selectedInstanceID = -1;
+        List expandedFields = null;
+        TreePath selectedField = null;
+        List expandedReferences = null;
+        TreePath selectedReference = null;
         Instance selectedInstance = getSelectedInstance();
 
         if (selectedInstance != null) {
             selectedInstanceID = selectedInstance.getInstanceId();
+            expandedFields = fieldsBrowserController.getExpandedPaths();
+            selectedField = fieldsBrowserController.getSelectedRow();
+            expandedReferences = referencesBrowserController.getExpandedPaths();
+            selectedReference = referencesBrowserController.getSelectedRow();
         }
 
-        return new Configuration(selectedInstanceID);
+        return new Configuration(selectedInstanceID, expandedFields, selectedField,
+                                 expandedReferences, selectedReference);
     }
 
     public FieldsBrowserController getFieldsBrowserController() {
@@ -195,6 +231,12 @@ public class InstancesController extends AbstractTopLevelController implements F
                 heapFragmentWalker.switchToHistoryInstancesView();
 
                 classPresenter.setJavaClass(jClass);
+                
+                fieldsBrowserController.restoreState(
+                        c.getExpandedFields(), c.getSelectedField());
+                referencesBrowserController.restoreState(
+                        c.getExpandedReferences(), c.getSelectedReference());
+                
                 instancesListController.showInstance(selectedInstance);
             } else {
                 heapFragmentWalker.switchToHistoryInstancesView();

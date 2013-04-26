@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.heapwalk.model;
 
 
 import org.openide.util.NbBundle;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -156,38 +155,38 @@ public class ObjectNode extends InstanceNode {
 
     protected ChildrenComputer getChildrenComputer() {
         return new ChildrenComputer() {
-                public HeapWalkerNode[] computeChildren() {
-                    HeapWalkerNode[] children = null;
+            public HeapWalkerNode[] computeChildren() {
+                HeapWalkerNode[] children = null;
 
-                    if (getMode() == HeapWalkerNode.MODE_FIELDS) {
-                        if (hasInstance()) {
-                            ArrayList fieldValues = new ArrayList();
-                            fieldValues.addAll(getInstance().getFieldValues());
-                            fieldValues.addAll(getInstance().getStaticFieldValues());
+                if (getMode() == HeapWalkerNode.MODE_FIELDS) {
+                    if (hasInstance()) {
+                        ArrayList fieldValues = new ArrayList();
+                        fieldValues.addAll(getInstance().getFieldValues());
+                        fieldValues.addAll(getInstance().getStaticFieldValues());
 
-                            if (fieldValues.size() == 0) {
-                                // Instance has no fields
-                                children = new HeapWalkerNode[1];
-                                children[0] = HeapWalkerNodeFactory.createNoFieldsNode(ObjectNode.this);
-                            } else {
-                                // Instance has at least one field
-                                children = new HeapWalkerNode[fieldValues.size()];
-
-                                for (int i = 0; i < children.length; i++) {
-                                    children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i),
-                                                                                        ObjectNode.this);
-                                }
-                            }
+                        if (fieldValues.size() == 0) {
+                            // Instance has no fields
+                            children = new HeapWalkerNode[1];
+                            children[0] = HeapWalkerNodeFactory.createNoFieldsNode(ObjectNode.this);
                         } else {
-                            children = new HeapWalkerNode[0];
-                        }
-                    } else if (getMode() == HeapWalkerNode.MODE_REFERENCES) {
-                        children = HeapWalkerNodeFactory.createReferences(ObjectNode.this);
-                    }
+                            // Instance has at least one field
+                            children = new HeapWalkerNode[fieldValues.size()];
 
-                    return children;
+                            for (int i = 0; i < children.length; i++) {
+                                children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i),
+                                                                                    ObjectNode.this);
+                            }
+                        }
+                    } else {
+                        children = new HeapWalkerNode[0];
+                    }
+                } else if (getMode() == HeapWalkerNode.MODE_REFERENCES) {
+                    children = HeapWalkerNodeFactory.createReferences(ObjectNode.this);
                 }
-            };
+
+                return children;
+            }
+        };
     }
 
     protected Icon computeIcon() {

@@ -185,99 +185,98 @@ public class InstancesListController extends AbstractController {
                 pathToSelect = null;
             }
         }
+        
+        protected ChildrenComputer getChildrenComputer() {
+            return new ChildrenComputer() {
+                public HeapWalkerNode[] computeChildren() {
+                    HeapWalkerNode[] children = null;
 
-        protected HeapWalkerNode[] computeChildren() {
-            return BrowserUtils.lazilyCreateChildren(this,
-                                                     new ChildrenComputer() {
-                    public HeapWalkerNode[] computeChildren() {
-                        HeapWalkerNode[] children = null;
+                    List instances = getJavaClass().getInstances();
+                    List filteredInstances = getFilteredInstances(instances, filterValue);
+                    List sortedFilteredInstances = null;
 
-                        List instances = getJavaClass().getInstances();
-                        List filteredInstances = getFilteredInstances(instances, filterValue);
-                        List sortedFilteredInstances = null;
+                    if (instanceToSelect != null) {
+                        sortedFilteredInstances = getSortedInstances(filteredInstances, sortingColumn, sortingOrder);
+                    }
+
+                    if (filteredInstances.size() == 0) {
+                        // Class has no instances
+                        children = new HeapWalkerNode[1];
+                        children[0] = HeapWalkerNodeFactory.createNoItemsNode(InstancesListClassNode.this);
+                    } else if (filteredInstances.size() > HeapWalkerNodeFactory.ITEMS_COLLAPSE_THRESHOLD) {
+                        int instanceToSelectIndex = -1;
 
                         if (instanceToSelect != null) {
+                            if (instanceToSelect == INSTANCE_FIRST) {
+                                instanceToSelectIndex = 0;
+                            } else {
+                                instanceToSelectIndex = sortedFilteredInstances.indexOf(instanceToSelect);
+                            }
+                        }
+
+                        int childrenCount = filteredInstances.size();
+                        BrowserUtils.GroupingInfo groupingInfo = BrowserUtils.getGroupingInfo(childrenCount);
+                        int containersCount = groupingInfo.containersCount;
+                        int collapseUnitSize = groupingInfo.collapseUnitSize;
+
+                        children = new HeapWalkerNode[containersCount];
+
+                        for (int i = 0; i < containersCount; i++) {
+                            int unitStartIndex = collapseUnitSize * i;
+                            int unitEndIndex = Math.min(unitStartIndex + collapseUnitSize, childrenCount) - 1;
+
+                            if ((instanceToSelectIndex != -1)
+                                    && ((instanceToSelectIndex >= unitStartIndex) && (instanceToSelectIndex <= unitEndIndex))) {
+                                children[i] = new InstancesListContainerNode(InstancesListClassNode.this, unitStartIndex,
+                                                                             unitEndIndex, filterValue, sortingColumn,
+                                                                             sortingOrder, sortedFilteredInstances,
+                                                                             instanceToSelectIndex);
+                                instanceToSelectIndex = -1;
+                            } else {
+                                children[i] = new InstancesListContainerNode(InstancesListClassNode.this, unitStartIndex,
+                                                                             unitEndIndex, filterValue, sortingColumn,
+                                                                             sortingOrder);
+
+                                if (containerToSelectIndex == i) {
+                                    pathToSelect = new TreePath(new Object[] { InstancesListClassNode.this, children[i] });
+                                    containerToSelectIndex = -1;
+                                    instanceToSelect = null;
+                                }
+                            }
+                        }
+
+                        containerToSelectIndex = -1;
+                        instanceToSelect = null;
+                    } else {
+                        // Class has at least one instance
+                        if (sortedFilteredInstances == null) {
                             sortedFilteredInstances = getSortedInstances(filteredInstances, sortingColumn, sortingOrder);
                         }
 
-                        if (filteredInstances.size() == 0) {
-                            // Class has no instances
-                            children = new HeapWalkerNode[1];
-                            children[0] = HeapWalkerNodeFactory.createNoItemsNode(InstancesListClassNode.this);
-                        } else if (filteredInstances.size() > HeapWalkerNodeFactory.ITEMS_COLLAPSE_THRESHOLD) {
-                            int instanceToSelectIndex = -1;
+                        children = new HeapWalkerNode[sortedFilteredInstances.size()];
 
-                            if (instanceToSelect != null) {
-                                if (instanceToSelect == INSTANCE_FIRST) {
-                                    instanceToSelectIndex = 0;
-                                } else {
-                                    instanceToSelectIndex = sortedFilteredInstances.indexOf(instanceToSelect);
-                                }
+                        for (int i = 0; i < children.length; i++) {
+                            Instance instance = (Instance) sortedFilteredInstances.get(i);
+                            children[i] = new InstancesListInstanceNode(instance, InstancesListClassNode.this);
+
+                            if ((instanceToSelect != null)
+                                    && (((i == 0) && (instanceToSelect == INSTANCE_FIRST))
+                                           || (instance.equals(instanceToSelect)))) {
+                                pathToSelect = new TreePath(new Object[] { InstancesListClassNode.this, children[i] });
+                                instanceToSelect = null;
+                                containerToSelectIndex = -1;
                             }
 
-                            int childrenCount = filteredInstances.size();
-                            BrowserUtils.GroupingInfo groupingInfo = BrowserUtils.getGroupingInfo(childrenCount);
-                            int containersCount = groupingInfo.containersCount;
-                            int collapseUnitSize = groupingInfo.collapseUnitSize;
-
-                            children = new HeapWalkerNode[containersCount];
-
-                            for (int i = 0; i < containersCount; i++) {
-                                int unitStartIndex = collapseUnitSize * i;
-                                int unitEndIndex = Math.min(unitStartIndex + collapseUnitSize, childrenCount) - 1;
-
-                                if ((instanceToSelectIndex != -1)
-                                        && ((instanceToSelectIndex >= unitStartIndex) && (instanceToSelectIndex <= unitEndIndex))) {
-                                    children[i] = new InstancesListContainerNode(InstancesListClassNode.this, unitStartIndex,
-                                                                                 unitEndIndex, filterValue, sortingColumn,
-                                                                                 sortingOrder, sortedFilteredInstances,
-                                                                                 instanceToSelectIndex);
-                                    instanceToSelectIndex = -1;
-                                } else {
-                                    children[i] = new InstancesListContainerNode(InstancesListClassNode.this, unitStartIndex,
-                                                                                 unitEndIndex, filterValue, sortingColumn,
-                                                                                 sortingOrder);
-
-                                    if (containerToSelectIndex == i) {
-                                        pathToSelect = new TreePath(new Object[] { InstancesListClassNode.this, children[i] });
-                                        containerToSelectIndex = -1;
-                                        instanceToSelect = null;
-                                    }
-                                }
-                            }
-
-                            containerToSelectIndex = -1;
-                            instanceToSelect = null;
-                        } else {
-                            // Class has at least one instance
-                            if (sortedFilteredInstances == null) {
-                                sortedFilteredInstances = getSortedInstances(filteredInstances, sortingColumn, sortingOrder);
-                            }
-
-                            children = new HeapWalkerNode[sortedFilteredInstances.size()];
-
-                            for (int i = 0; i < children.length; i++) {
-                                Instance instance = (Instance) sortedFilteredInstances.get(i);
-                                children[i] = new InstancesListInstanceNode(instance, InstancesListClassNode.this);
-
-                                if ((instanceToSelect != null)
-                                        && (((i == 0) && (instanceToSelect == INSTANCE_FIRST))
-                                               || (instance.equals(instanceToSelect)))) {
-                                    pathToSelect = new TreePath(new Object[] { InstancesListClassNode.this, children[i] });
-                                    instanceToSelect = null;
-                                    containerToSelectIndex = -1;
-                                }
-
-                                ;
-                            }
-
-                            instanceToSelect = null;
-                            containerToSelectIndex = -1;
+                            ;
                         }
 
-                        return children;
+                        instanceToSelect = null;
+                        containerToSelectIndex = -1;
                     }
-                });
+
+                    return children;
+                }
+            };
         }
 
         protected ImageIcon computeIcon() {

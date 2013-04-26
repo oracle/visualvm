@@ -204,9 +204,25 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
     public boolean currentlyHasChildren() {
         return children != null;
     }
+    
+    protected ChildrenComputer getChildrenComputer() {
+        return null;
+    }
 
     public String toString() {
         return getName();
+    }
+    
+    // TODO: use underlying data object for equals()
+    public boolean equals(Object o) {
+        if (!(o instanceof HeapWalkerNode)) return false;
+        HeapWalkerNode n = (HeapWalkerNode)o;
+        return (n.getName() + n.getType() + n.getValue()).equals(getName() + getType() + getValue());
+    }
+    
+    // TODO: use underlying data object for hashCode()
+    public int hashCode() {
+        return (getName() + getType() + getValue()).hashCode();
     }
 
     protected abstract Icon computeIcon();
@@ -228,7 +244,9 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
 
     // Should be overridden for lazy populating children
     protected HeapWalkerNode[] computeChildren() {
-        return new HeapWalkerNode[0];
+        ChildrenComputer ch = getChildrenComputer();
+        if (ch != null) return BrowserUtils.lazilyCreateChildren(this, ch);
+        else return new HeapWalkerNode[0];
     }
 
     // Used for updating lazily created children, shouldn't be used for any other purpose!
