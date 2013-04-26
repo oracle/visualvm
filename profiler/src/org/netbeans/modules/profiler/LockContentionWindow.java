@@ -56,6 +56,7 @@ import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.ui.ResultsView;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -100,6 +101,7 @@ public final class LockContentionWindow extends ProfilerTopComponent {
 
         locksPanel = new LockContentionPanel();
         locksPanel.addSaveViewAction(new SaveViewAction(new SaveView()));
+        locksPanel.addExportAction(new ExportAction(new Exporter(),null));
 
         lockView.addView("Locks", null, "Locks", locksPanel, locksPanel.getToolbar());
 //        lockView.addView(Bundle.ThreadsWindow_ThreadsTableTabName(), null,
@@ -193,6 +195,29 @@ public final class LockContentionWindow extends ProfilerTopComponent {
             profilingStateChanged(false);
         }
     }
+    
+    private class Exporter implements ExportAction.ExportProvider {
+
+        @Override
+        public void exportData(int exportedFileType, ExportDataDumper eDD) {
+            locksPanel.exportData(exportedFileType, eDD, getViewName());
+        }
+
+        @Override
+        public String getViewName() {
+            return Bundle.LockContentionWindow_WindowName();
+        }
+
+        @Override
+        public boolean hasExportableView() {
+            return locksPanel.hasView();
+        }
+
+        @Override
+        public boolean hasLoadedSnapshot() {
+            return false;
+        }
+    }
 
     private class LockContentionListener implements ActionListener {
 
@@ -227,7 +252,7 @@ public final class LockContentionWindow extends ProfilerTopComponent {
 
         @Override
         public String getViewName() {
-            return "lock-contention"; // NOI18N
+            return Bundle.LockContentionWindow_WindowName();
         }
 
         @Override
