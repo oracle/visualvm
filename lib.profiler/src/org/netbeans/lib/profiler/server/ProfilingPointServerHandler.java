@@ -43,7 +43,6 @@
 
 package org.netbeans.lib.profiler.server;
 
-import org.netbeans.lib.profiler.server.ProfilerRuntime;
 import org.netbeans.lib.profiler.server.system.Timers;
 import java.lang.reflect.Method;
 import java.util.Arrays;
