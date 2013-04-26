@@ -484,6 +484,11 @@ public abstract class FlatProfileContainer {
         long[] tpmA = null;
         long[] tpmB = null;
 
+        // Percentage is recalculated every time, since it depends on whether primary/secondary time is used
+        if ((percent == null) || (usePrimaryTime != staticUsePrimaryTime) || (percent.length != nRows)) {
+            calculatePercent(usePrimaryTime);
+        }
+
         if (collectingTwoTimeStamps) {
             if (usePrimaryTime) {
                 tpmA = totalTimeInMcs0;
