@@ -51,6 +51,7 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -78,6 +79,7 @@ public class JmxSupport implements DataRemovedListener {
     private Timer timer;
     private MemoryPoolMXBean permGenPool;
     private Collection<GarbageCollectorMXBean> gcList;
+    private String[] genName;
 
     JmxSupport(Application app, JVMImpl vm) {
         jvm = vm;
@@ -235,6 +237,24 @@ public class JmxSupport implements DataRemovedListener {
         }
     }
 
+    String[] getGenName() {
+        if (genName == null) {
+            MemoryPoolMXBean permPool = getPermGenPool();
+            initGenName();
+            if (permPool != null) {
+                String name = permPool.getName();
+                genName[1] = NbBundle.getMessage(JmxSupport.class, "LBL_Perm"); // NOI18N
+            }
+        }
+        return genName;
+    }
+
+    void initGenName() {
+        genName = new String[2];
+        genName[0] = NbBundle.getMessage(JmxSupport.class, "LBL_Heap");   // NOI18N
+        genName[1] = NbBundle.getMessage(JmxSupport.class, "LBL_NA");   // NOI18N        
+    }
+    
     void initTimer() {
         int interval = GlobalPreferences.sharedInstance().getMonitoredDataPoll() * 1000;
         final JvmMXBeans jmx = getJvmMXBeans();

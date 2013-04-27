@@ -266,6 +266,16 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         }
     }
     
+    public String[] getGenName() {
+        if (jvmstatModel != null) {
+            return jvmstatModel.getGenName();
+        }
+        if (jmxSupport != null) {
+            return jmxSupport.getGenName();
+        }
+        throw new UnsupportedOperationException();
+    }
+
     public boolean isMonitoringSupported() {
         return isClassMonitoringSupported() || isThreadMonitoringSupported() || isMemoryMonitoringSupported();
     }

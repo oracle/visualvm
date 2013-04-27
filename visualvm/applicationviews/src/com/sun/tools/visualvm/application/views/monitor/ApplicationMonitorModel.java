@@ -54,6 +54,7 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 
@@ -68,7 +69,7 @@ final class ApplicationMonitorModel {
     static final String SNAPSHOT_VERSION = PROP_PREFIX + "version"; // NOI18N
     private static final String SNAPSHOT_VERSION_DIVIDER = "."; // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
-    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "0";   // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "1";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
     
     private static final String PROP_NOT_DEFINED = "<not defined>"; // NOI18N
@@ -89,9 +90,11 @@ final class ApplicationMonitorModel {
     public static final String PROP_PROCESS_GC_TIME = PROP_PREFIX + "process_gc_time"; // NOI18N
     public static final String PROP_PREV_PROCESS_CPU_TIME = PROP_PREFIX + "prev_process_cpu_time"; // NOI18N
     public static final String PROP_PREV_PROCESS_GC_TIME = PROP_PREFIX + "prev_process_gc_time"; // NOI18N
+    public static final String PROP_HEAP_NAME = PROP_PREFIX + "heap_name"; // NOI18N
     public static final String PROP_HEAP_CAPACITY = PROP_PREFIX + "heap_capacity"; // NOI18N
     public static final String PROP_HEAP_USED = PROP_PREFIX + "heap_used"; // NOI18N
     public static final String PROP_MAX_HEAP = PROP_PREFIX + "max_heap"; // NOI18N
+    public static final String PROP_PERMGEN_NAME = PROP_PREFIX + "permgen_name"; // NOI18N
     public static final String PROP_PERMGEN_CAPACITY = PROP_PREFIX + "permgen_capacity"; // NOI18N
     public static final String PROP_PERMGEN_USED = PROP_PREFIX + "permgen_used"; // NOI18N
     public static final String PROP_PERMGEN_MAX = PROP_PREFIX + "permgen_max"; // NOI18N
@@ -138,9 +141,11 @@ final class ApplicationMonitorModel {
     private long processGcTime = -1;
     private long prevProcessCpuTime = -1;
     private long prevProcessGcTime = -1;
+    private String heapName;
     private long heapCapacity = -1;
     private long heapUsed = -1;
     private long maxHeap = -1;
+    private String permgenName;
     private long permgenCapacity = -1;
     private long permgenUsed = -1;
     private long permgenMax = -1;
@@ -193,9 +198,11 @@ final class ApplicationMonitorModel {
     public long getProcessGcTime() { return processGcTime; }
     public long getPrevProcessCpuTime() { return prevProcessCpuTime; }
     public long getPrevProcessGcTime() { return prevProcessGcTime; }
+    public String getHeapName() { return heapName; }
     public long getHeapCapacity() { return heapCapacity; }
     public long getHeapUsed() { return heapUsed; }
     public long getMaxHeap() { return maxHeap; }
+    public String getPermgenName() { return permgenName; }
     public long getPermgenCapacity() { return permgenCapacity; }
     public long getPermgenUsed() { return permgenUsed; }
     public long getPermgenMax() { return permgenMax; }
@@ -310,9 +317,11 @@ final class ApplicationMonitorModel {
         setProperty(storage, PROP_PROCESS_GC_TIME, Long.toString(processGcTime));
         setProperty(storage, PROP_PREV_PROCESS_CPU_TIME, Long.toString(prevProcessCpuTime));
         setProperty(storage, PROP_PREV_PROCESS_GC_TIME, Long.toString(prevProcessGcTime));
+        setProperty(storage, PROP_HEAP_NAME, heapName);
         setProperty(storage, PROP_HEAP_CAPACITY, Long.toString(heapCapacity));
         setProperty(storage, PROP_HEAP_USED, Long.toString(heapUsed));
         setProperty(storage, PROP_MAX_HEAP, Long.toString(maxHeap));
+        setProperty(storage, PROP_PERMGEN_NAME, permgenName);
         setProperty(storage, PROP_PERMGEN_CAPACITY, Long.toString(permgenCapacity));
         setProperty(storage, PROP_PERMGEN_USED, Long.toString(permgenUsed));
         setProperty(storage, PROP_PERMGEN_MAX, Long.toString(permgenMax));
@@ -380,6 +389,7 @@ final class ApplicationMonitorModel {
         // TODO: if some property cannot be loaded for current snapshot version, FAIL initializing the snapshot!
         Storage storage = snapshot.getStorage();
 
+        String version = getProperty(storage, SNAPSHOT_VERSION);
         chartCache = Integer.parseInt(getProperty(storage, PROP_CHART_CACHE));
         uptime = Long.parseLong(getProperty(storage, PROP_UPTIME));
         prevUpTime = Long.parseLong(getProperty(storage, PROP_PREV_UPTIME));
@@ -410,6 +420,13 @@ final class ApplicationMonitorModel {
         peakThreads = Long.parseLong(getProperty(storage, PROP_PEAK_THREADS));
         startedThreads = Long.parseLong(getProperty(storage, PROP_STARTED_THREADS));
         
+        if (version.compareTo("1.1") >= 0) {                      // NOI18N
+            heapName = getProperty(storage, PROP_HEAP_NAME);
+            permgenName = getProperty(storage, PROP_PERMGEN_NAME);
+        } else {
+            heapName = NbBundle.getMessage(ApplicationMonitorModel.class, "LBL_Heap");  // NOI18N
+            permgenName = NbBundle.getMessage(ApplicationMonitorModel.class, "LBL_PermGen");    // NOI18N
+        }
     }
     
     private static void setProperty(Storage storage, String property, String value) {
@@ -441,6 +458,11 @@ final class ApplicationMonitorModel {
             memoryMonitoringSupported = jvm.isMemoryMonitoringSupported();
             classMonitoringSupported = jvm.isClassMonitoringSupported();
             threadsMonitoringSupported = jvm.isThreadMonitoringSupported();
+            if (memoryMonitoringSupported) {
+                String[] names = jvm.getGenName();
+                heapName = names[0];
+                permgenName = names[1];
+            }
         }
 
         memoryMXBean = null;

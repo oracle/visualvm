@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
+import org.openide.util.NbBundle;
 
 /**
  * 
@@ -62,6 +63,7 @@ public abstract class JvmJvmstatModel extends Model {
     protected MonitoredValue applicationTime;
     protected MonitoredValue upTime;
     protected long osFrequency;
+    protected String[] genName;
     protected List<MonitoredValue> genCapacity;
     protected List<MonitoredValue> genUsed;
     protected long[] genMaxCapacity;
@@ -69,6 +71,9 @@ public abstract class JvmJvmstatModel extends Model {
     protected JvmJvmstatModel(Application app,JvmstatModel stat) {
         application = app;
         jvmstat = stat;
+        genName = new String[2];
+        genName[0] = NbBundle.getMessage(JvmJvmstatModel.class, "LBL_Heap");   // NOI18N
+        genName[1] = NbBundle.getMessage(JvmJvmstatModel.class, "LBL_Perm");   // NOI18N        
     }
     
     /**
@@ -383,6 +388,18 @@ public abstract class JvmJvmstatModel extends Model {
         return getLongValue(upTime);
     }
     
+    /**
+     * Returns the names of Java virtual machine spaces.
+     *
+     * @return Index 0 is the display name for heap,
+     * index 1 is display name for Permanent Generation (PermGen)
+     *
+     * @since VisualVM 1.3.6
+     */
+    public String[] getGenName() {
+        return genName.clone();
+    }
+
     /** 
      * Returns the amount of memory in bytes that is committed for
      * the Java virtual machine to use.  This amount of memory is

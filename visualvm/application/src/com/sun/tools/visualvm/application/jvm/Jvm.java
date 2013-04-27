@@ -243,6 +243,16 @@ public abstract class Jvm extends Model {
     public abstract void removeMonitoredDataListener(MonitoredDataListener l);
 
     /**
+     * Returns the names of Java virtual machine spaces.
+     *
+     * @return Index 0 is the display name for heap,
+     * index 1 is display name for Permanent Generation (PermGen)
+     *
+     * @since VisualVM 1.3.6
+     */
+    public abstract String[] getGenName();
+
+    /**
      * Tests if it is possible to obtain system properties from target JVM.
      * @return <CODE>true</CODE> if JVM supports system properties,
      * <CODE>false</CODE> otherwise

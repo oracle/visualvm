@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.MonitoredValue;
 import java.util.List;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -69,6 +70,7 @@ class JvmJvmstatModel_8 extends JvmJvmstatModel {
         for (MonitoredValue m : monitors) {
             if (m.getName().startsWith(PERM_GEN_PREFIX_META)) {
                 permGenPrefix = PERM_GEN_PREFIX_META;
+                genName[1] = NbBundle.getMessage(JvmJvmstatModel_8.class, "LBL_Meta"); // NOI18N
                 break;
             }
         }

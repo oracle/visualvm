@@ -120,6 +120,10 @@ class DefaultJvm extends Jvm {
         throw new UnsupportedOperationException();
     }
     
+    public String[] getGenName() {
+        throw new UnsupportedOperationException();
+    }
+    
     public boolean isDumpOnOOMEnabled() {
         throw new UnsupportedOperationException();
     }

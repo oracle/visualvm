@@ -373,15 +373,9 @@ class ApplicationMonitorView extends DataSourceView {
     // --- Heap ----------------------------------------------------------------
 
     private static class HeapViewSupport extends JPanel  {
-
-        private static final String HEAP_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size"); // NOI18N
-        private static final String HEAP_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size_leg"); // NOI18N
-        private static final String USED_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap"); // NOI18N
-        private static final String USED_HEAP_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap_leg"); // NOI18N
-        private static final String MAX_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_Heap");   // NOI18N
-
         private boolean liveModel;
         private boolean memoryMonitoringSupported;
+        private String heapName;
 
         private SimpleXYChartSupport chartSupport;
 
@@ -391,7 +385,7 @@ class ApplicationMonitorView extends DataSourceView {
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap"), null, 10, this, null);  // NOI18N
+            return new DataViewComponent.DetailsView(heapName, null, 10, this, null);
         }
 
         public void refresh(ApplicationMonitorModel model) {
@@ -411,6 +405,13 @@ class ApplicationMonitorView extends DataSourceView {
         private void initModels(ApplicationMonitorModel model) {
             liveModel = model.isLive();
             memoryMonitoringSupported = model.isMemoryMonitoringSupported();
+            heapName = model.getHeapName();
+
+            String HEAP_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size"); // NOI18N
+            String HEAP_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Heap_size_leg",heapName); // NOI18N
+            String USED_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap"); // NOI18N
+            String USED_HEAP_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_heap_leg",heapName); // NOI18N
+            String MAX_HEAP = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_Heap");   // NOI18N
 
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, model.getChartCache());
@@ -441,15 +442,10 @@ class ApplicationMonitorView extends DataSourceView {
     // --- PermGen -------------------------------------------------------------
 
     private static class PermGenViewSupport extends JPanel  {
-        
-        private static final String PERM_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size");  // NOI18N
-        private static final String PERM_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size_leg");  // NOI18N
-        private static final String USED_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen");  // NOI18N
-        private static final String USED_PERM_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen_leg");  // NOI18N
-        private static final String MAX_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_PermGen_size");   // NOI18N
 
         private boolean liveModel;
         private boolean memoryMonitoringSupported;
+        private String permgenName;
 
         private SimpleXYChartSupport chartSupport;
 
@@ -459,7 +455,7 @@ class ApplicationMonitorView extends DataSourceView {
         }
 
         public DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen"), null, 10, this, null);   // NOI18N
+            return new DataViewComponent.DetailsView(permgenName, null, 10, this, null);
         }
 
         public void refresh(ApplicationMonitorModel model) {
@@ -479,6 +475,13 @@ class ApplicationMonitorView extends DataSourceView {
         private void initModels(ApplicationMonitorModel model) {
             liveModel = model.isLive();
             memoryMonitoringSupported = model.isMemoryMonitoringSupported();
+            permgenName = model.getPermgenName();
+
+            String PERM_SIZE = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size");  // NOI18N
+            String PERM_SIZE_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_PermGen_size_leg", permgenName);  // NOI18N
+            String USED_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen");  // NOI18N
+            String USED_PERM_LEG = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Used_PermGen_leg", permgenName);  // NOI18N
+            String MAX_PERM = NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Max_PermGen_size");   // NOI18N
 
             SimpleXYChartDescriptor chartDescriptor =
                     SimpleXYChartDescriptor.bytes(10 * 1024 * 1024, false, model.getChartCache());
