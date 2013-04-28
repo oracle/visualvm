@@ -75,6 +75,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -345,12 +346,50 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
     public void refreshView() {
         // Used for refreshing treetable after lazy-populating the model
         if (fieldsListTable != null) {
-            fieldsListTable.updateTreeTable();
+            if (expandedPaths != null || selectedPath != null) {
+                BrowserUtils.restoreState(fieldsListTable, expandedPaths, selectedPath);
+                expandedPaths = null;
+                selectedPath = null;
+            } else {
+                Object root = fieldsListTable.getTree().getModel().getRoot();
+                fieldsListTable.changeRoot((HeapWalkerNode)root);
+            }
         }
     }
-
+    
     public void selectNode(HeapWalkerNode node) {
         fieldsListTable.selectNode(node, true);
+    }
+    
+    private List expandedPaths = null;
+    private TreePath selectedPath = null;
+    
+    public List getExpandedPaths() {
+        if (!showsData()) return null;
+        return fieldsListTable.getExpandedPaths();
+    }
+    
+    public TreePath getSelectedRow() {
+        if (!showsData()) return null;
+        return fieldsListTable.getTree().getSelectionPath();
+    }
+    
+    public void restoreState(List expanded, TreePath selected) {
+        if (showsData()) {
+            expandedPaths = expanded;
+            selectedPath = selected;
+        } else {
+            expandedPaths = null;
+            selectedPath = null;
+        }
+    }
+    
+    private boolean showsData() {
+        Object root = fieldsListTableModel.getRoot();
+        return root != null &&
+               root != FieldsBrowserController.EMPTY_CLASS_NODE &&
+               root != FieldsBrowserController.EMPTY_INSTANCE_NODE;
+                
     }
 
     // --- Public interface ------------------------------------------------------
@@ -360,9 +399,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
 
             if (contents != null) { // ui already initialized
 
-                if ((fieldsListTableModel.getRoot() == null)
-                        || (fieldsListTableModel.getRoot() == FieldsBrowserController.EMPTY_CLASS_NODE)
-                        || (fieldsListTableModel.getRoot() == FieldsBrowserController.EMPTY_INSTANCE_NODE)) {
+                if (!showsData()) {
                     contents.show(getContentPanel(), NO_DATA);
                 } else {
                     contents.show(getContentPanel(), DATA);
@@ -666,28 +703,27 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                                           == HeapFragmentWalker.RETAINED_SIZES_COMPUTED);
 
         fieldsListTable = new JTreeTable(fieldsListTableModel) {
-                public void doLayout() {
-                    int columnsWidthsSum = 0;
-                    int realFirstColumn = -1;
+            public void doLayout() {
+                int columnsWidthsSum = 0;
+                int realFirstColumn = -1;
 
-                    TableColumnModel colModel = getColumnModel();
+                TableColumnModel colModel = getColumnModel();
 
-                    for (int i = 0; i < fieldsListTableModel.getColumnCount(); i++) {
-                        if (fieldsListTableModel.getRealColumn(i) == 0) {
-                            realFirstColumn = i;
-                        } else {
-                            columnsWidthsSum += colModel.getColumn(i).getPreferredWidth();
-                        }
+                for (int i = 0; i < fieldsListTableModel.getColumnCount(); i++) {
+                    if (fieldsListTableModel.getRealColumn(i) == 0) {
+                        realFirstColumn = i;
+                    } else {
+                        columnsWidthsSum += colModel.getColumn(i).getPreferredWidth();
                     }
-
-                    if (realFirstColumn != -1) {
-                        colModel.getColumn(realFirstColumn).setPreferredWidth(getWidth() - columnsWidthsSum);
-                    }
-
-                    super.doLayout();
                 }
-                ;
+
+                if (realFirstColumn != -1) {
+                    colModel.getColumn(realFirstColumn).setPreferredWidth(getWidth() - columnsWidthsSum);
+                }
+
+                super.doLayout();
             };
+        };
         fieldsListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fieldsListTable.setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
         fieldsListTable.setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);

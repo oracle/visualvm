@@ -91,4 +91,8 @@ public class ObjectArrayFieldNode extends ObjectArrayNode implements HeapWalkerF
 
         return processLoopIcon(icon);
     }
+    
+    public Object getNodeID() {
+        return fieldValue;
+    }
 }
