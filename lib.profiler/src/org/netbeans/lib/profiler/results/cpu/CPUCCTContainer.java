@@ -51,6 +51,8 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
@@ -110,6 +112,9 @@ public class CPUCCTContainer {
     // -- Temporary data used during flat profile generation
     protected long[] timePerMethodId0;
     protected long[] timePerMethodId1;
+    protected long[] totalTimePerMethodId0;
+    protected long[] totalTimePerMethodId1;
+    protected Set methodsOnStack;
     protected boolean collectingTwoTimeStamps; // True if we collect two timestamps, absolute and thread CPU, for each method invocation
     protected boolean displayWholeThreadCPUTime; // True if we can calculate, and thus display, valid whole thread CPU time
 
@@ -405,6 +410,8 @@ public class CPUCCTContainer {
 
     protected void addFlatProfTimeForNode(int dataOfs) {
         int methodId = getMethodIdForNodeOfs(dataOfs);
+        Integer methodIdInt = new Integer(methodId);
+        boolean isRecursiveCall = methodsOnStack.contains(methodIdInt);
         
         if (methodId >= invPerMethodId.length) {
             LOGGER.log(Level.WARNING, "Method ID ({0}) out of bounds ({1})", new Object[]{methodId, invPerMethodId.length});
@@ -413,16 +420,27 @@ public class CPUCCTContainer {
         int nChildren = getNChildrenForNodeOfs(dataOfs);
 
         if (nChildren > 0) {
+            if (!isRecursiveCall) {
+                methodsOnStack.add(methodIdInt);
+            }
             for (int i = 0; i < nChildren; i++) {
                 int childOfs = getChildOfsForNodeOfs(dataOfs, i);
                 addFlatProfTimeForNode(childOfs);
             }
+            if (!isRecursiveCall) {
+                methodsOnStack.remove(methodIdInt);                
+            }
         }
 
         timePerMethodId0[methodId] += getSelfTime0ForNodeOfs(dataOfs);
-
+        if (!isRecursiveCall) {
+            totalTimePerMethodId0[methodId] += getTotalTime0ForNodeOfs(dataOfs);
+        }
         if (collectingTwoTimeStamps) {
             timePerMethodId1[methodId] += getSelfTime1ForNodeOfs(dataOfs);
+            if (!isRecursiveCall) {
+                totalTimePerMethodId1[methodId] += getTotalTime1ForNodeOfs(dataOfs);
+            }
         }
 
         invPerMethodId[methodId] += getNCallsForNodeOfs(dataOfs);
@@ -514,11 +532,13 @@ public class CPUCCTContainer {
     }
 
     protected FlatProfileContainer postGenerateFlatProfile() {
-        FlatProfileContainer fpc = new FlatProfileContainerBacked(this, timePerMethodId0, timePerMethodId1, invPerMethodId,
-                                                                  timePerMethodId0.length);
+        FlatProfileContainer fpc = new FlatProfileContainerBacked(this, timePerMethodId0, timePerMethodId1, 
+                totalTimePerMethodId0, totalTimePerMethodId1, invPerMethodId, timePerMethodId0.length);
 
         timePerMethodId0 = timePerMethodId1 = null;
+        totalTimePerMethodId0 = totalTimePerMethodId1 = null;
         invPerMethodId = null;
+        methodsOnStack = null;
 
         return fpc;
     }
@@ -526,13 +546,17 @@ public class CPUCCTContainer {
     protected void preGenerateFlatProfile() {
         int totalMethods = cpuResSnapshot.getNInstrMethods();
         timePerMethodId0 = new long[totalMethods];
+        totalTimePerMethodId0 = new long[totalMethods];
 
         if (collectingTwoTimeStamps) {
             timePerMethodId1 = new long[totalMethods];
+            totalTimePerMethodId1 = new long[totalMethods];
         }
 
         invPerMethodId = new int[totalMethods];
         timePerMethodId0[0] = -1; // 0th element is a hidden "Thread" quazi-method. This prevents exposing it in a pathological case when all times are zero.
+        totalTimePerMethodId0[0] = -1; // 0th element is a hidden "Thread" quazi-method. This prevents exposing it in a pathological case when all times are zero.
+        methodsOnStack = new HashSet();
     }
 
     // -- Utility methods, not interesting enough to place earlier in the code
