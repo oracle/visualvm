@@ -45,7 +45,7 @@ package org.netbeans.lib.profiler.heap;
 
 
 /**
- * This is common interface representing value. There are two tyes of value.
+ * This is common interface representing value. There are two types of value.
  * One is {@link ObjectFieldValue} and the second one is {@link ArrayItemValue}
  * @author Tomas Hurka
  */

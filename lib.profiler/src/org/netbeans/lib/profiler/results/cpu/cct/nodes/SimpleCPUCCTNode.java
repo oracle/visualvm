@@ -57,13 +57,13 @@ public class SimpleCPUCCTNode extends BaseCPUCCTNode {
 
     /** Creates a new instance of SimpleCPUCCTNode */
     public SimpleCPUCCTNode(boolean root) {
-        super(null);
+        super();
         this.root = root;
         this.maxMethodId = Integer.MAX_VALUE;
     }
     
     public SimpleCPUCCTNode(int maxMethodId) {
-        super(null);
+        super();
         this.root = false;
         this.maxMethodId = maxMethodId;
     }

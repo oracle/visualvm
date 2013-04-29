@@ -43,9 +43,6 @@
 
 package org.netbeans.lib.profiler.server;
 
-import org.netbeans.lib.profiler.global.ProfilingPointServerHandler;
-
-
 /**
  * Performs special handling of Take Snapshot With Reset profiling points on server side.
  *
