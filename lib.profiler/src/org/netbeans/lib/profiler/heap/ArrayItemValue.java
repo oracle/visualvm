@@ -53,7 +53,7 @@ public interface ArrayItemValue extends Value {
 
     /**
      * returns the corresponding index in array represented by this ArrayItemValue.
-     * Tthe following is true
+     * The following is true
      * <CODE>x.getDefiningInstance().getValues().get(x.getIndex()).equals(x.getInstance())</CODE>
      * <br>
      * Speed: fast
