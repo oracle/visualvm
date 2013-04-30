@@ -147,13 +147,14 @@ public interface CommonConstants {
     public static final byte METHOD_EXIT_SLEEP = 25;
     public static final byte METHOD_ENTRY_PARK = 26;
     public static final byte METHOD_EXIT_PARK = 27;
+    public static final byte NEW_MONITOR = 28;
     
-    public static final byte BUFFEREVENT_PROFILEPOINT_HIT = 28;
-    public static final byte SERVLET_DO_METHOD = 29;
-    public static final byte THREAD_DUMP_START = 30;
-    public static final byte THREAD_DUMP_END = 31;
-    public static final byte THREAD_INFO_IDENTICAL = 32;
-    public static final byte THREAD_INFO = 33;
+    public static final byte BUFFEREVENT_PROFILEPOINT_HIT = 29;
+    public static final byte SERVLET_DO_METHOD = 30;
+    public static final byte THREAD_DUMP_START = 31;
+    public static final byte THREAD_DUMP_END = 32;
+    public static final byte THREAD_INFO_IDENTICAL = 33;
+    public static final byte THREAD_INFO = 34;
 
     // The following are used when storing unstamped method entry/exit events in the "compact" format, when both
     // event code and method id are packed in a single char. See more comments in ProfilerRuntimeCPUSampledInstr.java

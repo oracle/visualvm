@@ -98,8 +98,6 @@ public class ProfilingSessionStatus {
     public double[] methodEntryExitCallTime = new double[N_TIMER_CONSTANTS]; // Elements #2 and #3 are actually the same
     public double[] methodEntryExitInnerTime = new double[N_TIMER_CONSTANTS];
     public double[] methodEntryExitOuterTime = new double[N_TIMER_CONSTANTS];
-    public ProfilingPointServerHandler[] profilingPointHandlers;
-    public int[] profilingPointIDs;
     public long[] timerCountsInSecond = new long[2];
     public boolean absoluteTimerOn;
     public boolean remoteProfiling = false;

@@ -130,7 +130,7 @@ public class BasicTest extends MonitorTestCase {
         ProfilerEngineSettings settings = initMonitorTest("j2se-simple", "simple.monitor.Monitor1");
         startMonitorTest(settings, 12, 1000, new String[] { "main", "Cascade" },
                          new byte[][] {
-                             { ST_SLEEPING | ST_WAIT | ST_RUNNING | ST_MONITOR, ST_ZOMBIE },
+                             { ST_UNKNOWN | ST_SLEEPING | ST_WAIT | ST_RUNNING | ST_MONITOR, ST_ZOMBIE },
                              { ST_UNKNOWN | ST_ZOMBIE, ST_RUNNING, ST_ZOMBIE }
                          }, WITH_MEMORY);
     }

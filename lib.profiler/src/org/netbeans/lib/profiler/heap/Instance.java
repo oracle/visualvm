@@ -79,7 +79,7 @@ public interface Instance {
     long getInstanceId();
 
     /**
-     * gets unique number of this {@link Instance} amoung all instances of the same Java Class.
+     * gets unique number of this {@link Instance} among all instances of the same Java Class.
      * Instances are numbered sequentially starting from 1.
      * <br>
      * Speed: fast
