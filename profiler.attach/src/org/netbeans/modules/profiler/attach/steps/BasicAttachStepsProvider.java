@@ -356,6 +356,8 @@ public class BasicAttachStepsProvider extends AttachStepsProvider {
     protected static String exportRemotePack(String path, AttachSettings settings, String jdk) throws IOException {
         if (exportRunning.compareAndSet(false, true)) {
             try {
+                if (path != null && path.endsWith(File.separator))
+                    path = path.substring(0, path.length() - 1);
                 return RemotePackExporter.getInstance().export(
                         path, getOS(settings, null), getPlatform(settings, jdk));
             } finally {

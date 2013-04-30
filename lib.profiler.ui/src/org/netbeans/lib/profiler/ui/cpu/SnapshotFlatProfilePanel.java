@@ -110,6 +110,10 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             if (iCTTS) {
                 result.append("<td class=\"right\">").append((double) flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms</td>");
             }
+            result.append("<td class=\"right\">").append((double) flatProfileContainer.getTotalTimeInMcs0AtRow(i)/1000).append(" ms</td>");
+            if (iCTTS) {
+                result.append("<td class=\"right\">").append((double) flatProfileContainer.getTotalTimeInMcs1AtRow(i)/1000).append(" ms</td>");
+            }
             result.append("<td class=\"right\">").append(flatProfileContainer.getNInvocationsAtRow(i)).append("</td></tr>");
             eDD.dumpData(result);
         }
@@ -138,6 +142,10 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs0AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline);
             if (iCTTS) {
                 result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTimeInMcs1AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline);
+            }
+            result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTotalTimeInMcs0AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline);
+            if (iCTTS) {
+                result.append("    <TableColumn><![CDATA[").append(((double) flatProfileContainer.getTotalTimeInMcs1AtRow(i))/1000).append(" ms]]></TableColumn>").append(newline);
             }
             result.append("    <TableColumn><![CDATA[").append(flatProfileContainer.getNInvocationsAtRow(i)).append("]]></TableColumn>").append(newline).append("  </TableRow>").append(newline);
             eDD.dumpData(result);
@@ -169,6 +177,10 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
             result.append(quote).append((double)flatProfileContainer.getTimeInMcs0AtRow(i)/1000).append(" ms").append(quote).append(separator);
             if (iCTTS) {
                 result.append(quote).append((double)flatProfileContainer.getTimeInMcs1AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            }
+            result.append(quote).append((double)flatProfileContainer.getTotalTimeInMcs0AtRow(i)/1000).append(" ms").append(quote).append(separator);
+            if (iCTTS) {
+                result.append(quote).append((double)flatProfileContainer.getTotalTimeInMcs1AtRow(i)/1000).append(" ms").append(quote).append(separator);
             }
             result.append(quote).append(flatProfileContainer.getNInvocationsAtRow(i)).append(quote).append(newLine);
             eDD.dumpData(result);

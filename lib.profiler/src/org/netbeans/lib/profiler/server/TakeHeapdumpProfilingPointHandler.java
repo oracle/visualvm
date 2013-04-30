@@ -44,8 +44,6 @@
 package org.netbeans.lib.profiler.server;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.global.ProfilingPointServerHandler;
 import org.netbeans.lib.profiler.server.system.HeapDump;
 import org.netbeans.lib.profiler.server.system.Timers;
 import java.io.File;
