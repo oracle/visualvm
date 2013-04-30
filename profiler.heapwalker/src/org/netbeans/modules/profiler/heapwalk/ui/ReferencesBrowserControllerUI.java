@@ -79,6 +79,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -346,7 +347,14 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     public void refreshView() {
         // Used for refreshing treetable after lazy-populating the model
         if (fieldsListTable != null) {
-            fieldsListTable.updateTreeTable();
+            if (expandedPaths != null || selectedPath != null) {
+                BrowserUtils.restoreState(fieldsListTable, expandedPaths, selectedPath);
+                expandedPaths = null;
+                selectedPath = null;
+            } else {
+                Object root = fieldsListTable.getTree().getModel().getRoot();
+                fieldsListTable.changeRoot((HeapWalkerNode)root);
+            }
         }
     }
 
@@ -354,11 +362,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
     public void selectNode(HeapWalkerNode node) {
         CCTNode[] pathArr = fieldsListTable.getPathToRoot(node);
-//        System.err.println(">>> About to open path size: " + pathArr.length);
-
         selectPath(pathArr, Math.min(pathArr.length, MAX_STEP));
-
-//        fieldsListTable.selectNode(node, true);
     }
 
     private void selectPath(final CCTNode[] path, final int length) {
@@ -384,6 +388,36 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
             });
         }
     }
+    
+    private List expandedPaths = null;
+    private TreePath selectedPath = null;
+    
+    public List getExpandedPaths() {
+        if (!showsData()) return null;
+        return fieldsListTable.getExpandedPaths();
+    }
+    
+    public TreePath getSelectedRow() {
+        if (!showsData()) return null;
+        return fieldsListTable.getTree().getSelectionPath();
+    }
+    
+    public void restoreState(List expanded, TreePath selected) {
+        if (showsData()) {
+            expandedPaths = expanded;
+            selectedPath = selected;
+        } else {
+            expandedPaths = null;
+            selectedPath = null;
+        }
+    }
+    
+    private boolean showsData() {
+        Object root = fieldsListTableModel.getRoot();
+        return root != null &&
+               root != ReferencesBrowserController.EMPTY_INSTANCE_NODE;
+                
+    }
 
     // --- Public interface ------------------------------------------------------
     public void update() {
@@ -392,8 +426,7 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
             if (contents != null) { // ui already initialized
 
-                if ((fieldsListTableModel.getRoot() == null)
-                        || (fieldsListTableModel.getRoot() == ReferencesBrowserController.EMPTY_INSTANCE_NODE)) {
+                if (!showsData()) {
                     contents.show(getContentPanel(), NO_DATA);
                 } else {
                     contents.show(getContentPanel(), DATA);

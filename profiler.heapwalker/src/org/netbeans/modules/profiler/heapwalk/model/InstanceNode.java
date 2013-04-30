@@ -153,12 +153,6 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
         }
         return Collections.EMPTY_LIST;
     }
-    
-    protected abstract ChildrenComputer getChildrenComputer();
-
-    protected HeapWalkerNode[] computeChildren() {
-        return BrowserUtils.lazilyCreateChildren(this, getChildrenComputer());
-    }
 
     protected HeapWalkerNode computeLoopTo() {
         if (hasInstance()) {
@@ -260,5 +254,9 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
         };
         progress.addChangeListener(cl);
         return cl;
+    }
+    
+    public Object getNodeID() {
+        return instance;
     }
 }
