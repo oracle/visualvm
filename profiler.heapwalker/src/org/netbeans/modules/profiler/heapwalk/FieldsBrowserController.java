@@ -43,16 +43,17 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
+import java.util.List;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.model.AbstractHeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNodeFactory;
 import org.netbeans.modules.profiler.heapwalk.ui.FieldsBrowserControllerUI;
 import org.openide.util.NbBundle;
-//import java.util.Comparator;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JPanel;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -266,6 +267,18 @@ public class FieldsBrowserController extends AbstractController {
 
     protected AbstractButton createControllerPresenter() {
         return ((FieldsBrowserControllerUI) getPanel()).getPresenter();
+    }
+    
+    public List getExpandedPaths() {
+        return ((FieldsBrowserControllerUI)getPanel()).getExpandedPaths();
+    }
+    
+    public TreePath getSelectedRow() {
+        return ((FieldsBrowserControllerUI)getPanel()).getSelectedRow();
+    }
+    
+    public void restoreState(List expanded, TreePath selected) {
+        ((FieldsBrowserControllerUI)getPanel()).restoreState(expanded, selected);
     }
 
     // --- Protected implementation ----------------------------------------------

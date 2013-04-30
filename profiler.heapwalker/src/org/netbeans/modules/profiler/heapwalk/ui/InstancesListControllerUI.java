@@ -394,7 +394,7 @@ public class InstancesListControllerUI extends JTitledPanel {
             instancesListTable.getTree()
                               .setShowsRootHandles(root instanceof InstancesListController.InstancesListClassNode
                                                    && root.getChild(0) instanceof InstancesListController.InstancesListContainerNode);
-            instancesListTable.updateTreeTable();
+            instancesListTable.changeRoot(root);
         }
     }
 
