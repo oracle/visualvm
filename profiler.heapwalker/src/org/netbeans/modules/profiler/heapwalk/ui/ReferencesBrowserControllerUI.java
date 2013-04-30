@@ -887,7 +887,9 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     }
 
     public HeapWalkerNode getSelectedNode(int row) {
-        return (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
+        return row == -1 ? null :
+               (HeapWalkerNode) fieldsListTable.getTree().
+               getPathForRow(row).getLastPathComponent();
     }
     
     public void showRootGCRoot() {
@@ -913,6 +915,8 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     }
 
     private void showPopupMenu(int row, int x, int y) {
+        if (row == -1) return;
+        
         HeapWalkerNode node = getSelectedNode(row);
 
         if (node instanceof HeapWalkerInstanceNode && ((HeapWalkerInstanceNode) node).isLoop()) {
@@ -921,13 +925,13 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
             showLoopOriginItem.setVisible(false);
         }
 
-        if (node.isRoot()) {
+        if (node != null && node.isRoot()) {
             showInstanceItem.setEnabled(false);
             copyPathFromRootItem.setEnabled(false);
         } else {
             showInstanceItem.setEnabled(node instanceof HeapWalkerInstanceNode
                                         && !(node instanceof HeapWalkerFieldNode && ((HeapWalkerFieldNode) node).isStatic()));
-            copyPathFromRootItem.setEnabled(true);
+            copyPathFromRootItem.setEnabled(node != null);
         }
 
 //        showClassItem.setEnabled(node instanceof HeapWalkerInstanceNode || node instanceof ClassNode);

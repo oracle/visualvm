@@ -836,7 +836,10 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
     }
 
     private void showPopupMenu(int row, int x, int y) {
-        HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().getPathForRow(row).getLastPathComponent();
+        if (row == -1) return;
+        
+        HeapWalkerNode node = (HeapWalkerNode) fieldsListTable.getTree().
+                              getPathForRow(row).getLastPathComponent();
 
         // Show Loop Origin
         if (node instanceof HeapWalkerInstanceNode && ((HeapWalkerInstanceNode) node).isLoop()) {
@@ -846,12 +849,12 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
         }
 
         // Show Instance
-        if (node.isRoot()) {
+        if (node != null && node.isRoot()) {
             showInstanceItem.setEnabled(false);
             copyPathFromRootItem.setEnabled(false);
         } else {
             showInstanceItem.setEnabled(node instanceof HeapWalkerInstanceNode && ((HeapWalkerInstanceNode) node).hasInstance());
-            copyPathFromRootItem.setEnabled(true);
+            copyPathFromRootItem.setEnabled(node != null);
         }
 
         // Show in Classes View
