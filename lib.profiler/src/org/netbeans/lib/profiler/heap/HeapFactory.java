@@ -71,7 +71,7 @@ public class HeapFactory {
 
     /**
      * this factory method creates {@link Heap} from a memory dump file in Hprof format.
-     * If the memory dump file contains more than one dump, paramer segment is used to
+     * If the memory dump file contains more than one dump, parameter segment is used to
      * select particular dump.
      * <br>
      * Speed: slow
