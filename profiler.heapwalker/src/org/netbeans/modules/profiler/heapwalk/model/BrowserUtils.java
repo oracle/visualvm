@@ -190,25 +190,26 @@ public class BrowserUtils {
         return fieldValue.getField().isStatic();
     }
     
-    public static TreePath ensurePathComputed(HeapWalkerNode root, TreePath path) {
+    public static TreePath ensurePathComputed(HeapWalkerNode root, TreePath path, Set<HeapWalkerNode> processed) {
         List p = new ArrayList();
         
         Object[] obj = path.getPath();
         if (root == null || !root.equals(obj[0])) return null;
         p.add(root);
 
-        for (int i = 1; i < obj.length; i++) {
+        for (int i = 1; i <= obj.length; i++) {
             HeapWalkerNode[] ch = null;
-            if (root instanceof AbstractHeapWalkerNode) {
+            if (root instanceof AbstractHeapWalkerNode && !processed.contains(root)) {
                 AbstractHeapWalkerNode a = (AbstractHeapWalkerNode)root;
                 ChildrenComputer c = a.getChildrenComputer();
                 if (c != null) ch = c.computeChildren();
                 a.setChildren(ch);
+                processed.add(root);
             }
             if (ch == null) ch = root.getChildren();
             
             root = null;
-            for (HeapWalkerNode x : ch)
+            if (i < obj.length) for (HeapWalkerNode x : ch)
                 if (x.equals(obj[i])) {
                     root = x;
                     p.add(root);
@@ -224,7 +225,7 @@ public class BrowserUtils {
         if (paths != null) {
             JTree tree = ttable.getTree();
             HeapWalkerNode root = (HeapWalkerNode)tree.getModel().getRoot();
-            for (Object path : paths) ensurePathComputed(root, (TreePath)path);
+            for (Object path : paths) ensurePathComputed(root, (TreePath)path, new HashSet());
             ttable.setup(paths, selected);
         }
     }

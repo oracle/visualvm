@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.ui.components.treetable;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.ui.components.JTreeTable;
@@ -162,7 +163,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
                 paths.add(expanded.nextElement());
             }
         }
-
+    
         return paths;
     }
 
@@ -304,21 +305,18 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         fireTableDataChanged();
         
         if (expanded != null) restoreExpandedPaths(expanded);
-        
-        // TODO: optimize!!!
-        if (selected != null) SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+        if (selected != null) {
+            tree.setSelectionPath(selected);
+            final Rectangle rect = tree.getPathBounds(selected);
+            if (rect != null) {
+                // scroll immediately
+                treeTable.scrollRectToVisible(tree.getPathBounds(selected));
+                // make sure the rect is still visible after eventually showing the horizontal scrollbar
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                treeTable.selectNode((CCTNode)selected.getLastPathComponent(), true);
-                            }
-                        });
-                    }
+                    public void run() { treeTable.scrollRectToVisible(rect); }
                 });
             }
-        });
+        }
     }
 
     /**

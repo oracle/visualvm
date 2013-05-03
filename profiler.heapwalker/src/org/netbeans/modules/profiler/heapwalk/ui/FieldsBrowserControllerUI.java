@@ -351,8 +351,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                 expandedPaths = null;
                 selectedPath = null;
             } else {
-                Object root = fieldsListTable.getTree().getModel().getRoot();
-                fieldsListTable.changeRoot((HeapWalkerNode)root);
+                fieldsListTable.updateTreeTable();
             }
         }
     }
