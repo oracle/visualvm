@@ -82,6 +82,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTProvider;
@@ -323,6 +324,168 @@ public class LockContentionPanel extends ResultsPanel {
         toolbar.add(actionButton, 0);
         toolbar.add(new JToolBar.Separator(), 1);
     }
+    
+    public void addExportAction(AbstractAction exportAction) {
+        Component actionButton = toolbar.add(exportAction);
+        toolbar.remove(actionButton);
+        toolbar.add(actionButton, 0);
+    }
+    
+    public void exportData(int exportedFileType, ExportDataDumper eDD, String viewName) {
+        switch (exportedFileType) {
+            case 1: exportCSV(",", eDD); break;  //NOI18N
+            case 2: exportCSV(";", eDD); break;  //NOI18N
+            case 3: exportXML(eDD, viewName); break;
+            case 4: exportHTML(eDD, viewName); break;
+        }
+    }
+    
+    private void
+            exportCSV(String separator, ExportDataDumper eDD) {
+        // Header
+        StringBuffer result = new StringBuffer();
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+        String indent = "   "; // NOI18N
+
+        for (int i = 0; i < (columnNames.length); i++) {
+            result.append(quote).append(columnNames[i]).append(quote).append(separator);
+        }
+        result.deleteCharAt(result.length()-1);
+        result.append(newLine);
+        // Data
+        
+        LockCCTNode tempTop = null;
+        String mode = modeCombo.getSelectedItem().toString();
+        if (MODE_THREADS.equals(mode)) {
+            tempTop = root.getThreads();
+        } else if (MODE_MONITORS.equals(mode)) {
+            tempTop = root.getMonitors();
+        }
+        if (tempTop!=null) {
+            //Sort the new tree
+            tempTop.sortChildren(getSortBy(sortingColumn), sortingOrder);
+            for (int i = 0; i < tempTop.getNChildren(); i++) {
+                LockCCTNode top = tempTop.getChild(i);
+                result.append(quote).append(top.getNodeName()).append(quote).append(separator);
+                result.append(top.getTimeInPerCent()).append(separator);
+                result.append(top.getTime()).append(separator);
+                result.append(top.getWaits()).append(newLine);
+                if (top.getNChildren()>0) {
+                    for (int j = 0; j < top.getNChildren(); j++) {
+                        LockCCTNode leaf = top.getChild(j);
+                        result.append(quote).append(indent).append(leaf.getNodeName()).append(quote).append(separator);
+                        result.append(leaf.getTimeInPerCent()).append(separator);
+                        result.append(leaf.getTime()).append(separator);
+                        result.append(leaf.getWaits()).append(newLine);
+                    }
+                }
+            }
+        }
+        eDD.dumpData(result);
+        eDD.close();
+        }
+        
+
+    private void exportXML(ExportDataDumper eDD, String viewName) {
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+        String indent = "   "; // NOI18N
+        
+        // Header
+        StringBuffer result = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+newLine+"<ExportedView Name=\""+viewName+"\" type=\""+"tree"+"\">"+newLine+"<tree>"+newLine); // NOI18N
+
+        // Data
+        LockRuntimeCCTNode tempRoot = root;
+        LockCCTNode tempTop;
+        
+        boolean threadFirst = MODE_THREADS.equals(modeCombo.getSelectedItem().toString());
+        String first, second;
+        if (threadFirst) {
+            tempTop = tempRoot.getThreads();
+            first="thread"; //NOI18N
+            second="monitor"; //NOI18N
+        } else {
+            tempTop = tempRoot.getMonitors();
+            second="thread"; //NOI18N
+            first="monitor"; //NOI18N
+        }
+        if (tempTop!=null) {
+            //Sort the new tree
+            tempTop.sortChildren(getSortBy(sortingColumn), sortingOrder);
+            for (int i = 0; i < tempTop.getNChildren(); i++) {
+                LockCCTNode top = tempTop.getChild(i);
+                result.append(indent).append("<").append(first).append(">").append(newLine); // NOI18N
+                result.append(indent).append(indent).append("<name>").append(quote).append(top.getNodeName()).append(quote).append("</name>").append(newLine); // NOI18N
+                result.append(indent).append(indent).append("<time_relative>").append(top.getTimeInPerCent()).append("</time_relative>").append(newLine); // NOI18N
+                result.append(indent).append(indent).append("<time>").append(top.getTime()).append("</time>").append(newLine); // NOI18N
+                result.append(indent).append(indent).append("<waits>").append(top.getWaits()).append("</waits>").append(newLine); // NOI18N
+                if (top.getNChildren()>0) {
+                    for (int j = 0; j < top.getNChildren(); j++) {
+                        LockCCTNode leaf = top.getChild(j);
+                        result.append(indent).append(indent).append("<").append(second).append(">").append(newLine); // NOI18N
+                        result.append(indent).append(indent).append(indent).append("<name>").append(quote).append(leaf.getNodeName()).append(quote).append("</name>").append(newLine); // NOI18N
+                        result.append(indent).append(indent).append(indent).append("<time_relative>").append(leaf.getTimeInPerCent()).append("</time_relative>").append(newLine); // NOI18N
+                        result.append(indent).append(indent).append(indent).append("<time>").append(leaf.getTime()).append("</time>").append(newLine); // NOI18N
+                        result.append(indent).append(indent).append(indent).append("<waits>").append(leaf.getWaits()).append("</waits>").append(newLine); // NOI18N
+                        result.append(indent).append(indent).append("</").append(second).append(">").append(newLine); // NOI18N
+                    }
+                }
+                result.append(indent).append("</").append(first).append(">").append(newLine); // NOI18N
+            }
+        }
+        
+        result.append("</tree>").append(newLine).append("</ExportedView>"); // NOI18N
+        eDD.dumpData(result);
+        eDD.close();
+        
+    }
+
+    private void exportHTML(ExportDataDumper eDD, String viewName) {
+        // Header
+        String newLine = "\r\n"; // NOI18N
+        String quote = "\""; // NOI18N
+        String indent = "   "; // NOI18N
+        StringBuffer result=new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE><style type=\"text/css\">pre.method{overflow:auto;width:600;height:30;vertical-align:baseline}pre.parent{overflow:auto;width:400;height:30;vertical-align:baseline}td.method{text-align:left;width:600}td.parent{text-align:left;width:400}td.right{text-align:right;white-space:nowrap}</style></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
+        
+        // Data
+        LockRuntimeCCTNode tempRoot = root;
+        LockCCTNode tempTop = null;
+        String mode = modeCombo.getSelectedItem().toString();
+        if (MODE_THREADS.equals(mode)) {
+            tempTop = tempRoot.getThreads();
+        } else if (MODE_MONITORS.equals(mode)) {
+            tempTop = tempRoot.getMonitors();
+        }
+        for (int i = 0; i < (columnNames.length); i++) {
+            result.append("<td>").append(columnNames[i]).append("</td>");  // NOI18N
+        }
+        result.append("</tr>"); // NOI18N
+        
+        if (tempTop!=null) {
+            //Sort the new tree
+            tempTop.sortChildren(getSortBy(sortingColumn), sortingOrder);
+            for (int i = 0; i < tempTop.getNChildren(); i++) {
+                LockCCTNode top = tempTop.getChild(i);
+                result.append("<tr><td><pre>").append(top.getNodeName()).append("</pre></td>"); // NOI18N
+                result.append("<td>").append(top.getTimeInPerCent()).append("%</td>"); // NOI18N
+                result.append("<td>").append(top.getTime()).append("</td>"); // NOI18N
+                result.append("<td>").append(top.getWaits()).append("</td></tr>").append(newLine); // NOI18N
+                if (top.getNChildren()>0) {
+                    for (int j = 0; j < top.getNChildren(); j++) {
+                        LockCCTNode leaf = top.getChild(j);
+                        result.append("<tr><td><pre>").append(indent).append(leaf.getNodeName()).append("</pre></td>"); // NOI18N                        
+                        result.append("<td>").append(leaf.getTimeInPerCent()).append("</td>"); // NOI18N
+                        result.append("<td>").append(leaf.getTime()).append("</td>"); // NOI18N
+                        result.append("<td>").append(leaf.getWaits()).append("</td></tr>"); // NOI18N
+                    }
+                }
+            }
+            result.append("</table></BODY></HTML>"); // NOI18N
+        }
+        eDD.dumpData(result);
+        eDD.close();
+        }
     
     public boolean fitsVisibleArea() {
         return !treeTablePanel.getScrollPane().getVerticalScrollBar().isEnabled();
