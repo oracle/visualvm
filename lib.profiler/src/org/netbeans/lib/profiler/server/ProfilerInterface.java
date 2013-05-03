@@ -45,7 +45,6 @@ package org.netbeans.lib.profiler.server;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.global.ProfilingPointServerHandler;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.global.TransactionalSupport;
 import org.netbeans.lib.profiler.server.system.*;
@@ -53,7 +52,6 @@ import org.netbeans.lib.profiler.wireprotocol.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
@@ -156,13 +154,13 @@ public class ProfilerInterface implements CommonConstants {
 
         private void initiateInstrumentation(final int instrType) {
             Monitors.DeterminateProgress progress = Monitors.enterServerState(CommonConstants.SERVER_INITIALIZING, 2);
+            int[] profilingPointIDs = cmd.getProfilingPointIDs();
             String[] handlers = cmd.getProfilingPointHandlers();
             String[] infos = cmd.getProfilingPointInfos();
             
             rootClassNames = cmd.getRootClassNames();
             status.startProfilingPointsActive = cmd.isStartProfilingPointsActive();
-            status.profilingPointIDs = cmd.getProfilingPointIDs();
-            status.profilingPointHandlers = ProfilingPointServerHandler.getInstances(handlers, infos);
+            ProfilingPointServerHandler.initInstances(profilingPointIDs, handlers, infos);
             computeRootWildcard();
             rootClassLoaded = false;
 

@@ -73,7 +73,7 @@ public class DiffFlatProfilePanel extends SnapshotFlatProfilePanel {
             case 0:
                 return flatProfileContainer.getMethodNameAtRow(row);
             case 1:
-                return flatProfileContainer.getTimeInMcs0AtRow(row);
+                return new Float(flatProfileContainer.getTimeInMcs0AtRow(row));
             case 2:
                 value = flatProfileContainer.getTimeInMcs0AtRow(row);
                 return (value > 0 ? "+" : "") + StringUtils.mcsTimeToString(value) + " ms"; // NOI18N
@@ -82,10 +82,21 @@ public class DiffFlatProfilePanel extends SnapshotFlatProfilePanel {
                     value = flatProfileContainer.getTimeInMcs1AtRow(row);
                     return (value > 0 ? "+" : "") + StringUtils.mcsTimeToString(value) + " ms"; // NOI18N
                 } else {
+                    value = flatProfileContainer.getTotalTimeInMcs0AtRow(row);
+                    return (value > 0 ? "+" : "") + StringUtils.mcsTimeToString(value) + " ms"; // NOI18N
+                }
+            case 4:
+                if (collectingTwoTimeStamps) {
+                    value = flatProfileContainer.getTotalTimeInMcs0AtRow(row);
+                    return (value > 0 ? "+" : "") + StringUtils.mcsTimeToString(value) + " ms"; // NOI18N
+                } else {
                     value = flatProfileContainer.getNInvocationsAtRow(row);
                     return (value > 0 ? "+" : "") + intFormat.format(value); // NOI18N
                 }
-            case 4:
+            case 5:
+                value = flatProfileContainer.getTotalTimeInMcs1AtRow(row);
+                return (value > 0 ? "+" : "") + StringUtils.mcsTimeToString(value) + " ms"; // NOI18N
+            case 6:
                 value = flatProfileContainer.getNInvocationsAtRow(row);
                 return (value > 0 ? "+" : "") + intFormat.format(value); // NOI18N
             default:
