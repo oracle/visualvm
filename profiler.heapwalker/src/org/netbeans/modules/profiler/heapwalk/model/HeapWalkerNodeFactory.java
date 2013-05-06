@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.heapwalk.model;
 
 
 import org.openide.util.NbBundle;
-import java.text.MessageFormat;
 import java.util.List;
 import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
@@ -114,10 +113,6 @@ public class HeapWalkerNodeFactory {
 
             public boolean isLeaf() {
                 return false;
-            }
-
-            protected HeapWalkerNode[] computeChildren() {
-                return BrowserUtils.lazilyCreateChildren(this, getChildrenComputer());
             }
 
             protected ChildrenComputer getChildrenComputer() {
