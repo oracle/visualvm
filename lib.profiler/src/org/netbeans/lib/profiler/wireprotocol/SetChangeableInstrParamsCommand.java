@@ -54,6 +54,7 @@ import java.io.ObjectOutputStream;
  *
  * @author Misha Dmitriev
  * @author Ian Formanek
+ * @author Tomas Hurka
  */
 public class SetChangeableInstrParamsCommand extends Command {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -66,17 +67,18 @@ public class SetChangeableInstrParamsCommand extends Command {
     private int objAllocStackSamplingDepth;
     private int objAllocStackSamplingInterval;
     private int samplingInterval;
-    private int samplingFrequency;
+    private int threadsSamplingFrequency;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SetChangeableInstrParamsCommand(int nProfiledThreadsLimit, int samplingInterval, int samplingFrequency, int objAllocStackSamplingInterval,
+    public SetChangeableInstrParamsCommand(int nProfiledThreadsLimit, int samplingInterval, int objAllocStackSamplingInterval,
                                            int objAllocStackSamplingDepth, boolean runGCOnGetResults,
-                                           boolean waitTrackingEnabled, boolean sleepTrackingEnabled, boolean threadsSamplingEnabled) {
+                                           boolean waitTrackingEnabled, boolean sleepTrackingEnabled, 
+                                           boolean threadsSamplingEnabled, int threadsSamplingFrequency) {
         super(SET_CHANGEABLE_INSTR_PARAMS);
         this.nProfiledThreadsLimit = nProfiledThreadsLimit;
         this.samplingInterval = samplingInterval;
-        this.samplingFrequency = samplingFrequency;
+        this.threadsSamplingFrequency = threadsSamplingFrequency;
         this.objAllocStackSamplingInterval = objAllocStackSamplingInterval;
         this.objAllocStackSamplingDepth = objAllocStackSamplingDepth;
         this.runGCOnGetResultsInMemoryProfiling = runGCOnGetResults;
@@ -112,8 +114,8 @@ public class SetChangeableInstrParamsCommand extends Command {
         return samplingInterval;
     }
 
-    public int getSamplingFrequency() {
-        return samplingFrequency;
+    public int getThreadsSamplingFrequency() {
+        return threadsSamplingFrequency;
     }
 
     public boolean isSleepTrackingEnabled() {
@@ -132,19 +134,19 @@ public class SetChangeableInstrParamsCommand extends Command {
     public String toString() {
         return super.toString() + ", nProfiledThreadsLimit: " + nProfiledThreadsLimit // NOI18N
                + ", samplingInterval: " + samplingInterval // NOI18N
-               + ", samplingFrequency: " + samplingFrequency // NOI18N
                + ", objAllocStackSamplingInterval: " + objAllocStackSamplingInterval // NOI18N
                + ", objAllocStackSamplingDepth: " + objAllocStackSamplingDepth // NOI18N
                + ", runGCOnGetResultsInMemoryProfiling: " + runGCOnGetResultsInMemoryProfiling // NOI18N
                + ", waitTrackingEnabled: " + waitTrackingEnabled // NOI18N
                + ", sleepTrackingEnabled: " + sleepTrackingEnabled // NOI18N
-               + ", threadsSamplingEnabled: " + threadsSamplingEnabled; // NOI18N
+               + ", threadsSamplingEnabled: " + threadsSamplingEnabled // NOI18N
+               + ", threadsSamplingFrequency: " + threadsSamplingFrequency; // NOI18N
     }
 
     void readObject(ObjectInputStream in) throws IOException {
         nProfiledThreadsLimit = in.readInt();
         samplingInterval = in.readInt();
-        samplingFrequency = in.readInt();
+        threadsSamplingFrequency = in.readInt();
         objAllocStackSamplingInterval = in.readInt();
         objAllocStackSamplingDepth = in.readInt();
         runGCOnGetResultsInMemoryProfiling = in.readBoolean();
@@ -156,7 +158,7 @@ public class SetChangeableInstrParamsCommand extends Command {
     void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(nProfiledThreadsLimit);
         out.writeInt(samplingInterval);
-        out.writeInt(samplingFrequency);
+        out.writeInt(threadsSamplingFrequency);
         out.writeInt(objAllocStackSamplingInterval);
         out.writeInt(objAllocStackSamplingDepth);
         out.writeBoolean(runGCOnGetResultsInMemoryProfiling);
