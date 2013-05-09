@@ -101,6 +101,10 @@ public class ObjectArrayNode extends ArrayNode {
 
             return super.computeType();
         }
+        
+        public Object getNodeID() {
+            return itemIndex;
+        }
     }
 
     public abstract static class RootNode extends ObjectArrayNode implements org.netbeans.modules.profiler.heapwalk.model.RootNode {
@@ -141,47 +145,47 @@ public class ObjectArrayNode extends ArrayNode {
 
     protected ChildrenComputer getChildrenComputer() {
         return new ChildrenComputer() {
-                public HeapWalkerNode[] computeChildren() {
-                    HeapWalkerNode[] children = null;
+            public HeapWalkerNode[] computeChildren() {
+                HeapWalkerNode[] children = null;
 
-                    if (getMode() == HeapWalkerNode.MODE_FIELDS) {
-                        int fieldsSize = getInstance().getLength();
+                if (getMode() == HeapWalkerNode.MODE_FIELDS) {
+                    int fieldsSize = getInstance().getLength();
 
-                        if (fieldsSize == 0) {
-                            // Array has no items
-                            children = new HeapWalkerNode[1];
-                            children[0] = HeapWalkerNodeFactory.createNoItemsNode(ObjectArrayNode.this);
-                        } else if (fieldsSize > HeapWalkerNodeFactory.ITEMS_COLLAPSE_UNIT_SIZE) {
-                            int childrenCount = fieldsSize;
-                            BrowserUtils.GroupingInfo groupingInfo = BrowserUtils.getGroupingInfo(childrenCount);
-                            int containersCount = groupingInfo.containersCount;
-                            int collapseUnitSize = groupingInfo.collapseUnitSize;
+                    if (fieldsSize == 0) {
+                        // Array has no items
+                        children = new HeapWalkerNode[1];
+                        children[0] = HeapWalkerNodeFactory.createNoItemsNode(ObjectArrayNode.this);
+                    } else if (fieldsSize > HeapWalkerNodeFactory.ITEMS_COLLAPSE_UNIT_SIZE) {
+                        int childrenCount = fieldsSize;
+                        BrowserUtils.GroupingInfo groupingInfo = BrowserUtils.getGroupingInfo(childrenCount);
+                        int containersCount = groupingInfo.containersCount;
+                        int collapseUnitSize = groupingInfo.collapseUnitSize;
 
-                            children = new HeapWalkerNode[containersCount];
+                        children = new HeapWalkerNode[containersCount];
 
-                            for (int i = 0; i < containersCount; i++) {
-                                int unitStartIndex = collapseUnitSize * i;
-                                int unitEndIndex = Math.min(unitStartIndex + collapseUnitSize, childrenCount) - 1;
-                                children[i] = HeapWalkerNodeFactory.createArrayItemContainerNode(ObjectArrayNode.this,
-                                                                                                 unitStartIndex, unitEndIndex);
-                            }
-                        } else {
-                            // TODO: currently the below is a kind of logical view - fields view should also be available!
-                            List fields = getInstance().getValues();
-                            children = new HeapWalkerNode[fields.size()];
-
-                            for (int i = 0; i < children.length; i++) {
-                                children[i] = HeapWalkerNodeFactory.createObjectArrayItemNode(ObjectArrayNode.this, i,
-                                                                                              (Instance) fields.get(i));
-                            }
+                        for (int i = 0; i < containersCount; i++) {
+                            int unitStartIndex = collapseUnitSize * i;
+                            int unitEndIndex = Math.min(unitStartIndex + collapseUnitSize, childrenCount) - 1;
+                            children[i] = HeapWalkerNodeFactory.createArrayItemContainerNode(ObjectArrayNode.this,
+                                                                                             unitStartIndex, unitEndIndex);
                         }
-                    } else if (getMode() == HeapWalkerNode.MODE_REFERENCES) {
-                        children = HeapWalkerNodeFactory.createReferences(ObjectArrayNode.this);
-                    }
+                    } else {
+                        // TODO: currently the below is a kind of logical view - fields view should also be available!
+                        List fields = getInstance().getValues();
+                        children = new HeapWalkerNode[fields.size()];
 
-                    return children;
+                        for (int i = 0; i < children.length; i++) {
+                            children[i] = HeapWalkerNodeFactory.createObjectArrayItemNode(ObjectArrayNode.this, i,
+                                                                                          (Instance) fields.get(i));
+                        }
+                    }
+                } else if (getMode() == HeapWalkerNode.MODE_REFERENCES) {
+                    children = HeapWalkerNodeFactory.createReferences(ObjectArrayNode.this);
                 }
-            };
+
+                return children;
+            }
+        };
     }
 
 }
