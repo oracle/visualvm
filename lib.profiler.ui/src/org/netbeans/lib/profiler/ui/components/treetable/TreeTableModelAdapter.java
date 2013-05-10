@@ -218,6 +218,32 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         }
         tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, Boolean.FALSE); // NOI18N
     }
+    
+    private TreePath getCurrentPath(TreePath oldPath) {
+        if (oldPath == null || oldPath.getPathCount() < 1) return null;
+        if (!treeTableModel.getRoot().equals(oldPath.getPathComponent(0))) return null;
+        
+        TreePath p = getRootPath();
+        Object[] op = oldPath.getPath();
+        CCTNode n = (CCTNode)treeTableModel.getRoot();
+        
+        for (int i = 1; i < op.length; i++) {
+            CCTNode nn = null;
+            
+            for (CCTNode c : n.getChildren())
+                if (c.equals(op[i])) {
+                    nn = c;
+                    break;
+                }
+            
+            if (nn == null) return null;
+            
+            n = nn;
+            p = p.pathByAddingChild(n);
+        }
+        
+        return p;
+    }
 
     public void updateTreeTable() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -231,6 +257,34 @@ public class TreeTableModelAdapter extends AbstractTableModel {
                     tree.setSelectionPaths(selectedPaths);
 
                     restoreExpandedPaths(pathState);
+
+                    treeTable.getTableHeader().repaint();
+
+                    delayedFireTableDataChanged();
+                }
+            });
+    }
+    
+    public void changeRoot(final CCTNode newRoot) {
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    List pathState = getExpandedPaths();
+                    TreePath[] selectedPaths = tree.getSelectionPaths();
+                    
+                    treeTableModel.setRoot(newRoot);
+                    treeTableModel.fireTreeStructureChanged(this,
+                                                            treeTableModel.getPathToRoot((CCTNode) treeTableModel.getRoot()),
+                                                            null, null);
+                    
+                    if (selectedPaths != null)
+                        for (int i = 0; i < selectedPaths.length; i++)
+                            selectedPaths[i] = getCurrentPath(selectedPaths[i]);
+                    List expandedPaths = new ArrayList();
+                    for (Object tp : pathState)
+                        expandedPaths.add(getCurrentPath((TreePath)tp));
+                    
+                    tree.setSelectionPaths(selectedPaths);
+                    restoreExpandedPaths(expandedPaths);
 
                     treeTable.getTableHeader().repaint();
 

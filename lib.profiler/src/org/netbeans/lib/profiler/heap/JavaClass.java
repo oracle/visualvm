@@ -113,7 +113,7 @@ public interface JavaClass extends Type {
 
     /**
      * computes the list of all {@link Instance} of this class.
-     * The instaces are ordered according to {@link Instance#getInstanceNumber()}
+     * The instances are ordered according to {@link Instance#getInstanceNumber()}
      * <br>
      * Speed: slow
      * @return list {@link Instance} of instances

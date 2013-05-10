@@ -45,7 +45,7 @@ package org.netbeans.lib.profiler.heap;
 
 
 /**
- * represens field (static or instace) of the class.
+ * represents field (static or instance) of the class.
  * @author Tomas Hurka
  */
 public interface Field {
