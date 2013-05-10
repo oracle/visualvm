@@ -93,18 +93,12 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
     }
 
     public void addListener(final CPUProfilingResultListener listener) {
-        if (cpuDataProcessor != null) {
-            cpuDataProcessor.addListener(listener);
-        }
-        if (cpuSamplingDataProcessor != null) {
-            cpuSamplingDataProcessor.addListener(listener);
-        }
+        cpuDataProcessor.addListener(listener);
+        cpuSamplingDataProcessor.addListener(listener);
     }
 
     public void addListener(final MemoryProfilingResultsListener listener) {
-        if (memoryDataProcessor != null) {
-            memoryDataProcessor.addListener(listener);
-        }
+        memoryDataProcessor.addListener(listener);
     }
 
     public synchronized void dataFrameReceived(final byte[] buffer, final int instrumentationType) {
@@ -217,32 +211,18 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
     }
 
     public void removeAllListeners() {
-        if (cpuDataProcessor != null) {
-            cpuDataProcessor.removeAllListeners();
-        }
-
-        if (cpuSamplingDataProcessor != null) {
-            cpuSamplingDataProcessor.removeAllListeners();
-        }
-
-        if (memoryDataProcessor != null) {
-            memoryDataProcessor.removeAllListeners();
-        }
+        cpuDataProcessor.removeAllListeners();
+        cpuSamplingDataProcessor.removeAllListeners();
+        memoryDataProcessor.removeAllListeners();
     }
 
     public void removeListener(final CPUProfilingResultListener listener) {
-        if (cpuDataProcessor != null) {
-            cpuDataProcessor.removeListener(listener);
-        }
-        if (cpuSamplingDataProcessor != null) {
-            cpuSamplingDataProcessor.removeListener(listener);
-        }
+        cpuDataProcessor.removeListener(listener);
+        cpuSamplingDataProcessor.removeListener(listener);
     }
 
     public void removeListener(final MemoryProfilingResultsListener listener) {
-        if (memoryDataProcessor != null) {
-            memoryDataProcessor.removeListener(listener);
-        }
+        memoryDataProcessor.removeListener(listener);
     }
 
     public void reset() {
@@ -279,17 +259,9 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
     }
 
     private synchronized void fireShutdown() {
-        if (cpuDataProcessor != null) {
-            cpuDataProcessor.shutdown();
-        }
-
-        if (cpuSamplingDataProcessor != null) {
-            cpuSamplingDataProcessor.shutdown();
-        }
-
-        if (memoryDataProcessor != null) {
-            memoryDataProcessor.shutdown();
-        }
+        cpuDataProcessor.shutdown();
+        cpuSamplingDataProcessor.shutdown();
+        memoryDataProcessor.shutdown();
     }
 
     private synchronized void fireStartup(ProfilerClient client) {
