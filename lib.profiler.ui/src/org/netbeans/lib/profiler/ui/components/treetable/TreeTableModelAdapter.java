@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.ui.components.treetable;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.ui.components.JTreeTable;
@@ -162,7 +163,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
                 paths.add(expanded.nextElement());
             }
         }
-
+    
         return paths;
     }
 
@@ -247,50 +248,75 @@ public class TreeTableModelAdapter extends AbstractTableModel {
 
     public void updateTreeTable() {
         SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    List pathState = getExpandedPaths();
+            public void run() {
+                List pathState = getExpandedPaths();
 
-                    TreePath[] selectedPaths = tree.getSelectionPaths();
-                    treeTableModel.fireTreeStructureChanged(this,
-                                                            treeTableModel.getPathToRoot((CCTNode) treeTableModel.getRoot()),
-                                                            null, null);
-                    tree.setSelectionPaths(selectedPaths);
+                TreePath[] selectedPaths = tree.getSelectionPaths();
+                tree.getSelectionModel().clearSelection();
+                treeTableModel.fireTreeStructureChanged(this,
+                        treeTableModel.getPathToRoot((CCTNode) treeTableModel.getRoot()),
+                        null, null);
+                tree.setSelectionPaths(selectedPaths);
 
-                    restoreExpandedPaths(pathState);
+                restoreExpandedPaths(pathState);
 
-                    treeTable.getTableHeader().repaint();
+                treeTable.getTableHeader().repaint();
 
-                    delayedFireTableDataChanged();
-                }
-            });
+                delayedFireTableDataChanged();
+            }
+        });
     }
     
     public void changeRoot(final CCTNode newRoot) {
         SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    List pathState = getExpandedPaths();
-                    TreePath[] selectedPaths = tree.getSelectionPaths();
-                    
-                    treeTableModel.setRoot(newRoot);
-                    treeTableModel.fireTreeStructureChanged(this,
-                                                            treeTableModel.getPathToRoot((CCTNode) treeTableModel.getRoot()),
-                                                            null, null);
-                    
-                    if (selectedPaths != null)
-                        for (int i = 0; i < selectedPaths.length; i++)
-                            selectedPaths[i] = getCurrentPath(selectedPaths[i]);
-                    List expandedPaths = new ArrayList();
-                    for (Object tp : pathState)
-                        expandedPaths.add(getCurrentPath((TreePath)tp));
-                    
-                    tree.setSelectionPaths(selectedPaths);
-                    restoreExpandedPaths(expandedPaths);
+            public void run() {
+                List pathState = getExpandedPaths();
+                TreePath[] selectedPaths = tree.getSelectionPaths();
 
-                    treeTable.getTableHeader().repaint();
+                treeTableModel.setRoot(newRoot);
+                tree.getSelectionModel().clearSelection();
+                treeTableModel.fireTreeStructureChanged(this,
+                                                        treeTableModel.getPathToRoot((CCTNode) treeTableModel.getRoot()),
+                                                        null, null);
 
-                    delayedFireTableDataChanged();
-                }
-            });
+                if (selectedPaths != null)
+                    for (int i = 0; i < selectedPaths.length; i++)
+                        selectedPaths[i] = getCurrentPath(selectedPaths[i]);
+                List expandedPaths = new ArrayList();
+                for (Object tp : pathState)
+                    expandedPaths.add(getCurrentPath((TreePath)tp));
+
+                tree.setSelectionPaths(selectedPaths);
+                restoreExpandedPaths(expandedPaths);
+
+                treeTable.getTableHeader().repaint();
+
+                delayedFireTableDataChanged();
+            }
+        });
+    }
+    
+    public void setup(List expanded, final TreePath selected) {
+        tree.getSelectionModel().clearSelection();
+        treeTableModel.fireTreeStructureChanged(this,
+                                                treeTableModel.getPathToRoot((CCTNode) treeTableModel.getRoot()),
+                                                null, null);
+        treeTable.getTableHeader().repaint();
+        fireTableDataChanged();
+        
+        if (expanded != null) restoreExpandedPaths(expanded);
+        if (selected != null) {
+            tree.setSelectionPath(selected);
+            final Rectangle rect = tree.getPathBounds(selected);
+            if (rect != null) {
+                // scroll immediately
+                treeTable.scrollRectToVisible(tree.getPathBounds(selected));
+                // make sure the rect is still visible after eventually showing the horizontal scrollbar
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { treeTable.scrollRectToVisible(rect); }
+                });
+            }
+        }
     }
 
     /**
@@ -306,7 +332,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
                 }
             });
     }
-
+    
     /**
      * Returns the object (TreeTableNode) on the given row in the tree.
      */

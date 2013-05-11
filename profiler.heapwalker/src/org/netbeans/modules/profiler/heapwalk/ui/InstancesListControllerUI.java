@@ -159,13 +159,15 @@ public class InstancesListControllerUI extends JTitledPanel {
         public void mousePressed(final MouseEvent e) {
             final int row = instancesListTable.rowAtPoint(e.getPoint());
             updateSelection(row);
-            if (e.isPopupTrigger()) showTablePopup(e.getComponent(), e.getX(), e.getY());
+            if (row != -1 && e.isPopupTrigger())
+                showTablePopup(e.getComponent(), e.getX(), e.getY());
         }
 
         public void mouseReleased(MouseEvent e) {
             int row = instancesListTable.rowAtPoint(e.getPoint());
             updateSelection(row);
-            if (e.isPopupTrigger()) showTablePopup(e.getComponent(), e.getX(), e.getY());
+            if (row != -1 && e.isPopupTrigger())
+                showTablePopup(e.getComponent(), e.getX(), e.getY());
         }
     }
     
@@ -394,7 +396,7 @@ public class InstancesListControllerUI extends JTitledPanel {
             instancesListTable.getTree()
                               .setShowsRootHandles(root instanceof InstancesListController.InstancesListClassNode
                                                    && root.getChild(0) instanceof InstancesListController.InstancesListContainerNode);
-            instancesListTable.updateTreeTable();
+            instancesListTable.changeRoot(root); // TODO: updateTreeTable()?
         }
     }
 

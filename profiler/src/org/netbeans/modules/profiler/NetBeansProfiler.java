@@ -688,8 +688,6 @@ public abstract class NetBeansProfiler extends Profiler {
     }
     
     public void setLockContentionMonitoringEnabled(final boolean enabled) {
-//        getThreadsManager().setThreadsMonitoringEnabled(enabled);
-
         if (lockContentionMonitoringEnabled == enabled) {
             return;
         }
