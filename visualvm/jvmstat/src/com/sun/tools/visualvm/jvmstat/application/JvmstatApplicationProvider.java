@@ -315,7 +315,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
                     File perfCurrent = perfCorrect.getCanonicalFile(); // Resolves real capitalization
                     if (!perfCorrect.getName().equals(perfCurrent.getName())) {
                         String link = DesktopUtils.isBrowseAvailable() ? NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps2_Link")   // NOI18N
-                                : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp2_NoLink");   // NOI18N
+                                : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps2_NoLink");   // NOI18N
                         String message = NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps2", link); // NOI18N
                         notifyBrokenJps(message);
                     }
@@ -328,7 +328,7 @@ public class JvmstatApplicationProvider implements DataChangeListener<Host> {
         }
 
         String link = DesktopUtils.isBrowseAvailable() ? NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps_Link")   // NOI18N
-                : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jsp_NoLink");   // NOI18N
+                : NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps_NoLink");   // NOI18N
         String message = NbBundle.getMessage(JvmstatApplicationProvider.class, "MSG_Broken_Jps", link); // NOI18N
         notifyBrokenJps(message);
     }
