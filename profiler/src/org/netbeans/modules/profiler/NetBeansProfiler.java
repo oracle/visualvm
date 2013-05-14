@@ -1732,8 +1732,7 @@ public abstract class NetBeansProfiler extends Profiler {
         if (lockContentionEnabled) {
             if ((locksBehavior == ProfilerIDESettings.OPEN_ALWAYS)
                     || ((locksBehavior == ProfilerIDESettings.OPEN_MONITORING) && (type == ProfilingSettings.PROFILE_MONITOR))) {
-                LockContentionWindow.getDefault().open();
-                LockContentionWindow.getDefault().requestVisible();
+                LockContentionWindow.getDefault().showView();
             }
         }
 
