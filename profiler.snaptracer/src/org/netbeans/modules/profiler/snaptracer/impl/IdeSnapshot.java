@@ -255,6 +255,7 @@ public final class IdeSnapshot {
                 Class decorableClass = Class.forName(DECORABLE_CLASS, true, c);
                 Object decorable = Proxy.newProxyInstance(c, new Class[]{decorableClass}, this);
                 Method decorate = decorationClass.getDeclaredMethod(DECORATE_METHOD, LogRecord.class, decorableClass);
+                decorate.setAccessible(true);
                 decorate.invoke(null, rec, decorable);
             } catch (IllegalAccessException ex) {
                 Exceptions.printStackTrace(ex);

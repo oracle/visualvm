@@ -1453,10 +1453,13 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 boolean threadSampling;
                 boolean waitTracking;
                 boolean sleepTracking;
+                boolean lockContentionMonitoring;
                 SetChangeableInstrParamsCommand scipCmd = (SetChangeableInstrParamsCommand) cmd;
+                lockContentionMonitoring = scipCmd.isLockContentionMonitoringEnabled();
+                ProfilerRuntime.setLockContentionMonitoringEnabled(lockContentionMonitoring);
                 ProfilerRuntimeCPU.setNProfiledThreadsLimit(scipCmd.getNProfiledThreadsLimit());
                 ProfilerRuntimeCPUSampledInstr.setSamplingInterval(scipCmd.getSamplingInterval());
-                ProfilerRuntimeSampler.setSamplngFrequency(scipCmd.getSamplingFrequency());
+                ProfilerRuntimeSampler.setSamplngFrequency(scipCmd.getThreadsSamplingFrequency());
                 ProfilerRuntimeMemory.setSamplingInterval((short) scipCmd.getObjAllocStackSamplingInterval());
                 ProfilerRuntimeMemory.setSamplingDepth(scipCmd.getObjAllocStackSamplingDepth());
                 ProfilerRuntimeObjLiveness.setRunGCOnGetResults(scipCmd.getRunGCOnGetResultsInMemoryProfiling());
@@ -1465,7 +1468,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 sleepTracking = scipCmd.isSleepTrackingEnabled();
                 Monitors.setThreadsSamplingEnabled(threadSampling);
                 ProfilerRuntimeCPU.setWaitAndSleepTracking(waitTracking,sleepTracking);
-                Classes.setWaitTrackingEnabled(threadSampling || waitTracking);
+                Classes.setWaitTrackingEnabled(threadSampling || waitTracking || lockContentionMonitoring);
                 Classes.setParkTrackingEnabled(threadSampling || waitTracking);
                 Classes.setSleepTrackingEnabled(threadSampling || sleepTracking);
                 sendSimpleResponseToClient(true, null);

@@ -160,34 +160,35 @@ public class ProfilerRuntimeCPUCodeRegion extends ProfilerRuntime {
     }
 
     // ---------------------------------- Handling wait/sleep/monitor times ----------------------------
-    protected static void monitorEntryRegion(Thread t, Object monitor) {
+    protected static long monitorEntryRegion(Thread t, Object monitor) {
         if (codeRegionInstrumentationDisabled) {
-            return;
+            return -1;
         }
 
         ThreadInfo ti = ThreadInfo.getThreadInfo();
 
         if (!ti.isInitialized() || !ti.inCallGraph) {
-            return;
+            return -1;
         }
 
         // take note of the time we started waiting
-        ti.lastWaitStartTime = Timers.getCurrentTimeInCounts();
+        return ti.lastWaitStartTime = Timers.getCurrentTimeInCounts();
     }
 
-    protected static void monitorExitRegion(Thread t, Object monitor) {
+    protected static long monitorExitRegion(Thread t, Object monitor) {
         if (codeRegionInstrumentationDisabled) {
-            return;
+            return -1;
         }
 
         ThreadInfo ti = ThreadInfo.getThreadInfo();
 
         if ((ti == null) || !ti.inCallGraph) {
-            return;
+            return -1;
         }
-
+        long timeStamp = Timers.getCurrentTimeInCounts();
         // adjust the entry time so that the time spent waiting is not accounted for
-        ti.absEntryTime += (Timers.getCurrentTimeInCounts() - ti.lastWaitStartTime);
+        ti.absEntryTime += (timeStamp - ti.lastWaitStartTime);
+        return timeStamp;
     }
 
     protected static void sleepEntryRegion() {

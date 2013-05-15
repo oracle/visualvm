@@ -43,10 +43,12 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
+import java.util.List;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.ui.ClassesControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -60,18 +62,30 @@ public class ClassesController extends AbstractTopLevelController implements Fie
     public static class Configuration extends NavigationHistoryManager.Configuration {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private long javaClassID;
+        private final long javaClassID;
+        private final List expandedStaticFields;
+        private final TreePath selectedStaticField;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        public Configuration(long javaClassID) {
+        public Configuration(long javaClassID, List expandedStaticFields, TreePath selectedStaticField) {
             this.javaClassID = javaClassID;
+            this.expandedStaticFields = expandedStaticFields;
+            this.selectedStaticField = selectedStaticField;
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public long getJavaClassID() {
             return javaClassID;
+        }
+        
+        public List getExpandedStaticFields() {
+            return expandedStaticFields;
+        }
+        
+        public TreePath getSelectedStaticField() {
+            return selectedStaticField;
         }
     }
 
@@ -102,13 +116,17 @@ public class ClassesController extends AbstractTopLevelController implements Fie
     public Configuration getCurrentConfiguration() {
         // Selected class
         long selectedClassID = -1;
+        List expandedStaticFields = null;
+        TreePath selectedStaticField = null;
         JavaClass selectedClass = getSelectedClass();
 
         if (selectedClass != null) {
             selectedClassID = selectedClass.getJavaClassId();
+            expandedStaticFields = staticFieldsBrowserController.getExpandedPaths();
+            selectedStaticField = staticFieldsBrowserController.getSelectedRow();
         }
 
-        return new Configuration(selectedClassID);
+        return new Configuration(selectedClassID, expandedStaticFields, selectedStaticField);
     }
 
     // --- Public interface ------------------------------------------------------
@@ -144,6 +162,8 @@ public class ClassesController extends AbstractTopLevelController implements Fie
             }
 
             if (selectedClass != null) {
+                staticFieldsBrowserController.restoreState(
+                        c.getExpandedStaticFields(), c.getSelectedStaticField());
                 classesListController.selectClass(selectedClass);
             }
         } else {
