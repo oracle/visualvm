@@ -87,7 +87,7 @@ public class StatisticalModuleContainer implements CPUCCTProvider.Listener {
             return;
         }
 
-        Set tmpModules = null;
+        Set tmpModules;
 
         synchronized (modules) {
             if (modules.isEmpty()) {

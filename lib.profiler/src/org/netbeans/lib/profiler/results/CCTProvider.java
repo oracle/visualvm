@@ -59,7 +59,7 @@ public interface CCTProvider {
          * in order to fix the issue #114638 i need to introduce the "empty" flag
          * it should be removed once this code is cleaned up
          */
-        void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy);
+        void cctEstablished(RuntimeCCTNode appRootNode, boolean empty);
 
         void cctReset();
     }

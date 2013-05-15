@@ -48,6 +48,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 
@@ -155,6 +157,8 @@ public abstract class SwingWorker {
 
                         try {
                             doInBackground();
+                        } catch (Throwable ex) {
+                            Logger.getLogger(SwingWorker.class.getName()).log(Level.SEVERE, "SwingWorker", ex);
                         } finally {
                             synchronized (warmupLock) {
                                 workerRunning = false;

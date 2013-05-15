@@ -64,6 +64,7 @@ import org.openide.util.HelpCtx;
  * @author Ian Formanek
  */
 @NbBundle.Messages({
+    "StopAction_DoYouWantToTerminateCap=Detach Profiler",
     "StopAction_DoYouWantToTerminateMsg=Do you want to terminate the profiled application upon detach?",
     "LBL_StopAction=&Stop Profiling Session",
     "HINT_StopAction=Stop (Terminate) the Profiled Application",
@@ -113,7 +114,8 @@ public final class StopAction extends ProfilingAwareAction {
 
         if (mode == Profiler.MODE_ATTACH) {
             Boolean ret = ProfilerDialogs.displayCancellableConfirmationDNSA(
-                Bundle.StopAction_DoYouWantToTerminateMsg(), null, null, StopAction.class.getName(), false);
+                Bundle.StopAction_DoYouWantToTerminateMsg(), Bundle.StopAction_DoYouWantToTerminateCap(),
+                null, StopAction.class.getName(), false);
 
             if (Boolean.TRUE.equals(ret)) {
                 task = new Runnable() {

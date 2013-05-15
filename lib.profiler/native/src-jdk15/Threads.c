@@ -78,16 +78,18 @@
 #define THREAD_STATUS_SLEEPING  2
 #define THREAD_STATUS_MONITOR   3
 #define THREAD_STATUS_WAIT      4
+#define THREAD_STATUS_PARK      5
 
 /* These masks essentially map JVMTI thread states into the above states */
 static jint JF_THREAD_STATE_MASK       = JVMTI_THREAD_STATE_TERMINATED |
                                          JVMTI_THREAD_STATE_ALIVE |
-                             JVMTI_THREAD_STATE_RUNNABLE |
-                       JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER |
-                       JVMTI_THREAD_STATE_WAITING |
-                       JVMTI_THREAD_STATE_WAITING_INDEFINITELY |
-                       JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT |
-                       JVMTI_THREAD_STATE_SLEEPING;
+                                         JVMTI_THREAD_STATE_RUNNABLE |
+                                         JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER |
+                                         JVMTI_THREAD_STATE_WAITING |
+                                         JVMTI_THREAD_STATE_WAITING_INDEFINITELY |
+                                         JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT |
+                                         JVMTI_THREAD_STATE_SLEEPING |
+                                         JVMTI_THREAD_STATE_PARKED;
 static jint JF_THREAD_STATE_NEW        = 0;
 static jint JF_THREAD_STATE_TERMINATED = JVMTI_THREAD_STATE_TERMINATED;
 static jint JF_THREAD_STATE_RUNNABLE   = JVMTI_THREAD_STATE_ALIVE |
@@ -96,14 +98,22 @@ static jint JF_THREAD_STATE_BLOCKED    = JVMTI_THREAD_STATE_ALIVE |
                                          JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER;
 static jint JF_THREAD_STATE_WAITING    = JVMTI_THREAD_STATE_ALIVE |
                                          JVMTI_THREAD_STATE_WAITING |
-                         JVMTI_THREAD_STATE_WAITING_INDEFINITELY;
+                                         JVMTI_THREAD_STATE_WAITING_INDEFINITELY;
 static jint JF_THREAD_STATE_TIMED_WAITING = JVMTI_THREAD_STATE_ALIVE |
                                          JVMTI_THREAD_STATE_WAITING |
-                       JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT;
+                                         JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT;
 static jint JF_THREAD_STATE_SLEEPING   = JVMTI_THREAD_STATE_ALIVE |
                                          JVMTI_THREAD_STATE_WAITING |
                                          JVMTI_THREAD_STATE_SLEEPING |
-                     JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT;
+                                         JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT;
+static jint JF_THREAD_STATE_TIMED_PARKED = JVMTI_THREAD_STATE_ALIVE |
+                                         JVMTI_THREAD_STATE_WAITING |
+                                         JVMTI_THREAD_STATE_PARKED |
+                                         JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT;
+static jint JF_THREAD_STATE_PARKED = JVMTI_THREAD_STATE_ALIVE |
+                                         JVMTI_THREAD_STATE_WAITING |
+                                         JVMTI_THREAD_STATE_PARKED |
+                                         JVMTI_THREAD_STATE_WAITING_INDEFINITELY;
 
 
 static int nProfThreads;
@@ -119,6 +129,8 @@ jint convert_JVMTI_thread_status_to_jfluid_status(jint jvmtiThreadStatus) {
     else if (status == JF_THREAD_STATE_BLOCKED)       return THREAD_STATUS_MONITOR;
     else if (status == JF_THREAD_STATE_WAITING)       return THREAD_STATUS_WAIT;
     else if (status == JF_THREAD_STATE_TIMED_WAITING) return THREAD_STATUS_WAIT;
+    else if (status == JF_THREAD_STATE_PARKED)        return THREAD_STATUS_PARK;
+    else if (status == JF_THREAD_STATE_TIMED_PARKED)  return THREAD_STATUS_PARK;
     else if (status == JF_THREAD_STATE_SLEEPING)      return THREAD_STATUS_SLEEPING;
     else if (status == JF_THREAD_STATE_NEW)           return THREAD_STATUS_ZOMBIE;
     else if (status == JF_THREAD_STATE_TERMINATED)    return THREAD_STATUS_ZOMBIE;

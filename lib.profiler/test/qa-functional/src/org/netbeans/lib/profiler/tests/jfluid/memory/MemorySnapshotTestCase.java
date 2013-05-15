@@ -123,8 +123,8 @@ public abstract class MemorySnapshotTestCase extends CommonProfilerTestCase {
             }
         }
 
-        public void cctEstablished(RuntimeCCTNode appRootNode, boolean emtpy) {
-            if (!emtpy) {
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+            if (!empty) {
                 cctEstablished(appRootNode);
             }
             //throw new UnsupportedOperationException("Not supported yet.");

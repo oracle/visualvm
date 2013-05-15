@@ -59,6 +59,8 @@ public interface ProfilingStateListener {
     void profilingStateChanged(ProfilingStateEvent e);
 
     void threadsMonitoringChanged();
+    
+    void lockContentionMonitoringChanged();
 
     void serverStateChanged(int serverState, int serverProgress);
 }

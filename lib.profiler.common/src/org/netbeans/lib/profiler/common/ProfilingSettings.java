@@ -96,6 +96,7 @@ public class ProfilingSettings {
     public static final String PROP_SETTINGS_NAME = "profiler.settings.settings.name"; //NOI18N
     public static final String PROP_PROFILING_TYPE = "profiler.settings.profiling.type"; //NOI18N
     public static final String PROP_THREADS_MONITORING_ENABLED = "profiler.settings.threads.monitoring.enabled"; //NOI18N
+    public static final String PROP_LOCKCONTENTION_MONITORING_ENABLED = "profiler.settings.lockcontention.monitoring.enabled"; //NOI18N
     public static final String PROP_THREADS_SAMPLING_ENABLED = "profiler.settings.threads.sampling.enabled"; //NOI18N
     public static final String PROP_CPU_PROFILING_TYPE = "profiler.settings.cpu.profiling.type"; //NOI18N
     public static final String PROP_EXCLUDE_WAIT_TIME = "profiler.settings.cpu.exclude.wait.time"; // NOI18N
@@ -158,6 +159,7 @@ public class ProfilingSettings {
     private boolean sortResultsByThreadCPUTime = false;
     private boolean threadCPUTimerOn = false;
     private boolean threadsMonitoringEnabled = false;
+    private boolean lockContentionMonitoringEnabled = false;
     private boolean threadsSamplingEnabled = true;
 
     // General CPU Profiling settings
@@ -506,6 +508,14 @@ public class ProfilingSettings {
         return threadsMonitoringEnabled;
     }
     
+    public void setLockContentionMonitoringEnabled(final boolean enabled) {
+        lockContentionMonitoringEnabled = enabled;
+    }
+
+    public boolean getLockContentionMonitoringEnabled() {
+        return lockContentionMonitoringEnabled;
+    }
+    
     public void setThreadsSamplingEnabled(final boolean enabled) {
         threadsSamplingEnabled = enabled;
     }
@@ -564,6 +574,7 @@ public class ProfilingSettings {
         settings.setInstrumentMethodInvoke(getInstrumentMethodInvoke());
         settings.setInstrumentSpawnedThreads(getInstrumentSpawnedThreads());
         settings.setThreadsMonitoringEnabled(getThreadsMonitoringEnabled());
+        settings.setLockContentionMonitoringEnabled(getLockContentionMonitoringEnabled());
         settings.setThreadsSamplingEnabled(getThreadsSamplingEnabled());
 
         if (getNProfiledThreadsLimit() > 0) {
@@ -683,6 +694,7 @@ public class ProfilingSettings {
         settings.setJVMArgs(getJVMArgs());
         settings.setJavaPlatformName(getJavaPlatformName());
         settings.setThreadsMonitoringEnabled(getThreadsMonitoringEnabled());
+        settings.setLockContentionMonitoringEnabled(getLockContentionMonitoringEnabled());
         settings.setThreadsSamplingEnabled(getThreadsSamplingEnabled());
         settings.setUseProfilingPoints(useProfilingPoints());
 
@@ -731,6 +743,8 @@ public class ProfilingSettings {
         sb.append("javaPlatform: ").append((getJavaPlatformName() == null) ? "<project>" : getJavaPlatformName()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("threadsMonitoringEnabled: ").append(getThreadsMonitoringEnabled()); //NOI18N
+        sb.append('\n'); //NOI18N
+        sb.append("lockContentionMonitoringEnabled: ").append(getLockContentionMonitoringEnabled()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("threadsSamplingEnabled: ").append(getThreadsSamplingEnabled()); //NOI18N
         sb.append('\n'); //NOI18N
@@ -797,6 +811,9 @@ public class ProfilingSettings {
         setJavaPlatformName(getProperty(props, prefix + PROP_JAVA_PLATFORM, null));
 
         setThreadsMonitoringEnabled(Boolean.valueOf(getProperty(props, prefix + PROP_THREADS_MONITORING_ENABLED, "false")) //NOI18N
+                                           .booleanValue());
+        
+        setLockContentionMonitoringEnabled(Boolean.valueOf(getProperty(props, prefix + PROP_LOCKCONTENTION_MONITORING_ENABLED, "false")) //NOI18N
                                            .booleanValue());
         
         setThreadsSamplingEnabled(Boolean.valueOf(getProperty(props, prefix + PROP_THREADS_SAMPLING_ENABLED, "true")) //NOI18N
@@ -923,6 +940,7 @@ public class ProfilingSettings {
         }
 
         props.put(prefix + PROP_THREADS_MONITORING_ENABLED, Boolean.toString(getThreadsMonitoringEnabled()));
+        props.put(prefix + PROP_LOCKCONTENTION_MONITORING_ENABLED, Boolean.toString(getLockContentionMonitoringEnabled()));
         props.put(prefix + PROP_THREADS_SAMPLING_ENABLED, Boolean.toString(getThreadsSamplingEnabled()));
 
         // CPU and Code Fragment common

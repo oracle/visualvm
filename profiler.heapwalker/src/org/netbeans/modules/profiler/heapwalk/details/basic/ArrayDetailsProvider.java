@@ -76,6 +76,12 @@ public final class ArrayDetailsProvider extends DetailsProvider {
         return null;
     }
     
+    public View getDetailsView(String className, Instance instance, Heap heap) {
+        if (instance instanceof PrimitiveArrayInstance)
+            return new ArrayValueView(className, instance, heap);
+        else return null;
+    }
+    
     private static String getItemsString(int length) {
         return length == 1 ? Bundle.ArrayDetailsProvider_OneItemString() :
                              Bundle.ArrayDetailsProvider_ItemsNumberString(length);

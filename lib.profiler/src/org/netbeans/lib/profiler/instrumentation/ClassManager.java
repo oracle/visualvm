@@ -53,7 +53,7 @@ import java.util.*;
 
 
 /**
- * Basic utility methods used by all scaner classes.
+ * Basic utility methods used by all scanner classes.
  *
  * @author Tomas Hurka
  * @author Misha Dmitriev
@@ -64,7 +64,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
     private static final RuntimeProfilingPoint[] EMPTY_PROFILEPOINT_ARRAY = new RuntimeProfilingPoint[0];
 
     /**
-     * Sorts profiling points by bytecode index so that injector can insert them sequentaly.
+     * Sorts profiling points by bytecode index so that injector can insert them sequentially.
      */
     private static Comparator ByBciComparator = new Comparator() {
         public int compare(Object aa, Object bb) {
@@ -236,7 +236,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
     }
 
     /**
-     * Given a list of classes (normally all classes currently loaded by the JVM), deterime those that are loaded using
+     * Given a list of classes (normally all classes currently loaded by the JVM), determine those that are loaded using
      * custom classloaders, get their cached bytecodes from the JVM, and put them into ClassRepository.
      */
     protected static void storeClassFileBytesForCustomLoaderClasses(String[] loadedClasses, int[] loadedClassLoaderIds,

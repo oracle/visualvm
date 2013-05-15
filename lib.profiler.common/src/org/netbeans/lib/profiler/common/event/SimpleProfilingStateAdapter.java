@@ -59,6 +59,10 @@ public abstract class SimpleProfilingStateAdapter implements ProfilingStateListe
     public void threadsMonitoringChanged() {
         update();
     }
+    
+    public void lockContentionMonitoringChanged() {
+        update();
+    }
 
     public void serverStateChanged(int serverState, int serverProgress) {
         update();

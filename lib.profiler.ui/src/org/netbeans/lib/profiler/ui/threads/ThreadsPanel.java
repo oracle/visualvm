@@ -224,6 +224,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
     private JLabel runningLegend;
     private JLabel sleepingLegend;
     private JLabel waitLegend;
+    private JLabel parkLegend;
     private JMenuItem showOnlySelectedThreads;
     private JMenuItem showThreadsDetails;
     private JPanel contentPanel; // panel with CardLayout containing threadsTable & enable threads profiling notification and button
@@ -380,13 +381,16 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         ThreadStateIcon sleepingIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_SLEEPING, 18, 9);
         ThreadStateIcon monitorIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_MONITOR, 18, 9);
         ThreadStateIcon waitIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_WAIT, 18, 9);
-
+        ThreadStateIcon parkIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_PARK, 18, 9);
+        
         runningLegend = new JLabel(CommonConstants.THREAD_STATUS_RUNNING_STRING, runningIcon, SwingConstants.LEADING);
         runningLegend.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         sleepingLegend = new JLabel(CommonConstants.THREAD_STATUS_SLEEPING_STRING, sleepingIcon, SwingConstants.LEADING);
         sleepingLegend.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         waitLegend = new JLabel(CommonConstants.THREAD_STATUS_WAIT_STRING, waitIcon, SwingConstants.LEADING);
         waitLegend.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        parkLegend = new JLabel(CommonConstants.THREAD_STATUS_PARK_STRING, parkIcon, SwingConstants.LEADING);
+        parkLegend.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         monitorLegend = new JLabel(CommonConstants.THREAD_STATUS_MONITOR_STRING, monitorIcon, SwingConstants.LEADING);
         monitorLegend.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
@@ -400,6 +404,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         }
 
         legendPanel.add(waitLegend);
+        legendPanel.add(parkLegend);
         legendPanel.add(monitorLegend);
 
         //legendPanel.add(unknownLegend);

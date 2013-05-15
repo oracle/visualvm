@@ -510,6 +510,8 @@ public class ThreadDetailsComponent extends JPanel {
                                                                      THREAD_ICON_SIZE);
     private static ThreadStateIcon waitIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_WAIT, THREAD_ICON_SIZE,
                                                                   THREAD_ICON_SIZE);
+    private static ThreadStateIcon parkIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_PARK, THREAD_ICON_SIZE,
+                                                                  THREAD_ICON_SIZE);
     private static ThreadStateIcon unknownIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_UNKNOWN, THREAD_ICON_SIZE,
                                                                      THREAD_ICON_SIZE);
     private static ThreadStateIcon zombieIcon = new ThreadStateIcon(CommonConstants.THREAD_STATUS_ZOMBIE, THREAD_ICON_SIZE,
@@ -525,6 +527,7 @@ public class ThreadDetailsComponent extends JPanel {
     long sleepingTime;
     long unknownTime;
     long waitTime;
+    long parkTime;
     private DynamicPieChartModel pieChartModel;
     private JButton hideButton;
     private JLabel monitorTitleLabel;
@@ -544,6 +547,9 @@ public class ThreadDetailsComponent extends JPanel {
     private JLabel waitTitleLabel;
     private JLabel waitValueLabel;
     private JLabel waitValueRelLabel;
+    private JLabel parkTitleLabel;
+    private JLabel parkValueLabel;
+    private JLabel parkValueRelLabel;
 
     // ---------------------------------------------------------------------------------------
     // Components declaration & initialization
@@ -694,6 +700,7 @@ public class ThreadDetailsComponent extends JPanel {
         runningTitleLabel = new JLabel();
         sleepingTitleLabel = new JLabel();
         waitTitleLabel = new JLabel();
+        parkTitleLabel = new JLabel();
         monitorTitleLabel = new JLabel();
         runningValueLabel = new JLabel();
         runningValueRelLabel = new JLabel();
@@ -701,6 +708,8 @@ public class ThreadDetailsComponent extends JPanel {
         sleepingValueRelLabel = new JLabel();
         waitValueLabel = new JLabel();
         waitValueRelLabel = new JLabel();
+        parkValueLabel = new JLabel();
+        parkValueRelLabel = new JLabel();
         monitorValueLabel = new JLabel();
         monitorValueRelLabel = new JLabel();
         jSeparator4 = new JSeparator();
@@ -848,11 +857,20 @@ public class ThreadDetailsComponent extends JPanel {
         gridBagConstraints.insets = new Insets(5, 5, 0, 5);
         jPanel10.add(waitTitleLabel, gridBagConstraints);
 
+        parkTitleLabel.setText(CommonConstants.THREAD_STATUS_PARK_STRING);
+        parkTitleLabel.setIcon(parkIcon);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+        jPanel10.add(parkTitleLabel, gridBagConstraints);
+
         monitorTitleLabel.setText(CommonConstants.THREAD_STATUS_MONITOR_STRING);
         monitorTitleLabel.setIcon(monitorIcon);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         jPanel10.add(monitorTitleLabel, gridBagConstraints);
@@ -903,25 +921,40 @@ public class ThreadDetailsComponent extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 0, 0, 10);
         jPanel10.add(waitValueRelLabel, gridBagConstraints);
+        
+        parkValueLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+        jPanel10.add(parkValueLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 0, 0, 10);
+        jPanel10.add(parkValueRelLabel, gridBagConstraints);
 
         monitorValueLabel.setHorizontalAlignment(SwingConstants.TRAILING);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         jPanel10.add(monitorValueLabel, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 0, 5, 10);
         jPanel10.add(monitorValueRelLabel, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -932,7 +965,7 @@ public class ThreadDetailsComponent extends JPanel {
         totalTitleLabel.setIcon(noneIcon);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         jPanel10.add(totalTitleLabel, gridBagConstraints);
@@ -940,7 +973,7 @@ public class ThreadDetailsComponent extends JPanel {
         totalValueLabel.setHorizontalAlignment(SwingConstants.TRAILING);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -1025,20 +1058,29 @@ public class ThreadDetailsComponent extends JPanel {
         if (supportsSleepingState) {
             pieChartModel.setupModel(new String[] {
                                          CommonConstants.THREAD_STATUS_RUNNING_STRING,
-                                         CommonConstants.THREAD_STATUS_SLEEPING_STRING, CommonConstants.THREAD_STATUS_WAIT_STRING,
+                                         CommonConstants.THREAD_STATUS_SLEEPING_STRING, 
+                                         CommonConstants.THREAD_STATUS_WAIT_STRING,
+                                         CommonConstants.THREAD_STATUS_PARK_STRING,
                                          CommonConstants.THREAD_STATUS_MONITOR_STRING
                                      },
                                      new Color[] {
-                                         CommonConstants.THREAD_STATUS_RUNNING_COLOR, CommonConstants.THREAD_STATUS_SLEEPING_COLOR,
-                                         CommonConstants.THREAD_STATUS_WAIT_COLOR, CommonConstants.THREAD_STATUS_MONITOR_COLOR
+                                         CommonConstants.THREAD_STATUS_RUNNING_COLOR, 
+                                         CommonConstants.THREAD_STATUS_SLEEPING_COLOR,
+                                         CommonConstants.THREAD_STATUS_WAIT_COLOR,
+                                         CommonConstants.THREAD_STATUS_PARK_COLOR,
+                                         CommonConstants.THREAD_STATUS_MONITOR_COLOR
                                      });
         } else {
             pieChartModel.setupModel(new String[] {
-                                         CommonConstants.THREAD_STATUS_RUNNING_STRING, CommonConstants.THREAD_STATUS_WAIT_STRING,
+                                         CommonConstants.THREAD_STATUS_RUNNING_STRING, 
+                                         CommonConstants.THREAD_STATUS_WAIT_STRING,
+                                         CommonConstants.THREAD_STATUS_PARK_STRING,
                                          CommonConstants.THREAD_STATUS_MONITOR_STRING
                                      },
                                      new Color[] {
-                                         CommonConstants.THREAD_STATUS_RUNNING_COLOR, CommonConstants.THREAD_STATUS_WAIT_COLOR,
+                                         CommonConstants.THREAD_STATUS_RUNNING_COLOR,
+                                         CommonConstants.THREAD_STATUS_WAIT_COLOR,
+                                         CommonConstants.THREAD_STATUS_PARK_COLOR,
                                          CommonConstants.THREAD_STATUS_MONITOR_COLOR
                                      });
         }
@@ -1118,6 +1160,12 @@ public class ThreadDetailsComponent extends JPanel {
                         threadStateLabel.setText("(" + THREAD_ALIVE_STRING + ")"); // NOI18N
 
                         break;
+                    case CommonConstants.THREAD_STATUS_PARK:
+                        threadNameLabel.setIcon(parkIcon);
+                        timeLine.setBackground(TIMELINE_ALIVE_BACKGROUND);
+                        threadStateLabel.setText("(" + THREAD_ALIVE_STRING + ")"); // NOI18N
+
+                        break;
                     case CommonConstants.THREAD_STATUS_MONITOR:
                         threadNameLabel.setIcon(monitorIcon);
                         timeLine.setBackground(TIMELINE_ALIVE_BACKGROUND);
@@ -1145,14 +1193,16 @@ public class ThreadDetailsComponent extends JPanel {
 
                 waitValueLabel.setText("-"); // NOI18N
                 waitValueRelLabel.setText("(-%)"); // NOI18N
+                parkValueLabel.setText("-"); // NOI18N
+                parkValueRelLabel.setText("(-%)"); // NOI18N
                 monitorValueLabel.setText("-"); // NOI18N
                 monitorValueRelLabel.setText("(-%)"); // NOI18N
                 totalValueLabel.setText(NO_DATA_COLLECTED_STRING);
 
                 if (supportsSleepingState) {
-                    pieChartModel.setItemValues(new double[] { 0d, 0d, 0d, 0d });
+                    pieChartModel.setItemValues(new double[] { 0d, 0d, 0d, 0d, 0d });
                 } else {
-                    pieChartModel.setItemValues(new double[] { 0d, 0d, 0d });
+                    pieChartModel.setItemValues(new double[] { 0d, 0d, 0d, 0d });
                 }
                 
                 timeLine.updateData(threadData, viewManager.getDataStartTime(), viewManager.getDataEndTime());
@@ -1195,6 +1245,11 @@ public class ThreadDetailsComponent extends JPanel {
                         waitTime += getThreadStateDuration(threadData, i);
 
                         break;
+                    case CommonConstants.THREAD_STATUS_PARK:
+                        detailsToAppend.append(getThreadDetail(timeStamp, CommonConstants.THREAD_STATUS_PARK_STRING));
+                        parkTime += getThreadStateDuration(threadData, i);
+
+                        break;
                     case CommonConstants.THREAD_STATUS_MONITOR:
                         detailsToAppend.append(getThreadDetail(timeStamp, CommonConstants.THREAD_STATUS_MONITOR_STRING));
                         monitorTime += getThreadStateDuration(threadData, i);
@@ -1234,6 +1289,10 @@ public class ThreadDetailsComponent extends JPanel {
                             waitTime += timeDiff;
 
                             break;
+                        case CommonConstants.THREAD_STATUS_PARK:
+                            parkTime += timeDiff;
+
+                            break;
                         case CommonConstants.THREAD_STATUS_MONITOR:
                             monitorTime += timeDiff;
 
@@ -1246,15 +1305,15 @@ public class ThreadDetailsComponent extends JPanel {
             long totalTime = 0;
 
             if (supportsSleepingState) {
-                totalTime = runningTime + sleepingTime + waitTime + monitorTime;
+                totalTime = runningTime + sleepingTime + waitTime + parkTime + monitorTime;
             } else {
-                totalTime = runningTime + waitTime + monitorTime;
+                totalTime = runningTime + waitTime + parkTime + monitorTime;
             }
 
             if (supportsSleepingState) {
-                pieChartModel.setItemValues(new double[] { runningTime, sleepingTime, waitTime, monitorTime });
+                pieChartModel.setItemValues(new double[] { runningTime, sleepingTime, waitTime, parkTime, monitorTime });
             } else {
-                pieChartModel.setItemValues(new double[] { runningTime, waitTime, monitorTime });
+                pieChartModel.setItemValues(new double[] { runningTime, waitTime, parkTime, monitorTime });
             }
 
             runningValueLabel.setText(TimeLineUtils.getMillisValue(runningTime));
@@ -1268,6 +1327,8 @@ public class ThreadDetailsComponent extends JPanel {
 
             waitValueLabel.setText(TimeLineUtils.getMillisValue(waitTime));
             waitValueRelLabel.setText("(" + ((waitTime == 0) ? "0.0" : getPercentValue(waitTime, totalTime)) + "%)"); // NOI18N
+            parkValueLabel.setText(TimeLineUtils.getMillisValue(parkTime));
+            parkValueRelLabel.setText("(" + ((parkTime == 0) ? "0.0" : getPercentValue(parkTime, totalTime)) + "%)"); // NOI18N
             monitorValueLabel.setText(TimeLineUtils.getMillisValue(monitorTime));
             monitorValueRelLabel.setText("(" + ((monitorTime == 0) ? "0.0" : getPercentValue(monitorTime, totalTime)) + "%)"); // NOI18N
             totalValueLabel.setText(TimeLineUtils.getMillisValue(totalTime));

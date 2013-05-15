@@ -55,8 +55,8 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=DetailsProvider.class)
 public final class StringDetailsProvider extends DetailsProvider.Basic {
     
-    private static final String STRING_MASK = "java.lang.String";                   // NOI18N
-    private static final String BUILDERS_MASK = "java.lang.AbstractStringBuilder+"; // NOI18N
+    static final String STRING_MASK = "java.lang.String";                           // NOI18N
+    static final String BUILDERS_MASK = "java.lang.AbstractStringBuilder+";         // NOI18N
     
     public StringDetailsProvider() {
         super(STRING_MASK, BUILDERS_MASK);
@@ -76,6 +76,10 @@ public final class StringDetailsProvider extends DetailsProvider.Basic {
                                                              "...");                // NOI18N
         }
         return null;
+    }
+    
+    public View getDetailsView(String className, Instance instance, Heap heap) {
+        return new ArrayValueView(className, instance, heap);
     }
     
 }

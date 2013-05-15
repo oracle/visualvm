@@ -249,4 +249,34 @@ public class ProfilerRuntimeCPUCodeRegion extends ProfilerRuntime {
         // adjust the entry time so that the time spent waiting is not accounted for
         ti.absEntryTime += (Timers.getCurrentTimeInCounts() - ti.lastWaitStartTime);
     }
+
+    protected static void parkEntryRegion() {
+        if (codeRegionInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (!ti.isInitialized() || !ti.inCallGraph) {
+            return;
+        }
+
+        // take note of the time we started waiting
+        ti.lastWaitStartTime = Timers.getCurrentTimeInCounts();
+    }
+
+    protected static void parkExitRegion() {
+        if (codeRegionInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (!ti.isInitialized() || !ti.inCallGraph) {
+            return;
+        }
+
+        // adjust the entry time so that the time spent waiting is not accounted for
+        ti.absEntryTime += (Timers.getCurrentTimeInCounts() - ti.lastWaitStartTime);
+    }
 }
