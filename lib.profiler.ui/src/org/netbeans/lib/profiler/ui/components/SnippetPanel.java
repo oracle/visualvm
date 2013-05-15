@@ -50,8 +50,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.accessibility.Accessible;
-import javax.accessibility.AccessibleContext;
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -79,7 +77,7 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
         }
     }
 
-    private static class Title extends JComponent implements Accessible {
+    private static class Title extends JPanel {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         String name;
@@ -91,6 +89,7 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
         private Title(String name) {
             this.name = name;
             setUI(new TitleUI());
+            getAccessibleContext().setAccessibleName(name);
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -210,11 +209,7 @@ public class SnippetPanel extends JPanel implements MouseListener, KeyListener, 
         this.snippetName = snippetName;
         this.content = content;
         setLayout(new BorderLayout());
-        title = new Title(snippetName) {
-                public AccessibleContext getAccessibleContext() {
-                    return SnippetPanel.this.getAccessibleContext();
-                }
-            };
+        title = new Title(snippetName);
         title.setFocusable(true);
         title.addKeyListener(this);
         title.addMouseListener(this);
