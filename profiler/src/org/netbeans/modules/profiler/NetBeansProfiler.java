@@ -127,6 +127,7 @@ import javax.swing.border.EmptyBorder;
 import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
+import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
 import org.netbeans.lib.profiler.ui.SwingWorker;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
 import org.netbeans.modules.profiler.api.GlobalStorage;
@@ -1906,6 +1907,16 @@ public abstract class NetBeansProfiler extends Profiler {
                         ProfilingResultsDispatcher.getDefault().addListener(listener);
                         listener.startup(getTargetAppRunner().getProfilerClient());
                     }
+                }
+                default: {
+                    listeners = Lookup.getDefault().lookupAll(LockProfilingResultListener.class);
+
+                    for (Iterator iter = listeners.iterator(); iter.hasNext();) {
+                        LockProfilingResultListener listener = (LockProfilingResultListener) iter.next();
+                        ProfilingResultsDispatcher.getDefault().addListener(listener);
+                        listener.startup(getTargetAppRunner().getProfilerClient());
+                    }
+                    
                 }
             }
             

@@ -43,20 +43,24 @@
 
 package org.netbeans.lib.profiler.results;
 
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.cpu.*;
-import org.netbeans.lib.profiler.results.memory.MemoryDataFrameProcessor;
-import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.results.cpu.CPUDataFrameProcessor;
+import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
+import org.netbeans.lib.profiler.results.cpu.CPUSamplingDataFrameProcessor;
+import org.netbeans.lib.profiler.results.locks.LockDataFrameProcessor;
+import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
+import org.netbeans.lib.profiler.results.memory.MemoryDataFrameProcessor;
+import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
 
 
 /**
  *
  * @author Jaroslav Bachorik
+ * @author Tomas Hurka
  */
 public final class ProfilingResultsDispatcher implements ProfilingResultsProvider.Dispatcher {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -68,11 +72,13 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final CPUDataFrameProcessor cpuDataProcessor = new CPUDataFrameProcessor();
-    private final CPUSamplingDataFrameProcessor cpuSamplingDataProcessor = new CPUSamplingDataFrameProcessor();
-    private final MemoryDataFrameProcessor memoryDataProcessor = new MemoryDataFrameProcessor();
+    private final AbstractDataFrameProcessor cpuDataProcessor = new CPUDataFrameProcessor();
+    private final AbstractDataFrameProcessor cpuSamplingDataProcessor = new CPUSamplingDataFrameProcessor();
+    private final AbstractDataFrameProcessor memoryDataProcessor = new MemoryDataFrameProcessor();
+    private final AbstractDataFrameProcessor lockDataProcessor = new LockDataFrameProcessor();
     private final Object cpuDataProcessorQLengthLock = new Object();
     private final Object memDataProcessorQLengthLock = new Object();
+    private final Object lockDataProcessorQLengthLock = new Object();
     private ExecutorService queueProcessor;
     private volatile boolean pauseFlag = true;
 
@@ -81,6 +87,9 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
 
     // @GuardedBy memDataProcessorQLengthLock
     private int memDataProcessorQLength = 0;
+
+    // @GuardedBy lockDataProcessorQLengthLock
+    private int lockDataProcessorQLength = 0;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -101,8 +110,13 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
         memoryDataProcessor.addListener(listener);
     }
 
+    public void addListener(final LockProfilingResultListener listener) {
+        lockDataProcessor.addListener(listener);
+    }
+
     public synchronized void dataFrameReceived(final byte[] buffer, final int instrumentationType) {
-        if (!cpuDataProcessor.hasListeners() && !memoryDataProcessor.hasListeners() && !cpuSamplingDataProcessor.hasListeners()) {
+        if (!cpuDataProcessor.hasListeners() && !memoryDataProcessor.hasListeners() &&
+            !cpuSamplingDataProcessor.hasListeners() && !lockDataProcessor.hasListeners()) {
             return; // no consumers
         }
 
@@ -202,7 +216,35 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
 
                 break;
             }                
-            default:ProfilerLogger.warning("Unknown instrumentation type (" + instrumentationType + ") in dataframe"); // NOI18N
+            default: {
+                synchronized (lockDataProcessorQLengthLock) {
+                    lockDataProcessorQLength++;
+
+                    if (lockDataProcessorQLength > QLengthUpperBound) {
+                        try {
+                            lockDataProcessorQLengthLock.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+
+                    getExecutor().submit(new Runnable() {
+                            public void run() {
+                                try {
+                                    lockDataProcessor.processDataFrame(buffer);
+                                } finally {
+                                    synchronized (lockDataProcessorQLengthLock) {
+                                        lockDataProcessorQLength--;
+
+                                        if (lockDataProcessorQLength < QLengthLowerBound) {
+                                            lockDataProcessorQLengthLock.notifyAll();
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                }
+            }
         }
     }
 
@@ -214,6 +256,7 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
         cpuDataProcessor.removeAllListeners();
         cpuSamplingDataProcessor.removeAllListeners();
         memoryDataProcessor.removeAllListeners();
+        lockDataProcessor.removeAllListeners();
     }
 
     public void removeListener(final CPUProfilingResultListener listener) {
@@ -223,6 +266,10 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
 
     public void removeListener(final MemoryProfilingResultsListener listener) {
         memoryDataProcessor.removeListener(listener);
+    }
+
+    public void removeListener(final LockProfilingResultListener listener) {
+        lockDataProcessor.removeListener(listener);
     }
 
     public void reset() {
@@ -256,17 +303,20 @@ public final class ProfilingResultsDispatcher implements ProfilingResultsProvide
         cpuDataProcessor.reset();
         cpuSamplingDataProcessor.reset();
         memoryDataProcessor.reset();
+        lockDataProcessor.reset();
     }
 
     private synchronized void fireShutdown() {
         cpuDataProcessor.shutdown();
         cpuSamplingDataProcessor.shutdown();
         memoryDataProcessor.shutdown();
+        lockDataProcessor.shutdown();
     }
 
     private synchronized void fireStartup(ProfilerClient client) {
         cpuSamplingDataProcessor.startup(client);
         cpuDataProcessor.startup(client);
         memoryDataProcessor.startup(client);
+        lockDataProcessor.startup(client);
     }
 }

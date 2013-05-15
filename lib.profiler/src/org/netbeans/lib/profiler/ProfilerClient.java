@@ -1196,7 +1196,8 @@ public class ProfilerClient implements CommonConstants {
 
     public void sendSetInstrumentationParamsCmd(boolean changeableOnly)
                                          throws ClientUtils.TargetAppOrVMTerminated {
-        SetChangeableInstrParamsCommand cmd = new SetChangeableInstrParamsCommand(settings.getNProfiledThreadsLimit(),
+        SetChangeableInstrParamsCommand cmd = new SetChangeableInstrParamsCommand(settings.isLockContentionMonitoringEnabled(),
+                                                                                  settings.getNProfiledThreadsLimit(),
                                                                                   settings.getSamplingInterval(),
                                                                                   settings.getAllocTrackEvery(),
                                                                                   settings.getAllocStackTraceLimit(),

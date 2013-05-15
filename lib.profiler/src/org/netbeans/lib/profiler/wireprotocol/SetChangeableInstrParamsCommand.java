@@ -63,6 +63,7 @@ public class SetChangeableInstrParamsCommand extends Command {
     private boolean sleepTrackingEnabled;
     private boolean waitTrackingEnabled;
     private boolean threadsSamplingEnabled;
+    private boolean lockContentionMonitoringEnabled;
     private int nProfiledThreadsLimit;
     private int objAllocStackSamplingDepth;
     private int objAllocStackSamplingInterval;
@@ -71,11 +72,13 @@ public class SetChangeableInstrParamsCommand extends Command {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SetChangeableInstrParamsCommand(int nProfiledThreadsLimit, int samplingInterval, int objAllocStackSamplingInterval,
+    public SetChangeableInstrParamsCommand(boolean lockContentionMonitoringEnabled, int nProfiledThreadsLimit, 
+                                           int samplingInterval, int objAllocStackSamplingInterval,
                                            int objAllocStackSamplingDepth, boolean runGCOnGetResults,
                                            boolean waitTrackingEnabled, boolean sleepTrackingEnabled, 
                                            boolean threadsSamplingEnabled, int threadsSamplingFrequency) {
         super(SET_CHANGEABLE_INSTR_PARAMS);
+        this.lockContentionMonitoringEnabled = lockContentionMonitoringEnabled;
         this.nProfiledThreadsLimit = nProfiledThreadsLimit;
         this.samplingInterval = samplingInterval;
         this.threadsSamplingFrequency = threadsSamplingFrequency;
@@ -93,6 +96,10 @@ public class SetChangeableInstrParamsCommand extends Command {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+
+    public boolean isLockContentionMonitoringEnabled() {
+        return lockContentionMonitoringEnabled;
+    }
 
     public int getNProfiledThreadsLimit() {
         return nProfiledThreadsLimit;
@@ -132,7 +139,8 @@ public class SetChangeableInstrParamsCommand extends Command {
 
     // For debugging
     public String toString() {
-        return super.toString() + ", nProfiledThreadsLimit: " + nProfiledThreadsLimit // NOI18N
+        return super.toString() + ", lockContentionMonitoringEnabled: " + lockContentionMonitoringEnabled // NOI18N
+               + ", nProfiledThreadsLimit: " + nProfiledThreadsLimit // NOI18N
                + ", samplingInterval: " + samplingInterval // NOI18N
                + ", objAllocStackSamplingInterval: " + objAllocStackSamplingInterval // NOI18N
                + ", objAllocStackSamplingDepth: " + objAllocStackSamplingDepth // NOI18N
@@ -144,26 +152,28 @@ public class SetChangeableInstrParamsCommand extends Command {
     }
 
     void readObject(ObjectInputStream in) throws IOException {
+        lockContentionMonitoringEnabled = in.readBoolean();
         nProfiledThreadsLimit = in.readInt();
         samplingInterval = in.readInt();
-        threadsSamplingFrequency = in.readInt();
         objAllocStackSamplingInterval = in.readInt();
         objAllocStackSamplingDepth = in.readInt();
         runGCOnGetResultsInMemoryProfiling = in.readBoolean();
         waitTrackingEnabled = in.readBoolean();
         sleepTrackingEnabled = in.readBoolean();
         threadsSamplingEnabled = in.readBoolean();
+        threadsSamplingFrequency = in.readInt();
     }
 
     void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeBoolean(lockContentionMonitoringEnabled);
         out.writeInt(nProfiledThreadsLimit);
         out.writeInt(samplingInterval);
-        out.writeInt(threadsSamplingFrequency);
         out.writeInt(objAllocStackSamplingInterval);
         out.writeInt(objAllocStackSamplingDepth);
         out.writeBoolean(runGCOnGetResultsInMemoryProfiling);
         out.writeBoolean(waitTrackingEnabled);
         out.writeBoolean(sleepTrackingEnabled);
         out.writeBoolean(threadsSamplingEnabled);
+        out.writeInt(threadsSamplingFrequency);
     }
 }
