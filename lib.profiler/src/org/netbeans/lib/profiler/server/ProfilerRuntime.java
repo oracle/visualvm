@@ -44,9 +44,12 @@
 package org.netbeans.lib.profiler.server;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.server.system.Histogram;
+import org.netbeans.lib.profiler.server.system.Timers;
 
 /**
  * This is a base class, containing common functionality for classes that contain instrumentation methods.
@@ -72,7 +75,9 @@ public class ProfilerRuntime implements CommonConstants {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    private static final boolean DEBUG = false;
     protected static ExternalActionsHandler externalActionsHandler;
+    protected static boolean lockContentionMonitoringEnabled;
 
     // ---------------------------------- Writing profiler events --------------------------------------
     protected static byte[] eventBuffer;
@@ -80,6 +85,7 @@ public class ProfilerRuntime implements CommonConstants {
     protected static int globalEvBufPosThreshold;
     protected static volatile boolean sendingBuffer;
     private static boolean printEvents; // For debugging
+    private volatile static Set knownMonitors;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -137,8 +143,84 @@ public class ProfilerRuntime implements CommonConstants {
         }
     }
 
+    protected static void copyLocalBuffer(ThreadInfo ti) {
+        long absTimeStamp = 0;
+        long threadTimeStamp = 0;
+
+        // Copy the local buffer into the main buffer - however avoid doing that if we have already reset profiler collectors
+        if (eventBuffer == null) {
+            return;
+        }
+
+        boolean needToAdjustTime = false;
+
+        if (sendingBuffer) { // Some other thread is already sending the buffer contents
+            absTimeStamp = Timers.getCurrentTimeInCounts();
+            if (ProfilerRuntimeCPU.threadCPUTimerOn) threadTimeStamp = Timers.getThreadCPUTimeInNanos();
+
+            synchronized (eventBuffer) { // Wait on the lock. When it's free, buffer has been sent and reset
+
+                if (sendingBuffer) {
+                    System.err.println("*** Sanity check failed - sendingBuffer where should have been already sent"); // NOI18N
+                }
+
+                needToAdjustTime = true;
+            }
+        }
+
+        synchronized (eventBuffer) {
+            if (!ti.isInitialized()) {
+                return; // Reset collectors performed when we were already executing instrumentation code
+            }
+
+            int curPos = ti.evBufPos;
+
+            // First check if the global buffer itself needs to be dumped
+            int evBufDumpLastPos = ti.evBufDumpLastPos;
+
+            if (((globalEvBufPos + curPos) - evBufDumpLastPos) > globalEvBufPosThreshold) {
+                sendingBuffer = true;
+
+                if (!needToAdjustTime) {
+                    absTimeStamp = Timers.getCurrentTimeInCounts();
+                    if (ProfilerRuntimeCPU.threadCPUTimerOn) threadTimeStamp = Timers.getThreadCPUTimeInNanos();
+                    needToAdjustTime = true;
+                }
+
+                externalActionsHandler.handleEventBufferDump(eventBuffer, 0, globalEvBufPos);
+                globalEvBufPos = 0;
+                sendingBuffer = false;
+            }
+            
+            // check that we still have valid eventBuffer
+            if (eventBuffer != null) {
+                // Finally copy the local buffer into the global one
+                eventBuffer[globalEvBufPos++] = SET_FOLLOWING_EVENTS_THREAD;
+                eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId >> 8) & 0xFF);
+                eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId) & 0xFF);
+                System.arraycopy(ti.evBuf, evBufDumpLastPos, eventBuffer, globalEvBufPos, curPos - evBufDumpLastPos);
+                globalEvBufPos += (curPos - evBufDumpLastPos);
+                ti.evBufPos = 0;
+                ti.evBufDumpLastPos = 0;
+
+                // Now, if we previously spent time waiting for another thread to dump the global buffer, or doing that
+                // ourselves, write the ADJUST_TIME event into the local buffer
+                if (needToAdjustTime) {
+                    writeAdjustTimeEvent(ti, absTimeStamp, threadTimeStamp);
+                }
+            }
+        }
+    }
+
     public static void init(ExternalActionsHandler h) {
         externalActionsHandler = h;
+    }
+
+    public static void setLockContentionMonitoringEnabled(boolean b) {
+        lockContentionMonitoringEnabled = b;
+        if (DEBUG) {
+            System.out.println("ProfilerRuntime.DEBUG: setLockContentionMonitoringEnabled "+b);
+        }
     }
 
     // ------------- Handling wait/sleep/monitors entry/exit -------------------------------------------
@@ -164,10 +246,13 @@ public class ProfilerRuntime implements CommonConstants {
 
                     break;
                 case INSTR_CODE_REGION:
-                    ProfilerRuntimeCPUCodeRegion.monitorEntryRegion(t, monitor);
+                    timeStamp = ProfilerRuntimeCPUCodeRegion.monitorEntryRegion(t, monitor);
 
                     break;
             }
+        }
+        if (lockContentionMonitoringEnabled && timeStamp == -1) {
+            writeWaitTimeEvent(METHOD_ENTRY_MONITOR, ti, monitor);
         }
 
         Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_MONITOR, timeStamp, monitor);
@@ -196,58 +281,17 @@ public class ProfilerRuntime implements CommonConstants {
 
                     break;
                 case INSTR_CODE_REGION:
-                    ProfilerRuntimeCPUCodeRegion.monitorExitRegion(t, monitor);
+                    timeStamp = ProfilerRuntimeCPUCodeRegion.monitorExitRegion(t, monitor);
 
                     break;
             }
         }
+        if (lockContentionMonitoringEnabled && timeStamp == -1) {
+            writeWaitTimeEvent(METHOD_EXIT_MONITOR, ti, monitor);
+        }
 
         Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_RUNNING, timeStamp, null);
         ti.inProfilingRuntimeMethod--;
-    }
-
-    public static void profilePointHit(char id) {
-        if (ThreadInfo.profilingSuspended() || ThreadInfo.isCurrentThreadProfilerServerThread()) {
-            return;
-        }
-
-        if (eventBuffer == null) {
-            return; // Instrumentation removal happened when we were in instrumentation
-        }
-
-        ThreadInfo ti = ThreadInfo.getThreadInfo();
-
-        if (ti.inProfilingRuntimeMethod > 0) {
-            return;
-        }
-
-        ti.inProfilingRuntimeMethod++;
-
-        ProfilingPointServerHandler method = ProfilingPointServerHandler.getHandler(id);
-        if (method != null) {
-            try {
-                method.profilingPointHit(id);
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
-            }
-        }
-
-        ti.inProfilingRuntimeMethod--;
-    }
-
-    public static boolean profiledTargetAppThreadsExist() {
-        return (ThreadInfo.getNProfiledAppThreads() > 0);
-    }
-
-    // ------------------------------ Common setup functionality ---------------------------------------
-    public static void resetProfilerCollectors(int instrType) {
-        if ((instrType != INSTR_CODE_REGION) && (eventBuffer != null)) {
-            synchronized (eventBuffer) {
-                doResetProfilerCollectors(instrType);
-            }
-        } else {
-            doResetProfilerCollectors(instrType);
-        }
     }
 
     public static void sleepEntry() {
@@ -441,6 +485,17 @@ public class ProfilerRuntime implements CommonConstants {
         Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_RUNNING, timeStamp, null);
         ti.inProfilingRuntimeMethod--;
     }
+    
+    // ------------------------------ Common setup functionality ---------------------------------------
+    public static void resetProfilerCollectors(int instrType) {
+        if ((instrType != INSTR_CODE_REGION) && (eventBuffer != null)) {
+            synchronized (eventBuffer) {
+                doResetProfilerCollectors(instrType);
+            }
+        } else {
+            doResetProfilerCollectors(instrType);
+        }
+    }
 
     public static void writeProfilingPointHitEvent(int id, long absTimeStamp) {
         ThreadInfo ti = ThreadInfo.getThreadInfo();
@@ -471,6 +526,39 @@ public class ProfilerRuntime implements CommonConstants {
             byte[] evBuf = ti.evBuf;
             ti.evBufPos = writePPointHitToBuffer(evBuf, absTimeStamp, curPos, id, tid);
         }
+    }
+
+    public static void profilePointHit(char id) {
+        if (ThreadInfo.profilingSuspended() || ThreadInfo.isCurrentThreadProfilerServerThread()) {
+            return;
+        }
+
+        if (eventBuffer == null) {
+            return; // Instrumentation removal happened when we were in instrumentation
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+
+        ProfilingPointServerHandler method = ProfilingPointServerHandler.getHandler(id);
+        if (method != null) {
+            try {
+                method.profilingPointHit(id);
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+            }
+        }
+
+        ti.inProfilingRuntimeMethod--;
+    }
+
+    static void writeThreadCreationEvent(ThreadInfo ti) {
+        writeThreadCreationEvent(ti.thread, ti.getThreadId());
     }
 
     protected static void writeThreadCreationEvent(Thread thread, int threadId) {
@@ -511,8 +599,162 @@ public class ProfilerRuntime implements CommonConstants {
             globalEvBufPos += len;
         }
     }
+    
+    static void writeAdjustTimeEvent(ThreadInfo ti, long absTimeStamp, long threadTimeStamp) {
+        //if (printEvents) System.out.println("*** Writing ADJUST_TIME event, metodId = " + (int)methodId + ", ts = " + timeStamp);
+        byte[] evBuf = ti.evBuf;
+        int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
+
+        // Check if the local buffer is about to overflow. We initially didn't have this code here, assuming that writeAdjustTimeEvent()
+        // cannot be called more than 1-2 times in a row. However, later we recognized that actually a large number of this calls can be
+        // made sequentially by classLoadHook() if many classes are loaded in a row. So we need to perform all checks for overflow;
+        // however we take some advantage of the fact that we don't need to take intermediate time stamps etc.
+        if (curPos > ThreadInfo.evBufPosThreshold) {
+            // Copy the local buffer into the main buffer - however avoid doing that if we have already reset profiler collectors
+            if (eventBuffer == null) {
+                return;
+            }
+
+            synchronized (eventBuffer) {
+                curPos = ti.evBufPos;
+
+                boolean globalBufNeedsDump = false;
+
+                // First check if the global buffer itself needs to be dumped
+                int evBufDumpLastPos = ti.evBufDumpLastPos;
+
+                if (((globalEvBufPos + curPos) - evBufDumpLastPos) > globalEvBufPosThreshold) {
+                    globalBufNeedsDump = true;
+                    sendingBuffer = true;
+                    externalActionsHandler.handleEventBufferDump(eventBuffer, 0, globalEvBufPos);
+                    globalEvBufPos = 0;
+                    sendingBuffer = false;
+                }
+
+                // Finally copy the local buffer into the global one
+                eventBuffer[globalEvBufPos++] = SET_FOLLOWING_EVENTS_THREAD;
+                eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId >> 8) & 0xFF);
+                eventBuffer[globalEvBufPos++] = (byte) ((ti.threadId) & 0xFF);
+                System.arraycopy(evBuf, evBufDumpLastPos, eventBuffer, globalEvBufPos, curPos - evBufDumpLastPos);
+                globalEvBufPos += (curPos - evBufDumpLastPos);
+                ti.evBufPos = 0;
+                ti.evBufDumpLastPos = 0;
+            }
+        }
+
+        curPos = ti.evBufPos;
+        evBuf[curPos++] = ADJUST_TIME;
+
+        long absInterval = Timers.getCurrentTimeInCounts() - absTimeStamp;
+        evBuf[curPos++] = (byte) ((absInterval >> 48) & 0xFF);
+        evBuf[curPos++] = (byte) ((absInterval >> 40) & 0xFF);
+        evBuf[curPos++] = (byte) ((absInterval >> 32) & 0xFF);
+        evBuf[curPos++] = (byte) ((absInterval >> 24) & 0xFF);
+        evBuf[curPos++] = (byte) ((absInterval >> 16) & 0xFF);
+        evBuf[curPos++] = (byte) ((absInterval >> 8) & 0xFF);
+        evBuf[curPos++] = (byte) ((absInterval) & 0xFF);
+
+        if (ProfilerRuntimeCPU.threadCPUTimerOn) {
+            long threadInterval = Timers.getThreadCPUTimeInNanos() - threadTimeStamp;
+            evBuf[curPos++] = (byte) ((threadInterval >> 48) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 40) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 32) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((threadInterval) & 0xFF);
+        }
+        ti.evBufPos = curPos;
+    }
+
+    static long writeWaitTimeEvent(byte eventType, ThreadInfo ti, Object id) {
+        int hash = writeNewMonitorEvent(ti,id);
+        
+        // if (printEvents) System.out.println("*** Writing event " + eventType + ", metodId = " + (int)methodId);
+        int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
+
+        if (curPos > ThreadInfo.evBufPosThreshold) {
+            copyLocalBuffer(ti);
+            curPos = ti.evBufPos;
+        }
+
+        byte[] evBuf = ti.evBuf;
+
+        evBuf[curPos++] = eventType;
+
+        // Note that in the code below, we write only the 7 low bytes of the 64-bit value. The justification is that this saves
+        // us some performance and memory, and 2^55 == 36028797018963968 ns == 36028797 sec == 10008 hr == 416 days is a sufficent
+        // representation range for the foreseeable usages of our tool. (***)
+        long absTimeStamp = Timers.getCurrentTimeInCounts();
+
+        if (DEBUG) {
+            System.out.println("ProfilerRuntime.DEBUG: Writing waitTime event type = " + eventType + // NOI18N
+                    ", timestamp: " + absTimeStamp + // NOI18N
+                    (id==null ? "" : ", id: "+Integer.toHexString(System.identityHashCode(id)))); // NOI18N
+        }
+
+        evBuf[curPos++] = (byte) ((absTimeStamp >> 48) & 0xFF);
+        evBuf[curPos++] = (byte) ((absTimeStamp >> 40) & 0xFF);
+        evBuf[curPos++] = (byte) ((absTimeStamp >> 32) & 0xFF);
+        evBuf[curPos++] = (byte) ((absTimeStamp >> 24) & 0xFF);
+        evBuf[curPos++] = (byte) ((absTimeStamp >> 16) & 0xFF);
+        evBuf[curPos++] = (byte) ((absTimeStamp >> 8) & 0xFF);
+        evBuf[curPos++] = (byte) ((absTimeStamp) & 0xFF);
+        if (id != null) {
+            evBuf[curPos++] = (byte) ((hash >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash) & 0xFF);            
+        }
+
+        ti.evBufPos = curPos;
+        return absTimeStamp;
+    }
+
+    private static int writeNewMonitorEvent(ThreadInfo ti, Object id) {
+        if (id == null || !lockContentionMonitoringEnabled) return -1;
+        if (ti.evBuf == null) {
+            if (!ti.isInitialized()) ti.initialize();
+            ti.useEventBuffer();
+            writeThreadCreationEvent(ti);
+        }
+        int hash = System.identityHashCode(id);
+        Integer hashInt = new Integer(hash);
+        if (knownMonitors == null) {
+            knownMonitors = new HashSet();
+        }
+        if (!knownMonitors.contains(hashInt)) {
+            knownMonitors.add(hashInt);
+            int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
+
+            if (curPos > ThreadInfo.evBufPosThreshold) {
+                copyLocalBuffer(ti);
+                curPos = ti.evBufPos;
+            }
+
+            byte[] evBuf = ti.evBuf;
+            evBuf[curPos++] = NEW_MONITOR;
+            evBuf[curPos++] = (byte) ((hash >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((hash) & 0xFF);            
+
+            byte[] name = id.getClass().getName().getBytes();
+            int len = name.length;
+            evBuf[curPos++] = (byte) ((len >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((len) & 0xFF);
+            System.arraycopy(name, 0, evBuf, curPos, len);
+            curPos += len;
+            ti.evBufPos = curPos;
+        }
+        return hash;
+    }
 
     // -------------------------------- Thread-related stuff ------------------------------------------
+    public static boolean profiledTargetAppThreadsExist() {
+        return (ThreadInfo.getNProfiledAppThreads() > 0);
+    }
+
     protected static void changeAllThreadsInProfRuntimeMethodStatus(int val) {
         ThreadInfo.changeAllThreadsInProfRuntimeMethodStatus(val);
     }
@@ -521,6 +763,7 @@ public class ProfilerRuntime implements CommonConstants {
         eventBuffer = null;
         globalEvBufPos = 0;
         ThreadInfo.resetThreadInfoTable();
+        knownMonitors = new HashSet();
     }
 
     protected static void createNewDataStructures() {

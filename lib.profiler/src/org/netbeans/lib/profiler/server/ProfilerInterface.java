@@ -587,14 +587,16 @@ public class ProfilerInterface implements CommonConstants {
         switch (instrType) {
             case INSTR_NONE:
             case INSTR_NONE_MEMORY_SAMPLING:
-                // do nothing
+                if (ProfilerRuntime.lockContentionMonitoringEnabled) {
+                    createEventBuffer();
+                }
+                
                 break;
             case INSTR_RECURSIVE_FULL:
             case INSTR_RECURSIVE_SAMPLED:
             case INSTR_OBJECT_ALLOCATIONS:
             case INSTR_OBJECT_LIVENESS:
-                evBufManager.openBufferFile(EVENT_BUFFER_SIZE_IN_BYTES);
-                ProfilerRuntime.createEventBuffer(EVENT_BUFFER_SIZE_IN_BYTES);
+                createEventBuffer();
                 status.resetInstrClassAndMethodInfo();
 
                 if ((instrType == INSTR_OBJECT_ALLOCATIONS) || (instrType == INSTR_OBJECT_LIVENESS)) {
@@ -609,8 +611,7 @@ public class ProfilerInterface implements CommonConstants {
 
                 break;
             case INSTR_NONE_SAMPLING:
-                evBufManager.openBufferFile(EVENT_BUFFER_SIZE_IN_BYTES);
-                ProfilerRuntime.createEventBuffer(EVENT_BUFFER_SIZE_IN_BYTES);
+                createEventBuffer();
                 break;
             default:
                 throw new IllegalArgumentException("Instr. type: "+instrType);
@@ -659,6 +660,11 @@ public class ProfilerInterface implements CommonConstants {
         }
 
         targetAppSuspended = true;
+    }
+
+    static void createEventBuffer() throws IOException {
+        evBufManager.openBufferFile(EVENT_BUFFER_SIZE_IN_BYTES);
+        ProfilerRuntime.createEventBuffer(EVENT_BUFFER_SIZE_IN_BYTES);
     }
 
     static String getBufferFileName() {
