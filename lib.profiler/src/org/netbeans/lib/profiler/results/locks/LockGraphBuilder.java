@@ -51,12 +51,13 @@ import org.netbeans.lib.profiler.global.TransactionalSupport;
 import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
+import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
 
 /**
  *
  * @author Tomas Hurka
  */
-public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUProfilingResultListener, LockCCTProvider {
+public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfilingResultListener, LockCCTProvider {
 
     static final Logger LOG = Logger.getLogger(LockGraphBuilder.class.getName());
     final private ThreadInfos threadInfos = new ThreadInfos();
@@ -115,26 +116,6 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
     }
 
     @Override
-    public void methodEntry(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1) {
-        // ignore
-    }
-
-    @Override
-    public void methodEntryUnstamped(int methodId, int threadId, int methodType) {
-        // ignore
-    }
-
-    @Override
-    public void methodExit(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1) {
-        // ignore
-    }
-
-    @Override
-    public void methodExitUnstamped(int methodId, int threadId, int methodType) {
-        // ignore
-    }
-
-    @Override
     public void monitorEntry(int threadId, long timeStamp0, long timeStamp1, int monitorId) {
         ThreadInfo ti = getThreadInfo(threadId);
 
@@ -185,11 +166,7 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         registerNewMonitor(hash,className);
     }
 
-    @Override
-    public void servletRequest(int threadId, int requestType, String servletPath, int sessionId) {
-        // ignore
-    }
-
+/*
     @Override
     public void sleepEntry(int threadId, long timeStamp0, long timeStamp1) {
         ThreadInfo ti = getThreadInfo(threadId);
@@ -213,17 +190,7 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
             LOG.log(Level.FINEST, "Sleep exit thread id = {0}", threadId);
         }
     }
-
-    @Override
-    public void threadsResume(long timeStamp0, long timeStamp1) {
-        // ignore
-    }
-
-    @Override
-    public void threadsSuspend(long timeStamp0, long timeStamp1) {
-        // ignore
-    }
-
+*/
     @Override
     public void timeAdjust(int threadId, long timeDiff0, long timeDiff1) {
         ThreadInfo ti = getThreadInfo(threadId);
@@ -236,7 +203,7 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         }
         ti.timeAdjust(timeDiff0);
     }
-
+/*
     @Override
     public void waitEntry(int threadId, long timeStamp0, long timeStamp1) {
         ThreadInfo ti = getThreadInfo(threadId);
@@ -284,7 +251,7 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
             LOG.log(Level.FINEST, "Park entry thread id = {0}", threadId);
         }
     }
-
+*/
     private boolean isReady() {
         return (status != null);
     }
@@ -316,5 +283,76 @@ public final class LockGraphBuilder extends BaseCallGraphBuilder implements CPUP
         } else {
             mi.setClassName(className);
         }
+    }
+    
+    public static final class CPULockGraphBuilder extends LockGraphBuilder implements CPUProfilingResultListener {
+
+        @Override
+        public void methodEntry(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1) {
+        }
+
+        @Override
+        public void methodEntryUnstamped(int methodId, int threadId, int methodType) {
+        }
+
+        @Override
+        public void methodExit(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1) {
+        }
+
+        @Override
+        public void methodExitUnstamped(int methodId, int threadId, int methodType) {
+        }
+
+        @Override
+        public void servletRequest(int threadId, int requestType, String servletPath, int sessionId) {
+        }
+
+        @Override
+        public void sleepEntry(int threadId, long timeStamp0, long timeStamp1) {
+        }
+
+        @Override
+        public void sleepExit(int threadId, long timeStamp0, long timeStamp1) {
+        }
+
+        @Override
+        public void threadsResume(long timeStamp0, long timeStamp1) {
+        }
+
+        @Override
+        public void threadsSuspend(long timeStamp0, long timeStamp1) {
+        }
+
+        @Override
+        public void waitEntry(int threadId, long timeStamp0, long timeStamp1) {
+        }
+
+        @Override
+        public void waitExit(int threadId, long timeStamp0, long timeStamp1) {
+        }
+
+        @Override
+        public void parkEntry(int threadId, long timeStamp0, long timeStamp1) {
+        }
+
+        @Override
+        public void parkExit(int threadId, long timeStamp0, long timeStamp1) {
+        }
+        
+    }
+    public static final class MemoryLockGraphBuilder extends LockGraphBuilder implements MemoryProfilingResultsListener {
+
+        @Override
+        public void onAllocStackTrace(char classId, long objSize, int[] methodIds) {
+        }
+
+        @Override
+        public void onGcPerformed(char classId, long objectId, int objEpoch) {
+        }
+
+        @Override
+        public void onLivenessStackTrace(char classId, long objectId, int objEpoch, long objSize, int[] methodIds) {
+        }
+        
     }
 }
