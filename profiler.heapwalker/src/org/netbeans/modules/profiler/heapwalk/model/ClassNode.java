@@ -107,31 +107,30 @@ public class ClassNode extends AbstractHeapWalkerNode {
     public boolean isLeaf() {
         return false;
     }
+    
+    protected ChildrenComputer getChildrenComputer() {
+        return new ChildrenComputer() {
+            public HeapWalkerNode[] computeChildren() {
+                HeapWalkerNode[] children = null;
 
-    protected HeapWalkerNode[] computeChildren() {
-        return BrowserUtils.lazilyCreateChildren(this,
-                                                 new ChildrenComputer() {
-                public HeapWalkerNode[] computeChildren() {
-                    HeapWalkerNode[] children = null;
+                List fieldValues = getJavaClass().getStaticFieldValues();
 
-                    List fieldValues = getJavaClass().getStaticFieldValues();
+                if (fieldValues.size() == 0) {
+                    // Instance has no fields
+                    children = new HeapWalkerNode[1];
+                    children[0] = HeapWalkerNodeFactory.createNoFieldsNode(ClassNode.this);
+                } else {
+                    // Instance has at least one field
+                    children = new HeapWalkerNode[fieldValues.size()];
 
-                    if (fieldValues.size() == 0) {
-                        // Instance has no fields
-                        children = new HeapWalkerNode[1];
-                        children[0] = HeapWalkerNodeFactory.createNoFieldsNode(ClassNode.this);
-                    } else {
-                        // Instance has at least one field
-                        children = new HeapWalkerNode[fieldValues.size()];
-
-                        for (int i = 0; i < children.length; i++) {
-                            children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i), ClassNode.this);
-                        }
+                    for (int i = 0; i < children.length; i++) {
+                        children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i), ClassNode.this);
                     }
-
-                    return children;
                 }
-            });
+
+                return children;
+            }
+        };
     }
 
     protected ImageIcon computeIcon() {
@@ -157,5 +156,9 @@ public class ClassNode extends AbstractHeapWalkerNode {
 
     protected String computeRetainedSize() {
         return numberFormat.format(javaClass.getRetainedSizeByClass());
+    }
+    
+    public Object getNodeID() {
+        return javaClass;
     }
 }
