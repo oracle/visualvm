@@ -690,7 +690,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         } catch (Exception ex) {}
     }
     
-    public void invokeSelectedLink() {
+    private void invokeSelectedLink() {
         for (Action action : getEditorKit().getActions()) {
             if ("activate-link-action".equals(action.getValue(Action.NAME))) {  // NOI18N
                 action.actionPerformed(new ActionEvent(this, 0, null));
