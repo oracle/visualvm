@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,74 +34,28 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
+package org.netbeans.lib.profiler.results.locks;
 
-package org.netbeans.modules.profiler.heapwalk.model;
-
-import java.util.List;
-import javax.swing.Icon;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.Value;
+import org.netbeans.lib.profiler.results.ProfilingResultListener;
 
 /**
  *
- * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public class InstancesContainerNode extends AbstractHeapWalkerNode {
+public interface LockProfilingResultListener extends ProfilingResultListener {
 
-    private final String name;
-    private List<Value> childrenValues;
-    private final List<Instance> instances;
+    void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId);
 
+    void monitorExit(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId);
 
-    public InstancesContainerNode(String name, HeapWalkerNode parent, List<Value> childrenValues,
-                                  List<Instance> instances) {
-        super(parent);
-        this.name = name;
-        this.childrenValues = childrenValues;
-        this.instances = instances;
-    }
+    void newThread(final int threadId, final String threadName, final String threadClassName);
 
+    void newMonitor(final int hash, final String className);
 
-    public List<Instance> getInstances() {
-        return instances;
-    }
-
-
-    protected String computeName() {
-        return name;
-    }
-
-    protected String computeType() {
-        return "-"; // NOI18N
-    }
-
-    protected String computeValue() {
-        return "-"; // NOI18N
-    }
-
-    protected String computeSize() {
-        return "-"; // NOI18N
-    }
-
-    protected String computeRetainedSize() {
-        return "-"; // NOI18N
-    }
-
-    protected Icon computeIcon() {
-        return BrowserUtils.ICON_INSTANCE;
-    }
-
-    protected HeapWalkerNode[] computeChildren() {
-        HeapWalkerNode[] nodes = new HeapWalkerNode[childrenValues.size()];
-        for (int i = 0; i < nodes.length; i++)
-            nodes[i] = HeapWalkerNodeFactory.createReferenceNode(childrenValues.get(i), this);
-        childrenValues = null;
-        return nodes;
-    }
-    
-    public Object getNodeID() {
-        return instances;
-    }
-
+    void timeAdjust(int threadId, long timeDiff0, long timeDiff1);
 }

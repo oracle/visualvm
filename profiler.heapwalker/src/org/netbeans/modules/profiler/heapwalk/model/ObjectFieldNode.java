@@ -131,4 +131,9 @@ public class ObjectFieldNode extends ObjectNode implements HeapWalkerFieldNode {
 
         return null;
     }
+    
+    public Object getNodeID() {
+        return fieldValue;
+    }
+    
 }

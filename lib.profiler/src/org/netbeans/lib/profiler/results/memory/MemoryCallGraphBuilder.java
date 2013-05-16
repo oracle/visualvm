@@ -448,6 +448,31 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
         batchNotEmpty = true;
     }
 
+    @Override
+    public void monitorEntry(int threadId, long timeStamp0, long timeStamp1, int monitorId) {
+        // ignore
+    }
+
+    @Override
+    public void monitorExit(int threadId, long timeStamp0, long timeStamp1, int monitorId) {
+        // ignore
+    }
+
+    @Override
+    public void newThread(int threadId, String threadName, String threadClassName) {
+        // ignore
+    }
+
+    @Override
+    public void newMonitor(int hash, String className) {
+        // ignore
+    }
+
+    @Override
+    public void timeAdjust(int threadId, long timeDiff0, long timeDiff1) {
+        // ignore
+    }
+    
     public void updateInternals() {
         loadNamesForJMethodIds();
     }

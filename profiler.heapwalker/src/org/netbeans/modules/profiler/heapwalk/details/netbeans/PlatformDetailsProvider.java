@@ -205,7 +205,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             if (i1 != null && i2 != null) {
                 return new Fixed6Bit_11_20(i1, i2).toString();
             }
-        } else if (FIXED_11_20.equals(className)) {
+        } else if (FIXED_21_30.equals(className)) {
             Long i1 = (Long) instance.getValueOfField("i1"); // NOI18N
             Long i2 = (Long) instance.getValueOfField("i2"); // NOI18N
             Long i3 = (Long) instance.getValueOfField("i3"); // NOI18N
