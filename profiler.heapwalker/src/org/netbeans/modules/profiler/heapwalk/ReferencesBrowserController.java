@@ -58,6 +58,7 @@ import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -66,6 +67,7 @@ import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.tree.TreePath;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -296,6 +298,18 @@ public class ReferencesBrowserController extends AbstractController {
 
     protected AbstractButton createControllerPresenter() {
         return ((ReferencesBrowserControllerUI) getPanel()).getPresenter();
+    }
+    
+    public List getExpandedPaths() {
+        return ((ReferencesBrowserControllerUI)getPanel()).getExpandedPaths();
+    }
+    
+    public TreePath getSelectedRow() {
+        return ((ReferencesBrowserControllerUI)getPanel()).getSelectedRow();
+    }
+    
+    public void restoreState(List expanded, TreePath selected) {
+        ((ReferencesBrowserControllerUI)getPanel()).restoreState(expanded, selected);
     }
 
     // --- Protected implementation ----------------------------------------------

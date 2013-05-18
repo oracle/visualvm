@@ -43,9 +43,10 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.AbstractDataFrameProcessor;
 import org.netbeans.lib.profiler.results.ProfilingResultListener;
+import org.netbeans.lib.profiler.results.locks.AbstractLockDataFrameProcessor;
 import java.util.logging.Level;
 
 
@@ -54,10 +55,9 @@ import java.util.logging.Level;
  * the JFluid server agent and dispatch the resulting events to all interested parties
  * @author Jaroslav Bachorik
  */
-public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
-    private volatile int currentThreadId = -1;
+    private boolean hasMonitorInfo;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -129,7 +129,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                                            | ((long) buffer[position++] & 0xFF);
                             }
                         }
-                        if (eventType == CommonConstants.METHOD_ENTRY_MONITOR || eventType == CommonConstants.METHOD_EXIT_MONITOR) {
+                        if (hasMonitorInfo && eventType == CommonConstants.METHOD_ENTRY_MONITOR || eventType == CommonConstants.METHOD_EXIT_MONITOR) {
                             hash = (((int) buffer[position++] & 0xFF) << 24) 
                                  | (((int) buffer[position++] & 0xFF) << 16)
                                  | (((int) buffer[position++] & 0xFF) << 8) 
@@ -396,7 +396,7 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
                             if (LOGGER.isLoggable(Level.FINEST)) {
                                 LOGGER.log(Level.FINEST, "Creating new monitor , mId={0} , className={1}", new Object[] {hash, className}); // NOI18N
                             }
-
+                            hasMonitorInfo = true;
                             fireNewMonitor(hash, className);
                             break;
                         }
@@ -446,12 +446,9 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
         }
     }
 
-    private void fireAdjustTime(final int threadId, final long timeStamp0, final long timeStamp1) {
-        foreachListener(new ListenerFunctor() {
-                public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).timeAdjust(threadId, timeStamp0, timeStamp1);
-                }
-            });
+    public void startup(ProfilerClient client) {
+        super.startup(client);
+        hasMonitorInfo = false;
     }
 
     private void fireMethodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0,
@@ -484,38 +481,6 @@ public class CPUDataFrameProcessor extends AbstractDataFrameProcessor {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
                     ((CPUProfilingResultListener) listener).methodExitUnstamped(methodId, threadId, methodType);
-                }
-            });
-    }
-
-    private void fireMonitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId) {
-        foreachListener(new ListenerFunctor() {
-                public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).monitorEntry(threadId, timeStamp0, timeStamp1, monitorId);
-                }
-            });
-    }
-
-    private void fireMonitorExit(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId) {
-        foreachListener(new ListenerFunctor() {
-                public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).monitorExit(threadId, timeStamp0, timeStamp1, monitorId);
-                }
-            });
-    }
-
-    private void fireNewThread(final int threadId, final String threadName, final String threadClassName) {
-        foreachListener(new ListenerFunctor() {
-                public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).newThread(threadId, threadName, threadClassName);
-                }
-            });
-    }
-
-    private void fireNewMonitor(final int hash, final String className) {
-        foreachListener(new ListenerFunctor() {
-                public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).newMonitor(hash, className);
                 }
             });
     }

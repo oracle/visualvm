@@ -90,6 +90,9 @@ public interface HeapWalkerNode extends CCTNode {
     public String getSize();
 
     public String getRetainedSize();
+    
+    // used for equals() and hashCode() implementation
+    public Object getNodeID();
 
     // used for testing children for null without lazy-populating invocation
     // note that if false, it means that chilren are not yet computed OR this node is leaf!
