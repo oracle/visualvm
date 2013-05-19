@@ -70,7 +70,6 @@ public class EventBufferProcessor implements CommonConstants {
 
     protected static ProfilingSessionStatus status;
     protected static ProfilerClient profilerClient;
-    protected static byte[] buf;
     protected static MappedByteBuffer mapByteBuf;
     protected static File bufFile;
     protected static RandomAccessFile raFile;
@@ -127,19 +126,20 @@ public class EventBufferProcessor implements CommonConstants {
         status = profilerClient.getStatus();
     }
 
-    public static synchronized void readDataAndPrepareForProcessing(EventBufferDumpedCommand cmd) {
+    public static synchronized byte[] readDataAndPrepareForProcessing(EventBufferDumpedCommand cmd) {
+        byte[] buf;
         if (!status.remoteProfiling) {
             int bufSizeInBytes = cmd.getBufSize();
-            if ((buf == null) || (buf.length < bufSizeInBytes)) {
-                buf = new byte[bufSizeInBytes];
-            }
+            buf = new byte[bufSizeInBytes];
             mapByteBuf.reset();
             mapByteBuf.get(buf, 0, bufSizeInBytes);
         } else {
             buf = cmd.getBuffer();
             assert buf != null;
+            assert buf.length == cmd.getBufSize();
         }
         startDataProcessingTime = System.currentTimeMillis();
+        return buf;
     }
 
     public static void removeEventBufferFile() {
