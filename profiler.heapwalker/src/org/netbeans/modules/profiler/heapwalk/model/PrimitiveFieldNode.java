@@ -98,6 +98,10 @@ public class PrimitiveFieldNode extends AbstractHeapWalkerNode implements HeapWa
         protected String computeValue() {
             return value;
         }
+        
+        public Object getNodeID() {
+            return itemIndex;
+        }
     }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -157,5 +161,9 @@ public class PrimitiveFieldNode extends AbstractHeapWalkerNode implements HeapWa
 
     protected String computeRetainedSize() {
         return "-"; // NOI18N
+    }
+    
+    public Object getNodeID() {
+        return fieldValue;
     }
 }

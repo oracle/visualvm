@@ -87,4 +87,8 @@ public class PrimitiveArrayFieldNode extends PrimitiveArrayNode implements HeapW
 
         return processLoopIcon(icon);
     }
+    
+    public Object getNodeID() {
+        return fieldValue;
+    }
 }
