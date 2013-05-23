@@ -77,7 +77,7 @@ public interface ProfilingResultsProvider {
 
     void addDispatcher(ProfilingResultsProvider.Dispatcher dispatcher);
 
-    void dataReady(int buffsize, int instrumentationType);
+    void dataReady(final byte[] buffer, int instrumentationType);
 
     void removeDispatcher(ProfilingResultsProvider.Dispatcher dispatcher);
 
