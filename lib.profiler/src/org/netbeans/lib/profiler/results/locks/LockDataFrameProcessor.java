@@ -41,6 +41,7 @@
  */
 package org.netbeans.lib.profiler.results.locks;
 
+import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import org.netbeans.lib.profiler.global.CommonConstants;
 
@@ -51,12 +52,10 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
     @Override
-    public void doProcessDataFrame(byte[] buffer) {
-        int curPos = 0;
-        int bufSize = buffer.length;
+    public void doProcessDataFrame(ByteBuffer buffer) {
 
-        do {
-            byte eventType = buffer[curPos++];
+        while (buffer.hasRemaining()) {
+            byte eventType = buffer.get();
 
             switch (eventType) {
                 case CommonConstants.RESET_COLLECTORS: {
@@ -69,12 +68,9 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     break;
                 }
                 case CommonConstants.BUFFEREVENT_PROFILEPOINT_HIT: {
-                    int id = (((int) buffer[curPos++] & 0xFF) << 8) | ((int) buffer[curPos++] & 0xFF);
-                    long timeStamp = (((long) buffer[curPos++] & 0xFF) << 48) | (((long) buffer[curPos++] & 0xFF) << 40)
-                                     | (((long) buffer[curPos++] & 0xFF) << 32) | (((long) buffer[curPos++] & 0xFF) << 24)
-                                     | (((long) buffer[curPos++] & 0xFF) << 16) | (((long) buffer[curPos++] & 0xFF) << 8)
-                                     | ((long) buffer[curPos++] & 0xFF);
-                    int threadId = (((int) buffer[curPos++] & 0xFF) << 8) | ((int) buffer[curPos++] & 0xFF);
+                    int id = buffer.getChar();
+                    long timeStamp = getTimeStamp(buffer);
+                    int threadId = buffer.getChar();
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.finest("Profile Point Hit " + id + ", threadId=" + id + ", timeStamp=" + timeStamp); // NOI18N
                     }
@@ -84,7 +80,7 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     break;
                 }
                 case CommonConstants.SET_FOLLOWING_EVENTS_THREAD: {
-                    currentThreadId = (char) ((((int) buffer[curPos++] & 0xFF) << 8) | ((int) buffer[curPos++] & 0xFF));
+                    currentThreadId = buffer.getChar();
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.log(Level.FINEST, "Change current thread , tId={0}", currentThreadId); // NOI18N
                     }
@@ -92,14 +88,9 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     break;
                 }
                 case CommonConstants.NEW_THREAD: {
-                    int threadId = (char) ((((int) buffer[curPos++] & 0xFF) << 8) | ((int) buffer[curPos++] & 0xFF));
-                    int strLen = ((((int) buffer[curPos++] & 0xFF) << 8) | ((int) buffer[curPos++] & 0xFF));
-                    String threadName = new String(buffer, curPos, strLen);
-                    curPos += strLen;
-                    strLen = ((((int) buffer[curPos++] & 0xFF) << 8) | ((int) buffer[curPos++] & 0xFF));
-
-                    String threadClassName = new String(buffer, curPos, strLen);
-                    curPos += strLen;
+                    int threadId = buffer.getChar();
+                    String threadName = getString(buffer);
+                    String threadClassName = getString(buffer);
 
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.log(Level.FINEST, "Creating new thread , tId={0}", threadId); // NOI18N
@@ -111,13 +102,8 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     break;
                 }
                 case CommonConstants.NEW_MONITOR: {
-                    int hash = (((int) buffer[curPos++] & 0xFF) << 24) 
-                         | (((int) buffer[curPos++] & 0xFF) << 16)
-                         | (((int) buffer[curPos++] & 0xFF) << 8) 
-                         | ((int) buffer[curPos++] & 0xFF);
-                    int strLen = ((((int) buffer[curPos++] & 0xFF) << 8) | ((int) buffer[curPos++] & 0xFF));
-                    String className = new String(buffer, curPos, strLen);
-                    curPos += strLen;
+                    int hash = buffer.getInt();
+                    String className = getString(buffer);
 
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.log(Level.FINEST, "Creating new monitor , mId={0} , className={1}", new Object[] {hash, className}); // NOI18N
@@ -128,15 +114,9 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                 }
                 case CommonConstants.METHOD_ENTRY_MONITOR:
                 case CommonConstants.METHOD_EXIT_MONITOR: {
-                    long timeStamp0 = (((long) buffer[curPos++] & 0xFF) << 48) | (((long) buffer[curPos++] & 0xFF) << 40)
-                                 | (((long) buffer[curPos++] & 0xFF) << 32) | (((long) buffer[curPos++] & 0xFF) << 24)
-                                 | (((long) buffer[curPos++] & 0xFF) << 16) | (((long) buffer[curPos++] & 0xFF) << 8)
-                                 | ((long) buffer[curPos++] & 0xFF);
+                    long timeStamp0 = getTimeStamp(buffer);
                     long timeStamp1 = -1;
-                    int hash = (((int) buffer[curPos++] & 0xFF) << 24) 
-                         | (((int) buffer[curPos++] & 0xFF) << 16)
-                         | (((int) buffer[curPos++] & 0xFF) << 8) 
-                         | ((int) buffer[curPos++] & 0xFF);
+                    int hash = buffer.getInt();
                     
                     if (eventType == CommonConstants.METHOD_ENTRY_MONITOR) {
                         if (LOGGER.isLoggable(Level.FINEST)) {
@@ -155,14 +135,8 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     break;
                 }
                 case CommonConstants.ADJUST_TIME: {
-                    long timeStamp0 = (((long) buffer[curPos++] & 0xFF) << 48) | (((long) buffer[curPos++] & 0xFF) << 40)
-                                 | (((long) buffer[curPos++] & 0xFF) << 32) | (((long) buffer[curPos++] & 0xFF) << 24)
-                                 | (((long) buffer[curPos++] & 0xFF) << 16) | (((long) buffer[curPos++] & 0xFF) << 8)
-                                 | ((long) buffer[curPos++] & 0xFF);
-                    long timeStamp1 = (((long) buffer[curPos++] & 0xFF) << 48) | (((long) buffer[curPos++] & 0xFF) << 40)
-                                 | (((long) buffer[curPos++] & 0xFF) << 32) | (((long) buffer[curPos++] & 0xFF) << 24)
-                                 | (((long) buffer[curPos++] & 0xFF) << 16) | (((long) buffer[curPos++] & 0xFF) << 8)
-                                 | ((long) buffer[curPos++] & 0xFF);
+                    long timeStamp0 = getTimeStamp(buffer);
+                    long timeStamp1 = getTimeStamp(buffer);
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.log(Level.FINEST, "Adjust time , tId={0}", currentThreadId); // NOI18N
                     }
@@ -174,13 +148,13 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                 default: {
                     LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in LockDataFrameProcessor: " // NOI18N
                                   + (int) eventType
-                                  + " at " + curPos // NOI18N
+                                  + " at " + buffer.position() // NOI18N
                                   );
 
                     break;
                 }
             }
-        } while (curPos < bufSize);
+        }
     }
     
 }

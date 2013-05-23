@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -81,34 +82,25 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
     
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
-    public void doProcessDataFrame(byte[] buffer) {
-        int position = 0;
+    public void doProcessDataFrame(ByteBuffer buffer) {
         JMethodIdTable methodIdsTable = JMethodIdTable.getDefault();
         
         threadDumps = new ArrayList();
-        while (position < buffer.length) {
-            byte eventType = buffer[position++];
+        while (buffer.hasRemaining()) {
+            byte eventType = buffer.get();
             
             switch (eventType) {    
                 case CommonConstants.THREAD_DUMP_START:
                     currentThreadsDump = new HashMap();
-                    currentTimestamp = (((long) buffer[position++] & 0xFF) << 48) | (((long) buffer[position++] & 0xFF) << 40)
-                                     | (((long) buffer[position++] & 0xFF) << 32) | (((long) buffer[position++] & 0xFF) << 24)
-                                     | (((long) buffer[position++] & 0xFF) << 16) | (((long) buffer[position++] & 0xFF) << 8)
-                                     | ((long) buffer[position++] & 0xFF);
+                    currentTimestamp = getTimeStamp(buffer);
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.finest("Thread dump start: Timestamps:"+currentTimestamp); // NOI18N
                     }
                     break;
                 case CommonConstants.NEW_THREAD: {
-                    int threadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
-                    int strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
-                    String threadName = new String(buffer, position, strLen);
-                    position += strLen;
-                    strLen = ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
-                    
-                    String threadClassName = new String(buffer, position, strLen);
-                    position += strLen;
+                    int threadId = buffer.getChar();
+                    String threadName = getString(buffer);
+                    String threadClassName = getString(buffer);
                     
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.finest("Creating new thread: tId="+threadId+" name="+threadName); // NOI18N
@@ -120,7 +112,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                     break;
                 }
                 case CommonConstants.THREAD_INFO_IDENTICAL: {
-                    int threadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
+                    int threadId = buffer.getChar();
                     Integer threadIdObj = Integer.valueOf(threadId);
                     ThreadInfo lastInfo = lastThreadsDump.get(threadIdObj);
                     assert lastInfo != null;
@@ -131,15 +123,14 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                     break;
                 }
                 case CommonConstants.THREAD_INFO: {
-                    int threadId = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
-                    byte state = buffer[position++];
-                    int stackLen = (char) ((((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF));
+                    int threadId = buffer.getChar();
+                    byte state = buffer.get();
+                    int stackLen = buffer.getChar();
                     int methodIds[] = new int[stackLen];
                     ThreadInfo info;
                     
                     for (int i=0; i<stackLen; i++) {
-                        methodIds[i] = (((int) buffer[position++] & 0xFF) << 24) | (((int) buffer[position++] & 0xFF) << 16)
-                                | (((int) buffer[position++] & 0xFF) << 8) | ((int) buffer[position++] & 0xFF);
+                        methodIds[i] = buffer.getInt();
                         methodIdsTable.checkMethodId(methodIds[i]);
                     }
                     if (currentThreadId == threadId) {
@@ -171,7 +162,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                 }
                 default: {
                     LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CallGraphBuilder: {0} at {1}", // NOI18N
-                            new Object[]{(int) eventType, position});
+                            new Object[]{(int) eventType, buffer.position()});
                     
                     break;
                 }
