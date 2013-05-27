@@ -43,17 +43,19 @@
 
 package org.netbeans.lib.profiler.results;
 
-import org.netbeans.lib.profiler.ProfilerClient;
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.ProfilerClient;
 
 
 /**
  *
  * @author Jaroslav Bachorik
+ * @author Tomas Hurka
  */
 public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
@@ -91,7 +93,7 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.finest("Frame start, size="+buffer.length); // NOI18N
                     }
-                    doProcessDataFrame(buffer);
+                    doProcessDataFrame(ByteBuffer.wrap(buffer));
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Error while processing data frame", e); // NOI18N
                 } finally {
@@ -134,7 +136,23 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
         listeners.add(listener);
     }
 
-    protected abstract void doProcessDataFrame(byte[] buffer);
+    protected abstract void doProcessDataFrame(ByteBuffer buffer);
+
+    protected static long getTimeStamp(ByteBuffer buffer) {
+        long timestamp = (((long) buffer.get() & 0xFF) << 48) | (((long) buffer.get() & 0xFF) << 40)
+                         | (((long) buffer.get() & 0xFF) << 32) | (((long) buffer.get() & 0xFF) << 24)
+                         | (((long) buffer.get() & 0xFF) << 16) | (((long) buffer.get() & 0xFF) << 8)
+                         | ((long) buffer.get() & 0xFF);
+        return timestamp;
+    }
+
+    protected static String getString(final ByteBuffer buffer) {
+        int strLen = buffer.getChar();
+        byte[] str = new byte[strLen];
+        
+        buffer.get(str);
+        return new String(str);
+    }
 
     protected void fireProfilingPoint(final int threadId, final int ppId, final long timeStamp) {
         foreachListener(new ListenerFunctor() {
