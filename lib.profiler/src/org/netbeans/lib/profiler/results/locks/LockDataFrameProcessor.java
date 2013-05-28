@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,98 +34,30 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-
-package org.netbeans.lib.profiler.results.memory;
+package org.netbeans.lib.profiler.results.locks;
 
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.results.ProfilingResultListener;
-import org.netbeans.lib.profiler.results.locks.AbstractLockDataFrameProcessor;
 
 /**
  *
- * @author Jaroslav Bachorik
  * @author Tomas Hurka
  */
-public class MemoryDataFrameProcessor extends AbstractLockDataFrameProcessor {
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
+    @Override
     public void doProcessDataFrame(ByteBuffer buffer) {
-        int currentEpoch = -1;
 
         while (buffer.hasRemaining()) {
             byte eventType = buffer.get();
 
             switch (eventType) {
-                case CommonConstants.OBJ_ALLOC_STACK_TRACE: {
-                    char classId = buffer.getChar();
-                    long objSize = getObjSize(buffer);
-                    int depth = getDepth(buffer);
-
-                    if (LOGGER.isLoggable(Level.FINEST)) {
-                        LOGGER.finest("Allocation stack trace: classId=" + (int) classId + ", objSize=" + objSize + ", depth=" + depth); // NOI18N
-                    }
-
-                    int[] methodIds = new int[depth];
-
-                    for (int i = 0; i < depth; i++) {
-                        methodIds[i] = buffer.getInt();
-                    }
-
-                    fireAllocStackTrace(classId, objSize, methodIds);
-
-                    break;
-                }
-                case CommonConstants.OBJ_LIVENESS_STACK_TRACE: {
-                    char classId = buffer.getChar();
-                    int objEpoch = buffer.getChar();
-
-                    if (objEpoch > currentEpoch) {
-                        currentEpoch = objEpoch; // objEpoch may be < currentEpoch if e.g. the GC event is being processed
-                    }
-
-                    long objectId = ((((long) classId) & 0xFFFF) << 48) | ((((long) objEpoch) & 0xFFFF) << 32)
-                                    | (((long) buffer.getInt()) & 0xFFFFFFFF);
-                    long objSize = getObjSize(buffer);
-
-                    int depth = getDepth(buffer);
-
-                    if (LOGGER.isLoggable(Level.FINEST)) {
-                        LOGGER.finest("Liveness stack trace: classId=" + (int) classId + ", objectId=" + objectId + ", objEpoch=" //NOI18N
-                                      + objEpoch + ", objSize=" + objSize + ", depth=" + depth); // NOI18N
-                    }
-
-                    int[] methodIds = new int[depth];
-
-                    for (int i = 0; i < depth; i++) {
-                        methodIds[i] = buffer.getInt();
-                    }
-
-                    fireLivenessStackTrace(classId, objectId, objEpoch, objSize, methodIds);
-
-                    break;
-                }
-                case CommonConstants.OBJ_GC_HAPPENED: {
-                    char classId = buffer.getChar();
-                    int objEpoch = buffer.getChar();
-
-                    if (objEpoch > currentEpoch) {
-                        currentEpoch = objEpoch; // objEpoch may be < currentEpoch if e.g. the GC event is being processed
-                    }
-
-                    long objectId = ((((long) classId) & 0xFFFF) << 48) | ((((long) objEpoch) & 0xFFFF) << 32)
-                                    | (((long) buffer.getInt()) & 0xFFFFFFFF);
-
-                    if (LOGGER.isLoggable(Level.FINEST)) {
-                        LOGGER.finest("GC Performed: classId=" + (int) classId + ", objectId=" + objectId + ", objEpoch=" + objEpoch); // NOI18N
-                    }
-
-                    fireGCPerformed(classId, objectId, objEpoch);
-
-                    break;
-                }
                 case CommonConstants.RESET_COLLECTORS: {
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.finest("Profiling data reset"); // NOI18N
@@ -219,7 +146,7 @@ public class MemoryDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     break;
                 }
                 default: {
-                    LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in MemoryDataFrameProcessor: " // NOI18N
+                    LOGGER.severe("*** Profiler Engine: internal error: got unknown event type in LockDataFrameProcessor: " // NOI18N
                                   + (int) eventType
                                   + " at " + buffer.position() // NOI18N
                                   );
@@ -229,47 +156,5 @@ public class MemoryDataFrameProcessor extends AbstractLockDataFrameProcessor {
             }
         }
     }
-
-    private void fireAllocStackTrace(final char classId, final long objSize, final int[] methodIds) {
-        foreachListener(new ListenerFunctor() {
-                public void execute(ProfilingResultListener listener) {
-                    try {
-                        ((MemoryProfilingResultsListener) listener).onAllocStackTrace(classId, objSize, methodIds);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-    }
-
-    private void fireGCPerformed(final char classId, final long objectId, final int objEpoch) {
-        foreachListener(new ListenerFunctor() {
-                public void execute(ProfilingResultListener listener) {
-                    ((MemoryProfilingResultsListener) listener).onGcPerformed(classId, objectId, objEpoch);
-                }
-            });
-    }
-
-    private void fireLivenessStackTrace(final char classId, final long objectId, final int objEpoch, final long objSize,
-                                        final int[] methodIds) {
-        foreachListener(new ListenerFunctor() {
-                public void execute(ProfilingResultListener listener) {
-                    ((MemoryProfilingResultsListener) listener).onLivenessStackTrace(classId, objectId, objEpoch, objSize,
-                                                                                     methodIds);
-                }
-            });
-    }
     
-    private static long getObjSize(ByteBuffer buffer) {
-        long objSize = (((long) buffer.get() & 0xFF) << 32) | (((long) buffer.get() & 0xFF) << 24)
-                       | (((long) buffer.get() & 0xFF) << 16) | (((long) buffer.get() & 0xFF) << 8)
-                       | ((long) buffer.get() & 0xFF);
-        return objSize;
-    }
-    
-    private static int getDepth(ByteBuffer buffer) {
-        int depth = ((((int) buffer.get()) & 0xFF) << 16) | ((((int) buffer.get()) & 0xFF) << 8)
-                    | (((int) buffer.get()) & 0xFF);
-        return depth;
-    }
 }

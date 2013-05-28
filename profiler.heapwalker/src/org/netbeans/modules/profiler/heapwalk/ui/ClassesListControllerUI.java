@@ -960,6 +960,8 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     private void showPopupMenu(int row, int x, int y) {
+        if (row == -1) return;
+        
         if(showSourceItem != null) {
             String className = BrowserUtils.getArrayBaseType((String)displayCache[row][0]);
             showSourceItem.setEnabled(!BrowserUtils.isPrimitiveType(className));

@@ -63,6 +63,7 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import java.util.List;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
@@ -901,7 +902,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
             scrollRectToVisible(getCellRect(getSelectedRow(), 0, true));
         }
     }
-
+    
     public void selectRowByContents(String rowString, int columnIndex, boolean setVisible) {
         for (int i = 0; i < getRowCount(); i++) {
             if (getValueAt(i, columnIndex).toString().equals(rowString)) {
@@ -928,6 +929,14 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
     
     public void changeRoot(CCTNode newRoot) {
         treeTableModelAdapter.changeRoot(newRoot);
+    }
+    
+    public void setup(List expanded, TreePath selected) {
+        treeTableModelAdapter.setup(expanded, selected);
+    }
+    
+    public List getExpandedPaths() {
+        return treeTableModelAdapter.getExpandedPaths();
     }
 
     public void updateTreeTableHeader() {
