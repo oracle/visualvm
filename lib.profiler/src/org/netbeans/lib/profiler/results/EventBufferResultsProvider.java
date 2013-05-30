@@ -82,14 +82,11 @@ public class EventBufferResultsProvider implements ProfilingResultsProvider {
         listeners.add(dispatcher);
     }
 
-    public void dataReady(int buffsize, int instrumentationType) {
+    public void dataReady(final byte[] buf, int instrumentationType) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("Profiling data ready "+buffsize); // NOI18N
+            LOGGER.finest("Profiling data ready "+buf.length); // NOI18N
         }
-
-        byte[] data = new byte[buffsize];
-        System.arraycopy(EventBufferProcessor.buf, 0, data, 0, buffsize);
-        fireProcessData(data, instrumentationType);
+        fireProcessData(buf, instrumentationType);
     }
 
     public void removeDispatcher(ProfilingResultsProvider.Dispatcher dispatcher) {

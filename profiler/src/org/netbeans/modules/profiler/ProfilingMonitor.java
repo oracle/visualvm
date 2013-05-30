@@ -127,16 +127,20 @@ public final class ProfilingMonitor {
 
                                             // ---------------------------------------------------------
                                             // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
+                                            // Temporary workaround to refresh sampling data when LiveResultsWindow is not refreshing
+                                            // Temporary workaround to refresh lock contention data when LiveResultsWindow is not refreshing
                                             // TODO: move this code to a separate class performing the update if necessary
-                                            if (NetBeansProfiler.getDefaultNB().processesProfilingPoints()
-                                                    && (!doUpdateLiveResults || !LiveResultsWindow.hasDefault())) {
+                                            final Profiler profiler = Profiler.getDefault();
+                                            final ProfilerClient client = profiler.getTargetAppRunner().getProfilerClient();
+                                            final int instrType = client.getCurrentInstrType();
+                                            if ((NetBeansProfiler.getDefaultNB().processesProfilingPoints() 
+                                                    || instrType == ProfilerEngineSettings.INSTR_NONE_SAMPLING
+                                                    || profiler.getLockContentionMonitoringEnabled())
+                                                && (!doUpdateLiveResults || !LiveResultsWindow.hasDefault())) {
                                                 ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                                                         public void run() {
                                                             try {
-                                                                ProfilerClient client = Profiler.getDefault().getTargetAppRunner()
-                                                                                                .getProfilerClient();
-
-                                                                if (client.getCurrentInstrType() != ProfilerEngineSettings.INSTR_CODE_REGION) {
+                                                                if (instrType != ProfilerEngineSettings.INSTR_CODE_REGION) {
                                                                     client.forceObtainedResultsDump(true);
                                                                 }
                                                             } catch (Exception e /*ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated*/) {
