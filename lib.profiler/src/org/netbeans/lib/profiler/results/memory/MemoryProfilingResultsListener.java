@@ -43,14 +43,14 @@
 
 package org.netbeans.lib.profiler.results.memory;
 
-import org.netbeans.lib.profiler.results.ProfilingResultListener;
+import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public interface MemoryProfilingResultsListener extends ProfilingResultListener {
+public interface MemoryProfilingResultsListener extends LockProfilingResultListener {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     void onAllocStackTrace(char classId, long objSize, int[] methodIds);

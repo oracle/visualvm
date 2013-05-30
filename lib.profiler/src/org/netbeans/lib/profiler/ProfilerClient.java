@@ -128,9 +128,9 @@ public class ProfilerClient implements CommonConstants {
                             break;
                         case Command.EVENT_BUFFER_DUMPED:
                             EventBufferDumpedCommand bufferDumpedCmd = ((EventBufferDumpedCommand) cmd);
+                            byte[] buf = EventBufferProcessor.readDataAndPrepareForProcessing(bufferDumpedCmd);
                             
-                            EventBufferProcessor.readDataAndPrepareForProcessing(bufferDumpedCmd);
-                            EventBufferResultsProvider.getDefault().dataReady(bufferDumpedCmd.getBufSize(), getCurrentInstrType());
+                            EventBufferResultsProvider.getDefault().dataReady(buf, getCurrentInstrType());
                             sendSimpleRespToServer(true, null);
 
                             break;
@@ -1196,15 +1196,16 @@ public class ProfilerClient implements CommonConstants {
 
     public void sendSetInstrumentationParamsCmd(boolean changeableOnly)
                                          throws ClientUtils.TargetAppOrVMTerminated {
-        SetChangeableInstrParamsCommand cmd = new SetChangeableInstrParamsCommand(settings.getNProfiledThreadsLimit(),
+        SetChangeableInstrParamsCommand cmd = new SetChangeableInstrParamsCommand(settings.isLockContentionMonitoringEnabled(),
+                                                                                  settings.getNProfiledThreadsLimit(),
                                                                                   settings.getSamplingInterval(),
-                                                                                  settings.getSamplingFrequency(),
                                                                                   settings.getAllocTrackEvery(),
                                                                                   settings.getAllocStackTraceLimit(),
                                                                                   settings.getRunGCOnGetResultsInMemoryProfiling(),
                                                                                   settings.getExcludeWaitTime(),
                                                                                   settings.getExcludeWaitTime(),
-                                                                                  settings.isThreadsSamplingEnabled());
+                                                                                  settings.isThreadsSamplingEnabled(),
+                                                                                  settings.getSamplingFrequency());
 
         String errorMessage = sendCommandAndGetResponse(cmd);
 
@@ -1967,8 +1968,8 @@ public class ProfilerClient implements CommonConstants {
             // Process profiling results synchronously in case of:
             //  - remote profiling
             //  - explicite Get results (forceObtainedResultsDumpCalled)
-            EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
-            EventBufferResultsProvider.getDefault().dataReady(bufSize, getCurrentInstrType());
+            byte[] buf = EventBufferProcessor.readDataAndPrepareForProcessing(cmd);
+            EventBufferResultsProvider.getDefault().dataReady(buf, getCurrentInstrType());
             handlingEventBufferDump = false;
             sendSimpleRespToServer(true, null);
             forceObtainedResultsDumpCalled = false;
