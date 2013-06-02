@@ -55,8 +55,10 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
     
     
     public CPUResultsDiff(CPUResultsSnapshot snapshot1, CPUResultsSnapshot snapshot2) {
-        this.snapshot1 = snapshot1;
-        this.snapshot2 = snapshot2;
+        this.snapshot1 = new CPUResultsSnapshot();
+        this.snapshot1.readFromSnapshot(snapshot1);
+        this.snapshot2 = new CPUResultsSnapshot();
+        this.snapshot2.readFromSnapshot(snapshot2);
     }
     
     public boolean isCollectingTwoTimeStamps() {
