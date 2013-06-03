@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,13 +26,19 @@
 package com.sun.tools.visualvm.modules.killapp;
 
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
-import com.sun.tools.visualvm.core.ui.actions.SingleDataSourceAction;
+import com.sun.tools.visualvm.core.ui.actions.ActionUtils;
+import com.sun.tools.visualvm.core.ui.actions.MultiDataSourceAction;
 import com.sun.tools.visualvm.host.Host;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -45,16 +51,51 @@ import org.openide.util.Utilities;
  *
  * @author Tomas Hurka
  */
-public final class KillAction extends SingleDataSourceAction<Application> {
+public final class KillAction extends MultiDataSourceAction<Application> {
+    
+    private final Set<Application> lastSelectedApplications;
+    private final RequestProcessor killRP;
+    private final PropertyChangeListener stateListener;
 
     public KillAction() {
         super(Application.class);
         putValue(NAME, NbBundle.getMessage(KillAction.class, "CTL_KillAction"));    // NOI18N
         putValue("noIconInMenu", Boolean.TRUE); // NOI18N
+        lastSelectedApplications = new HashSet();
+        killRP = new RequestProcessor("KillAction processor", 5);   // NOI18N
+        stateListener = new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateState(ActionUtils.getSelectedDataSources(Application.class));
+            }
+        };
     }
 
-    protected void actionPerformed(Application app, ActionEvent event) {
-        killApplication(app);
+    @Override
+    protected void actionPerformed(Set<Application> dataSources, ActionEvent ae) {
+        for (Application dataSource : dataSources) {
+            killApplication((Application)dataSource);
+        }
+    }
+
+    @Override
+    protected boolean isEnabled(Set<Application> dataSources) {
+        for (DataSource dataSource : dataSources) {
+            Application application = (Application)dataSource;
+                lastSelectedApplications.add(application);
+            application.addPropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+            if (application.getState() != Stateful.STATE_AVAILABLE) return false;
+            if (!isEnabled(application)) return false;
+        }
+        return true;
+    }
+
+    @Override
+    protected void updateState(Set<Application> dataSources) {
+        if (!lastSelectedApplications.isEmpty())
+            for (Application application : lastSelectedApplications)
+                application.removePropertyChangeListener(Stateful.PROPERTY_STATE, stateListener);
+        lastSelectedApplications.clear();
+        super.updateState(dataSources);
     }
 
     private void killApplication(final Application app) {
@@ -67,7 +108,7 @@ public final class KillAction extends SingleDataSourceAction<Application> {
 
         final Progress handle = new Progress(pidString);
         app.notifyWhenRemoved(handle);
-        RequestProcessor.getDefault().post(new Runnable() {
+        killRP.post(new Runnable() {
             public void run() {
                 try {
                     Runtime.getRuntime().exec(command);
@@ -98,7 +139,7 @@ public final class KillAction extends SingleDataSourceAction<Application> {
         }
     }
 
-    protected boolean isEnabled(Application application) {
+    private boolean isEnabled(Application application) {
         if (Application.CURRENT_APPLICATION.equals(application)) {
             // don't commit suiside
             return false;
