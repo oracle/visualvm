@@ -141,7 +141,7 @@ public final class KillAction extends MultiDataSourceAction<Application> {
 
     private boolean isEnabled(Application application) {
         if (Application.CURRENT_APPLICATION.equals(application)) {
-            // don't commit suiside
+            // don't commit suicide
             return false;
         }
         if (!Host.LOCALHOST.equals(application.getHost())) {
