@@ -57,9 +57,10 @@ public final class KillAction extends MultiDataSourceAction<Application> {
     private final RequestProcessor killRP;
     private final PropertyChangeListener stateListener;
 
+    @NbBundle.Messages({"CTL_KillAction=Kill Application"})
     public KillAction() {
         super(Application.class);
-        putValue(NAME, NbBundle.getMessage(KillAction.class, "CTL_KillAction"));    // NOI18N
+        putValue(NAME, Bundle.CTL_KillAction());
         putValue("noIconInMenu", Boolean.TRUE); // NOI18N
         lastSelectedApplications = new HashSet();
         killRP = new RequestProcessor("KillAction processor", 5);   // NOI18N
