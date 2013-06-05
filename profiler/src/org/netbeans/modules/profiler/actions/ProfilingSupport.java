@@ -109,7 +109,7 @@ public final class ProfilingSupport {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private boolean profilingActionInvoked = false;
+    private volatile boolean profilingActionInvoked = false;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -196,32 +196,28 @@ public final class ProfilingSupport {
     /**
      * Performs attaching profiler.
      */
+    // To be invoked outside of EDT
     void doAttach() {
-        if (isProfilingActionInvoked()) {
-            return;
-        }
-
+        if (isProfilingActionInvoked()) return;
         setProfilingActionInvoked(true);
 
-        RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    try {
-                        // 1. if there is profiling in progress, ask the user and possibly cancel
-                        if (checkProfilingInProgress()) {
-                            return;
-                        }
+        try {
+            // 1. if there is profiling in progress, ask the user and possibly cancel
+            if (checkProfilingInProgress()) {
+                return;
+            }
 
-                        // NOTE: Let's not preselect main project, force the user to choose from list of projects and remember selection
-                        //       Project should be passed here from hypotetic Attach To Project action (not implemented yet)
-                        //Project project = ProjectUtilities.getMainProject();
-                        Lookup.Provider project = null;
-                        Profiler profiler = Profiler.getDefault();
+            // NOTE: Let's not preselect main project, force the user to choose from list of projects and remember selection
+            //       Project should be passed here from hypotetic Attach To Project action (not implemented yet)
+            //Project project = ProjectUtilities.getMainProject();
+            Lookup.Provider project = null;
+            Profiler profiler = Profiler.getDefault();
 
-                        //2. load or ask the user for attach settings
-                        final GlobalProfilingSettings gps = profiler.getGlobalProfilingSettings();
+            //2. load or ask the user for attach settings
+            final GlobalProfilingSettings gps = profiler.getGlobalProfilingSettings();
 
-                        SessionSettings ss = new SessionSettings();
-                        ss.setPortNo(gps.getPortNo());
+            SessionSettings ss = new SessionSettings();
+            ss.setPortNo(gps.getPortNo());
 
 //                        ProjectTypeProfiler ptp = null;
 //
@@ -232,49 +228,49 @@ public final class ProfilingSupport {
 //                        if (ptp != null) {
 //                            ptp.setupProjectSessionSettings(project, ss); // can be null in case of global attach
 //                        }
-                        
-                        ProjectProfilingSupport pps = ProjectProfilingSupport.get(project);
-                        pps.setupProjectSessionSettings(ss);
 
-                        boolean settingsAccepted = false;
-                        ProfilingSettings ps = null;
+            ProjectProfilingSupport pps = ProjectProfilingSupport.get(project);
+            pps.setupProjectSessionSettings(ss);
 
-                        while (!settingsAccepted) {
-                            // 4. let the user choose the task to perform => result is selected ProfilingSettings and modified shared
-                            //    singleton of global settings, all changes are persisted to disk
-                            final AttachSTPData asd = selectTaskForAttach(project, ss);
+            boolean settingsAccepted = false;
+            ProfilingSettings ps = null;
 
-                            if (asd == null) {
-                                return; // cancelled by the user
-                            }
+            while (!settingsAccepted) {
+                // 4. let the user choose the task to perform => result is selected ProfilingSettings and modified shared
+                //    singleton of global settings, all changes are persisted to disk
+                final AttachSTPData asd = selectTaskForAttach(project, ss);
 
-                            project = asd.getProject(); // project could have changed
-                            ps = asd.getSettings();
-                            ProfilerLogger.log(">>> Project: " + project); // NOI18N
-                            ProfilerLogger.log(">>> Profiling settings: " + ps); // NOI18N
-                                                                                 // Here was a check for enormous profiling overhead when profiling Web Projects.
-                                                                                 // Generally, this is the right place to give ProjectTypeProfiler a chance to
-                                                                                 // accept/reject current profiling settings before starting new profiling session.
+                if (asd == null) {
+                    return; // cancelled by the user
+                }
 
-                            settingsAccepted = true;
-                        }
+                project = asd.getProject(); // project could have changed
+                ps = asd.getSettings();
+                ProfilerLogger.log(">>> Project: " + project); // NOI18N
+                ProfilerLogger.log(">>> Profiling settings: " + ps); // NOI18N
+                                                                     // Here was a check for enormous profiling overhead when profiling Web Projects.
+                                                                     // Generally, this is the right place to give ProjectTypeProfiler a chance to
+                                                                     // accept/reject current profiling settings before starting new profiling session.
 
-                        // 5. start the actual attach process with selected settings
-                        ((NetBeansProfiler) profiler).setProfiledProject(project, null);
+                settingsAccepted = true;
+            }
 
-                        // 6. the user may have altered the attach settings from the Select task panel, let's reread them
-                        AttachSettings as = null;
+            // 5. start the actual attach process with selected settings
+            ((NetBeansProfiler) profiler).setProfiledProject(project, null);
 
-                        try {
-                            as = ProjectStorage.loadAttachSettings(project);
-                        } catch (IOException e) {
-                            ProfilerDialogs.displayWarning(Bundle.ProfilingSupport_FailedLoadSettingsMsg(e.getMessage()));
-                            ProfilerLogger.log(e);
-                        }
+            // 6. the user may have altered the attach settings from the Select task panel, let's reread them
+            AttachSettings as = null;
 
-                        ProfilerLogger.log(">>> Attach settings: " + as); // NOI18N
+            try {
+                as = ProjectStorage.loadAttachSettings(project);
+            } catch (IOException e) {
+                ProfilerDialogs.displayWarning(Bundle.ProfilingSupport_FailedLoadSettingsMsg(e.getMessage()));
+                ProfilerLogger.log(e);
+            }
 
-                        if (as == null) {
+            ProfilerLogger.log(">>> Attach settings: " + as); // NOI18N
+
+            if (as == null) {
 //                            AttachWizard attachWizard = new AttachWizard();
 //                            return attachWizard.init(); // as == null resets previous attach wizard settings
 //
@@ -289,60 +285,52 @@ public final class ProfilingSupport {
 //                            attachWizard.finish(); // wizard correctly finished
 //
 //                            as = attachWizard.getAttachSettings();
-                            as = AttachWizard.getDefault().configure(as);
-                            if (as == null) return; // cancelled by the user
-                            ProjectStorage.saveAttachSettings(project, as);
-                        }
+                as = AttachWizard.getDefault().configure(as);
+                if (as == null) return; // cancelled by the user
+                ProjectStorage.saveAttachSettings(project, as);
+            }
 
-                        if (!as.isRemote() && as.isDynamic16()) {
-                            // we need to prompt the user for PID
-                            int pid = selectApplicationPid();
+            if (!as.isRemote() && as.isDynamic16()) {
+                // we need to prompt the user for PID
+                int pid = selectApplicationPid();
 
-                            if (pid == -1) {
-                                return; // cancelled by the user
-                            }
-
-                            as.setPid(pid);
-                        }
-
-                        // 7. start the actual attach
-                        profiler.attachToApp(ps, as);
-                    } finally {
-                        setProfilingActionInvoked(false);
-                    }
+                if (pid == -1) {
+                    return; // cancelled by the user
                 }
-            });
+
+                as.setPid(pid);
+            }
+
+            // 7. start the actual attach
+            profiler.attachToApp(ps, as);
+        } finally {
+            setProfilingActionInvoked(false);
+        }
     }
 
+    // To be invoked outside of EDT
     void modifyProfiling() {
-        if (isProfilingActionInvoked()) {
-            return;
-        }
-
+        if (isProfilingActionInvoked()) return;
         setProfilingActionInvoked(true);
+        
+        NetBeansProfiler profiler = NetBeansProfiler.getDefaultNB();
+        TargetAppRunner targetAppRunner = profiler.getTargetAppRunner();
 
-        RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    NetBeansProfiler profiler = NetBeansProfiler.getDefaultNB();
-                    TargetAppRunner targetAppRunner = profiler.getTargetAppRunner();
-                    
-                    try {
-                        ProfilingSettings settings;
-                        boolean attach = profiler.getProfilingMode() == Profiler.MODE_ATTACH;
-                        
-                        targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
-                        settings = selectTaskForProfiling(profiler.getProfiledProject(),null,profiler.getProfiledSingleFile(),attach);
+        try {
+            ProfilingSettings settings;
+            boolean attach = profiler.getProfilingMode() == Profiler.MODE_ATTACH;
 
-                        if (settings == null) {
-                            return; // Cancelled by the user
-                        } else {
-                            profiler.modifyCurrentProfiling(settings);
-                        }
-                    } finally {
-                        setProfilingActionInvoked(false);
-                        targetAppRunner.getAppStatusHandler().resumeLiveUpdates();
-                    }
-                }
-            });
+            targetAppRunner.getAppStatusHandler().pauseLiveUpdates();
+            settings = selectTaskForProfiling(profiler.getProfiledProject(),null,profiler.getProfiledSingleFile(),attach);
+
+            if (settings == null) {
+                return; // Cancelled by the user
+            } else {
+                profiler.modifyCurrentProfiling(settings);
+            }
+        } finally {
+            setProfilingActionInvoked(false);
+            targetAppRunner.getAppStatusHandler().resumeLiveUpdates();
+        }
     }
 }
