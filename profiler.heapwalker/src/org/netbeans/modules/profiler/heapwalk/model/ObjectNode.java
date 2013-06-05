@@ -120,8 +120,11 @@ public class ObjectNode extends InstanceNode {
             return super.computeType();
         }
         
+        private String nodeID;
         public Object getNodeID() {
-            return itemIndex;
+            if (nodeID == null)
+                nodeID = itemIndex + "#" + (hasInstance() ? getInstance().getInstanceId() : "null"); // NOI18N
+            return nodeID;
         }
     }
 
