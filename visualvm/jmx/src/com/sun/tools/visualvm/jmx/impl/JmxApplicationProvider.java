@@ -44,6 +44,7 @@ import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -52,6 +53,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,6 +61,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -92,7 +98,7 @@ public class JmxApplicationProvider {
     static final String JMX_SUFFIX = ".jmx";  // NOI18N
     
     
-    private boolean trackingNewHosts;
+    private volatile boolean trackingNewHosts;
     private Map<String, Set<Storage>> persistedApplications =
             new HashMap<String, Set<Storage>>();
     
@@ -180,24 +186,28 @@ public class JmxApplicationProvider {
             storage.setCustomProperty(SNAPSHOT_VERSION, CURRENT_SNAPSHOT_VERSION);
         }
 
-        return addJmxApplication(true, serviceURL, normalizedConnectionName,
-                displayName, suggestedName, hostName, provider, storage);
+        try {
+            return addJmxApplication(true, serviceURL, normalizedConnectionName,
+                    displayName, suggestedName, hostName, provider, storage);
+        } catch (JMXException e) {
+            if (storage != null) {
+                File appStorage = storage.getDirectory();
+                if (appStorage.isDirectory()) Utils.delete(appStorage, true);
+            }
+            throw new JmxApplicationException(e.getMessage(), e.getCause());
+        }
     }
 
     private JmxApplication addJmxApplication(boolean newApp, JMXServiceURL serviceURL,
             String connectionName, String displayName, String suggestedName, String hostName,
-            EnvironmentProvider provider, Storage storage) throws JmxApplicationException {
+            EnvironmentProvider provider, Storage storage) throws JMXException {
 
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) {
             try {
                 serviceURL = getServiceURL(connectionName);
             } catch (MalformedURLException ex) {
-                if (storage != null) {
-                    File appStorage = storage.getDirectory();
-                    if (appStorage.isDirectory()) Utils.delete(appStorage, true);
-                }
-                throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
+                throw new JMXException(true, NbBundle.getMessage(JmxApplicationProvider.class,
                                     "MSG_Invalid_JMX_connection", connectionName), ex); // NOI18N
             }
         }
@@ -208,13 +218,9 @@ public class JmxApplicationProvider {
         try {
             host = getHost(hostName, serviceURL);
         } catch (Exception e) {
-            if (storage != null) {
-                File appStorage = storage.getDirectory();
-                if (appStorage.isDirectory()) Utils.delete(appStorage, true);
-            }
             cleanupCreatedHost(hosts, host);
-            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                       "MSG_Cannot_resolve_host", hostName), e); // NOI18N
+            throw new JMXException(false, NbBundle.getMessage(JmxApplicationProvider.class,
+                                    "MSG_Cannot_resolve_host", hostName), e); // NOI18N
         }
 
         // Update persistent storage and EnvironmentProvider
@@ -257,10 +263,6 @@ public class JmxApplicationProvider {
         // Check if the given JmxApplication has been already added to the application tree
         final Set<JmxApplication> jmxapps = host.getRepository().getDataSources(JmxApplication.class);
         if (jmxapps.contains(application)) {
-            if (storage != null) {
-                File appStorage = storage.getDirectory();
-                if (appStorage.isDirectory()) Utils.delete(appStorage, true);
-            }
             JmxApplication tempapp = null;
             for (JmxApplication jmxapp : jmxapps) {
                 if (jmxapp.equals(application)) {
@@ -269,25 +271,21 @@ public class JmxApplicationProvider {
                 }
             }
             cleanupCreatedHost(hosts, host);
-            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                              "MSG_connection_already_exists", new Object[] { // NOI18N
-                                              application.getId(), DataSourceDescriptorFactory.
-                                              getDescriptor(tempapp).getName() }));
+            throw new JMXException(true, NbBundle.getMessage(JmxApplicationProvider.class,
+                                    "MSG_connection_already_exists", new Object[] { // NOI18N
+                                    application.getId(), DataSourceDescriptorFactory.
+                                    getDescriptor(tempapp).getName() }));
         }
 
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
         if (model == null || model.getConnectionState() != JmxModel.ConnectionState.CONNECTED) {
             application.setStateImpl(Stateful.STATE_UNAVAILABLE);
-            if (storage != null) {
-                File appStorage = storage.getDirectory();
-                if (appStorage.isDirectory()) Utils.delete(appStorage, true);
-            }
             cleanupCreatedHost(hosts, host);
-            throw new JmxApplicationException(NbBundle.getMessage(JmxApplicationProvider.class,
-                                       "MSG_Cannot_connect_using", new Object[] { // NOI18N
-                                       displayName != null ? displayName : suggestedName,
-                                       connectionName }));
+            throw new JMXException(false, NbBundle.getMessage(JmxApplicationProvider.class,
+                                    "MSG_Cannot_connect_using", new Object[] { // NOI18N
+                                    displayName != null ? displayName : suggestedName,
+                                    connectionName }));
         }
 
         // Update application state according to the connection state
@@ -375,8 +373,10 @@ public class JmxApplicationProvider {
                     }
                 });
         
+        final int[] persistedAppsCount = new int[1];
         for (File file : files) {
             if (file.isDirectory()) {
+                persistedAppsCount[0]++;
                 Storage storage = new Storage(file, PROPERTIES_FILE);
                 Set<Storage> storageSet = persistedApplications.get(storage.getCustomProperty(PROPERTY_HOSTNAME));
                 if (storageSet == null) {
@@ -390,6 +390,8 @@ public class JmxApplicationProvider {
         DataChangeListener<Host> dataChangeListener = new DataChangeListener<Host>() {
 
             public synchronized void dataChanged(DataChangeEvent<Host> event) {
+                final Set<String> failedAppsN = Collections.synchronizedSet(new HashSet());
+                final Set<Storage> failedAppsS = Collections.synchronizedSet(new HashSet());
                 Set<Host> hosts = event.getAdded();
                 for (Host host : hosts) {
                     String hostName = host.getHostName();
@@ -421,11 +423,23 @@ public class JmxApplicationProvider {
                                                                  getProvider(epid);
                                         addJmxApplication(false, null, values[0], values[2],
                                                           values[3], values[1], ep, storage);
-                                    } catch (final JmxApplicationException e) {
-                                        DialogDisplayer.getDefault().notifyLater(
+                                    } catch (final JMXException e) {
+                                        if (e.isConfig()) {
+                                            DialogDisplayer.getDefault().notifyLater(
                                                 new NotifyDescriptor.Message(e.
                                                 getMessage(), NotifyDescriptor.
                                                 ERROR_MESSAGE));
+                                        } else {
+                                            String name = values[2];
+                                            if (name == null || name.trim().isEmpty()) name = values[3];
+                                            failedAppsN.add(name);
+                                            failedAppsS.add(storage);
+                                        }
+                                    }
+                                    synchronized (persistedAppsCount) {
+                                        persistedAppsCount[0]--;
+                                        if (persistedAppsCount[0] == 0 && !failedAppsN.isEmpty())
+                                            notifyUnresolvedApplications(failedAppsN, failedAppsS);
                                     }
                                 }
                             });
@@ -446,6 +460,29 @@ public class JmxApplicationProvider {
             DataSourceRepository.sharedInstance().addDataChangeListener(dataChangeListener, Host.class);
         }
     }
+    
+    private static void notifyUnresolvedApplications(final Set<String> failedHostsN, final Set<Storage> failedHostsS) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
+                messagePanel.add(new JLabel(NbBundle.getMessage(JmxApplicationProvider.class, "MSG_Unresolved_JMX")), BorderLayout.NORTH); // NOI18N
+                JList list = new JList(failedHostsN.toArray());
+                list.setVisibleRowCount(4);
+                messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
+                NotifyDescriptor dd = new NotifyDescriptor(
+                        messagePanel, NbBundle.getMessage(JmxApplicationProvider.class, "Title_Unresolved_JMX"), // NOI18N
+                        NotifyDescriptor.YES_NO_OPTION, NotifyDescriptor.ERROR_MESSAGE,
+                        null, NotifyDescriptor.YES_OPTION);
+                if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.NO_OPTION)
+                    for (Storage storage : failedHostsS) {
+                        File appStorage = storage.getDirectory();
+                        if (appStorage.isDirectory()) Utils.delete(appStorage, true);
+                    }
+
+                failedHostsS.clear();
+            }
+        }, 1000);
+    }
 
     public void initialize() {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
@@ -457,5 +494,13 @@ public class JmxApplicationProvider {
                 });
             }
         });
+    }
+    
+    
+    private static class JMXException  extends Exception {
+        private final boolean isConfig;
+        public JMXException(boolean config, String message) { super(message); isConfig = config; }
+        public JMXException(boolean config, String message, Throwable cause) { super(message,cause); isConfig = config; }
+        public boolean isConfig() { return isConfig; }
     }
 }
