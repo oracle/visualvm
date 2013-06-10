@@ -51,6 +51,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -89,12 +90,14 @@ public final class AttachAction extends AbstractAction {
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        // 1. if there is profiling in progress, ask the user and possibly cancel
-        if (ProfilingSupport.getDefault().checkProfilingInProgress()) {
-            return;
-        }
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                // 1. if there is profiling in progress, ask the user and possibly cancel
+                if (ProfilingSupport.getDefault().checkProfilingInProgress()) return;
 
-        //2. start attaching
-        ProfilingSupport.getDefault().doAttach();
+                //2. start attaching
+                ProfilingSupport.getDefault().doAttach();
+            }
+        });
     }
 }

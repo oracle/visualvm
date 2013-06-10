@@ -785,11 +785,15 @@ public final class LiveResultsWindow extends ProfilerTopComponent
             // Temporary workaround to refresh lock contention data when LiveResultsWindow is not refreshing
             // TODO: move this code to a separate class performing the update if necessary
             Profiler profiler = Profiler.getDefault();
-            ProfilerClient client = profiler.getTargetAppRunner().getProfilerClient();
+            final ProfilerClient client = profiler.getTargetAppRunner().getProfilerClient();
             if (NetBeansProfiler.getDefaultNB().processesProfilingPoints() 
                 || client.getCurrentInstrType() == ProfilerEngineSettings.INSTR_NONE_SAMPLING
                 || profiler.getLockContentionMonitoringEnabled()) {
-                callForceObtainedResultsDump(client, false);
+                ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                    public void run() {
+                        callForceObtainedResultsDump(client, false);
+                    }
+                });
             }
 
             // -----------------------------------------------------------------------

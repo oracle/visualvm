@@ -64,7 +64,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     
     public DiffCPUCCTNode createRootCopy() {
         PrestimeCPUCCTNodeBacked copy1 = node1.createRootCopy();
-        PrestimeCPUCCTNodeBacked copy2 = node1.createRootCopy();
+        PrestimeCPUCCTNodeBacked copy2 = node2.createRootCopy();
         return new DiffCPUCCTNode(copy1, copy2);
     }
     

@@ -53,6 +53,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -105,7 +106,11 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
 
     @Override
     public void performAction() {
-        ProfilingSupport.getDefault().modifyProfiling();
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                ProfilingSupport.getDefault().modifyProfiling();
+            }
+        });
     }
 
     protected int[] enabledStates() {

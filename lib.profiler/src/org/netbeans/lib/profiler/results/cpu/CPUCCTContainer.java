@@ -155,7 +155,7 @@ public class CPUCCTContainer {
     // -- Temporary data used during above array generation
     private long childTotalTime0InTimerUnits;
     private long childTotalTime1InTimerUnits;
-    private long totalInvNo;
+    long totalInvNo;
 
     private TimingAdjusterOld timingAdjuster;
 
