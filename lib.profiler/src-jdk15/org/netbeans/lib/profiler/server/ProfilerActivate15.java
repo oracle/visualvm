@@ -95,7 +95,7 @@ public class ProfilerActivate15 {
     }
 
     private static void activate(String agentArgs, Instrumentation inst, int activateCode) {
-        URL classUrl = ClassLoader.getSystemClassLoader().getResource("org/netbeans/lib/profiler/server/ProfilerActivate15.class");
+        URL classUrl = ClassLoader.getSystemClassLoader().getResource("org/netbeans/lib/profiler/server/ProfilerActivate15.class"); // NOI18N
         File jar = getArchiveFile(classUrl);
         String fullJFluidPath = jar.getParent();
 
