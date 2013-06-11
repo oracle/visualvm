@@ -560,7 +560,7 @@ public class ProfilerClient implements CommonConstants {
             return resp.getStatus();
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {
             if (serverListener.isRunning()) { // The possibly problematic situation is not known yet
-                MiscUtils.printErrorMessage("in getCurrentThreadLivenessStatus(), caught exception: " + ex); // NOI18N
+                ProfilerLogger.log("in getCurrentThreadLivenessStatus(), caught exception: " + ex); // NOI18N
             }
 
             return null;
@@ -714,7 +714,7 @@ public class ProfilerClient implements CommonConstants {
             }
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {
             if (serverListener.isRunning()) { // The possibly problematic situation is not known yet
-                MiscUtils.printErrorMessage("in getMonitoredData(), caught exception: " + ex); // NOI18N
+                ProfilerLogger.log("in getMonitoredData(), caught exception: " + ex); // NOI18N
             }
 
             return null;
@@ -1731,8 +1731,8 @@ public class ProfilerClient implements CommonConstants {
                 try {
                     terminateTargetJVM();
                 } catch (ClientUtils.TargetAppOrVMTerminated e) {
-                    ProfilerLogger.warning("terminateTargetJVM failed with TargetAppOrVMTerminated exception:"); // NOI18N
-                    ProfilerLogger.log(e);
+                    ProfilerLogger.log("terminateTargetJVM failed with TargetAppOrVMTerminated exception:"); // NOI18N
+                    ProfilerLogger.log(e.getMessage());
 
                     // this is OK here
                 }
@@ -1797,7 +1797,7 @@ public class ProfilerClient implements CommonConstants {
             }
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {
             targetVMAlive = false;
-            MiscUtils.printErrorMessage("target app terminated:" + ex.getMessage()); // NOI18N
+            MiscUtils.printWarningMessage("target app terminated:" + ex.getMessage()); // NOI18N
 
             return false;
         }
