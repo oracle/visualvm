@@ -954,8 +954,8 @@ public final class LiveResultsWindow extends ProfilerTopComponent
                     try {
                         Profiler.getDefault().getTargetAppRunner().runGC();
                     } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                        ProfilerDialogs.displayError(ex.getMessage());
-                        ProfilerLogger.log(ex);
+                        ProfilerDialogs.displayWarning(ex.getMessage());
+                        ProfilerLogger.log(ex.getMessage());
                     }
 
                     requestProfilingDataUpdate(true);
