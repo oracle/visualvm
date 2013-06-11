@@ -92,7 +92,8 @@ public final class JavaPlatform {
         List<JavaPlatform> platforms = new ArrayList(platformProviders.size());
         
         for (JavaPlatformProvider p : platformProviders) {
-            if (MiscUtils.isSupportedJVM(p.getSystemProperties())) {
+            if (p.getPlatformJavaFile() != null &&
+                MiscUtils.isSupportedJVM(p.getSystemProperties())) {
                 platforms.add(new JavaPlatform(p));
             }
         }

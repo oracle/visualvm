@@ -109,8 +109,8 @@ public final class RunGCAction extends ProfilingAwareAction {
         try {
             Profiler.getDefault().getTargetAppRunner().runGC();
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
-            ProfilerDialogs.displayError(e.getMessage());
-            ProfilerLogger.log(e);
+            ProfilerDialogs.displayWarning(e.getMessage());
+            ProfilerLogger.log(e.getMessage());
         }
     }
 
