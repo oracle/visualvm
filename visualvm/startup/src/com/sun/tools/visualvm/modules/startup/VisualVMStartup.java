@@ -24,10 +24,12 @@
  */
 package com.sun.tools.visualvm.modules.startup;
 
+import com.sun.tools.visualvm.modules.startup.dialogs.StartupDialog;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import org.openide.LifecycleManager;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.NbBundle;
@@ -73,17 +75,18 @@ final class VisualVMStartup extends ModuleInstall {
     
     private static void displayError6or7or8() {
         Utils.setSystemLaF();
-        JDialog d = Utils.assertiveErrorDialog(ERROR_STARTUP_CAPTION, MessageFormat.format(INCORRECT_VERSION_MSG,
+        JDialog d = StartupDialog.create(ERROR_STARTUP_CAPTION, MessageFormat.format(INCORRECT_VERSION_MSG,
                 new Object[] { System.getProperty("java.specification.version"), getJavaInfo(), // NOI18N
-                getJvmInfo(), System.getProperties().getProperty("java.home", "unknown location") })); // NOI18N
+                getJvmInfo(), System.getProperties().getProperty("java.home", "unknown location") }),
+                JOptionPane.ERROR_MESSAGE); // NOI18N
         d.setVisible(true);
     }
     
     private static void displayErrorJRE() {
         Utils.setSystemLaF();
-        JDialog d = Utils.assertiveErrorDialog(ERROR_STARTUP_CAPTION, MessageFormat.format(JRE_MSG,
+        JDialog d = StartupDialog.create(ERROR_STARTUP_CAPTION, MessageFormat.format(JRE_MSG,
                 new Object[] { getJavaInfo(), getJvmInfo(), System.getProperties().getProperty(
-                "java.home", "unknown location") })); // NOI18N
+                "java.home", "unknown location") }), JOptionPane.ERROR_MESSAGE); // NOI18N
         d.setVisible(true);
     }
     

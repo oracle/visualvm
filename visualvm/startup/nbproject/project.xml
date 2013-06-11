@@ -48,7 +48,10 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <friend-packages>
+                <friend>com.sun.tools.visualvm.profiler</friend>
+                <package>com.sun.tools.visualvm.modules.startup.dialogs</package>
+            </friend-packages>
         </data>
     </configuration>
 </project>

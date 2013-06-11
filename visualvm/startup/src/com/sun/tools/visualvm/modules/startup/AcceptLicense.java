@@ -25,16 +25,13 @@
 
 package com.sun.tools.visualvm.modules.startup;
 
+import com.sun.tools.visualvm.modules.startup.dialogs.StartupDialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -42,6 +39,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.openide.util.NbBundle;
+import org.openide.util.UserCancelException;
 
 /**
  * Displays LicensePanel to user. User must accept license to continue. 
@@ -104,22 +102,7 @@ public final class AcceptLicense {
         yesButton.setPreferredSize(new Dimension(maxWidth, maxHeight));
         noButton.setPreferredSize(new Dimension(maxWidth, maxHeight));
 
-        // Bugfix #361, set the JDialog to appear in the Taskbar on Windows
-        d = new JDialog(null, bundle.getString("MSG_LicenseDlgTitle"), // NOI18N
-                        JDialog.ModalityType.APPLICATION_MODAL);
-
-        // Bugfix #361, JDialog should use the VisualVM icon for better identification
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        List<Image> icons = new ArrayList();
-        icons.add(toolkit.createImage(AcceptLicense.class.getResource(
-                "/com/sun/tools/visualvm/modules/startup/resources/icon16.png"))); // NOI18N
-        icons.add(toolkit.createImage(AcceptLicense.class.getResource(
-                "/com/sun/tools/visualvm/modules/startup/resources/icon24.png"))); // NOI18N
-        icons.add(toolkit.createImage(AcceptLicense.class.getResource(
-                "/com/sun/tools/visualvm/modules/startup/resources/icon32.png"))); // NOI18N
-        icons.add(toolkit.createImage(AcceptLicense.class.getResource(
-                "/com/sun/tools/visualvm/modules/startup/resources/icon48.png"))); // NOI18N
-        d.setIconImages(icons);
+        d = StartupDialog.create(bundle.getString("MSG_LicenseDlgTitle"), null, -1); // NOI18N
         
         d.getAccessibleContext().setAccessibleName(bundle.getString("ACSN_LicenseDlg")); // NOI18N
         d.getAccessibleContext().setAccessibleDescription(bundle.getString("ACSD_LicenseDlg")); // NOI18N
@@ -132,20 +115,11 @@ public final class AcceptLicense {
         buttonPanel.add(noButton);
         d.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
         d.setSize(new Dimension(600, 600));
-        d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         d.setResizable(true);
         d.setLocationRelativeTo(null);
-        
-        // Bugfix #361, ensure that the dialog will be the topmost visible window after opening
-        Utils.makeAssertive(d);
-        
         d.setVisible(true);
         
-        if (YES_AC.equals(command)) {
-            return;
-        } else {
-            throw new org.openide.util.UserCancelException();
-        }
+        if (!YES_AC.equals(command)) throw new UserCancelException();
     }
     
 }

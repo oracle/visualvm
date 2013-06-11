@@ -25,12 +25,7 @@
 
 package com.sun.tools.visualvm.modules.startup;
 
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
-import java.awt.peer.ComponentPeer;
 import javax.swing.AbstractButton;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import org.openide.util.Utilities;
 
@@ -47,40 +42,6 @@ final class Utils {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Throwable t) {}
-    }
-
-    /**
-     * Ensures that the dialog will be the topmost visible window after opening.
-     */
-    static void makeAssertive(final JDialog d) {
-        d.addHierarchyListener(new HierarchyListener() {
-            public void hierarchyChanged(HierarchyEvent e) {
-                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                    if (d.isShowing()) {
-                        // For some reason the dialog created with defined JDialog.ModalityType
-                        // isn't displayed on Windows when opened by the NetBeans launcher. This
-                        // code seems to workaround it while not breaking anything elsewhere.
-                        ComponentPeer peer = d.getPeer();
-                        if (peer != null) peer.setVisible(true);
-
-                        d.removeHierarchyListener(this);
-                        d.setAlwaysOnTop(true);
-                        d.toFront();
-                        d.setAlwaysOnTop(false);
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * Creates an assertive error dialog.
-     */
-    static JDialog assertiveErrorDialog(String caption, String message) {
-        JOptionPane p = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);
-        JDialog d = p.createDialog(null, caption);
-        Utils.makeAssertive(d);
-        return d;
     }
 
     /**
