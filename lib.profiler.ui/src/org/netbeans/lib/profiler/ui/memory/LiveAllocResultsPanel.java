@@ -58,10 +58,12 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.memory.ClassHistoryDataManager;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 
 
 /**
@@ -258,8 +260,9 @@ public class LiveAllocResultsPanel extends AllocResultsPanel implements LiveResu
             if ((resTable != null) && resTable.isFocusOwner()) {
                 resTable.requestFocusInWindow(); // prevents results table from losing focus
             }
-        } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
-            targetAppOrVMTerminated.printStackTrace(System.err);
+        } catch (ClientUtils.TargetAppOrVMTerminated e) {
+            ProfilerDialogs.displayWarning(e.getMessage());
+            ProfilerLogger.log(e.getMessage());
         }
 
         updateResultsInProgress = false;
