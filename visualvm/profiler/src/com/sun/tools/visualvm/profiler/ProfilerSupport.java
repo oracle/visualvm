@@ -32,14 +32,16 @@ import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.host.Host;
+import com.sun.tools.visualvm.modules.startup.dialogs.StartupDialog;
 import java.io.File;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.openide.util.NbBundle;
 
@@ -275,7 +277,10 @@ final class ProfilerSupport {
         // TODO: this should be performed after all modules are loaded & initialized to not bias the calibration!!!
         
         // Display blocking notification
-        ProfilerDialogs.displayInfo(NbBundle.getMessage(ProfilerSupport.class, "MSG_Calibration")); // NOI18N
+        JDialog d = StartupDialog.create(NbBundle.getMessage(ProfilerSupport.class, "CAPTION_Calibration"), // NOI18N
+                                         NbBundle.getMessage(ProfilerSupport.class, "MSG_Calibration"), // NOI18N
+                                         JOptionPane.INFORMATION_MESSAGE);
+        d.setVisible(true);
 
         // Perform calibration
         boolean result = false;
