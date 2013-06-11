@@ -49,6 +49,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -59,6 +60,7 @@ import org.netbeans.lib.profiler.results.memory.HeapHistogram.ClassInfo;
 import org.netbeans.lib.profiler.ui.LiveResultsPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 
 
 /**
@@ -235,8 +237,9 @@ public class LiveSampledResultsPanel extends SampledResultsPanel implements Live
             if ((resTable != null) && resTable.isFocusOwner()) {
                 resTable.requestFocusInWindow(); // prevents results table from losing focus
             }
-        } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
-            targetAppOrVMTerminated.printStackTrace(System.err);
+        } catch (ClientUtils.TargetAppOrVMTerminated e) {
+            ProfilerDialogs.displayWarning(e.getMessage());
+            ProfilerLogger.log(e.getMessage());
         }
 
         updateResultsInProgress = false;
