@@ -104,8 +104,8 @@ public final class PauseAction extends ProfilingAwareAction {
                 firePropertyChange(PROP_ICON, null, null);
             }
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
-            ProfilerDialogs.displayError(e.getMessage());
-            ProfilerLogger.log(e);
+            ProfilerDialogs.displayWarning(e.getMessage());
+            ProfilerLogger.log(e.getMessage());
         }
     }
 
