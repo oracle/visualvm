@@ -387,10 +387,10 @@ function wrapJavaObject(thing) {
                 } else if (name == 'wrapped-object') {
                     return instance;
                 } else {
-                    if (fldValueCache[name] == undefined) {
-                        fldValueCache[name] = wrapJavaObject(instance.getValueOfField(name));
+                    if (fldValueCache["_$"+name] == undefined) {
+                        fldValueCache["_$"+name] = wrapJavaObject(instance.getValueOfField(name));
                     }
-                    return fldValueCache[name];
+                    return fldValueCache["_$"+name];
                 }
             }
         }				
@@ -424,7 +424,7 @@ function wrapJavaObject(thing) {
                 if (name == "toString") {
                     result = jclass.toString();
                 } else {
-                    if (fldValueCache[name] == undefined) {
+                    if (fldValueCache["_$"+name] == undefined) {
                         var result;
                         if (name == 'id') {
                             result = jclass.javaClassId;
@@ -434,9 +434,9 @@ function wrapJavaObject(thing) {
                                 result = wrapJavaObject(jclass.getValueOfStaticField(name));
                             }
                         }
-                        fldValueCache[name] = result;
+                        fldValueCache["_$"+name] = result;
                     }
-                    return fldValueCache[name];
+                    return fldValueCache["_$"+name];
                 }
             }
         }

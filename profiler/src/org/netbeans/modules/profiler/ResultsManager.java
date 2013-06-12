@@ -759,7 +759,8 @@ public final class ResultsManager {
                         break;
                 }
             } catch (ClientUtils.TargetAppOrVMTerminated e1) {
-                LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ProfiledAppTerminatedMsg(), e1);
+                ProfilerDialogs.displayWarning(Bundle.ResultsManager_ProfiledAppTerminatedMsg());
+                ProfilerLogger.log(e1.getMessage());
             } catch (CPUResultsSnapshot.NoDataAvailableException e2) {
                 LOGGER.log(Level.SEVERE, Bundle.ResultsManager_DataNotAvailableMsg(), e2);
             } catch (OutOfMemoryError e) {
