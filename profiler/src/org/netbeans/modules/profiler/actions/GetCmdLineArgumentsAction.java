@@ -55,6 +55,7 @@ import org.openide.util.NbBundle;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -148,6 +149,7 @@ public final class GetCmdLineArgumentsAction extends ProfilingAwareAction {
                                                               null, null)).setVisible(true);
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
             ProfilerDialogs.displayWarning(Bundle.MSG_NotAvailableNow(e.getMessage()));
+            ProfilerLogger.log(e.getMessage());
         }
     }
 
