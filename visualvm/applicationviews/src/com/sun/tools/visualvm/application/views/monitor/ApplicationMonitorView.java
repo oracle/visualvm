@@ -42,6 +42,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -51,6 +52,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -190,8 +193,16 @@ class ApplicationMonitorView extends DataSourceView {
                 public void actionPerformed(ActionEvent e) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
-                            try { model.getMemoryMXBean().gc(); } catch (Exception e) {
-                                LOGGER.throwing(ApplicationMonitorView.class.getName(), "initComponents", e);   // NOI18N
+                            try {
+                                model.getMemoryMXBean().gc(); 
+                            } catch (SecurityException ex) {
+                                String err = NbBundle.getMessage(ApplicationMonitorView.class, "TXT_Perform_GC_failed", ex.getLocalizedMessage());  // NOI18N
+                                NotifyDescriptor nd = new NotifyDescriptor.Message(err, NotifyDescriptor.INFORMATION_MESSAGE);
+                                DialogDisplayer.getDefault().notify(nd);
+                                gcButton.setEnabled(false);
+                            } catch (Exception e) {
+                                LOGGER.log(Level.WARNING, "initComponents", e);   // NOI18N
+                                gcButton.setEnabled(false);
                             }
                         };
                     });
