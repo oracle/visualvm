@@ -82,8 +82,10 @@ public class ApplicationThreadsViewProvider extends PluggableDataSourceViewProvi
     static ThreadMXBean resolveThreads(Application application) {
         JmxModel jmxModel = JmxModelFactory.getJmxModelFor(application);
         if (jmxModel != null && jmxModel.getConnectionState() == JmxModel.ConnectionState.CONNECTED) {
-            JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
-            return mxbeans == null ? null : mxbeans.getThreadMXBean();
+            if (jmxModel.isTakeThreadDumpSupported()) {
+                JvmMXBeans mxbeans = JvmMXBeansFactory.getJvmMXBeans(jmxModel);
+                return mxbeans == null ? null : mxbeans.getThreadMXBean();
+            }
         }
         return null;
     }

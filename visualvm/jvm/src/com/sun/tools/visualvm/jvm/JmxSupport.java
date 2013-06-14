@@ -75,7 +75,6 @@ public class JmxSupport implements DataRemovedListener {
     private Object processCPUTimeAttributeLock = new Object();
     private Boolean processCPUTimeAttribute;
     private long processCPUTimeMultiplier;
-    private Boolean readOnlyConnection;
     private Timer timer;
     private MemoryPoolMXBean permGenPool;
     private Collection<GarbageCollectorMXBean> gcList;
@@ -161,24 +160,6 @@ public class JmxSupport implements DataRemovedListener {
             }
         }
         return mxbeans;
-    }
-
-    synchronized boolean isReadOnlyConnection() {
-        if (readOnlyConnection == null) {
-            readOnlyConnection = Boolean.FALSE;
-            JvmMXBeans mxbeans = getJvmMXBeans();
-            if (mxbeans != null) {
-                ThreadMXBean threads = mxbeans.getThreadMXBean();
-                if (threads != null) {
-                    try {
-                        threads.getThreadInfo(1);
-                    } catch (SecurityException ex) {
-                        readOnlyConnection = Boolean.TRUE;
-                    }
-                }
-            }
-        }
-        return readOnlyConnection.booleanValue();
     }
     
     synchronized Collection<GarbageCollectorMXBean> getGarbageCollectorMXBeans() {

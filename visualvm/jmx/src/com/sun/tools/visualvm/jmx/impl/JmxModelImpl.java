@@ -309,11 +309,13 @@ class JmxModelImpl extends JmxModel {
     }
 
     public boolean isTakeHeapDumpSupported() {
-        return getJmxSupport().getHotSpotDiagnostic() != null;
+        JmxSupport support = getJmxSupport();
+        return support.getHotSpotDiagnostic() != null && !support.isReadOnlyConnection();
     }
     
     public boolean isTakeThreadDumpSupported() {
-        return getJmxSupport().getThreadBean() != null;
+        JmxSupport support = getJmxSupport();
+        return support.getThreadBean() != null && !support.isReadOnlyConnection();
     }
 
     private JmxSupport getJmxSupport() {

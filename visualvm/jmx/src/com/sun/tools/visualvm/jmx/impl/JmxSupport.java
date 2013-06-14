@@ -63,6 +63,8 @@ public class JmxSupport {
     private boolean hotspotDiagnosticInitialized;
     private final Object hotspotDiagnosticLock = new Object();
     private HotSpotDiagnosticMXBean hotspotDiagnosticMXBean;
+    private final Object readOnlyConnectionLock = new Object();
+    private Boolean readOnlyConnection;
     
     private Boolean hasDumpAllThreads;
     private final Object hasDumpAllThreadsLock = new Object();
@@ -100,6 +102,23 @@ public class JmxSupport {
         } catch (Exception e) {
             LOGGER.throwing(JmxSupport.class.getName(), "getSystemProperties", e); // NOI18N
             return null;
+        }
+    }
+
+    synchronized boolean isReadOnlyConnection() {
+        synchronized (readOnlyConnectionLock) {
+            if (readOnlyConnection == null) {
+                readOnlyConnection = Boolean.FALSE;
+                ThreadMXBean threads = getThreadBean();
+                if (threads != null) {
+                    try {
+                        threads.getThreadInfo(1);
+                    } catch (SecurityException ex) {
+                        readOnlyConnection = Boolean.TRUE;
+                    }
+                }
+            }
+            return readOnlyConnection.booleanValue();
         }
     }
     

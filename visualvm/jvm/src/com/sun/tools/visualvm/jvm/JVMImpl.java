@@ -221,7 +221,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             }
             if (args == null) {
                 JmxModel jmx = getJmxModel();
-                if (jmx != null && jmx.isTakeHeapDumpSupported() && !jmxSupport.isReadOnlyConnection()) {
+                if (jmx != null && jmx.isTakeHeapDumpSupported()) {
                     String value = jmx.getFlagValue(HEAP_DUMP_ON_OOME);
                     isDumpOnOOMEnabled = Boolean.valueOf(value);
                     return isDumpOnOOMEnabled.booleanValue();
