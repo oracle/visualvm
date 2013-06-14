@@ -272,7 +272,7 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
     super.paint(g);
     
     // Have a look at
-    // http://ui.netbeans.org/docs/ui/closeButton/closeButtonUISpec.html
+    // https://ui.netbeans.org/docs/ui/closeButton/closeButtonUISpec.html
     // to see how the buttons are specified to be drawn.
     
     for (int i = 0, n = getTabCount(); i < n; i++) {

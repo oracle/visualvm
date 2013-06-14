@@ -88,7 +88,7 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
             if (time < 0) {
                 // in some cases the combination of cleansing the time by calibration and subtracting wait/sleep
                 // times can lead to <0 time
-                // see http://profiler.netbeans.org/issues/show_bug.cgi?id=64416
+                // see https://netbeans.org/bugzilla/show_bug.cgi?id=64416
                 time = 0;
             }
 
