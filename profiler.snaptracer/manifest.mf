@@ -3,5 +3,5 @@ AutoUpdate-Show-In-Client: false
 OpenIDE-Module: org.netbeans.modules.profiler.snaptracer/1
 OpenIDE-Module-Layer: org/netbeans/modules/profiler/snaptracer/impl/resources/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/snaptracer/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.13
+OpenIDE-Module-Specification-Version: 1.14
 

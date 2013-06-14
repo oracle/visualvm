@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.netbeans.lib.profiler.charts/1
 OpenIDE-Module-Localizing-Bundle: org/netbeans/lib/profiler/charts/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.19
+OpenIDE-Module-Specification-Version: 1.20
 
