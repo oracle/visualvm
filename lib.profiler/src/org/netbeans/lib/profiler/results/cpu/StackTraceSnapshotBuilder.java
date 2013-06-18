@@ -329,6 +329,9 @@ public class StackTraceSnapshotBuilder {
             String tname = tinfo.getThreadName();
             
             if (ignoredThreadNames.contains(tname)) continue;
+            Thread.State newState = tinfo.getThreadState();
+            // ignore threads, which has not yet started.
+            if (Thread.State.NEW.equals(newState)) continue;
             
             long threadId = tinfo.getThreadId();
             if (!threadIds.contains(threadId)) {
@@ -338,7 +341,6 @@ public class StackTraceSnapshotBuilder {
                 threadtimes.put(threadId,dumpTimeStamp);
             }
             StackTraceElement[] newElements = tinfo.getStackTrace();
-            Thread.State newState = tinfo.getThreadState();
             SampledThreadInfo oldTinfo = lastStackTrace.get().get(threadId);
             StackTraceElement[] oldElements = NO_STACK_TRACE;
             Thread.State oldState = Thread.State.NEW;
@@ -352,6 +354,8 @@ public class StackTraceSnapshotBuilder {
         
         for (SampledThreadInfo oldTinfo : lastStackTrace.get().values()) {
             if (ignoredThreadNames.contains(oldTinfo.getThreadName())) continue;
+            // ignore threads, which has not yet started.
+            if (Thread.State.NEW.equals(oldTinfo.getThreadState())) continue;
             
             if (!tinfoMap.containsKey(oldTinfo.getThreadId())) {
                 Thread.State oldState = oldTinfo.getThreadState();
@@ -381,9 +385,7 @@ public class StackTraceSnapshotBuilder {
     }
     
     private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp, long timediff, Thread.State oldState, Thread.State newState) throws IllegalStateException {
-        if (newState == Thread.State.NEW) {
-            throw new IllegalStateException("Invalid thread state " + Thread.State.NEW.name() + " for taking a stack trace");
-        }
+        assert newState != Thread.State.NEW : "Invalid thread state " + newState.name() + " for taking a stack trace"; // just to be sure
         if (oldState == Thread.State.TERMINATED && newState != Thread.State.TERMINATED) {
             throw new IllegalStateException("Thread has already been set to " + Thread.State.TERMINATED.name() + " - stack trace can not be taken");
         }
