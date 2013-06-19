@@ -3,5 +3,5 @@ AutoUpdate-Show-In-Client: false
 OpenIDE-Module: org.netbeans.modules.profiler.heapwalker
 OpenIDE-Module-Layer: org/netbeans/modules/profiler/heapwalker/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/heapwalker/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.94
+OpenIDE-Module-Specification-Version: 1.95
 

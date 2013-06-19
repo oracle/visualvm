@@ -616,7 +616,7 @@ public class StackTraceSnapshotBuilderTest {
 
         try {
             addStacktrace(stack0, 500000);
-            fail();
+            assertFalse(instance.threadNames.contains(stack0[0].getThreadName()));
         } catch (IllegalStateException ex) {}
     }
 

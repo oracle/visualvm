@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -324,11 +325,23 @@ public class StackTraceSnapshotBuilder {
     }
 
     private void processThreadDump(final long timediff, final long dumpTimeStamp, final Map<Long, SampledThreadInfo> tinfoMap) throws IllegalStateException {
+        Iterator<Map.Entry<Long,SampledThreadInfo>> tinfoIt = tinfoMap.entrySet().iterator();
         
-        for (SampledThreadInfo tinfo : tinfoMap.values()) {
+        while (tinfoIt.hasNext()) {
+            Map.Entry<Long,SampledThreadInfo> tinfoEntry = tinfoIt.next();
+            SampledThreadInfo tinfo = tinfoEntry.getValue();
             String tname = tinfo.getThreadName();
             
-            if (ignoredThreadNames.contains(tname)) continue;
+            if (ignoredThreadNames.contains(tname)) {
+                tinfoIt.remove();
+                continue;
+            }
+            Thread.State newState = tinfo.getThreadState();
+            // ignore threads, which has not yet started.
+            if (Thread.State.NEW.equals(newState)) {
+                tinfoIt.remove();
+                continue;
+            }
             
             long threadId = tinfo.getThreadId();
             if (!threadIds.contains(threadId)) {
@@ -338,7 +351,6 @@ public class StackTraceSnapshotBuilder {
                 threadtimes.put(threadId,dumpTimeStamp);
             }
             StackTraceElement[] newElements = tinfo.getStackTrace();
-            Thread.State newState = tinfo.getThreadState();
             SampledThreadInfo oldTinfo = lastStackTrace.get().get(threadId);
             StackTraceElement[] oldElements = NO_STACK_TRACE;
             Thread.State oldState = Thread.State.NEW;
@@ -350,9 +362,7 @@ public class StackTraceSnapshotBuilder {
             processDiffs((int) threadId, oldElements, newElements, dumpTimeStamp, timediff, oldState, newState);
         }
         
-        for (SampledThreadInfo oldTinfo : lastStackTrace.get().values()) {
-            if (ignoredThreadNames.contains(oldTinfo.getThreadName())) continue;
-            
+        for (SampledThreadInfo oldTinfo : lastStackTrace.get().values()) {            
             if (!tinfoMap.containsKey(oldTinfo.getThreadId())) {
                 Thread.State oldState = oldTinfo.getThreadState();
                 Thread.State newState = Thread.State.TERMINATED;
@@ -381,9 +391,7 @@ public class StackTraceSnapshotBuilder {
     }
     
     private void processDiffs(int threadId, StackTraceElement[] oldElements, StackTraceElement[] newElements, long timestamp, long timediff, Thread.State oldState, Thread.State newState) throws IllegalStateException {
-        if (newState == Thread.State.NEW) {
-            throw new IllegalStateException("Invalid thread state " + Thread.State.NEW.name() + " for taking a stack trace");
-        }
+        assert newState != Thread.State.NEW : "Invalid thread state " + newState.name() + " for taking a stack trace"; // just to be sure
         if (oldState == Thread.State.TERMINATED && newState != Thread.State.TERMINATED) {
             throw new IllegalStateException("Thread has already been set to " + Thread.State.TERMINATED.name() + " - stack trace can not be taken");
         }
