@@ -674,9 +674,7 @@ class JmxModelImpl extends JmxModel {
             try {
                 vm = VirtualMachine.attach(name);
             } catch (AttachNotSupportedException x) {
-                IOException ioe = new IOException(x.getMessage());
-                ioe.initCause(x);
-                throw ioe;
+                throw new IOException(x);
             }
             // Normally in ${java.home}/jre/lib/management-agent.jar but might
             // be in ${java.home}/lib in build environments.
@@ -697,13 +695,9 @@ class JmxModelImpl extends JmxModel {
             try {
                 vm.loadAgent(agent, "com.sun.management.jmxremote");    // NOI18N
             } catch (AgentLoadException x) {
-                IOException ioe = new IOException(x.getMessage());
-                ioe.initCause(x);
-                throw ioe;
+                throw new IOException(x);
             } catch (AgentInitializationException x) {
-                IOException ioe = new IOException(x.getMessage());
-                ioe.initCause(x);
-                throw ioe;
+                throw new IOException(x);
             }
 
             // get the connector address
