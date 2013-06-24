@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.logging.Level;
 import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils.TargetAppOrVMTerminated;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
@@ -170,7 +171,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
             try {
                 methodIdsTable.getNamesForMethodIds(client);
             } catch (TargetAppOrVMTerminated ex) {
-                ex.printStackTrace();
+                ProfilerLogger.log(ex.getMessage());
                 return;
             }
             processCollectedDumps(methodIdsTable,threadDumps);
