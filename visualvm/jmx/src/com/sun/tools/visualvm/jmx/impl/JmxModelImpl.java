@@ -71,6 +71,9 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -222,6 +225,16 @@ class JmxModelImpl extends JmxModel {
                 application.addPropertyChangeListener(Stateful.PROPERTY_STATE, aListener);
                 break;
             } catch (SecurityException e) {
+                LOGGER.log(Level.INFO, "connect", e);   // NOI18N
+                if (proxyClient.hasSSLStubCheck()) {
+                    String msg = NbBundle.getMessage(JmxModelImpl.class, "MSG_Insecure_SSL", proxyClient.getUrl().toString());  // NOI18N
+                    String title = NbBundle.getMessage(JmxModelImpl.class, "Title_Insecure_SSL");   // NOI18N
+                    NotifyDescriptor dd = new NotifyDescriptor.Confirmation(msg, title, NotifyDescriptor.YES_NO_OPTION);
+                    if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.YES_OPTION) {
+                        proxyClient.setInsecure();
+                        continue;
+                    }
+                }
                 if (supplyCredentials(application, proxyClient) == null) {
                     break;
                 }
@@ -375,6 +388,8 @@ class JmxModelImpl extends JmxModel {
         private static final SslRMIClientSocketFactory sslRMIClientSocketFactory =
                 new SslRMIClientSocketFactory();
         private final JmxModelImpl model;
+        private boolean insecure;   // do not check for SSL-protected RMI registry
+        private boolean checkSSLStub;
 
 
         // Self attach
@@ -421,6 +436,18 @@ class JmxModelImpl extends JmxModel {
             this.password = password;
         }
 
+        boolean hasSSLStubCheck() {
+            return checkSSLStub;
+        }
+        
+        void setInsecure() {
+            insecure = true;
+        }
+        
+        boolean isInsecure() {
+            return insecure;
+        }
+        
         private static String createUrl(String hostName, int port) {
             return "/jndi/rmi://" + hostName + ":" + port + "/jmxrmi";  // NOI18N
         }
@@ -486,6 +513,13 @@ class JmxModelImpl extends JmxModel {
                 if (userName != null || password != null)
                     env.put(JMXConnector.CREDENTIALS,
                             new String[] { userName, password });
+
+                if (!insecure && mode != MODE_LOCAL && env.get(JMXConnector.CREDENTIALS) != null) {
+                    env.put("jmx.remote.x.check.stub", "true");     // NOI18N
+                    checkSSLStub = true;
+                } else {
+                    checkSSLStub = false;
+                }
 
                 jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, env);
                 jmxc.addConnectionNotificationListener(this, null, null);
