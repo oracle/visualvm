@@ -50,6 +50,7 @@ import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
 import java.awt.*;
 import javax.swing.*;
+import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
@@ -110,6 +111,7 @@ public final class InternalStatsAction extends ProfilingAwareAction {
                                                               null, null)).setVisible(true);
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
              ProfilerDialogs.displayWarning(Bundle.MSG_NotAvailableNow(e.getMessage()));
+             ProfilerLogger.log(e.getMessage());
         }
     }
 

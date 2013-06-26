@@ -209,7 +209,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
             debugValues();
         }
     }
-
+    
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public boolean isCollectingTwoTimeStamps() {
@@ -399,6 +399,61 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         }
 
         return ret;
+    }
+    
+    void readFromSnapshot(CPUResultsSnapshot s) {
+        beginTime = s.beginTime;
+        timeTaken = s.timeTaken;
+        collectingTwoTimeStamps = s.collectingTwoTimeStamps;
+        
+        nInstrMethods = s.nInstrMethods;
+        instrMethodClassesViews = s.instrMethodClassesViews;
+        
+        instrMethodNames = s.instrMethodNames;
+        instrMethodSignatures = s.instrMethodSignatures;
+        
+        threadCCTContainers = new CPUCCTContainer[3][];
+        CPUCCTContainer[] scontainers = s.threadCCTContainers[METHOD_LEVEL_VIEW];
+        int nThreads = scontainers.length;
+        CPUCCTContainer[] containers = new CPUCCTContainer[nThreads];
+        threadCCTContainers[METHOD_LEVEL_VIEW] = containers;
+        
+        threadIdMap = s.threadIdMap;
+        for (int i = 0; i < nThreads; i++) {
+            containers[i] = new CPUCCTContainer(this);
+            
+            containers[i].threadId = scontainers[i].threadId;
+            containers[i].threadName = scontainers[i].threadName;
+
+            containers[i].collectingTwoTimeStamps = scontainers[i].collectingTwoTimeStamps;
+
+            containers[i].compactData = scontainers[i].compactData;
+
+            containers[i].childOfsSize = scontainers[i].childOfsSize;
+
+            containers[i].nodeSize = scontainers[i].nodeSize;
+
+            containers[i].wholeGraphGrossTimeAbs = scontainers[i].wholeGraphGrossTimeAbs;
+            containers[i].wholeGraphGrossTimeThreadCPU = scontainers[i].wholeGraphGrossTimeThreadCPU;
+            containers[i].timeInInjectedCodeInAbsCounts = scontainers[i].timeInInjectedCodeInAbsCounts;
+            containers[i].timeInInjectedCodeInThreadCPUCounts = scontainers[i].timeInInjectedCodeInThreadCPUCounts;
+            containers[i].wholeGraphPureTimeAbs = scontainers[i].wholeGraphPureTimeAbs;
+            containers[i].wholeGraphPureTimeThreadCPU = scontainers[i].wholeGraphPureTimeThreadCPU;
+            containers[i].wholeGraphNetTime0 = scontainers[i].wholeGraphNetTime0;
+            containers[i].wholeGraphNetTime1 = scontainers[i].wholeGraphNetTime1;
+            containers[i].totalInvNo = scontainers[i].totalInvNo;
+            containers[i].displayWholeThreadCPUTime = scontainers[i].displayWholeThreadCPUTime;
+
+            containers[i].rootNode = new PrestimeCPUCCTNodeBacked(containers[i], null, 0);
+
+            if (containers[i].getMethodIdForNodeOfs(0) == 0) {
+                containers[i].rootNode.setThreadNode();
+            }
+        }
+        
+        allThreadsMergedCCTContainers = new CPUCCTContainer[3];
+        rootNode = new PrestimeCPUCCTNode[3];
+        rootNode[METHOD_LEVEL_VIEW] = createRootNodeForAllThreads(METHOD_LEVEL_VIEW);
     }
 
     public void readFromStream(DataInputStream in) throws IOException {

@@ -636,7 +636,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
         try {
             PresoObjAllocCCTNode.getNamesForMethodIdsFromVM(getClient(), stacksForClasses);
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-            ex.printStackTrace(); /* No longer ignore silently */
+            ProfilerLogger.log(ex.getMessage()); /* No longer ignore silently */
         } finally {
             transaction.endTrans();
         }
