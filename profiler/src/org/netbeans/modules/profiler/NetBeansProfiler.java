@@ -1406,7 +1406,7 @@ public abstract class NetBeansProfiler extends Profiler {
         try {
             return super.prepareInstrumentation(profilingSettings);
         } catch (ClientUtils.TargetAppOrVMTerminated e) {
-            ProfilerDialogs.displayError(e.getMessage());
+            ProfilerDialogs.displayWarning(e.getMessage());
             e.printStackTrace(System.err);
         } catch (InstrumentationException e) {
             ProfilerDialogs.displayError(e.getMessage());

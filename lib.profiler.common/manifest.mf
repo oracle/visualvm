@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.netbeans.lib.profiler.common/1
 OpenIDE-Module-Localizing-Bundle: org/netbeans/lib/profiler/common/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.25
+OpenIDE-Module-Specification-Version: 1.26
 OpenIDE-Module-Needs: org.netbeans.lib.profiler.common.Profiler
 
