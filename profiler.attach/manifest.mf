@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: org.netbeans.modules.profiler.attach/2
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/attach/Bundle.properties
-OpenIDE-Module-Specification-Version: 2.10
+OpenIDE-Module-Specification-Version: 2.11
 
