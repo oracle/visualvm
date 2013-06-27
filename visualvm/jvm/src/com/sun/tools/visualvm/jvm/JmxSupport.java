@@ -39,7 +39,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
 import java.lang.management.RuntimeMXBean;
-import java.lang.management.ThreadMXBean;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collection;
 import java.util.List;
