@@ -65,6 +65,7 @@ public class JmxSupport implements DataRemovedListener {
     private static final String PS_PERM_GEN = "PS Perm Gen";    // NOI18N
     private static final String CMS_PERM_GEN = "CMS Perm Gen";    // NOI18N
     private static final String G1_PERM_GEN = "G1 Perm Gen";    // NOI18N
+    private static final String METASPACE = "Metaspace";       // NOI18N
     private static final String IBM_PERM_GEN = "class storage";    // NOI18N
     private static final ObjectName osName = getOSName();
     private static long INITIAL_DELAY = 100;
@@ -204,6 +205,7 @@ public class JmxSupport implements DataRemovedListener {
                                 PS_PERM_GEN.equals(name) ||
                                 CMS_PERM_GEN.equals(name) ||
                                 G1_PERM_GEN.equals(name) ||
+                                METASPACE.equals(name) ||
                                 IBM_PERM_GEN.equals(name))) {
                             permGenPool = pool;
                             break;
@@ -223,8 +225,14 @@ public class JmxSupport implements DataRemovedListener {
             MemoryPoolMXBean permPool = getPermGenPool();
             initGenName();
             if (permPool != null) {
+                String label;
                 String name = permPool.getName();
-                genName[1] = NbBundle.getMessage(JmxSupport.class, "LBL_Perm"); // NOI18N
+                if (METASPACE.equals(name)) {
+                    label = NbBundle.getMessage(JmxSupport.class, "LBL_Meta"); // NOI18N                    
+                } else {
+                    label = NbBundle.getMessage(JmxSupport.class, "LBL_Perm"); // NOI18N
+                }
+                genName[1] = label;
             }
         }
         return genName;
