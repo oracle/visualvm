@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE windowmanager PUBLIC
+          "-//NetBeans//DTD Window Manager Properties 2.1//EN"
+          "http://www.netbeans.org/dtds/windowmanager-properties2_1.dtd">
+
+<windowmanager version="2.1">
+    <main-window> 
+        <joined-properties centered-horizontally="true" centered-vertically="true"
+                           width="900" height="590" />
+        <separated-properties centered-horizontally="true" centered-vertically="true"
+                           width="900" height="590" />
+    </main-window>
+    <editor-area state="joined">
+        <constraints>
+            <path orientation="horizontal" number="60" weight="0.7" />
+            <path orientation="vertical" number="40" weight="0.7" />
+            <path orientation="horizontal" number="40" weight="0.7" />
+        </constraints>
+    </editor-area>
+    <active-mode name="explorer" />
+    <maximized-mode name="" />
+    <toolbar configuration="Standard" preferred-icon-size="16" />
+</windowmanager>
