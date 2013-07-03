@@ -512,18 +512,19 @@ final class ProfilingOptionsPanel extends JPanel {
                 try {
                     File calibrationDirectory = new File(Platform.getProfilerUserDir());
                     if (calibrationDirectory.isDirectory()) {
+                        boolean deleted = false;
                         File[] calibrationFiles = calibrationDirectory.listFiles();
                         for (File calibrationFile : calibrationFiles) {
                             if (calibrationFile.isFile() && calibrationFile.getName().startsWith("machinedata.")) { // NOI18N
                                 Utils.delete(calibrationFile, false);
-                                if (ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
-                                    ProfilingOptionsPanel.class, "MSG_DeletedRestart"), NbBundle.getMessage( // NOI18N
-                                    ProfilingOptionsPanel.class, "CAPTION_DeletedRestart"))) { // NOI18N
-                                    LifecycleManager.getDefault().markForRestart();
-                                    LifecycleManager.getDefault().exit();
-                                }
+                                deleted = true;
                             }
-
+                        }
+                        if (deleted && ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
+                            ProfilingOptionsPanel.class, "MSG_DeletedRestart"), NbBundle.getMessage( // NOI18N
+                            ProfilingOptionsPanel.class, "CAPTION_DeletedRestart"))) { // NOI18N
+                            LifecycleManager.getDefault().markForRestart();
+                            LifecycleManager.getDefault().exit();
                         }
                     }
                 } catch (Exception e) {
