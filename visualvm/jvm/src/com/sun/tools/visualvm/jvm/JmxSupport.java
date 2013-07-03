@@ -229,7 +229,7 @@ public class JmxSupport implements DataRemovedListener {
                 if (METASPACE.equals(name)) {
                     label = NbBundle.getMessage(JmxSupport.class, "LBL_Meta"); // NOI18N                    
                 } else {
-                    label = NbBundle.getMessage(JmxSupport.class, "LBL_Perm"); // NOI18N
+                    label = NbBundle.getMessage(JmxSupport.class, "LBL_PermGen"); // NOI18N
                 }
                 genName[1] = label;
             }

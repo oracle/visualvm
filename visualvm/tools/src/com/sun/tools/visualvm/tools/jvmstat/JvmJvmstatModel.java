@@ -73,7 +73,7 @@ public abstract class JvmJvmstatModel extends Model {
         jvmstat = stat;
         genName = new String[2];
         genName[0] = NbBundle.getMessage(JvmJvmstatModel.class, "LBL_Heap");   // NOI18N
-        genName[1] = NbBundle.getMessage(JvmJvmstatModel.class, "LBL_Perm");   // NOI18N        
+        genName[1] = NbBundle.getMessage(JvmJvmstatModel.class, "LBL_PermGen");   // NOI18N        
     }
     
     /**
