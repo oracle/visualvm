@@ -236,7 +236,7 @@ final class WindowBuilders {
                 while (parent instanceof Instance) {
                     icons = ((Instance)parent).getValueOfField("icons");
                     if (icons instanceof Instance) break;
-                    parent = instance.getValueOfField("parent");
+                    parent = ((Instance)parent).getValueOfField("parent");
                 }
             }
             if (icons instanceof Instance) {
