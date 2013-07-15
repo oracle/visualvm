@@ -200,7 +200,8 @@ final class BaseBuilders {
         ColorBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             value = DetailsUtils.getIntFieldValue(instance, "value", 0);
-            isUIResource = DetailsUtils.isSubclassOf(instance, "javax.swing.plaf.ColorUIResource");
+            isUIResource = DetailsUtils.isSubclassOf(instance, "javax.swing.plaf.ColorUIResource") ||
+                           DetailsUtils.isSubclassOf(instance, "javax.swing.plaf.nimbus.DerivedColor$UIResource");
         }
         
         boolean isUIResource() {
