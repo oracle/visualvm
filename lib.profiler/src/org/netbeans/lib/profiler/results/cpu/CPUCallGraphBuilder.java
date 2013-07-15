@@ -427,7 +427,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("ENTRY SLEEP: " // + debugNode(curNode) // NOI18N
@@ -458,7 +461,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         long lastSleep = timeStamp0 - curNode.getLastWaitOrSleepStamp();
 
@@ -596,7 +602,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("ENTRY WAIT: " //+ debugNode(curNode) // NOI18N
@@ -628,7 +637,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         long lastWait = timeStamp0 - curNode.getLastWaitOrSleepStamp();
         curNode.setLastWaitOrSleepStamp(0);
@@ -659,7 +671,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("ENTRY PARK: " //+ debugNode(curNode) // NOI18N
@@ -691,7 +706,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         long lastWait = timeStamp0 - curNode.getLastWaitOrSleepStamp();
         curNode.setLastWaitOrSleepStamp(0);
