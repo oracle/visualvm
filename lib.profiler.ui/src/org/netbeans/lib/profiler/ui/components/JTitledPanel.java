@@ -47,7 +47,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -82,6 +81,7 @@ import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
@@ -541,8 +541,7 @@ public class JTitledPanel extends JPanel {
                              BorderFactory.createLineBorder(getTitleBorderColor()),
                              BorderFactory.createEmptyBorder(2, 5, 2, 2)));
         titlePanel.setOpaque(true);
-        //    titlePanel.setBackground(UIManager.getColor("ToolTip.background"));
-        titlePanel.setBackground(new Color(245, 245, 245));
+        titlePanel.setBackground(UIUtils.getDarker(UIUtils.getProfilerResultsBackground()));
         
         GridBagConstraints gbc;
         
