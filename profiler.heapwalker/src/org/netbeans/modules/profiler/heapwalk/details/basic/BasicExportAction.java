@@ -77,7 +77,7 @@ import org.openide.windows.WindowManager;
     "BasicExportAction_OverwriteFileCaption=Overwrite Existing File",
     "BasicExportAction_OverwriteFileMsg=<html><b>File {0} already exists.</b><br><br>Do you want to replace it?</html>",
     "BasicExportAction_ExportDialogCSVFilter=CSV File (*.csv)",
-    "BasicExportAction_ExportDialogTXTFilter=txt File (*.TXT)",
+    "BasicExportAction_ExportDialogTXTFilter=Text File (*.txt)",
     "BasicExportAction_ExportingViewMsg=Exporting...",
     "BasicExportAction_NoViewMsg=No view to export.",
     "BasicExportAction_OomeExportingMsg=<html><b>Not enough memory to save the file.</b><br><br>To avoid this error increase the -Xmx<br>value in the etc/netbeans.conf file in NetBeans IDE installation.</html>",
