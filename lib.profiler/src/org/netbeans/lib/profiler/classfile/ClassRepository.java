@@ -121,7 +121,7 @@ public abstract class ClassRepository implements CommonConstants {
 
         if (entry != null) { // A single class or placeholder, or a group of them for this name, exists
 
-            ArrayList ret = new ArrayList();
+            List ret = new ArrayList();
 
             if (entry instanceof BaseClassInfo) {
                 ret.add(entry);
@@ -198,7 +198,7 @@ public abstract class ClassRepository implements CommonConstants {
      * Returns names of all classes that can be located on the given classpath.
      * Since this method performs directory scanning, it is recommended to call it once and cache the results.
      */
-    public static List getClassesOnClasspath(ArrayList classPathElementList) { // TODO CHECK: unused method
+    public static List getClassesOnClasspath(List classPathElementList) { // TODO CHECK: unused method
 
         List list = new ArrayList();
         list.addAll(classPathElementList);
