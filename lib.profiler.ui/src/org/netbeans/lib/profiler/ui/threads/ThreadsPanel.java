@@ -333,7 +333,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
                                                            int row, int column) {
                 Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                component.setBackground(Color.WHITE);
+                component.setBackground(UIUtils.getProfilerResultsBackground());
                 component.setFont(table.getFont().deriveFont(Font.BOLD));
 
                 if (component instanceof JComponent) {
@@ -354,7 +354,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         table.getColumnModel().getColumn(NAME_COLUMN_INDEX).setPreferredWidth(NAME_COLUMN_WIDTH);
 
         ThreadStateHeaderRenderer headerRenderer = new ThreadStateHeaderRenderer(this);
-        headerRenderer.setBackground(Color.WHITE);
+        headerRenderer.setBackground(UIUtils.getProfilerResultsBackground());
         table.getColumnModel().getColumn(DISPLAY_COLUMN_INDEX).setHeaderRenderer(headerRenderer);
 
         TableColumnModel columnModel = table.getColumnModel();
@@ -366,7 +366,7 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
         // perform layout
         tablePanel.setLayout(new BorderLayout());
         scrollPanel.setLayout(new BorderLayout());
-        scrollPanel.setBackground(Color.WHITE);
+        scrollPanel.setBackground(UIUtils.getProfilerResultsBackground());
 
         buttonsToolBar.add(zoomInButton);
         buttonsToolBar.add(zoomOutButton);
@@ -419,10 +419,10 @@ public class ThreadsPanel extends JPanel implements AdjustmentListener, ActionLi
 
         tableScroll = new JScrollPane();
         tableScroll.setCorner(JScrollPane.UPPER_RIGHT_CORNER, new JPanel());
-        tableScroll.getCorner(JScrollPane.UPPER_RIGHT_CORNER).setBackground(Color.WHITE);
+        tableScroll.getCorner(JScrollPane.UPPER_RIGHT_CORNER).setBackground(UIUtils.getProfilerResultsBackground());
         viewPort = new CustomTimeLineViewport(this);
         viewPort.setView(table);
-        viewPort.setBackground(table.getBackground());
+        viewPort.setBackground(UIUtils.getProfilerResultsBackground());
         tableScroll.setViewport(viewPort);
         tableScroll.setBorder(BorderFactory.createEmptyBorder());
         tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
