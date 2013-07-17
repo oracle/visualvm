@@ -53,6 +53,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
@@ -203,8 +204,7 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
         setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(borderColor), BorderFactory.createEmptyBorder(2, 5, 2, 5)));
         setOpaque(true);
-        //    titlePanel.setBackground(UIManager.getColor("ToolTip.background"));
-        setBackground(new Color(245, 245, 245));
+        setBackground(UIUtils.getDarker(UIUtils.getProfilerResultsBackground()));
 
         headerRenderer = new HeaderRenderer();
         headerRenderer.setIcon(ICON_CLASS);
