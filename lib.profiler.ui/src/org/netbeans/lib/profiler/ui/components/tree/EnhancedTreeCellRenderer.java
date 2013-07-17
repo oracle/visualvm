@@ -48,6 +48,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRendererPersistent {
@@ -337,13 +338,13 @@ public class EnhancedTreeCellRenderer extends JPanel implements TreeCellRenderer
             label2.setForeground(getTextSelectionColor());
 
             Color c = getTextSelectionColor();
-            label3.setForeground(c.equals(Color.BLACK) ? Color.GRAY : c.brighter());
+            label3.setForeground(UIUtils.getDisabledForeground(c));
         } else {
             label1.setForeground(getTextNonSelectionColor());
             label2.setForeground(getTextNonSelectionColor());
 
             Color c = getTextNonSelectionColor();
-            label3.setForeground(c.equals(Color.BLACK) ? Color.GRAY : c.brighter());
+            label3.setForeground(UIUtils.getDisabledForeground(c));
         }
 
         if (!tree.isEnabled()) {

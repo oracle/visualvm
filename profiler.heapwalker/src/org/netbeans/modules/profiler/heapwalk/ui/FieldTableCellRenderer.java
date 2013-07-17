@@ -45,6 +45,7 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 
 import java.awt.*;
 import javax.swing.*;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.table.EnhancedTableCellRenderer;
 import org.netbeans.modules.profiler.heapwalk.model.HeapWalkerNode;
 
@@ -121,7 +122,7 @@ final class FieldTableCellRenderer extends EnhancedTableCellRenderer {
     protected void setRowForeground(Color c) {
         super.setRowForeground(c);
         label1.setForeground(c);
-        label2.setForeground(c.equals(Color.BLACK) ? Color.GRAY : c.brighter());
+        label2.setForeground(UIUtils.getDisabledForeground(c));
     }
 
     protected void setValue(JTable table, Object value, int row, int column) {
