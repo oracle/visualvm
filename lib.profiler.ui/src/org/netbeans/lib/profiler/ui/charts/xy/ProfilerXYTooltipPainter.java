@@ -124,10 +124,11 @@ public class ProfilerXYTooltipPainter extends JPanel {
         float defaultFontSize;
 
         caption = new JLabel();
+        caption.setEnabled(false);
         defaultFontSize = caption.getFont().getSize2D();
         caption.setFont(caption.getFont().deriveFont(
                         defaultFontSize - 1));
-        caption.setForeground(Color.DARK_GRAY);
+//        caption.setForeground(Color.DARK_GRAY);
         caption.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;

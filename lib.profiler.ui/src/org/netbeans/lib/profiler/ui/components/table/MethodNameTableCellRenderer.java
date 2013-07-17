@@ -93,9 +93,9 @@ public class MethodNameTableCellRenderer extends EnhancedTableCellRenderer {
         super.setRowForeground(c);
         label1.setForeground(c);
         label2.setForeground(c);
-        label3.setForeground(c.equals(Color.BLACK) ? Color.GRAY : c.brighter());
+        label3.setForeground(UIUtils.getDisabledForeground(c));
     }
-
+    
     protected void setValue(JTable table, Object value, int row, int column) {
         if (table != null) {
             setFont(table.getFont());

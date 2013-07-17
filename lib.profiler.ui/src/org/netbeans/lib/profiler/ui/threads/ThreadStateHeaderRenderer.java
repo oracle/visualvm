@@ -47,6 +47,7 @@ import java.awt.*;
 import java.io.Serializable;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -150,42 +151,70 @@ public class ThreadStateHeaderRenderer extends JPanel implements TableCellRender
 
         g.setClip(4, 0, getWidth() - 3, getHeight());
     }
-
-    private void paintString(Graphics g, String string, int x, int y) {
-        int length = g.getFontMetrics().stringWidth(string);
-        g.drawString(string, x - (length / 2) + 1, y);
-    }
+    
+    private static JLabel MARK_NOMILLIS_LABEL;
+    private static JLabel MARK_MILLIS_LABEL;
 
     private void paintTimeMarkString(Graphics g, int currentMark, int optimalUnits, int x, int y) {
-        int markStringMillisMargin = 0; // space between mark's string without milliseconds and mark's milliseconds string
-        int markStringMillisReduce = 2; // markStringNoMillis.height - markStringMillisReduce = markStringMillis.height
-
-        Font markStringNoMillisFont = g.getFont();
-        Font markStringMillisFont = markStringNoMillisFont.deriveFont((float) (markStringNoMillisFont.getSize() - 2));
-
-        String markStringNoMillis = TimeLineUtils.getTimeMarkNoMillisString(currentMark, optimalUnits);
-        int wMarkStringNoMillis = g.getFontMetrics().stringWidth(markStringNoMillis); // width of the mark's string without milliseconds
-        String markStringMillis = TimeLineUtils.getTimeMarkMillisString(currentMark, optimalUnits);
-
-        if (!markStringMillis.isEmpty()) {
-            markStringMillis = "." + markStringMillis; // NOI18N
+        if (MARK_NOMILLIS_LABEL == null) {
+            MARK_NOMILLIS_LABEL = new JLabel();
+            MARK_NOMILLIS_LABEL.setHorizontalAlignment(JLabel.CENTER);
+            MARK_NOMILLIS_LABEL.setOpaque(true);
+            MARK_NOMILLIS_LABEL.setBackground(UIUtils.getProfilerResultsBackground());
+            MARK_NOMILLIS_LABEL.setFont(MARK_NOMILLIS_LABEL.getFont().deriveFont(Font.BOLD));
+            
+            MARK_MILLIS_LABEL = new JLabel();
+            MARK_MILLIS_LABEL.setHorizontalAlignment(JLabel.CENTER);
+            MARK_MILLIS_LABEL.setOpaque(true);
+            MARK_MILLIS_LABEL.setBackground(UIUtils.getProfilerResultsBackground());
+            MARK_MILLIS_LABEL.setFont(MARK_MILLIS_LABEL.getFont().deriveFont(Font.BOLD));
+            MARK_MILLIS_LABEL.setFont(MARK_MILLIS_LABEL.getFont().deriveFont((float)(MARK_MILLIS_LABEL.getFont().getSize() - 2)));
         }
 
-        int wMarkStringMillis = g.getFontMetrics(markStringMillisFont).stringWidth(markStringMillis); // width of the mark's milliseconds string
+        String markStringNoMillis = TimeLineUtils.getTimeMarkNoMillisString(currentMark, optimalUnits);
+        String markStringMillis = TimeLineUtils.getTimeMarkMillisString(currentMark, optimalUnits);
 
-        int xMarkStringNoMillis = x - (wMarkStringNoMillis / 2) + 1; // x-position of the mark's string without milliseconds
-        int xMarkStringMillis = xMarkStringNoMillis + wMarkStringNoMillis + markStringMillisMargin; // x-position of the mark's milliseconds string
-
-        g.setColor(TimeLineUtils.BASE_TIMELINE_COLOR);
-        g.drawString(markStringNoMillis, xMarkStringNoMillis, y);
-
-        g.setFont(markStringMillisFont);
-        g.drawString(markStringMillis, xMarkStringMillis, y - markStringMillisReduce + 1);
-        g.setFont(markStringNoMillisFont);
+        boolean millis = !markStringMillis.isEmpty();
+        if (millis) markStringMillis = "." + markStringMillis; // NOI18N
+        
+        MARK_NOMILLIS_LABEL.setText(markStringNoMillis);
+        if (millis) MARK_MILLIS_LABEL.setText(markStringMillis);
+        
+        Dimension dNoMillis = MARK_NOMILLIS_LABEL.getPreferredSize();
+        dNoMillis.width += 2;
+        dNoMillis.height += 1;
+        Dimension dMillis = millis ? MARK_MILLIS_LABEL.getPreferredSize() : new Dimension();
+        dMillis.width += 2;
+        dMillis.height += 1;
+        int w1 = dNoMillis.width;
+        int w = w1 + dMillis.width;
+        int h = dNoMillis.height;
+        
+        int xx = x - w / 2;
+        int yy = y + (getHeight() - h) / 2;
+        
+        g.translate(xx, yy);
+        MARK_NOMILLIS_LABEL.setSize(dNoMillis);
+        MARK_NOMILLIS_LABEL.paint(g);
+        g.translate(-xx, -yy);
+        
+        if (millis) {
+            g.translate(xx + w1, yy);
+            MARK_MILLIS_LABEL.setSize(dMillis);
+            MARK_MILLIS_LABEL.paint(g);
+            g.translate(-xx - w1, -yy);
+        }
     }
 
+    private static JLabel LEGEND_LABEL;
+    
     private void paintTimeMarks(Graphics g) {
-        g.setFont(g.getFont().deriveFont(Font.BOLD));
+        if (LEGEND_LABEL == null) {
+            LEGEND_LABEL = new JLabel();
+            LEGEND_LABEL.setHorizontalAlignment(JLabel.CENTER);
+            LEGEND_LABEL.setOpaque(true);
+            LEGEND_LABEL.setBackground(UIUtils.getProfilerResultsBackground());
+        }
 
         if ((viewEnd - viewStart) > 0) {
             int firstValue = (int) (viewStart - dataStart);
@@ -197,8 +226,6 @@ public class ThreadStateHeaderRenderer extends JPanel implements TableCellRender
 
             int currentMark = firstMark - optimalUnits;
 
-            int componentFontSize = getFont().getSize();
-
             while (currentMark <= (lastValue + optimalUnits)) {
                 if (currentMark >= 0) {
                     float currentMarkRel = currentMark - firstValue;
@@ -207,26 +234,26 @@ public class ThreadStateHeaderRenderer extends JPanel implements TableCellRender
                                    TimeLineUtils.getTicksCount(optimalUnits));
                     g.setColor(TimeLineUtils.BASE_TIMELINE_COLOR);
                     g.drawLine(markPosition, 0, markPosition, 4);
-                    paintTimeMarkString(g, currentMark, optimalUnits, markPosition, 5 + componentFontSize);
                     g.setColor(TimeLineUtils.MAIN_TIMELINE_COLOR);
-                    g.drawLine(markPosition, 8 + componentFontSize, markPosition, getHeight() - 1);
+                    g.drawLine(markPosition, 5, markPosition, getHeight() - 1);
+                    paintTimeMarkString(g, currentMark, optimalUnits, markPosition, 0);
                 }
 
                 currentMark += optimalUnits;
             }
-
-            Font origFont = g.getFont();
-            Font plainFont = origFont.deriveFont(Font.PLAIN);
+            
             String sLegend = TimeLineUtils.getUnitsLegend(lastValue, optimalUnits);
-            int wLegend = g.getFontMetrics(plainFont).stringWidth(sLegend);
+            
+            LEGEND_LABEL.setText(sLegend);
+            Dimension dLegend = LEGEND_LABEL.getPreferredSize();
+            dLegend.width += 8;
+            dLegend.height += 4;
 
-            if ((wLegend + 7) <= getWidth()) {
-                g.setFont(plainFont);
-                g.setColor(Color.WHITE);
-                g.fillRect(getWidth() - wLegend - 7, 5, wLegend + 7, 4 + plainFont.getSize());
-                g.setColor(Color.BLACK);
-                g.drawString(sLegend, getWidth() - wLegend - 2, 5 + plainFont.getSize());
-                g.setFont(origFont);
+            if (dLegend.width <= getWidth()) {
+                g.translate(getWidth() - dLegend.width, (getHeight() - dLegend.height) / 2);
+                LEGEND_LABEL.setSize(dLegend.width, dLegend.height);
+                LEGEND_LABEL.paint(g);
+                g.translate(-getWidth() + dLegend.width, -(getHeight() - dLegend.height) / 2);
             }
         }
     }
