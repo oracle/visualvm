@@ -65,11 +65,11 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
      * Creates new instance of SnapshotDescriptor.
      *
      * @param snapshot snapshot.
-     * @param n snapshot name.
-     * @param desc snapshot description.
-     * @param ic snapshot icon.
-     * @param pos snapshot position.
-     * @param aep snapshot expansion policy.
+     * @param name snapshot name.
+     * @param description snapshot description.
+     * @param icon snapshot icon.
+     * @param position snapshot position.
+     * @param autoExpansionPolicy snapshot expansion policy.
      *
      * @since VisualVM 1.3
      */

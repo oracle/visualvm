@@ -157,9 +157,9 @@ public final class SimpleXYChartSupport {
      *
      * @param details details packet
      */
-    public void updateDetails(final String[] values) {
+    public void updateDetails(final String[] details) {
         Runnable detailsUpdater = new Runnable() {
-            public void run() { detailsHandle.updateDetails(values); }
+            public void run() { detailsHandle.updateDetails(details); }
         };
         if (SwingUtilities.isEventDispatchThread()) detailsUpdater.run();
         else SwingUtilities.invokeLater(detailsUpdater);

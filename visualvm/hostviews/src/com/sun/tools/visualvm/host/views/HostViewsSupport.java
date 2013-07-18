@@ -56,7 +56,7 @@ public final class HostViewsSupport {
     /**
      * Returns PluggableDataSourceViewProvider for Overview host subtab.
      * 
-     * @return
+     * @return PluggableDataSourceViewProvider for Overview host subtab.
      */
     public PluggableDataSourceViewProvider<Host> getOverviewView() {
         return viewProvider;

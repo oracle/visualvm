@@ -104,7 +104,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
     /**
      * Returns true if the provided string represents a valid JMX url, false otherwise.
      *
-     * @param txt JMX url to be checked
+     * @param jmxurl JMX url to be checked
      * @return true if the provided string represents a valid JMX url, false otherwise
      */
     protected static boolean isValidConnectionString(String jmxurl) {
