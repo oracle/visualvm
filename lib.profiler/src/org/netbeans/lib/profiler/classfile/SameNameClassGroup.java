@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.classfile;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -56,7 +57,7 @@ import java.util.ArrayList;
 public class SameNameClassGroup {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private ArrayList classes;
+    private List classes;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +67,7 @@ public class SameNameClassGroup {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public ArrayList getAll() {
+    public List getAll() {
         return classes;
     }
 

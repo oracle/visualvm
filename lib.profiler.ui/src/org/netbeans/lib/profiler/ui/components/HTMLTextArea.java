@@ -607,6 +607,12 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public void setOpaque(boolean o) {
+        super.setOpaque(o);
+        if (UIUtils.isNimbusLookAndFeel() && !o)
+            setBackground(new Color(0, 0, 0, 0));
+    }
 
     public void setForeground(Color color) {
         Color foreground = getForeground();
