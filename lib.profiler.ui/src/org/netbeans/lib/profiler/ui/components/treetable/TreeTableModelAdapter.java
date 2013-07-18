@@ -256,6 +256,10 @@ public class TreeTableModelAdapter extends AbstractTableModel {
                 treeTableModel.fireTreeStructureChanged(this,
                         treeTableModel.getPathToRoot((CCTNode) treeTableModel.getRoot()),
                         null, null);
+                
+                if (selectedPaths != null)
+                    for (int i = 0; i < selectedPaths.length; i++)
+                        selectedPaths[i] = getCurrentPath(selectedPaths[i]);
                 tree.setSelectionPaths(selectedPaths);
 
                 restoreExpandedPaths(pathState);
