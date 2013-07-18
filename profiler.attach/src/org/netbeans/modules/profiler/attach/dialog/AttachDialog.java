@@ -443,9 +443,9 @@ public class AttachDialog extends AttachWizard {
             };
             hint.setLabelFor(steps);
             steps.setEditable(false);
-            steps.setPreferredSize(new Dimension(505, 130));
             
             JScrollPane stepsScroll = new JScrollPane(steps);
+            stepsScroll.setPreferredSize(new Dimension(505, 130));
             add(stepsScroll, c);
         }
         
