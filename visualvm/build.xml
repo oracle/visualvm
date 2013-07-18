@@ -184,6 +184,31 @@
                 <exclude name="com/sun/tools/visualvm/tools/*.java"/>
             </fileset>
 
+            <classpath>
+                <pathelement location="netbeans/platform/lib/org-openide-util-lookup.jar"/>
+                <pathelement location="netbeans/platform/lib/org-openide-util.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-windows.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-awt.jar"/>
+                <pathelement location="netbeans/platform/lib/org-openide-modules.jar"/>
+                <pathelement location="netbeans/platform/core/org-openide-filesystems.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-dialogs.jar"/>
+                <pathelement location="netbeans/platform/modules/org-netbeans-api-progress.jar"/>
+                <pathelement location="netbeans/platform/modules/org-netbeans-modules-options-api.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-loaders.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-nodes.jar"/>
+                <pathelement location="netbeans/profiler/modules/org-netbeans-lib-profiler-charts.jar"/>
+                <pathelement location="netbeans/profiler/modules/org-netbeans-modules-profiler-api.jar"/>
+                <pathelement location="uisupport/build/classes/"/>
+                <pathelement location="applicationviews/build/classes/"/>
+                <pathelement location="charts/build/classes/"/>
+                <pathelement location="coredump/build/classes/"/>
+                <pathelement location="threaddump/build/classes/"/>
+                <pathelement location="heapdump/build/classes/"/>
+                <pathelement location="jmx/build/classes/"/>
+                <pathelement location="host/build/classes/"/>
+                <pathelement location="hostviews/build/classes/"/>
+            </classpath>
+
             <link href="http://download.oracle.com/javase/6/docs/api/"/>
 
 
