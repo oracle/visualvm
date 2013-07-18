@@ -30,7 +30,7 @@ import com.sun.tools.visualvm.core.model.ModelFactory;
 
 /**
  * The SaModelFactory class is a factory class for getting the
- * {@link SaModel} representation for the {@link Application}.
+ * {@link SaModel} representation for the {@link DataSource}.
  * 
  * @author Tomas Hurka
  */
@@ -53,9 +53,9 @@ public final class SaModelFactory extends ModelFactory<SaModel, DataSource> {
     }
     
     /**
-     * Factory method for obtaining {@link SaModel} for {@link Application}.
+     * Factory method for obtaining {@link SaModel} for {@link DataSource}.
      * Note that there is only one instance of {@link SaModel} for a concrete
-     * application.This {@link SaModel} instance is cached. This method can 
+     * data source. This {@link SaModel} instance is cached. This method can 
      * return <CODE>null</CODE> if there is no AttachModel available
      * @param app application
      * @return {@link SaModel} instance or <CODE>null</CODE> if there is no

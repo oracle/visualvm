@@ -53,7 +53,7 @@ public final class JmxConnectionSupport {
     /**
      * Registers new EnvironmentProvider.
      * 
-     * @param category EnvironmentProvider to be registered
+     * @param provider EnvironmentProvider to be registered
      */
     public void registerProvider(EnvironmentProvider provider) {
         JmxConnectionSupportImpl.registerProviderImpl(provider);
@@ -62,7 +62,7 @@ public final class JmxConnectionSupport {
     /**
      * Unregisters the EnvironmentProvider.
      * 
-     * @param category EnvironmentProvider to unregister
+     * @param provider EnvironmentProvider to unregister
      */
     public void unregisterProvider(EnvironmentProvider provider) {
         JmxConnectionSupportImpl.unregisterProviderImpl(provider);

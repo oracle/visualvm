@@ -36,7 +36,7 @@ import javax.management.remote.JMXServiceURL;
 /**
  * <p>This class encapsulates the JMX functionality of the target Java application.</p>
  *
- * <p>Call {@link JmxModelFactory#getJmxModelFor()} to get an instance of the
+ * <p>Call {@link JmxModelFactory#getJmxModelFor(Application)} to get an instance of the
  * {@link JmxModel} class.</p>
  *
  * <p>Usually this class will be used as follows:</p>

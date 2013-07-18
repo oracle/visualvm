@@ -43,9 +43,9 @@ public final class JmxModelFactory extends ModelFactory<JmxModel, Application> {
     }
 
     /**
-     * Getter for the default version of the {@link JmxFactory}.
+     * Getter for the default version of the {@link JmxModelFactory}.
      * 
-     * @return an instance of {@link JmxFactory}.
+     * @return an instance of {@link JmxModelFactory}.
      */
     public static synchronized JmxModelFactory getDefault() {
         if (factory == null) {

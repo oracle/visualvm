@@ -70,7 +70,7 @@ public final class HostOverviewFactory extends ModelFactory<HostOverview,Host> i
     /**
      * Default {@link ModelProvider} implementation, which creates 
      * HostOverview for localhost. If you want to extend HostOverviewFactory use 
-     * {@link HostOverviewFactory#registerProvider()} to register the new instances
+     * {@link HostOverviewFactory#registerProvider(ModelProvider)} to register the new instances
      * of {@link ModelProvider} for the different types of {@link Host}.
      * @param host host
      * @return instance of {@link HostOverview} for localhost
