@@ -56,12 +56,21 @@ import java.util.Arrays;
  * @author Tomas Hurka
  * @author Maros Sandor
  */
-public abstract class ProfilingPointServerHandler {
+public class ProfilingPointServerHandler {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static ProfilingPointServerHandler[] profilingPointHandlers;
     private static int[] profilingPointIDs;
+    private static ProfilingPointServerHandler instance;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public static synchronized ProfilingPointServerHandler getInstance(String clientInfo) {
+        if (instance == null) {
+            instance = new ProfilingPointServerHandler();
+        }
+
+        return instance;
+    }
+    
     public static synchronized void initInstances(int[] ppIDs, String[] handlerClassNames, String[] handlersInfo) {
         profilingPointIDs = ppIDs;
         profilingPointHandlers = getInstances(handlerClassNames, handlersInfo);
