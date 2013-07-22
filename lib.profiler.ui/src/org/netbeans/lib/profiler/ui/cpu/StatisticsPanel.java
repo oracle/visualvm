@@ -375,8 +375,9 @@ public class StatisticsPanel extends JPanel {
     private class NavPanel extends JPanel {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private final Color backgroundColor = new Color(248, 248, 248);
-        private final Color focusedBackgroundColor = new Color(230, 230, 230);
+        private Color lineColor;
+        private Color backgroundColor;
+        private Color focusedBackgroundColor;
         private final MouseListener focusGrabber = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 requestFocusInWindow();
@@ -387,6 +388,7 @@ public class StatisticsPanel extends JPanel {
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
         public NavPanel(HTMLTextArea navArea) {
+            initColors();
             initComponents(navArea);
         }
 
@@ -394,7 +396,7 @@ public class StatisticsPanel extends JPanel {
 
         private void initComponents(HTMLTextArea navArea) {
             setBackground(backgroundColor);
-            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(214, 223, 247)),
+            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, lineColor),
                                                          BorderFactory.createEmptyBorder(4, 0, 4, 0)));
 
             navArea.setHighlighter(null);
@@ -450,6 +452,25 @@ public class StatisticsPanel extends JPanel {
             addMouseListener(focusGrabber);
             scopeLabel.addMouseListener(focusGrabber);
             navArea.addMouseListener(focusGrabber);
+        }
+        
+        private void initColors() {
+            Color systemBackgroundColor = UIUtils.getProfilerResultsBackground();
+
+            int backgroundRed = systemBackgroundColor.getRed(); 
+            int backgroundGreen = systemBackgroundColor.getGreen();
+            int backgroundBlue = systemBackgroundColor.getBlue();
+            boolean inverseColors = backgroundRed < 41 || backgroundGreen < 32 || backgroundBlue < 25;
+
+            if (inverseColors) {
+                lineColor = UIUtils.getSafeColor(backgroundRed + 41, backgroundGreen + 32, backgroundBlue + 8);
+                backgroundColor = UIUtils.getSafeColor(backgroundRed + 7, backgroundGreen + 7, backgroundBlue + 7);
+                focusedBackgroundColor = UIUtils.getSafeColor(backgroundRed + 25, backgroundGreen + 25, backgroundBlue + 25);
+            } else {
+                lineColor = UIUtils.getSafeColor(backgroundRed - 41 /*214*/, backgroundGreen - 32 /*223*/, backgroundBlue - 8 /*247*/);
+                backgroundColor = UIUtils.getSafeColor(backgroundRed - 7 /*248*/, backgroundGreen - 7 /*248*/, backgroundBlue - 7 /*248*/);
+                focusedBackgroundColor = UIUtils.getSafeColor(backgroundRed - 25 /*230*/, backgroundGreen - 25 /*230*/, backgroundBlue - 25 /*230*/);
+            }
         }
     }
 

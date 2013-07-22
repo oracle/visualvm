@@ -154,6 +154,13 @@ public final class UIUtils {
         return getSafeColor((int) (c.getRed() * alternateRowDarkerFactor), (int) (c.getGreen() * alternateRowDarkerFactor),
                             (int) (c.getBlue() * alternateRowDarkerFactor));
     }
+    
+    public static Color getDisabledForeground(Color c) {
+        if (isNimbusLookAndFeel()) return UIManager.getColor("nimbusDisabledText").darker(); //NOI18N
+        else if (isMetalLookAndFeel()) return UIManager.getColor("Label.disabledForeground"); //NOI18N
+        else if (Color.BLACK.equals(c)) return Color.GRAY;
+        else return c.brighter();
+    }
 
     public static int getDefaultRowHeight() {
         return new JLabel("X").getPreferredSize().height + 2; //NOI18N
