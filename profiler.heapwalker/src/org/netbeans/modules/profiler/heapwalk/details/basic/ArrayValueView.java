@@ -310,15 +310,14 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     @Override
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         String comma = ","; // NOI18N
-        if (values == null) {
-            eDD.dumpData(""); //NOI18N
-        } else {
+        if (values != null) {
             int valuesCount = count < 0 ? values.size() - offset :
                               Math.min(count, values.size() - offset);
             int lastValue = offset + valuesCount - 1;
             if (exportedFileType == BasicExportAction.MODE_CSV) {
                 for (int i = offset; i <= lastValue; i++) {
-                    eDD.dumpData(values.get(i)+comma);
+                    eDD.dumpData(values.get(i));
+                    eDD.dumpData(comma);
                 }
             } else if (exportedFileType==BasicExportAction.MODE_TXT) {
                 for (int i = offset; i <= lastValue; i++) {
