@@ -191,6 +191,11 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
         }
     }
 */
+
+    public void profilingPoint(final int threadId, final int ppId, final long timeStamp) {
+        // do nothing
+    }
+
     @Override
     public void timeAdjust(int threadId, long timeDiff0, long timeDiff1) {
         ThreadInfo ti = getThreadInfo(threadId);
