@@ -118,6 +118,10 @@ public class ThreadInfo {
         return threadId;
     }
 
+    static boolean isProfilerServerMonitor(Object monitor) {
+        return monitor == threadInfosLock;
+    }
+    
     public static boolean isCurrentThreadProfilerServerThread() {
         return isProfilerServerThread(Thread.currentThread());
     }

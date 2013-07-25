@@ -50,6 +50,7 @@ import java.util.logging.Level;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
+import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.marker.Mark;
@@ -563,6 +564,22 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         batchNotEmpty = true;
+    }
+    
+    public void profilingPoint(final int threadId, final int ppId, final long timeStamp) {
+        ProfilerClient client = getClient();
+
+        if (client == null) {
+            return;
+        }
+
+        final ProfilingPointsProcessor ppp = TargetAppRunner.getDefault().getProfilingPointsProcessor();
+
+        afterBatchCommands.add(new Runnable() {
+            public void run() {
+                ppp.profilingPointHit(new RuntimeProfilingPoint.HitEvent(ppId, timeStamp, threadId));
+            }
+        });
     }
 
     /**
