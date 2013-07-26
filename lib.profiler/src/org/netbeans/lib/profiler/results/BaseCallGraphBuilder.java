@@ -44,9 +44,6 @@
 package org.netbeans.lib.profiler.results;
 
 import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
-import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -117,22 +114,6 @@ public abstract class BaseCallGraphBuilder implements ProfilingResultListener, C
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("Finishing batch"); // NOI18N
         }
-    }
-
-    public void profilingPoint(final int threadId, final int ppId, final long timeStamp) {
-        ProfilerClient client = getClient();
-
-        if (client == null) {
-            return;
-        }
-
-        final ProfilingPointsProcessor ppp = TargetAppRunner.getDefault().getProfilingPointsProcessor();
-
-        afterBatchCommands.add(new Runnable() {
-                public void run() {
-                    ppp.profilingPointHit(new RuntimeProfilingPoint.HitEvent(ppId, timeStamp, threadId));
-                }
-            });
     }
 
     public void removeAllListeners() {
