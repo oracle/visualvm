@@ -52,6 +52,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.NavigationFilter;
 import javax.swing.text.Position;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -89,6 +90,12 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public void setOpaque(boolean o) {
+        super.setOpaque(o);
+        if (UIUtils.isNimbusLookAndFeel() && !o)
+            setBackground(new Color(0, 0, 0, 0));
+    }
 
     public void setText(String value) {
         Font font = getFont();

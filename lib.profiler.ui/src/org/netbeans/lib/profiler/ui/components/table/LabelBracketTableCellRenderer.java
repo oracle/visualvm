@@ -118,7 +118,7 @@ public class LabelBracketTableCellRenderer extends EnhancedTableCellRenderer {
     protected void setRowForeground(Color c) {
         super.setRowForeground(c);
         label1.setForeground(c);
-        label2.setForeground(c.equals(Color.BLACK) ? Color.GRAY : c.brighter());
+        label2.setForeground(UIUtils.getDisabledForeground(c));
     }
 
     protected void setValue(JTable table, Object value, int row, int column) {

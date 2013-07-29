@@ -43,13 +43,20 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
+import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MarkedCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
@@ -57,13 +64,7 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.SimpleCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
-import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.logging.Level;
-import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 
 
 /**
@@ -427,7 +428,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("ENTRY SLEEP: " // + debugNode(curNode) // NOI18N
@@ -458,7 +462,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         long lastSleep = timeStamp0 - curNode.getLastWaitOrSleepStamp();
 
@@ -558,6 +565,22 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
         batchNotEmpty = true;
     }
+    
+    public void profilingPoint(final int threadId, final int ppId, final long timeStamp) {
+        ProfilerClient client = getClient();
+
+        if (client == null) {
+            return;
+        }
+
+        final ProfilingPointsProcessor ppp = TargetAppRunner.getDefault().getProfilingPointsProcessor();
+
+        afterBatchCommands.add(new Runnable() {
+            public void run() {
+                ppp.profilingPointHit(new RuntimeProfilingPoint.HitEvent(ppId, timeStamp, threadId));
+            }
+        });
+    }
 
     /**
      * Called when the TA is suspended waiting for the tool to process the buffer
@@ -596,7 +619,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("ENTRY WAIT: " //+ debugNode(curNode) // NOI18N
@@ -628,7 +654,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         long lastWait = timeStamp0 - curNode.getLastWaitOrSleepStamp();
         curNode.setLastWaitOrSleepStamp(0);
@@ -659,7 +688,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("ENTRY PARK: " //+ debugNode(curNode) // NOI18N
@@ -691,7 +723,10 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         ThreadInfo ti = threadInfos.threadInfos[threadId];
-        TimedCPUCCTNode curNode = ti.stack[ti.stackTopIdx];
+        TimedCPUCCTNode curNode = ti.peek();
+        if (curNode == null) {
+            return;
+        }
 
         long lastWait = timeStamp0 - curNode.getLastWaitOrSleepStamp();
         curNode.setLastWaitOrSleepStamp(0);

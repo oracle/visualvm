@@ -42,6 +42,7 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.basic;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -308,32 +309,24 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
 
     @Override
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
-        StringBuffer result;
         String comma = ","; // NOI18N
-        if (values == null) {
-            result = new StringBuffer(""); //NOI18N
-        } else {
+        if (values != null) {
             int valuesCount = count < 0 ? values.size() - offset :
-                              Math.min(count, values.size() - offset);            
-            int separatorLength = separator == null ? 0 : separator.length();
-            int estimatedSize = Math.min(valuesCount * (2 + separatorLength), MAX_PREVIEW_LENGTH + TRUNCATED.length());
-            result = new StringBuffer(estimatedSize);
+                              Math.min(count, values.size() - offset);
             int lastValue = offset + valuesCount - 1;
             if (exportedFileType == BasicExportAction.MODE_CSV) {
                 for (int i = offset; i <= lastValue; i++) {
-                    result.append(values.get(i));
-                    result.append(comma);
+                    eDD.dumpData(values.get(i));
+                    eDD.dumpData(comma);
                 }
-                result.deleteCharAt(result.length()-1);
             } else if (exportedFileType==BasicExportAction.MODE_TXT) {
                 for (int i = offset; i <= lastValue; i++) {
-                    result.append(values.get(i));
+                    eDD.dumpData(values.get(i));
                 }
             } else {
                 throw new IllegalArgumentException(); //Illegal export type
             }
         }
-        eDD.dumpData(result);
         eDD.close();
     }
 

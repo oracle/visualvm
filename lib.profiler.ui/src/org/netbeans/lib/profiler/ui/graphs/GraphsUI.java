@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.ui.graphs;
 
 import java.awt.Color;
 import java.util.ResourceBundle;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -76,13 +77,13 @@ public interface GraphsUI {
 
     // --- Charts colors definition --------------------------------------------
 
-    public static final Color  CHART_BACKGROUND_COLOR = Color.WHITE;
-    public static final Color  SMALL_LEGEND_BACKGROUND_COLOR = Color.WHITE;
+    public static final Color  CHART_BACKGROUND_COLOR = UIUtils.getProfilerResultsBackground();
+    public static final Color  SMALL_LEGEND_BACKGROUND_COLOR = UIUtils.getProfilerResultsBackground();
     public static final Color  SMALL_LEGEND_BORDER_COLOR = new Color(235, 235, 235);
 
     public static final float  TOOLTIP_OVERLAY_LINE_WIDTH = 2.1f;
     public static final Color  TOOLTIP_OVERLAY_LINE_COLOR = Color.DARK_GRAY;
-    public static final Color  TOOLTIP_OVERLAY_FILL_COLOR = new Color(250, 250, 255);
+    public static final Color  TOOLTIP_OVERLAY_FILL_COLOR = UIUtils.getProfilerResultsBackground();
 
 
     // --- Class History graphs ------------------------------------------------

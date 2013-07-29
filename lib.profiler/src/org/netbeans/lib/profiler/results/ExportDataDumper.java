@@ -86,7 +86,7 @@ public class ExportDataDumper {
         return numExceptions;
     }
 
-    public void dumpData(StringBuffer s) {
+    public void dumpData(CharSequence s) {
         if (caughtEx != null) {
             return;
         }

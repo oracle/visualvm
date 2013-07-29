@@ -45,7 +45,10 @@ package org.netbeans.lib.profiler.results.memory;
 
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerLogger;
+import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
+import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.TransactionalSupport;
 import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
@@ -446,6 +449,22 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
         }
 
         batchNotEmpty = true;
+    }
+    
+    public void profilingPoint(final int threadId, final int ppId, final long timeStamp) {
+        ProfilerClient client = getClient();
+
+        if (client == null) {
+            return;
+        }
+
+        final ProfilingPointsProcessor ppp = TargetAppRunner.getDefault().getProfilingPointsProcessor();
+
+        afterBatchCommands.add(new Runnable() {
+                public void run() {
+                    ppp.profilingPointHit(new RuntimeProfilingPoint.HitEvent(ppId, timeStamp, threadId));
+                }
+            });
     }
 
     @Override
