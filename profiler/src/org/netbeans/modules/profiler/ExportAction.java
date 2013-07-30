@@ -294,17 +294,19 @@ public final class ExportAction extends AbstractAction {
 
         // 2. process both cases and extract file name and extension to use and set exported file type
         File file = chooser.getSelectedFile();
-        String targetExt;
-        if (chooser.getFileFilter().getDescription().equals(Bundle.ExportAction_ExportDialogXMLFilter())) {
+        String targetExt;        
+        FileFilter selectedFileFilter = chooser.getFileFilter();
+        if (selectedFileFilter==null // workaround for #233652
+                || selectedFileFilter.getDescription().equals(Bundle.ExportAction_ExportDialogXMLFilter())) {
             targetExt=FILE_EXTENSION_XML;
             exportedFileType=MODE_XML;
-        } else if (chooser.getFileFilter().getDescription().equals(Bundle.ExportAction_ExportDialogHTMLFilter())) {
+        } else if (selectedFileFilter.getDescription().equals(Bundle.ExportAction_ExportDialogHTMLFilter())) {
             targetExt=FILE_EXTENSION_HTML;
             exportedFileType=MODE_HTML;
-        } else if (chooser.getFileFilter().getDescription().equals(Bundle.ExportAction_ExportDialogExcelFilter())) {
+        } else if (selectedFileFilter.getDescription().equals(Bundle.ExportAction_ExportDialogExcelFilter())) {
             targetExt = FILE_EXTENSION_CSV;
             exportedFileType=MODE_EXCEL;
-        } else if (chooser.getFileFilter().getDescription().equals(Bundle.ExportAction_ExportDialogNPSFilter())) {
+        } else if (selectedFileFilter.getDescription().equals(Bundle.ExportAction_ExportDialogNPSFilter())) {
             targetExt = FILE_EXTENSION_NPS;
             exportedFileType=MODE_NPS;
         } else { // CSV is default
