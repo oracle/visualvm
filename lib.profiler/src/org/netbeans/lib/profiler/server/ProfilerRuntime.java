@@ -702,7 +702,7 @@ public class ProfilerRuntime implements CommonConstants {
         evBuf[curPos++] = (byte) ((absTimeStamp >> 16) & 0xFF);
         evBuf[curPos++] = (byte) ((absTimeStamp >> 8) & 0xFF);
         evBuf[curPos++] = (byte) ((absTimeStamp) & 0xFF);
-        if (id != null) {
+        if (hash != -1) {
             evBuf[curPos++] = (byte) ((hash >> 24) & 0xFF);
             evBuf[curPos++] = (byte) ((hash >> 16) & 0xFF);
             evBuf[curPos++] = (byte) ((hash >> 8) & 0xFF);
