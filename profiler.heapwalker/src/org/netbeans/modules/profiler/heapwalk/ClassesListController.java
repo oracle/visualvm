@@ -575,9 +575,9 @@ public class ClassesListController extends AbstractController {
         HashSet subclasses = new HashSet();
 
         for (int i = 0; i < filterStrings.length; i++) {
-            JavaClass jClass = heap.getJavaClassByName(filterStrings[i]);
+            Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(filterStrings[i].replace(".", "\\."));
 
-            if (jClass != null) {
+            for (JavaClass jClass : jClasses) {
                 Collection subclassesCol = jClass.getSubClasses();
                 subclasses.add(jClass); // instanceof approach rather than subclassof
 
