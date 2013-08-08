@@ -383,7 +383,7 @@ class ClassDump extends HprofObject implements JavaClass {
         HprofByteBuffer buffer = getHprofBuffer();
         int idSize = buffer.getIDSize();
         long fieldOffset = fileOffset + staticFieldOffset;
-        int fields = getHprofBuffer().getShort(fieldOffset);
+        int fields = buffer.getShort(fieldOffset);
         HprofHeap heap = getHprof();
 
         fieldOffset += 2;
@@ -402,7 +402,7 @@ class ClassDump extends HprofObject implements JavaClass {
         HprofByteBuffer buffer = getHprofBuffer();
         int idSize = buffer.getIDSize();
         long fieldOffset = fileOffset + getStaticFieldOffset();
-        int fields = getHprofBuffer().getShort(fieldOffset);
+        int fields = buffer.getShort(fieldOffset);
         List staticFileds = null;
         HprofHeap heap = getHprof();
 
