@@ -152,7 +152,7 @@ class ClassDump extends HprofObject implements JavaClass {
         HprofHeap heap = getHprof();
         HprofByteBuffer dumpBuffer = getHprofBuffer();
         int idSize = dumpBuffer.getIDSize();
-        List instances = new ArrayList(instancesCount);
+        List instancesList = new ArrayList(instancesCount);
         TagBounds allInstanceDumpBounds = heap.getAllInstanceDumpBounds();
         long[] offset = new long[] { firstInstanceOffset };
 
@@ -187,19 +187,19 @@ class ClassDump extends HprofObject implements JavaClass {
                     throw new IllegalArgumentException("Illegal tag " + tag); // NOI18N
                 }
 
-                instances.add(instance);
+                instancesList.add(instance);
 
                 if (--instancesCount == 0) {
-                    return instances;
+                    return instancesList;
                 }
             }
         }
 
         if (DEBUG) {
-            System.out.println("Class " + getName() + " Col " + instances.size() + " instances " + getInstancesCount()); // NOI18N
+            System.out.println("Class " + getName() + " Col " + instancesList.size() + " instances " + getInstancesCount()); // NOI18N
         }
 
-        return instances;
+        return instancesList;
     }
 
     public int getInstancesCount() {
