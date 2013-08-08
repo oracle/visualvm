@@ -74,6 +74,7 @@ class ClassDump extends HprofObject implements JavaClass {
 
     final ClassDumpSegment classDumpSegment;
     private int instances;
+    private long firstInstanceOffset;
     private long loadClassOffset;
     private long retainedSizeByClass;
 
@@ -153,7 +154,7 @@ class ClassDump extends HprofObject implements JavaClass {
         int idSize = dumpBuffer.getIDSize();
         List instances = new ArrayList(instancesCount);
         TagBounds allInstanceDumpBounds = heap.getAllInstanceDumpBounds();
-        long[] offset = new long[] { allInstanceDumpBounds.startOffset };
+        long[] offset = new long[] { firstInstanceOffset };
 
         while (offset[0] < allInstanceDumpBounds.endOffset) {
             long start = offset[0];
@@ -429,8 +430,14 @@ class ClassDump extends HprofObject implements JavaClass {
         }
     }
 
-    void incrementInstance() {
+    void registerInstance(long offset) {
         instances++;
+        if (firstInstanceOffset == 0) {
+            firstInstanceOffset = offset;
+            if (DEBUG) {
+                System.out.println("First instance :"+getName()+" "+offset/1024/1024); // NOI18N
+            }
+        }
     }
 
     void addSizeForInstance(Instance i) {
