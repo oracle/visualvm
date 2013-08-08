@@ -444,13 +444,13 @@ class ClassDump extends HprofObject implements JavaClass {
             while(fieldsIt.hasNext()) {
                 Field f = (Field) fieldsIt.next();
 
-                if (f.getType().getName().equals("object")) {
+                if (f.getType().getName().equals("object")) {   // NOI18N
                     return true;
                 }
             }
         }
         if (DEBUG) {
-            if (instances>10) System.out.println(getName()+" cannot contain itself "+instances);
+            if (instances>10) System.out.println(getName()+" cannot contain itself "+instances);    // NOI18N
         }
         return false;
     }
