@@ -121,7 +121,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                                 timeStamp1 = getTimeStamp(buffer);
                             }
                         }
-                        if (hasMonitorInfo && eventType == CommonConstants.METHOD_ENTRY_MONITOR || eventType == CommonConstants.METHOD_EXIT_MONITOR) {
+                        if (hasMonitorInfo && (eventType == CommonConstants.METHOD_ENTRY_MONITOR || eventType == CommonConstants.METHOD_EXIT_MONITOR)) {
                             hash = buffer.getInt();
                         }
                     }
