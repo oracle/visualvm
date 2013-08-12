@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.actions;
 
 import org.netbeans.modules.profiler.LoadedSnapshot;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -152,9 +151,17 @@ public final class LoadSnapshotAction extends AbstractAction {
             }
 
             if (!snapshotsFOArr.isEmpty()) {
-                LoadedSnapshot[] imported = ResultsManager.getDefault()
-                                                          .loadSnapshots(snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
-                ResultsManager.getDefault().openSnapshots(imported);
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        final LoadedSnapshot[] imported = ResultsManager.getDefault().loadSnapshots(
+                                snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                ResultsManager.getDefault().openSnapshots(imported);
+                            }
+                        });
+                    }
+                });
             } else if (!handleHeapdumps) {
                 ProfilerDialogs.displayError(Bundle.LoadSnapshotAction_No_Snapshot_Selected());
 

@@ -122,7 +122,7 @@ public interface Heap {
     JavaClass getJavaClassByName(String fqn);
 
     /**
-     * computes collection of {@link JavaClass} filtered by regular rexpression.
+     * computes collection of {@link JavaClass} filtered by regular expression.
      * <br>
      * Speed: slow
      * @param regexp regular expression for java class name.
