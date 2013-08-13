@@ -225,7 +225,8 @@ public class ProfilerRuntime implements CommonConstants {
 
     // ------------- Handling wait/sleep/monitors entry/exit -------------------------------------------
     public static void monitorEntry(Thread t, Object monitor) {
-        if (ThreadInfo.profilingSuspended() || ThreadInfo.isProfilerServerThread(t)) {
+        if (ThreadInfo.profilingSuspended() || ThreadInfo.isProfilerServerThread(t)
+            || ThreadInfo.isProfilerServerMonitor(monitor)) {
             // nothing done for profiler own threads or if in instrumentation
             return;
         }
@@ -260,7 +261,8 @@ public class ProfilerRuntime implements CommonConstants {
     }
 
     public static void monitorExit(Thread t, Object monitor) {
-        if (ThreadInfo.profilingSuspended() || ThreadInfo.isProfilerServerThread(t)) {
+        if (ThreadInfo.profilingSuspended() || ThreadInfo.isProfilerServerThread(t)
+            || ThreadInfo.isProfilerServerMonitor(monitor)) {
             // nothing done for profiler own threads or if in instrumentation
             return;
         }
@@ -700,7 +702,7 @@ public class ProfilerRuntime implements CommonConstants {
         evBuf[curPos++] = (byte) ((absTimeStamp >> 16) & 0xFF);
         evBuf[curPos++] = (byte) ((absTimeStamp >> 8) & 0xFF);
         evBuf[curPos++] = (byte) ((absTimeStamp) & 0xFF);
-        if (id != null) {
+        if (hash != -1) {
             evBuf[curPos++] = (byte) ((hash >> 24) & 0xFF);
             evBuf[curPos++] = (byte) ((hash >> 16) & 0xFF);
             evBuf[curPos++] = (byte) ((hash >> 8) & 0xFF);
