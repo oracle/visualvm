@@ -969,6 +969,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                         return Bundle.CompareSnapshotsAction_OpenChooserFilter("nps"); // NOI18N
                     }
                 });
+            snapshotFileChooser.setAcceptAllFileFilterUsed(false);
         }
 
         return snapshotFileChooser;
