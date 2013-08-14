@@ -70,6 +70,8 @@ public class PresoObjAllocCCTNode implements CCTNode {
     public static final String VM_ALLOC_METHOD = "traceVMObjectAlloc"; // NOI18N
     private static final String VM_ALLOC_TEXT = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle") // NOI18N
     .getString("PresoObjAllocCCTNode_VMAllocMsg"); // NOI18N
+    private static final String UKNOWN_NODENAME = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.memory.Bundle") // NOI18N
+    .getString("PresoObjAllocCCTNode_UnknownMsg"); // NOI18N
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_ALLOC_OBJ_SIZE = 2;
     public static final int SORT_BY_ALLOC_OBJ_NUMBER = 3;
@@ -176,8 +178,10 @@ public class PresoObjAllocCCTNode implements CCTNode {
             return FilterSortSupport.FILTERED_OUT_LBL;
         } else if (methodId != 0) {
             return nodeName;
-        } else {
+        } else if (className != null) {
             return className;
+        } else {
+            return UKNOWN_NODENAME;
         }
     }
 
@@ -321,7 +325,7 @@ public class PresoObjAllocCCTNode implements CCTNode {
 
         // If any object allocations that happen in our own code are caught (which shouldn't happen),
         // make sure to conceal this data here.
-        boolean thisNodeOk = !className.equals("org.netbeans.lib.profiler.server.ProfilerServer"); // NOI18N
+        boolean thisNodeOk = !"org.netbeans.lib.profiler.server.ProfilerServer".equals(className); // NOI18N
         boolean childrenOk = true;
 
         if (children != null) {
