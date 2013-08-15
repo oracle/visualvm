@@ -322,12 +322,18 @@ public class CompareSnapshotsAction extends AbstractAction {
                             
                             @Override
                             protected void doInBackground() {
+                                ResultsManager rm = ResultsManager.getDefault();
                                 FileObject s1fo = FileUtil.toFileObject(s1);
                                 FileObject s2fo = FileUtil.toFileObject(s2);
-                                int s1t = ResultsManager.getDefault().getSnapshotType(s1fo);
-                                int s2t = ResultsManager.getDefault().getSnapshotType(s2fo);
+                                int s1t = rm.getSnapshotType(s1fo);
+                                int s2t = rm.getSnapshotType(s2fo);
 
-                                if (s1t != s2t) {
+                                if (s1t == LoadedSnapshot.SNAPSHOT_TYPE_UNKNOWN ||
+                                    s2t == LoadedSnapshot.SNAPSHOT_TYPE_UNKNOWN) {
+                                    // Unknown snapshot types or not .nps snapshots
+                                    hintStr = Bundle.CompareSnapshotsAction_InvalidFilesMsg();
+                                    okButton.setEnabled(false);
+                                } else if (s1t != s2t) {
                                     // snapshot types don't match
                                     hintStr = Bundle.CompareSnapshotsAction_DifferentSnapshotsTypeMsg();
                                     enabledOk = false;
@@ -336,16 +342,23 @@ public class CompareSnapshotsAction extends AbstractAction {
 //                                    // not a memory snapshot
 //                                    hintStr = Bundle.CompareSnapshotsAction_OnlyMemorySnapshotsMsg();
 //                                    enabledOk = false;
-                                } else if (ResultsManager.getDefault().getSnapshotSettings(s1fo).getAllocTrackEvery() != ResultsManager.getDefault()
-                                                                                                                                   .getSnapshotSettings(s2fo)
-                                                                                                                                   .getAllocTrackEvery()) {
-                                    // memory snapshots have different track every N objects
-                                    hintStr = Bundle.CompareSnapshotsAction_DifferentObjectsCountsMsg();
-                                    enabledOk = false;
                                 } else {
-                                    // comparable snapshots (from the hint point of view!)
-                                    hintStr = " "; // NOI18N
-                                    enabledOk = areComparableSnapshots(s1fo, s2fo);
+                                    ProfilingSettings s1s = rm.getSnapshotSettings(s1fo);
+                                    ProfilingSettings s2s = rm.getSnapshotSettings(s2fo);
+                                    if (s1s == null || s2s == null) {
+                                        // Snapshot settings not available (should not happen)
+                                        hintStr = Bundle.CompareSnapshotsAction_InvalidFilesMsg();
+                                        okButton.setEnabled(false);
+                                    } else if (s1s.getAllocTrackEvery() != s2s.getAllocTrackEvery()) {
+                                        // memory snapshots have different track every N objects
+                                        // TODO: is this branch OK for CPU snapshots? Seems to work fine.
+                                        hintStr = Bundle.CompareSnapshotsAction_DifferentObjectsCountsMsg();
+                                        enabledOk = false;
+                                    } else {
+                                        // comparable snapshots (from the hint point of view!)
+                                        hintStr = " "; // NOI18N
+                                        enabledOk = areComparableSnapshots(s1fo, s2fo);
+                                    }
                                 }
                             }
 
