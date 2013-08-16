@@ -56,6 +56,7 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -239,7 +240,7 @@ public class HeapTest {
         PrintStream out = new PrintStream(new BufferedOutputStream(outs,128*1024),false,"UTF-8");
         HeapSummary summary = heap.getSummary();
         out.println("Heap Summary");
-        DateFormat df = DateFormat.getDateTimeInstance();
+        DateFormat df = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss aaa");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         out.println("Time "+df.format(new Date(summary.getTime())));
         out.println("Live instances "+summary.getTotalLiveInstances());
