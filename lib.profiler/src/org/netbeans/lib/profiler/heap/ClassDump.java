@@ -74,6 +74,7 @@ class ClassDump extends HprofObject implements JavaClass {
 
     final ClassDumpSegment classDumpSegment;
     private int instances;
+    private long firstInstanceOffset;
     private long loadClassOffset;
     private long retainedSizeByClass;
 
@@ -151,9 +152,9 @@ class ClassDump extends HprofObject implements JavaClass {
         HprofHeap heap = getHprof();
         HprofByteBuffer dumpBuffer = getHprofBuffer();
         int idSize = dumpBuffer.getIDSize();
-        List instances = new ArrayList(instancesCount);
+        List instancesList = new ArrayList(instancesCount);
         TagBounds allInstanceDumpBounds = heap.getAllInstanceDumpBounds();
-        long[] offset = new long[] { allInstanceDumpBounds.startOffset };
+        long[] offset = new long[] { firstInstanceOffset };
 
         while (offset[0] < allInstanceDumpBounds.endOffset) {
             long start = offset[0];
@@ -186,19 +187,19 @@ class ClassDump extends HprofObject implements JavaClass {
                     throw new IllegalArgumentException("Illegal tag " + tag); // NOI18N
                 }
 
-                instances.add(instance);
+                instancesList.add(instance);
 
                 if (--instancesCount == 0) {
-                    return instances;
+                    return instancesList;
                 }
             }
         }
 
         if (DEBUG) {
-            System.out.println("Class " + getName() + " Col " + instances.size() + " instances " + getInstancesCount()); // NOI18N
+            System.out.println("Class " + getName() + " Col " + instancesList.size() + " instances " + getInstancesCount()); // NOI18N
         }
 
-        return instances;
+        return instancesList;
     }
 
     public int getInstancesCount() {
@@ -382,7 +383,7 @@ class ClassDump extends HprofObject implements JavaClass {
         HprofByteBuffer buffer = getHprofBuffer();
         int idSize = buffer.getIDSize();
         long fieldOffset = fileOffset + staticFieldOffset;
-        int fields = getHprofBuffer().getShort(fieldOffset);
+        int fields = buffer.getShort(fieldOffset);
         HprofHeap heap = getHprof();
 
         fieldOffset += 2;
@@ -401,7 +402,7 @@ class ClassDump extends HprofObject implements JavaClass {
         HprofByteBuffer buffer = getHprofBuffer();
         int idSize = buffer.getIDSize();
         long fieldOffset = fileOffset + getStaticFieldOffset();
-        int fields = getHprofBuffer().getShort(fieldOffset);
+        int fields = buffer.getShort(fieldOffset);
         List staticFileds = null;
         HprofHeap heap = getHprof();
 
@@ -429,8 +430,14 @@ class ClassDump extends HprofObject implements JavaClass {
         }
     }
 
-    void incrementInstance() {
+    void registerInstance(long offset) {
         instances++;
+        if (firstInstanceOffset == 0) {
+            firstInstanceOffset = offset;
+            if (DEBUG) {
+                System.out.println("First instance :"+getName()+" "+offset/1024/1024); // NOI18N
+            }
+        }
     }
 
     void addSizeForInstance(Instance i) {
@@ -444,13 +451,13 @@ class ClassDump extends HprofObject implements JavaClass {
             while(fieldsIt.hasNext()) {
                 Field f = (Field) fieldsIt.next();
 
-                if (f.getType().getName().equals("object")) {
+                if (f.getType().getName().equals("object")) {   // NOI18N
                     return true;
                 }
             }
         }
         if (DEBUG) {
-            if (instances>10) System.out.println(getName()+" cannot contain itself "+instances);
+            if (instances>10) System.out.println(getName()+" cannot contain itself "+instances);    // NOI18N
         }
         return false;
     }
