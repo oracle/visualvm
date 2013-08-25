@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -152,6 +151,11 @@ public final class ResetResultsAction extends CallableSystemAction {
                 } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {} // ignore
             }
         });
+    }
+    
+    @Override
+    protected boolean asynchronous() {
+        return false;
     }
     
     @Override
