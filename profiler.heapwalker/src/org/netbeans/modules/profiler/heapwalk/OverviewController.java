@@ -204,7 +204,10 @@ public class OverviewController extends AbstractController {
                 + Bundle.OverviewController_GcRootsItemString(numberFormat.format(heap.getGCRoots().size()));
         
         String finalizersInfo = LINE_PREFIX
-                + Bundle.OverviewController_FinalizersItemString(numberFormat.format(finalizers));
+                + Bundle.OverviewController_FinalizersItemString(
+                          finalizers >= 0 ? numberFormat.format(finalizers) :
+                          Bundle.OverviewController_NotAvailableMsg()
+                );
 
         String oomeString = "";
         if (oome != null) {
