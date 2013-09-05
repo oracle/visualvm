@@ -885,6 +885,11 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         headerPopup.show(cornerButton, cornerButton.getWidth() - headerPopup.getPreferredSize().width, cornerButton.getHeight());
     }
 
+    public HeapWalkerNode getSelectedNode() {
+        int row = fieldsListTable.getSelectedRow();
+        return getSelectedNode(row);        
+    }
+    
     public HeapWalkerNode getSelectedNode(int row) {
         return row == -1 ? null :
                (HeapWalkerNode) fieldsListTable.getTree().
