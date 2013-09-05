@@ -601,17 +601,13 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
         showGcRootItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_ShowGcRootItemText());
         showGcRootItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    int row = fieldsListTable.getSelectedRow();
+                    HeapWalkerNode node = getSelectedNode();
 
-                    if (row != -1) {
-                        HeapWalkerNode node = getSelectedNode(row);
+                    if (node instanceof InstanceNode) {
+                        InstanceNode instanceNode = (InstanceNode) node;
 
-                        if (node instanceof InstanceNode) {
-                            InstanceNode instanceNode = (InstanceNode) node;
-
-                            if (instanceNode.hasInstance()) {
-                                referencesBrowserController.navigateToNearestGCRoot(instanceNode);
-                            }
+                        if (instanceNode.hasInstance()) {
+                            referencesBrowserController.navigateToNearestGCRoot(instanceNode);
                         }
                     }
                 }
@@ -619,15 +615,11 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
 
         showLoopOriginItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_ShowLoopItemText());
         showLoopOriginItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    int row = fieldsListTable.getSelectedRow();
+            public void actionPerformed(ActionEvent e) {
+                    HeapWalkerNode node = getSelectedNode();
 
-                    if (row != -1) {
-                        HeapWalkerNode node = getSelectedNode(row);
-
-                        if (node instanceof HeapWalkerInstanceNode && ((HeapWalkerInstanceNode) node).isLoop()) {
-                            selectNode(((HeapWalkerInstanceNode) node).getLoopTo());
-                        }
+                    if (node instanceof HeapWalkerInstanceNode && ((HeapWalkerInstanceNode) node).isLoop()) {
+                        selectNode(((HeapWalkerInstanceNode) node).getLoopTo());
                     }
                 }
             });
@@ -648,29 +640,24 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
             showSourceItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_GoToSourceItemText());
             showSourceItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        int row = fieldsListTable.getSelectedRow();
-
-                        if (row != -1) {
-                            HeapWalkerNode node = getSelectedNode(row);
-                            String className = BrowserUtils.getArrayBaseType(node.getType());
-                            Lookup.Provider p = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
-                            GoToSource.openSource(p, className, null, null);
+                            HeapWalkerNode node = getSelectedNode();
+                            
+                            if (node != null) {
+                                String className = BrowserUtils.getArrayBaseType(node.getType());
+                                Lookup.Provider p = referencesBrowserController.getReferencesControllerHandler().getHeapFragmentWalker().getHeapDumpProject();
+                                GoToSource.openSource(p, className, null, null);
+                            }
                         }
-                    }
-                });
+                    });
         }
             
         showInThreadsItem = new JMenuItem(Bundle.ReferencesBrowserControllerUI_ShowInThreadsItemText());
         showInThreadsItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    int row = fieldsListTable.getSelectedRow();
-
-                    if (row != -1) {
-                        HeapWalkerNode node = getSelectedNode(row);
-                        if (node instanceof HeapWalkerInstanceNode) {
-                            Instance instance = ((HeapWalkerInstanceNode)node).getInstance();
-                            referencesBrowserController.showInThreads(instance);
-                        }
+                    HeapWalkerNode node = getSelectedNode();
+                    if (node instanceof HeapWalkerInstanceNode) {
+                        Instance instance = ((HeapWalkerInstanceNode)node).getInstance();
+                        referencesBrowserController.showInThreads(instance);
                     }
                 }
             });
@@ -854,17 +841,13 @@ public class ReferencesBrowserControllerUI extends JTitledPanel {
     }
 
     private void performDefaultAction() {
-        int row = fieldsListTable.getSelectedRow();
+        HeapWalkerNode node = getSelectedNode();
 
-        if (row != -1) {
-            HeapWalkerNode node = getSelectedNode(row);
+        if (node instanceof HeapWalkerInstanceNode) {
+            referencesBrowserController.createNavigationHistoryPoint();
 
-            if (node instanceof HeapWalkerInstanceNode) {
-                referencesBrowserController.createNavigationHistoryPoint();
-
-                HeapWalkerInstanceNode instanceNode = (HeapWalkerInstanceNode) node;
-                referencesBrowserController.navigateToInstance(instanceNode.getInstance());
-            }
+            HeapWalkerInstanceNode instanceNode = (HeapWalkerInstanceNode) node;
+            referencesBrowserController.navigateToInstance(instanceNode.getInstance());
         }
     }
 
