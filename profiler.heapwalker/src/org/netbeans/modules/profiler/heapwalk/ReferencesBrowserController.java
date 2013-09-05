@@ -264,7 +264,11 @@ public class ReferencesBrowserController extends AbstractController {
                 }
                 
                 ReferencesBrowserControllerUI controlerUI = (ReferencesBrowserControllerUI) getPanel();
-                if (instanceNode.equals(controlerUI.getSelectedNode(0))) {
+                HeapWalkerNode selNode = controlerUI.getSelectedNode();
+                if (selNode == null) {
+                    selNode = controlerUI.getSelectedNode(0);
+                }
+                if (instanceNode.equals(selNode)) {
                     if (gcRootNode != null) {
                         if (instanceNode == gcRootNode) {
                             ProfilerDialogs.displayInfo(Bundle.ReferencesBrowserController_SelfGcRootMsg());
