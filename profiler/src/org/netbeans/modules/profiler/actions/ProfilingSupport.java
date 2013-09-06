@@ -51,12 +51,15 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.api.TaskConfigurator;
 import org.netbeans.modules.profiler.api.project.ProjectProfilingSupport;
 import org.netbeans.modules.profiler.attach.AttachWizard;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 
@@ -141,8 +144,29 @@ public final class ProfilingSupport {
                     Bundle.CAPTION_Question())) {
                     return true;
                 }
-
-                profiler.stopApp();
+                if (SwingUtilities.isEventDispatchThread()) {
+                    StopAction.getInstance().setEnabled(false);
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            profiler.stopApp();
+                        }
+                    });
+                } else {
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                StopAction.getInstance().setEnabled(false);
+                            }
+                        });
+                    } catch (InterruptedException ex) {
+                        ProfilerLogger.log(ex);
+                    } catch (InvocationTargetException ex) {
+                        ProfilerLogger.log(ex);
+                    }
+                    profiler.stopApp();
+                }                
             } else {
                 if (!ProfilerDialogs.displayConfirmation(
                     Bundle.ProfilingSupport_StopStartAttachSessionMessage(), 
