@@ -150,11 +150,12 @@ class JmxModelImpl extends JmxModel {
                 } else {
                     proxyClient = new ProxyClient(this, lvm);
                 }
-            } else {
+            }
+            if (proxyClient == null) {
                 // Create a ProxyClient for the remote out-of-the-box
                 // JMX management agent using the port and security
                 // related information retrieved through jvmstat.
-                List<String> urls = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.address"); // NOI18N
+                List<String> urls = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.remoteAddress"); // NOI18N
                 if (urls.size() != 0) {
                     List<String> auths = jvmstat.findByPattern("sun.management.JMXConnectorServer.[0-9]+.authenticate"); // NOI18N
                     proxyClient = new ProxyClient(this, urls.get(0));
