@@ -650,14 +650,19 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
     private void loadNamesForJMethodIds() {
         // problem: unloaded classes in the meantime
         // unloaded classes need to be handled specifically - see ClassLoaderManager, JMethodIdTable
-        transaction.beginTrans(false);
+        final ProfilerClient client = getClient();
+        if (client != null) {
+            synchronized (client) {
+                transaction.beginTrans(false);
 
-        try {
-            PresoObjAllocCCTNode.getNamesForMethodIdsFromVM(getClient(), stacksForClasses);
-        } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-            ProfilerLogger.log(ex.getMessage()); /* No longer ignore silently */
-        } finally {
-            transaction.endTrans();
+                try {
+                    PresoObjAllocCCTNode.getNamesForMethodIdsFromVM(client, stacksForClasses);
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    ProfilerLogger.log(ex.getMessage()); /* No longer ignore silently */
+                } finally {
+                    transaction.endTrans();
+                }
+            }
         }
     }
 
