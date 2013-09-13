@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
@@ -115,6 +114,11 @@ final class ApplicationProfilerView extends DataSourceView {
                 return ApplicationProfilerView.this.createSelector(presetSynchronizer, application);
             }
         };
+    }
+    
+    void copySettings(CPUSettingsSupport cpuSettingsC, MemorySettingsSupport memorySettingsC) {
+        if (cpuSettingsC != null) cpuSettings.copySettings(cpuSettingsC);
+        if (memorySettingsC != null) memorySettings.copySettings(memorySettingsC);
     }
     
     private PresetSelector createSelector(Runnable presetSynchronizer, Application application) {
@@ -350,7 +354,6 @@ final class ApplicationProfilerView extends DataSourceView {
           disableControlButtons();
           ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
             public void run() {
-              ProfilerSupport.getInstance().setProfiledApplication(null);
               NetBeansProfiler.getDefaultNB().detachFromApp();
             }
           });
@@ -373,7 +376,6 @@ final class ApplicationProfilerView extends DataSourceView {
               public void run() {
                 switch (state) {
                   case NetBeansProfiler.PROFILING_INACTIVE:
-                    ProfilerSupport.getInstance().setProfiledApplication(null); // Necessary to set here when profiled app finished
                     lastInstrValue = -1;
                     if (!applicationTerminated) {
                         timer.stop();
@@ -381,14 +383,23 @@ final class ApplicationProfilerView extends DataSourceView {
                         resetControlButtons();
                         RequestProcessor.getDefault().post(new Runnable() {
                           public void run() {
-                              enableControlButtons();
-                              enableSettings();
+                            ProfilerSupport.getInstance().setProfiledApplication(null);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    enableControlButtons();
+                                    enableSettings();
+                                }
+                            });
                           }
                         }, 500); // Wait for the application to finish
+                    } else {
+                        ProfilerSupport.getInstance().setProfiledApplication(null);
                     }
                     break;
                   case NetBeansProfiler.PROFILING_STARTED:
                     timer.stop();
+                    disableControlButtons();
+                    disableSettings();
                     statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_started")); // NOI18N
                     break;
                   case NetBeansProfiler.PROFILING_PAUSED:
@@ -411,7 +422,7 @@ final class ApplicationProfilerView extends DataSourceView {
                       disableSettings();
                       profilingResultsView.setProfilingResultsDisplay(getLiveResultsView());
                     } else {
-                      statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_of") + DataSourceDescriptorFactory.getDescriptor(profiledApplication).getName() + NbBundle.getMessage(ApplicationProfilerView.class, "MSG_in_progress"));  // NOI18N
+                      statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_of") + ProfilerSupport.getInstance().getProfiledApplicationName() + NbBundle.getMessage(ApplicationProfilerView.class, "MSG_in_progress"));  // NOI18N
                       disableControlButtons();
                       profilingResultsView.setProfilingResultsDisplay(null);
                     }
@@ -502,7 +513,7 @@ final class ApplicationProfilerView extends DataSourceView {
         }
 
         private void enableControlButtons() {
-          boolean enabled = application.getState() == Stateful.STATE_AVAILABLE;
+          boolean enabled = ProfilerSupport.getInstance().supportsProfiling(application);
           cpuButton.setEnabled(enabled);
           memoryButton.setEnabled(enabled);
           stopButton.setEnabled(NetBeansProfiler.getDefaultNB().getTargetAppRunner().targetAppIsRunning());
