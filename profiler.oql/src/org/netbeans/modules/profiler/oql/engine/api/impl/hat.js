@@ -422,7 +422,7 @@ function wrapJavaObject(thing) {
             },
             __get__ : function(name) {
                 if (name == "toString") {
-                    result = jclass.toString();
+                    return jclass.toString();
                 } else {
                     if (fldValueCache["_$"+name] == undefined) {
                         var result;
