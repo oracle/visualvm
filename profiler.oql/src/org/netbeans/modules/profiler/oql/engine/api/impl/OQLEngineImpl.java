@@ -41,7 +41,6 @@
  */
 package org.netbeans.modules.profiler.oql.engine.api.impl;
 
-import org.netbeans.modules.profiler.oql.engine.api.OQLException;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -58,6 +57,7 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.OQLQuery;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
+import org.netbeans.modules.profiler.oql.engine.api.OQLException;
 import org.openide.util.NbBundle;
 
 /**
@@ -70,6 +70,9 @@ public class OQLEngineImpl {
     final private static Logger LOGGER = Logger.getLogger(OQLEngineImpl.class.getName());
 
     private static boolean oqlSupported;
+    private static final String HAT_JS_RHINO = "/org/netbeans/modules/profiler/oql/engine/api/impl/hat.js"; // NOI18N
+    private static final String NASHORN_ID = "Oracle Nashorn";          // NOI18N
+    private static final String HAT_JS_NASHORN = "/org/netbeans/modules/profiler/oql/engine/api/impl/hat_nashorn.js"; // NOI18N
 
     static {
         try {
@@ -377,11 +380,13 @@ public class OQLEngineImpl {
 
     public Object unwrapJavaObject(Object object, boolean tryAssociativeArray) {
         if (object == null) return null;
-        boolean isNativeJS = object.getClass().getName().contains(".javascript."); // NOI18N
+        String className = object.getClass().getName();
+        boolean isNativeJS = className.contains(".javascript.")     // NOI18N
+                          || className.equals("jdk.nashorn.api.scripting.ScriptObjectMirror"); // NOI18N
 
         try {
             Object ret = ((Invocable)engine).invokeFunction("unwrapJavaObject", object); // NOI18N
-            if (isNativeJS && (ret == null || ret == object) && tryAssociativeArray) {
+            if (isNativeJS && (ret == null || ret.equals(object)) && tryAssociativeArray) {
                 ret = ((Invocable)engine).invokeFunction("unwrapMap", object); // NOI18N
             }
             return ret;
@@ -397,7 +402,7 @@ public class OQLEngineImpl {
         try {
             ScriptEngineManager manager = new ScriptEngineManager();
             engine = manager.getEngineByName("JavaScript"); // NOI18N
-            InputStream strm = getInitStream();
+            InputStream strm = getInitStream(engine.getFactory().getParameter(ScriptEngine.ENGINE));
             CompiledScript cs = ((Compilable)engine).compile(new InputStreamReader(strm));
             cs.eval();
             Object heap = ((Invocable)engine).invokeFunction("wrapHeapSnapshot", snapshot); // NOI18N
@@ -409,7 +414,15 @@ public class OQLEngineImpl {
         }
     }
 
-    private InputStream getInitStream() {
-        return getClass().getResourceAsStream("/org/netbeans/modules/profiler/oql/engine/api/impl/hat.js"); // NOI18N
+    private InputStream getInitStream(Object engineId) {
+        String hatjs;
+        
+        if (engineId != null && NASHORN_ID.equals(engineId.toString())) {
+            hatjs = HAT_JS_NASHORN;            
+        } else {
+            hatjs = HAT_JS_RHINO;
+        }
+//        System.out.println("Loading "+hatjs);
+        return getClass().getResourceAsStream(hatjs);
     }
 }
