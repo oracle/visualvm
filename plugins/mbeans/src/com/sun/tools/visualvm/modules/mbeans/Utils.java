@@ -67,7 +67,7 @@ class Utils {
     private static final Set<Class<?>> extraEditableClasses =
             new HashSet<Class<?>>(Arrays.asList(new Class<?>[] {
         BigDecimal.class, BigInteger.class, Number.class,
-        String.class, ObjectName.class}));
+        String.class, String[].class, ObjectName.class}));
     
     private static final Set<String> numericalTypes = new HashSet<String>();
     
@@ -357,6 +357,12 @@ class Utils {
             result = new Character(value.charAt(0));
         } else if (Number.class.isAssignableFrom(Utils.getClass(type))) {
             result = createNumberFromStringValue(type, value);
+        } else if (String[].class.isAssignableFrom(Utils.getClass(type))) {
+            String[] args = value.split(",");       // NOI18N
+            for (int i = 0; i < args.length; i++) {
+                args[i] = args[i].trim();
+            }
+            result = args;
         } else if (value == null || value.toString().equals("null")) { // NOI18N
             // hack for null value
             result = null;
