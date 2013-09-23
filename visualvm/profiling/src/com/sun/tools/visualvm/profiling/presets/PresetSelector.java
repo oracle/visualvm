@@ -89,6 +89,19 @@ public final class PresetSelector extends JPanel {
         return (ProfilerPreset)presetsCombo.getSelectedItem();
     }
     
+    public void synchronizeWith(final PresetSelector selector) {
+        // Need to invokeLater, to be called after updatePresets() in constructor
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (selector.customPreset != null) {
+                    customPreset = new ProfilerPreset(selector.customPreset);
+                    if (refSelector != null) refSelector.customPreset = customPreset;
+                }
+                updatePresets(selector.getSelectedPreset());
+            }
+        });
+    }
+    
     public ProfilerPreset customize(boolean presetValid) {
         if (customPreset == null) {
             customPreset = new ProfilerPreset(NbBundle.getMessage(

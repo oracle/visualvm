@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.profiling.presets.ProfilerMemoryPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.openide.util.NbBundle;
@@ -39,17 +40,22 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-abstract class MemorySettingsSupport {
+public abstract class MemorySettingsSupport {
     
     private JPanel container;
     private ProfilerMemoryPanel panel;
     private PresetSelector selector;
     
     
-    public DataViewComponent.DetailsView getDetailsView() {
+    DataViewComponent.DetailsView getDetailsView() {
         return new DataViewComponent.DetailsView(NbBundle.getMessage(
                 MemorySettingsSupport.class, "LBL_Memory_settings"), null, 20, // NOI18N
-                createPanel(), null);
+                getComponent(), null);
+    }
+    
+    public JComponent getComponent() {
+        if (container == null) createPanel();
+        return container;
     }
     
     
@@ -57,6 +63,11 @@ abstract class MemorySettingsSupport {
     
     public void saveSettings() {
         // NOTE: might save custom configuration here
+    }
+    
+    void copySettings(MemorySettingsSupport settings) {
+        getComponent(); // initialize selector
+        selector.synchronizeWith(settings.selector);
     }
     
     public abstract boolean presetValid();

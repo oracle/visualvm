@@ -161,6 +161,7 @@
             </module-dependencies>
             <friend-packages>
                 <friend>com.sun.tools.visualvm.profiler</friend>
+                <friend>com.sun.tools.visualvm.profiler.startup</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
                 <package>com.sun.tools.visualvm.profiling.presets</package>
                 <package>com.sun.tools.visualvm.profiling.snapshot</package>

@@ -116,14 +116,24 @@ public final class ProfilerPresets {
         });
     }
     
+    public PresetSelector createSelector(PresetSelector refSelector,
+                                         Runnable presetSync) {
+        return createSelector(null, refSelector, presetSync);
+    }
+    
     public PresetSelector createSelector(Application application,
                                          PresetSelector refSelector,
                                          Runnable presetSync) {
-        String mainClass = getMainClass(application);
-        if (mainClass == null || mainClass.isEmpty()) mainClass =
-                ApplicationTypeFactory.getApplicationTypeFor(application).getName();
-        if (mainClass == null || mainClass.isEmpty()) mainClass =
-                DataSourceDescriptorFactory.getDescriptor(application).getName();
+        
+        String mainClass = null;
+        
+        if (application != null) {
+            mainClass = getMainClass(application);
+            if (mainClass == null || mainClass.isEmpty()) mainClass =
+                    ApplicationTypeFactory.getApplicationTypeFor(application).getName();
+            if (mainClass == null || mainClass.isEmpty()) mainClass =
+                    DataSourceDescriptorFactory.getDescriptor(application).getName();
+        }
         
         ProfilerPreset toSelect = null;
         if (mainClass != null && !mainClass.isEmpty()) {
@@ -242,6 +252,8 @@ public final class ProfilerPresets {
     }
 
     private static String getDefaultRootsP(Application application) {
+        if (application == null) return NbBundle.getMessage(
+                ProfilerPresets.class, "HINT_Define_roots"); // NOI18N
         String mainClass = getMainClass(application);
         int dotIndex = mainClass.lastIndexOf("."); // NOI18N
         if (dotIndex == -1) return ""; // NOI18N
