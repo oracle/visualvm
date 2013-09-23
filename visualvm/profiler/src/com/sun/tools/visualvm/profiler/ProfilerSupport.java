@@ -427,12 +427,16 @@ public final class ProfilerSupport {
         selectProfilerView(application, null, null);
     }
     
-    private void selectProfilerView(Application application, CPUSettingsSupport cpu, MemorySettingsSupport memory) {
+    private void selectProfilerView(Application application, final CPUSettingsSupport cpu, final MemorySettingsSupport memory) {
         if (application == null) return;
-        DataSourceView activeView = profilerViewProvider.view(application);
+        final DataSourceView activeView = profilerViewProvider.view(application);
         if (activeView == null) return;
-        if (cpu != null || memory != null) ((ApplicationProfilerView)activeView).copySettings(cpu, memory);
-        DataSourceWindowManager.sharedInstance().selectView(activeView);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (cpu != null || memory != null) ((ApplicationProfilerView)activeView).copySettings(cpu, memory);
+                DataSourceWindowManager.sharedInstance().selectView(activeView);
+            }
+        });
     }
     
     
