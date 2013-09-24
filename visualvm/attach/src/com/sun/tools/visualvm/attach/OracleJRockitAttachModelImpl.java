@@ -34,7 +34,7 @@ import java.util.logging.Level;
  *
  * @author Tomas Hurka
  */
-public class OracleJRockitAttachModelImpl extends AttachModelImpl {
+class OracleJRockitAttachModelImpl extends AttachModelImpl {
     
     OracleJRockitAttachModelImpl(Application app) {
         super(app);

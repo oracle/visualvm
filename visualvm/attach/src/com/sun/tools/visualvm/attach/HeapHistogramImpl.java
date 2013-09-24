@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author Tomas Hurka
  */
-public class HeapHistogramImpl extends HeapHistogram {
+class HeapHistogramImpl extends HeapHistogram {
     private static final String BOOLEAN_TEXT = "boolean"; // NOI18N
     private static final String CHAR_TEXT = "char"; // NOI18N
     private static final String BYTE_TEXT = "byte"; // NOI18N

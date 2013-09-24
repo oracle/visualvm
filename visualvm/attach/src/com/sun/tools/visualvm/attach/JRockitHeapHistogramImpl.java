@@ -38,7 +38,7 @@ import java.util.Scanner;
  *
  * @author Tomas Hurka
  */
-public class JRockitHeapHistogramImpl extends HeapHistogramImpl {
+class JRockitHeapHistogramImpl extends HeapHistogramImpl {
     
     JRockitHeapHistogramImpl(InputStream in) {
         Map<String,ClassInfoImpl> classesMap = new HashMap(1024);

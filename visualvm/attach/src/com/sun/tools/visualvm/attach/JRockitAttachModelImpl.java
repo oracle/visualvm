@@ -31,7 +31,7 @@ import com.sun.tools.visualvm.application.Application;
  *
  * @author Tomas Hurka
  */
-public class JRockitAttachModelImpl extends OracleJRockitAttachModelImpl {
+class JRockitAttachModelImpl extends OracleJRockitAttachModelImpl {
     
     JRockitAttachModelImpl(Application app) {
         super(app);
