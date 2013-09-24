@@ -201,7 +201,7 @@ public abstract class JmxModel extends Model {
     public abstract String takeThreadDump();
 
     /**
-     * Returns the combined strack trace from each thread
+     * Returns the combined stack trace from each thread
      * whose ID is in the input array <tt>threadIds</tt>,
      * @param threadIds an array of thread IDs
      * @return Returns {@link String} representing combined stack traces
@@ -214,7 +214,7 @@ public abstract class JmxModel extends Model {
      * print VM option.
      * Note that VM option is the one which starts with
      * <CODE>-XX:</CODE>
-     * @param name name of VM option. For examle <CODE>HeapDumpOnOutOfMemoryError</CODE>
+     * @param name name of VM option. For example <CODE>HeapDumpOnOutOfMemoryError</CODE>
      * @return Text value of VM option. For example <CODE>true</CODE>
      * @since VisualVM 1.3
      */
