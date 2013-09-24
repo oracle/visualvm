@@ -280,7 +280,7 @@ public abstract class Jvm extends Model {
 
     /**
      * sets HeapDumpOnOutOfMemoryError flag on target JVM.
-     * @param enabled new vaule of HeapDumpOnOutOfMemoryError flag
+     * @param enabled new value of HeapDumpOnOutOfMemoryError flag
      */
     public abstract void setDumpOnOOMEnabled(boolean enabled);
 
@@ -314,7 +314,7 @@ public abstract class Jvm extends Model {
     
     /**
      * provides access to current values of monitored data in instance of {@link MonitoredData}. 
-     * The methods may return <CODE>null</CODE> if the {@link MonitoredData} are not avaialable
+     * The methods may return <CODE>null</CODE> if the {@link MonitoredData} are not available
      * or are not supported by particular {@link Jvm} instance.
      * @since VisualVM 1.2
      * @return instance of {@link MonitoredData} with current values of monitored data or
