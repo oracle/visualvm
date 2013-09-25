@@ -80,6 +80,7 @@ import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
@@ -127,7 +128,9 @@ import org.openide.util.Lookup;
     "ResultsManager_MemorySnapshotDisplayName=mem: {0}",
     "ResultsManager_HeapSnapshotDisplayName=heap: {0}",
     "MSG_SavingSnapshots=Saving Snapshots",
-    "MSG_SavingSnapshot=Saving Snapshot"
+    "MSG_SavingSnapshot=Saving Snapshot",
+    "ResultsManager_CaptionWarning=Warning",
+    "ResultsManager_DifferentObjectSize=<html><b>Object sizes are different.</b><br><br>Size of the same objects differ for each snapshot and their comparison is invalid.<br>The snapshots have likely been taken on different architectures (32bit vs. 64bit).</html>"
 })
 public final class ResultsManager {
     final private static Logger LOGGER = Logger.getLogger(ResultsManager.class.getName());
@@ -385,13 +388,35 @@ public final class ResultsManager {
         ResultsSnapshot diff = null;
 
         if (snap1 instanceof SampledMemoryResultsSnapshot && snap2 instanceof SampledMemoryResultsSnapshot) {
+            SampledMemoryResultsSnapshot sn1 = (SampledMemoryResultsSnapshot)snap1;
+            SampledMemoryResultsSnapshot sn2 = (SampledMemoryResultsSnapshot)snap2;
+            checkObjectSizes(sn1.getClassNames(), sn1.getObjectsCounts(), sn1.getObjectsSizePerClass(), 1,
+                             sn2.getClassNames(), sn2.getObjectsCounts(), sn2.getObjectsSizePerClass(), 1);
             diff = new SampledMemoryResultsDiff((SampledMemoryResultsSnapshot)snap1,
-                                              (SampledMemoryResultsSnapshot)snap2);
+                                                (SampledMemoryResultsSnapshot)snap2);
         } else if (snap1 instanceof AllocMemoryResultsSnapshot && snap2 instanceof AllocMemoryResultsSnapshot) {
+            AllocMemoryResultsSnapshot sn1 = (AllocMemoryResultsSnapshot)snap1;
+            AllocMemoryResultsSnapshot sn2 = (AllocMemoryResultsSnapshot)snap2;
+// Note: instrumented allocations not compared because of #236363
+//            ProfilingSettings sn1s = s1.getSettings();
+//            ProfilingSettings sn2s = s2.getSettings();
+//            checkObjectSizes(sn1.getClassNames(), sn1.getObjectsCounts(), sn1.getObjectsSizePerClass(), sn1s.getAllocTrackEvery(),
+//                             sn2.getClassNames(), sn2.getObjectsCounts(), sn2.getObjectsSizePerClass(), sn2s.getAllocTrackEvery());
+            checkObjectSizes(sn1.getClassNames(), sn1.getObjectsCounts(), sn1.getObjectsSizePerClass(), Integer.MAX_VALUE,
+                             sn2.getClassNames(), sn2.getObjectsCounts(), sn2.getObjectsSizePerClass(), Integer.MAX_VALUE);
             diff = new AllocMemoryResultsDiff((AllocMemoryResultsSnapshot)snap1,
                                               (AllocMemoryResultsSnapshot)snap2);
         }
         else if (snap1 instanceof LivenessMemoryResultsSnapshot && snap2 instanceof LivenessMemoryResultsSnapshot) {
+            LivenessMemoryResultsSnapshot sn1 = (LivenessMemoryResultsSnapshot)snap1;
+            LivenessMemoryResultsSnapshot sn2 = (LivenessMemoryResultsSnapshot)snap2;
+// Note: using track each 1 object to prevent unnecessary division, the data are always correct for liveness results
+//            ProfilingSettings sn1s = s1.getSettings();
+//            ProfilingSettings sn2s = s2.getSettings();
+//            checkObjectSizes(sn1.getClassNames(), sn1.getNTrackedLiveObjects(), sn1.getTrackedLiveObjectsSize(), sn1s.getAllocTrackEvery(),
+//                             sn2.getClassNames(), sn2.getNTrackedLiveObjects(), sn2.getTrackedLiveObjectsSize(), sn2s.getAllocTrackEvery());
+            checkObjectSizes(sn1.getClassNames(), sn1.getNTrackedLiveObjects(), sn1.getTrackedLiveObjectsSize(), 1,
+                             sn2.getClassNames(), sn2.getNTrackedLiveObjects(), sn2.getTrackedLiveObjectsSize(), 1);
             diff = new LivenessMemoryResultsDiff((LivenessMemoryResultsSnapshot)snap1,
                                                  (LivenessMemoryResultsSnapshot)snap2);
         }
@@ -408,6 +433,37 @@ public final class ResultsManager {
                                             s1.getFile().getName(), 
                                             s2.getFile().getName()));
         }
+    }
+    
+    static void checkObjectSizes(String[] names1, int[] counts1, long[] sizes1, int n1,
+                                 String[] names2, int[] counts2, long[] sizes2, int n2) {
+        String obj1 = "java.lang.Object"; // NOI18N // Sampled snapshots
+        String obj2 = "java/lang/Object"; // NOI18N // Instrumented snapshots
+        
+        int idx1 = -1;
+        for (int i = 0; i < names1.length; i++)
+            if (obj1.equals(names1[i]) || obj2.equals(names1[i])) {
+                idx1 = i;
+                break;
+            }
+        if (idx1 == -1) return; // Should not happen
+        
+        int idx2 = -1;
+        for (int i = 0; i < names2.length; i++)
+            if (obj1.equals(names2[i]) || obj2.equals(names2[i])) {
+                idx2 = i;
+                break;
+            }
+        if (idx2 == -1) return; // Should not happen
+        
+        // Note: instrumented allocations not compared because of #236363
+        long objsize1 = n1 == 1 ? sizes1[idx1] / counts1[idx1] : 0;
+        long objsize2 = n2 == 1 ? sizes2[idx2] / counts2[idx2] : 0;
+        
+        if (objsize1 != objsize2)
+            ProfilerDialogs.displayWarningDNSA(Bundle.ResultsManager_DifferentObjectSize(),
+                                               Bundle.ResultsManager_CaptionWarning(), null,
+                                               "ResultsManager.checkObjectSizes", false); // NOI18N
     }
 
     public void deleteSnapshot(FileObject snapshotFile) {
